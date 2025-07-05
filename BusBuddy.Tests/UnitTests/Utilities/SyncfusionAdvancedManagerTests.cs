@@ -56,9 +56,10 @@ namespace BusBuddy.Tests.UnitTests.Utilities
                 if (_dataGrid != null)
                 {
                     TestContext.WriteLine("Cleaning up SfDataGrid...");
-                    _dataGrid.DataSource = null;
-                    _dataGrid.Columns.Clear();
+                    // Clear grouping FIRST to avoid KeyNotFoundException during cleanup
                     _dataGrid.GroupColumnDescriptions.Clear();
+                    _dataGrid.Columns.Clear();
+                    _dataGrid.DataSource = null;
                 }
 
                 // Clean up main test object
