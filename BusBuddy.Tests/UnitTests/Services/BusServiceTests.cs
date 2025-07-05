@@ -19,6 +19,10 @@ namespace BusBuddy.Tests.UnitTests.Services
     /// Tests existing service functionality to ensure regression testing
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
+    [Parallelizable(ParallelScope.Children)]
+    [Category("Unit")]
+    [Category("Services")]
     public class BusServiceTests : TestBase
     {
         private IBusService _busService = null!;
@@ -261,3 +265,4 @@ namespace BusBuddy.Tests.UnitTests.Services
         }
     }
 }
+

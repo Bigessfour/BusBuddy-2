@@ -22,6 +22,7 @@ namespace BusBuddy.Tests.UnitTests.UI
     /// - Control initialization order and dependencies
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // TestBase database tests need to run sequentially
     [Apartment(ApartmentState.STA)] // Required for Windows Forms testing
     [Ignore("Disabled - SimplifiedSyncfusionUITests is active")]
     public class SyncfusionUITests : TestBase
@@ -36,3 +37,4 @@ namespace BusBuddy.Tests.UnitTests.UI
         }
     }
 }
+

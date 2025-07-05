@@ -19,6 +19,7 @@ namespace BusBuddy.Tests.UnitTests.Services
     /// PRIORITY: CRITICAL - Core student safety and transportation management
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
     public class StudentServiceTests : TestBase
     {
         private IStudentService _studentService = null!;
@@ -738,3 +739,4 @@ namespace BusBuddy.Tests.UnitTests.Services
         #endregion
     }
 }
+

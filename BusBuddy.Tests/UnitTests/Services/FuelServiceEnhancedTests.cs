@@ -20,6 +20,7 @@ namespace BusBuddy.Tests.UnitTests.Services
     /// This should resolve our Entity Framework tracking conflicts
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
 
     public class FuelServiceEnhancedTests : TestBase
     {
@@ -215,3 +216,4 @@ namespace BusBuddy.Tests.UnitTests.Services
         }
     }
 }
+

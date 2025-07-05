@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!-- Enable parallel execution -->
+    <MaxCpuCount>0</MaxCpuCount> <!-- Use all available processors -->
+    <DisableParallelization>false</DisableParallelization>
+  </RunConfiguration>
+  
+  <!-- NUnit specific settings -->
+  <NUnit>
+    <!-- Number of workers (0 = auto-detect based on CPU cores) -->
+    <NumberOfTestWorkers>0</NumberOfTestWorkers>
+    
+    <!-- Enable parallel execution at fixture level -->
+    <Parallelizable>true</Parallelizable>
+    
+    <!-- Default timeout for tests -->
+    <DefaultTimeout>30000</DefaultTimeout>
+    
+    <!-- Randomize test order -->
+    <RandomSeed>1234</RandomSeed>
+    
+    <!-- Work directory for tests -->
+    <WorkDirectory>TestResults</WorkDirectory>
+    
+    <!-- Verbose output -->
+    <Verbosity>1</Verbosity>
+  </NUnit>
+  
+  <!-- Data collection settings -->
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Include>[Bus_Buddy]*</Include>
+          <Exclude>[*Tests*]*,[*Test*]*</Exclude>
+          <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+          <ExcludeByFile>**/bin/**/*,**/obj/**/*,**/TestResults/**/*</ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

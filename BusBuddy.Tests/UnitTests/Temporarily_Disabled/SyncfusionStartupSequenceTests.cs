@@ -24,6 +24,7 @@ namespace BusBuddy.Tests.UnitTests.Utilities
     /// 6. Final UI polish and optimization
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // TestBase database tests need to run sequentially
     public class SyncfusionStartupSequenceTests : TestBase
     {
         private Form _testForm;
@@ -471,3 +472,4 @@ namespace BusBuddy.Tests.UnitTests.Utilities
         #endregion
     }
 }
+

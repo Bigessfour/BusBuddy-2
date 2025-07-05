@@ -24,7 +24,10 @@ namespace BusBuddy.Tests.UnitTests.Utilities
     /// </summary>
     [TestFixture]
     [Apartment(ApartmentState.STA)] // Required for Syncfusion Windows Forms controls
+    [NonParallelizable] // UI tests should run sequentially
     [Timeout(30000)] // 30 second overall timeout to prevent indefinite hangs
+    [Category("UI")]
+    [Category("Sequential")]
     public class SyncfusionLayoutManagerTests
     {
         private SfDataGrid _testDataGrid = null!;

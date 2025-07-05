@@ -16,6 +16,7 @@ namespace BusBuddy.Tests.UnitTests.Services
     /// Tests all 9 critical methods for activity/schedule management
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // TestBase database tests need to run sequentially
 
     public class ActivityServiceTests : TestBase
     {
@@ -636,3 +637,4 @@ namespace BusBuddy.Tests.UnitTests.Services
         #endregion
     }
 }
+

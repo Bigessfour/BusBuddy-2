@@ -10,6 +10,9 @@ namespace BusBuddy.Tests.UnitTests.Models
     /// These tests validate basic model properties and computed values
     /// </summary>
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
+    [Category("Unit")]
+    [Category("Models")]
     public class ModelValidationTests
     {
         [Test]

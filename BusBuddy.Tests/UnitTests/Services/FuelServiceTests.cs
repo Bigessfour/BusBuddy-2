@@ -13,6 +13,7 @@ namespace BusBuddy.Tests.UnitTests.Services
     /// This covers CRUD operations and fuel analytics without database dependencies
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
 
     public class FuelServiceTests : TestBase
     {
@@ -701,3 +702,4 @@ namespace BusBuddy.Tests.UnitTests.Services
 
     }
 }
+

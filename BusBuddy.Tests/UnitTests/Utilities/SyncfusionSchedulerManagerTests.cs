@@ -288,7 +288,15 @@ namespace BusBuddy.Tests.UnitTests.Utilities
         [TearDown]
         public void TearDown()
         {
-            _testForm?.Dispose();
+            try
+            {
+                _testForm?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"TearDown warning: {ex.Message}");
+                // Ignore disposal errors in test cleanup
+            }
         }
     }
 }

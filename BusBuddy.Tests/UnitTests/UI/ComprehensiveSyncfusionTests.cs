@@ -31,7 +31,10 @@ namespace BusBuddy.Tests.UnitTests.UI
     /// </summary>
     [TestFixture]
     [Apartment(ApartmentState.STA)] // Required for Syncfusion Windows Forms controls
+    [NonParallelizable] // UI tests should run sequentially
     [Category("SyncfusionComprehensive")]
+    [Category("UI")]
+    [Category("Sequential")]
     public class ComprehensiveSyncfusionTests : TestBase
     {
         private SfDataGrid _testDataGrid = null!;

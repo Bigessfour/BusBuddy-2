@@ -18,6 +18,7 @@ namespace BusBuddy.Tests.UnitTests.UnitOfWorkTests;
 /// - Category 1: Entity Framework patterns - Proper transaction handling
 /// </summary>
 [TestFixture]
+    [NonParallelizable] // TestBase database tests need to run sequentially
 public class UnitOfWorkTests : TestBase
 {
     private UnitOfWork _unitOfWork = null!;
@@ -563,3 +564,4 @@ public class UnitOfWorkTests : TestBase
 
     #endregion
 }
+

@@ -19,6 +19,7 @@ namespace BusBuddy.Tests.UnitTests.RepositoryTests;
 /// - Category 3: Safety-critical testing priorities
 /// </summary>
 [TestFixture]
+    [NonParallelizable] // TestBase database tests need to run sequentially
 public class RepositoryTests : TestBase
 {
     private Repository<Bus> _busRepository = null!;
@@ -532,4 +533,5 @@ public class RepositoryTests : TestBase
 
     #endregion
 }
+
 

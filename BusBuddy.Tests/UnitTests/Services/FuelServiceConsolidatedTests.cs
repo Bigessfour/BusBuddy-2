@@ -13,6 +13,7 @@ namespace BusBuddy.Tests.UnitTests.Services
     /// and the consolidated test base for consistent testing.
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
 
     public class FuelServiceConsolidatedTests : ConsolidatedTestBase
     {
@@ -297,3 +298,4 @@ namespace BusBuddy.Tests.UnitTests.Services
         }
     }
 }
+

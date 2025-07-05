@@ -15,6 +15,7 @@ namespace BusBuddy.Tests.UnitTests.Services;
 /// Created following 9-step testing methodology from TEST_COVERAGE_ANALYSIS.md
 /// </summary>
 [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
 
 public class MaintenanceServiceTests : TestBase
 {
@@ -904,3 +905,4 @@ public class MaintenanceServiceTests : TestBase
 
     #endregion
 }
+

@@ -11,7 +11,10 @@ namespace BusBuddy.Tests.UnitTests.Utilities
     /// </summary>
     [TestFixture]
     [Apartment(ApartmentState.STA)]
+    [NonParallelizable] // UI tests should run sequentially
     [Timeout(5000)] // 5 second max
+    [Category("UI")]
+    [Category("Sequential")]
     public class MinimalSyncfusionTests
     {
         [Test]

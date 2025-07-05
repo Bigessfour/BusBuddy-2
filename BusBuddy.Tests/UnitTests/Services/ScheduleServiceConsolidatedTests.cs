@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 namespace BusBuddy.Tests.UnitTests.Services
 {
     [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
     public class ScheduleServiceConsolidatedTests : ConsolidatedTestBase
     {
         private IScheduleService _scheduleService = null!;
@@ -375,3 +376,4 @@ namespace BusBuddy.Tests.UnitTests.Services
         }
     }
 }
+

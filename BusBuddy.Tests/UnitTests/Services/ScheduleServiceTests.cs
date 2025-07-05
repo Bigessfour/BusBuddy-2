@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Bus_Buddy.Data;
 using Bus_Buddy.Models;
 using Bus_Buddy.Services;
+using BusBuddy.Tests.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,20 +13,22 @@ using System.Threading.Tasks;
 namespace BusBuddy.Tests.UnitTests
 {
     [TestFixture]
+    [Category("Services")]
+    [NonParallelizable] // Database tests need to run sequentially to avoid DbContext conflicts
     public class ScheduleServiceTests
     {
         private BusBuddyDbContext _context;
         private ScheduleService _scheduleService;
-        private DbContextOptions<BusBuddyDbContext> _options;
 
         [SetUp]
         public void Setup()
         {
-            _options = new DbContextOptionsBuilder<BusBuddyDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            // Create a unique in-memory database for each test
+            var options = new DbContextOptionsBuilder<BusBuddyDbContext>()
+                .UseInMemoryDatabase(databaseName: $"TestDb_{Guid.NewGuid()}")
                 .Options;
 
-            _context = new BusBuddyDbContext(_options);
+            _context = new BusBuddyDbContext(options);
             _scheduleService = new ScheduleService(_context);
         }
 

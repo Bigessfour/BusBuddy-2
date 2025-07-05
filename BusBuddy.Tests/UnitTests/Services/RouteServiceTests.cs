@@ -20,6 +20,7 @@ namespace BusBuddy.Tests.UnitTests.Services
     /// Tests critical blocker fix: Missing RouteService implementation
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // Database tests need to run sequentially
     public class RouteServiceTests : TestBase
     {
         private IRouteService _routeService = null!;
@@ -392,3 +393,4 @@ namespace BusBuddy.Tests.UnitTests.Services
         }
     }
 }
+
