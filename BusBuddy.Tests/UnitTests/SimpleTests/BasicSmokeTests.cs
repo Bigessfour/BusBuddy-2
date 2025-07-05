@@ -165,7 +165,7 @@ namespace BusBuddy.Tests.UnitTests.SimpleTests
         {
             // Test actual Bus model validation logic
             var bus = new Bus();
-            
+
             // Exercise property setters/getters = COVERAGE!
             bus.BusNumber = "TEST123";
             bus.Make = "TestMake";
