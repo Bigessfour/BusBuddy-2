@@ -324,11 +324,12 @@ public class Bus : INotifyPropertyChanged
         get
         {
             if (!DateLastInspection.HasValue) return "Overdue";
-            var monthsSinceInspection = (DateTime.Now - DateLastInspection.Value).Days / 30;
+            var daysSinceInspection = (DateTime.Now - DateLastInspection.Value).TotalDays;
+            var monthsSinceInspection = daysSinceInspection / 30.0; // Use double for precision
             return monthsSinceInspection switch
             {
-                > 12 => "Overdue",
-                > 11 => "Due Soon",
+                > 12.0 => "Overdue",
+                > 11.0 => "Due Soon",
                 _ => "Current"
             };
         }

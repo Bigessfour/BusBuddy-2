@@ -144,17 +144,17 @@ public class Activity : INotifyPropertyChanged
         }
     }
 
-    [Required]
     [ForeignKey("Driver")]
     [Display(Name = "Driver")]
-    public int DriverId
+    public int? DriverId
     {
-        get => _driverId;
+        get => _driverId == 0 ? null : _driverId;
         set
         {
-            if (_driverId != value)
+            var newValue = value ?? 0;
+            if (_driverId != newValue)
             {
-                _driverId = value;
+                _driverId = newValue;
                 OnPropertyChanged();
             }
         }
@@ -380,7 +380,7 @@ public class Activity : INotifyPropertyChanged
     [NotMapped]
     public virtual Bus Vehicle => AssignedVehicle;
 
-    public virtual Driver Driver { get; set; } = null!;
+    public virtual Driver? Driver { get; set; }
 
     // Route navigation property for activities
     public virtual Route? Route { get; set; }

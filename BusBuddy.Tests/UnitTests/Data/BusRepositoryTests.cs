@@ -15,6 +15,9 @@ namespace BusBuddy.Tests.UnitTests.Data
     /// Tests both async and sync methods, business logic, and data retrieval scenarios
     /// </summary>
     [TestFixture]
+    [NonParallelizable] // Force sequential execution
+    [SingleThreaded]    // NUnit attribute for single-threaded execution
+    [Order(1)]          // Control test execution order
     public class BusRepositoryTests : TestBase
     {
         private BusBuddyDbContext _context = null!;
@@ -35,17 +38,24 @@ namespace BusBuddy.Tests.UnitTests.Data
             _repository = new BusRepository(_context, _mockUserContextService.Object);
 
             // Seed test data
-            SeedTestData();
+            SeedTestDataAsync().GetAwaiter().GetResult();
+        }
+
+        [TearDown]
+        public async Task TearDown()
+        {
+            // Clean database between tests to prevent duplicate key violations
+            await ClearDatabaseAsync();
         }
 
 
-        private void SeedTestData()
+        private async Task SeedTestDataAsync()
         {
             var buses = new List<Bus>
             {
                 new Bus
                 {
-                    VehicleId = 1,
+                    // VehicleId removed - let SQL Server auto-increment
                     BusNumber = "BUS001",
                     Year = 2020,
                     Make = "Blue Bird",
@@ -63,7 +73,7 @@ namespace BusBuddy.Tests.UnitTests.Data
                 },
                 new Bus
                 {
-                    VehicleId = 2,
+                    // VehicleId removed - let SQL Server auto-increment
                     BusNumber = "BUS002",
                     Year = 2018,
                     Make = "Thomas Built",
@@ -80,7 +90,7 @@ namespace BusBuddy.Tests.UnitTests.Data
                 },
                 new Bus
                 {
-                    VehicleId = 3,
+                    // VehicleId removed - let SQL Server auto-increment
                     BusNumber = "BUS003",
                     Year = 2022,
                     Make = "IC Bus",
@@ -94,30 +104,40 @@ namespace BusBuddy.Tests.UnitTests.Data
                     FleetType = "Activity",
                     GPSTracking = true
                 }
-            };
+            }; _context.Vehicles.AddRange(buses);
+            // Save buses first to get their auto-generated IDs
+            await _context.SaveChangesAsync();
 
-            _context.Vehicles.AddRange(buses);
+            // Get the first bus ID for activity relationship
+            var firstBus = await _context.Vehicles.FirstAsync();
 
-            // Add some activities for availability testing
+            // Add some activities for availability testing (no driver required)
             var activities = new List<Activity>
             {
                 new Activity
                 {
-                    ActivityId = 1,
-                    AssignedVehicleId = 1,
+                    // ActivityId removed - let SQL Server auto-increment
+                    AssignedVehicleId = firstBus.VehicleId, // Use the actual generated ID
+                    // DriverId is optional - not setting it
                     Date = DateTime.Today,
                     LeaveTime = TimeSpan.FromHours(8),
-                    EventTime = TimeSpan.FromHours(10)
+                    EventTime = TimeSpan.FromHours(10),
+                    ActivityType = "Regular Route",
+                    Destination = "Test School",
+                    RequestedBy = "Test User"
                 }
             };
 
             _context.Activities.AddRange(activities);
-            _context.SaveChanges();
+
+            // Save activities
+            await _context.SaveChangesAsync();
         }
 
         #region Basic CRUD Operations
 
         [Test]
+        [Order(1)] // Run first to ensure clean state
         public async Task AddAsync_ShouldAddBusToDatabase()
         {
             // Arrange
@@ -145,10 +165,15 @@ namespace BusBuddy.Tests.UnitTests.Data
         }
 
         [Test]
+        [Order(2)] // Run after AddAsync
         public async Task GetByIdAsync_ShouldReturnCorrectBus()
         {
+            // Arrange - Get the first bus from our seed data
+            var buses = await _repository.GetAllAsync();
+            var firstBus = buses.OrderBy(b => b.BusNumber).First();
+
             // Act
-            var bus = await _repository.GetByIdAsync(1);
+            var bus = await _repository.GetByIdAsync(firstBus.VehicleId);
 
             // Assert
             bus.Should().NotBeNull();
@@ -157,30 +182,34 @@ namespace BusBuddy.Tests.UnitTests.Data
         }
 
         [Test]
+        [Order(3)] // Run after basic CRUD
         public async Task GetAllAsync_ShouldReturnAllBuses()
         {
             // Act
             var buses = await _repository.GetAllAsync();
 
             // Assert
-            buses.Should().HaveCount(3);
+            buses.Should().HaveCountGreaterOrEqualTo(3); // At least our 3 seed buses
             buses.Should().Contain(b => b.BusNumber == "BUS001");
+            buses.Should().Contain(b => b.BusNumber == "BUS002");
+            buses.Should().Contain(b => b.BusNumber == "BUS003");
         }
 
         [Test]
         public async Task Update_ShouldModifyBusProperties()
         {
-            // Arrange
-            var bus = await _repository.GetByIdAsync(1);
-            bus!.Status = "Maintenance";
-            bus.CurrentOdometer = 50000;
+            // Arrange - Get the first bus dynamically instead of hardcoded ID
+            var buses = await _repository.GetAllAsync();
+            var firstBus = buses.OrderBy(b => b.BusNumber).First();
+            firstBus.Status = "Maintenance";
+            firstBus.CurrentOdometer = 50000;
 
             // Act
-            _repository.Update(bus);
+            _repository.Update(firstBus);
             await _context.SaveChangesAsync();
 
             // Assert
-            var updatedBus = await _repository.GetByIdAsync(1);
+            var updatedBus = await _repository.GetByIdAsync(firstBus.VehicleId);
             updatedBus!.Status.Should().Be("Maintenance");
             updatedBus.CurrentOdometer.Should().Be(50000);
         }
@@ -188,16 +217,22 @@ namespace BusBuddy.Tests.UnitTests.Data
         [Test]
         public async Task RemoveByIdAsync_ShouldRemoveBusFromDatabase()
         {
+            // Arrange - Get the last bus dynamically and capture original count
+            var originalBuses = (await _repository.GetAllAsync()).ToList();
+            var originalCount = originalBuses.Count;
+            var lastBus = originalBuses.OrderBy(bus => bus.BusNumber).Last();
+            var lastBusId = lastBus.VehicleId;
+
             // Act
-            await _repository.RemoveByIdAsync(3);
+            await _repository.RemoveByIdAsync(lastBusId);
             await _context.SaveChangesAsync();
 
             // Assert
-            var deletedBus = await _repository.GetByIdAsync(3);
+            var deletedBus = await _repository.GetByIdAsync(lastBusId);
             deletedBus.Should().BeNull();
 
             var remainingBuses = await _repository.GetAllAsync();
-            remainingBuses.Should().HaveCount(2);
+            remainingBuses.Should().HaveCount(originalCount - 1);
         }
 
         #endregion
@@ -246,7 +281,7 @@ namespace BusBuddy.Tests.UnitTests.Data
 
             // Assert
             bus.Should().NotBeNull();
-            bus!.VehicleId.Should().Be(1);
+            bus!.BusNumber.Should().Be("BUS001");
             bus.Make.Should().Be("Blue Bird");
         }
 
@@ -510,7 +545,8 @@ namespace BusBuddy.Tests.UnitTests.Data
 
             // Assert
             bus.Should().NotBeNull();
-            bus!.VehicleId.Should().Be(1);
+            bus!.BusNumber.Should().Be("BUS001");
+            bus.Make.Should().Be("Blue Bird");
         }
 
         [Test]

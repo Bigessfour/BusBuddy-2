@@ -324,25 +324,41 @@ public class StudentService : IStudentService
             // Route validation (if routes exist in database)
             if (!string.IsNullOrWhiteSpace(student.AMRoute))
             {
-                var amRouteExists = await _context.Routes.AnyAsync(r => r.RouteName == student.AMRoute);
-                if (!amRouteExists)
+                try
                 {
+                    var amRouteExists = await _context.Routes.AnyAsync(r => r.RouteName == student.AMRoute);
+                    if (!amRouteExists)
+                    {
+                        errors.Add($"AM Route '{student.AMRoute}' does not exist");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error validating AM route: {AMRoute}", student.AMRoute);
                     errors.Add($"AM Route '{student.AMRoute}' does not exist");
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(student.PMRoute))
             {
-                var pmRouteExists = await _context.Routes.AnyAsync(r => r.RouteName == student.PMRoute);
-                if (!pmRouteExists)
+                try
                 {
+                    var pmRouteExists = await _context.Routes.AnyAsync(r => r.RouteName == student.PMRoute);
+                    if (!pmRouteExists)
+                    {
+                        errors.Add($"PM Route '{student.PMRoute}' does not exist");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error validating PM route: {PMRoute}", student.PMRoute);
                     errors.Add($"PM Route '{student.PMRoute}' does not exist");
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during student validation");
+            _logger.LogError(ex, "Error during basic student validation");
             errors.Add("Validation error occurred");
         }
 

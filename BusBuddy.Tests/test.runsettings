@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
   <RunConfiguration>
-    <!-- Enable parallel execution -->
-    <MaxCpuCount>0</MaxCpuCount> <!-- Use all available processors -->
-    <DisableParallelization>false</DisableParallelization>
+    <!-- Completely disable parallel execution for database tests -->
+    <MaxCpuCount>1</MaxCpuCount> <!-- Use single processor only -->
+    <DisableParallelization>true</DisableParallelization>
+    
+    <!-- Force sequential execution -->
+    <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
+    <TestSessionTimeout>600000</TestSessionTimeout> <!-- 10 minutes total timeout -->
   </RunConfiguration>
   
   <!-- NUnit specific settings -->
   <NUnit>
-    <!-- Number of workers (0 = auto-detect based on CPU cores) -->
-    <NumberOfTestWorkers>0</NumberOfTestWorkers>
+    <!-- Force single worker for sequential execution -->
+    <NumberOfTestWorkers>1</NumberOfTestWorkers>
     
-    <!-- Enable parallel execution at fixture level -->
-    <Parallelizable>true</Parallelizable>
+    <!-- Completely disable parallel execution at all levels -->
+    <Parallelizable>false</Parallelizable>
+    
+    <!-- Synchronize test execution -->
+    <SynchronousEvents>true</SynchronousEvents>
+    
+    <!-- Force deterministic test order -->
+    <RandomSeed>0</RandomSeed> <!-- Deterministic seed instead of random -->
     
     <!-- Default timeout for tests -->
     <DefaultTimeout>30000</DefaultTimeout>
-    
-    <!-- Randomize test order -->
-    <RandomSeed>1234</RandomSeed>
     
     <!-- Work directory for tests -->
     <WorkDirectory>TestResults</WorkDirectory>

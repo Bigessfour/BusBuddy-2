@@ -297,7 +297,8 @@ namespace BusBuddy.Tests.UnitTests.Models
         public void InspectionStatus_WhenInspectionIsAlmostDue_ShouldReturnDueSoon()
         {
             // Arrange - Set inspection to exactly 370 days ago (370/30 = 12.33 months, which is > 11 but <= 12)
-            _bus.DateLastInspection = DateTime.Now.AddDays(-370);
+            // 345 days = 11.5 months (between 11 and 12, should be "Due Soon")
+            _bus.DateLastInspection = DateTime.Now.AddDays(-345);
 
             // Act
             var status = _bus.InspectionStatus;

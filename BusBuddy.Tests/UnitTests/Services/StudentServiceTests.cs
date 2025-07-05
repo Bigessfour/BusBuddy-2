@@ -29,10 +29,10 @@ namespace BusBuddy.Tests.UnitTests.Services
         [SetUp]
         public void Setup()
         {
-            // Manually construct the in-memory DbContext after setting SkipGlobalSeedData
-            _testDbContext = CreateInMemoryDbContext();
+            // Use the inherited LocalDB context from TestBase
+            _testDbContext = DbContext;
 
-            // Build a DI container for this test, registering _testDbContext as the context instance
+            // Build a DI container for this test, registering the inherited DbContext
             var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
             services.AddLogging();
             services.AddSingleton<BusBuddyDbContext>(_testDbContext);
