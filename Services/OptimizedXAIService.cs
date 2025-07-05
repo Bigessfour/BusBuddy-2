@@ -40,7 +40,6 @@ namespace BusBuddy.Services
         private readonly SemaphoreSlim _batchSemaphore;
         private readonly SemaphoreSlim _concurrencySemaphore;
         private readonly System.Threading.Timer _batchTimer;
-        private readonly int _maxRetries = 3;
         private readonly int _retryPolicy = 3; // Simple retry count for requests
 
         // Performance Monitoring
@@ -114,7 +113,7 @@ namespace BusBuddy.Services
         /// <summary>
         /// Process a single request with optimization features
         /// </summary>
-        public async Task<string> ProcessRequestAsync(string prompt, string context = null)
+        public async Task<string> ProcessRequestAsync(string prompt, string? context = null)
         {
             _requestCount.Add(1);
             var stopwatch = Stopwatch.StartNew();
@@ -203,7 +202,7 @@ namespace BusBuddy.Services
             using var reader = new StreamReader(stream);
 
             int totalTokens = 0;
-            string line;
+            string? line;
             while ((line = await reader.ReadLineAsync()) != null)
             {
                 if (string.IsNullOrEmpty(line) || !line.StartsWith("data: ")) continue;
@@ -224,10 +223,10 @@ namespace BusBuddy.Services
                 }
 
                 // Yield outside try-catch
-                if (chunk?.Choices?.Length > 0 && !string.IsNullOrEmpty(chunk.Choices[0].Delta?.Content))
+                if (chunk?.Choices?.Length > 0 && chunk.Choices[0].Delta?.Content is string deltaContent && !string.IsNullOrEmpty(deltaContent))
                 {
-                    totalTokens += EstimateTokens(chunk.Choices[0].Delta.Content);
-                    yield return chunk.Choices[0].Delta.Content;
+                    totalTokens += EstimateTokens(deltaContent);
+                    yield return deltaContent;
                 }
                 continue;
             }
@@ -262,7 +261,7 @@ namespace BusBuddy.Services
         /// <summary>
         /// Optimize prompts for token efficiency
         /// </summary>
-        private string OptimizePrompt(string userInput, string context = null)
+        private string OptimizePrompt(string userInput, string? context = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
                 return string.Empty;
@@ -314,7 +313,7 @@ namespace BusBuddy.Services
         {
             var cacheKey = ComputeCacheKey(prompt);
 
-            if (_cache.TryGetValue(cacheKey, out string cachedResponse))
+            if (_cache.TryGetValue(cacheKey, out string? cachedResponse) && cachedResponse != null)
             {
                 _cacheHits.Add(1);
                 _logger.LogDebug("Cache hit for prompt hash: {CacheKey}", cacheKey);
@@ -335,7 +334,7 @@ namespace BusBuddy.Services
         /// </summary>
         private async Task<string> ExecuteApiRequestAsync(string prompt)
         {
-            Exception lastException = null;
+            Exception? lastException = null;
 
             for (int attempt = 0; attempt < _retryPolicy; attempt++)
             {

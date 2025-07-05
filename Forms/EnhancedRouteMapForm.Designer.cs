@@ -5,7 +5,9 @@ namespace Bus_Buddy.Forms
         /// <summary>
         /// Required designer variable.
         /// </summary>
+#pragma warning disable CS0414 // Field is assigned but never used
         private System.ComponentModel.IContainer components = null;
+#pragma warning restore CS0414
 
         #region Windows Form Designer generated code
 

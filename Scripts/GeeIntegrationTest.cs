@@ -93,16 +93,16 @@ namespace Bus_Buddy.Scripts
             return allTestsPassed;
         }
 
-        private async Task<bool> TestConfiguration()
+        private Task<bool> TestConfiguration()
         {
             if (!_geeService.IsConfigured)
             {
                 _logger.LogError("Google Earth Engine is not configured. Check appsettings.json");
-                return false;
+                return Task.FromResult(false);
             }
 
             _logger.LogInformation("Configuration appears valid");
-            return true;
+            return Task.FromResult(true);
         }
 
         private async Task<bool> TestSatelliteImagery()

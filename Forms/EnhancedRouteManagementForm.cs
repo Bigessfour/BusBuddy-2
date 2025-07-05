@@ -105,7 +105,7 @@ namespace Bus_Buddy.Forms
             Controls.Add(optimizationResultsLabel);
         }
 
-        private async void OptimizeRouteWithGEE_Click(object sender, EventArgs e)
+        private async void OptimizeRouteWithGEE_Click(object? sender, EventArgs e)
         {
             if (!_geeService.IsConfigured)
             {
@@ -116,7 +116,7 @@ namespace Bus_Buddy.Forms
 
             try
             {
-                optimizeRouteButton.Text = "🔄 Analyzing...";
+                optimizeRouteButton!.Text = "🔄 Analyzing...";
                 optimizeRouteButton.Enabled = false;
 
                 _logger.LogInformation("Starting Google Earth Engine route optimization");
@@ -175,7 +175,7 @@ namespace Bus_Buddy.Forms
 💡 RECOMMENDATIONS:
 {string.Join(Environment.NewLine, efficiency?.RecommendedImprovements?.Take(3) ?? new[] { "Optimize during off-peak hours" })}";
 
-                optimizationResultsLabel.Text = optimizationSummary;
+                optimizationResultsLabel!.Text = optimizationSummary;
                 optimizationResultsLabel.BackColor = Color.FromArgb(240, 255, 240); // Light green for success
 
                 // Load satellite imagery for the route
@@ -190,7 +190,7 @@ namespace Bus_Buddy.Forms
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during Google Earth Engine route optimization");
-                optimizationResultsLabel.Text = $"❌ Optimization failed: {ex.Message}";
+                optimizationResultsLabel!.Text = $"❌ Optimization failed: {ex.Message}";
                 optimizationResultsLabel.BackColor = Color.FromArgb(255, 240, 240); // Light red for error
 
                 MessageBoxAdv.Show($"Optimization error: {ex.Message}",
@@ -198,16 +198,16 @@ namespace Bus_Buddy.Forms
             }
             finally
             {
-                optimizeRouteButton.Text = "🌍 AI Optimize Route";
+                optimizeRouteButton!.Text = "🌍 AI Optimize Route";
                 optimizeRouteButton.Enabled = true;
             }
         }
 
-        private async void WeatherAnalysis_Click(object sender, EventArgs e)
+        private async void WeatherAnalysis_Click(object? sender, EventArgs e)
         {
             try
             {
-                weatherAnalysisButton.Text = "🔄 Loading...";
+                weatherAnalysisButton!.Text = "🔄 Loading...";
                 weatherAnalysisButton.Enabled = false;
 
                 var weather = await _geeService.GetWeatherDataAsync();
@@ -232,12 +232,12 @@ Wind: {weather?.WindCondition}
             }
             finally
             {
-                weatherAnalysisButton.Text = "🌦️ Weather Impact";
+                weatherAnalysisButton!.Text = "🌦️ Weather Impact";
                 weatherAnalysisButton.Enabled = true;
             }
         }
 
-        private async void TerrainAnalysis_Click(object sender, EventArgs e)
+        private async void TerrainAnalysis_Click(object? sender, EventArgs e)
         {
             var selectedRoute = GetSelectedRoute();
             if (selectedRoute == null)
@@ -249,7 +249,7 @@ Wind: {weather?.WindCondition}
 
             try
             {
-                terrainAnalysisButton.Text = "🔄 Analyzing...";
+                terrainAnalysisButton!.Text = "🔄 Analyzing...";
                 terrainAnalysisButton.Enabled = false;
 
                 // Use school coordinates for route terrain analysis since routes are fixed daily paths
@@ -281,7 +281,7 @@ Difficulty Rating: {terrain?.RouteDifficulty}
             }
             finally
             {
-                terrainAnalysisButton.Text = "🏔️ Terrain Analysis";
+                terrainAnalysisButton!.Text = "🏔️ Terrain Analysis";
                 terrainAnalysisButton.Enabled = true;
             }
         }
@@ -297,7 +297,7 @@ Difficulty Rating: {terrain?.RouteDifficulty}
                 var imagery = await _geeService.GetSatelliteImageryAsync("roads", schoolLat, schoolLon);
 
                 // Create a placeholder satellite image visualization
-                var graphics = satelliteImagePanel.CreateGraphics();
+                var graphics = satelliteImagePanel!.CreateGraphics();
                 graphics.Clear(Color.LightBlue);
 
                 // Draw route representation

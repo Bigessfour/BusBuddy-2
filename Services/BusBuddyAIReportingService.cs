@@ -38,13 +38,13 @@ namespace BusBuddy.Services
             _logger = logger;
             _transportationContext = transportationContext;
             _promptBuilder = promptBuilder;
-            _apiKey = configuration["XAI:ApiKey"];
+            _apiKey = configuration["XAI:ApiKey"] ?? throw new ArgumentException("XAI:ApiKey configuration is required");
         }
 
         /// <summary>
         /// Generate comprehensive AI reports with context awareness and performance monitoring
         /// </summary>
-        public async Task<AIReportResponse> GenerateReportAsync(string reportType, string location = null, Dictionary<string, object> parameters = null)
+        public async Task<AIReportResponse> GenerateReportAsync(string reportType, string? location = null, Dictionary<string, object>? parameters = null)
         {
             var startTime = DateTime.UtcNow;
             var operationId = Guid.NewGuid().ToString();
@@ -57,7 +57,7 @@ namespace BusBuddy.Services
                 var contextData = await _transportationContext.GetContextDataAsync("BusBuddy");
 
                 // Build context-aware prompt
-                var prompt = await _promptBuilder.BuildReportPromptAsync(reportType, location, contextData, parameters);
+                var prompt = await _promptBuilder.BuildReportPromptAsync(reportType, location ?? "Unknown", contextData, parameters ?? new Dictionary<string, object>());
 
                 // Make AI API call with retry logic
                 var aiResponse = await CallAIWithRetryAsync(prompt, operationId);
@@ -74,7 +74,7 @@ namespace BusBuddy.Services
                 };
 
                 // Cache the response
-                await CacheReportAsync(reportType, reportResponse);
+                CacheReportAsync(reportType, reportResponse);
 
                 var duration = DateTime.UtcNow - startTime;
                 _logger.LogInformation("AI report generated successfully: {ReportType}, Duration: {Duration}ms, Tokens: {Tokens}",
@@ -163,7 +163,7 @@ namespace BusBuddy.Services
         /// <summary>
         /// Cache AI report responses to improve performance and reduce costs
         /// </summary>
-        private async Task CacheReportAsync(string reportType, AIReportResponse response)
+        private void CacheReportAsync(string reportType, AIReportResponse response)
         {
             var cacheKey = $"AIReport_{reportType}_{DateTime.UtcNow:yyyyMMddHH}";
             var cacheOptions = new MemoryCacheEntryOptions
@@ -180,7 +180,7 @@ namespace BusBuddy.Services
         /// <summary>
         /// Get cached report if available
         /// </summary>
-        public bool TryGetCachedReport(string reportType, out AIReportResponse cachedReport)
+        public bool TryGetCachedReport(string reportType, out AIReportResponse? cachedReport)
         {
             var cacheKey = $"AIReport_{reportType}_{DateTime.UtcNow:yyyyMMddHH}";
             return _cache.TryGetValue(cacheKey, out cachedReport);
@@ -195,7 +195,7 @@ namespace BusBuddy.Services
                     .GetProperty("choices")[0]
                     .GetProperty("message")
                     .GetProperty("content")
-                    .GetString();
+                    .GetString() ?? "Error parsing AI response";
             }
             catch (Exception ex)
             {
@@ -245,7 +245,7 @@ namespace BusBuddy.Services
         {
             var cacheKey = $"{CACHE_KEY_PREFIX}{contextId}";
 
-            if (_cache.TryGetValue(cacheKey, out TransportationData cachedData))
+            if (_cache.TryGetValue(cacheKey, out TransportationData? cachedData) && cachedData != null)
             {
                 _logger.LogDebug("Retrieved transportation context from cache: {ContextId}", contextId);
                 return cachedData;
@@ -273,12 +273,11 @@ namespace BusBuddy.Services
             _logger.LogDebug("Invalidated transportation context cache: {ContextId}", contextId);
         }
 
-        private async Task<TransportationData> FetchContextDataFromSourceAsync(string contextId)
+        private Task<TransportationData> FetchContextDataFromSourceAsync(string contextId)
         {
             // Simulate fetching real transportation data
-            await Task.Delay(50);
-
-            return new TransportationData
+            // Removed async/await since this is just simulation
+            var data = new TransportationData
             {
                 ContextId = contextId,
                 TotalBuses = 25,
@@ -289,6 +288,8 @@ namespace BusBuddy.Services
                 CurrentWeather = "Clear, 72°F",
                 TrafficStatus = "Normal"
             };
+
+            return Task.FromResult(data);
         }
     }
 
@@ -304,7 +305,7 @@ namespace BusBuddy.Services
             _logger = logger;
         }
 
-        public async Task<string> BuildReportPromptAsync(string reportType, string location, TransportationData context, Dictionary<string, object> parameters)
+        public Task<string> BuildReportPromptAsync(string reportType, string location, TransportationData context, Dictionary<string, object> parameters)
         {
             var basePrompt = PromptTemplates.GetReportPrompt(reportType);
             var contextPrompt = BuildContextSection(context);
@@ -320,7 +321,7 @@ CURRENT SYSTEM CONTEXT:
 Please provide a comprehensive analysis with specific recommendations and actionable insights for the Bus Buddy transportation system.";
 
             _logger.LogDebug("Built context-aware prompt for {ReportType}, length: {Length} characters", reportType, fullPrompt.Length);
-            return fullPrompt;
+            return Task.FromResult(fullPrompt);
         }
 
         private string BuildContextSection(TransportationData context)
@@ -423,18 +424,18 @@ As Bus Buddy AI route optimization expert, provide:
     // Data Models
     public class AIReportResponse
     {
-        public string ReportType { get; set; }
-        public string Content { get; set; }
+        public required string ReportType { get; set; }
+        public required string Content { get; set; }
         public DateTime GeneratedAt { get; set; }
-        public string OperationId { get; set; }
-        public TokenUsage TokenUsage { get; set; }
-        public TransportationData ContextData { get; set; }
+        public required string OperationId { get; set; }
+        public required TokenUsage TokenUsage { get; set; }
+        public required TransportationData ContextData { get; set; }
     }
 
     public class AIApiResponse
     {
-        public string Content { get; set; }
-        public TokenUsage Usage { get; set; }
+        public required string Content { get; set; }
+        public required TokenUsage Usage { get; set; }
     }
 
     public class TokenUsage
@@ -446,13 +447,13 @@ As Bus Buddy AI route optimization expert, provide:
 
     public class TransportationData
     {
-        public string ContextId { get; set; }
+        public required string ContextId { get; set; }
         public int TotalBuses { get; set; }
         public int TotalRoutes { get; set; }
         public int TotalStudents { get; set; }
         public double AverageEfficiency { get; set; }
         public int ActiveDrivers { get; set; }
-        public string CurrentWeather { get; set; }
-        public string TrafficStatus { get; set; }
+        public required string CurrentWeather { get; set; }
+        public required string TrafficStatus { get; set; }
     }
 }

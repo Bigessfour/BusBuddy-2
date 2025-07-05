@@ -50,7 +50,8 @@ namespace Bus_Buddy.Tests
                     .AddLogging(builder => builder.AddConsole())
                     .BuildServiceProvider();
 
-                var logger = serviceProvider.GetService<ILogger<GoogleEarthEngineService>>();
+                var logger = serviceProvider.GetService<ILogger<GoogleEarthEngineService>>()
+                    ?? throw new InvalidOperationException("Logger service not available");
 
                 // Initialize service (fix constructor parameter order)
                 var geeService = new GoogleEarthEngineService(logger, configuration);

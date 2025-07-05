@@ -20,9 +20,9 @@ namespace BusBuddy.Forms
         private SfDataGrid? busReportsGrid;
         private BindingList<BusReportViewModel>? busReportsData;
         private readonly BusRepository _busRepository;
-        private Button refreshButton;
-        private Button exportButton;
-        private Label statusLabel;
+        private Button refreshButton = null!;
+        private Button exportButton = null!;
+        private Label statusLabel = null!;
 
         public BusReportsForm(BusRepository busRepository)
         {
@@ -155,7 +155,7 @@ namespace BusBuddy.Forms
             await LoadBusReportDataAsync();
         }
 
-        private void ExportButton_Click(object sender, EventArgs e)
+        private void ExportButton_Click(object? sender, EventArgs e)
         {
             MessageBox.Show("Export functionality will be implemented with Syncfusion's export features",
                 "Export", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -184,12 +184,12 @@ namespace BusBuddy.Forms
         /// <summary>
         /// Additional methods leveraging existing repository capabilities
         /// </summary>
-        public async Task LoadMaintenanceDueBusesAsync()
+        public void LoadMaintenanceDueBuses()
         {
             MessageBox.Show("Maintenance due bus filtering is not implemented. Please add this feature to BusRepository if needed.", "Not Implemented", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        public async Task LoadInspectionDueBusesAsync()
+        public void LoadInspectionDueBuses()
         {
             MessageBox.Show("Inspection due bus filtering is not implemented. Please add this feature to BusRepository if needed.", "Not Implemented", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }

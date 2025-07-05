@@ -560,7 +560,7 @@ namespace Bus_Buddy.Forms
                 if (_routeGrid?.SelectedItem is Route selectedRoute)
                 {
                     _selectedRoute = selectedRoute;
-                    await LoadRouteDetails(selectedRoute);
+                    LoadRouteDetails(selectedRoute);
                     await LoadTerrainAnalysis(selectedRoute);
                     await LoadWeatherTrafficData();
                 }
@@ -614,7 +614,7 @@ namespace Bus_Buddy.Forms
             }
         }
 
-        private async Task LoadRouteDetails(Route route)
+        private void LoadRouteDetails(Route route)
         {
             try
             {
@@ -851,7 +851,7 @@ namespace Bus_Buddy.Forms
                 // Refresh selected route data
                 if (_selectedRoute != null)
                 {
-                    await LoadRouteDetails(_selectedRoute);
+                    LoadRouteDetails(_selectedRoute);
                     await LoadTerrainAnalysis(_selectedRoute);
                 }
 

@@ -24,28 +24,28 @@ namespace Bus_Buddy.Forms
         private readonly GoogleEarthEngineService _geeService;
 
         // UI Components
-        private TabControlAdv mainTabControl;
-        private TabPageAdv summaryTab;
-        private TabPageAdv chatTab;
+        private TabControlAdv mainTabControl = null!;
+        private TabPageAdv summaryTab = null!;
+        private TabPageAdv chatTab = null!;
 
         // Chat Components
-        private Panel chatPanel;
-        private RichTextBox chatHistory;
-        private TextBox chatInput;
-        private SfButton sendButton;
-        private SfButton clearButton;
-        private ComboBox queryTypeCombo;
-        private Panel chatControlsPanel;
+        private Panel chatPanel = null!;
+        private RichTextBox chatHistory = null!;
+        private TextBox chatInput = null!;
+        private SfButton sendButton = null!;
+        private SfButton clearButton = null!;
+        private ComboBox queryTypeCombo = null!;
+        private Panel chatControlsPanel = null!;
 
         // Fleet Summary Components (existing)
-        private Panel summaryContentPanel;
-        private AutoLabel summaryTitle;
-        private AutoLabel statsLabel;
-        private HubTile fleetTile;
-        private HubTile routesTile;
-        private HubTile activeTile;
-        private HubTile maintenanceTile;
-        private HubTile capacityTile;
+        private Panel summaryContentPanel = null!;
+        private AutoLabel summaryTitle = null!;
+        private AutoLabel statsLabel = null!;
+        private HubTile fleetTile = null!;
+        private HubTile routesTile = null!;
+        private HubTile activeTile = null!;
+        private HubTile maintenanceTile = null!;
+        private HubTile capacityTile = null!;
 
         // Chat history storage
         private List<ChatMessage> chatMessages = new List<ChatMessage>();
@@ -268,7 +268,7 @@ namespace Bus_Buddy.Forms
 
         #region Chat Event Handlers
 
-        private void ChatInput_KeyPress(object sender, KeyPressEventArgs e)
+        private void ChatInput_KeyPress(object? sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
@@ -277,12 +277,12 @@ namespace Bus_Buddy.Forms
             }
         }
 
-        private void SendButton_Click(object sender, EventArgs e)
+        private void SendButton_Click(object? sender, EventArgs e)
         {
             ProcessChatMessage();
         }
 
-        private void ClearButton_Click(object sender, EventArgs e)
+        private void ClearButton_Click(object? sender, EventArgs e)
         {
             chatHistory.Clear();
             chatMessages.Clear();

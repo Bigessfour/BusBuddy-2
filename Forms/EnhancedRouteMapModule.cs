@@ -43,7 +43,6 @@ namespace Bus_Buddy.Forms
 
         // Route Management
         private ListView? _routeListView;
-        private Panel? _routeDetailsPanel;
         private ButtonAdv? _addRouteButton;
         private ButtonAdv? _editRouteButton;
         private ButtonAdv? _deleteRouteButton;

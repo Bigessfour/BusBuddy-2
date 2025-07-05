@@ -47,9 +47,9 @@ public class StudentRepository : Repository<Student>, IStudentRepository
 
         return await Query()
             .Where(s => s.Active &&
-                       (s.StudentName.Contains(searchTerm) ||
-                        s.StudentNumber.Contains(searchTerm) ||
-                        s.School.Contains(searchTerm)))
+                       (s.StudentName != null && s.StudentName.Contains(searchTerm) ||
+                        s.StudentNumber != null && s.StudentNumber.Contains(searchTerm) ||
+                        s.School != null && s.School.Contains(searchTerm)))
             .OrderBy(s => s.StudentName)
             .ToListAsync();
     }
@@ -172,8 +172,8 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public async Task<Dictionary<string, int>> GetStudentCountByGradeAsync()
     {
         return await Query()
-            .Where(s => s.Active)
-            .GroupBy(s => s.Grade)
+            .Where(s => s.Active && s.Grade != null)
+            .GroupBy(s => s.Grade!)
             .ToDictionaryAsync(g => g.Key, g => g.Count());
     }
 
