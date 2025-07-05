@@ -9,6 +9,7 @@ using Bus_Buddy.Services;
 using Bus_Buddy.Forms;
 using Bus_Buddy.Data.Repositories;
 using Bus_Buddy.Utilities;
+using BusBuddy.Services;
 
 namespace Bus_Buddy.Forms
 {
@@ -269,7 +270,8 @@ namespace Bus_Buddy.Forms
                 var dashboardLogger = _serviceProvider.GetRequiredService<ILogger<Dashboard>>();
                 var xaiService = _serviceProvider.GetRequiredService<XAIService>();
                 var geeService = _serviceProvider.GetRequiredService<GoogleEarthEngineService>();
-                _embeddedDashboard = new Dashboard(dashboardLogger, _busService, _configService, xaiService, geeService, _serviceProvider);
+                var aiReportingService = _serviceProvider.GetRequiredService<BusBuddyAIReportingService>();
+                _embeddedDashboard = new Dashboard(dashboardLogger, _busService, _configService, xaiService, geeService, aiReportingService, _serviceProvider);
 
                 // Embed the dashboard in the left panel
                 _embeddedDashboard.TopLevel = false;
@@ -314,7 +316,9 @@ namespace Bus_Buddy.Forms
 
                 // Create and add the Enhanced Dashboard Analytics
                 var analyticsLogger = _serviceProvider.GetRequiredService<ILogger<EnhancedDashboardAnalytics>>();
-                var analyticsPanel = new EnhancedDashboardAnalytics(analyticsLogger, _busRepository, _busService)
+                var aiReportingService = _serviceProvider.GetRequiredService<BusBuddyAIReportingService>();
+                var routeOptimizationService = _serviceProvider.GetRequiredService<SmartRouteOptimizationService>();
+                var analyticsPanel = new EnhancedDashboardAnalytics(analyticsLogger, _busRepository, _busService, aiReportingService, routeOptimizationService)
                 {
                     Dock = DockStyle.Fill
                 };

@@ -1,11 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Http;
 using Bus_Buddy.Data;
 using Bus_Buddy.Data.Interfaces;
 using Bus_Buddy.Data.Repositories;
 using Bus_Buddy.Data.UnitOfWork;
 using Bus_Buddy.Services;
+using BusBuddy.Services;
 
 namespace Bus_Buddy.Extensions;
 
@@ -63,6 +65,16 @@ public static class ServiceCollectionExtensions
         // Register User Context Service (must be registered before UnitOfWork since it depends on it)
         services.AddScoped<IUserContextService, UserContextService>();
 
+        // Register Business Services
+        services.AddScoped<IBusService, BusService>();
+        services.AddScoped<IActivityService, ActivityService>();
+        services.AddScoped<IRouteService, RouteService>();
+        services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IFuelService, FuelService>();
+        services.AddScoped<IMaintenanceService, MaintenanceService>();
+        services.AddScoped<IScheduleService, ScheduleService>();
+        services.AddScoped<ITicketService, TicketService>();
+
         return services;
     }
 
@@ -82,6 +94,30 @@ public static class ServiceCollectionExtensions
 
         // Register audit services
         services.AddScoped<IAuditService, AuditService>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Register AI and advanced services for Bus Buddy
+    /// </summary>
+    public static IServiceCollection AddAIServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Register HttpClient for AI services
+        services.AddHttpClient<BusBuddyAIReportingService>();
+
+        // Register AI services
+        services.AddScoped<TransportationContext>();
+        services.AddScoped<ContextAwarePromptBuilder>();
+        services.AddScoped<BusBuddyAIReportingService>();
+        services.AddScoped<SmartRouteOptimizationService>();
+
+        // Register existing AI services if they exist
+        services.AddScoped<XAIService>();
+        services.AddScoped<GoogleEarthEngineService>();
+
+        // Register background monitoring service
+        services.AddHostedService<FleetMonitoringService>();
 
         return services;
     }

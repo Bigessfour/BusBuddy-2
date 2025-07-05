@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Bus_Buddy.Services;
 using Bus_Buddy.Data;
+using Bus_Buddy.Extensions;
 using Syncfusion.Licensing;
 
 namespace Bus_Buddy
@@ -55,10 +56,10 @@ namespace Bus_Buddy
             services.AddSingleton<IConfiguration>(configuration);
             services.AddSingleton<IConfigurationService, ConfigurationService>();
 
-            // Entity Framework & Database
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<BusBuddyDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            // Use the extension methods for centralized service registration
+            services.AddDataServices(configuration);
+            services.AddDataExtensions(configuration);
+            services.AddAIServices(configuration);
 
             // Logging
             services.AddLogging(builder =>
@@ -68,16 +69,8 @@ namespace Bus_Buddy
                 builder.AddConfiguration(configuration.GetSection("Logging"));
             });
 
-            // Business Services
-            services.AddScoped<IBusService, BusService>();
-            services.AddScoped<IActivityService, ActivityService>();
-            services.AddScoped<IScheduleService, ScheduleService>();
-            services.AddScoped<IStudentService, StudentService>();
-            services.AddScoped<IFuelService, FuelService>();
-            services.AddScoped<IMaintenanceService, MaintenanceService>();
-            services.AddScoped<ITicketService, TicketService>();
-            services.AddScoped<IRouteService, RouteService>(); // Fixed: Added RouteService implementation
-            services.AddScoped<BusBuddyScheduleDataProvider>();
+            // Register BusRepository explicitly for forms that depend on it directly
+            services.AddScoped<Bus_Buddy.Data.Repositories.BusRepository>();
 
             // Forms (as transient so they can be created multiple times if needed)
             services.AddTransient<Dashboard>();
@@ -96,6 +89,7 @@ namespace Bus_Buddy
             services.AddTransient<Bus_Buddy.Forms.TicketEditForm>();
             services.AddTransient<Bus_Buddy.Forms.VisualEnhancementShowcaseForm>();
             services.AddTransient<Bus_Buddy.Forms.PassengerManagementForm>();
+            services.AddTransient<Bus_Buddy.Forms.EnhancedDashboardAnalytics>();
         }
 
         public static T GetService<T>() where T : notnull

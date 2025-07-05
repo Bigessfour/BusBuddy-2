@@ -8,6 +8,7 @@ using Bus_Buddy.Utilities;
 using Bus_Buddy.Data.Interfaces;
 using Bus_Buddy.Data.Repositories;
 using BusBuddy.Forms;
+using BusBuddy.Services;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,6 +22,7 @@ public partial class Dashboard : MetroForm
     private readonly IConfigurationService _configService;
     private readonly XAIService _xaiService;
     private readonly GoogleEarthEngineService _geeService;
+    private readonly BusBuddyAIReportingService _aiReportingService;
     private readonly IServiceProvider _serviceProvider;
     private AIAssistantPanel? _aiAssistantPanel;
 
@@ -32,18 +34,20 @@ public partial class Dashboard : MetroForm
     private TabPageAdv? studentsTab;
     private TabPageAdv? reportsTab;
     private TabPageAdv? aiAssistantTab;
+    private TabPageAdv? analyticsTab;
 
     // Dashboard controls
     private Label? subtitleLabel;
 
     public Dashboard(ILogger<Dashboard> logger, IBusService busService, IConfigurationService configService,
-                     XAIService xaiService, GoogleEarthEngineService geeService, IServiceProvider serviceProvider)
+                     XAIService xaiService, GoogleEarthEngineService geeService, BusBuddyAIReportingService aiReportingService, IServiceProvider serviceProvider)
     {
         _logger = logger;
         _busService = busService;
         _configService = configService;
         _xaiService = xaiService;
         _geeService = geeService;
+        _aiReportingService = aiReportingService;
         _serviceProvider = serviceProvider;
 
         _logger.LogInformation("Initializing Dashboard form with AI capabilities");
@@ -153,10 +157,17 @@ public partial class Dashboard : MetroForm
         reportsTab.Controls.Add(reportsForm);
         reportsForm.Show();
 
+        // Create Analytics tab with Enhanced Dashboard Analytics
+        analyticsTab = new TabPageAdv("Analytics");
+        var analyticsPanel = _serviceProvider.GetRequiredService<EnhancedDashboardAnalytics>();
+        analyticsPanel.Dock = DockStyle.Fill;
+        analyticsTab.Controls.Add(analyticsPanel);
+
         // Create AI Assistant tab
         aiAssistantTab = new TabPageAdv("AI Assistant");
 
-        // Add tabs to control
+        // Add tabs to control (Analytics first for prominence)
+        mainTabControl.TabPages.Add(analyticsTab);
         mainTabControl.TabPages.Add(fleetTab);
         mainTabControl.TabPages.Add(routesTab);
         mainTabControl.TabPages.Add(maintenanceTab);
