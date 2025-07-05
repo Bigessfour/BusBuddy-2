@@ -51,6 +51,7 @@ namespace BusBuddy.Tests.Infrastructure
         protected BusBuddyDbContext DbContext { get; private set; } = null!;
         protected IConfiguration Configuration { get; private set; } = null!;
         protected DialogEventCapture DialogCapture { get; private set; } = null!;
+        protected IUserContextService UserContextService { get; private set; } = null!;
         private string? _currentTestDbName;
 
         protected TestBase()
@@ -87,6 +88,7 @@ namespace BusBuddy.Tests.Infrastructure
             if (ServiceProvider == null)
                 throw new InvalidOperationException("ServiceProvider is not initialized.");
             DialogCapture = ServiceProvider.GetRequiredService<DialogEventCapture>();
+            UserContextService = ServiceProvider.GetRequiredService<IUserContextService>();
 
             // Always generate a new unique database name for each test
             _currentTestDbName = $"TestDb_{Guid.NewGuid()}_{DateTime.UtcNow.Ticks}";
@@ -273,6 +275,15 @@ namespace BusBuddy.Tests.Infrastructure
                 options.EnableSensitiveDataLogging();
                 options.EnableDetailedErrors();
             }, ServiceLifetime.Transient); // Transient prevents disposal issues
+
+            // Mock IUserContextService for testing
+            var mockUserContextService = new Mock<IUserContextService>();
+            mockUserContextService.Setup(x => x.CurrentUserId).Returns("TestUser");
+            mockUserContextService.Setup(x => x.CurrentUserName).Returns("Test User");
+            mockUserContextService.Setup(x => x.CurrentUserEmail).Returns("test@busbuddy.com");
+            mockUserContextService.Setup(x => x.IsAuthenticated).Returns(true);
+            mockUserContextService.Setup(x => x.GetCurrentUserForAudit()).Returns("TestUser");
+            services.AddSingleton<IUserContextService>(mockUserContextService.Object);
 
             // Repository Pattern Support
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

@@ -30,9 +30,9 @@ public class RepositoryTests : TestBase
     {
         SetupTestDatabase(); // LESSON 2.2: Test Data Isolation
 
-        _busRepository = new Repository<Bus>(DbContext);
-        _driverRepository = new Repository<Driver>(DbContext);
-        _studentRepository = new Repository<Student>(DbContext);
+        _busRepository = new Repository<Bus>(DbContext, UserContextService);
+        _driverRepository = new Repository<Driver>(DbContext, UserContextService);
+        _studentRepository = new Repository<Student>(DbContext, UserContextService);
     }
 
     [TearDown]
@@ -450,7 +450,7 @@ public class RepositoryTests : TestBase
 
         // Assert
         result.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
-        result.CreatedBy.Should().Be("System"); // Default audit user
+        result.CreatedBy.Should().Be("TestUser"); // Mock user context service returns "TestUser"
         result.UpdatedDate.Should().BeNull();
         result.UpdatedBy.Should().BeNull();
     }
@@ -481,7 +481,7 @@ public class RepositoryTests : TestBase
         // Assert
         driver.CreatedDate.Should().Be(originalCreatedDate); // Should not change
         driver.UpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMinutes(1));
-        driver.UpdatedBy.Should().Be("System");
+        driver.UpdatedBy.Should().Be("TestUser");
     }
 
     #endregion

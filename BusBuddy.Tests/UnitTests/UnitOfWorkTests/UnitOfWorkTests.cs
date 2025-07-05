@@ -35,7 +35,7 @@ public class UnitOfWorkTests : TestBase
             SetupTestDatabase();
         }
 
-        _unitOfWork = new UnitOfWork(DbContext);
+        _unitOfWork = new UnitOfWork(DbContext, UserContextService);
     }
 
     [TearDown]
@@ -515,7 +515,7 @@ public class UnitOfWorkTests : TestBase
     public void Dispose_ShouldCleanupResources()
     {
         // Arrange
-        var unitOfWork = new UnitOfWork(DbContext);
+        var unitOfWork = new UnitOfWork(DbContext, UserContextService);
 
         // Act
         unitOfWork.Dispose();
