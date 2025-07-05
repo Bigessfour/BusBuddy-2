@@ -2,6 +2,7 @@ using Bus_Buddy.Models;
 using Bus_Buddy.Services;
 using Microsoft.Extensions.Logging;
 using Syncfusion.WinForms.Controls;
+using Syncfusion.Windows.Forms;
 using Syncfusion.Windows.Forms.Schedule;
 using Syncfusion.Schedule;
 using Syncfusion.Windows.Forms.Tools;
@@ -13,7 +14,7 @@ namespace Bus_Buddy.Forms;
 /// Schedule Management Form - Enhanced implementation using local Syncfusion ScheduleControl
 /// Integrates with Activity management for comprehensive bus scheduling
 /// </summary>
-public partial class ScheduleManagementForm : SfForm
+public partial class ScheduleManagementForm : MetroForm
 {
     #region Fields and Services
     private readonly IActivityService _activityService;
@@ -90,9 +91,9 @@ public partial class ScheduleManagementForm : SfForm
         WindowState = FormWindowState.Maximized;
 
         // Syncfusion Styling
-        Style.TitleBar.BackColor = Color.FromArgb(46, 204, 113);
-        Style.TitleBar.ForeColor = Color.White;
-        Style.BackColor = Color.FromArgb(248, 249, 250);
+        this.MetroColor = Color.FromArgb(46, 204, 113);
+        this.CaptionForeColor = Color.White;
+        this.BackColor = Color.FromArgb(248, 249, 250);
 
         ResumeLayout(false);
         _logger.LogInformation("Form basic initialization completed");

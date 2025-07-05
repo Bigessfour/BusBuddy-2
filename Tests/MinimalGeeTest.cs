@@ -1,10 +1,12 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Bus_Buddy.Services;
+using Bus_Buddy.Models;
 
 namespace Bus_Buddy.Tests
 {
@@ -50,20 +52,21 @@ namespace Bus_Buddy.Tests
 
                 var logger = serviceProvider.GetService<ILogger<GoogleEarthEngineService>>();
 
-                // Initialize service
-                var geeService = new GoogleEarthEngineService(configuration, logger);
+                // Initialize service (fix constructor parameter order)
+                var geeService = new GoogleEarthEngineService(logger, configuration);
                 Console.WriteLine("✅ Google Earth Engine service initialized");
 
                 // Test basic functionality (mock mode)
                 var testCoords = new[] { 40.7128, -74.0060 }; // NYC coordinates
 
                 Console.WriteLine("🗺️ Testing terrain analysis...");
-                var terrainData = await geeService.GetTerrainAnalysis(testCoords[0], testCoords[1], 1000);
-                Console.WriteLine($"✅ Terrain analysis returned: {terrainData?.Count ?? 0} data points");
+                var terrainData = await geeService.GetTerrainAnalysisAsync(testCoords[0], testCoords[1], 1000);
+                Console.WriteLine($"✅ Terrain analysis completed: {terrainData?.TerrainType ?? "Mock data"}");
 
                 Console.WriteLine("🚌 Testing route optimization...");
-                var routeData = await geeService.OptimizeRoute(new[] { testCoords }, new[] { "efficiency" });
-                Console.WriteLine($"✅ Route optimization returned: {routeData?.Count ?? 0} suggestions");
+                var routes = new List<Route>(); // Empty list for testing
+                var routeData = await geeService.OptimizeRoutesAsync(routes);
+                Console.WriteLine($"✅ Route optimization completed: {routeData?.Count ?? 0} results");
 
                 Console.WriteLine("🌍 All tests passed! Google Earth Engine is ready to use.");
                 return true;

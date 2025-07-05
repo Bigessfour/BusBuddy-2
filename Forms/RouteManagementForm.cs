@@ -110,6 +110,7 @@ public partial class RouteManagementForm : MetroForm
         routeDataGrid.Style.SelectionStyle.TextColor = System.Drawing.Color.Black;
 
         // Add custom columns using Syncfusion GridTextColumn
+
         routeDataGrid.Columns.Add(new GridTextColumn()
         {
             MappingName = "RouteId",
@@ -136,33 +137,81 @@ public partial class RouteManagementForm : MetroForm
 
         routeDataGrid.Columns.Add(new GridTextColumn()
         {
-            MappingName = "AMVehicle.BusNumber",
-            HeaderText = "AM Bus",
+            MappingName = "AMVehicleId",
+            HeaderText = "AM Vehicle ID",
             Width = 100,
             AllowSorting = true
         });
 
         routeDataGrid.Columns.Add(new GridTextColumn()
         {
-            MappingName = "PMVehicle.BusNumber",
-            HeaderText = "PM Bus",
+            MappingName = "PMVehicleId",
+            HeaderText = "PM Vehicle ID",
             Width = 100,
             AllowSorting = true
         });
 
         routeDataGrid.Columns.Add(new GridTextColumn()
         {
-            MappingName = "AMDriver.DriverName",
-            HeaderText = "AM Driver",
-            Width = 150,
+            MappingName = "AMDriverId",
+            HeaderText = "AM Driver ID",
+            Width = 100,
             AllowSorting = true
         });
 
         routeDataGrid.Columns.Add(new GridTextColumn()
         {
-            MappingName = "PMDriver.DriverName",
-            HeaderText = "PM Driver",
-            Width = 150,
+            MappingName = "PMDriverId",
+            HeaderText = "PM Driver ID",
+            Width = 100,
+            AllowSorting = true
+        });
+
+        routeDataGrid.Columns.Add(new GridTextColumn()
+        {
+            MappingName = "AMBeginMiles",
+            HeaderText = "AM Begin Miles",
+            Width = 100,
+            AllowSorting = true
+        });
+
+        routeDataGrid.Columns.Add(new GridTextColumn()
+        {
+            MappingName = "AMEndMiles",
+            HeaderText = "AM End Miles",
+            Width = 100,
+            AllowSorting = true
+        });
+
+        routeDataGrid.Columns.Add(new GridTextColumn()
+        {
+            MappingName = "AMRiders",
+            HeaderText = "AM Riders",
+            Width = 80,
+            AllowSorting = true
+        });
+
+        routeDataGrid.Columns.Add(new GridTextColumn()
+        {
+            MappingName = "PMBeginMiles",
+            HeaderText = "PM Begin Miles",
+            Width = 100,
+            AllowSorting = true
+        });
+
+        routeDataGrid.Columns.Add(new GridTextColumn()
+        {
+            MappingName = "PMEndMiles",
+            HeaderText = "PM End Miles",
+            Width = 100,
+            AllowSorting = true
+        });
+
+        routeDataGrid.Columns.Add(new GridTextColumn()
+        {
+            MappingName = "PMRiders",
+            HeaderText = "PM Riders",
+            Width = 80,
             AllowSorting = true
         });
 
@@ -229,7 +278,7 @@ public partial class RouteManagementForm : MetroForm
         statusLabel.ForeColor = System.Drawing.Color.FromArgb(46, 204, 113);
 
         // Count inactive routes for status
-        var inactiveCount = _routes.Count(r => !r.IsActive);
+        var inactiveCount = _routes.Count(r => r.IsActive == false);
         if (inactiveCount > 0)
         {
             statusLabel.Text += $" - {inactiveCount} inactive route(s)";
@@ -251,7 +300,7 @@ public partial class RouteManagementForm : MetroForm
         if (e.RowData is Route route)
         {
             // Apply styling based on route status
-            if (!route.IsActive)
+            if (route.IsActive == false)
             {
                 // Inactive routes - subtle gray styling
                 e.Style.BackColor = Color.FromArgb(248, 248, 248);

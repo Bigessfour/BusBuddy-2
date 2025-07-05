@@ -71,6 +71,34 @@ public class Route
     [Display(Name = "PM Driver")]
     public int? PMDriverId { get; set; }
 
+    // Additional properties for route analysis and optimization
+    [Column(TypeName = "decimal(10,2)")]
+    [Display(Name = "Distance (Miles)")]
+    public decimal? Distance { get; set; }
+
+    [Display(Name = "Estimated Duration (Minutes)")]
+    public int? EstimatedDuration { get; set; }
+
+    [Display(Name = "Student Count")]
+    public int? StudentCount { get; set; }
+
+    [Display(Name = "Stop Count")]
+    public int? StopCount { get; set; }
+
+    [Display(Name = "AM Begin Time")]
+    public TimeSpan? AMBeginTime { get; set; }
+
+    [Display(Name = "PM Begin Time")]
+    public TimeSpan? PMBeginTime { get; set; }
+
+    [StringLength(100)]
+    [Display(Name = "Driver Name")]
+    public string? DriverName { get; set; }
+
+    [StringLength(20)]
+    [Display(Name = "Bus Number")]
+    public string? BusNumber { get; set; }
+
     // Navigation properties
     public virtual Bus? AMVehicle { get; set; }
     public virtual Bus? PMVehicle { get; set; }

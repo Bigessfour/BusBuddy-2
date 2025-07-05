@@ -1,5 +1,6 @@
 using Syncfusion.WinForms.Controls;
 using Syncfusion.WinForms.DataGrid;
+using Syncfusion.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using Bus_Buddy.Models;
 using Bus_Buddy.Services;
@@ -12,7 +13,7 @@ namespace Bus_Buddy.Forms;
 /// Maintenance Management Form - Complete implementation using Syncfusion WinForms
 /// Provides CRUD operations for vehicle maintenance records with search and filtering capabilities
 /// </summary>
-public partial class MaintenanceManagementForm : SfForm
+public partial class MaintenanceManagementForm : MetroForm
 {
     #region Fields and Services
     private readonly IBusService _busService;
@@ -64,9 +65,9 @@ public partial class MaintenanceManagementForm : SfForm
         try
         {
             // Apply Syncfusion Office2019 theme
-            Style.TitleBar.BackColor = Color.FromArgb(230, 126, 34);
-            Style.TitleBar.ForeColor = Color.White;
-            Style.BackColor = Color.FromArgb(248, 249, 250);
+            this.BackColor = Color.FromArgb(248, 249, 250);
+            this.MetroColor = Color.FromArgb(230, 126, 34);
+            this.CaptionForeColor = Color.White;
 
             _logger.LogDebug("Syncfusion styling applied successfully");
         }

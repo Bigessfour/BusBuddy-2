@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using Syncfusion.WinForms.Controls;
 
 namespace BusBuddy.Forms.Base
 {
@@ -10,7 +9,7 @@ namespace BusBuddy.Forms.Base
     /// Provides standard validation, save/cancel operations, and UI patterns.
     /// </summary>
     /// <typeparam name="T">The entity type being edited</typeparam>
-    public abstract partial class BaseEditForm<T> : SfForm where T : class, new()
+    public abstract partial class BaseEditForm<T> : Form where T : class, new()
     {
         protected T? currentItem;
         protected bool isEditMode;

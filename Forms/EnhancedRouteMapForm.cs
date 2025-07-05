@@ -40,7 +40,7 @@ namespace Bus_Buddy.Forms
         // Data
         private List<Route> _routes;
         private Route? _selectedRoute;
-        private Timer? _realTimeUpdateTimer;
+        private System.Windows.Forms.Timer? _realTimeUpdateTimer;
 
         public EnhancedRouteMapForm(ILogger<EnhancedRouteMapForm> logger,
                                    RouteRepository routeRepository,
@@ -116,11 +116,10 @@ namespace Bus_Buddy.Forms
                     .Create(builder => builder.AddConsole())
                     .CreateLogger<GoogleEarthEngineService>();
 
-                _geeService = new GoogleEarthEngineService(
-                    logger,
-                    "your-private-api-key",  // Replace with your actual API key
-                    "your-service-account@your-project.iam.gserviceaccount.com" // Replace with your service account
-                );
+                var configBuilder = new Microsoft.Extensions.Configuration.ConfigurationBuilder();
+                var config = configBuilder.Build();
+
+                _geeService = new GoogleEarthEngineService(logger, config);
 
                 _logger.LogInformation("Google Earth Engine service initialized");
             }
@@ -540,7 +539,7 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                _realTimeUpdateTimer = new Timer { Interval = 60000 }; // 1 minute
+                _realTimeUpdateTimer = new System.Windows.Forms.Timer { Interval = 60000 }; // 1 minute
                 _realTimeUpdateTimer.Tick += async (s, e) => await UpdateRealTimeData();
                 _realTimeUpdateTimer.Start();
 
@@ -554,7 +553,7 @@ namespace Bus_Buddy.Forms
 
         #region Event Handlers
 
-        private async void RouteGrid_SelectionChanged(object? sender, Syncfusion.WinForms.DataGrid.Events.GridSelectionChangedEventArgs e)
+        private async void RouteGrid_SelectionChanged(object? sender, EventArgs e)
         {
             try
             {
@@ -586,7 +585,7 @@ namespace Bus_Buddy.Forms
                         _routeGrid.DataSource = null;
                 });
 
-                _routes = await _routeRepository.GetAllRoutesAsync();
+                _routes = (await _routeRepository.GetAllRoutesAsync()).ToList();
 
                 // Enhance route data with calculated fields
                 var enhancedRoutes = _routes.Select(r => new
@@ -632,8 +631,8 @@ namespace Bus_Buddy.Forms
                                     $"Bus: {route.BusNumber ?? "Not assigned"}\n" +
                                     $"AM Riders: {route.AMRiders ?? 0}\n" +
                                     $"PM Riders: {route.PMRiders ?? 0}\n" +
-                                    $"AM Time: {route.AMBeginTime ?? "Not set"}\n" +
-                                    $"PM Time: {route.PMBeginTime ?? "Not set"}\n" +
+                                    $"AM Time: {route.AMBeginTime?.ToString(@"hh\:mm") ?? "Not set"}\n" +
+                                    $"PM Time: {route.PMBeginTime?.ToString(@"hh\:mm") ?? "Not set"}\n" +
                                     $"Daily Mileage: {((route.AMEndMiles ?? 0) - (route.AMBeginMiles ?? 0)) + ((route.PMEndMiles ?? 0) - (route.PMBeginMiles ?? 0)):F1} miles";
 
                     var detailsLabel = new Label

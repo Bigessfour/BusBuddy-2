@@ -963,214 +963,184 @@ Provide mathematically sound optimization recommendations with clear implementat
         public bool ValidateDocumentationUrls() => _documentationSettings.ValidateUrls();
 
         #endregion
-    }
 
-    #region Data Models for xAI Integration
+        #region Data Models for xAI Integration
 
-    public class RouteAnalysisRequest
-    {
-        public int RouteId { get; set; }
-        public double CurrentDistance { get; set; }
-        public int StudentCount { get; set; }
-        public int VehicleCapacity { get; set; }
-        public TerrainAnalysisResult? TerrainData { get; set; }
-        public WeatherData? WeatherData { get; set; }
-        public TrafficData? TrafficData { get; set; }
-        public HistoricalPerformanceData? HistoricalData { get; set; }
-    }
+        public class RouteAnalysisRequest
+        {
+            public int RouteId { get; set; }
+            public double CurrentDistance { get; set; }
+            public int StudentCount { get; set; }
+            public int VehicleCapacity { get; set; }
+            public TerrainAnalysisResult? TerrainData { get; set; }
+            public WeatherData? WeatherData { get; set; }
+            public TrafficData? TrafficData { get; set; }
+            public HistoricalPerformanceData? HistoricalData { get; set; }
+        }
 
-    public class HistoricalPerformanceData
-    {
-        public double AverageFuelConsumption { get; set; }
-        public double OnTimePerformance { get; set; }
-        public int SafetyIncidents { get; set; }
-    }
+        public class HistoricalPerformanceData
+        {
+            public double AverageFuelConsumption { get; set; }
+            public double OnTimePerformance { get; set; }
+            public int SafetyIncidents { get; set; }
+        }
 
-    public class AIRouteRecommendations
-    {
-        public RouteRecommendation OptimalRoute { get; set; } = new();
-        public RiskAssessment RiskAssessment { get; set; } = new();
-        public double ConfidenceLevel { get; set; }
-        public string Reasoning { get; set; } = string.Empty;
-    }
+        public class AIRouteRecommendations
+        {
+            public RouteRecommendation OptimalRoute { get; set; } = new();
+            public RiskAssessment RiskAssessment { get; set; } = new();
+            public double ConfidenceLevel { get; set; }
+            public string Reasoning { get; set; } = string.Empty;
+        }
 
-    public class RouteRecommendation
-    {
-        public double EstimatedFuelSavings { get; set; }
-        public double EstimatedTimeSavings { get; set; }
-        public double SafetyScore { get; set; }
-        public string[] RecommendedChanges { get; set; } = Array.Empty<string>();
-    }
+        public class RouteRecommendation
+        {
+            public double EstimatedFuelSavings { get; set; }
+            public double EstimatedTimeSavings { get; set; }
+            public double SafetyScore { get; set; }
+            public string[] RecommendedChanges { get; set; } = Array.Empty<string>();
+        }
 
-    public class RiskAssessment
-    {
-        public string OverallRiskLevel { get; set; } = string.Empty;
-        public string[] IdentifiedRisks { get; set; } = Array.Empty<string>();
-        public string[] MitigationStrategies { get; set; } = Array.Empty<string>();
-    }
+        public class RiskAssessment
+        {
+            public string OverallRiskLevel { get; set; } = string.Empty;
+            public string[] IdentifiedRisks { get; set; } = Array.Empty<string>();
+            public string[] MitigationStrategies { get; set; } = Array.Empty<string>();
+        }
 
-    public class MaintenanceAnalysisRequest
-    {
-        public int BusId { get; set; }
-        public string VehicleMake { get; set; } = string.Empty;
-        public string VehicleModel { get; set; } = string.Empty;
-        public int VehicleYear { get; set; }
-        public int CurrentMileage { get; set; }
-        public DateTime LastMaintenanceDate { get; set; }
-        public double DailyMiles { get; set; }
-        public string TerrainDifficulty { get; set; } = string.Empty;
-        public double StopFrequency { get; set; }
-        public double ElevationChanges { get; set; }
-        public int EngineHours { get; set; }
-        public string BrakeUsage { get; set; } = string.Empty;
-        public string TireCondition { get; set; } = string.Empty;
-        public string FluidLevels { get; set; } = string.Empty;
-    }
+        public class MaintenanceAnalysisRequest
+        {
+            public int BusId { get; set; }
+            public string VehicleMake { get; set; } = string.Empty;
+            public string VehicleModel { get; set; } = string.Empty;
+            public int VehicleYear { get; set; }
+            public int CurrentMileage { get; set; }
+            public DateTime LastMaintenanceDate { get; set; }
+            public double DailyMiles { get; set; }
+            public string TerrainDifficulty { get; set; } = string.Empty;
+            public double StopFrequency { get; set; }
+            public double ElevationChanges { get; set; }
+            public int EngineHours { get; set; }
+            public string BrakeUsage { get; set; } = string.Empty;
+            public string TireCondition { get; set; } = string.Empty;
+            public string FluidLevels { get; set; } = string.Empty;
+        }
 
-    public class AIMaintenancePrediction
-    {
-        public DateTime PredictedMaintenanceDate { get; set; }
-        public ComponentPrediction[] ComponentPredictions { get; set; } = Array.Empty<ComponentPrediction>();
-        public decimal TotalEstimatedCost { get; set; }
-        public decimal PotentialSavings { get; set; }
-        public string Reasoning { get; set; } = string.Empty;
-    }
+        public class AIMaintenancePrediction
+        {
+            public DateTime PredictedMaintenanceDate { get; set; }
+            public ComponentPrediction[] ComponentPredictions { get; set; } = Array.Empty<ComponentPrediction>();
+            public decimal TotalEstimatedCost { get; set; }
+            public decimal PotentialSavings { get; set; }
+            public string Reasoning { get; set; } = string.Empty;
+        }
 
-    public class ComponentPrediction
-    {
-        public string Component { get; set; } = string.Empty;
-        public DateTime PredictedWearDate { get; set; }
-        public double ConfidenceLevel { get; set; }
-        public decimal EstimatedCost { get; set; }
-    }
+        public class ComponentPrediction
+        {
+            public string Component { get; set; } = string.Empty;
+            public DateTime PredictedWearDate { get; set; }
+            public double ConfidenceLevel { get; set; }
+            public decimal EstimatedCost { get; set; }
+        }
 
-    public class SafetyAnalysisRequest
-    {
-        public string RouteType { get; set; } = string.Empty;
-        public string TrafficDensity { get; set; } = string.Empty;
-        public string RoadConditions { get; set; } = string.Empty;
-        public string WeatherConditions { get; set; } = string.Empty;
-        public string[] AgeGroups { get; set; } = Array.Empty<string>();
-        public int SpecialNeedsCount { get; set; }
-        public int TotalStudents { get; set; }
-        public int PreviousIncidents { get; set; }
-        public int NearMissReports { get; set; }
-        public string DriverSafetyRecord { get; set; } = string.Empty;
-    }
+        public class SafetyAnalysisRequest
+        {
+            public string RouteType { get; set; } = string.Empty;
+            public string TrafficDensity { get; set; } = string.Empty;
+            public string RoadConditions { get; set; } = string.Empty;
+            public string WeatherConditions { get; set; } = string.Empty;
+            public string[] AgeGroups { get; set; } = Array.Empty<string>();
+            public int SpecialNeedsCount { get; set; }
+            public int TotalStudents { get; set; }
+            public int PreviousIncidents { get; set; }
+            public int NearMissReports { get; set; }
+            public string DriverSafetyRecord { get; set; } = string.Empty;
+        }
 
-    public class AISafetyAnalysis
-    {
-        public double OverallSafetyScore { get; set; }
-        public SafetyRiskFactor[] RiskFactors { get; set; } = Array.Empty<SafetyRiskFactor>();
-        public string[] Recommendations { get; set; } = Array.Empty<string>();
-        public string ComplianceStatus { get; set; } = string.Empty;
-        public double ConfidenceLevel { get; set; }
-    }
+        public class AISafetyAnalysis
+        {
+            public double OverallSafetyScore { get; set; }
+            public SafetyRiskFactor[] RiskFactors { get; set; } = Array.Empty<SafetyRiskFactor>();
+            public string[] Recommendations { get; set; } = Array.Empty<string>();
+            public string ComplianceStatus { get; set; } = string.Empty;
+            public double ConfidenceLevel { get; set; }
+        }
 
-    public class SafetyRiskFactor
-    {
-        public string Factor { get; set; } = string.Empty;
-        public string RiskLevel { get; set; } = string.Empty;
-        public string Impact { get; set; } = string.Empty;
-        public string Mitigation { get; set; } = string.Empty;
-    }
+        public class SafetyRiskFactor
+        {
+            public string Factor { get; set; } = string.Empty;
+            public string RiskLevel { get; set; } = string.Empty;
+            public string Impact { get; set; } = string.Empty;
+            public string Mitigation { get; set; } = string.Empty;
+        }
 
-    public class StudentOptimizationRequest
-    {
-        public int TotalStudents { get; set; }
-        public int AvailableBuses { get; set; }
-        public string GeographicConstraints { get; set; } = string.Empty;
-        public string SpecialRequirements { get; set; } = string.Empty;
-    }
+        public class StudentOptimizationRequest
+        {
+            public int TotalStudents { get; set; }
+            public int AvailableBuses { get; set; }
+            public string GeographicConstraints { get; set; } = string.Empty;
+            public string SpecialRequirements { get; set; } = string.Empty;
+        }
 
-    public class AIStudentOptimization
-    {
-        public StudentAssignment[] OptimalAssignments { get; set; } = Array.Empty<StudentAssignment>();
-        public EfficiencyMetrics EfficiencyGains { get; set; } = new();
-        public double ConfidenceLevel { get; set; }
-        public string Reasoning { get; set; } = string.Empty;
-    }
+        public class AIStudentOptimization
+        {
+            public StudentAssignment[] OptimalAssignments { get; set; } = Array.Empty<StudentAssignment>();
+            public EfficiencyMetrics EfficiencyGains { get; set; } = new();
+            public double ConfidenceLevel { get; set; }
+            public string Reasoning { get; set; } = string.Empty;
+        }
 
-    public class StudentAssignment
-    {
-        public int BusId { get; set; }
-        public int StudentsAssigned { get; set; }
-        public double CapacityUtilization { get; set; }
-        public double AverageRideTime { get; set; }
-    }
+        public class StudentAssignment
+        {
+            public int BusId { get; set; }
+            public int StudentsAssigned { get; set; }
+            public double CapacityUtilization { get; set; }
+            public double AverageRideTime { get; set; }
+        }
 
-    public class EfficiencyMetrics
-    {
-        public double TotalTimeSaved { get; set; }
-        public double FuelSavings { get; set; }
-        public double CapacityOptimization { get; set; }
-    }
+        public class EfficiencyMetrics
+        {
+            public double TotalTimeSaved { get; set; }
+            public double FuelSavings { get; set; }
+            public double CapacityOptimization { get; set; }
+        }
 
-    #endregion
+        #endregion
 
-    #region xAI API Models (Future Implementation)
+        #region xAI API Models (Future Implementation)
 
-    public class XAIRequest
-    {
-        public string Model { get; set; } = string.Empty;
-        public XAIMessage[] Messages { get; set; } = Array.Empty<XAIMessage>();
-        public double Temperature { get; set; }
-        public int MaxTokens { get; set; }
-    }
+        public class XAIRequest
+        {
+            public string Model { get; set; } = string.Empty;
+            public XAIMessage[] Messages { get; set; } = Array.Empty<XAIMessage>();
+            public double Temperature { get; set; }
+            public int MaxTokens { get; set; }
+        }
 
-    public class XAIMessage
-    {
-        public string Role { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
-    }
+        public class XAIMessage
+        {
+            public string Role { get; set; } = string.Empty;
+            public string Content { get; set; } = string.Empty;
+        }
 
-    public class XAIResponse
-    {
-        public XAIChoice[] Choices { get; set; } = Array.Empty<XAIChoice>();
-        public XAIUsage Usage { get; set; } = new();
-    }
+        public class XAIResponse
+        {
+            public XAIChoice[] Choices { get; set; } = Array.Empty<XAIChoice>();
+            public XAIUsage Usage { get; set; } = new();
+        }
 
-    public class XAIChoice
-    {
-        public XAIMessage Message { get; set; } = new();
-        public string FinishReason { get; set; } = string.Empty;
-    }
+        public class XAIChoice
+        {
+            public XAIMessage Message { get; set; } = new();
+            public string FinishReason { get; set; } = string.Empty;
+        }
 
-    public class XAIUsage
-    {
-        public int PromptTokens { get; set; }
-        public int CompletionTokens { get; set; }
-        public int TotalTokens { get; set; }
-    }
-
-    #endregion
-
-        #region Documentation Access Methods
-
-        /// <summary>
-        /// Gets the official xAI overview documentation URL
-        /// </summary>
-        public string GetOfficialDocumentationUrl() => _documentationSettings.GetOverviewUrl();
-
-        /// <summary>
-        /// Gets the xAI Chat API guide URL
-        /// </summary>
-        public string GetChatApiGuideUrl() => _documentationSettings.GetChatGuideUrl();
-
-        /// <summary>
-        /// Gets the xAI API reference URL
-        /// </summary>
-        public string GetApiReferenceUrl() => _documentationSettings.GetApiReferenceUrl();
-
-        /// <summary>
-        /// Gets all available documentation URLs
-        /// </summary>
-        public Dictionary<string, string> GetAllDocumentationUrls() => _documentationSettings.GetAllUrls();
-
-        /// <summary>
-        /// Validates that all documentation URLs are accessible
-        /// </summary>
-        public bool ValidateDocumentationUrls() => _documentationSettings.ValidateUrls();
+        public class XAIUsage
+        {
+            public int PromptTokens { get; set; }
+            public int CompletionTokens { get; set; }
+            public int TotalTokens { get; set; }
+        }
 
         #endregion
     }

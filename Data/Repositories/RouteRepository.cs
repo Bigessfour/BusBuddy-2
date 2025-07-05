@@ -1,206 +1,351 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Bus_Buddy.Data.Interfaces;
 using Bus_Buddy.Models;
-using Bus_Buddy.Data;
+using Bus_Buddy.Services;
 
-namespace Bus_Buddy.Data.Repositories
+namespace Bus_Buddy.Data.Repositories;
+
+/// <summary>
+/// Route-specific repository implementation
+/// Extends generic repository with route-specific operations
+/// </summary>
+public class RouteRepository : Repository<Route>, IRouteRepository
 {
-    /// <summary>
-    /// Repository for Route entity operations
-    /// Provides data access methods for route management
-    /// </summary>
-    public class RouteRepository
+    public RouteRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService)
     {
-        private readonly BusBuddyDbContext _context;
-        private readonly ILogger<RouteRepository> _logger;
-
-        public RouteRepository(BusBuddyDbContext context, ILogger<RouteRepository> logger)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <summary>
-        /// Gets all routes from the database
-        /// </summary>
-        public async Task<List<Route>> GetAllRoutesAsync()
-        {
-            try
-            {
-                return await _context.Routes
-                    .OrderBy(r => r.RouteName)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving all routes");
-                return new List<Route>();
-            }
-        }
-
-        /// <summary>
-        /// Gets a specific route by ID
-        /// </summary>
-        public async Task<Route?> GetRouteByIdAsync(int routeId)
-        {
-            try
-            {
-                return await _context.Routes
-                    .FirstOrDefaultAsync(r => r.RouteId == routeId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving route with ID {routeId}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets all active routes
-        /// </summary>
-        public async Task<List<Route>> GetActiveRoutesAsync()
-        {
-            try
-            {
-                return await _context.Routes
-                    .Where(r => r.IsActive)
-                    .OrderBy(r => r.RouteName)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving active routes");
-                return new List<Route>();
-            }
-        }
-
-        /// <summary>
-        /// Creates a new route
-        /// </summary>
-        public async Task<Route?> CreateRouteAsync(Route route)
-        {
-            try
-            {
-                _context.Routes.Add(route);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation($"Created new route: {route.RouteName}");
-                return route;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error creating route: {route.RouteName}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Updates an existing route
-        /// </summary>
-        public async Task<bool> UpdateRouteAsync(Route route)
-        {
-            try
-            {
-                _context.Routes.Update(route);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation($"Updated route: {route.RouteName}");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error updating route: {route.RouteName}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Deletes a route
-        /// </summary>
-        public async Task<bool> DeleteRouteAsync(int routeId)
-        {
-            try
-            {
-                var route = await GetRouteByIdAsync(routeId);
-                if (route != null)
-                {
-                    _context.Routes.Remove(route);
-                    await _context.SaveChangesAsync();
-                    _logger.LogInformation($"Deleted route: {route.RouteName}");
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error deleting route with ID {routeId}");
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets routes by rider count range
-        /// </summary>
-        public async Task<List<Route>> GetRoutesByRiderCountRangeAsync(int minRiders, int maxRiders)
-        {
-            try
-            {
-                return await _context.Routes
-                    .Where(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0) >= minRiders &&
-                               (r.AMRiders ?? 0) + (r.PMRiders ?? 0) <= maxRiders)
-                    .OrderBy(r => r.RouteName)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error retrieving routes by rider count range {minRiders}-{maxRiders}");
-                return new List<Route>();
-            }
-        }
-
-        /// <summary>
-        /// Gets route statistics
-        /// </summary>
-        public async Task<RouteStatistics> GetRouteStatisticsAsync()
-        {
-            try
-            {
-                var routes = await GetAllRoutesAsync();
-
-                return new RouteStatistics
-                {
-                    TotalRoutes = routes.Count,
-                    ActiveRoutes = routes.Count(r => r.IsActive),
-                    InactiveRoutes = routes.Count(r => !r.IsActive),
-                    AverageMileage = routes.Any() ? routes.Average(r =>
-                        ((r.AMEndMiles ?? 0) - (r.AMBeginMiles ?? 0)) +
-                        ((r.PMEndMiles ?? 0) - (r.PMBeginMiles ?? 0))) : 0,
-                    TotalMileage = routes.Sum(r =>
-                        ((r.AMEndMiles ?? 0) - (r.AMBeginMiles ?? 0)) +
-                        ((r.PMEndMiles ?? 0) - (r.PMBeginMiles ?? 0))),
-                    AverageRiders = routes.Any() ? routes.Average(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0)) : 0
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating route statistics");
-                return new RouteStatistics();
-            }
-        }
     }
 
-    /// <summary>
-    /// Route statistics data class
-    /// </summary>
-    public class RouteStatistics
+    #region Async Route-Specific Operations
+
+    public async Task<IEnumerable<Route>> GetRoutesByDateAsync(DateTime date)
     {
-        public int TotalRoutes { get; set; }
-        public int ActiveRoutes { get; set; }
-        public int InactiveRoutes { get; set; }
-        public decimal AverageMileage { get; set; }
-        public decimal TotalMileage { get; set; }
-        public double AverageRiders { get; set; }
+        return await Query()
+            .Where(r => r.Date.Date == date.Date)
+            .OrderBy(r => r.RouteName)
+            .ToListAsync();
     }
+
+    public async Task<IEnumerable<Route>> GetRoutesByDateRangeAsync(DateTime startDate, DateTime endDate)
+    {
+        return await Query()
+            .Where(r => r.Date >= startDate.Date && r.Date <= endDate.Date)
+            .OrderBy(r => r.Date)
+            .ThenBy(r => r.RouteName)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Route>> GetRoutesByNameAsync(string routeName)
+    {
+        return await Query()
+            .Where(r => r.RouteName.Contains(routeName))
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Route>> GetActiveRoutesAsync()
+    {
+        return await Query()
+            .Where(r => r.IsActive)
+            .OrderBy(r => r.RouteName)
+            .ToListAsync();
+    }
+
+    public async Task<Route?> GetRouteByNameAndDateAsync(string routeName, DateTime date)
+    {
+        return await Query()
+            .FirstOrDefaultAsync(r => r.RouteName == routeName && r.Date.Date == date.Date);
+    }
+
+    public async Task<IEnumerable<Route>> GetRoutesByVehicleAsync(int vehicleId, DateTime? date = null)
+    {
+        var query = Query()
+            .Where(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
+
+        if (date.HasValue)
+            query = query.Where(r => r.Date.Date == date.Value.Date);
+
+        return await query
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Route>> GetRoutesByDriverAsync(int driverId, DateTime? date = null)
+    {
+        var query = Query()
+            .Where(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
+
+        if (date.HasValue)
+            query = query.Where(r => r.Date.Date == date.Value.Date);
+
+        return await query
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Route>> GetRoutesWithoutVehicleAssignmentAsync(DateTime date)
+    {
+        return await Query()
+            .Where(r => r.Date.Date == date.Date &&
+                       r.IsActive &&
+                       (r.AMVehicleId == null || r.PMVehicleId == null))
+            .OrderBy(r => r.RouteName)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Route>> GetRoutesWithoutDriverAssignmentAsync(DateTime date)
+    {
+        return await Query()
+            .Where(r => r.Date.Date == date.Date &&
+                       r.IsActive &&
+                       (r.AMDriverId == null || r.PMDriverId == null))
+            .OrderBy(r => r.RouteName)
+            .ToListAsync();
+    }
+
+    public async Task<decimal> GetTotalMileageByDateAsync(DateTime date)
+    {
+        var routes = await Query()
+            .Where(r => r.Date.Date == date.Date && r.IsActive)
+            .ToListAsync();
+
+        return routes.Sum(r =>
+            (r.AMEndMiles - r.AMBeginMiles ?? 0) +
+            (r.PMEndMiles - r.PMBeginMiles ?? 0));
+    }
+
+    public async Task<decimal> GetTotalMileageByDateRangeAsync(DateTime startDate, DateTime endDate)
+    {
+        var routes = await Query()
+            .Where(r => r.Date >= startDate.Date && r.Date <= endDate.Date && r.IsActive)
+            .ToListAsync();
+
+        return routes.Sum(r =>
+            (r.AMEndMiles - r.AMBeginMiles ?? 0) +
+            (r.PMEndMiles - r.PMBeginMiles ?? 0));
+    }
+
+    public async Task<decimal> GetAverageRidershipByRouteAsync(string routeName, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        var query = Query().Where(r => r.RouteName == routeName && r.IsActive);
+
+        if (startDate.HasValue)
+            query = query.Where(r => r.Date >= startDate.Value.Date);
+
+        if (endDate.HasValue)
+            query = query.Where(r => r.Date <= endDate.Value.Date);
+
+        var routes = await query.ToListAsync();
+        if (!routes.Any()) return 0;
+
+        var totalRiders = routes.Sum(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0));
+        return routes.Count > 0 ? (decimal)totalRiders / routes.Count : 0;
+    }
+
+    public async Task<Dictionary<string, decimal>> GetMileageByRouteNameAsync(DateTime startDate, DateTime endDate)
+    {
+        var routes = await Query()
+            .Where(r => r.Date >= startDate.Date && r.Date <= endDate.Date && r.IsActive)
+            .ToListAsync();
+
+        return routes
+            .GroupBy(r => r.RouteName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Sum(r => (r.AMEndMiles - r.AMBeginMiles ?? 0) + (r.PMEndMiles - r.PMBeginMiles ?? 0))
+            );
+    }
+
+    public async Task<Dictionary<string, int>> GetRidershipByRouteNameAsync(DateTime startDate, DateTime endDate)
+    {
+        var routes = await Query()
+            .Where(r => r.Date >= startDate.Date && r.Date <= endDate.Date && r.IsActive)
+            .ToListAsync();
+
+        return routes
+            .GroupBy(r => r.RouteName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Sum(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0))
+            );
+    }
+
+    public async Task<bool> ValidateRouteScheduleAsync(DateTime date)
+    {
+        var errors = await GetRouteValidationErrorsAsync(date);
+        return !errors.Any();
+    }
+
+    public async Task<IEnumerable<string>> GetRouteValidationErrorsAsync(DateTime date)
+    {
+        var errors = new List<string>();
+        var routes = await GetRoutesByDateAsync(date);
+
+        foreach (var route in routes.Where(r => r.IsActive))
+        {
+            if (!route.AMVehicleId.HasValue && !route.PMVehicleId.HasValue)
+                errors.Add($"Route '{route.RouteName}' has no vehicle assignments");
+
+            if (!route.AMDriverId.HasValue && !route.PMDriverId.HasValue)
+                errors.Add($"Route '{route.RouteName}' has no driver assignments");
+
+            if (route.AMBeginMiles.HasValue && route.AMEndMiles.HasValue && route.AMEndMiles < route.AMBeginMiles)
+                errors.Add($"Route '{route.RouteName}' AM: End miles less than begin miles");
+
+            if (route.PMBeginMiles.HasValue && route.PMEndMiles.HasValue && route.PMEndMiles < route.PMBeginMiles)
+                errors.Add($"Route '{route.RouteName}' PM: End miles less than begin miles");
+        }
+
+        return errors;
+    }
+
+    public async Task<IEnumerable<Route>> GetRoutesWithMileageIssuesAsync(DateTime? startDate = null, DateTime? endDate = null)
+    {
+        var query = Query().Where(r => r.IsActive);
+
+        if (startDate.HasValue)
+            query = query.Where(r => r.Date >= startDate.Value.Date);
+
+        if (endDate.HasValue)
+            query = query.Where(r => r.Date <= endDate.Value.Date);
+
+        return await query
+            .Where(r =>
+                (r.AMBeginMiles.HasValue && r.AMEndMiles.HasValue && r.AMEndMiles < r.AMBeginMiles) ||
+                (r.PMBeginMiles.HasValue && r.PMEndMiles.HasValue && r.PMEndMiles < r.PMBeginMiles))
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Route>> GetMostActiveRoutesAsync(DateTime startDate, DateTime endDate, int count = 10)
+    {
+        var routes = await Query()
+            .Where(r => r.Date >= startDate.Date && r.Date <= endDate.Date && r.IsActive)
+            .ToListAsync();
+
+        return routes
+            .GroupBy(r => r.RouteName)
+            .OrderByDescending(g => g.Sum(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0)))
+            .Take(count)
+            .SelectMany(g => g)
+            .OrderBy(r => r.RouteName)
+            .ThenByDescending(r => r.Date);
+    }
+
+    public async Task<IEnumerable<Route>> GetLeastActiveRoutesAsync(DateTime startDate, DateTime endDate, int count = 10)
+    {
+        var routes = await Query()
+            .Where(r => r.Date >= startDate.Date && r.Date <= endDate.Date && r.IsActive)
+            .ToListAsync();
+
+        return routes
+            .GroupBy(r => r.RouteName)
+            .OrderBy(g => g.Sum(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0)))
+            .Take(count)
+            .SelectMany(g => g)
+            .OrderBy(r => r.RouteName)
+            .ThenByDescending(r => r.Date);
+    }
+
+    public async Task<Dictionary<DateTime, int>> GetDailyRouteCountAsync(DateTime startDate, DateTime endDate)
+    {
+        var routes = await Query()
+            .Where(r => r.Date >= startDate.Date && r.Date <= endDate.Date && r.IsActive)
+            .ToListAsync();
+
+        return routes
+            .GroupBy(r => r.Date.Date)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
+    #endregion
+
+    #region Synchronous Methods for Syncfusion Data Binding
+
+    public IEnumerable<Route> GetRoutesByDate(DateTime date)
+    {
+        return Query()
+            .Where(r => r.Date.Date == date.Date)
+            .OrderBy(r => r.RouteName)
+            .ToList();
+    }
+
+    public IEnumerable<Route> GetRoutesByName(string routeName)
+    {
+        return Query()
+            .Where(r => r.RouteName.Contains(routeName))
+            .OrderByDescending(r => r.Date)
+            .ToList();
+    }
+
+    public IEnumerable<Route> GetActiveRoutes()
+    {
+        return Query()
+            .Where(r => r.IsActive)
+            .OrderBy(r => r.RouteName)
+            .ToList();
+    }
+
+    public IEnumerable<Route> GetRoutesByVehicle(int vehicleId, DateTime? date = null)
+    {
+        var query = Query()
+            .Where(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
+
+        if (date.HasValue)
+            query = query.Where(r => r.Date.Date == date.Value.Date);
+
+        return query
+            .OrderByDescending(r => r.Date)
+            .ToList();
+    }
+
+    public IEnumerable<Route> GetRoutesByDriver(int driverId, DateTime? date = null)
+    {
+        var query = Query()
+            .Where(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
+
+        if (date.HasValue)
+            query = query.Where(r => r.Date.Date == date.Value.Date);
+
+        return query
+            .OrderByDescending(r => r.Date)
+            .ToList();
+    }
+
+    public decimal GetTotalMileageByDate(DateTime date)
+    {
+        var routes = Query()
+            .Where(r => r.Date.Date == date.Date && r.IsActive)
+            .ToList();
+
+        return routes.Sum(r =>
+            (r.AMEndMiles - r.AMBeginMiles ?? 0) +
+            (r.PMEndMiles - r.PMBeginMiles ?? 0));
+    }
+
+    #endregion
+
+    #region Additional Async Methods for Compatibility
+
+    public async Task UpdateAsync(Route route)
+    {
+        Update(route);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Route>> GetAllRoutesAsync()
+    {
+        return await GetAllAsync();
+    }
+
+    public async Task<bool> DeleteRouteAsync(int routeId)
+    {
+        return await RemoveByIdAsync(routeId);
+    }
+
+    public async Task<Route?> GetRouteByIdAsync(int routeId)
+    {
+        return await GetByIdAsync(routeId);
+    }
+
+    #endregion
 }

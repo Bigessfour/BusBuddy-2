@@ -10,6 +10,11 @@ using Syncfusion.WinForms.Controls;
 using Bus_Buddy.Services;
 using Bus_Buddy.Models;
 
+// Type aliases to resolve namespace conflicts
+using ServiceWeatherData = Bus_Buddy.Services.WeatherData;
+using ServiceTerrainAnalysisResult = Bus_Buddy.Services.TerrainAnalysisResult;
+using ServiceTrafficData = Bus_Buddy.Services.TrafficData;
+
 namespace Bus_Buddy.Forms
 {
     /// <summary>
@@ -23,11 +28,11 @@ namespace Bus_Buddy.Forms
         private readonly GoogleEarthEngineService _geeService;
 
         // Enhanced UI controls for GEE integration
-        private SfButton optimizeRouteButton;
-        private SfButton weatherAnalysisButton;
-        private SfButton terrainAnalysisButton;
-        private Panel satelliteImagePanel;
-        private Label optimizationResultsLabel;
+        private SfButton? optimizeRouteButton;
+        private SfButton? weatherAnalysisButton;
+        private SfButton? terrainAnalysisButton;
+        private Panel? satelliteImagePanel;
+        private Label? optimizationResultsLabel;
 
         public EnhancedRouteManagementForm(
             ILogger<EnhancedRouteManagementForm> logger,
@@ -38,7 +43,6 @@ namespace Bus_Buddy.Forms
             _busService = busService;
             _geeService = geeService;
 
-            InitializeComponent();
             InitializeGeeControls();
         }
 
@@ -50,7 +54,7 @@ namespace Bus_Buddy.Forms
                 Text = "🌍 AI Optimize Route",
                 Size = new Size(150, 35),
                 Location = new Point(20, 50),
-                Style = new ButtonAppearance { BackColor = Color.FromArgb(34, 139, 34) }
+                BackColor = Color.FromArgb(34, 139, 34) // Direct property instead of Style.BackColor
             };
             optimizeRouteButton.Click += OptimizeRouteWithGEE_Click;
             Controls.Add(optimizeRouteButton);
@@ -61,7 +65,7 @@ namespace Bus_Buddy.Forms
                 Text = "🌦️ Weather Impact",
                 Size = new Size(150, 35),
                 Location = new Point(180, 50),
-                Style = new ButtonAppearance { BackColor = Color.FromArgb(30, 144, 255) }
+                BackColor = Color.FromArgb(30, 144, 255) // Direct property instead of Style.BackColor
             };
             weatherAnalysisButton.Click += WeatherAnalysis_Click;
             Controls.Add(weatherAnalysisButton);
@@ -72,7 +76,7 @@ namespace Bus_Buddy.Forms
                 Text = "🏔️ Terrain Analysis",
                 Size = new Size(150, 35),
                 Location = new Point(340, 50),
-                Style = new ButtonAppearance { BackColor = Color.FromArgb(139, 69, 19) }
+                BackColor = Color.FromArgb(139, 69, 19) // Direct property instead of Style.BackColor
             };
             terrainAnalysisButton.Click += TerrainAnalysis_Click;
             Controls.Add(terrainAnalysisButton);
@@ -127,19 +131,22 @@ namespace Bus_Buddy.Forms
                 }
 
                 // Perform comprehensive route analysis using Google Earth Engine
-                var tasks = new[]
-                {
-                    _geeService.AnalyzeRouteEfficiencyAsync(selectedRoute.RouteId),
-                    _geeService.GetTerrainAnalysisAsync(selectedRoute.StartLat, selectedRoute.StartLon, 1000),
-                    _geeService.GetWeatherDataAsync(),
-                    _geeService.GetTrafficDataAsync()
-                };
+                // Since routes are daily fixed paths, use default school coordinates for terrain analysis
+                // For activity-specific analysis with destinations, use Activity model instead
+                var schoolLat = 40.7128; // Replace with actual school coordinates
+                var schoolLon = -74.0060;
 
-                var results = await Task.WhenAll(tasks);
-                var efficiency = results[0];
-                var terrain = results[1];
-                var weather = results[2];
-                var traffic = results[3];
+                var efficiencyTask = _geeService.AnalyzeRouteEfficiencyAsync(selectedRoute.RouteId);
+                var terrainTask = _geeService.GetTerrainAnalysisAsync(schoolLat, schoolLon, 1000);
+                var weatherTask = _geeService.GetWeatherDataAsync();
+                var trafficTask = _geeService.GetTrafficDataAsync();
+
+                await Task.WhenAll(efficiencyTask, terrainTask, weatherTask, trafficTask);
+
+                var efficiency = await efficiencyTask;
+                var terrain = await terrainTask;
+                var weather = await weatherTask;
+                var traffic = await trafficTask;
 
                 // Display comprehensive optimization results
                 var optimizationSummary = $@"🌍 GOOGLE EARTH ENGINE ROUTE ANALYSIS
@@ -245,12 +252,16 @@ Wind: {weather?.WindCondition}
                 terrainAnalysisButton.Text = "🔄 Analyzing...";
                 terrainAnalysisButton.Enabled = false;
 
-                var terrain = await _geeService.GetTerrainAnalysisAsync(
-                    selectedRoute.StartLat, selectedRoute.StartLon, 1000);
+                // Use school coordinates for route terrain analysis since routes are fixed daily paths
+                var schoolLat = 40.7128; // Replace with actual school coordinates
+                var schoolLon = -74.0060;
+
+                var terrain = await _geeService.GetTerrainAnalysisAsync(schoolLat, schoolLon, 1000);
 
                 var terrainReport = $@"🏔️ TERRAIN ANALYSIS REPORT
 
 Route: {selectedRoute.RouteName}
+Analysis Area: School vicinity (daily route)
 Elevation Range: {terrain?.MinElevation:F0}m - {terrain?.MaxElevation:F0}m
 Average Slope: {terrain?.AverageSlope:F1}°
 Terrain Type: {terrain?.TerrainType}
@@ -279,7 +290,11 @@ Difficulty Rating: {terrain?.RouteDifficulty}
         {
             try
             {
-                var imagery = await _geeService.GetSatelliteImageryAsync("roads", route.StartLat, route.StartLon);
+                // Use school coordinates for route imagery since routes are fixed daily paths
+                var schoolLat = 40.7128; // Replace with actual school coordinates
+                var schoolLon = -74.0060;
+
+                var imagery = await _geeService.GetSatelliteImageryAsync("roads", schoolLat, schoolLon);
 
                 // Create a placeholder satellite image visualization
                 var graphics = satelliteImagePanel.CreateGraphics();
@@ -292,7 +307,7 @@ Difficulty Rating: {terrain?.RouteDifficulty}
                 // Add imagery info
                 var font = new Font("Arial", 8);
                 var brush = new SolidBrush(Color.Black);
-                graphics.DrawString($"Satellite View\n{route.RouteName}", font, brush, 10, 10);
+                graphics.DrawString($"Satellite View\n{route.RouteName}\n(School Area)", font, brush, 10, 10);
                 graphics.DrawString($"Resolution: {imagery?.Resolution}\nCapture: {imagery?.CaptureDate:yyyy-MM-dd}",
                     font, brush, 10, 150);
             }
@@ -305,17 +320,20 @@ Difficulty Rating: {terrain?.RouteDifficulty}
         private Route GetSelectedRoute()
         {
             // Mock route for demonstration - replace with actual grid selection
+            // Routes are daily fixed paths, not geographic routes
             return new Route
             {
                 RouteId = 1,
                 RouteName = "Elementary Route 1",
-                StartLat = 40.7128,
-                StartLon = -74.0060,
-                IsActive = true
+                Date = DateTime.Today,
+                Description = "Daily elementary school route",
+                IsActive = true,
+                AMVehicleId = 1,
+                PMVehicleId = 1
             };
         }
 
-        private string GetWeatherImpactMessage(WeatherData? weather)
+        private string GetWeatherImpactMessage(ServiceWeatherData? weather)
         {
             if (weather == null) return "Weather data unavailable";
 
@@ -331,7 +349,7 @@ Difficulty Rating: {terrain?.RouteDifficulty}
             };
         }
 
-        private string GetTerrainRecommendations(TerrainAnalysisResult? terrain)
+        private string GetTerrainRecommendations(ServiceTerrainAnalysisResult? terrain)
         {
             if (terrain == null) return "Terrain analysis unavailable";
 
@@ -360,9 +378,9 @@ Difficulty Rating: {terrain?.RouteDifficulty}
     {
         public RouteOptimizationDetailsForm(
             RouteEfficiencyAnalysis? efficiency,
-            TerrainAnalysisResult? terrain,
-            WeatherData? weather,
-            TrafficData? traffic)
+            ServiceTerrainAnalysisResult? terrain,
+            ServiceWeatherData? weather,
+            ServiceTrafficData? traffic)
         {
             Text = "Google Earth Engine Route Optimization Details";
             Size = new Size(600, 500);
@@ -383,9 +401,9 @@ Difficulty Rating: {terrain?.RouteDifficulty}
 
         private string GenerateDetailedReport(
             RouteEfficiencyAnalysis? efficiency,
-            TerrainAnalysisResult? terrain,
-            WeatherData? weather,
-            TrafficData? traffic)
+            ServiceTerrainAnalysisResult? terrain,
+            ServiceWeatherData? weather,
+            ServiceTrafficData? traffic)
         {
             return $@"🌍 GOOGLE EARTH ENGINE COMPREHENSIVE ROUTE ANALYSIS
 ================================================================
@@ -429,13 +447,4 @@ Analysis completed at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
 Powered by Google Earth Engine";
         }
     }
-}
-
-// Extension to Route model for GEE integration
-public partial class Route
-{
-    public double StartLat { get; set; } = 40.7128; // Default to NYC for demo
-    public double StartLon { get; set; } = -74.0060;
-    public double EndLat { get; set; } = 40.7589;
-    public double EndLon { get; set; } = -73.9851;
 }

@@ -1,9 +1,13 @@
 using Syncfusion.Windows.Forms;
+using Syncfusion.Windows.Forms.Tools;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Bus_Buddy.Services;
 using Bus_Buddy.Forms;
 using Bus_Buddy.Utilities;
+using Bus_Buddy.Data.Interfaces;
+using Bus_Buddy.Data.Repositories;
+using BusBuddy.Forms;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,14 +19,34 @@ public partial class Dashboard : MetroForm
     private readonly ILogger<Dashboard> _logger;
     private readonly IBusService _busService;
     private readonly IConfigurationService _configService;
+    private readonly XAIService _xaiService;
+    private readonly GoogleEarthEngineService _geeService;
+    private readonly IServiceProvider _serviceProvider;
+    private AIAssistantPanel? _aiAssistantPanel;
 
-    public Dashboard(ILogger<Dashboard> logger, IBusService busService, IConfigurationService configService)
+    // Main tab control for dashboard sections
+    private TabControlAdv? mainTabControl;
+    private TabPageAdv? fleetTab;
+    private TabPageAdv? routesTab;
+    private TabPageAdv? maintenanceTab;
+    private TabPageAdv? studentsTab;
+    private TabPageAdv? reportsTab;
+    private TabPageAdv? aiAssistantTab;
+
+    // Dashboard controls
+    private Label? subtitleLabel;
+
+    public Dashboard(ILogger<Dashboard> logger, IBusService busService, IConfigurationService configService,
+                     XAIService xaiService, GoogleEarthEngineService geeService, IServiceProvider serviceProvider)
     {
         _logger = logger;
         _busService = busService;
         _configService = configService;
+        _xaiService = xaiService;
+        _geeService = geeService;
+        _serviceProvider = serviceProvider;
 
-        _logger.LogInformation("Initializing Dashboard form");
+        _logger.LogInformation("Initializing Dashboard form with AI capabilities");
 
         InitializeComponent();
 
@@ -47,59 +71,156 @@ public partial class Dashboard : MetroForm
         this.AutoScaleMode = AutoScaleMode.Dpi;
         this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 
-        // Enable high-quality font rendering
-        VisualEnhancementManager.EnableHighQualityFontRendering(this);
+        // Create main tab control
+        InitializeTabControl();
 
-        // FIX: Ensure all buttons have solid backgrounds (no transparency)
-        SyncfusionBackgroundFix.FixButtonBackgrounds(this);
+        // Initialize subtitle label
+        InitializeSubtitleLabel();
 
-        // Fix title label color after visual enhancements
-        if (titleLabel != null)
-        {
-            titleLabel.ForeColor = System.Drawing.Color.White;
-        }
+        // Initialize AI Assistant Panel
+        InitializeAIAssistantPanel();
 
-        // Fix subtitle label color after visual enhancements  
-        if (subtitleLabel != null)
-        {
-            subtitleLabel.ForeColor = System.Drawing.Color.LightGray;
-        }
-
-        // Force HubTile sizes to match test expectations
-        if (fleetTile != null) { fleetTile.Size = new System.Drawing.Size(180, 80); }
-        if (routesTile != null) { routesTile.Size = new System.Drawing.Size(180, 80); }
-        if (activeTile != null) { activeTile.Size = new System.Drawing.Size(180, 80); }
-        if (maintenanceTile != null) { maintenanceTile.Size = new System.Drawing.Size(180, 80); }
-        if (capacityTile != null) { capacityTile.Size = new System.Drawing.Size(180, 80); }
-
-        // Force summaryPanel BorderStyle after visual enhancements
-        if (summaryPanel != null)
-        {
-            summaryPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-        }
-
-        // Fix summaryTitle label color after visual enhancements
-        if (summaryTitle != null)
-        {
-            summaryTitle.ForeColor = System.Drawing.Color.FromArgb(46, 125, 185);
-        }
-
-        // Force contentPanel size after docking issues
-        if (contentPanel != null)
-        {
-            contentPanel.Size = new System.Drawing.Size(1200, 720);
-        }
-
-        // Fix statsLabel color after visual enhancements
-        if (statsLabel != null)
-        {
-            statsLabel.ForeColor = System.Drawing.Color.FromArgb(95, 99, 104);
-        }
-
-        _logger.LogInformation("Dashboard form initialized with enhanced visuals");
+        _logger.LogInformation("Dashboard form initialized with tab-based layout and AI capabilities");
 
         // Load initial data
         LoadDashboardDataAsync();
+    }
+
+    private void InitializeTabControl()
+    {
+        // Create main tab control
+        mainTabControl = new TabControlAdv
+        {
+            Location = new System.Drawing.Point(10, 10),
+            Size = new System.Drawing.Size(1180, 700),
+            Dock = DockStyle.Fill,
+            TabStyle = typeof(TabRendererMetro),
+            ThemeName = "Metro"
+        };
+
+        // Create Fleet Management tab
+        fleetTab = new TabPageAdv("Fleet Management");
+        var fleetForm = new BusManagementForm(
+            _serviceProvider.GetRequiredService<ILogger<BusManagementForm>>(),
+            _busService);
+        fleetForm.TopLevel = false;
+        fleetForm.FormBorderStyle = FormBorderStyle.None;
+        fleetForm.Dock = DockStyle.Fill;
+        fleetTab.Controls.Add(fleetForm);
+        fleetForm.Show();
+
+        // Create Routes tab
+        routesTab = new TabPageAdv("Routes");
+        var routeForm = new RouteManagementForm(
+            _serviceProvider.GetRequiredService<ILogger<RouteManagementForm>>(),
+            _busService);
+        routeForm.TopLevel = false;
+        routeForm.FormBorderStyle = FormBorderStyle.None;
+        routeForm.Dock = DockStyle.Fill;
+        routesTab.Controls.Add(routeForm);
+        routeForm.Show();
+
+        // Create Maintenance tab
+        maintenanceTab = new TabPageAdv("Maintenance");
+        var maintenanceForm = new MaintenanceManagementForm(
+            _busService,
+            _serviceProvider.GetRequiredService<IMaintenanceService>(),
+            _serviceProvider.GetRequiredService<ILogger<MaintenanceManagementForm>>());
+        maintenanceForm.TopLevel = false;
+        maintenanceForm.FormBorderStyle = FormBorderStyle.None;
+        maintenanceForm.Dock = DockStyle.Fill;
+        maintenanceTab.Controls.Add(maintenanceForm);
+        maintenanceForm.Show();
+
+        // Create Students tab
+        studentsTab = new TabPageAdv("Students");
+        var studentForm = new StudentManagementForm(
+            _serviceProvider.GetRequiredService<ILogger<StudentManagementForm>>(),
+            _serviceProvider.GetRequiredService<IStudentService>(),
+            _busService);
+        studentForm.TopLevel = false;
+        studentForm.FormBorderStyle = FormBorderStyle.None;
+        studentForm.Dock = DockStyle.Fill;
+        studentsTab.Controls.Add(studentForm);
+        studentForm.Show();
+
+        // Create Reports tab
+        reportsTab = new TabPageAdv("Reports");
+        var reportsForm = new BusReportsForm(_serviceProvider.GetRequiredService<BusRepository>());
+        reportsForm.TopLevel = false;
+        reportsForm.FormBorderStyle = FormBorderStyle.None;
+        reportsForm.Dock = DockStyle.Fill;
+        reportsTab.Controls.Add(reportsForm);
+        reportsForm.Show();
+
+        // Create AI Assistant tab
+        aiAssistantTab = new TabPageAdv("AI Assistant");
+
+        // Add tabs to control
+        mainTabControl.TabPages.Add(fleetTab);
+        mainTabControl.TabPages.Add(routesTab);
+        mainTabControl.TabPages.Add(maintenanceTab);
+        mainTabControl.TabPages.Add(studentsTab);
+        mainTabControl.TabPages.Add(reportsTab);
+        mainTabControl.TabPages.Add(aiAssistantTab);
+
+        // Add tab control to form
+        this.Controls.Add(mainTabControl);
+    }
+
+    private void InitializeAIAssistantPanel()
+    {
+        try
+        {
+            // Create AI Assistant Panel with integrated xAI chat
+            _aiAssistantPanel = new AIAssistantPanel(
+                ServiceContainer.GetService<ILogger<AIAssistantPanel>>(),
+                _xaiService,
+                _geeService
+            );
+
+            // Position the AI Assistant Panel where the old summary panel was
+            _aiAssistantPanel.Location = new System.Drawing.Point(750, 30);
+            _aiAssistantPanel.Size = new System.Drawing.Size(420, 420);
+
+            // Add to form's controls
+            this.Controls.Add(_aiAssistantPanel);
+
+            _logger.LogInformation("AI Assistant Panel initialized and added to dashboard successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing AI Assistant Panel");
+            // Create a simple fallback label if AI initialization fails
+            var fallbackLabel = new Label
+            {
+                Text = "AI Assistant Panel\nInitialization Error\n\nCheck logs for details",
+                Location = new System.Drawing.Point(750, 30),
+                Size = new System.Drawing.Size(420, 420),
+                BackColor = System.Drawing.Color.FromArgb(248, 249, 250),
+                BorderStyle = BorderStyle.FixedSingle,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold),
+                ForeColor = System.Drawing.Color.FromArgb(158, 158, 158)
+            };
+            this.Controls.Add(fallbackLabel);
+        }
+    }
+
+    private void InitializeSubtitleLabel()
+    {
+        subtitleLabel = new Label
+        {
+            Text = "Loading fleet information...",
+            Location = new System.Drawing.Point(20, 50),
+            Size = new System.Drawing.Size(700, 30),
+            Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular),
+            ForeColor = System.Drawing.Color.FromArgb(102, 102, 102),
+            AutoSize = false,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+
+        this.Controls.Add(subtitleLabel);
     }
 
     private async void LoadDashboardDataAsync()
@@ -127,7 +248,7 @@ public partial class Dashboard : MetroForm
     }
 
     /// <summary>
-    /// Update dashboard summary using Syncfusion HubTile components for visual display
+    /// Update dashboard summary using the AI Assistant Panel
     /// </summary>
     private void UpdateDashboardSummary(System.Collections.Generic.List<Bus_Buddy.Services.BusInfo> buses, System.Collections.Generic.List<Bus_Buddy.Services.RouteInfo> routes)
     {
@@ -142,47 +263,17 @@ public partial class Dashboard : MetroForm
             // Update the subtitle with current statistics
             if (subtitleLabel != null)
             {
-                subtitleLabel.Text = $"Fleet: {buses.Count} buses | Routes: {routes.Count} | Active: {activeBuses} | Total Capacity: {totalCapacity:N0} passengers";
+                subtitleLabel.Text = $"Fleet: {buses.Count} buses | Routes: {routes.Count} | Active: {activeBuses} | Total Capacity: {totalCapacity:N0} passengers | AI: {(_xaiService.IsConfigured ? "✅ Live" : "⚠️ Mock")}";
             }
 
-            // Create or update dashboard summary tiles using Syncfusion HubTile
-            CreateDashboardTiles(buses.Count, routes.Count, activeBuses, inServiceBuses, maintenanceBuses, totalCapacity);
+            // Update AI Assistant Panel with fleet summary
+            _aiAssistantPanel?.UpdateFleetSummary(buses.Count, routes.Count, activeBuses, maintenanceBuses, totalCapacity);
 
-            _logger.LogInformation("Dashboard summary updated successfully");
+            _logger.LogInformation("Dashboard summary updated successfully with AI integration");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating dashboard summary: {Message}", ex.Message);
-        }
-    }
-
-    /// <summary>
-    /// Create dashboard summary tiles using Syncfusion HubTile components
-    /// </summary>
-    private void CreateDashboardTiles(int totalBuses, int totalRoutes, int activeBuses, int inServiceBuses, int maintenanceBuses, int totalCapacity)
-    {
-        try
-        {
-            // Update HubTile values with current data
-            if (fleetTile != null) fleetTile.Title.Text = totalBuses.ToString();
-            if (routesTile != null) routesTile.Title.Text = totalRoutes.ToString();
-            if (activeTile != null) activeTile.Title.Text = activeBuses.ToString();
-            if (maintenanceTile != null) maintenanceTile.Title.Text = maintenanceBuses.ToString();
-            if (capacityTile != null) capacityTile.Title.Text = totalCapacity.ToString("N0");
-
-            // Update stats label
-            if (statsLabel != null)
-            {
-                statsLabel.Text = $"Fleet Utilization: {(activeBuses > 0 ? (double)inServiceBuses / activeBuses * 100 : 0):F1}%\n" +
-                                 $"Maintenance Rate: {(totalBuses > 0 ? (double)maintenanceBuses / totalBuses * 100 : 0):F1}%\n" +
-                                 $"Average Capacity: {(totalBuses > 0 ? (double)totalCapacity / totalBuses : 0):F0} seats/bus";
-            }
-
-            _logger.LogInformation("Dashboard tiles created successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating dashboard tiles: {Message}", ex.Message);
         }
     }
 
@@ -404,6 +495,33 @@ public partial class Dashboard : MetroForm
         {
             _logger.LogError(ex, "Error opening Reports");
             MessageBoxAdv.Show($"Reports error: {ex.Message}", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void AIAssistantButton_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            _logger.LogInformation("AI Assistant button clicked");
+
+            // Switch to AI Chat tab in the assistant panel
+            _aiAssistantPanel?.ShowAIChat();
+
+            MessageBoxAdv.Show($"🤖 AI Assistant Status: {(_xaiService.IsConfigured ? "Live xAI (Grok) Ready" : "Mock Mode")}\n\n" +
+                              "The AI chat interface is located in the right panel.\n" +
+                              "You can ask about:\n" +
+                              "• Route optimization\n" +
+                              "• Maintenance predictions\n" +
+                              "• Safety analysis\n" +
+                              "• Student assignments\n" +
+                              "• Fleet performance",
+                              "AI Assistant", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error with AI Assistant");
+            MessageBoxAdv.Show($"AI Assistant error: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }

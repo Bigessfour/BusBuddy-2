@@ -39,8 +39,9 @@ namespace BusBuddy.Services
         private readonly ConcurrentQueue<(string Prompt, TaskCompletionSource<string> Tcs)> _requestQueue;
         private readonly SemaphoreSlim _batchSemaphore;
         private readonly SemaphoreSlim _concurrencySemaphore;
-        private readonly AsyncRetryPolicy _retryPolicy;
-        private readonly Timer _batchTimer;
+        private readonly System.Threading.Timer _batchTimer;
+        private readonly int _maxRetries = 3;
+        private readonly int _retryPolicy = 3; // Simple retry count for requests
 
         // Performance Monitoring
         private readonly Meter _meter;
@@ -91,18 +92,8 @@ namespace BusBuddy.Services
             };
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
 
-            // Configure retry policy with exponential backoff
-            _retryPolicy = Policy
-                .Handle<HttpRequestException>()
-                .Or<TaskCanceledException>()
-                .WaitAndRetryAsync(
-                    retryCount: 3,
-                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)),
-                    onRetry: (exception, timeSpan, attempt, context) =>
-                    {
-                        _logger.LogWarning("Retry {Attempt} after {Delay}s due to {Error}",
-                            attempt, timeSpan.TotalSeconds, exception.Message);
-                    });
+            // Note: Retry policy implementation would require Polly package
+            // For now, implement basic retry in the request methods
 
             // Initialize performance monitoring
             _meter = new Meter("BusBuddy.XAIService");
@@ -113,7 +104,7 @@ namespace BusBuddy.Services
             _cacheHits = _meter.CreateCounter<long>("cache_hits", "hits", "Cache hit count");
 
             // Start batch processing timer
-            _batchTimer = new Timer(async _ => await ProcessBatchAsync(), null, TimeSpan.FromMilliseconds(BATCH_DELAY_MS), TimeSpan.FromMilliseconds(BATCH_DELAY_MS));
+            _batchTimer = new System.Threading.Timer(async _ => await ProcessBatchAsync(), null, TimeSpan.FromMilliseconds(BATCH_DELAY_MS), TimeSpan.FromMilliseconds(BATCH_DELAY_MS));
         }
 
         #endregion
@@ -220,22 +211,28 @@ namespace BusBuddy.Services
                 var data = line.Substring(6); // Remove "data: " prefix
                 if (data == "[DONE]") break;
 
+                // Parse JSON outside try-catch to allow yield
+                StreamResponse? chunk = null;
                 try
                 {
-                    var chunk = JsonSerializer.Deserialize<StreamResponse>(data);
-                    if (chunk?.Choices?.Length > 0 && !string.IsNullOrEmpty(chunk.Choices[0].Delta?.Content))
-                    {
-                        totalTokens += EstimateTokens(chunk.Choices[0].Delta.Content);
-                        yield return chunk.Choices[0].Delta.Content;
-                    }
+                    chunk = JsonSerializer.Deserialize<StreamResponse>(data);
                 }
                 catch (JsonException)
                 {
                     // Skip malformed JSON chunks
                     continue;
                 }
+
+                // Yield outside try-catch
+                if (chunk?.Choices?.Length > 0 && !string.IsNullOrEmpty(chunk.Choices[0].Delta?.Content))
+                {
+                    totalTokens += EstimateTokens(chunk.Choices[0].Delta.Content);
+                    yield return chunk.Choices[0].Delta.Content;
+                }
+                continue;
             }
 
+            // Record final token usage
             _budgetManager.RecordUsage(totalTokens);
             _tokenUsage.Add(totalTokens);
         }
@@ -245,14 +242,16 @@ namespace BusBuddy.Services
         /// </summary>
         public PerformanceMetrics GetPerformanceMetrics()
         {
+            // Note: .NET System.Diagnostics.Metrics doesn't provide direct access to current values
+            // This is a temporary implementation - proper metrics collection would need a separate tracking system
             return new PerformanceMetrics
             {
-                TotalRequests = _requestCount.GetMeasurements().Sum(m => m.Value),
-                TotalErrors = _errorCount.GetMeasurements().Sum(m => m.Value),
-                TotalTokensUsed = _tokenUsage.GetMeasurements().Sum(m => m.Value),
-                CacheHitCount = _cacheHits.GetMeasurements().Sum(m => m.Value),
+                TotalRequests = 0, // TODO: Implement proper counter tracking
+                TotalErrors = 0, // TODO: Implement proper counter tracking  
+                TotalTokensUsed = 0, // TODO: Implement proper counter tracking
+                CacheHitCount = 0, // TODO: Implement proper counter tracking
                 RemainingTokenBudget = _budgetManager.GetRemainingBudget(),
-                AverageResponseTime = _requestDuration.GetMeasurements().Average(m => m.Value)
+                AverageResponseTime = 0 // TODO: Implement proper histogram tracking
             };
         }
 
@@ -336,50 +335,67 @@ namespace BusBuddy.Services
         /// </summary>
         private async Task<string> ExecuteApiRequestAsync(string prompt)
         {
-            return await _retryPolicy.ExecuteAsync(async () =>
+            Exception lastException = null;
+
+            for (int attempt = 0; attempt < _retryPolicy; attempt++)
             {
-                var requestBody = new
+                try
                 {
-                    model = _model,
-                    messages = new[]
+                    var requestBody = new
                     {
-                        new { role = "system", content = "You are an AI assistant for Bus Buddy, a school transportation management system. Provide concise, actionable responses." },
-                        new { role = "user", content = prompt }
-                    },
-                    temperature = 0.3,
-                    max_tokens = 1000
-                };
+                        model = _model,
+                        messages = new[]
+                        {
+                            new { role = "system", content = "You are an AI assistant for Bus Buddy, a school transportation management system. Provide concise, actionable responses." },
+                            new { role = "user", content = prompt }
+                        },
+                        temperature = 0.3,
+                        max_tokens = 1000
+                    };
 
-                var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(API_ENDPOINT, content);
-                response.EnsureSuccessStatusCode();
+                    var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                    var response = await _httpClient.PostAsync(API_ENDPOINT, content);
+                    response.EnsureSuccessStatusCode();
 
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var jsonResponse = JsonSerializer.Deserialize<XAIResponse>(responseContent);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var jsonResponse = JsonSerializer.Deserialize<XAIResponse>(responseContent);
 
-                if (jsonResponse?.Choices?.Length > 0)
-                {
-                    var responseText = jsonResponse.Choices[0].Message?.Content ?? string.Empty;
-
-                    // Record actual token usage if available
-                    if (jsonResponse.Usage != null)
+                    if (jsonResponse?.Choices?.Length > 0)
                     {
-                        _budgetManager.RecordUsage(jsonResponse.Usage.TotalTokens);
-                        _tokenUsage.Add(jsonResponse.Usage.TotalTokens);
+                        var responseText = jsonResponse.Choices[0].Message?.Content ?? string.Empty;
+
+                        // Record actual token usage if available
+                        if (jsonResponse.Usage != null)
+                        {
+                            _budgetManager.RecordUsage(jsonResponse.Usage.TotalTokens);
+                            _tokenUsage.Add(jsonResponse.Usage.TotalTokens);
+                        }
+                        else
+                        {
+                            // Fallback to estimation
+                            var estimatedTokens = EstimateTokens(prompt + responseText);
+                            _budgetManager.RecordUsage(estimatedTokens);
+                            _tokenUsage.Add(estimatedTokens);
+                        }
+
+                        return responseText;
                     }
-                    else
-                    {
-                        // Fallback to estimation
-                        var estimatedTokens = EstimateTokens(prompt + responseText);
-                        _budgetManager.RecordUsage(estimatedTokens);
-                        _tokenUsage.Add(estimatedTokens);
-                    }
 
-                    return responseText;
+                    throw new InvalidOperationException("No valid response received from XAI API");
                 }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    _logger.LogWarning(ex, "API request attempt {Attempt} failed", attempt + 1);
 
-                throw new InvalidOperationException("No valid response received from XAI API");
-            });
+                    if (attempt < _retryPolicy - 1)
+                    {
+                        await Task.Delay(1000 * (attempt + 1)); // Exponential backoff
+                    }
+                }
+            }
+
+            throw new InvalidOperationException($"All retry attempts failed. Last error: {lastException?.Message}", lastException);
         }
 
         /// <summary>

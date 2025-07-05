@@ -323,6 +323,39 @@ public class Activity : INotifyPropertyChanged
     [Display(Name = "Updated By")]
     public string? UpdatedBy { get; set; }
 
+    // Geographic properties for destination coordinates (Activities need this, Routes don't)
+    [Display(Name = "Destination Latitude")]
+    [Column(TypeName = "decimal(10,8)")]
+    public decimal? DestinationLatitude { get; set; }
+
+    [Display(Name = "Destination Longitude")]
+    [Column(TypeName = "decimal(11,8)")]
+    public decimal? DestinationLongitude { get; set; }
+
+    [Display(Name = "Distance (Miles)")]
+    [Column(TypeName = "decimal(8,2)")]
+    public decimal? DistanceMiles { get; set; }
+
+    [Display(Name = "Estimated Travel Time")]
+    public TimeSpan? EstimatedTravelTime { get; set; }
+
+    // Navigation/routing properties for activities with variable destinations
+    [StringLength(500)]
+    [Display(Name = "Directions")]
+    public string? Directions { get; set; }
+
+    [StringLength(200)]
+    [Display(Name = "Pickup Location")]
+    public string? PickupLocation { get; set; } = "School"; // Default to school
+
+    [Display(Name = "Pickup Latitude")]
+    [Column(TypeName = "decimal(10,8)")]
+    public decimal? PickupLatitude { get; set; }
+
+    [Display(Name = "Pickup Longitude")]
+    [Column(TypeName = "decimal(11,8)")]
+    public decimal? PickupLongitude { get; set; }
+
     // Computed properties for Syncfusion scheduling
     [NotMapped]
     [Display(Name = "Duration")]

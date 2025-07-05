@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Bus_Buddy.Data.Interfaces;
 using Bus_Buddy.Models;
+using Bus_Buddy.Services;
 
 namespace Bus_Buddy.Data.Repositories;
 
@@ -10,7 +11,7 @@ namespace Bus_Buddy.Data.Repositories;
 /// </summary>
 public class BusRepository : Repository<Bus>, IBusRepository
 {
-    public BusRepository(BusBuddyDbContext context) : base(context)
+    public BusRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService)
     {
     }
 

@@ -1,0 +1,29 @@
+# Enhanced PowerShell Integration Step for GitHub Actions
+- name: Run Enhanced PowerShell Analysis
+  shell: pwsh
+  run: |
+    # Load PowerShell 7.x enhanced tools
+    . ./Scripts/Enhanced-CI-Integration.ps1
+
+    # Run comprehensive analysis
+    Start-CIIntegrationDemo -GenerateReports -UploadCoverage
+
+    # Export results for subsequent steps
+    if (Test-Path "build-error-analysis.json") {
+      Write-Host "::notice::Build errors found. Check build-error-analysis.json"
+      Get-Content "build-error-analysis.json" | Write-Host
+    }
+
+    # Set outputs for other jobs
+    "enhanced-analysis=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+    "coverage-generated=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+- name: Upload Enhanced Coverage Artifacts
+  uses: actions/upload-artifact@v4
+  if: always()
+  with:
+    name: enhanced-coverage-reports
+    path: |
+      TestResults/Enhanced/
+      build-error-analysis.json
+    retention-days: 30

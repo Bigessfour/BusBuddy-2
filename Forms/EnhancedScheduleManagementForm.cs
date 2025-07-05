@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Bus_Buddy.Forms
 {
-    public partial class EnhancedScheduleManagementForm : SfForm
+    public partial class EnhancedScheduleManagementForm : MetroForm
     {
         private readonly IScheduleService _scheduleService;
         private readonly IBusService _busService;
@@ -61,11 +61,11 @@ namespace Bus_Buddy.Forms
                 Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this,
                     Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
 
-                // Apply theme colors through Style property
-                this.Style.TitleBar.BackColor = System.Drawing.Color.FromArgb(52, 152, 219);
-                this.Style.TitleBar.ForeColor = System.Drawing.Color.White;
-                this.Style.TitleBar.Height = 40;
-                this.Style.TitleBar.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+                // Apply theme colors through MetroForm properties
+                this.MetroColor = System.Drawing.Color.FromArgb(52, 152, 219);
+                this.CaptionForeColor = System.Drawing.Color.White;
+                this.CaptionBarHeight = 40;
+                this.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
                 this.AutoScaleMode = AutoScaleMode.Dpi;
 
                 _logger.LogInformation("Office2016Colorful theme applied successfully");
@@ -84,10 +84,10 @@ namespace Bus_Buddy.Forms
             this.WindowState = FormWindowState.Maximized;
 
             // Apply Syncfusion styling
-            this.Style.TitleBar.Height = 40;
-            this.Style.TitleBar.BackColor = Color.FromArgb(0, 120, 215);
-            this.Style.TitleBar.ForeColor = Color.White;
-            this.Style.TitleBar.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            this.CaptionBarHeight = 40;
+            this.MetroColor = Color.FromArgb(0, 120, 215);
+            this.CaptionForeColor = Color.White;
+            this.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
         }
 
         private void SetupLayout()

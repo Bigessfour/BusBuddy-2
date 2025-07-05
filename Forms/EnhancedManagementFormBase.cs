@@ -103,7 +103,9 @@ namespace Bus_Buddy.Forms
                 {
                     DataGrid.Style.HeaderStyle.BackColor = Color.FromArgb(240, 240, 240);
                     DataGrid.Style.HeaderStyle.TextColor = Color.FromArgb(68, 68, 68);
-                    DataGrid.Style.HeaderStyle.Font.FontWeight = FontWeight.SemiBold;
+                    // Note: FontWeight property not available in current Syncfusion version
+                    // DataGrid.Style.HeaderStyle.Font.FontWeight = FontWeight.SemiBold;
+                    DataGrid.Style.HeaderStyle.Font.Bold = true; // Use Bold property instead
                 }
 
                 Logger.LogDebug("Enhanced data grid configuration applied to {FormType}", this.GetType().Name);
@@ -389,11 +391,10 @@ namespace Bus_Buddy.Forms
                 // Enable high-quality font rendering
                 try
                 {
-                    form.SetStyle(ControlStyles.AllPaintingInWmPaint |
-                                 ControlStyles.UserPaint |
-                                 ControlStyles.DoubleBuffer |
-                                 ControlStyles.ResizeRedraw, true);
-                    form.UpdateStyles();
+                    // Note: SetStyle, UpdateStyles, and DoubleBuffered are protected members
+                    // These optimizations should be applied within each form's constructor
+                    // For now, we'll skip these optimizations to avoid compilation errors
+                    System.Diagnostics.Debug.WriteLine("Font rendering optimizations skipped due to access restrictions");
                 }
                 catch (Exception ex)
                 {

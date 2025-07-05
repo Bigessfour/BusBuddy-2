@@ -54,6 +54,9 @@ namespace Bus_Buddy.Forms
         private Label? _trafficStatusLabel;
         private Label? _weatherStatusLabel;
 
+        // Map component (using Panel as placeholder for now)
+        private Panel? _routeMap;
+
         public EnhancedRouteMapModule(ILogger<EnhancedRouteMapModule> logger,
                                      RouteRepository routeRepository,
                                      BusRepository busRepository,
@@ -374,13 +377,23 @@ namespace Bus_Buddy.Forms
 
                 // Main route map tab
                 var routeMapTab = new TabPageAdv("Route Map");
-                _routeMap = new Maps
+                _routeMap = new Panel
                 {
                     Dock = DockStyle.Fill,
-                    EnableNavigation = true,
-                    EnableZooming = true,
-                    EnablePanning = true
+                    BackColor = System.Drawing.Color.LightGray,
+                    BorderStyle = BorderStyle.FixedSingle
                 };
+
+                // Add placeholder label for map
+                var mapPlaceholder = new Label
+                {
+                    Text = "Route Map\n(Google Earth Engine Integration)\n\nMap functionality will be\nimplemented with proper\nSyncfusion Maps controls",
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold),
+                    ForeColor = System.Drawing.Color.DarkSlateGray
+                };
+                _routeMap.Controls.Add(mapPlaceholder);
 
                 // Configure map for satellite view with Google Earth Engine
                 ConfigureMapForSatelliteView();
@@ -414,15 +427,9 @@ namespace Bus_Buddy.Forms
             {
                 if (_routeMap != null)
                 {
-                    // Configure map layers for satellite imagery
-                    _routeMap.BaseMapIndex = 0; // Start with standard map
-                    _routeMap.EnableZooming = true;
-                    _routeMap.EnablePanning = true;
-                    _routeMap.ZoomLevel = 10;
-
-                    // Set initial center (you can customize this based on your service area)
-                    _routeMap.Latitude = 40.7128; // New York City as example
-                    _routeMap.Longitude = -74.0060;
+                    // For now, just log that we're configuring the map
+                    // In the future, this will configure actual Syncfusion Maps controls
+                    _logger.LogInformation("Configuring route map for satellite view");
 
                     // Enable satellite overlay from Google Earth Engine
                     _ = Task.Run(async () => await OverlaySatelliteImagery());
@@ -477,13 +484,24 @@ namespace Bus_Buddy.Forms
                 _realTimePanel.Controls.Add(statusPanel);
 
                 // Real-time map (clone of main map for tracking)
-                var realTimeMap = new Maps
+                var realTimeMap = new Panel
                 {
                     Dock = DockStyle.Fill,
-                    EnableNavigation = true,
-                    EnableZooming = true,
-                    EnablePanning = true
+                    BackColor = System.Drawing.Color.LightBlue,
+                    BorderStyle = BorderStyle.FixedSingle
                 };
+
+                // Add placeholder label for real-time map
+                var realTimeMapPlaceholder = new Label
+                {
+                    Text = "Real-Time Tracking Map\n(GPS & Live Updates)\n\nLive bus tracking will be\nimplemented here",
+                    Dock = DockStyle.Fill,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold),
+                    ForeColor = System.Drawing.Color.DarkBlue
+                };
+                realTimeMap.Controls.Add(realTimeMapPlaceholder);
+
                 _realTimePanel.Controls.Add(realTimeMap);
 
                 tab.Controls.Add(_realTimePanel);
@@ -549,7 +567,7 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                _realTimeUpdateTimer = new Timer
+                _realTimeUpdateTimer = new System.Windows.Forms.Timer
                 {
                     Interval = 30000 // 30 seconds
                 };
@@ -570,7 +588,7 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                _refreshImageryButton.Text = "🔄 Refreshing...";
+                _refreshImageryButton!.Text = "🔄 Refreshing...";
                 _refreshImageryButton.Enabled = false;
 
                 var selectedLayer = _satelliteLayerCombo?.SelectedItem?.ToString() ?? "";
@@ -578,8 +596,8 @@ namespace Bus_Buddy.Forms
 
                 // Call Google Earth Engine service to get latest imagery
                 var imageryData = await _geeService.GetSatelliteImageryAsync(selectedLayer,
-                    _routeMap?.Latitude ?? 40.7128,
-                    _routeMap?.Longitude ?? -74.0060);
+                    40.7128, // Default NYC latitude
+                    -74.0060); // Default NYC longitude
 
                 if (imageryData != null)
                 {
@@ -595,7 +613,7 @@ namespace Bus_Buddy.Forms
             }
             finally
             {
-                _refreshImageryButton.Text = "🛰️ Refresh Imagery";
+                _refreshImageryButton!.Text = "🛰️ Refresh Imagery";
                 _refreshImageryButton.Enabled = true;
             }
         }
@@ -604,16 +622,16 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                _analyzeTerrainButton.Text = "🔄 Analyzing...";
+                _analyzeTerrainButton!.Text = "🔄 Analyzing...";
                 _analyzeTerrainButton.Enabled = false;
 
                 _logger.LogInformation("Starting terrain analysis with Google Earth Engine");
 
                 // Get terrain data for current map view
                 var terrainData = await _geeService.GetTerrainAnalysisAsync(
-                    _routeMap?.Latitude ?? 40.7128,
-                    _routeMap?.Longitude ?? -74.0060,
-                    _routeMap?.ZoomLevel ?? 10);
+                    40.7128, // Default NYC latitude
+                    -74.0060, // Default NYC longitude
+                    10); // Default zoom level
 
                 if (terrainData != null)
                 {
@@ -638,7 +656,7 @@ namespace Bus_Buddy.Forms
             }
             finally
             {
-                _analyzeTerrainButton.Text = "🏔️ Analyze Terrain";
+                _analyzeTerrainButton!.Text = "🏔️ Analyze Terrain";
                 _analyzeTerrainButton.Enabled = true;
             }
         }
@@ -647,7 +665,7 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                _optimizeRoutesButton.Text = "🔄 Optimizing...";
+                _optimizeRoutesButton!.Text = "🔄 Optimizing...";
                 _optimizeRoutesButton.Enabled = false;
 
                 _logger.LogInformation("Starting route optimization with Google Earth Engine");
@@ -688,7 +706,7 @@ namespace Bus_Buddy.Forms
             }
             finally
             {
-                _optimizeRoutesButton.Text = "🎯 Optimize Routes";
+                _optimizeRoutesButton!.Text = "🎯 Optimize Routes";
                 _optimizeRoutesButton.Enabled = true;
             }
         }
@@ -724,7 +742,9 @@ namespace Bus_Buddy.Forms
             try
             {
                 // Open route edit form for new route
-                var routeEditForm = new RouteEditForm();
+                var routeEditForm = new RouteEditForm(
+                    ServiceContainer.GetService<ILogger<RouteEditForm>>(),
+                    ServiceContainer.GetService<IBusService>());
                 if (routeEditForm.ShowDialog(this) == DialogResult.OK)
                 {
                     await LoadRouteData();
@@ -746,9 +766,15 @@ namespace Bus_Buddy.Forms
                 if (_routeListView?.SelectedItems.Count == 1)
                 {
                     var selectedItem = _routeListView.SelectedItems[0];
-                    var routeId = (int)selectedItem.Tag;
+                    var routeId = (int?)selectedItem.Tag ?? 0;
 
-                    var routeEditForm = new RouteEditForm(routeId);
+                    // Get the route object
+                    var route = await _routeRepository.GetRouteByIdAsync(routeId);
+
+                    var routeEditForm = new RouteEditForm(
+                        ServiceContainer.GetService<ILogger<RouteEditForm>>(),
+                        ServiceContainer.GetService<IBusService>(),
+                        route);
                     if (routeEditForm.ShowDialog(this) == DialogResult.OK)
                     {
                         await LoadRouteData();
@@ -783,7 +809,7 @@ namespace Bus_Buddy.Forms
 
                     if (result == DialogResult.Yes)
                     {
-                        var routeId = (int)selectedItem.Tag;
+                        var routeId = (int?)selectedItem.Tag ?? 0;
                         await _routeRepository.DeleteRouteAsync(routeId);
                         await LoadRouteData();
                         _logger.LogInformation($"Route {routeId} deleted successfully");
@@ -810,7 +836,7 @@ namespace Bus_Buddy.Forms
                 if (_routeListView?.SelectedItems.Count == 1)
                 {
                     var selectedItem = _routeListView.SelectedItems[0];
-                    var routeId = (int)selectedItem.Tag;
+                    var routeId = (int?)selectedItem.Tag ?? 0;
 
                     // Display route on map
                     await DisplayRouteOnMap(routeId);
@@ -864,7 +890,7 @@ namespace Bus_Buddy.Forms
                     }
                 });
 
-                _logger.LogDebug($"Loaded {routes?.Count ?? 0} routes");
+                _logger.LogDebug($"Loaded {routes?.Count() ?? 0} routes");
             }
             catch (Exception ex)
             {

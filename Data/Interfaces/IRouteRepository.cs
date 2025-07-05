@@ -15,6 +15,12 @@ public interface IRouteRepository : IRepository<Route>
     Task<IEnumerable<Route>> GetActiveRoutesAsync();
     Task<Route?> GetRouteByNameAndDateAsync(string routeName, DateTime date);
 
+    // Additional async methods for compatibility
+    Task UpdateAsync(Route route);
+    Task<IEnumerable<Route>> GetAllRoutesAsync();
+    Task<bool> DeleteRouteAsync(int routeId);
+    Task<Route?> GetRouteByIdAsync(int routeId);
+
     // Vehicle and driver assignments
     Task<IEnumerable<Route>> GetRoutesByVehicleAsync(int vehicleId, DateTime? date = null);
     Task<IEnumerable<Route>> GetRoutesByDriverAsync(int driverId, DateTime? date = null);

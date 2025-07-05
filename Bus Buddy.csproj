@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -91,6 +91,41 @@
     <Reference Include="Syncfusion.Schedule.Base">
       <HintPath>libs/Syncfusion/Syncfusion.Schedule.Base.dll</HintPath>
     </Reference>
+    <!-- Add missing assemblies that are available locally -->
+    <Reference Include="Syncfusion.Grid.Base">
+      <HintPath>libs/Syncfusion/Syncfusion.Grid.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Chart.Windows">
+      <HintPath>libs/Syncfusion/Syncfusion.Chart.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Chart.Base">
+      <HintPath>libs/Syncfusion/Syncfusion.Chart.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.DataSource.WinForms">
+      <HintPath>libs/Syncfusion/Syncfusion.DataSource.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Data.WinForms">
+      <HintPath>libs/Syncfusion/Syncfusion.Data.WinForms.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
+
+  <!-- SYNCFUSION_LOCAL_REFERENCES: Lock to local installation only -->
+  <PropertyGroup>
+    <SyncfusionLocalPath>C:\Program Files (x86)\Syncfusion\Essential Studio\Windows\30.1.37</SyncfusionLocalPath>
+    <SyncfusionAssembliesPath>$(SyncfusionLocalPath)\Assemblies</SyncfusionAssembliesPath>
+    <SyncfusionUseLocalOnly>true</SyncfusionUseLocalOnly>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(SyncfusionUseLocalOnly)' == 'true'">
+    <!-- Local Syncfusion References - NO EXTERNAL PACKAGES -->
+    <Reference Include="Syncfusion.SfDataGrid.WinForms">
+      <HintPath>$(SyncfusionAssembliesPath)\4.8\Syncfusion.SfDataGrid.WinForms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Syncfusion.Shared.Base">
+      <HintPath>$(SyncfusionAssembliesPath)\4.8\Syncfusion.Shared.Base.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
 </Project>

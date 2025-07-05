@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Bus_Buddy.Data.Interfaces;
 using Bus_Buddy.Models.Base;
+using Bus_Buddy.Services;
 using System.Reflection;
 
 namespace Bus_Buddy.Data.Repositories;
@@ -16,11 +17,13 @@ public class Repository<T> : IRepository<T> where T : class
 {
     protected readonly BusBuddyDbContext _context;
     protected readonly DbSet<T> _dbSet;
+    protected readonly IUserContextService _userContextService;
     private readonly bool _supportsSoftDelete;
 
-    public Repository(BusBuddyDbContext context)
+    public Repository(BusBuddyDbContext context, IUserContextService userContextService)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
         _dbSet = _context.Set<T>();
         _supportsSoftDelete = typeof(BaseEntity).IsAssignableFrom(typeof(T)) ||
                              typeof(T).GetProperty("Active")?.PropertyType == typeof(bool);
@@ -633,9 +636,8 @@ public class Repository<T> : IRepository<T> where T : class
 
     private string? GetCurrentUser()
     {
-        // This would typically get the current user from the security context
-        // For now, return a default value or get from a service
-        return "System"; // TODO: Implement proper user context
+        // Get the current authenticated user from the user context service
+        return _userContextService.GetCurrentUserForAudit();
     }
 
     private string GetPrimaryKeyName()

@@ -15,7 +15,7 @@ namespace BusBuddy.Forms
     /// Professional Bus Reports Form using actual Bus entities and BusRepository
     /// Demonstrates integration with existing sophisticated models and repositories
     /// </summary>
-    public partial class BusReportsForm : SfForm
+    public partial class BusReportsForm : Form
     {
         private SfDataGrid? busReportsGrid;
         private BindingList<BusReportViewModel>? busReportsData;
@@ -27,10 +27,10 @@ namespace BusBuddy.Forms
         public BusReportsForm(BusRepository busRepository)
         {
             _busRepository = busRepository ?? throw new ArgumentNullException(nameof(busRepository));
-            InitializeComponent();
+            // No designer file, so skip InitializeComponent
             InitializeBusReportsLayout();
             SetupEventHandlers();
-            LoadBusReportDataAsync();
+            _ = LoadBusReportDataAsync();
         }
 
         private void InitializeBusReportsLayout()
@@ -82,15 +82,15 @@ namespace BusBuddy.Forms
 
             // Configure columns to match Bus entity properties
             busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "BusNumber", HeaderText = "Bus #", Width = 80 });
-            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "LicensePlate", HeaderText = "License", Width = 100 });
+            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "LicenseNumber", HeaderText = "License", Width = 100 });
             busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "Model", HeaderText = "Model", Width = 120 });
-            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "Capacity", HeaderText = "Capacity", Width = 80 });
+            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "SeatingCapacity", HeaderText = "Capacity", Width = 80 });
             busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "Age", HeaderText = "Age (Years)", Width = 90 });
-            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "Mileage", HeaderText = "Mileage", Width = 100, Format = "N0" });
+            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "CurrentOdometer", HeaderText = "Mileage", Width = 100, Format = "N0" });
             busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "InspectionStatus", HeaderText = "Inspection", Width = 100 });
-            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "MaintenanceStatus", HeaderText = "Maintenance", Width = 100 });
-            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "IsActive", HeaderText = "Active", Width = 60 });
-            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "LastInspection", HeaderText = "Last Inspection", Width = 120, Format = "d" });
+            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "NeedsAttention", HeaderText = "Needs Attention", Width = 100 });
+            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "Status", HeaderText = "Status", Width = 80 });
+            busReportsGrid.Columns.Add(new GridTextColumn() { MappingName = "DateLastInspection", HeaderText = "Last Inspection", Width = 120, Format = "d" });
 
             this.Controls.Add(busReportsGrid);
         }
@@ -101,7 +101,7 @@ namespace BusBuddy.Forms
                 refreshButton.Click += async (s, e) => await RefreshBusReportsAsync();
 
             if (exportButton != null)
-                exportButton.Click += ExportButton_Click;
+                exportButton.Click += new EventHandler(ExportButton_Click);
 
             if (busReportsGrid != null)
                 busReportsGrid.CellDoubleClick += BusReportsGrid_CellDoubleClick;
@@ -118,17 +118,17 @@ namespace BusBuddy.Forms
                 var buses = await _busRepository.GetAllAsync();
                 var busReportViewModels = buses.Select(bus => new BusReportViewModel
                 {
-                    BusId = bus.BusId,
+                    VehicleId = bus.VehicleId,
                     BusNumber = bus.BusNumber,
-                    LicensePlate = bus.LicensePlate,
+                    LicenseNumber = bus.LicenseNumber,
                     Model = bus.Model,
-                    Capacity = bus.Capacity,
+                    SeatingCapacity = bus.SeatingCapacity,
                     Age = bus.Age, // Uses computed property from Bus model
-                    Mileage = bus.Mileage,
+                    CurrentOdometer = bus.CurrentOdometer ?? 0,
                     InspectionStatus = bus.InspectionStatus, // Uses computed property
-                    MaintenanceStatus = bus.MaintenanceStatus,
-                    IsActive = bus.IsActive ? "Yes" : "No",
-                    LastInspection = bus.LastInspection,
+                    NeedsAttention = bus.NeedsAttention ? "Yes" : "No",
+                    Status = bus.Status,
+                    DateLastInspection = bus.DateLastInspection,
                     PurchaseDate = bus.PurchaseDate,
                     FuelType = bus.FuelType
                 }).ToList();
@@ -169,11 +169,12 @@ namespace BusBuddy.Forms
                 MessageBox.Show($"Bus Details:\n" +
                     $"Bus Number: {selectedBus.BusNumber}\n" +
                     $"Model: {selectedBus.Model}\n" +
-                    $"Capacity: {selectedBus.Capacity}\n" +
+                    $"Capacity: {selectedBus.SeatingCapacity}\n" +
                     $"Age: {selectedBus.Age} years\n" +
-                    $"Mileage: {selectedBus.Mileage:N0}\n" +
+                    $"Mileage: {selectedBus.CurrentOdometer:N0}\n" +
                     $"Inspection Status: {selectedBus.InspectionStatus}\n" +
-                    $"Maintenance Status: {selectedBus.MaintenanceStatus}",
+                    $"Needs Attention: {selectedBus.NeedsAttention}\n" +
+                    $"Status: {selectedBus.Status}",
                     "Bus Details", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // TODO: Open detailed bus management form when available
@@ -185,74 +186,12 @@ namespace BusBuddy.Forms
         /// </summary>
         public async Task LoadMaintenanceDueBusesAsync()
         {
-            try
-            {
-                var maintenanceDueBuses = await _busRepository.GetBusesNeedingMaintenanceAsync();
-                var viewModels = maintenanceDueBuses.Select(bus => new BusReportViewModel
-                {
-                    BusId = bus.BusId,
-                    BusNumber = bus.BusNumber,
-                    LicensePlate = bus.LicensePlate,
-                    Model = bus.Model,
-                    Capacity = bus.Capacity,
-                    Age = bus.Age,
-                    Mileage = bus.Mileage,
-                    InspectionStatus = bus.InspectionStatus,
-                    MaintenanceStatus = bus.MaintenanceStatus,
-                    IsActive = bus.IsActive ? "Yes" : "No",
-                    LastInspection = bus.LastInspection,
-                    PurchaseDate = bus.PurchaseDate,
-                    FuelType = bus.FuelType
-                }).ToList();
-
-                busReportsData = new BindingList<BusReportViewModel>(viewModels);
-                if (busReportsGrid != null)
-                    busReportsGrid.DataSource = busReportsData;
-
-                if (statusLabel != null)
-                    statusLabel.Text = $"Showing {viewModels.Count} buses needing maintenance";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading maintenance due buses: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            MessageBox.Show("Maintenance due bus filtering is not implemented. Please add this feature to BusRepository if needed.", "Not Implemented", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         public async Task LoadInspectionDueBusesAsync()
         {
-            try
-            {
-                var inspectionDueBuses = await _busRepository.GetBusesNeedingInspectionAsync();
-                var viewModels = inspectionDueBuses.Select(bus => new BusReportViewModel
-                {
-                    BusId = bus.BusId,
-                    BusNumber = bus.BusNumber,
-                    LicensePlate = bus.LicensePlate,
-                    Model = bus.Model,
-                    Capacity = bus.Capacity,
-                    Age = bus.Age,
-                    Mileage = bus.Mileage,
-                    InspectionStatus = bus.InspectionStatus,
-                    MaintenanceStatus = bus.MaintenanceStatus,
-                    IsActive = bus.IsActive ? "Yes" : "No",
-                    LastInspection = bus.LastInspection,
-                    PurchaseDate = bus.PurchaseDate,
-                    FuelType = bus.FuelType
-                }).ToList();
-
-                busReportsData = new BindingList<BusReportViewModel>(viewModels);
-                if (busReportsGrid != null)
-                    busReportsGrid.DataSource = busReportsData;
-
-                if (statusLabel != null)
-                    statusLabel.Text = $"Showing {viewModels.Count} buses needing inspection";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading inspection due buses: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            MessageBox.Show("Inspection due bus filtering is not implemented. Please add this feature to BusRepository if needed.", "Not Implemented", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 
@@ -262,18 +201,18 @@ namespace BusBuddy.Forms
     /// </summary>
     public class BusReportViewModel
     {
-        public int BusId { get; set; }
+        public int VehicleId { get; set; }
         public string BusNumber { get; set; } = string.Empty;
-        public string LicensePlate { get; set; } = string.Empty;
+        public string LicenseNumber { get; set; } = string.Empty;
         public string Model { get; set; } = string.Empty;
-        public int Capacity { get; set; }
+        public int SeatingCapacity { get; set; }
         public int Age { get; set; }
-        public decimal Mileage { get; set; }
+        public int CurrentOdometer { get; set; }
         public string InspectionStatus { get; set; } = string.Empty;
-        public string MaintenanceStatus { get; set; } = string.Empty;
-        public string IsActive { get; set; } = string.Empty;
-        public DateTime? LastInspection { get; set; }
-        public DateTime PurchaseDate { get; set; }
-        public string FuelType { get; set; } = string.Empty;
+        public string NeedsAttention { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public DateTime? DateLastInspection { get; set; }
+        public DateTime? PurchaseDate { get; set; }
+        public string? FuelType { get; set; } = string.Empty;
     }
 }

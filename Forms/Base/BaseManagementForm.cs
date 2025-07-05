@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using Syncfusion.WinForms.Controls;
 using Syncfusion.WinForms.DataGrid;
 
 namespace BusBuddy.Forms.Base
@@ -11,7 +10,7 @@ namespace BusBuddy.Forms.Base
     /// Provides standard CRUD operations, data binding, and UI patterns.
     /// </summary>
     /// <typeparam name="T">The entity type (e.g., Bus, Driver, Route)</typeparam>
-    public abstract partial class BaseManagementForm<T> : SfForm where T : class, new()
+    public abstract partial class BaseManagementForm<T> : Form where T : class, new()
     {
         protected Syncfusion.WinForms.DataGrid.SfDataGrid? dataGrid;
         protected BindingList<T>? dataSource;

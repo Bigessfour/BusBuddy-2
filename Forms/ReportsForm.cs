@@ -19,7 +19,7 @@ namespace BusBuddy.Forms
         public string Status { get; set; } = string.Empty;
     }
 
-    public partial class ReportsForm : SfForm
+    public partial class ReportsForm : Form
     {
         private Syncfusion.WinForms.DataGrid.SfDataGrid? reportsGrid;
         private System.ComponentModel.BindingList<ReportInfo>? reportsData;
@@ -27,7 +27,7 @@ namespace BusBuddy.Forms
 
         public ReportsForm()
         {
-            InitializeComponent();
+            // No designer file, so skip InitializeComponent
             InitializeReportsLayout();
             SetupEventHandlers();
         }

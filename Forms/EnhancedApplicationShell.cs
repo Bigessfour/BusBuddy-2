@@ -267,7 +267,9 @@ namespace Bus_Buddy.Forms
 
                 // Create the existing sophisticated Dashboard
                 var dashboardLogger = _serviceProvider.GetRequiredService<ILogger<Dashboard>>();
-                _embeddedDashboard = new Dashboard(dashboardLogger, _busService, _configService);
+                var xaiService = _serviceProvider.GetRequiredService<XAIService>();
+                var geeService = _serviceProvider.GetRequiredService<GoogleEarthEngineService>();
+                _embeddedDashboard = new Dashboard(dashboardLogger, _busService, _configService, xaiService, geeService, _serviceProvider);
 
                 // Embed the dashboard in the left panel
                 _embeddedDashboard.TopLevel = false;

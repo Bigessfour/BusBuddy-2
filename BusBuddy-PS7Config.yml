@@ -1,0 +1,16 @@
+Platform: Windows
+Project: Bus Buddy
+Timestamp: 2025-07-04T21:42:07.2391660-06:00
+Tools:
+  PowerShellYaml: true
+  PSScriptAnalyzer: true
+  Pester: true
+  TerminalIcons: true
+  ConsoleGuiTools: true
+Features:
+  NullConditionals: true
+  EnhancedJSON: true
+  ParallelProcessing: true
+  TernaryOperator: true
+PowerShellVersion: 7.5.2
+

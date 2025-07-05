@@ -13,7 +13,7 @@ public interface IStudentRepository : IRepository<Student>
     Task<IEnumerable<Student>> GetStudentsByGradeAsync(string grade);
     Task<IEnumerable<Student>> GetStudentsByRouteAsync(int? routeId);
     Task<IEnumerable<Student>> GetStudentsWithoutRouteAsync();
-    Task<Student?> GetStudentByNameAsync(string firstName, string lastName);
+    Task<Student?> GetStudentByNameAsync(string studentName);
     Task<IEnumerable<Student>> SearchStudentsByNameAsync(string searchTerm);
 
     // Special needs and medical

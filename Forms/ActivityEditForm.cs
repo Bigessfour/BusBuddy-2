@@ -10,7 +10,7 @@ namespace Bus_Buddy.Forms;
 /// <summary>
 /// Form for adding/editing activities using Syncfusion components
 /// </summary>
-public partial class ActivityEditForm : SfForm
+public partial class ActivityEditForm : Form
 {
     private readonly IActivityService _activityService;
     private readonly IBusService _busService;
@@ -75,10 +75,6 @@ public partial class ActivityEditForm : SfForm
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
-
-        // Apply Syncfusion styling
-        Style.TitleBar.BackColor = Color.FromArgb(46, 204, 113);
-        Style.TitleBar.ForeColor = Color.White;
 
         int yPos = 20;
         const int leftMargin = 20;

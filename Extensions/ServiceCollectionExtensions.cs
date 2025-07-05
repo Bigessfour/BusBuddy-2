@@ -5,6 +5,7 @@ using Bus_Buddy.Data;
 using Bus_Buddy.Data.Interfaces;
 using Bus_Buddy.Data.Repositories;
 using Bus_Buddy.Data.UnitOfWork;
+using Bus_Buddy.Services;
 
 namespace Bus_Buddy.Extensions;
 
@@ -41,23 +42,26 @@ public static class ServiceCollectionExtensions
 #endif
         });
 
-        // Register repositories
-        services.AddScoped<IActivityRepository, ActivityRepository>();
-        services.AddScoped<IBusRepository, BusRepository>();
-        services.AddScoped<IDriverRepository, DriverRepository>();
-        services.AddScoped<IRouteRepository, RouteRepository>();
-        services.AddScoped<IStudentRepository, StudentRepository>();
-        services.AddScoped<IFuelRepository, FuelRepository>();
-        services.AddScoped<IMaintenanceRepository, MaintenanceRepository>();
-        services.AddScoped<IScheduleRepository, ScheduleRepository>();
-        services.AddScoped<ISchoolCalendarRepository, SchoolCalendarRepository>();
-        services.AddScoped<IActivityScheduleRepository, ActivityScheduleRepository>();
+        // Register repositories - use fully qualified names to avoid ambiguity
+        services.AddScoped<IActivityRepository, Bus_Buddy.Data.Repositories.ActivityRepository>();
+        services.AddScoped<IBusRepository, Bus_Buddy.Data.Repositories.BusRepository>();
+        services.AddScoped<IDriverRepository, Bus_Buddy.Data.Repositories.DriverRepository>();
+        services.AddScoped<IRouteRepository, Bus_Buddy.Data.Repositories.RouteRepository>();
+        services.AddScoped<IStudentRepository, Bus_Buddy.Data.Repositories.StudentRepository>();
+        services.AddScoped<IFuelRepository, Bus_Buddy.Data.Repositories.FuelRepository>();
+        services.AddScoped<IMaintenanceRepository, Bus_Buddy.Data.Repositories.MaintenanceRepository>();
+        services.AddScoped<IScheduleRepository, Bus_Buddy.Data.Repositories.ScheduleRepository>();
+        services.AddScoped<ISchoolCalendarRepository, Bus_Buddy.Data.Repositories.SchoolCalendarRepository>();
+        services.AddScoped<IActivityScheduleRepository, Bus_Buddy.Data.Repositories.ActivityScheduleRepository>();
 
         // Register generic repository
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-        // Register Unit of Work
+        // Register Unit of Work - NOTE: UnitOfWork constructor now requires IUserContextService
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Register User Context Service (must be registered before UnitOfWork since it depends on it)
+        services.AddScoped<IUserContextService, UserContextService>();
 
         return services;
     }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Bus_Buddy.Data.Interfaces;
 using Bus_Buddy.Data.Repositories;
 using Bus_Buddy.Models;
+using Bus_Buddy.Services;
 
 namespace Bus_Buddy.Data.UnitOfWork;
 
@@ -13,6 +14,7 @@ namespace Bus_Buddy.Data.UnitOfWork;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly BusBuddyDbContext _context;
+    private readonly IUserContextService _userContextService;
     private IDbContextTransaction? _transaction;
     private string? _currentAuditUser;
     private bool _disposed = false;
@@ -32,61 +34,62 @@ public class UnitOfWork : IUnitOfWork
     // Generic repository cache
     private readonly Dictionary<Type, object> _repositories = new();
 
-    public UnitOfWork(BusBuddyDbContext context)
+    public UnitOfWork(BusBuddyDbContext context, IUserContextService userContextService)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
     }
 
     #region Repository Properties
 
     public IActivityRepository Activities
     {
-        get { return _activities ??= new ActivityRepository(_context); }
+        get { return _activities ??= new ActivityRepository(_context, _userContextService); }
     }
 
     public IBusRepository Buses
     {
-        get { return _buses ??= new BusRepository(_context); }
+        get { return _buses ??= new BusRepository(_context, _userContextService); }
     }
 
     public IDriverRepository Drivers
     {
-        get { return _drivers ??= new DriverRepository(_context); }
+        get { return _drivers ??= new DriverRepository(_context, _userContextService); }
     }
 
     public IRouteRepository Routes
     {
-        get { return _routes ??= new RouteRepository(_context); }
+        get { return _routes ??= new RouteRepository(_context, _userContextService); }
     }
 
     public IStudentRepository Students
     {
-        get { return _students ??= new StudentRepository(_context); }
+        get { return _students ??= new StudentRepository(_context, _userContextService); }
     }
 
     public IFuelRepository FuelRecords
     {
-        get { return _fuelRecords ??= new FuelRepository(_context); }
+        get { return _fuelRecords ??= new FuelRepository(_context, _userContextService); }
     }
 
     public IMaintenanceRepository MaintenanceRecords
     {
-        get { return _maintenanceRecords ??= new MaintenanceRepository(_context); }
+        get { return _maintenanceRecords ??= new MaintenanceRepository(_context, _userContextService); }
     }
 
     public IScheduleRepository Schedules
     {
-        get { return _schedules ??= new ScheduleRepository(_context); }
+        get { return _schedules ??= new ScheduleRepository(_context, _userContextService); }
     }
 
     public ISchoolCalendarRepository SchoolCalendar
     {
-        get { return _schoolCalendar ??= new SchoolCalendarRepository(_context); }
+        get { return _schoolCalendar ??= new SchoolCalendarRepository(_context, _userContextService); }
     }
 
     public IActivityScheduleRepository ActivitySchedules
     {
-        get { return _activitySchedules ??= new ActivityScheduleRepository(_context); }
+        get { return _activitySchedules ??= new ActivityScheduleRepository(_context, _userContextService); }
     }
 
     #endregion
@@ -95,13 +98,10 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<T> Repository<T>() where T : class
     {
-        var type = typeof(T);
-
-        if (!_repositories.ContainsKey(type))
+        var type = typeof(T); if (!_repositories.ContainsKey(type))
         {
-            _repositories[type] = new Repository<T>(_context);
+            _repositories[type] = new Repository<T>(_context, _userContextService);
         }
-
         return (IRepository<T>)_repositories[type];
     }
 
@@ -430,7 +430,7 @@ public class UnitOfWork : IUnitOfWork
 // Placeholder repository implementations - these would be fully implemented similar to ActivityRepository and BusRepository
 public class DriverRepository : Repository<Driver>, IDriverRepository
 {
-    public DriverRepository(BusBuddyDbContext context) : base(context) { }
+    public DriverRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService) { }
 
     // Implement all interface methods similar to other repositories
     public async Task<IEnumerable<Driver>> GetActiveDriversAsync() => await GetAllAsync();
@@ -465,77 +465,52 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
     public bool IsDriverAvailable(int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime) => true;
 }
 
-public class RouteRepository : Repository<Route>, IRouteRepository
-{
-    public RouteRepository(BusBuddyDbContext context) : base(context) { }
-
-    // Implement all interface methods similar to other repositories
-    public async Task<IEnumerable<Route>> GetRoutesByDateAsync(DateTime date) => await FindAsync(r => r.Date.Date == date.Date);
-    public async Task<IEnumerable<Route>> GetRoutesByDateRangeAsync(DateTime startDate, DateTime endDate) => await FindAsync(r => r.Date >= startDate && r.Date <= endDate);
-    public async Task<IEnumerable<Route>> GetRoutesByNameAsync(string routeName) => await FindAsync(r => r.RouteName == routeName);
-    public async Task<IEnumerable<Route>> GetActiveRoutesAsync() => await FindAsync(r => r.IsActive);
-    public async Task<Route?> GetRouteByNameAndDateAsync(string routeName, DateTime date) => await FirstOrDefaultAsync(r => r.RouteName == routeName && r.Date.Date == date.Date);
-    public async Task<IEnumerable<Route>> GetRoutesByVehicleAsync(int vehicleId, DateTime? date = null) => await FindAsync(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
-    public async Task<IEnumerable<Route>> GetRoutesByDriverAsync(int driverId, DateTime? date = null) => await FindAsync(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
-    public async Task<IEnumerable<Route>> GetRoutesWithoutVehicleAssignmentAsync(DateTime date) => await FindAsync(r => r.Date.Date == date.Date && (!r.AMVehicleId.HasValue || !r.PMVehicleId.HasValue));
-    public async Task<IEnumerable<Route>> GetRoutesWithoutDriverAssignmentAsync(DateTime date) => await FindAsync(r => r.Date.Date == date.Date && (!r.AMDriverId.HasValue || !r.PMDriverId.HasValue));
-    public async Task<decimal> GetTotalMileageByDateAsync(DateTime date) => await Task.FromResult(0m);
-    public async Task<decimal> GetTotalMileageByDateRangeAsync(DateTime startDate, DateTime endDate) => await Task.FromResult(0m);
-    public async Task<decimal> GetAverageRidershipByRouteAsync(string routeName, DateTime? startDate = null, DateTime? endDate = null) => await Task.FromResult(0m);
-    public async Task<Dictionary<string, decimal>> GetMileageByRouteNameAsync(DateTime startDate, DateTime endDate) => await Task.FromResult(new Dictionary<string, decimal>());
-    public async Task<Dictionary<string, int>> GetRidershipByRouteNameAsync(DateTime startDate, DateTime endDate) => await Task.FromResult(new Dictionary<string, int>());
-    public async Task<bool> ValidateRouteScheduleAsync(DateTime date) => await Task.FromResult(true);
-    public async Task<IEnumerable<string>> GetRouteValidationErrorsAsync(DateTime date) => await Task.FromResult(Enumerable.Empty<string>());
-    public async Task<IEnumerable<Route>> GetRoutesWithMileageIssuesAsync(DateTime? startDate = null, DateTime? endDate = null) => await GetAllAsync();
-    public async Task<IEnumerable<Route>> GetMostActiveRoutesAsync(DateTime startDate, DateTime endDate, int count = 10) => await GetAllAsync();
-    public async Task<IEnumerable<Route>> GetLeastActiveRoutesAsync(DateTime startDate, DateTime endDate, int count = 10) => await GetAllAsync();
-    public async Task<Dictionary<DateTime, int>> GetDailyRouteCountAsync(DateTime startDate, DateTime endDate) => await Task.FromResult(new Dictionary<DateTime, int>());
-
-    // Synchronous methods
-    public IEnumerable<Route> GetRoutesByDate(DateTime date) => Find(r => r.Date.Date == date.Date);
-    public IEnumerable<Route> GetRoutesByName(string routeName) => Find(r => r.RouteName == routeName);
-    public IEnumerable<Route> GetActiveRoutes() => Find(r => r.IsActive);
-    public IEnumerable<Route> GetRoutesByVehicle(int vehicleId, DateTime? date = null) => Find(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
-    public IEnumerable<Route> GetRoutesByDriver(int driverId, DateTime? date = null) => Find(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
-    public decimal GetTotalMileageByDate(DateTime date) => 0;
-}
-
 public class StudentRepository : Repository<Student>, IStudentRepository
 {
-    public StudentRepository(BusBuddyDbContext context) : base(context) { }
+    public StudentRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService) { }
 
-    // Implement all interface methods
-    public async Task<IEnumerable<Student>> GetActiveStudentsAsync() => await GetAllAsync();
+    // Implement all interface methods (updated for model alignment)
+    public async Task<IEnumerable<Student>> GetActiveStudentsAsync() => await FindAsync(s => s.Active);
     public async Task<IEnumerable<Student>> GetStudentsByGradeAsync(string grade) => await FindAsync(s => s.Grade == grade);
-    public async Task<IEnumerable<Student>> GetStudentsByRouteAsync(int? routeId) => await FindAsync(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
+    public async Task<IEnumerable<Student>> GetStudentsByRouteAsync(int? routeId)
+    {
+        if (routeId == null) return new List<Student>();
+        string routeStr = routeId.Value.ToString();
+        return await FindAsync(s => s.AMRoute == routeStr || s.PMRoute == routeStr);
+    }
     public async Task<IEnumerable<Student>> GetStudentsWithoutRouteAsync() => await FindAsync(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute));
-    public async Task<Student?> GetStudentByNameAsync(string firstName, string lastName) => await FirstOrDefaultAsync(s => s.StudentName.Contains(firstName) && s.StudentName.Contains(lastName));
+    public async Task<Student?> GetStudentByNameAsync(string name) => await FirstOrDefaultAsync(s => s.StudentName.Contains(name));
     public async Task<IEnumerable<Student>> SearchStudentsByNameAsync(string searchTerm) => await FindAsync(s => s.StudentName.Contains(searchTerm));
     public async Task<IEnumerable<Student>> GetStudentsWithSpecialNeedsAsync() => await FindAsync(s => s.SpecialNeeds);
     public async Task<IEnumerable<Student>> GetStudentsWithMedicalConditionsAsync() => await FindAsync(s => !string.IsNullOrEmpty(s.MedicalNotes));
-    public async Task<IEnumerable<Student>> GetStudentsRequiringSpecialTransportationAsync() => await GetAllAsync();
+    public async Task<IEnumerable<Student>> GetStudentsRequiringSpecialTransportationAsync() => await FindAsync(s => s.SpecialNeeds || !string.IsNullOrEmpty(s.SpecialAccommodations));
     public async Task<IEnumerable<Student>> GetStudentsWithEmergencyContactsAsync() => await FindAsync(s => !string.IsNullOrEmpty(s.EmergencyPhone));
     public async Task<IEnumerable<Student>> GetStudentsWithoutEmergencyContactsAsync() => await FindAsync(s => string.IsNullOrEmpty(s.EmergencyPhone));
-    public async Task<IEnumerable<Student>> GetStudentsByTransportationTypeAsync(string transportationType) => await GetAllAsync();
-    public async Task<IEnumerable<Student>> GetStudentsEligibleForRouteAsync(int routeId) => await GetAllAsync();
+    public async Task<IEnumerable<Student>> GetStudentsByTransportationTypeAsync(string transportationType) => await FindAsync(s => s.TransportationNotes != null && s.TransportationNotes.Contains(transportationType));
+    public async Task<IEnumerable<Student>> GetStudentsEligibleForRouteAsync(int routeId) => await FindAsync(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
     public async Task<int> GetStudentCountByRouteAsync(int routeId) => await CountAsync(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
     public async Task<Dictionary<string, int>> GetStudentCountByRouteAsync() => await Task.FromResult(new Dictionary<string, int>());
     public async Task<int> GetTotalStudentCountAsync() => await CountAsync();
-    public async Task<int> GetActiveStudentCountAsync() => await CountAsync();
+    public async Task<int> GetActiveStudentCountAsync() => await CountAsync(s => s.Active);
     public async Task<Dictionary<string, int>> GetStudentCountByGradeAsync() => await Task.FromResult(new Dictionary<string, int>());
     public async Task<Dictionary<string, int>> GetStudentCountByTransportationTypeAsync() => await Task.FromResult(new Dictionary<string, int>());
-    public async Task<IEnumerable<Student>> GetStudentsByAgeRangeAsync(int minAge, int maxAge) => await GetAllAsync();
-    public async Task<IEnumerable<Student>> GetStudentsByParentEmailAsync(string email) => await GetAllAsync();
-    public async Task<IEnumerable<Student>> GetStudentsByParentPhoneAsync(string phone) => await GetAllAsync();
-    public async Task<IEnumerable<Student>> GetStudentsWithIncompleteContactInfoAsync() => await GetAllAsync();
-    public async Task<IEnumerable<Student>> GetStudentsBySchoolAsync(string schoolName) => await GetAllAsync();
+    public async Task<IEnumerable<Student>> GetStudentsByAgeRangeAsync(int minAge, int maxAge) => await FindAsync(s => s.Age >= minAge && s.Age <= maxAge);
+    public async Task<IEnumerable<Student>> GetStudentsByParentEmailAsync(string email) => await FindAsync(s => s.ParentGuardian != null && s.ParentGuardian.Contains(email));
+    public async Task<IEnumerable<Student>> GetStudentsByParentPhoneAsync(string phone) => await FindAsync(s => s.HomePhone == phone || s.EmergencyPhone == phone || s.AlternativePhone == phone);
+    public async Task<IEnumerable<Student>> GetStudentsWithIncompleteContactInfoAsync() => await FindAsync(s => string.IsNullOrEmpty(s.ParentGuardian) || string.IsNullOrEmpty(s.HomePhone));
+    public async Task<IEnumerable<Student>> GetStudentsBySchoolAsync(string schoolName) => await FindAsync(s => s.School == schoolName);
     public async Task<IEnumerable<Student>> GetStudentsWithActivityPermissionsAsync() => await FindAsync(s => s.PhotoPermission || s.FieldTripPermission);
     public async Task<IEnumerable<Student>> GetStudentsWithoutActivityPermissionsAsync() => await FindAsync(s => !s.PhotoPermission && !s.FieldTripPermission);
 
     // Synchronous methods
-    public IEnumerable<Student> GetActiveStudents() => GetAll();
+    public IEnumerable<Student> GetActiveStudents() => Find(s => s.Active);
     public IEnumerable<Student> GetStudentsByGrade(string grade) => Find(s => s.Grade == grade);
-    public IEnumerable<Student> GetStudentsByRoute(int? routeId) => Find(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
+    public IEnumerable<Student> GetStudentsByRoute(int? routeId)
+    {
+        if (routeId == null) return new List<Student>();
+        string routeStr = routeId.Value.ToString();
+        return Find(s => s.AMRoute == routeStr || s.PMRoute == routeStr);
+    }
     public IEnumerable<Student> GetStudentsWithoutRoute() => Find(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute));
     public IEnumerable<Student> GetStudentsWithSpecialNeeds() => Find(s => s.SpecialNeeds);
     public IEnumerable<Student> SearchStudentsByName(string searchTerm) => Find(s => s.StudentName.Contains(searchTerm));
@@ -544,7 +519,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
 
 public class FuelRepository : Repository<Fuel>, IFuelRepository
 {
-    public FuelRepository(BusBuddyDbContext context) : base(context) { }
+    public FuelRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService) { }
 
     public async Task<IEnumerable<Fuel>> GetFuelRecordsByVehicleAsync(int vehicleId) => await FindAsync(f => f.VehicleFueledId == vehicleId);
     public async Task<IEnumerable<Fuel>> GetFuelRecordsByDateRangeAsync(DateTime startDate, DateTime endDate) => await FindAsync(f => f.FuelDate >= startDate && f.FuelDate <= endDate);
@@ -559,7 +534,7 @@ public class FuelRepository : Repository<Fuel>, IFuelRepository
 
 public class MaintenanceRepository : Repository<Maintenance>, IMaintenanceRepository
 {
-    public MaintenanceRepository(BusBuddyDbContext context) : base(context) { }
+    public MaintenanceRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService) { }
 
     public async Task<IEnumerable<Maintenance>> GetMaintenanceRecordsByVehicleAsync(int vehicleId) => await FindAsync(m => m.VehicleId == vehicleId);
     public async Task<IEnumerable<Maintenance>> GetMaintenanceRecordsByDateRangeAsync(DateTime startDate, DateTime endDate) => await FindAsync(m => m.Date >= startDate && m.Date <= endDate);
@@ -575,7 +550,7 @@ public class MaintenanceRepository : Repository<Maintenance>, IMaintenanceReposi
 
 public class ScheduleRepository : Repository<Schedule>, IScheduleRepository
 {
-    public ScheduleRepository(BusBuddyDbContext context) : base(context) { }
+    public ScheduleRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService) { }
 
     public async Task<IEnumerable<Schedule>> GetSchedulesByDateAsync(DateTime date) => await FindAsync(s => s.ScheduleDate.Date == date.Date);
     public async Task<IEnumerable<Schedule>> GetSchedulesByRouteAsync(int routeId) => await FindAsync(s => s.RouteId == routeId);
@@ -590,7 +565,7 @@ public class ScheduleRepository : Repository<Schedule>, IScheduleRepository
 
 public class SchoolCalendarRepository : Repository<SchoolCalendar>, ISchoolCalendarRepository
 {
-    public SchoolCalendarRepository(BusBuddyDbContext context) : base(context) { }
+    public SchoolCalendarRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService) { }
 
     public async Task<IEnumerable<SchoolCalendar>> GetEventsByDateRangeAsync(DateTime startDate, DateTime endDate) => await FindAsync(c => c.Date >= startDate && c.Date <= endDate);
     public async Task<IEnumerable<SchoolCalendar>> GetEventsByTypeAsync(string eventType) => await FindAsync(c => c.EventType == eventType);
@@ -607,7 +582,7 @@ public class SchoolCalendarRepository : Repository<SchoolCalendar>, ISchoolCalen
 
 public class ActivityScheduleRepository : Repository<ActivitySchedule>, IActivityScheduleRepository
 {
-    public ActivityScheduleRepository(BusBuddyDbContext context) : base(context) { }
+    public ActivityScheduleRepository(BusBuddyDbContext context, IUserContextService userContextService) : base(context, userContextService) { }
 
     public async Task<IEnumerable<ActivitySchedule>> GetSchedulesByDateAsync(DateTime date) => await FindAsync(a => a.ScheduledDate.Date == date.Date);
     public async Task<IEnumerable<ActivitySchedule>> GetSchedulesByDateRangeAsync(DateTime startDate, DateTime endDate) => await FindAsync(a => a.ScheduledDate >= startDate && a.ScheduledDate <= endDate);

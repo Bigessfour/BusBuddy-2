@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Bus_Buddy.Data;
+using System.IO;
 
 namespace Bus_Buddy;
 
@@ -13,7 +14,7 @@ public class BusBuddyDbContextFactory : IDesignTimeDbContextFactory<BusBuddyDbCo
     public BusBuddyDbContext CreateDbContext(string[] args)
     {
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
+            .SetBasePath(System.IO.Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 

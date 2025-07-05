@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,7 @@ namespace Bus_Buddy.Scripts
             _logger.LogInformation("🌍 Starting Google Earth Engine Integration Tests");
             _logger.LogInformation("Project: busbuddy-465000");
 
-            var tests = new[]
+            var tests = new (string, Func<Task<bool>>)[]
             {
                 ("Configuration Check", TestConfiguration),
                 ("Satellite Imagery", TestSatelliteImagery),
@@ -41,7 +42,7 @@ namespace Bus_Buddy.Scripts
             bool allTestsPassed = true;
             int passedTests = 0;
 
-            foreach (var (testName, testMethod) in tests)
+            foreach ((string testName, Func<Task<bool>> testMethod) in tests)
             {
                 try
                 {
