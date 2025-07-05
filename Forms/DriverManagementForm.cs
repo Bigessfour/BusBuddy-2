@@ -5,6 +5,7 @@ using Syncfusion.WinForms.DataGrid;
 using Microsoft.Extensions.Logging;
 using Bus_Buddy.Services;
 using Bus_Buddy.Models;
+using Bus_Buddy.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -78,34 +79,21 @@ public partial class DriverManagementForm : MetroForm
     {
         try
         {
-            // Apply Office2016 styling to SfDataGrid
-            driverDataGrid.Style.HeaderStyle.BackColor = Color.FromArgb(52, 152, 219);
-            driverDataGrid.Style.HeaderStyle.TextColor = Color.White;
-            driverDataGrid.Style.HeaderStyle.Font.Bold = true;
-            driverDataGrid.Style.SelectionStyle.BackColor = Color.FromArgb(52, 152, 219, 50);
-            driverDataGrid.Style.SelectionStyle.TextColor = Color.Black;
-
-            // Enhanced styling
-            driverDataGrid.Style.BorderColor = Color.FromArgb(227, 227, 227);
-            driverDataGrid.Style.CellStyle.BackColor = Color.White;
-            driverDataGrid.Style.CellStyle.TextColor = Color.Black;
-
-            // Grid behavior
-            driverDataGrid.AllowEditing = false;
-            driverDataGrid.AllowDeleting = false;
-            driverDataGrid.AutoSizeColumnsMode = Syncfusion.WinForms.DataGrid.Enums.AutoSizeColumnsMode.Fill;
-            driverDataGrid.SelectionMode = Syncfusion.WinForms.DataGrid.Enums.GridSelectionMode.Single;
-            driverDataGrid.SelectionUnit = Syncfusion.WinForms.DataGrid.Enums.SelectionUnit.Row;
+            // Apply standardized configuration
+            SyncfusionLayoutManager.ConfigureSfDataGrid(driverDataGrid, true, true);
+            SyncfusionAdvancedManager.ApplyAdvancedConfiguration(driverDataGrid);
+            VisualEnhancementManager.ApplyEnhancedGridVisuals(driverDataGrid);
+            SyncfusionLayoutManager.ApplyGridStyling(driverDataGrid);
 
             // Add event handlers for SfDataGrid
             driverDataGrid.SelectionChanged += DriverDataGrid_SelectionChanged;
             driverDataGrid.CellDoubleClick += DriverDataGrid_CellDoubleClick;
 
-            _logger.LogInformation("SfDataGrid configured successfully with Office2016 styling");
+            _logger.LogInformation("SfDataGrid configured successfully with standardized configuration");
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error configuring SfDataGrid styling");
+            _logger.LogWarning(ex, "Error configuring SfDataGrid");
         }
     }
 

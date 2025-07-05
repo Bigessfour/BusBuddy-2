@@ -403,22 +403,14 @@ public partial class StudentManagementForm : MetroForm
             studentDataGrid = new SfDataGrid
             {
                 Dock = DockStyle.Fill,
-                AutoGenerateColumns = false,
-                AllowEditing = false,
-                AllowSorting = true,
-                AllowFiltering = true,
-                AllowGrouping = true,
-                ShowGroupDropArea = true,
-                SelectionMode = GridSelectionMode.Single
+                AutoGenerateColumns = false
             };
 
-            // Apply Office2016 styling to the grid with enhanced visuals
+            // Apply standardized configuration
+            SyncfusionLayoutManager.ConfigureSfDataGrid(studentDataGrid, true, true);
+            SyncfusionAdvancedManager.ApplyAdvancedConfiguration(studentDataGrid);
             VisualEnhancementManager.ApplyEnhancedGridVisuals(studentDataGrid);
-
-            // Configure grid features
-            studentDataGrid.AutoSizeColumnsMode = AutoSizeColumnsMode.None;
-            studentDataGrid.AllowResizingColumns = true;
-            studentDataGrid.ShowRowHeader = false;
+            SyncfusionLayoutManager.ApplyGridStyling(studentDataGrid);
 
             // Configure columns
             ConfigureGridColumns();
@@ -430,7 +422,7 @@ public partial class StudentManagementForm : MetroForm
             // Add to container
             panelGrid.Controls.Add(studentDataGrid);
 
-            _logger.LogInformation("SfDataGrid configured successfully");
+            _logger.LogInformation("SfDataGrid configured successfully with standardized configuration");
         }
         catch (Exception ex)
         {

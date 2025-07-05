@@ -59,9 +59,12 @@ public partial class BusManagementForm : MetroForm
         this.CaptionForeColor = System.Drawing.Color.White;
         this.Text = "Bus Management - Fleet Vehicles";
 
-        // Configure the data grid with enhanced visual system
+        // Configure the data grid with standardized configuration
+        SyncfusionLayoutManager.ConfigureSfDataGrid(busDataGrid, true, true);
+        SyncfusionAdvancedManager.ApplyAdvancedConfiguration(busDataGrid);
         SyncfusionLayoutManager.ConfigureBusManagementGrid(busDataGrid);
         VisualEnhancementManager.ApplyEnhancedGridVisuals(busDataGrid);
+        SyncfusionLayoutManager.ApplyGridStyling(busDataGrid);
         ConfigureDataGrid();
 
         // Enable high-quality font rendering
@@ -106,18 +109,10 @@ public partial class BusManagementForm : MetroForm
     {
         if (busDataGrid != null)
         {
-            // Apply Office2016 styling to the grid
-            busDataGrid.Style.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(63, 81, 181);
-            busDataGrid.Style.HeaderStyle.TextColor = System.Drawing.Color.White;
-            busDataGrid.Style.HeaderStyle.Font.Bold = true;
-            busDataGrid.Style.BorderColor = System.Drawing.Color.FromArgb(227, 227, 227);
-            busDataGrid.Style.SelectionStyle.BackColor = System.Drawing.Color.FromArgb(63, 81, 181, 50);
-            busDataGrid.Style.SelectionStyle.TextColor = System.Drawing.Color.Black;
+            // Note: Basic configuration now handled by standardized methods above
+            // This method reserved for bus-specific customizations only
 
-            // Enable advanced grid features
-            busDataGrid.AllowSorting = true;
-            busDataGrid.AllowResizingColumns = true;
-            busDataGrid.AutoSizeColumnsMode = Syncfusion.WinForms.DataGrid.Enums.AutoSizeColumnsMode.None;
+            _logger.LogInformation("Bus-specific data grid customizations applied");
         }
     }
 

@@ -5,6 +5,9 @@ using Syncfusion.WinForms.DataGrid;
 using Syncfusion.WinForms.DataGrid.Enums;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Threading;
+using System.Windows.Forms;
+using System;
 
 namespace BusBuddy.Tests.UnitTests.Utilities
 {
@@ -13,6 +16,8 @@ namespace BusBuddy.Tests.UnitTests.Utilities
     /// This covers complex Syncfusion grid functionality without UI popups
     /// </summary>
     [TestFixture]
+    [Apartment(System.Threading.ApartmentState.STA)] // Required for Syncfusion Windows Forms controls
+    [Timeout(30000)] // 30 second overall timeout to prevent indefinite hangs
     public class SyncfusionAdvancedManagerTests
     {
         private SfDataGrid _dataGrid = null!;
@@ -21,6 +26,13 @@ namespace BusBuddy.Tests.UnitTests.Utilities
         [SetUp]
         public void SetUp()
         {
+            // Ensure UI thread is ready
+            Application.DoEvents();
+            Thread.Sleep(50); // Small delay to ensure thread stability
+
+            TestContext.WriteLine($"Test starting on thread: {Thread.CurrentThread.ManagedThreadId}");
+            TestContext.WriteLine($"STA State: {Thread.CurrentThread.GetApartmentState()}");
+
             _dataGrid = new SfDataGrid();
             _testData = new List<TestDataItem>
             {
@@ -30,6 +42,52 @@ namespace BusBuddy.Tests.UnitTests.Utilities
                 new TestDataItem { ID = 4, Name = "Item 4", Category = "C", Value = 400.00m }
             };
             _dataGrid.DataSource = _testData;
+            Application.DoEvents(); // Allow data binding to complete
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            TestContext.WriteLine("Starting cleanup...");
+
+            try
+            {
+                // Detach event handlers and clear data sources first
+                if (_dataGrid != null)
+                {
+                    TestContext.WriteLine("Cleaning up SfDataGrid...");
+                    _dataGrid.DataSource = null;
+                    _dataGrid.Columns.Clear();
+                    _dataGrid.GroupColumnDescriptions.Clear();
+                }
+
+                // Clean up main test object
+                try
+                {
+                    _dataGrid?.Dispose();
+                    TestContext.WriteLine("SfDataGrid disposed");
+                }
+                catch (Exception ex)
+                {
+                    TestContext.WriteLine($"Error disposing SfDataGrid: {ex.Message}");
+                }
+            }
+            finally
+            {
+                _dataGrid = null!;
+                _testData = null!;
+
+                // Force garbage collection with logging
+                var gcStart = DateTime.Now;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                var gcTime = DateTime.Now - gcStart;
+                TestContext.WriteLine($"GC completed in {gcTime.TotalMilliseconds}ms");
+
+                // Final UI thread yield
+                Application.DoEvents();
+            }
         }
 
         public class TestDataItem
@@ -415,11 +473,5 @@ namespace BusBuddy.Tests.UnitTests.Utilities
         }
 
         #endregion
-
-        [TearDown]
-        public void TearDown()
-        {
-            _dataGrid?.Dispose();
-        }
     }
 }

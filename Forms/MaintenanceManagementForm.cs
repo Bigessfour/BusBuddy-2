@@ -80,24 +80,21 @@ public partial class MaintenanceManagementForm : SfForm
     {
         try
         {
-            // Configure data grid properties
+            // Apply standardized configuration
+            SyncfusionLayoutManager.ConfigureSfDataGrid(dataGridMaintenance, true, true);
+            SyncfusionAdvancedManager.ApplyAdvancedConfiguration(dataGridMaintenance);
+            VisualEnhancementManager.ApplyEnhancedGridVisuals(dataGridMaintenance);
+            SyncfusionLayoutManager.ApplyGridStyling(dataGridMaintenance);
+
+            // Configure data source and columns
             dataGridMaintenance.AutoGenerateColumns = false;
             dataGridMaintenance.DataSource = _filteredRecords;
-            dataGridMaintenance.AllowEditing = false;
-            dataGridMaintenance.AllowFiltering = true;
-            dataGridMaintenance.AllowSorting = true;
-            dataGridMaintenance.SelectionMode = Syncfusion.WinForms.DataGrid.Enums.GridSelectionMode.Single;
-
-            // Configure columns
             SetupDataGridColumns();
-
-            // Apply theme to data grid
-            ApplyDataGridTheme();
 
             // Setup selection event
             dataGridMaintenance.SelectionChanged += DataGridMaintenance_SelectionChanged;
 
-            _logger.LogInformation("Data grid configured successfully");
+            _logger.LogInformation("Data grid configured successfully with standardized configuration");
         }
         catch (Exception ex)
         {

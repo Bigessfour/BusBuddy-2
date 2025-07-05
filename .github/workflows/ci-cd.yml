@@ -190,12 +190,15 @@ jobs:
         files: TestResults/*.trx
 
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       if: always()
       with:
         files: TestResults/*/coverage.cobertura.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
         verbose: true
+        flags: unittests
+        name: codecov-umbrella
 
   integration-tests:
     name: Integration Tests

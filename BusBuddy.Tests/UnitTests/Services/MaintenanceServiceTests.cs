@@ -408,7 +408,7 @@ public class MaintenanceServiceTests : TestBase
         // Verify record is removed by checking the service can't find it
         var deletedRecord = await _maintenanceService.GetMaintenanceRecordByIdAsync(maintenanceId);
         deletedRecord.Should().BeNull();
-        
+
         // Also verify it's not in the list of all records
         var allRecords = await _maintenanceService.GetAllMaintenanceRecordsAsync();
         allRecords.Should().NotContain(r => r.MaintenanceId == maintenanceId);

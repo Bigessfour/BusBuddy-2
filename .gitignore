@@ -14,6 +14,10 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Syncfusion Development Resources (Symbolic Links)
+Syncfusion-Samples/
+Syncfusion-Installation/
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -387,3 +391,16 @@ TestResults/
 # Local environment files
 .env
 .env.local
+
+# Google Earth Engine Security
+keys/
+*.json
+!appsettings.json
+!appsettings.test.json
+!package.json
+bus-buddy-gee-key.json
+*-service-account-*.json
+
+# Google Cloud credentials
+google-cloud-keyfile.json
+gcp-credentials.json

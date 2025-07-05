@@ -1,5 +1,10 @@
 # Bus Buddy - Transportation Management System
 
+[![CI/CD Pipeline](https://github.com/Bigessfour/BusBuddy_Syncfusion/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Bigessfour/BusBuddy_Syncfusion/actions/workflows/ci-cd.yml)
+[![codecov](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion/branch/master/graph/badge.svg)](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion)
+[![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
+[![Syncfusion](https://img.shields.io/badge/Syncfusion-30.1.37-orange.svg)](https://www.syncfusion.com/)
+
 A comprehensive school bus transportation management system built with C# .NET 8, Windows Forms, and Syncfusion UI components.
 
 ## Features
@@ -102,6 +107,44 @@ Bus Buddy/
 2. View all routes with AM/PM assignments
 3. Manage route details and descriptions
 4. Track active/inactive routes
+
+## Testing and Code Coverage
+
+### Test Suite Overview
+This project includes comprehensive testing with automated code coverage reporting:
+
+- **Unit Tests**: Testing individual components and utilities
+- **Integration Tests**: Testing database interactions and service integrations
+- **Syncfusion Component Tests**: Specialized tests for UI components with freeze mitigation strategies
+
+### Code Coverage
+- **Target Coverage**: 75% for project, 75% for patches
+- **Coverage Reports**: Automatically generated via Codecov on every PR and push
+- **Coverage Badge**: ![Coverage](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion/branch/master/graph/badge.svg)
+
+### Running Tests Locally
+```bash
+# Run all tests
+dotnet test
+
+# Run unit tests only
+dotnet test --filter "Category!=Integration"
+
+# Run integration tests only
+dotnet test --filter "Category=Integration"
+
+# Run tests with coverage
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+### Syncfusion Test Mitigations
+Special considerations for Syncfusion Windows Forms testing:
+- STA apartment threading for UI components
+- Proper resource disposal with comprehensive cleanup
+- Timeout protection to prevent test freezing
+- Enhanced logging for debugging test issues
+
+For detailed testing documentation, see: [SYNCFUSION_TEST_FREEZE_MITIGATIONS.md](BusBuddy.Tests/SYNCFUSION_TEST_FREEZE_MITIGATIONS.md)
 
 ## Contributing
 1. Fork the repository

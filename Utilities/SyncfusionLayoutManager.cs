@@ -50,6 +50,10 @@ namespace Bus_Buddy.Utilities
         /// </summary>
         public static void ConfigureSfDataGrid(SfDataGrid dataGrid, bool enableFullScreen = true, bool enableVisualEnhancements = true)
         {
+            // Validate parameters
+            if (dataGrid == null)
+                throw new ArgumentNullException(nameof(dataGrid), "DataGrid cannot be null");
+
             // Basic grid configuration - DOCUMENTED METHODS
             dataGrid.AllowEditing = false;
             dataGrid.AllowDeleting = false;
@@ -99,7 +103,13 @@ namespace Bus_Buddy.Utilities
             // Enable full screen optimization if requested
             if (enableFullScreen)
             {
+                System.Diagnostics.Debug.WriteLine("ConfigureSfDataGrid: Calling ConfigureForFullScreen");
                 ConfigureForFullScreen(dataGrid);
+                System.Diagnostics.Debug.WriteLine($"ConfigureSfDataGrid: After ConfigureForFullScreen, Dock = {dataGrid.Dock}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("ConfigureSfDataGrid: Full screen not enabled, skipping ConfigureForFullScreen");
             }
         }
 
@@ -108,6 +118,10 @@ namespace Bus_Buddy.Utilities
         /// </summary>
         public static void ApplyGridStyling(SfDataGrid dataGrid)
         {
+            // Validate parameters
+            if (dataGrid == null)
+                throw new ArgumentNullException(nameof(dataGrid), "DataGrid cannot be null");
+
             // Border and general appearance
             dataGrid.Style.BorderColor = GRID_BORDER_COLOR;
             dataGrid.Style.BorderStyle = BorderStyle.FixedSingle;
@@ -144,15 +158,39 @@ namespace Bus_Buddy.Utilities
         /// </summary>
         public static void ConfigureForFullScreen(SfDataGrid dataGrid)
         {
-            // Optimize for full screen viewing
-            dataGrid.Dock = DockStyle.Fill;
-            dataGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            // Validate parameters
+            if (dataGrid == null)
+                throw new ArgumentNullException(nameof(dataGrid), "DataGrid cannot be null");
 
-            // Enable data virtualization for performance with large datasets
-            dataGrid.EnableDataVirtualization = true;
+            System.Diagnostics.Debug.WriteLine($"ConfigureForFullScreen: Before setting Dock, current value = {dataGrid.Dock}");
 
-            // Optimize scrolling for full screen
-            dataGrid.AutoSizeController.AutoSizeRange = AutoSizeRange.VisibleRows;
+            // Ensure proper initialization like in Syncfusion samples
+            if (dataGrid is System.ComponentModel.ISupportInitialize initializeSupport)
+            {
+                initializeSupport.BeginInit();
+            }
+
+            try
+            {
+                // Optimize for full screen viewing
+                dataGrid.Dock = DockStyle.Fill;
+                System.Diagnostics.Debug.WriteLine($"ConfigureForFullScreen: After setting Dock = Fill, current value = {dataGrid.Dock}");
+
+                dataGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+
+                // Enable data virtualization for performance with large datasets
+                dataGrid.EnableDataVirtualization = true;
+
+                // Optimize scrolling for full screen
+                dataGrid.AutoSizeController.AutoSizeRange = AutoSizeRange.VisibleRows;
+            }
+            finally
+            {
+                if (dataGrid is System.ComponentModel.ISupportInitialize finalizeSupport)
+                {
+                    finalizeSupport.EndInit();
+                }
+            }
         }
 
         /// <summary>

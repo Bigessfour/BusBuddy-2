@@ -80,24 +80,21 @@ public partial class FuelManagementForm : SfForm
     {
         try
         {
-            // Configure data grid properties
+            // Apply standardized configuration
+            SyncfusionLayoutManager.ConfigureSfDataGrid(dataGridFuel, true, true);
+            SyncfusionAdvancedManager.ApplyAdvancedConfiguration(dataGridFuel);
+            VisualEnhancementManager.ApplyEnhancedGridVisuals(dataGridFuel);
+            SyncfusionLayoutManager.ApplyGridStyling(dataGridFuel);
+
+            // Configure data source and columns
             dataGridFuel.AutoGenerateColumns = false;
             dataGridFuel.DataSource = _filteredRecords;
-            dataGridFuel.AllowEditing = false;
-            dataGridFuel.AllowFiltering = true;
-            dataGridFuel.AllowSorting = true;
-            dataGridFuel.SelectionMode = Syncfusion.WinForms.DataGrid.Enums.GridSelectionMode.Single;
-
-            // Configure columns
             SetupDataGridColumns();
-
-            // Apply theme to data grid
-            ApplyDataGridTheme();
 
             // Setup selection event
             dataGridFuel.SelectionChanged += DataGridFuel_SelectionChanged;
 
-            _logger.LogInformation("Data grid configured successfully");
+            _logger.LogInformation("Data grid configured successfully with standardized configuration");
         }
         catch (Exception ex)
         {

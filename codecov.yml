@@ -1,0 +1,105 @@
+# Codecov configuration for Bus Buddy Syncfusion project
+# Documentation: https://docs.codecov.com/docs/codecov-yaml
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  
+  status:
+    project:
+      default:
+        target: 75%
+        threshold: 5%
+        base: auto
+        branches:
+          - main
+          - master
+    patch:
+      default:
+        target: 75%
+        threshold: 5%
+
+  ignore:
+    # Ignore generated files and external libraries
+    - "Migrations/**/*"
+    - "bin/**/*"
+    - "obj/**/*"
+    - "**/AssemblyInfo.cs"
+    - "**/*.Designer.cs"
+    - "**/Program.cs"
+    - "libs/**/*"
+    
+    # Ignore test files from coverage calculation
+    - "BusBuddy.Tests/**/*"
+    - "**/*Tests.cs"
+    - "**/*Test.cs"
+    
+    # Ignore Syncfusion scaffolding and generated code
+    - "**/SfSchedulerTest.cs"
+    - "**/EnhancedGridDemoForm.cs"
+    - "**/VisualEnhancementShowcaseForm.cs"
+
+flags:
+  unittests:
+    paths:
+      - "Services/"
+      - "Data/"
+      - "Models/"
+      - "Utilities/"
+      - "Extensions/"
+    carryforward: true
+  
+  integration:
+    paths:
+      - "Services/"
+      - "Data/"
+    carryforward: true
+
+comment:
+  layout: "header, diff, flags, files, footer"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+  branches:
+    - main
+    - master
+
+github_checks:
+  annotations: true
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
+component_management:
+  default_rules:
+    flag_regexes:
+      - name: unittests
+        regex: unittests
+        statuses:
+          - type: project
+            target: 75%
+          - type: patch
+            target: 75%
+      - name: integration
+        regex: integration
+        statuses:
+          - type: project
+            target: 70%
+          - type: patch
+            target: 70%
+
+# Notification settings
+slack:
+  url: "secret:SLACK_WEBHOOK_URL"  # Add this secret if you want Slack notifications
+  threshold: 5%
+  only_pulls: false
+  branches: main,master
+  flags: unittests,integration
+  message: "Coverage for {{repo}} changed by {{diff}}% ({{coverage}}%)"
