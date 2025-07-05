@@ -120,6 +120,7 @@ namespace BusBuddy.Tests.UnitTests.UI
         #region Performance Testing
 
         [Test]
+        [Apartment(ApartmentState.STA)]
         [Timeout(5000)] // 5 second timeout for performance
         public void SfDataGrid_LargeDataConfiguration_CompletesInReasonableTime()
         {
