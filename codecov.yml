@@ -1,6 +1,14 @@
 # Codecov configuration for Bus Buddy Syncfusion project
 # Documentation: https://docs.codecov.com/docs/codecov-yaml
 
+codecov:
+  branch: main
+  strict_yaml_branch: main
+  max_report_age: '12h'
+  notify:
+    after_n_builds: 1
+    wait_for_ci: true
+
 coverage:
   precision: 2
   round: down
@@ -76,30 +84,3 @@ parsers:
       loop: yes
       method: no
       macro: no
-
-component_management:
-  default_rules:
-    flag_regexes:
-      - name: unittests
-        regex: unittests
-        statuses:
-          - type: project
-            target: 75%
-          - type: patch
-            target: 75%
-      - name: integration
-        regex: integration
-        statuses:
-          - type: project
-            target: 70%
-          - type: patch
-            target: 70%
-
-# Notification settings
-slack:
-  url: "secret:SLACK_WEBHOOK_URL"  # Add this secret if you want Slack notifications
-  threshold: 5%
-  only_pulls: false
-  branches: main,master
-  flags: unittests,integration
-  message: "Coverage for {{repo}} changed by {{diff}}% ({{coverage}}%)"

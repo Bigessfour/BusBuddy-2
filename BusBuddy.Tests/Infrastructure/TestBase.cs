@@ -66,6 +66,13 @@ namespace BusBuddy.Tests.Infrastructure
         /// </summary>
         protected void SetupTestDatabase()
         {
+            // Always generate a new unique database name for each test FIRST
+            // Include thread ID and high-resolution timestamp for maximum uniqueness
+            var threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+            var ticks = DateTime.UtcNow.Ticks;
+            var guid = Guid.NewGuid().ToString("N")[0..8]; // Short GUID for readability
+            _currentTestDbName = $"TestDb_{guid}_{threadId}_{ticks}";
+
             if (Configuration == null)
             {
                 // Configuration is set up in ConfigureSharedServices
@@ -89,9 +96,6 @@ namespace BusBuddy.Tests.Infrastructure
                 throw new InvalidOperationException("ServiceProvider is not initialized.");
             DialogCapture = ServiceProvider.GetRequiredService<DialogEventCapture>();
             UserContextService = ServiceProvider.GetRequiredService<IUserContextService>();
-
-            // Always generate a new unique database name for each test
-            _currentTestDbName = $"TestDb_{Guid.NewGuid()}_{DateTime.UtcNow.Ticks}";
 
             // Create fresh DbContext with unique database for complete test isolation
             if (useInMemory)
@@ -261,8 +265,9 @@ namespace BusBuddy.Tests.Infrastructure
             {
                 if (Configuration.GetValue<bool>("TestSettings:UseInMemoryDatabase"))
                 {
-                    // Use the same in-memory database name as the test's DbContext for true isolation
-                    var dbName = _currentTestDbName ?? "TestDb_Default";
+                    // Use the current test's unique database name for true isolation
+                    // If _currentTestDbName is not set yet, generate a temporary one
+                    var dbName = _currentTestDbName ?? $"TempTestDb_{Guid.NewGuid().ToString("N")[0..8]}_{DateTime.UtcNow.Ticks}";
                     options.UseInMemoryDatabase(dbName);
                 }
                 else

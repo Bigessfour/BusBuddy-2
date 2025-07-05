@@ -10,6 +10,7 @@ namespace BusBuddy.Tests.UnitTests.Utilities
      /// This covers complex visual styling and animation management
      /// </summary>
     [TestFixture]
+    [NonParallelizable] // Graphics operations must run sequentially
     public class VisualEnhancementManagerTests
     {
         private Form _testForm = null!;
@@ -25,6 +26,9 @@ namespace BusBuddy.Tests.UnitTests.Utilities
 
             _testForm.Controls.Add(_testButton);
             _testForm.Controls.Add(_testPanel);
+
+            // Initialize the graphics context to prevent "Object is currently in use elsewhere"
+            _testForm.CreateControl();
         }
 
         [Test]
@@ -42,13 +46,29 @@ namespace BusBuddy.Tests.UnitTests.Utilities
         }
 
         [Test]
+        [NonParallelizable] // Prevent conflicts with graphics objects
         public void ApplyEnhancedGridVisuals_WithValidDataGrid_ShouldNotThrow()
         {
             // Arrange
             var dataGrid = new Syncfusion.WinForms.DataGrid.SfDataGrid();
+            try
+            {
+                // Add to a form to ensure proper graphics context
+                _testForm.Controls.Add(dataGrid);
+                _testForm.CreateControl(); // Initialize the graphics context
 
-            // Act & Assert
-            Assert.DoesNotThrow(() => VisualEnhancementManager.ApplyEnhancedGridVisuals(dataGrid));
+                // Act & Assert
+                Assert.DoesNotThrow(() => VisualEnhancementManager.ApplyEnhancedGridVisuals(dataGrid));
+            }
+            finally
+            {
+                // Clean up
+                if (_testForm.Controls.Contains(dataGrid))
+                {
+                    _testForm.Controls.Remove(dataGrid);
+                }
+                dataGrid?.Dispose();
+            }
         }
 
         [Test]

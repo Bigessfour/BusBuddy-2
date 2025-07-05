@@ -164,33 +164,17 @@ namespace Bus_Buddy.Utilities
 
             System.Diagnostics.Debug.WriteLine($"ConfigureForFullScreen: Before setting Dock, current value = {dataGrid.Dock}");
 
-            // Ensure proper initialization like in Syncfusion samples
-            if (dataGrid is System.ComponentModel.ISupportInitialize initializeSupport)
-            {
-                initializeSupport.BeginInit();
-            }
+            // Optimize for full screen viewing
+            dataGrid.Dock = DockStyle.Fill;
+            System.Diagnostics.Debug.WriteLine($"ConfigureForFullScreen: After setting Dock = Fill, current value = {dataGrid.Dock}");
 
-            try
-            {
-                // Optimize for full screen viewing
-                dataGrid.Dock = DockStyle.Fill;
-                System.Diagnostics.Debug.WriteLine($"ConfigureForFullScreen: After setting Dock = Fill, current value = {dataGrid.Dock}");
+            dataGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
-                dataGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            // Enable data virtualization for performance with large datasets
+            dataGrid.EnableDataVirtualization = true;
 
-                // Enable data virtualization for performance with large datasets
-                dataGrid.EnableDataVirtualization = true;
-
-                // Optimize scrolling for full screen
-                dataGrid.AutoSizeController.AutoSizeRange = AutoSizeRange.VisibleRows;
-            }
-            finally
-            {
-                if (dataGrid is System.ComponentModel.ISupportInitialize finalizeSupport)
-                {
-                    finalizeSupport.EndInit();
-                }
-            }
+            // Optimize scrolling for full screen
+            dataGrid.AutoSizeController.AutoSizeRange = AutoSizeRange.VisibleRows;
         }
 
         /// <summary>
@@ -231,6 +215,10 @@ namespace Bus_Buddy.Utilities
         /// </summary>
         public static void ConfigureFormForFullScreen(Form form)
         {
+            // Validate parameters
+            if (form == null)
+                throw new ArgumentNullException(nameof(form), "Form cannot be null");
+
             // Set form properties for optimal full screen experience
             form.WindowState = FormWindowState.Maximized;
             form.StartPosition = FormStartPosition.CenterScreen;
@@ -278,6 +266,9 @@ namespace Bus_Buddy.Utilities
         /// </summary>
         public static void ConfigureGradientPanel(GradientPanel panel, Color? backgroundColor = null)
         {
+            if (panel == null)
+                throw new ArgumentNullException(nameof(panel), "GradientPanel cannot be null");
+
             panel.BorderStyle = BorderStyle.None;
 
             if (backgroundColor.HasValue)

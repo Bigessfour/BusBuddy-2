@@ -42,7 +42,7 @@ public class Bus : INotifyPropertyChanged
             if (_busNumber != value)
             {
                 _busNumber = value ?? string.Empty;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(BusNumber));
             }
         }
     }
@@ -58,7 +58,7 @@ public class Bus : INotifyPropertyChanged
             if (_year != value)
             {
                 _year = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(Year));
                 OnPropertyChanged(nameof(Age));
             }
         }
@@ -75,7 +75,7 @@ public class Bus : INotifyPropertyChanged
             if (_make != value)
             {
                 _make = value ?? string.Empty;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(Make));
                 OnPropertyChanged(nameof(FullDescription));
             }
         }
@@ -92,7 +92,7 @@ public class Bus : INotifyPropertyChanged
             if (_model != value)
             {
                 _model = value ?? string.Empty;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(Model));
                 OnPropertyChanged(nameof(FullDescription));
             }
         }
@@ -109,7 +109,7 @@ public class Bus : INotifyPropertyChanged
             if (_seatingCapacity != value)
             {
                 _seatingCapacity = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(SeatingCapacity));
             }
         }
     }
@@ -125,7 +125,7 @@ public class Bus : INotifyPropertyChanged
             if (_vinNumber != value)
             {
                 _vinNumber = value ?? string.Empty;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(VINNumber));
             }
         }
     }
@@ -141,7 +141,7 @@ public class Bus : INotifyPropertyChanged
             if (_licenseNumber != value)
             {
                 _licenseNumber = value ?? string.Empty;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(LicenseNumber));
             }
         }
     }
@@ -155,7 +155,7 @@ public class Bus : INotifyPropertyChanged
             if (_dateLastInspection != value)
             {
                 _dateLastInspection = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(DateLastInspection));
                 OnPropertyChanged(nameof(InspectionStatus));
             }
         }
@@ -170,7 +170,7 @@ public class Bus : INotifyPropertyChanged
             if (_currentOdometer != value)
             {
                 _currentOdometer = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentOdometer));
             }
         }
     }
@@ -185,7 +185,7 @@ public class Bus : INotifyPropertyChanged
             if (_status != value)
             {
                 _status = value ?? "Active";
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(Status));
             }
         }
     }
@@ -199,7 +199,7 @@ public class Bus : INotifyPropertyChanged
             if (_purchaseDate != value)
             {
                 _purchaseDate = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(PurchaseDate));
             }
         }
     }
@@ -214,7 +214,7 @@ public class Bus : INotifyPropertyChanged
             if (_purchasePrice != value)
             {
                 _purchasePrice = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(PurchasePrice));
             }
         }
     }
@@ -229,7 +229,7 @@ public class Bus : INotifyPropertyChanged
             if (_insurancePolicyNumber != value)
             {
                 _insurancePolicyNumber = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(InsurancePolicyNumber));
             }
         }
     }
@@ -243,7 +243,7 @@ public class Bus : INotifyPropertyChanged
             if (_insuranceExpiryDate != value)
             {
                 _insuranceExpiryDate = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(InsuranceExpiryDate));
                 OnPropertyChanged(nameof(InsuranceStatus));
             }
         }
