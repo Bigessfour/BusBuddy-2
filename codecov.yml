@@ -2,8 +2,8 @@
 # Documentation: https://docs.codecov.com/docs/codecov-yaml
 
 codecov:
-  branch: main
-  strict_yaml_branch: main
+  branch: master
+  strict_yaml_branch: master
   max_report_age: '12h'
   notify:
     after_n_builds: 1
@@ -21,7 +21,6 @@ coverage:
         threshold: 5%
         base: auto
         branches:
-          - main
           - master
     patch:
       default:
@@ -71,7 +70,6 @@ comment:
   require_base: false
   require_head: true
   branches:
-    - main
     - master
 
 github_checks:

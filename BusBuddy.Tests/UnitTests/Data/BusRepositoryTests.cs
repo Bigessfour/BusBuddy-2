@@ -189,7 +189,7 @@ namespace BusBuddy.Tests.UnitTests.Data
             var buses = await _repository.GetAllAsync();
 
             // Assert
-            buses.Should().HaveCountGreaterOrEqualTo(3); // At least our 3 seed buses
+            buses.Should().HaveCountGreaterThanOrEqualTo(3); // At least our 3 seed buses
             buses.Should().Contain(b => b.BusNumber == "BUS001");
             buses.Should().Contain(b => b.BusNumber == "BUS002");
             buses.Should().Contain(b => b.BusNumber == "BUS003");

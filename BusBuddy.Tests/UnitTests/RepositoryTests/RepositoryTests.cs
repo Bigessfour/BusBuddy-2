@@ -6,6 +6,8 @@ using Bus_Buddy.Data.Repositories;
 using Bus_Buddy.Models;
 using Bus_Buddy.Models.Base;
 using BusBuddy.Tests.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Bus_Buddy.Services;
 
 namespace BusBuddy.Tests.UnitTests.RepositoryTests;
 
@@ -19,12 +21,22 @@ namespace BusBuddy.Tests.UnitTests.RepositoryTests;
 /// - Category 3: Safety-critical testing priorities
 /// </summary>
 [TestFixture]
-    [NonParallelizable] // TestBase database tests need to run sequentially
+[NonParallelizable] // TestBase database tests need to run sequentially
 public class RepositoryTests : TestBase
 {
     private Repository<Bus> _busRepository = null!;
     private Repository<Driver> _driverRepository = null!;
     private Repository<Student> _studentRepository = null!;
+
+    /// <summary>
+    /// Override service configuration to use mock UserContextService for testing
+    /// </summary>
+    protected override void ConfigureTestSpecificServices(IServiceCollection services)
+    {
+        // Replace the real UserContextService with a mock for testing
+        services.Remove(services.First(s => s.ServiceType == typeof(IUserContextService)));
+        services.AddScoped<IUserContextService, MockUserContextService>();
+    }
 
     [SetUp]
     public void SetUp()

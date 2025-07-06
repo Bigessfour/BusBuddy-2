@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!-- Enable parallel execution with optimal CPU usage -->
+    <MaxCpuCount>0</MaxCpuCount> <!-- 0 = use all available processors -->
+    <DisableParallelization>false</DisableParallelization> <!-- Enable parallel execution -->
+    
+    <!-- Target framework and timeout settings -->
+    <TargetFrameworkVersion>net8.0</TargetFrameworkVersion>
+    <TestSessionTimeout>900000</TestSessionTimeout> <!-- 15 minutes total timeout -->
+    
+    <!-- Batch size for better performance -->
+    <BatchSize>10</BatchSize>
+  </RunConfiguration>
+  
+  <!-- NUnit parallel execution settings -->
+  <NUnit>
+    <!-- Use multiple workers for parallel execution -->
+    <NumberOfTestWorkers>4</NumberOfTestWorkers> <!-- Matches AssemblyInfo.cs -->
+    
+    <!-- Enable parallel execution where safe -->
+    <Parallelizable>true</Parallelizable>
+    
+    <!-- Asynchronous events for better performance -->
+    <SynchronousEvents>false</SynchronousEvents>
+    
+    <!-- Random seed for test variety (but can be fixed for debugging) -->
+    <RandomSeed>-1</RandomSeed> <!-- Random seed -->
+    
+    <!-- Reasonable timeout for individual tests -->
+    <DefaultTimeout>60000</DefaultTimeout> <!-- 60 seconds max per test -->
+    
+    <!-- Work directory for test outputs -->
+    <WorkDirectory>TestResults</WorkDirectory>
+    
+    <!-- Normal verbosity -->
+    <Verbosity>1</Verbosity>
+  </NUnit>
+  
+  <!-- Data collection settings optimized for Codecov -->
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Include main assembly with proper escaping -->
+          <Include>[Bus*Buddy]*</Include>
+          <Include>[BusBuddy]*</Include>
+          <Include>Bus?Buddy*</Include>
+          <!-- Exclude test assemblies and generated code -->
+          <Exclude>[*Tests*]*</Exclude>
+          <Exclude>[*Test*]*</Exclude>
+          <Exclude>[*.Tests]*</Exclude>
+          <Exclude>[*.Test]*</Exclude>
+          <Exclude>[testhost]*</Exclude>
+          <Exclude>[Moq*]*</Exclude>
+          <Exclude>[FluentAssertions*]*</Exclude>
+          <Exclude>[NUnit*]*</Exclude>
+          <Exclude>[Syncfusion*]*</Exclude>
+          <!-- Exclude by attributes -->
+          <ExcludeByAttribute>Obsolete</ExcludeByAttribute>
+          <ExcludeByAttribute>GeneratedCodeAttribute</ExcludeByAttribute>
+          <ExcludeByAttribute>CompilerGeneratedAttribute</ExcludeByAttribute>
+          <ExcludeByAttribute>ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+          <!-- Exclude by file patterns -->
+          <ExcludeByFile>**/bin/**/*</ExcludeByFile>
+          <ExcludeByFile>**/obj/**/*</ExcludeByFile>
+          <ExcludeByFile>**/TestResults/**/*</ExcludeByFile>
+          <ExcludeByFile>**/*Designer.cs</ExcludeByFile>
+          <ExcludeByFile>**/*.g.cs</ExcludeByFile>
+          <ExcludeByFile>**/*.generated.cs</ExcludeByFile>
+          <!-- Include source files for better coverage -->
+          <IncludeDirectory>../</IncludeDirectory>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

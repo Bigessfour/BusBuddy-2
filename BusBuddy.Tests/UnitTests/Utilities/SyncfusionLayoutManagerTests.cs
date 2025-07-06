@@ -320,8 +320,8 @@ namespace BusBuddy.Tests.UnitTests.Utilities
             testForm.StartPosition.Should().Be(FormStartPosition.CenterScreen);
 
             // Documentation-compliant minimum sizes for Bus Buddy application (flexible for CI)
-            testForm.MinimumSize.Width.Should().BeGreaterOrEqualTo(800, "minimum width should be reasonable for various screen sizes");
-            testForm.MinimumSize.Height.Should().BeGreaterOrEqualTo(600, "minimum height should be reasonable for various screen sizes");
+            testForm.MinimumSize.Width.Should().BeGreaterThanOrEqualTo(800, "minimum width should be reasonable for various screen sizes");
+            testForm.MinimumSize.Height.Should().BeGreaterThanOrEqualTo(600, "minimum height should be reasonable for various screen sizes");
 
             // DPI and scaling settings per documentation
             testForm.AutoScaleMode.Should().Be(AutoScaleMode.Dpi, "should use DPI scaling for high-resolution displays");

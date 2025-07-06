@@ -57,24 +57,7 @@ namespace BusBuddy.Tests.UnitTests.Utilities
             grid.ColumnCount.Should().Be(0);
         }
 
-        // Removed duplicate STAThreadingTest_ShouldWork declaration
-        [Test]
-        [Apartment(ApartmentState.STA)]
-        [Timeout(2000)]
-        [Ignore("STA threading cannot be reliably asserted in headless/unit test environments. See https://github.com/Bigessfour/BusBuddy_Syncfusion/issues/known-ui-test-limitations for details.")]
-        public void STAThreadingTest_ShouldWork()
-        {
-            // Verify STA threading is working
-            Thread.CurrentThread.GetApartmentState().Should().Be(ApartmentState.STA);
-
-            // Test creating multiple controls
-            for (int i = 0; i < 3; i++)
-            {
-                using var control = new Panel();
-                control.BackColor = Color.Red;
-                control.Should().NotBeNull();
-            }
-        }
+        // Removed duplicate STAThreadingTest_ShouldWork declaration - was skipped due to STA threading assertion issues in headless environments
 
         [Test]
         [Timeout(1000)]

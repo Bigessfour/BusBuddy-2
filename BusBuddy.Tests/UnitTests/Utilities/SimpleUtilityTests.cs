@@ -60,16 +60,7 @@ namespace BusBuddy.Tests.UnitTests.Utilities
             Assert.DoesNotThrow(() => VisualEnhancementManager.ApplyEnhancedTheme(form));
         }
 
-        [Test]
-        [Ignore("GDI+/graphics operations cannot be reliably tested in headless/unit test environments. See https://github.com/Bigessfour/BusBuddy_Syncfusion/issues/known-ui-test-limitations for details.")]
-        public void VisualEnhancementManager_ApplyEnhancedGridVisuals_WithValidGrid_ShouldNotThrow()
-        {
-            // Arrange
-            var dataGrid = new Syncfusion.WinForms.DataGrid.SfDataGrid();
 
-            // Act & Assert
-            Assert.DoesNotThrow(() => VisualEnhancementManager.ApplyEnhancedGridVisuals(dataGrid));
-        }
 
         [Test]
         public void VisualEnhancementManager_ApplyChartEnhancements_WithValidControl_ShouldNotThrow()

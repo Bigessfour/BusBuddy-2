@@ -337,7 +337,7 @@ namespace BusBuddy.Tests.UnitTests.SimpleTests
         {
             var capacity = 72;
             capacity.Should().BeGreaterThan(0);
-            capacity.Should().BeLessOrEqualTo(100); // Reasonable max
+            capacity.Should().BeLessThanOrEqualTo(100); // Reasonable max
         }
 
         [Test]

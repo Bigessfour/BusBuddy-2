@@ -585,7 +585,10 @@ namespace BusBuddy.Tests.UnitTests
 
             // Assert
             result.Should().HaveCount(1);
-            result.First().Driver.DriverName.Should().Be("John Doe");
+            var firstResult = result.FirstOrDefault();
+            Assert.That(firstResult, Is.Not.Null);
+            Assert.That(firstResult!.Driver, Is.Not.Null);
+            Assert.That(firstResult.Driver!.DriverName, Is.EqualTo("John Doe"));
         }
 
         [Test]
