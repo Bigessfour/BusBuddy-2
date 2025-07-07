@@ -10,7 +10,7 @@ using Syncfusion.Windows.Forms.Tools;
 using Syncfusion.WinForms.Controls;
 using Syncfusion.Drawing;
 
-namespace Bus_Buddy.Utilities
+namespace BusBuddy.Utilities
 {
     /// <summary>
     /// Visual Enhancement Manager for BusBuddy_Syncfusion Application

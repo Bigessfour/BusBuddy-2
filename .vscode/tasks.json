@@ -35,6 +35,24 @@
                 "${workspaceFolder}/Bus Buddy.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Run Tests and Log Output",
+            "type": "shell",
+            "command": "dotnet test --logger 'console;verbosity=detailed' *>&1 | Tee-Object -FilePath '${workspaceFolder}/BusBuddy.Tests/test-output.log'",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
         }
     ]
 }

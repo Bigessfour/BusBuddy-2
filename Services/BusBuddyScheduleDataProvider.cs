@@ -1,43 +1,43 @@
-using Bus_Buddy.Models;
+using BusBuddy.Core.Models;
+using BusBuddy.Core.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using Syncfusion.Schedule;
-using Syncfusion.Windows.Forms.Schedule;
-using System.ComponentModel;
+using Syncfusion.UI.Xaml.Scheduler;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
+using System.Windows.Media;
 
-namespace Bus_Buddy.Services;
+namespace BusBuddy.WPF.Services;
 
 /// <summary>
 /// Custom Schedule Data Provider for Bus Buddy
-/// Integrates Activity entities with Syncfusion ScheduleControl
-/// Based on Syncfusion SimpleScheduleDataProvider pattern
+/// Integrates Activity entities with Syncfusion SfScheduler
 /// </summary>
-public class BusBuddyScheduleDataProvider : ScheduleDataProvider
+public class BusBuddyScheduleDataProvider
 {
     private readonly IActivityService _activityService;
     private readonly ILogger<BusBuddyScheduleDataProvider> _logger;
-    private BusBuddyScheduleAppointmentList _masterList;
+    private ObservableCollection<BusBuddyScheduleAppointment> _masterList;
     private bool _isDirty;
 
     public BusBuddyScheduleDataProvider(IActivityService activityService, ILogger<BusBuddyScheduleDataProvider> logger)
     {
         _activityService = activityService;
         _logger = logger;
-        _masterList = new BusBuddyScheduleAppointmentList();
+        _masterList = new ObservableCollection<BusBuddyScheduleAppointment>();
         _isDirty = false;
-
-        // Initialize the drop-down lists for appointments
-        InitLists();
     }
 
     /// <summary>
     /// Gets or sets the master list of appointments
     /// </summary>
-    public BusBuddyScheduleAppointmentList MasterList
+    public ObservableCollection<BusBuddyScheduleAppointment> MasterList
     {
         get => _masterList;
         set
         {
-            _masterList = value ?? new BusBuddyScheduleAppointmentList();
+            _masterList = value ?? new ObservableCollection<BusBuddyScheduleAppointment>();
             _isDirty = true;
         }
     }
@@ -45,7 +45,7 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
     /// <summary>
     /// Gets or sets whether the data has been modified
     /// </summary>
-    public override bool IsDirty
+    public bool IsDirty
     {
         get => _isDirty;
         set => _isDirty = value;
@@ -54,11 +54,11 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
     /// <summary>
     /// Returns appointments for a specific day
     /// </summary>
-    public override IScheduleAppointmentList GetScheduleForDay(DateTime day)
+    public ObservableCollection<BusBuddyScheduleAppointment> GetScheduleForDay(DateTime day)
     {
-        var dayAppointments = new BusBuddyScheduleAppointmentList();
+        var dayAppointments = new ObservableCollection<BusBuddyScheduleAppointment>();
 
-        foreach (BusBuddyScheduleAppointment appointment in _masterList)
+        foreach (var appointment in _masterList)
         {
             if (appointment.StartTime.Date == day.Date ||
                 (appointment.StartTime.Date <= day.Date && appointment.EndTime.Date >= day.Date))
@@ -73,11 +73,11 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
     /// <summary>
     /// Returns appointments within a date range
     /// </summary>
-    public override IScheduleAppointmentList GetSchedule(DateTime startDate, DateTime endDate)
+    public ObservableCollection<BusBuddyScheduleAppointment> GetSchedule(DateTime startDate, DateTime endDate)
     {
-        var rangeAppointments = new BusBuddyScheduleAppointmentList();
+        var rangeAppointments = new ObservableCollection<BusBuddyScheduleAppointment>();
 
-        foreach (BusBuddyScheduleAppointment appointment in _masterList)
+        foreach (var appointment in _masterList)
         {
             if ((appointment.StartTime >= startDate && appointment.StartTime <= endDate) ||
                 (appointment.EndTime >= startDate && appointment.EndTime <= endDate) ||
@@ -93,16 +93,16 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
     /// <summary>
     /// Creates a new appointment with default values
     /// </summary>
-    public override IScheduleAppointment NewScheduleAppointment()
+    public BusBuddyScheduleAppointment NewScheduleAppointment()
     {
         var appointment = new BusBuddyScheduleAppointment
         {
-            UniqueID = GenerateUniqueId(),
+            Id = GenerateUniqueId(),
             StartTime = DateTime.Now,
             EndTime = DateTime.Now.AddHours(1),
             Subject = "New Activity",
-            Content = "",
-            AllDay = false
+            Notes = "",
+            IsAllDay = false
         };
 
         return appointment;
@@ -111,44 +111,34 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
     /// <summary>
     /// Adds an appointment to the master list
     /// </summary>
-    public override void AddItem(IScheduleAppointment item)
+    public void AddItem(BusBuddyScheduleAppointment item)
     {
-        if (item is BusBuddyScheduleAppointment busAppointment)
-        {
-            _masterList.Add(busAppointment);
-            _isDirty = true;
-            _logger.LogInformation("Added appointment: {Subject}", item.Subject);
-        }
+        _masterList.Add(item);
+        _isDirty = true;
+        _logger.LogInformation("Added appointment: {Subject}", item.Subject);
     }
 
     /// <summary>
     /// Removes an appointment from the master list
     /// </summary>
-    public override void RemoveItem(IScheduleAppointment item)
+    public void RemoveItem(BusBuddyScheduleAppointment item)
     {
-        if (item is BusBuddyScheduleAppointment busAppointment)
-        {
-            _masterList.Remove(busAppointment);
-            _isDirty = true;
-            _logger.LogInformation("Removed appointment: {Subject}", item.Subject);
-        }
+        _masterList.Remove(item);
+        _isDirty = true;
+        _logger.LogInformation("Removed appointment: {Subject}", item.Subject);
     }
 
     /// <summary>
     /// Saves any changes to the database
     /// </summary>
-    public override void CommitChanges()
+    public void CommitChanges()
     {
         if (!_isDirty) return;
 
         try
         {
             _logger.LogInformation("Committing schedule changes to database");
-
-            // Here we would save changes to the database via ActivityService
-            // For now, we'll just mark as clean
             _isDirty = false;
-
             _logger.LogInformation("Successfully committed schedule changes");
         }
         catch (Exception ex)
@@ -169,11 +159,7 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
 
             var activities = await _activityService.GetActivitiesByDateRangeAsync(startDate, endDate);
 
-            // Clear existing appointments
-            while (_masterList.Count > 0)
-            {
-                _masterList.RemoveAt(0);
-            }
+            _masterList.Clear();
 
             foreach (var activity in activities)
             {
@@ -198,50 +184,32 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
     {
         var appointment = new BusBuddyScheduleAppointment
         {
-            UniqueID = activity.ActivityId,
-            ActivityId = activity.ActivityId,
-            StartTime = activity.ActivityDate.Add(activity.StartTime ?? TimeSpan.Zero),
-            EndTime = activity.ActivityDate.Add(activity.EndTime ?? activity.StartTime?.Add(TimeSpan.FromHours(1)) ?? TimeSpan.FromHours(1)),
-            Subject = $"{activity.ActivityType}",
-            Content = $"Route: {activity.RouteId}\nVehicle: {activity.VehicleId}\nDriver: {activity.DriverId}\nStudents: {activity.StudentsCount ?? 0}",
-            AllDay = false,
-            LabelValue = GetLabelValueForActivityType(activity.ActivityType),
-            LocationValue = activity.Notes ?? ""
+            Id = activity.Id,
+            ActivityId = activity.Id,
+            StartTime = activity.StartTime,
+            EndTime = activity.EndTime,
+            Subject = activity.ActivityType,
+            Notes = $"Route: {activity.RouteId}, Vehicle: {activity.VehicleId}, Driver: {activity.DriverId}, Students: {activity.StudentsCount}",
+            IsAllDay = false,
+            AppointmentBackground = GetBrushForActivityType(activity.ActivityType),
+            Location = activity.Notes ?? ""
         };
-
-        // Set color based on activity type
-        appointment.ForeColor = GetColorForActivityType(activity.ActivityType);
 
         return appointment;
     }
 
     /// <summary>
-    /// Gets the label value for an activity type
+    /// Gets the brush for an activity type
     /// </summary>
-    private int GetLabelValueForActivityType(string? activityType)
+    private System.Windows.Media.Brush GetBrushForActivityType(string? activityType)
     {
         return activityType?.ToLower() switch
         {
-            "morning" => 1,      // Important (Orange)
-            "afternoon" => 2,    // Business (Blue)
-            "field trip" => 3,   // Personal (Green)
-            "special" => 4,      // Vacation (Gray)
-            _ => 0               // None (White)
-        };
-    }
-
-    /// <summary>
-    /// Gets the color for an activity type
-    /// </summary>
-    private Color GetColorForActivityType(string? activityType)
-    {
-        return activityType?.ToLower() switch
-        {
-            "morning" => Color.FromArgb(46, 125, 50),     // Green
-            "afternoon" => Color.FromArgb(25, 118, 210),  // Blue  
-            "field trip" => Color.FromArgb(255, 152, 0),  // Orange
-            "special" => Color.FromArgb(156, 39, 176),    // Purple
-            _ => Color.FromArgb(97, 97, 97)               // Gray
+            "morning" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 46, 125, 50)), // Green
+            "afternoon" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 25, 118, 210)), // Blue
+            "field trip" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 152, 0)), // Orange
+            "special" => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 156, 39, 176)), // Purple
+            _ => new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 97, 97, 97)) // Gray
         };
     }
 
@@ -250,40 +218,8 @@ public class BusBuddyScheduleDataProvider : ScheduleDataProvider
     /// </summary>
     private int GenerateUniqueId()
     {
-        var maxId = _masterList.Count > 0 ? _masterList.Cast<BusBuddyScheduleAppointment>().Max(a => a.UniqueID) : 0;
+        var maxId = _masterList.Count > 0 ? _masterList.Max(a => (int)a.Id) : 0;
         return maxId + 1;
     }
 }
 
-/// <summary>
-/// Custom appointment class that extends ScheduleAppointment with Activity-specific properties
-/// </summary>
-public class BusBuddyScheduleAppointment : ScheduleAppointment
-{
-    /// <summary>
-    /// Associated Activity ID from the database
-    /// </summary>
-    public int ActivityId { get; set; }
-
-    /// <summary>
-    /// Creates a new instance of BusBuddyScheduleAppointment
-    /// </summary>
-    public BusBuddyScheduleAppointment() : base()
-    {
-        ActivityId = 0;
-    }
-}
-
-/// <summary>
-/// Custom appointment list for Bus Buddy appointments
-/// </summary>
-public class BusBuddyScheduleAppointmentList : ScheduleAppointmentList
-{
-    /// <summary>
-    /// Creates a new appointment with default values
-    /// </summary>
-    public override IScheduleAppointment NewScheduleAppointment()
-    {
-        return new BusBuddyScheduleAppointment();
-    }
-}

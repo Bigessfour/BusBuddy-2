@@ -17,7 +17,11 @@ static class Program
     {
         try
         {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhec3RSRGRYU0R2WUBWYEk=");
+            var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
+            if (!string.IsNullOrEmpty(licenseKey))
+            {
+                SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+            }
 
             // Initialize the service container
             ServiceContainer.Initialize();
