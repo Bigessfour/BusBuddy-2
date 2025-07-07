@@ -269,10 +269,10 @@ namespace Bus_Buddy.Forms
                 _contentPanel.Controls.Add(mainSplitter);
 
                 // Create the existing sophisticated Dashboard
-                var dashboardLogger = _serviceProvider.GetRequiredService<ILogger<Dashboard>>();
-                var xaiService = _serviceProvider.GetRequiredService<XAIService>();
-                var geeService = _serviceProvider.GetRequiredService<GoogleEarthEngineService>();
-                var aiReportingService = _serviceProvider.GetRequiredService<BusBuddyAIReportingService>();
+                var dashboardLogger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<Dashboard>>(_serviceProvider);
+                var xaiService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<XAIService>(_serviceProvider);
+                var geeService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<GoogleEarthEngineService>(_serviceProvider);
+                var aiReportingService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyAIReportingService>(_serviceProvider);
                 _embeddedDashboard = new Dashboard(dashboardLogger, _busService, _configService, xaiService, geeService, aiReportingService, _serviceProvider);
 
                 // Embed the dashboard in the left panel
@@ -317,9 +317,9 @@ namespace Bus_Buddy.Forms
                 parentPanel.Controls.Add(analyticsHeader);
 
                 // Create and add the Enhanced Dashboard Analytics
-                var analyticsLogger = _serviceProvider.GetRequiredService<ILogger<EnhancedDashboardAnalytics>>();
-                var aiReportingService = _serviceProvider.GetRequiredService<BusBuddyAIReportingService>();
-                var routeOptimizationService = _serviceProvider.GetRequiredService<SmartRouteOptimizationService>();
+                var analyticsLogger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<EnhancedDashboardAnalytics>>(_serviceProvider);
+                var aiReportingService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyAIReportingService>(_serviceProvider);
+                var routeOptimizationService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<SmartRouteOptimizationService>(_serviceProvider);
                 var analyticsPanel = new EnhancedDashboardAnalytics(analyticsLogger, _busRepository, _busService, aiReportingService, routeOptimizationService)
                 {
                     Dock = DockStyle.Fill
@@ -400,7 +400,7 @@ namespace Bus_Buddy.Forms
             {
                 _logger.LogInformation("Opening Bus Management");
 
-                var logger = _serviceProvider.GetRequiredService<ILogger<BusManagementForm>>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<BusManagementForm>>(_serviceProvider);
                 var busForm = new BusManagementForm(logger, _busService);
                 busForm.ShowDialog(this);
 
@@ -434,8 +434,11 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                var driverForm = ServiceContainer.GetService<DriverManagementForm>();
-                driverForm.ShowDialog(this);
+                var driverForm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<DriverManagementForm>(_serviceProvider);
+                if (driverForm != null)
+                {
+                    driverForm.ShowDialog(this);
+                }
             }
             catch (Exception ex)
             {
@@ -448,8 +451,11 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                var routeForm = ServiceContainer.GetService<RouteManagementForm>();
-                routeForm.ShowDialog(this);
+                var routeForm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<RouteManagementForm>(_serviceProvider);
+                if (routeForm != null)
+                {
+                    routeForm.ShowDialog(this);
+                }
             }
             catch (Exception ex)
             {
@@ -464,8 +470,8 @@ namespace Bus_Buddy.Forms
             {
                 _logger.LogInformation("Opening Enhanced Route Map with Google Earth Engine");
 
-                var logger = _serviceProvider.GetRequiredService<ILogger<EnhancedRouteMapForm>>();
-                var routeRepository = _serviceProvider.GetRequiredService<RouteRepository>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<EnhancedRouteMapForm>>(_serviceProvider);
+                var routeRepository = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<RouteRepository>(_serviceProvider);
                 var enhancedRouteMapForm = new EnhancedRouteMapForm(logger, routeRepository, _busRepository);
                 enhancedRouteMapForm.ShowDialog(this);
 
@@ -483,8 +489,11 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                var studentForm = ServiceContainer.GetService<Bus_Buddy.Forms.StudentManagementForm>();
-                studentForm.ShowDialog(this);
+                var studentForm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<Bus_Buddy.Forms.StudentManagementForm>(_serviceProvider);
+                if (studentForm != null)
+                {
+                    studentForm.ShowDialog(this);
+                }
             }
             catch (Exception ex)
             {
@@ -513,8 +522,11 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                var fuelForm = ServiceContainer.GetService<Bus_Buddy.Forms.FuelManagementForm>();
-                fuelForm.ShowDialog(this);
+                var fuelForm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<Bus_Buddy.Forms.FuelManagementForm>(_serviceProvider);
+                if (fuelForm != null)
+                {
+                    fuelForm.ShowDialog(this);
+                }
             }
             catch (Exception ex)
             {

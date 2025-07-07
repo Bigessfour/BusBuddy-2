@@ -25,17 +25,18 @@ public static class ServiceCollectionExtensions
         // Register DbContext with SQL Server
         services.AddDbContext<BusBuddyDbContext>(options =>
         {
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("DefaultConnection string is not configured.");
+            options.UseInMemoryDatabase("BusBuddyDb");
+            //var connectionString = configuration.GetConnectionString("DefaultConnection")
+            //    ?? throw new InvalidOperationException("DefaultConnection string is not configured.");
 
-            options.UseSqlServer(connectionString, sqlOptions =>
-            {
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
-                sqlOptions.CommandTimeout(30);
-            });
+            //options.UseSqlServer(connectionString, sqlOptions =>
+            //{
+            //    sqlOptions.EnableRetryOnFailure(
+            //        maxRetryCount: 3,
+            //        maxRetryDelay: TimeSpan.FromSeconds(30),
+            //        errorNumbersToAdd: null);
+            //    sqlOptions.CommandTimeout(30);
+            //});
 
             // Enable sensitive data logging in development
 #if DEBUG
@@ -128,7 +129,7 @@ public static class ServiceCollectionExtensions
     public static async Task<IServiceProvider> InitializeDatabaseAsync(this IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();
+        var context = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(scope.ServiceProvider);
 
         try
         {

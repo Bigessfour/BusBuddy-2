@@ -34,7 +34,7 @@ namespace BusBuddy.Tests.Infrastructure
         protected TestBaseWithSQLite()
         {
             SetupServices();
-            DbContext = ServiceProvider.GetRequiredService<BusBuddyDbContext>();
+            DbContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(ServiceProvider);
             InitializeDatabase();
         }
 
@@ -161,11 +161,11 @@ namespace BusBuddy.Tests.Infrastructure
         {
             try
             {
-                return ServiceProvider.GetRequiredService<T>();
+                return Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<T>(ServiceProvider);
             }
             catch (Exception ex)
             {
-                var logger = ServiceProvider?.GetService<ILogger<TestBaseWithSQLite>>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<TestBaseWithSQLite>>(ServiceProvider);
                 logger?.LogError(ex, "Failed to resolve service {ServiceType}", typeof(T).Name);
                 throw new InvalidOperationException($"Service resolution failed for {typeof(T).Name}", ex);
             }
@@ -201,7 +201,7 @@ namespace BusBuddy.Tests.Infrastructure
 
             await DbContext.SaveChangesAsync();
 
-            var logger = ServiceProvider?.GetService<ILogger<TestBaseWithSQLite>>();
+            var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<TestBaseWithSQLite>>(ServiceProvider);
             logger?.LogInformation("Test data seeded: 1 bus, 1 driver");
         }
 

@@ -75,8 +75,7 @@ partial class Dashboard
             Location = new System.Drawing.Point(10, 10),
             Size = new System.Drawing.Size(1180, 700),
             Dock = DockStyle.Fill,
-            TabStyle = typeof(TabRendererMetro),
-            ThemeName = "Metro"
+            ThemeName = "Office2019Colorful"
         };
 
         // Create Fleet Management tab

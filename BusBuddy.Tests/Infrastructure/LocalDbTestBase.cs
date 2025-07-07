@@ -52,7 +52,7 @@ namespace BusBuddy.Tests.Infrastructure
             ConnectionString = _databaseManager.BuildLocalDbConnectionString(DatabaseName);
 
             SetupServices();
-            DbContext = ServiceProvider.GetRequiredService<BusBuddyDbContext>();
+            DbContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(ServiceProvider);
             InitializeDatabaseAsync().GetAwaiter().GetResult();
         }
 
@@ -71,12 +71,12 @@ namespace BusBuddy.Tests.Infrastructure
                 // Clear change tracker for clean state
                 DbContext.ChangeTracker.Clear();
 
-                var logger = ServiceProvider?.GetService<ILogger<LocalDbTestBase>>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<LocalDbTestBase>>(ServiceProvider);
                 logger?.LogInformation("LocalDB test database initialized: {DatabaseName}", DatabaseName);
             }
             catch (Exception ex)
             {
-                var logger = ServiceProvider?.GetService<ILogger<LocalDbTestBase>>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<LocalDbTestBase>>(ServiceProvider);
                 logger?.LogError(ex, "Failed to initialize LocalDB test database: {DatabaseName}", DatabaseName);
 
                 // Try fallback approach if initial setup fails
@@ -209,7 +209,7 @@ namespace BusBuddy.Tests.Infrastructure
             }
             catch (Exception ex)
             {
-                var logger = ServiceProvider?.GetService<ILogger<LocalDbTestBase>>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<LocalDbTestBase>>(ServiceProvider);
                 logger?.LogWarning(ex, "Fast database clear failed, falling back to recreate");
 
                 // Fallback to full recreation if truncate fails
@@ -292,11 +292,11 @@ namespace BusBuddy.Tests.Infrastructure
         {
             try
             {
-                return ServiceProvider.GetRequiredService<T>();
+                return Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<T>(ServiceProvider);
             }
             catch (Exception ex)
             {
-                var logger = ServiceProvider?.GetService<ILogger<LocalDbTestBase>>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<LocalDbTestBase>>(ServiceProvider);
                 logger?.LogError(ex, "Failed to resolve service {ServiceType}", typeof(T).Name);
                 throw new InvalidOperationException($"Service resolution failed for {typeof(T).Name}", ex);
             }
@@ -332,7 +332,7 @@ namespace BusBuddy.Tests.Infrastructure
             await DbContext.SaveChangesAsync();
             DbContext.ChangeTracker.Clear();
 
-            var logger = ServiceProvider?.GetService<ILogger<LocalDbTestBase>>();
+            var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<LocalDbTestBase>>(ServiceProvider);
             logger?.LogInformation("Minimal test data seeded for {DatabaseName}", DatabaseName);
         }
 
@@ -385,8 +385,11 @@ namespace BusBuddy.Tests.Infrastructure
                     ServiceProvider?.Dispose();
                 }
 
-                var logger = ServiceProvider?.GetService<ILogger<LocalDbTestBase>>();
-                logger?.LogInformation("LocalDB test database cleaned up: {DatabaseName}", DatabaseName);
+                if (ServiceProvider != null)
+                {
+                    var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<LocalDbTestBase>>(ServiceProvider);
+                    logger?.LogInformation("LocalDB test database cleaned up: {DatabaseName}", DatabaseName);
+                }
             }
             catch (Exception ex)
             {

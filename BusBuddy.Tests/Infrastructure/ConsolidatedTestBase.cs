@@ -33,8 +33,8 @@ namespace BusBuddy.Tests.Infrastructure
         {
             BusBuddyDbContext.SkipGlobalSeedData = true;
             SetupServices();
-            DbContext = ServiceProvider.GetRequiredService<BusBuddyDbContext>();
-            DialogCapture = ServiceProvider.GetRequiredService<DialogEventCapture>();
+            DbContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(ServiceProvider);
+            DialogCapture = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<DialogEventCapture>(ServiceProvider);
             InitializeDatabase();
         }
 
@@ -176,8 +176,8 @@ namespace BusBuddy.Tests.Infrastructure
             ServiceProvider = services.BuildServiceProvider();
 
             // Re-resolve DbContext and DialogCapture from the new provider
-            DbContext = ServiceProvider.GetRequiredService<BusBuddyDbContext>();
-            DialogCapture = ServiceProvider.GetRequiredService<DialogEventCapture>();
+            DbContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(ServiceProvider);
+            DialogCapture = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<DialogEventCapture>(ServiceProvider);
 
             // Ensure the database is created and ready
             DbContext.Database.EnsureCreated();
@@ -326,11 +326,11 @@ namespace BusBuddy.Tests.Infrastructure
         {
             try
             {
-                return ServiceProvider.GetRequiredService<T>();
+                return Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<T>(ServiceProvider);
             }
             catch (Exception ex)
             {
-                var logger = ServiceProvider.GetService<ILogger<ConsolidatedTestBase>>();
+                var logger = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<ILogger<ConsolidatedTestBase>>(ServiceProvider);
                 logger?.LogError(ex, "Failed to resolve service {ServiceType}", typeof(T).Name);
                 throw new InvalidOperationException($"Service resolution failed for {typeof(T).Name}", ex);
             }

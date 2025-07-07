@@ -18,7 +18,7 @@ namespace Bus_Buddy
             _serviceProvider = services.BuildServiceProvider();
 
             // Initialize database
-            InitializeDatabase();
+            //InitializeDatabase();
 
             // Register Syncfusion license
             var configService = GetService<IConfigurationService>();
@@ -30,13 +30,16 @@ namespace Bus_Buddy
             try
             {
                 using var scope = _serviceProvider!.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();
+                var context = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(scope.ServiceProvider);
 
                 // Ensure database is created
                 context.Database.EnsureCreated();
 
-                // Apply any pending migrations
-                context.Database.Migrate();
+                // Apply any pending migrations, but not for in-memory database
+                if (!context.Database.IsInMemory())
+                {
+                    context.Database.Migrate();
+                }
             }
             catch (Exception ex)
             {
@@ -98,7 +101,7 @@ namespace Bus_Buddy
             if (_serviceProvider == null)
                 throw new InvalidOperationException("ServiceContainer not initialized. Call Initialize() first.");
 
-            return _serviceProvider.GetRequiredService<T>();
+            return Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<T>(_serviceProvider);
         }
 
         public static T? GetOptionalService<T>() where T : class
@@ -106,7 +109,7 @@ namespace Bus_Buddy
             if (_serviceProvider == null)
                 return null;
 
-            return _serviceProvider.GetService<T>();
+            return Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetService<T>(_serviceProvider);
         }
 
         public static void Dispose()

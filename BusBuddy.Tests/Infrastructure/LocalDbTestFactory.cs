@@ -124,7 +124,7 @@ namespace BusBuddy.Tests.Infrastructure
             if (_isInitialized) return;
 
             SetupServices();
-            DbContext = ServiceProvider.GetRequiredService<BusBuddyDbContext>();
+            DbContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(ServiceProvider);
 
             // Create fresh database for this test
             await DbContext.Database.EnsureDeletedAsync();
@@ -206,7 +206,7 @@ namespace BusBuddy.Tests.Infrastructure
         /// </summary>
         public T GetService<T>() where T : class
         {
-            return ServiceProvider.GetRequiredService<T>();
+            return Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<T>(ServiceProvider);
         }
 
         /// <summary>

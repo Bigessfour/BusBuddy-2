@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="8.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
@@ -42,58 +43,20 @@
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Syncfusion.Diagram.Windows" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Grid.Windows" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Licensing" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Office2019Theme.WinForms" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Schedule.Windows" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.SfDataGrid.WinForms" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.SfListView.WinForms" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Tools.Windows" Version="30.1.38" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <!-- Corrected Syncfusion References for .NET 8 -->
-  <ItemGroup>
-    <Reference Include="Syncfusion.Licensing">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Licensing.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Core.WinForms">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Core.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Shared.Base">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Shared.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.SfDataGrid.WinForms">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.SfDataGrid.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.SfInput.WinForms">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.SfInput.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Tools.Windows">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Tools.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Office2019Theme.WinForms">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Office2019Theme.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Schedule.Base">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Schedule.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Schedule.Windows">
-      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Schedule.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Grid.Windows">
-        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Grid.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Grid.Base">
-        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Grid.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Shared.Windows">
-        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Shared.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.SfListView.WinForms">
-        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.SfListView.WinForms.dll</HintPath>
-    </Reference>
-     <Reference Include="Syncfusion.Diagram.Windows">
-        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Diagram.Windows.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

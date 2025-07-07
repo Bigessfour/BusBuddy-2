@@ -71,7 +71,7 @@ public partial class Dashboard : MetroForm
     {
         // Create Fleet Management tab
         var fleetForm = new BusManagementForm(
-            _serviceProvider.GetRequiredService<ILogger<BusManagementForm>>(),
+            Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<BusManagementForm>>(_serviceProvider),
             _busService);
         fleetForm.TopLevel = false;
         fleetForm.FormBorderStyle = FormBorderStyle.None;
@@ -81,7 +81,7 @@ public partial class Dashboard : MetroForm
 
         // Create Routes tab
         var routeForm = new RouteManagementForm(
-            _serviceProvider.GetRequiredService<ILogger<RouteManagementForm>>(),
+            Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<RouteManagementForm>>(_serviceProvider),
             _busService);
         routeForm.TopLevel = false;
         routeForm.FormBorderStyle = FormBorderStyle.None;
@@ -91,9 +91,9 @@ public partial class Dashboard : MetroForm
 
         // Create Maintenance tab
         var maintenanceForm = new FuelManagementForm(
-            _serviceProvider.GetRequiredService<IBusService>(),
-            _serviceProvider.GetRequiredService<IFuelService>(),
-            _serviceProvider.GetRequiredService<ILogger<FuelManagementForm>>());
+            Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IBusService>(_serviceProvider),
+            Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IFuelService>(_serviceProvider),
+            Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<FuelManagementForm>>(_serviceProvider));
         maintenanceForm.TopLevel = false;
         maintenanceForm.FormBorderStyle = FormBorderStyle.None;
         maintenanceForm.Dock = DockStyle.Fill;
@@ -102,8 +102,8 @@ public partial class Dashboard : MetroForm
 
         // Create Students tab
         var studentForm = new StudentManagementForm(
-            _serviceProvider.GetRequiredService<ILogger<StudentManagementForm>>(),
-            _serviceProvider.GetRequiredService<IStudentService>(),
+            Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<ILogger<StudentManagementForm>>(_serviceProvider),
+            Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IStudentService>(_serviceProvider),
             _busService);
         studentForm.TopLevel = false;
         studentForm.FormBorderStyle = FormBorderStyle.None;
@@ -112,7 +112,7 @@ public partial class Dashboard : MetroForm
         studentForm.Show();
 
         // Create Reports tab
-        var reportsForm = new BusReportsForm(_serviceProvider.GetRequiredService<BusRepository>());
+        var reportsForm = new BusReportsForm(Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusRepository>(_serviceProvider));
         reportsForm.TopLevel = false;
         reportsForm.FormBorderStyle = FormBorderStyle.None;
         reportsForm.Dock = DockStyle.Fill;
@@ -120,12 +120,12 @@ public partial class Dashboard : MetroForm
         reportsForm.Show();
 
         // Create Analytics tab with Enhanced Dashboard Analytics
-        var analyticsPanel = _serviceProvider.GetRequiredService<EnhancedDashboardAnalytics>();
+        var analyticsPanel = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<EnhancedDashboardAnalytics>(_serviceProvider);
         analyticsPanel.Dock = DockStyle.Fill;
         analyticsTab.Controls.Add(analyticsPanel);
 
         // Create Settings tab
-        var settingsForm = _serviceProvider.GetRequiredService<Bus_Buddy.Forms.SettingsForm>();
+        var settingsForm = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<Bus_Buddy.Forms.SettingsForm>(_serviceProvider);
         settingsForm.TopLevel = false;
         settingsForm.FormBorderStyle = FormBorderStyle.None;
         settingsForm.Dock = DockStyle.Fill;
@@ -133,7 +133,7 @@ public partial class Dashboard : MetroForm
         settingsForm.Show();
 
         // Create GEE Maps tab
-        var mapPanel = _serviceProvider.GetRequiredService<Bus_Buddy.Forms.MapPanel>();
+        var mapPanel = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<Bus_Buddy.Forms.MapPanel>(_serviceProvider);
         mapPanel.Dock = DockStyle.Fill;
         geeMapsTab.Controls.Add(mapPanel);
     }

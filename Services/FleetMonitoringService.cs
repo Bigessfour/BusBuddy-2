@@ -66,8 +66,8 @@ namespace Bus_Buddy.Services
             try
             {
                 using var scope = _serviceProvider.CreateScope();
-                var busService = scope.ServiceProvider.GetRequiredService<IBusService>();
-                var maintenanceService = scope.ServiceProvider.GetRequiredService<IMaintenanceService>();
+                var busService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IBusService>(scope.ServiceProvider);
+                var maintenanceService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IMaintenanceService>(scope.ServiceProvider);
 
                 _logger.LogDebug("Starting fleet monitoring cycle");
 

@@ -30,7 +30,7 @@ namespace BusBuddy.Tests.Infrastructure
         protected ProperTestBase()
         {
             SetupServices();
-            DbContext = ServiceProvider.GetRequiredService<BusBuddyDbContext>();
+            DbContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<BusBuddyDbContext>(ServiceProvider);
 
             // Work with the application's intended design
             InitializeWithApplicationDefaults();
