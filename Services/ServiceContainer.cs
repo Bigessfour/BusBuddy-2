@@ -83,13 +83,14 @@ namespace Bus_Buddy
             services.AddTransient<Bus_Buddy.Forms.ActivityEditForm>();
             services.AddTransient<Bus_Buddy.Forms.StudentManagementForm>();
             services.AddTransient<Bus_Buddy.Forms.StudentEditForm>();
-            services.AddTransient<Bus_Buddy.Forms.MaintenanceManagementForm>();
+            //services.AddTransient<Bus_Buddy.Forms.MaintenanceManagementForm>();
             services.AddTransient<Bus_Buddy.Forms.FuelManagementForm>();
-            services.AddTransient<Bus_Buddy.Forms.TicketManagementForm>();
-            services.AddTransient<Bus_Buddy.Forms.TicketEditForm>();
-            services.AddTransient<Bus_Buddy.Forms.VisualEnhancementShowcaseForm>();
-            services.AddTransient<Bus_Buddy.Forms.PassengerManagementForm>();
+            //services.AddTransient<Bus_Buddy.Forms.TicketManagementForm>();
+            //services.AddTransient<Bus_Buddy.Forms.TicketEditForm>();
+            //services.AddTransient<Bus_Buddy.Forms.PassengerManagementForm>();
             services.AddTransient<Bus_Buddy.Forms.EnhancedDashboardAnalytics>();
+            services.AddTransient<Bus_Buddy.Forms.SettingsForm>();
+            services.AddTransient<Bus_Buddy.Forms.MapPanel>();
         }
 
         public static T GetService<T>() where T : notnull

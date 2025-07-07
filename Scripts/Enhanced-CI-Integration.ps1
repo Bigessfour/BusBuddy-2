@@ -30,8 +30,7 @@ function Invoke-EnhancedTestSuite {
 
     # Parallel test execution (5x faster than sequential)
     $testProjects = @(
-        'BusBuddy.Tests\BusBuddy.Tests.csproj',
-        'Bus Buddy.csproj'
+        'BusBuddy.Tests\BusBuddy.Tests.csproj'
     )
 
     $testResults = $testProjects | ForEach-Object -Parallel {
@@ -81,8 +80,8 @@ function Invoke-BuildErrorAnalysis {
     Write-Host '🔍 Analyzing Build Errors with PowerShell 7.x' -ForegroundColor Magenta
 
     # Enhanced build with detailed error capture
-    $buildOutput = & dotnet build 'Bus Buddy.sln' --verbosity detailed 2>&1
-    $errors = $buildOutput | Where-Object { $_ -match 'error|Error|ERROR' }
+    $buildOutput = & dotnet build 'Bus Buddy.sln' --verbosity normal 2>&1
+    $errors = $buildOutput | Where-Object { $_ -match ':\s*error\s' }
 
     if ($errors.Count -gt 0) {
         Write-Host "❌ Found $($errors.Count) build errors:" -ForegroundColor Red

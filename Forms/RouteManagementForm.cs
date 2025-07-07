@@ -32,67 +32,9 @@ public partial class RouteManagementForm : MetroForm
 
         _logger.LogInformation("Initializing Route Management form");
         InitializeComponent();
-        InitializeRouteManagement();
-    }
-
-    private void InitializeRouteManagement()
-    {
-        // Apply Syncfusion theme integration
-        try
-        {
-            // Set Office2016 visual style using SkinManager
-            Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this, Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not apply Office2016 theme, using default styling");
-        }
-
-        // Set Syncfusion MetroForm styles
-        this.MetroColor = System.Drawing.Color.FromArgb(255, 87, 34);
-        this.CaptionBarColor = System.Drawing.Color.FromArgb(255, 87, 34);
-        this.CaptionForeColor = System.Drawing.Color.White;
-        this.Text = "Route Management - Bus Routes";
-
-        // Enable high DPI scaling for this form
-        this.AutoScaleMode = AutoScaleMode.Dpi;
-        this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-
-        // Configure data grid columns
-        ConfigureDataGridColumns();
-
-        // Setup SfDataGrid event handlers
-        routeDataGrid.SelectionChanged += RouteDataGrid_SelectionChanged;
-        routeDataGrid.CellDoubleClick += RouteDataGrid_CellDoubleClick;
-        routeDataGrid.QueryRowStyle += RouteDataGrid_QueryRowStyle;
-
-        _logger.LogInformation("Route Management form initialized successfully");
 
         // Load route data asynchronously with proper UI thread marshaling
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await LoadRouteDataAsync();
-
-                // Update UI on main thread
-                this.Invoke(() =>
-                {
-                    statusLabel.ForeColor = System.Drawing.Color.FromArgb(46, 204, 113);
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during initial data load");
-
-                // Update UI on main thread for error state
-                this.Invoke(() =>
-                {
-                    statusLabel.Text = "Failed to load initial data";
-                    statusLabel.ForeColor = System.Drawing.Color.FromArgb(231, 76, 60);
-                });
-            }
-        });
+        Load += async (s, e) => await LoadRouteDataAsync();
     }
 
     private void ConfigureDataGridColumns()

@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit.Analyzers" Version="3.9.0">
@@ -38,34 +39,54 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bus Buddy.csproj" />
+    <ProjectReference Include="..\Bus Buddy.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
 
-  <!-- Syncfusion References from Local Repository -->
+  <!-- Corrected Syncfusion References for .NET 8 -->
   <ItemGroup>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>..\libs\Syncfusion\Syncfusion.Licensing.dll</HintPath>
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Core.WinForms">
-      <HintPath>..\libs\Syncfusion\Syncfusion.Core.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.SfDataGrid.WinForms">
-      <HintPath>..\libs\Syncfusion\Syncfusion.SfDataGrid.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.GridCommon.WinForms">
-      <HintPath>..\libs\Syncfusion\Syncfusion.GridCommon.WinForms.dll</HintPath>
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Core.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Shared.Base">
-      <HintPath>..\libs\Syncfusion\Syncfusion.Shared.Base.dll</HintPath>
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Shared.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Syncfusion.Shared.Windows">
-      <HintPath>..\libs\Syncfusion\Syncfusion.Shared.Windows.dll</HintPath>
+    <Reference Include="Syncfusion.SfDataGrid.WinForms">
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.SfDataGrid.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfInput.WinForms">
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.SfInput.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Tools.Windows">
-      <HintPath>..\libs\Syncfusion\Syncfusion.Tools.Windows.dll</HintPath>
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Tools.Windows.dll</HintPath>
     </Reference>
-    <Reference Include="Syncfusion.Tools.Base">
-      <HintPath>..\libs\Syncfusion\Syncfusion.Tools.Base.dll</HintPath>
+    <Reference Include="Syncfusion.Office2019Theme.WinForms">
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Office2019Theme.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Schedule.Base">
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Schedule.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Schedule.Windows">
+      <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Schedule.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Grid.Windows">
+        <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Grid.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Grid.Base">
+        <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Grid.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Shared.Windows">
+        <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Shared.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.SfListView.WinForms">
+        <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.SfListView.WinForms.dll</HintPath>
+    </Reference>
+     <Reference Include="Syncfusion.Diagram.Windows">
+        <HintPath>..\bin\Debug\net8.0-windows\Syncfusion.Diagram.Windows.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -118,7 +118,7 @@ namespace Bus_Buddy.Services
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Driver)
                 .Include(a => a.Route)
-                .Where(a => a.Driver.DriverName == driverName)
+                .Where(a => a.Driver != null && a.Driver.DriverName == driverName)
                 .OrderBy(a => a.Date)
                 .ThenBy(a => a.LeaveTime)
                 .ToListAsync();

@@ -32,69 +32,7 @@ public partial class DriverManagementForm : MetroForm
 
         _logger.LogInformation("Initializing Driver Management form");
         InitializeComponent();
-        InitializeSyncfusionTheme();
-        InitializeDriverManagement();
-    }
-
-    private void InitializeSyncfusionTheme()
-    {
-        try
-        {
-            // Apply Office2016Colorful theme consistently
-            Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this,
-                Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
-
-            // Enhanced MetroForm styling with Office2016 colors
-            this.MetroColor = Color.FromArgb(52, 152, 219);
-            this.CaptionBarColor = Color.FromArgb(52, 152, 219);
-            this.CaptionForeColor = Color.White;
-            this.AutoScaleMode = AutoScaleMode.Dpi;
-
-            _logger.LogInformation("Applied Office2016Colorful theme successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not apply theme, using default");
-        }
-    }
-
-    private void InitializeDriverManagement()
-    {
-        // Enhanced MetroForm styles with Office2016 colors
-        this.Text = "Driver Management - Bus Drivers";
-
-        // Enable high DPI scaling for this form
-        this.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-
-        // Configure SfDataGrid with Office2016 styling
-        ConfigureSfDataGrid();
-
-        _logger.LogInformation("Driver Management form initialized successfully with Office2016 theme");
-
-        // Load driver data asynchronously
         LoadDriverDataAsync();
-    }
-
-    private void ConfigureSfDataGrid()
-    {
-        try
-        {
-            // Apply standardized configuration
-            SyncfusionLayoutManager.ConfigureSfDataGrid(driverDataGrid, true, true);
-            SyncfusionAdvancedManager.ApplyAdvancedConfiguration(driverDataGrid);
-            VisualEnhancementManager.ApplyEnhancedGridVisuals(driverDataGrid);
-            SyncfusionLayoutManager.ApplyGridStyling(driverDataGrid);
-
-            // Add event handlers for SfDataGrid
-            driverDataGrid.SelectionChanged += DriverDataGrid_SelectionChanged;
-            driverDataGrid.CellDoubleClick += DriverDataGrid_CellDoubleClick;
-
-            _logger.LogInformation("SfDataGrid configured successfully with standardized configuration");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Error configuring SfDataGrid");
-        }
     }
 
     private async void LoadDriverDataAsync()

@@ -1,40 +1,19 @@
 using Syncfusion.WinForms.Controls;
 using Syncfusion.WinForms.DataGrid;
+using Syncfusion.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using Bus_Buddy.Models;
 using Bus_Buddy.Services;
 using Bus_Buddy.Utilities;
 using System.ComponentModel;
-using System.IO;
-using System.Text;
 
 namespace Bus_Buddy.Forms;
 
 /// <summary>
 /// Fuel Management Form - Complete implementation using Syncfusion WinForms
-/// Provides CRUD operations for fuel records with analytics and filtering capabilities
-/// 
-/// Enhanced Features:
-/// - Advanced Syncfusion styling with Office2019 theme support
-/// - Professional form layout with responsive design
-/// - High-quality font rendering and visual enhancements
-/// - Excel/CSV export functionality
-/// - Keyboard shortcuts for common operations
-/// - Real-time filtering and search capabilities
-/// - Comprehensive error handling and logging
-/// - Status bar for user feedback
-/// - Professional grid configuration with standardized styling
-/// 
-/// Keyboard Shortcuts:
-/// - F1: Add new fuel record
-/// - F2: Edit selected record
-/// - F3: View record details
-/// - F5: Refresh data
-/// - Ctrl+Del: Delete selected record
-/// - Ctrl+E: Export data
-/// - Ctrl+F: Focus search box
+/// Provides CRUD operations for vehicle fuel records with search and filtering capabilities
 /// </summary>
-public partial class FuelManagementForm : Form
+public partial class FuelManagementForm : MetroForm
 {
     #region Fields and Services
     private readonly IBusService _busService;
@@ -70,10 +49,6 @@ public partial class FuelManagementForm : Form
 
         // Load data asynchronously after form is shown
         Load += async (s, e) => await LoadFuelDataAsync();
-
-        // Setup keyboard shortcuts
-        KeyPreview = true;
-        KeyDown += FuelManagementForm_KeyDown;
     }
     #endregion
 
@@ -89,23 +64,10 @@ public partial class FuelManagementForm : Form
     {
         try
         {
-            // Apply basic styling for Windows Form
+            // Apply Syncfusion Office2019 theme
             this.BackColor = Color.FromArgb(248, 249, 250);
-
-            // Apply enhanced visual theme with modern Office2019 styling
-            VisualEnhancementManager.ApplyModernOffice2019Theme(this);
-
-            // Configure form properties for professional appearance
-            this.Text = "Fuel Management";
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.WindowState = FormWindowState.Maximized;
-            this.MinimumSize = new Size(1200, 800);
-
-            // Configure form for optimal full screen display
-            SyncfusionLayoutManager.ConfigureFormForFullScreen(this);
-
-            // Enable high-quality font rendering throughout the form
-            VisualEnhancementManager.EnableHighQualityFontRendering(this);
+            this.MetroColor = Color.FromArgb(230, 126, 34);
+            this.CaptionForeColor = Color.White;
 
             _logger.LogDebug("Syncfusion styling applied successfully");
         }
@@ -121,6 +83,7 @@ public partial class FuelManagementForm : Form
         {
             // Apply standardized configuration
             SyncfusionLayoutManager.ConfigureSfDataGrid(dataGridFuel, true, true);
+            SyncfusionAdvancedManager.ApplyAdvancedConfiguration(dataGridFuel);
             VisualEnhancementManager.ApplyEnhancedGridVisuals(dataGridFuel);
             SyncfusionLayoutManager.ApplyGridStyling(dataGridFuel);
 
@@ -128,9 +91,6 @@ public partial class FuelManagementForm : Form
             dataGridFuel.AutoGenerateColumns = false;
             dataGridFuel.DataSource = _filteredRecords;
             SetupDataGridColumns();
-
-            // Apply additional theme styling
-            ApplyDataGridTheme();
 
             // Setup selection event
             dataGridFuel.SelectionChanged += DataGridFuel_SelectionChanged;
@@ -174,20 +134,12 @@ public partial class FuelManagementForm : Form
             Width = 100
         });
 
-        // Fuel Location Column
-        dataGridFuel.Columns.Add(new Syncfusion.WinForms.DataGrid.GridTextColumn()
-        {
-            MappingName = nameof(Fuel.FuelLocation),
-            HeaderText = "Location",
-            Width = 150
-        });
-
         // Fuel Type Column
         dataGridFuel.Columns.Add(new Syncfusion.WinForms.DataGrid.GridTextColumn()
         {
             MappingName = nameof(Fuel.FuelType),
             HeaderText = "Fuel Type",
-            Width = 100
+            Width = 180
         });
 
         // Gallons Column
@@ -196,33 +148,23 @@ public partial class FuelManagementForm : Form
             MappingName = nameof(Fuel.Gallons),
             HeaderText = "Gallons",
             Width = 100,
-            Format = "N2"
         });
 
-        // Price Per Gallon Column
-        dataGridFuel.Columns.Add(new Syncfusion.WinForms.DataGrid.GridNumericColumn()
-        {
-            MappingName = nameof(Fuel.PricePerGallon),
-            HeaderText = "Price/Gal",
-            Width = 100,
-            Format = "C3"
-        });
-
-        // Total Cost Column
+        // Cost Column
         dataGridFuel.Columns.Add(new Syncfusion.WinForms.DataGrid.GridNumericColumn()
         {
             MappingName = nameof(Fuel.TotalCost),
-            HeaderText = "Total Cost",
+            HeaderText = "Cost",
             Width = 120,
             Format = "C"
         });
 
-        // Notes Column
-        dataGridFuel.Columns.Add(new Syncfusion.WinForms.DataGrid.GridTextColumn()
+        // Odometer Column
+        dataGridFuel.Columns.Add(new Syncfusion.WinForms.DataGrid.GridNumericColumn()
         {
-            MappingName = nameof(Fuel.Notes),
-            HeaderText = "Notes",
-            Width = 200
+            MappingName = nameof(Fuel.VehicleOdometerReading),
+            HeaderText = "Odometer",
+            Width = 120,
         });
     }
 
@@ -233,9 +175,9 @@ public partial class FuelManagementForm : Form
             // Apply Office2019 theme colors to match application style
             if (dataGridFuel.Style != null)
             {
-                dataGridFuel.Style.HeaderStyle.BackColor = Color.FromArgb(41, 128, 185);
+                dataGridFuel.Style.HeaderStyle.BackColor = Color.FromArgb(230, 126, 34);
                 dataGridFuel.Style.HeaderStyle.TextColor = Color.White;
-                dataGridFuel.Style.SelectionStyle.BackColor = Color.FromArgb(41, 128, 185, 50);
+                dataGridFuel.Style.SelectionStyle.BackColor = Color.FromArgb(230, 126, 34, 50);
                 dataGridFuel.Style.SelectionStyle.TextColor = Color.Black;
             }
         }
@@ -249,19 +191,8 @@ public partial class FuelManagementForm : Form
     {
         try
         {
-            // Populate fuel type filter
-            cmbFuelTypeFilter.Items.Clear();
-            cmbFuelTypeFilter.Items.Add("All Types");
-            cmbFuelTypeFilter.Items.Add("Gasoline");
-            cmbFuelTypeFilter.Items.Add("Diesel");
-            cmbFuelTypeFilter.Items.Add("Unleaded");
-            cmbFuelTypeFilter.Items.Add("Premium");
-
-            cmbFuelTypeFilter.SelectedIndex = 0; // Default to "All Types"
-
-            // Set default date range to last 30 days
-            dtpStartDate.Value = DateTime.Today.AddDays(-30);
-            dtpEndDate.Value = DateTime.Today;
+            // Set default date filter to 30 days ago
+            dtpDateFilter.Value = DateTime.Today.AddDays(-30);
 
             _logger.LogDebug("Filters setup completed");
         }
@@ -283,7 +214,7 @@ public partial class FuelManagementForm : Form
             // Load vehicles first for the filter dropdown
             await LoadVehiclesAsync();
 
-            // Load fuel records
+            // Load fuel records using the fuel service
             var fuelRecords = await _fuelService.GetAllFuelRecordsAsync();
 
             _fuelRecords.Clear();
@@ -293,7 +224,6 @@ public partial class FuelManagementForm : Form
             }
 
             ApplyFilters();
-            UpdateSummaryLabels();
 
             UpdateStatus($"Loaded {_fuelRecords.Count} fuel records");
             _logger.LogInformation("Loaded {Count} fuel records successfully", _fuelRecords.Count);
@@ -314,14 +244,9 @@ public partial class FuelManagementForm : Form
             _vehicles = vehicles;
 
             // Update vehicle filter dropdown
-            cmbVehicleFilter.Items.Clear();
-            cmbVehicleFilter.Items.Add("All Vehicles");
-
-            foreach (var vehicle in _vehicles)
-            {
-                cmbVehicleFilter.Items.Add($"{vehicle.BusNumber} - {vehicle.Make} {vehicle.Model}");
-            }
-
+            var vehicleList = new List<string> { "All Vehicles" };
+            vehicleList.AddRange(_vehicles.Select(v => $"{v.BusNumber} - {v.Make} {v.Model}"));
+            cmbVehicleFilter.DataSource = vehicleList;
             cmbVehicleFilter.SelectedIndex = 0;
         }
         catch (Exception ex)
@@ -340,10 +265,9 @@ public partial class FuelManagementForm : Form
             if (!string.IsNullOrWhiteSpace(txtSearch.Text))
             {
                 var searchTerm = txtSearch.Text.ToLower();
-                filtered = filtered.Where(f =>
-                    (f.FuelLocation?.ToLower().Contains(searchTerm) == true) ||
-                    (f.Notes?.ToLower().Contains(searchTerm) == true) ||
-                    (f.Vehicle?.BusNumber?.ToLower().Contains(searchTerm) == true));
+                filtered = filtered.Where(m =>
+                    (m.FuelType?.ToLower().Contains(searchTerm) == true) ||
+                    (m.Vehicle?.BusNumber?.ToLower().Contains(searchTerm) == true));
             }
 
             // Apply vehicle filter
@@ -353,66 +277,29 @@ public partial class FuelManagementForm : Form
                 var busNumber = selectedVehicleText?.Split(' ')[0]; // Extract bus number
                 if (!string.IsNullOrEmpty(busNumber))
                 {
-                    filtered = filtered.Where(f => f.Vehicle?.BusNumber == busNumber);
+                    filtered = filtered.Where(m => m.Vehicle?.BusNumber == busNumber);
                 }
             }
 
-            // Apply fuel type filter
-            if (cmbFuelTypeFilter.SelectedIndex > 0 && cmbFuelTypeFilter.SelectedItem != null)
+            // Apply date filter
+            if (dtpDateFilter.Value.HasValue)
             {
-                var selectedFuelType = cmbFuelTypeFilter.SelectedItem.ToString();
-                if (selectedFuelType != "All Types")
-                {
-                    filtered = filtered.Where(f => f.FuelType == selectedFuelType);
-                }
+                filtered = filtered.Where(m => m.FuelDate >= dtpDateFilter.Value.Value.Date);
             }
-
-            // Apply date range filter
-            filtered = filtered.Where(f =>
-                f.FuelDate >= dtpStartDate.Value.Date &&
-                f.FuelDate <= dtpEndDate.Value.Date);
 
             // Update filtered collection
             _filteredRecords.Clear();
-            foreach (var record in filtered.OrderByDescending(f => f.FuelDate))
+            foreach (var record in filtered.OrderByDescending(m => m.FuelDate))
             {
                 _filteredRecords.Add(record);
             }
 
             UpdateStatus($"Showing {_filteredRecords.Count} of {_fuelRecords.Count} fuel records");
-            UpdateSummaryLabels(); // Update summary
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error applying filters");
             ShowError($"Filter error: {ex.Message}");
-        }
-    }
-
-    private void UpdateSummaryLabels()
-    {
-        try
-        {
-            var totalCost = _filteredRecords.Sum(f => f.TotalCost ?? 0);
-            var totalGallons = _filteredRecords.Sum(f => f.Gallons ?? 0);
-
-            if (InvokeRequired)
-            {
-                Invoke(() =>
-                {
-                    lblTotalCost.Text = $"Total Cost: {totalCost:C}";
-                    lblTotalGallons.Text = $"Total Gallons: {totalGallons:N1}";
-                });
-            }
-            else
-            {
-                lblTotalCost.Text = $"Total Cost: {totalCost:C}";
-                lblTotalGallons.Text = $"Total Gallons: {totalGallons:N1}";
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating summary labels");
         }
     }
     #endregion
@@ -479,7 +366,7 @@ public partial class FuelManagementForm : Form
             }
 
             var result = Syncfusion.Windows.Forms.MessageBoxAdv.Show(this,
-                $"Are you sure you want to delete this fuel record?\n\nVehicle: {_selectedRecord.Vehicle?.BusNumber}\nDate: {_selectedRecord.FuelDate:MM/dd/yyyy}\nAmount: {_selectedRecord.Gallons:N2} gallons\nCost: {_selectedRecord.TotalCost:C}\n\nThis action cannot be undone.",
+                $"Are you sure you want to delete this fuel record?\n\nVehicle: {_selectedRecord.Vehicle?.BusNumber}\nType: {_selectedRecord.FuelType}\nDate: {_selectedRecord.FuelDate:MM/dd/yyyy}\n\nThis action cannot be undone.",
                 "Confirm Delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
@@ -521,53 +408,6 @@ public partial class FuelManagementForm : Form
         }
     }
 
-    private void BtnExport_Click(object sender, EventArgs e)
-    {
-        try
-        {
-            if (_filteredRecords.Count == 0)
-            {
-                ShowInfo("No fuel records to export.");
-                return;
-            }
-
-            _logger.LogInformation("Exporting fuel data");
-
-            using var saveDialog = new SaveFileDialog()
-            {
-                Filter = "Excel Files|*.xlsx|CSV Files|*.csv|All Files|*.*",
-                DefaultExt = "xlsx",
-                FileName = $"FuelRecords_{DateTime.Now:yyyyMMdd_HHmmss}"
-            };
-
-            if (saveDialog.ShowDialog() == DialogResult.OK)
-            {
-                var extension = Path.GetExtension(saveDialog.FileName).ToLower();
-
-                if (extension == ".xlsx")
-                {
-                    ExportToExcel(saveDialog.FileName);
-                }
-                else if (extension == ".csv")
-                {
-                    ExportToCSV(saveDialog.FileName);
-                }
-                else
-                {
-                    ExportToCSV(saveDialog.FileName); // Default to CSV
-                }
-
-                ShowSuccess($"Fuel records exported successfully to {saveDialog.FileName}");
-                _logger.LogInformation("Fuel records exported to {FileName}", saveDialog.FileName);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error exporting fuel records");
-            ShowError($"Export failed: {ex.Message}");
-        }
-    }
-
     private void BtnViewDetails_Click(object sender, EventArgs e)
     {
         try
@@ -589,18 +429,17 @@ Date: {_selectedRecord.FuelDate:MM/dd/yyyy}
 
 Fuel Information:
 Type: {_selectedRecord.FuelType}
-Location: {_selectedRecord.FuelLocation ?? "Not specified"}
-Gallons: {_selectedRecord.Gallons:N3}
-Price per Gallon: {_selectedRecord.PricePerGallon:C3}
-Total Cost: {_selectedRecord.TotalCost:C}
+Gallons: {_selectedRecord.Gallons}
+Cost: {_selectedRecord.TotalCost:C}
+Odometer: {_selectedRecord.VehicleOdometerReading}
+Location: {_selectedRecord.FuelLocation}
+Price Per Gallon: {_selectedRecord.PricePerGallon:C}
 
 Additional Information:
-Notes: {_selectedRecord.Notes ?? "No notes"}
-
-{(_selectedRecord.Vehicle?.MilesPerGallon.HasValue == true ? $"Vehicle MPG: {_selectedRecord.Vehicle.MilesPerGallon:N1}" : "")}";
+Notes: {_selectedRecord.Notes ?? "No additional notes"}";
 
             Syncfusion.Windows.Forms.MessageBoxAdv.Show(this, details,
-                $"Fuel Record Details - {_selectedRecord.Vehicle?.BusNumber}",
+                $"Fuel Record Details - {_selectedRecord.FuelType}",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         catch (Exception ex)
@@ -634,7 +473,7 @@ Notes: {_selectedRecord.Notes ?? "No notes"}
         }
     }
 
-    private void CmbFuelTypeFilter_SelectedIndexChanged(object sender, EventArgs e)
+    private void DtpDateFilter_ValueChanged(object sender, Syncfusion.WinForms.Input.Events.DateTimeValueChangedEventArgs e)
     {
         try
         {
@@ -642,31 +481,7 @@ Notes: {_selectedRecord.Notes ?? "No notes"}
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error applying fuel type filter");
-        }
-    }
-
-    private void DtpStartDate_ValueChanged(object sender, EventArgs e)
-    {
-        try
-        {
-            ApplyFilters();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error applying start date filter");
-        }
-    }
-
-    private void DtpEndDate_ValueChanged(object sender, EventArgs e)
-    {
-        try
-        {
-            ApplyFilters();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error applying end date filter");
+            _logger.LogError(ex, "Error applying date filter");
         }
     }
 
@@ -686,7 +501,7 @@ Notes: {_selectedRecord.Notes ?? "No notes"}
         }
     }
 
-    private void DataGridFuel_SelectionChanged(object sender, EventArgs e)
+    private void DataGridFuel_SelectionChanged(object sender, Syncfusion.WinForms.DataGrid.Events.SelectionChangedEventArgs e)
     {
         try
         {
@@ -708,57 +523,6 @@ Notes: {_selectedRecord.Notes ?? "No notes"}
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling selection change");
-        }
-    }
-
-    private void FuelManagementForm_KeyDown(object? sender, KeyEventArgs e)
-    {
-        try
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.F1:
-                    BtnAdd_Click(this, e);
-                    e.Handled = true;
-                    break;
-                case Keys.F2:
-                    if (_selectedRecord != null)
-                        BtnEdit_Click(this, e);
-                    e.Handled = true;
-                    break;
-                case Keys.Delete:
-                    if (_selectedRecord != null && e.Control)
-                        BtnDelete_Click(this, e);
-                    e.Handled = true;
-                    break;
-                case Keys.F5:
-                    BtnRefresh_Click(this, e);
-                    e.Handled = true;
-                    break;
-                case Keys.F3:
-                    if (_selectedRecord != null)
-                        BtnViewDetails_Click(this, e);
-                    e.Handled = true;
-                    break;
-                case Keys.E:
-                    if (e.Control)
-                    {
-                        BtnExport_Click(this, e);
-                        e.Handled = true;
-                    }
-                    break;
-                case Keys.F:
-                    if (e.Control)
-                    {
-                        txtSearch.Focus();
-                        e.Handled = true;
-                    }
-                    break;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error handling keyboard shortcut");
         }
     }
     #endregion
@@ -794,74 +558,6 @@ Notes: {_selectedRecord.Notes ?? "No notes"}
         else
         {
             statusLabel.Text = message;
-        }
-    }
-
-    private void ExportToCSV(string fileName)
-    {
-        try
-        {
-            var csv = new StringBuilder();
-
-            // Add header
-            csv.AppendLine("FuelId,Date,Vehicle,Location,FuelType,Gallons,PricePerGallon,TotalCost,Notes");
-
-            // Add data rows
-            foreach (var record in _filteredRecords)
-            {
-                csv.AppendLine($"{record.FuelId}," +
-                              $"{record.FuelDate:yyyy-MM-dd}," +
-                              $"\"{record.Vehicle?.BusNumber}\"," +
-                              $"\"{record.FuelLocation}\"," +
-                              $"\"{record.FuelType}\"," +
-                              $"{record.Gallons:N3}," +
-                              $"{record.PricePerGallon:N3}," +
-                              $"{record.TotalCost:N2}," +
-                              $"\"{record.Notes}\"");
-            }
-
-            File.WriteAllText(fileName, csv.ToString());
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error exporting to CSV");
-            throw;
-        }
-    }
-
-    private void ExportToExcel(string fileName)
-    {
-        try
-        {
-            // Simple Excel-compatible CSV export with proper formatting
-            var csv = new StringBuilder();
-
-            // Add header with Excel-friendly formatting
-            csv.AppendLine("\"Fuel ID\",\"Date\",\"Vehicle\",\"Location\",\"Fuel Type\",\"Gallons\",\"Price Per Gallon\",\"Total Cost\",\"Notes\"");
-
-            // Add data rows with proper Excel formatting
-            foreach (var record in _filteredRecords)
-            {
-                csv.AppendLine($"\"{record.FuelId}\"," +
-                              $"\"{record.FuelDate:MM/dd/yyyy}\"," +
-                              $"\"{record.Vehicle?.BusNumber ?? ""}\"," +
-                              $"\"{record.FuelLocation ?? ""}\"," +
-                              $"\"{record.FuelType ?? ""}\"," +
-                              $"\"{record.Gallons:N3}\"," +
-                              $"\"{record.PricePerGallon:C3}\"," +
-                              $"\"{record.TotalCost:C2}\"," +
-                              $"\"{record.Notes ?? ""}\"");
-            }
-
-            // Save as CSV which Excel can open
-            File.WriteAllText(fileName, csv.ToString());
-
-            _logger.LogInformation("Exported {Count} fuel records to Excel-compatible format", _filteredRecords.Count);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error exporting to Excel");
-            throw;
         }
     }
 

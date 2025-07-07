@@ -203,6 +203,23 @@ partial class DriverManagementForm
 
         // Resume layout
         this.ResumeLayout(false);
+
+        // Apply Syncfusion theme and layout enhancements
+        Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this, Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
+        this.MetroColor = System.Drawing.Color.FromArgb(52, 152, 219);
+        this.CaptionBarColor = System.Drawing.Color.FromArgb(52, 152, 219);
+        this.CaptionForeColor = System.Drawing.Color.White;
+        this.Text = "Driver Management - Bus Drivers";
+
+        // Configure SfDataGrid with standardized layout and visuals
+        Bus_Buddy.Utilities.SyncfusionLayoutManager.ConfigureSfDataGrid(this.driverDataGrid, true, true);
+        Bus_Buddy.Utilities.SyncfusionAdvancedManager.ApplyAdvancedConfiguration(this.driverDataGrid);
+        Bus_Buddy.Utilities.VisualEnhancementManager.ApplyEnhancedGridVisuals(this.driverDataGrid);
+        Bus_Buddy.Utilities.SyncfusionLayoutManager.ApplyGridStyling(this.driverDataGrid);
+
+        // Add event handlers for SfDataGrid
+        this.driverDataGrid.SelectionChanged += new Syncfusion.WinForms.DataGrid.Events.SelectionChangedEventHandler(this.DriverDataGrid_SelectionChanged);
+        this.driverDataGrid.CellDoubleClick += new Syncfusion.WinForms.DataGrid.Events.CellClickEventHandler(this.DriverDataGrid_CellDoubleClick);
     }
 
     private void ConfigureActionButton(SfButton button, string title, int x, int y, int tabIndex, Color color)

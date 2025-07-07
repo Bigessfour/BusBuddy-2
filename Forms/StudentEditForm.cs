@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using Syncfusion.Windows.Forms;
 using Syncfusion.Windows.Forms.Tools;
 using Syncfusion.WinForms.Controls;
+using Syncfusion.WinForms.ListView;
+using Syncfusion.WinForms.ListView.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Bus_Buddy.Forms;
@@ -30,60 +32,6 @@ public partial class StudentEditForm : MetroForm
 
     #endregion
 
-    #region UI Controls - Personal Information
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelPersonal = null!;
-    private Syncfusion.Windows.Forms.Tools.AutoLabel lblPersonalInfo = null!;
-
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtStudentNumber = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtStudentName = null!;
-    private ComboBoxAdv cmbGrade = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtSchool = null!;
-    private Syncfusion.Windows.Forms.Tools.DateTimePickerAdv dtpEnrollmentDate = null!;
-    private CheckBoxAdv chkActive = null!;
-
-    #endregion
-
-    #region UI Controls - Contact Information
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelContact = null!;
-    private Syncfusion.Windows.Forms.Tools.AutoLabel lblContactInfo = null!;
-
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtHomeAddress = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtCity = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtState = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtZip = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtHomePhone = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtParentGuardian = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtEmergencyPhone = null!;
-
-    #endregion
-
-    #region UI Controls - Transportation Information
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelTransport = null!;
-    private Syncfusion.Windows.Forms.Tools.AutoLabel lblTransportInfo = null!;
-
-    private ComboBoxAdv cmbAMRoute = null!;
-    private ComboBoxAdv cmbPMRoute = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtBusStop = null!;
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtTransportationNotes = null!;
-
-    #endregion
-
-    #region UI Controls - Medical and Additional Notes
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelNotes = null!;
-    private Syncfusion.Windows.Forms.Tools.AutoLabel lblNotesInfo = null!;
-
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtMedicalNotes = null!;
-
-    #endregion
-
-    #region UI Controls - Buttons
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelButtons = null!;
-    private SfButton btnSave = null!;
-    private SfButton btnCancel = null!;
-    private SfButton btnValidate = null!;
-
-    #endregion
-
     #region Constructor
     public StudentEditForm(
         ILogger<StudentEditForm> logger,
@@ -102,9 +50,17 @@ public partial class StudentEditForm : MetroForm
             "Initializing StudentEditForm for new student",
             student?.StudentId);
 
-        InitializeComponent();
+        InitializeComponent(); // This will now call the method from the .Designer.cs file
         InitializeSyncfusionTheme();
-        SetupLayout();
+
+        if (_isEditMode && _existingStudent != null)
+        {
+            Text = $"Edit Student - {_existingStudent.StudentName}";
+        }
+        else
+        {
+            Text = "Add New Student";
+        }
 
         // Load data asynchronously after form is shown
         Load += async (s, e) => await LoadInitialDataAsync();
@@ -136,6 +92,7 @@ public partial class StudentEditForm : MetroForm
     #endregion
 
     #region Initialization
+    /*
     private void InitializeComponent()
     {
         SuspendLayout();
@@ -157,6 +114,7 @@ public partial class StudentEditForm : MetroForm
         ResumeLayout(false);
         _logger.LogInformation("StudentEditForm basic initialization completed");
     }
+    */
 
     private void SetupLayout()
     {
@@ -492,26 +450,25 @@ public partial class StudentEditForm : MetroForm
         return textBox;
     }
 
-    private ComboBoxAdv CreateComboBox(int x, int y, int width)
+    private SfComboBox CreateComboBox(int x, int y, int width)
     {
-        return new ComboBoxAdv
+        return new SfComboBox
         {
             Location = new Point(x, y),
             Size = new Size(width, 30),
-            DropDownStyle = ComboBoxStyle.DropDownList,
+            DropDownStyle = DropDownStyle.DropDownList,
             Font = new Font("Segoe UI", 9F)
         };
     }
 
     private void PopulateGradeDropdown()
     {
-        cmbGrade.Items.Add("");
-        cmbGrade.Items.Add("Pre-K");
-        cmbGrade.Items.Add("K");
+        var grades = new List<string> { "", "Pre-K", "K" };
         for (int i = 1; i <= 12; i++)
         {
-            cmbGrade.Items.Add(i.ToString());
+            grades.Add(i.ToString());
         }
+        cmbGrade.DataSource = grades;
     }
     #endregion
 
@@ -546,18 +503,12 @@ public partial class StudentEditForm : MetroForm
         {
             _routes = await _busService.GetAllRouteEntitiesAsync();
 
+            var routeNames = new List<string> { "" };
+            routeNames.AddRange(_routes.Select(r => r.RouteName));
+
             // Populate route dropdowns
-            cmbAMRoute.Items.Clear();
-            cmbPMRoute.Items.Clear();
-
-            cmbAMRoute.Items.Add("");
-            cmbPMRoute.Items.Add("");
-
-            foreach (var route in _routes)
-            {
-                cmbAMRoute.Items.Add(route.RouteName);
-                cmbPMRoute.Items.Add(route.RouteName);
-            }
+            cmbAMRoute.DataSource = new List<string>(routeNames);
+            cmbPMRoute.DataSource = new List<string>(routeNames);
 
             _logger.LogInformation("Loaded {Count} routes for dropdowns", _routes.Count);
         }
@@ -576,8 +527,7 @@ public partial class StudentEditForm : MetroForm
             txtStudentName.Text = student.StudentName;
 
             // Set grade dropdown
-            var gradeIndex = cmbGrade.Items.IndexOf(student.Grade ?? "");
-            cmbGrade.SelectedIndex = gradeIndex >= 0 ? gradeIndex : 0;
+            cmbGrade.SelectedItem = student.Grade ?? "";
 
             txtSchool.Text = student.School ?? "";
             dtpEnrollmentDate.Value = student.EnrollmentDate ?? DateTime.Today;
@@ -593,11 +543,8 @@ public partial class StudentEditForm : MetroForm
             txtEmergencyPhone.Text = student.EmergencyPhone ?? "";
 
             // Transportation
-            var amRouteIndex = cmbAMRoute.Items.IndexOf(student.AMRoute ?? "");
-            cmbAMRoute.SelectedIndex = amRouteIndex >= 0 ? amRouteIndex : 0;
-
-            var pmRouteIndex = cmbPMRoute.Items.IndexOf(student.PMRoute ?? "");
-            cmbPMRoute.SelectedIndex = pmRouteIndex >= 0 ? pmRouteIndex : 0;
+            cmbAMRoute.SelectedItem = student.AMRoute ?? "";
+            cmbPMRoute.SelectedItem = student.PMRoute ?? "";
 
             txtBusStop.Text = student.BusStop ?? "";
             txtTransportationNotes.Text = student.TransportationNotes ?? "";

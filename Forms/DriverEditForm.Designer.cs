@@ -94,6 +94,9 @@ partial class DriverEditForm
     {
         this.components = new System.ComponentModel.Container();
 
+        // Apply Office2016Colorful theme consistently
+        Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this, Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
+
         // Suspend layout for better performance during initialization
         this.SuspendLayout();
 
@@ -247,8 +250,8 @@ partial class DriverEditForm
         ConfigureEmploymentInfoControls();
 
         // Configure action buttons with Office2016 colors
-        ConfigureActionButton(this.saveButton, "Save", 710, 15, 0, Color.FromArgb(76, 175, 80));
-        ConfigureActionButton(this.cancelButton, "Cancel", 820, 15, 1, Color.FromArgb(158, 158, 158));
+        ConfigureActionButton(this.saveButton, "Save", 710, 15, 19, Color.FromArgb(76, 175, 80));
+        ConfigureActionButton(this.cancelButton, "Cancel", 820, 15, 20, Color.FromArgb(158, 158, 158));
 
         // Add event handlers
         this.saveButton.Click += new System.EventHandler(this.SaveButton_Click);
@@ -281,6 +284,29 @@ partial class DriverEditForm
         this.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
+        this.MetroColor = Color.FromArgb(52, 152, 219);
+        this.CaptionBarColor = Color.FromArgb(52, 152, 219);
+        this.CaptionForeColor = Color.White;
+
+        // Set up date pickers with current date as default
+        hireDatePicker.Value = DateTime.Now;
+        licenseIssueDatePicker.Value = DateTime.Now.AddYears(-1);
+        licenseExpiryDatePicker.Value = DateTime.Now.AddYears(5);
+
+        // Set up combo boxes with enhanced styling
+        licenseTypeComboBox.Items.AddRange(new[] { "CDL", "Passenger", "Regular", "Chauffeur" });
+        licenseTypeComboBox.SelectedIndex = 0;
+
+        licenseClassComboBox.Items.AddRange(new[] { "A", "B", "C", "CDL-A", "CDL-B", "CDL-C" });
+        licenseClassComboBox.SelectedIndex = 3; // CDL-B is common for school buses
+
+        statusComboBox.Items.AddRange(new[] { "Active", "Inactive", "Suspended", "Terminated", "On Leave" });
+        statusComboBox.SelectedIndex = 0;
+
+        stateComboBox.Items.AddRange(new[] { "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+            "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO",
+            "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+            "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" });
 
         // Resume layout
         this.ResumeLayout(false);
@@ -297,6 +323,7 @@ partial class DriverEditForm
         this.firstNameTextBox.Location = new Point(105, 25);
         this.firstNameTextBox.Size = new Size(150, 23);
         this.firstNameTextBox.Font = new Font("Segoe UI", 9F);
+        this.firstNameTextBox.TabIndex = 0;
 
         // Last Name
         this.lastNameLabel.Font = new Font("Segoe UI", 9F);
@@ -307,6 +334,7 @@ partial class DriverEditForm
         this.lastNameTextBox.Location = new Point(355, 25);
         this.lastNameTextBox.Size = new Size(150, 23);
         this.lastNameTextBox.Font = new Font("Segoe UI", 9F);
+        this.lastNameTextBox.TabIndex = 1;
 
         // Driver Name
         this.driverNameLabel.Font = new Font("Segoe UI", 9F);
@@ -317,6 +345,7 @@ partial class DriverEditForm
         this.driverNameTextBox.Location = new Point(105, 65);
         this.driverNameTextBox.Size = new Size(200, 23);
         this.driverNameTextBox.Font = new Font("Segoe UI", 9F);
+        this.driverNameTextBox.TabIndex = 2;
 
         // Add controls to personal info group
         this.personalInfoGroupBox.Controls.Add(this.firstNameLabel);
@@ -338,6 +367,7 @@ partial class DriverEditForm
         this.phoneTextBox.Location = new Point(75, 25);
         this.phoneTextBox.Size = new Size(150, 23);
         this.phoneTextBox.Font = new Font("Segoe UI", 9F);
+        this.phoneTextBox.TabIndex = 3;
 
         // Email
         this.emailLabel.Font = new Font("Segoe UI", 9F);
@@ -348,6 +378,7 @@ partial class DriverEditForm
         this.emailTextBox.Location = new Point(75, 55);
         this.emailTextBox.Size = new Size(250, 23);
         this.emailTextBox.Font = new Font("Segoe UI", 9F);
+        this.emailTextBox.TabIndex = 4;
 
         // Address
         this.addressLabel.Font = new Font("Segoe UI", 9F);
@@ -358,6 +389,7 @@ partial class DriverEditForm
         this.addressTextBox.Location = new Point(75, 85);
         this.addressTextBox.Size = new Size(300, 23);
         this.addressTextBox.Font = new Font("Segoe UI", 9F);
+        this.addressTextBox.TabIndex = 5;
 
         // City
         this.cityLabel.Font = new Font("Segoe UI", 9F);
@@ -368,6 +400,7 @@ partial class DriverEditForm
         this.cityTextBox.Location = new Point(75, 115);
         this.cityTextBox.Size = new Size(150, 23);
         this.cityTextBox.Font = new Font("Segoe UI", 9F);
+        this.cityTextBox.TabIndex = 6;
 
         // State
         this.stateLabel.Font = new Font("Segoe UI", 9F);
@@ -379,6 +412,7 @@ partial class DriverEditForm
         this.stateComboBox.Size = new Size(60, 23);
         this.stateComboBox.Font = new Font("Segoe UI", 9F);
         this.stateComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
+        this.stateComboBox.TabIndex = 7;
 
         // Zip
         this.zipLabel.Font = new Font("Segoe UI", 9F);
@@ -389,6 +423,7 @@ partial class DriverEditForm
         this.zipTextBox.Location = new Point(75, 145);
         this.zipTextBox.Size = new Size(100, 23);
         this.zipTextBox.Font = new Font("Segoe UI", 9F);
+        this.zipTextBox.TabIndex = 8;
 
         // Add controls to contact info group
         this.contactInfoGroupBox.Controls.Add(this.phoneLabel);
@@ -416,6 +451,7 @@ partial class DriverEditForm
         this.licenseNumberTextBox.Location = new Point(115, 25);
         this.licenseNumberTextBox.Size = new Size(150, 23);
         this.licenseNumberTextBox.Font = new Font("Segoe UI", 9F);
+        this.licenseNumberTextBox.TabIndex = 9;
 
         // License Type
         this.licenseTypeLabel.Font = new Font("Segoe UI", 9F);
@@ -427,6 +463,7 @@ partial class DriverEditForm
         this.licenseTypeComboBox.Size = new Size(120, 23);
         this.licenseTypeComboBox.Font = new Font("Segoe UI", 9F);
         this.licenseTypeComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
+        this.licenseTypeComboBox.TabIndex = 10;
 
         // License Class
         this.licenseClassLabel.Font = new Font("Segoe UI", 9F);
@@ -438,6 +475,7 @@ partial class DriverEditForm
         this.licenseClassComboBox.Size = new Size(70, 23);
         this.licenseClassComboBox.Font = new Font("Segoe UI", 9F);
         this.licenseClassComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
+        this.licenseClassComboBox.TabIndex = 11;
 
         // License Issue Date
         this.licenseIssueDateLabel.Font = new Font("Segoe UI", 9F);
@@ -449,6 +487,7 @@ partial class DriverEditForm
         this.licenseIssueDatePicker.Size = new Size(120, 23);
         this.licenseIssueDatePicker.Font = new Font("Segoe UI", 9F);
         this.licenseIssueDatePicker.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
+        this.licenseIssueDatePicker.TabIndex = 12;
 
         // License Expiry Date
         this.licenseExpiryDateLabel.Font = new Font("Segoe UI", 9F);
@@ -460,6 +499,7 @@ partial class DriverEditForm
         this.licenseExpiryDatePicker.Size = new Size(120, 23);
         this.licenseExpiryDatePicker.Font = new Font("Segoe UI", 9F);
         this.licenseExpiryDatePicker.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
+        this.licenseExpiryDatePicker.TabIndex = 13;
 
         // Endorsements
         this.endorsementsLabel.Font = new Font("Segoe UI", 9F);
@@ -470,6 +510,7 @@ partial class DriverEditForm
         this.endorsementsTextBox.Location = new Point(115, 115);
         this.endorsementsTextBox.Size = new Size(280, 23);
         this.endorsementsTextBox.Font = new Font("Segoe UI", 9F);
+        this.endorsementsTextBox.TabIndex = 14;
 
         // Add controls to license info group
         this.licenseInfoGroupBox.Controls.Add(this.licenseNumberLabel);
@@ -498,6 +539,7 @@ partial class DriverEditForm
         this.hireDatePicker.Size = new Size(120, 23);
         this.hireDatePicker.Font = new Font("Segoe UI", 9F);
         this.hireDatePicker.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
+        this.hireDatePicker.TabIndex = 15;
 
         // Status
         this.statusLabel.Font = new Font("Segoe UI", 9F);
@@ -509,6 +551,7 @@ partial class DriverEditForm
         this.statusComboBox.Size = new Size(120, 23);
         this.statusComboBox.Font = new Font("Segoe UI", 9F);
         this.statusComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
+        this.statusComboBox.TabIndex = 16;
 
         // Training Complete
         this.trainingCompleteCheckBox.Font = new Font("Segoe UI", 9F);
@@ -516,6 +559,7 @@ partial class DriverEditForm
         this.trainingCompleteCheckBox.Size = new Size(150, 20);
         this.trainingCompleteCheckBox.Text = "Training Complete";
         this.trainingCompleteCheckBox.Style = CheckBoxAdvStyle.Office2016Colorful;
+        this.trainingCompleteCheckBox.TabIndex = 17;
 
         // Add controls to employment info group
         this.employmentInfoGroupBox.Controls.Add(this.hireDateLabel);

@@ -11,12 +11,13 @@ using Bus_Buddy.Data.UnitOfWork;
 using Bus_Buddy.Models;
 using Bus_Buddy.Services;
 using Bus_Buddy.Utilities;
+using System.Collections.Generic;
 
 namespace Bus_Buddy.Forms
 {
     /// <summary>
     /// Fuel record edit form using Syncfusion v30.1.37 components
-    /// Provides CRUD operations for fuel consumption data
+    /// Provides CRUD operations for fuel data
     /// </summary>
     public partial class FuelEditForm : MetroForm
     {
@@ -24,23 +25,9 @@ namespace Bus_Buddy.Forms
         private readonly IFuelService _fuelService;
         private readonly IBusService _busService;
 
-        // Syncfusion Controls
-        private AutoLabel titleLabel = null!;
-        private AutoLabel busLabel = null!, driverLabel = null!, dateLabel = null!;
-        private AutoLabel volumeLabel = null!, costLabel = null!, vendorLabel = null!;
-        private AutoLabel notesLabel = null!;
-        private ComboBoxAdv busComboBox = null!, driverComboBox = null!;
-        private ComboBoxAdv vendorComboBox = null!;
-        private DateTimePickerAdv dateEdit = null!;
-        private TextBoxExt volumeTextBox = null!, costTextBox = null!;
-        private TextBoxExt notesTextBox = null!;
-        private SfButton saveButton = null!, cancelButton = null!;
-        private GradientPanel mainPanel = null!, buttonPanel = null!;
-        private TableLayoutPanel formLayoutPanel = null!;
-
-        // Data
+        // Data Management
         private Fuel? _currentFuel;
-        private bool _isEditMode;
+        private bool _isEditMode = false;
 
         public Fuel? EditedFuel { get; private set; }
         public bool IsDataSaved { get; private set; }
@@ -50,330 +37,56 @@ namespace Bus_Buddy.Forms
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _fuelService = fuelService ?? throw new ArgumentNullException(nameof(fuelService));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
-            _currentFuel = fuel;
+
+            _currentFuel = fuel ?? new Fuel();
             _isEditMode = fuel != null;
 
             InitializeComponent();
-            SetupForm();
-            SetupControls();
-            LoadComboBoxData();
+            InitializeFormStyling();
+            LoadFormData();
 
-            _logger.LogInformation("FuelEditForm initialized successfully");
-        }
-
-        private void InitializeComponent()
-        {
-            SuspendLayout();
-
-            // Form properties
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(500, 600);
-            MinimumSize = new Size(450, 550);
-            MaximumSize = new Size(600, 700);
-            Name = "FuelEditForm";
-            Text = "Fuel Record";
-            StartPosition = FormStartPosition.CenterParent;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-
-            ResumeLayout(false);
-        }
-
-        private void SetupForm()
-        {
-            // Apply Syncfusion visual enhancements
-            VisualEnhancementManager.ApplyEnhancedTheme(this);
-            VisualEnhancementManager.EnableHighQualityFontRendering(this);
-
-            // Configure MetroForm properties
-            MetroColor = Color.FromArgb(67, 126, 231);
-            CaptionBarColor = Color.FromArgb(31, 31, 31);
-            CaptionForeColor = Color.White;
-            BorderColor = Color.FromArgb(67, 126, 231);
-
-            _logger.LogDebug("Form visual enhancements applied");
-        }
-
-        private void SetupControls()
-        {
-            try
+            if (_isEditMode && _currentFuel != null)
             {
-                // Create main panel
-                mainPanel = new GradientPanel()
-                {
-                    Dock = DockStyle.Fill,
-                    BackgroundColor = new Syncfusion.Drawing.BrushInfo(Color.FromArgb(250, 250, 250))
-                };
-
-                // Create title label
-                titleLabel = new AutoLabel()
-                {
-                    Text = _isEditMode ? "Edit Fuel Record" : "Add New Fuel Record",
-                    Font = new Font("Segoe UI", 14F, FontStyle.Bold),
-                    ForeColor = Color.FromArgb(31, 31, 31),
-                    Location = new Point(20, 20),
-                    Size = new Size(300, 25)
-                };
-
-                // Create form layout panel
-                formLayoutPanel = new TableLayoutPanel()
-                {
-                    Location = new Point(20, 60),
-                    Size = new Size(440, 450),
-                    ColumnCount = 2,
-                    RowCount = 7,
-                    AutoSize = false
-                };
-
-                // Configure column widths
-                formLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 120));
-                formLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-
-                // Configure row heights
-                for (int i = 0; i < 7; i++)
-                {
-                    formLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 60));
-                }
-
-                CreateFormControls();
-                PopulateFormLayout();
-                CreateButtonPanel();
-
-                // Add controls to main panel
-                mainPanel.Controls.AddRange(new Control[] {
-                    titleLabel, formLayoutPanel, buttonPanel
-                });
-
-                Controls.Add(mainPanel);
-
-                _logger.LogDebug("Controls setup completed");
+                LoadFuelData();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error setting up controls");
-                throw;
-            }
+
+            _logger.LogInformation("FuelEditForm initialized in {Mode} mode", _isEditMode ? "Edit" : "Add");
         }
 
-        private void CreateFormControls()
+        private void InitializeFormStyling()
         {
-            // Bus selection
-            busLabel = new AutoLabel()
-            {
-                Text = "Bus:",
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(31, 31, 31),
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Fill
-            };
+            // Title label
+            titleLabel.Text = _isEditMode ? "Edit Fuel Record" : "Add New Fuel Record";
 
-            busComboBox = new ComboBoxAdv()
-            {
-                DisplayMember = "BusNumber",
-                ValueMember = "Id",
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 10F),
-                Dock = DockStyle.Fill,
-                Margin = new Padding(5)
-            };
-
-            // Driver selection
-            driverLabel = new AutoLabel()
-            {
-                Text = "Driver:",
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(31, 31, 31),
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Fill
-            };
-
-            driverComboBox = new ComboBoxAdv()
-            {
-                DisplayMember = "FullName",
-                ValueMember = "Id",
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 10F),
-                Dock = DockStyle.Fill,
-                Margin = new Padding(5)
-            };
-
-            // Date selection
-            dateLabel = new AutoLabel()
-            {
-                Text = "Date:",
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(31, 31, 31),
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Fill
-            };
-
-            dateEdit = new DateTimePickerAdv()
-            {
-                Font = new Font("Segoe UI", 10F),
-                Value = DateTime.Now,
-                Format = DateTimePickerFormat.Short,
-                Dock = DockStyle.Fill,
-                Margin = new Padding(5)
-            };
-
-            // Volume input
-            volumeLabel = new AutoLabel()
-            {
-                Text = "Volume (L):",
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(31, 31, 31),
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Fill
-            };
-
-            volumeTextBox = new TextBoxExt()
-            {
-                Font = new Font("Segoe UI", 10F),
-                Dock = DockStyle.Fill,
-                Margin = new Padding(5)
-            };
-
-            // Cost input
-            costLabel = new AutoLabel()
-            {
-                Text = "Cost:",
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(31, 31, 31),
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Fill
-            };
-
-            costTextBox = new TextBoxExt()
-            {
-                Font = new Font("Segoe UI", 10F),
-                Dock = DockStyle.Fill,
-                Margin = new Padding(5)
-            };
-
-            // Vendor input
-            vendorLabel = new AutoLabel()
-            {
-                Text = "Vendor:",
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(31, 31, 31),
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Fill
-            };
-
-            vendorComboBox = new ComboBoxAdv()
-            {
-                Font = new Font("Segoe UI", 10F),
-                Dock = DockStyle.Fill,
-                Margin = new Padding(5)
-            };
-
-            // Notes input
-            notesLabel = new AutoLabel()
-            {
-                Text = "Notes:",
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(31, 31, 31),
-                TextAlign = ContentAlignment.MiddleRight,
-                Dock = DockStyle.Top
-            };
-
-            notesTextBox = new TextBoxExt()
-            {
-                Font = new Font("Segoe UI", 10F),
-                Multiline = true,
-                ScrollBars = ScrollBars.Vertical,
-                Dock = DockStyle.Fill,
-                Margin = new Padding(5)
-            };
-        }
-
-        private void PopulateFormLayout()
-        {
-            // Add controls to layout panel
-            formLayoutPanel.Controls.Add(busLabel, 0, 0);
-            formLayoutPanel.Controls.Add(busComboBox, 1, 0);
-
-            formLayoutPanel.Controls.Add(driverLabel, 0, 1);
-            formLayoutPanel.Controls.Add(driverComboBox, 1, 1);
-
-            formLayoutPanel.Controls.Add(dateLabel, 0, 2);
-            formLayoutPanel.Controls.Add(dateEdit, 1, 2);
-
-            formLayoutPanel.Controls.Add(volumeLabel, 0, 3);
-            formLayoutPanel.Controls.Add(volumeTextBox, 1, 3);
-
-            formLayoutPanel.Controls.Add(costLabel, 0, 4);
-            formLayoutPanel.Controls.Add(costTextBox, 1, 4);
-
-            formLayoutPanel.Controls.Add(vendorLabel, 0, 5);
-            formLayoutPanel.Controls.Add(vendorComboBox, 1, 5);
-
-            formLayoutPanel.Controls.Add(notesLabel, 0, 6);
-            formLayoutPanel.Controls.Add(notesTextBox, 1, 6);
-        }
-
-        private void CreateButtonPanel()
-        {
-            buttonPanel = new GradientPanel()
-            {
-                Location = new Point(20, 530),
-                Size = new Size(440, 50),
-                BackgroundColor = new Syncfusion.Drawing.BrushInfo(Color.FromArgb(245, 245, 245))
+            // Fuel Type ComboBox
+            fuelTypeComboBox.DataSource = new List<string> {
+                "Gasoline", "Diesel"
             };
 
             // Save button
-            saveButton = new SfButton()
-            {
-                Text = _isEditMode ? "Update" : "Save",
-                Size = new Size(100, 35),
-                Location = new Point(240, 8),
-                BackColor = Color.FromArgb(46, 125, 50),
-                ForeColor = Color.White
-            };
-            saveButton.Click += SaveButton_Click;
-            VisualEnhancementManager.ApplyEnhancedButtonStyling(saveButton, Color.FromArgb(46, 125, 50));
+            saveButton.Text = _isEditMode ? "Update" : "Save";
 
-            // Cancel button
-            cancelButton = new SfButton()
-            {
-                Text = "Cancel",
-                Size = new Size(80, 35),
-                Location = new Point(350, 8)
-            };
-            cancelButton.Click += CancelButton_Click;
-            VisualEnhancementManager.ApplyEnhancedButtonStyling(cancelButton, Color.FromArgb(108, 117, 125));
-
-            buttonPanel.Controls.AddRange(new Control[] { saveButton, cancelButton });
+            // Apply visual enhancements
+            ApplyMetroTheme();
         }
 
-        private async void LoadComboBoxData()
+        private async void LoadFormData()
         {
             try
             {
-                // Load buses
+                // Load buses for selection
                 var buses = await _busService.GetAllBusesAsync();
                 busComboBox.DataSource = buses.ToList();
                 busComboBox.DisplayMember = "BusNumber";
                 busComboBox.ValueMember = "BusId";
 
-                // Load common vendors
-                var vendors = new[]
-                {
-                    "Shell", "BP", "Caltex", "Total", "Mobil", "Petron", "Other"
-                };
-                vendorComboBox.DataSource = vendors;
-
-                _logger.LogDebug("Combo box data loaded successfully");
+                _logger.LogDebug("Form data loaded successfully");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading combo box data");
-                MessageBoxAdv.Show(this,
-                    "Error loading form data. Please check the logs for details.",
-                    "Data Loading Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                _logger.LogError(ex, "Error loading form data");
+                MessageBox.Show("Error loading form data. Please try again.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -381,47 +94,24 @@ namespace Bus_Buddy.Forms
         {
             if (_currentFuel == null) return;
 
-            try
-            {
-                busComboBox.SelectedValue = _currentFuel.VehicleFueledId;
-                dateEdit.Value = _currentFuel.FuelDate;
-                volumeTextBox.Text = _currentFuel.Gallons?.ToString("F2") ?? "";
-                costTextBox.Text = _currentFuel.TotalCost?.ToString("F2") ?? "";
-                vendorComboBox.Text = _currentFuel.FuelLocation ?? "";
-                notesTextBox.Text = _currentFuel.Notes ?? "";
-                // odometerTextBox.Text = _currentFuel.VehicleOdometerReading.ToString();
-                // fuelTypeComboBox.Text = _currentFuel.FuelType ?? "";
-
-                _logger.LogDebug("Fuel data loaded for editing: ID {FuelId}", _currentFuel.FuelId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error loading fuel data for editing");
-            }
+            busComboBox.SelectedValue = _currentFuel.VehicleFueledId;
+            dateEdit.Value = _currentFuel.FuelDate;
+            odometerTextBox.Text = _currentFuel.VehicleOdometerReading.ToString();
+            fuelTypeComboBox.Text = _currentFuel.FuelType;
+            costTextBox.Text = _currentFuel.TotalCost.ToString();
+            notesTextBox.Text = _currentFuel.Notes;
+            gallonsTextBox.Text = _currentFuel.Gallons.ToString();
+            pricePerGallonTextBox.Text = _currentFuel.PricePerGallon.ToString();
+            locationTextBox.Text = _currentFuel.FuelLocation;
         }
 
         private async void SaveButton_Click(object? sender, EventArgs e)
         {
             try
             {
-                if (!ValidateInput())
-                    return;
+                if (!ValidateInput()) return;
 
-                if (_currentFuel == null)
-                {
-                    _currentFuel = new Fuel();
-                }
-
-                // Update fuel properties
-                _currentFuel.VehicleFueledId = (int)busComboBox.SelectedValue;
-                _currentFuel.FuelDate = dateEdit.Value;
-                _currentFuel.Gallons = decimal.Parse(volumeTextBox.Text);
-                _currentFuel.TotalCost = decimal.Parse(costTextBox.Text);
-                _currentFuel.FuelLocation = vendorComboBox.Text;
-                _currentFuel.Notes = notesTextBox.Text;
-                // Set required fields with defaults for now
-                _currentFuel.VehicleOdometerReading = 0; // TODO: Add odometer field
-                _currentFuel.FuelType = "Gasoline"; // TODO: Add fuel type field
+                UpdateFuelFromForm();
 
                 if (_isEditMode && _currentFuel != null)
                 {
@@ -435,25 +125,30 @@ namespace Bus_Buddy.Forms
                 }
 
                 IsDataSaved = true;
-
-                MessageBoxAdv.Show(this,
-                    _isEditMode ? "Fuel record updated successfully!" : "Fuel record created successfully!",
-                    "Success",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-
                 DialogResult = DialogResult.OK;
                 Close();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error saving fuel record");
-                MessageBoxAdv.Show(this,
-                    "Error saving fuel record. Please check the logs for details.",
-                    "Save Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show($"Error saving fuel record: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void UpdateFuelFromForm()
+        {
+            if (_currentFuel == null) return;
+
+            _currentFuel.VehicleFueledId = (int)busComboBox.SelectedValue;
+            _currentFuel.FuelDate = dateEdit.Value!.Value;
+            _currentFuel.VehicleOdometerReading = int.Parse(odometerTextBox.Text);
+            _currentFuel.FuelType = fuelTypeComboBox.Text;
+            _currentFuel.TotalCost = decimal.Parse(costTextBox.Text);
+            _currentFuel.Notes = notesTextBox.Text;
+            _currentFuel.Gallons = decimal.Parse(gallonsTextBox.Text);
+            _currentFuel.PricePerGallon = decimal.Parse(pricePerGallonTextBox.Text);
+            _currentFuel.FuelLocation = locationTextBox.Text;
         }
 
         private void CancelButton_Click(object? sender, EventArgs e)
@@ -464,79 +159,105 @@ namespace Bus_Buddy.Forms
 
         private bool ValidateInput()
         {
-            // Validate bus selection
             if (busComboBox.SelectedValue == null)
             {
-                MessageBoxAdv.Show(this, "Please select a bus.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                busComboBox.Focus();
+                MessageBoxAdv.Show(this, "Please select a bus.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-
-            // Validate driver selection
-            if (driverComboBox.SelectedValue == null)
+            if (dateEdit.Value == null)
             {
-                MessageBoxAdv.Show(this, "Please select a driver.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                driverComboBox.Focus();
+                MessageBoxAdv.Show(this, "Please select a date.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-
-            // Validate volume
-            if (!decimal.TryParse(volumeTextBox.Text, out decimal volume) || volume <= 0)
+            if (!int.TryParse(odometerTextBox.Text, out int odometer) || odometer < 0)
             {
-                MessageBoxAdv.Show(this, "Please enter a valid volume greater than 0.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                volumeTextBox.Focus();
+                MessageBoxAdv.Show(this, "Please enter a valid odometer reading.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-
-            // Validate cost
-            if (!decimal.TryParse(costTextBox.Text, out decimal cost) || cost <= 0)
+            if (string.IsNullOrWhiteSpace(fuelTypeComboBox.Text))
             {
-                MessageBoxAdv.Show(this, "Please enter a valid cost greater than 0.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                costTextBox.Focus();
+                MessageBoxAdv.Show(this, "Please select a fuel type.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-
-            // Validate vendor
-            if (string.IsNullOrWhiteSpace(vendorComboBox.Text))
+            if (string.IsNullOrWhiteSpace(locationTextBox.Text))
             {
-                MessageBoxAdv.Show(this, "Please select or enter a vendor.", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                vendorComboBox.Focus();
+                MessageBoxAdv.Show(this, "Please enter a location.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-
+            if (!decimal.TryParse(costTextBox.Text, out decimal cost) || cost < 0)
+            {
+                MessageBoxAdv.Show(this, "Please enter a valid cost.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            if (!decimal.TryParse(gallonsTextBox.Text, out decimal gallons) || gallons < 0)
+            {
+                MessageBoxAdv.Show(this, "Please enter a valid number of gallons.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            if (!decimal.TryParse(pricePerGallonTextBox.Text, out decimal price) || price < 0)
+            {
+                MessageBoxAdv.Show(this, "Please enter a valid price per gallon.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
             return true;
+        }
+
+        private void ApplyMetroTheme()
+        {
+            try
+            {
+                // Apply Syncfusion Metro styling
+                BackColor = Color.FromArgb(255, 255, 255);
+                VisualEnhancementManager.ApplyEnhancedTheme(this);
+
+                _logger.LogDebug("Metro theme applied successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error applying metro theme");
+            }
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            // Set focus to the first input control
+            if (busComboBox != null)
+            {
+                busComboBox.Focus();
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                // Dispose Syncfusion components
+                // Dispose of Syncfusion controls
                 titleLabel?.Dispose();
                 busLabel?.Dispose();
-                driverLabel?.Dispose();
                 dateLabel?.Dispose();
-                volumeLabel?.Dispose();
+                odometerLabel?.Dispose();
+                fuelTypeLabel?.Dispose();
+                locationLabel?.Dispose();
                 costLabel?.Dispose();
-                vendorLabel?.Dispose();
                 notesLabel?.Dispose();
+                gallonsLabel?.Dispose();
+                pricePerGallonLabel?.Dispose();
                 busComboBox?.Dispose();
-                driverComboBox?.Dispose();
-                vendorComboBox?.Dispose();
+                fuelTypeComboBox?.Dispose();
                 dateEdit?.Dispose();
-                volumeTextBox?.Dispose();
+                odometerTextBox?.Dispose();
                 costTextBox?.Dispose();
                 notesTextBox?.Dispose();
+                gallonsTextBox?.Dispose();
+                pricePerGallonTextBox?.Dispose();
+                locationTextBox?.Dispose();
                 saveButton?.Dispose();
                 cancelButton?.Dispose();
                 mainPanel?.Dispose();
+                formTableLayout?.Dispose();
                 buttonPanel?.Dispose();
-                formLayoutPanel?.Dispose();
             }
             base.Dispose(disposing);
         }

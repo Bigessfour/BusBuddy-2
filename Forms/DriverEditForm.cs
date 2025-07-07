@@ -36,109 +36,20 @@ public partial class DriverEditForm : MetroForm
         _logger.LogInformation("Initializing Driver Edit form in {Mode} mode", _isEditMode ? "Edit" : "Add");
 
         InitializeComponent();
-        InitializeSyncfusionTheme();
-        InitializeDriverEditForm();
+
+        if (_isEditMode)
+        {
+            this.Text = "Edit Driver";
+        }
+        else
+        {
+            this.Text = "Add New Driver";
+        }
 
         if (_isEditMode && _currentDriver != null)
         {
             LoadDriverData(_currentDriver);
         }
-    }
-
-    private void InitializeSyncfusionTheme()
-    {
-        try
-        {
-            // Apply Office2016Colorful theme consistently
-            Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this,
-                Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
-
-            // Enhanced MetroForm styling with Office2016 colors
-            this.MetroColor = Color.FromArgb(52, 152, 219);
-            this.CaptionBarColor = Color.FromArgb(52, 152, 219);
-            this.CaptionForeColor = Color.White;
-            this.AutoScaleMode = AutoScaleMode.Dpi;
-
-            _logger.LogInformation("Applied Office2016Colorful theme successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not apply theme, using default");
-        }
-    }
-
-    private void InitializeDriverEditForm()
-    {
-        // Enhanced MetroForm styles with Office2016 colors
-        this.Text = _isEditMode ? "Edit Driver" : "Add New Driver";
-
-        // Enable high DPI scaling for this form
-        this.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-
-        // Initialize form controls with enhanced styling
-        InitializeFormControls();
-
-        _logger.LogInformation("Driver Edit form initialized successfully with Office2016 theme");
-    }
-
-    private void InitializeFormControls()
-    {
-        // Set up date pickers with current date as default
-        hireDatePicker.Value = DateTime.Now;
-        licenseIssueDatePicker.Value = DateTime.Now.AddYears(-1);
-        licenseExpiryDatePicker.Value = DateTime.Now.AddYears(5);
-
-        // Set up combo boxes with enhanced styling
-        licenseTypeComboBox.Items.AddRange(new[] { "CDL", "Passenger", "Regular", "Chauffeur" });
-        licenseTypeComboBox.SelectedIndex = 0;
-        licenseTypeComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
-
-        licenseClassComboBox.Items.AddRange(new[] { "A", "B", "C", "CDL-A", "CDL-B", "CDL-C" });
-        licenseClassComboBox.SelectedIndex = 3; // CDL-B is common for school buses
-        licenseClassComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
-
-        statusComboBox.Items.AddRange(new[] { "Active", "Inactive", "Suspended", "Terminated", "On Leave" });
-        statusComboBox.SelectedIndex = 0;
-        statusComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
-
-        stateComboBox.Items.AddRange(new[] { "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-            "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO",
-            "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-            "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" });
-        stateComboBox.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
-
-        // Apply Office2016 styling to date pickers
-        hireDatePicker.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
-        licenseIssueDatePicker.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
-        licenseExpiryDatePicker.Style = Syncfusion.Windows.Forms.VisualStyle.Office2016Colorful;
-
-        // Set tab order
-        SetTabOrder();
-    }
-
-    private void SetTabOrder()
-    {
-        int tabIndex = 0;
-        firstNameTextBox.TabIndex = tabIndex++;
-        lastNameTextBox.TabIndex = tabIndex++;
-        driverNameTextBox.TabIndex = tabIndex++;
-        phoneTextBox.TabIndex = tabIndex++;
-        emailTextBox.TabIndex = tabIndex++;
-        addressTextBox.TabIndex = tabIndex++;
-        cityTextBox.TabIndex = tabIndex++;
-        stateComboBox.TabIndex = tabIndex++;
-        zipTextBox.TabIndex = tabIndex++;
-        licenseNumberTextBox.TabIndex = tabIndex++;
-        licenseTypeComboBox.TabIndex = tabIndex++;
-        licenseClassComboBox.TabIndex = tabIndex++;
-        licenseIssueDatePicker.TabIndex = tabIndex++;
-        licenseExpiryDatePicker.TabIndex = tabIndex++;
-        endorsementsTextBox.TabIndex = tabIndex++;
-        hireDatePicker.TabIndex = tabIndex++;
-        statusComboBox.TabIndex = tabIndex++;
-        trainingCompleteCheckBox.TabIndex = tabIndex++;
-        saveButton.TabIndex = tabIndex++;
-        cancelButton.TabIndex = tabIndex++;
     }
 
     private void LoadDriverData(Driver driver)

@@ -1,5 +1,7 @@
 using Syncfusion.WinForms.Controls;
 using Syncfusion.WinForms.DataGrid;
+using Syncfusion.WinForms.Input;
+using Syncfusion.WinForms.ListView;
 using Syncfusion.Windows.Forms.Tools;
 
 namespace Bus_Buddy.Forms
@@ -34,8 +36,6 @@ namespace Bus_Buddy.Forms
         {
             this.panelHeader = new GradientPanel();
             this.labelTitle = new AutoLabel();
-            this.lblTotalCost = new AutoLabel();
-            this.lblTotalGallons = new AutoLabel();
             this.panelControls = new GradientPanel();
             this.btnAdd = new Syncfusion.WinForms.Controls.SfButton();
             this.btnEdit = new Syncfusion.WinForms.Controls.SfButton();
@@ -44,14 +44,10 @@ namespace Bus_Buddy.Forms
             this.btnViewDetails = new Syncfusion.WinForms.Controls.SfButton();
             this.txtSearch = new Syncfusion.Windows.Forms.Tools.TextBoxExt();
             this.labelSearch = new AutoLabel();
-            this.cmbVehicleFilter = new Syncfusion.Windows.Forms.Tools.ComboBoxAdv();
+            this.cmbVehicleFilter = new SfComboBox();
             this.labelVehicle = new AutoLabel();
-            this.cmbFuelTypeFilter = new Syncfusion.Windows.Forms.Tools.ComboBoxAdv();
-            this.labelFuelType = new AutoLabel();
-            this.dtpStartDate = new Syncfusion.Windows.Forms.Tools.DateTimePickerAdv();
-            this.labelStartDate = new AutoLabel();
-            this.dtpEndDate = new Syncfusion.Windows.Forms.Tools.DateTimePickerAdv();
-            this.labelEndDate = new AutoLabel();
+            this.dtpDateFilter = new SfDateTimeEdit();
+            this.labelDateFilter = new AutoLabel();
             this.panelGrid = new GradientPanel();
             this.dataGridFuel = new Syncfusion.WinForms.DataGrid.SfDataGrid();
             this.statusLabel = new AutoLabel();
@@ -63,8 +59,6 @@ namespace Bus_Buddy.Forms
             // panelHeader
             // 
             this.panelHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(249)))), ((int)(((byte)(250)))));
-            this.panelHeader.Controls.Add(this.lblTotalGallons);
-            this.panelHeader.Controls.Add(this.lblTotalCost);
             this.panelHeader.Controls.Add(this.labelTitle);
             this.panelHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelHeader.Location = new System.Drawing.Point(0, 0);
@@ -76,45 +70,19 @@ namespace Bus_Buddy.Forms
             // 
             this.labelTitle.AutoSize = true;
             this.labelTitle.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
-            this.labelTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
+            this.labelTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(126)))), ((int)(((byte)(34)))));
             this.labelTitle.Location = new System.Drawing.Point(20, 20);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(287, 32);
+            this.labelTitle.Size = new System.Drawing.Size(357, 32);
             this.labelTitle.TabIndex = 0;
             this.labelTitle.Text = "⛽ Fuel Management";
-            // 
-            // lblTotalCost
-            // 
-            this.lblTotalCost.AutoSize = true;
-            this.lblTotalCost.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.lblTotalCost.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(76)))), ((int)(((byte)(60)))));
-            this.lblTotalCost.Location = new System.Drawing.Point(350, 15);
-            this.lblTotalCost.Name = "lblTotalCost";
-            this.lblTotalCost.Size = new System.Drawing.Size(112, 20);
-            this.lblTotalCost.TabIndex = 1;
-            this.lblTotalCost.Text = "Total Cost: $0.00";
-            // 
-            // lblTotalGallons
-            // 
-            this.lblTotalGallons.AutoSize = true;
-            this.lblTotalGallons.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.lblTotalGallons.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
-            this.lblTotalGallons.Location = new System.Drawing.Point(350, 40);
-            this.lblTotalGallons.Name = "lblTotalGallons";
-            this.lblTotalGallons.Size = new System.Drawing.Size(127, 20);
-            this.lblTotalGallons.TabIndex = 2;
-            this.lblTotalGallons.Text = "Total Gallons: 0.0";
             // 
             // panelControls
             // 
             this.panelControls.BackColor = System.Drawing.Color.White;
             this.panelControls.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelControls.Controls.Add(this.labelEndDate);
-            this.panelControls.Controls.Add(this.dtpEndDate);
-            this.panelControls.Controls.Add(this.labelStartDate);
-            this.panelControls.Controls.Add(this.dtpStartDate);
-            this.panelControls.Controls.Add(this.labelFuelType);
-            this.panelControls.Controls.Add(this.cmbFuelTypeFilter);
+            this.panelControls.Controls.Add(this.labelDateFilter);
+            this.panelControls.Controls.Add(this.dtpDateFilter);
             this.panelControls.Controls.Add(this.labelVehicle);
             this.panelControls.Controls.Add(this.cmbVehicleFilter);
             this.panelControls.Controls.Add(this.labelSearch);
@@ -135,19 +103,19 @@ namespace Bus_Buddy.Forms
             // 
             this.btnAdd.Location = new System.Drawing.Point(20, 20);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(130, 40);
-            this.btnAdd.Style.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
+            this.btnAdd.Size = new System.Drawing.Size(140, 40);
+            this.btnAdd.Style.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(126)))), ((int)(((byte)(34)))));
             this.btnAdd.Style.ForeColor = System.Drawing.Color.White;
             this.btnAdd.TabIndex = 0;
-            this.btnAdd.Text = "➕ Add Fuel Record";
+            this.btnAdd.Text = "➕ Add Record";
             this.btnAdd.UseVisualStyleBackColor = false;
             this.btnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
             // 
             // btnEdit
             // 
-            this.btnEdit.Location = new System.Drawing.Point(160, 20);
+            this.btnEdit.Location = new System.Drawing.Point(170, 20);
             this.btnEdit.Name = "btnEdit";
-            this.btnEdit.Size = new System.Drawing.Size(130, 40);
+            this.btnEdit.Size = new System.Drawing.Size(140, 40);
             this.btnEdit.Style.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(241)))), ((int)(((byte)(196)))), ((int)(((byte)(15)))));
             this.btnEdit.Style.ForeColor = System.Drawing.Color.White;
             this.btnEdit.TabIndex = 1;
@@ -157,7 +125,7 @@ namespace Bus_Buddy.Forms
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(300, 20);
+            this.btnDelete.Location = new System.Drawing.Point(320, 20);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(100, 40);
             this.btnDelete.Style.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(76)))), ((int)(((byte)(60)))));
@@ -169,7 +137,7 @@ namespace Bus_Buddy.Forms
             // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(410, 20);
+            this.btnRefresh.Location = new System.Drawing.Point(430, 20);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(100, 40);
             this.btnRefresh.Style.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(155)))), ((int)(((byte)(89)))), ((int)(((byte)(182)))));
@@ -181,10 +149,10 @@ namespace Bus_Buddy.Forms
             // 
             // btnViewDetails
             // 
-            this.btnViewDetails.Location = new System.Drawing.Point(520, 20);
+            this.btnViewDetails.Location = new System.Drawing.Point(540, 20);
             this.btnViewDetails.Name = "btnViewDetails";
-            this.btnViewDetails.Size = new System.Drawing.Size(130, 40);
-            this.btnViewDetails.Style.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(204)))), ((int)(((byte)(113)))));
+            this.btnViewDetails.Size = new System.Drawing.Size(140, 40);
+            this.btnViewDetails.Style.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
             this.btnViewDetails.Style.ForeColor = System.Drawing.Color.White;
             this.btnViewDetails.TabIndex = 4;
             this.btnViewDetails.Text = "👁️ View Details";
@@ -196,7 +164,7 @@ namespace Bus_Buddy.Forms
             this.txtSearch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtSearch.Location = new System.Drawing.Point(70, 80);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(180, 23);
+            this.txtSearch.Size = new System.Drawing.Size(200, 23);
             this.txtSearch.TabIndex = 5;
             this.txtSearch.TextChanged += new System.EventHandler(this.TxtSearch_TextChanged);
             // 
@@ -212,8 +180,7 @@ namespace Bus_Buddy.Forms
             // 
             // cmbVehicleFilter
             // 
-
-            this.cmbVehicleFilter.Location = new System.Drawing.Point(320, 80);
+            this.cmbVehicleFilter.Location = new System.Drawing.Point(340, 80);
             this.cmbVehicleFilter.Name = "cmbVehicleFilter";
             this.cmbVehicleFilter.Size = new System.Drawing.Size(150, 21);
             this.cmbVehicleFilter.TabIndex = 7;
@@ -223,68 +190,30 @@ namespace Bus_Buddy.Forms
             // 
             this.labelVehicle.AutoSize = true;
             this.labelVehicle.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.labelVehicle.Location = new System.Drawing.Point(270, 82);
+            this.labelVehicle.Location = new System.Drawing.Point(290, 82);
             this.labelVehicle.Name = "labelVehicle";
             this.labelVehicle.Size = new System.Drawing.Size(47, 15);
             this.labelVehicle.TabIndex = 8;
             this.labelVehicle.Text = "Vehicle:";
             // 
-            // cmbFuelTypeFilter
+            // dtpDateFilter
             // 
-
-            this.cmbFuelTypeFilter.Location = new System.Drawing.Point(550, 80);
-            this.cmbFuelTypeFilter.Name = "cmbFuelTypeFilter";
-            this.cmbFuelTypeFilter.Size = new System.Drawing.Size(120, 21);
-            this.cmbFuelTypeFilter.TabIndex = 9;
-            this.cmbFuelTypeFilter.SelectedIndexChanged += new System.EventHandler(this.CmbFuelTypeFilter_SelectedIndexChanged);
+            this.dtpDateFilter.Location = new System.Drawing.Point(560, 80);
+            this.dtpDateFilter.Name = "dtpDateFilter";
+            this.dtpDateFilter.Size = new System.Drawing.Size(150, 30);
+            this.dtpDateFilter.TabIndex = 11;
+            this.dtpDateFilter.Value = new System.DateTime(2025, 7, 3, 0, 0, 0, 0);
+            this.dtpDateFilter.ValueChanged += new Syncfusion.WinForms.Input.Events.DateTimeValueChangedEventHandler(this.DtpDateFilter_ValueChanged);
             // 
-            // labelFuelType
+            // labelDateFilter
             // 
-            this.labelFuelType.AutoSize = true;
-            this.labelFuelType.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.labelFuelType.Location = new System.Drawing.Point(490, 82);
-            this.labelFuelType.Name = "labelFuelType";
-            this.labelFuelType.Size = new System.Drawing.Size(60, 15);
-            this.labelFuelType.TabIndex = 10;
-            this.labelFuelType.Text = "Fuel Type:";
-            // 
-            // dtpStartDate
-            // 
-            this.dtpStartDate.Location = new System.Drawing.Point(750, 80);
-            this.dtpStartDate.Name = "dtpStartDate";
-            this.dtpStartDate.Size = new System.Drawing.Size(120, 20);
-            this.dtpStartDate.TabIndex = 11;
-            this.dtpStartDate.Value = new System.DateTime(2025, 7, 3, 0, 0, 0, 0);
-            this.dtpStartDate.ValueChanged += new System.EventHandler(this.DtpStartDate_ValueChanged);
-            // 
-            // labelStartDate
-            // 
-            this.labelStartDate.AutoSize = true;
-            this.labelStartDate.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.labelStartDate.Location = new System.Drawing.Point(690, 82);
-            this.labelStartDate.Name = "labelStartDate";
-            this.labelStartDate.Size = new System.Drawing.Size(58, 15);
-            this.labelStartDate.TabIndex = 12;
-            this.labelStartDate.Text = "Start Date:";
-            // 
-            // dtpEndDate
-            // 
-            this.dtpEndDate.Location = new System.Drawing.Point(940, 80);
-            this.dtpEndDate.Name = "dtpEndDate";
-            this.dtpEndDate.Size = new System.Drawing.Size(120, 20);
-            this.dtpEndDate.TabIndex = 13;
-            this.dtpEndDate.Value = new System.DateTime(2025, 7, 3, 0, 0, 0, 0);
-            this.dtpEndDate.ValueChanged += new System.EventHandler(this.DtpEndDate_ValueChanged);
-            // 
-            // labelEndDate
-            // 
-            this.labelEndDate.AutoSize = true;
-            this.labelEndDate.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.labelEndDate.Location = new System.Drawing.Point(890, 82);
-            this.labelEndDate.Name = "labelEndDate";
-            this.labelEndDate.Size = new System.Drawing.Size(55, 15);
-            this.labelEndDate.TabIndex = 14;
-            this.labelEndDate.Text = "End Date:";
+            this.labelDateFilter.AutoSize = true;
+            this.labelDateFilter.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.labelDateFilter.Location = new System.Drawing.Point(500, 82);
+            this.labelDateFilter.Name = "labelDateFilter";
+            this.labelDateFilter.Size = new System.Drawing.Size(57, 15);
+            this.labelDateFilter.TabIndex = 12;
+            this.labelDateFilter.Text = "Since Date:";
             // 
             // panelGrid
             // 
@@ -312,6 +241,7 @@ namespace Bus_Buddy.Forms
             this.dataGridFuel.TabIndex = 0;
             this.dataGridFuel.Text = "sfDataGrid1";
             this.dataGridFuel.CellDoubleClick += new Syncfusion.WinForms.DataGrid.Events.CellClickEventHandler(this.DataGridFuel_CellDoubleClick);
+            this.dataGridFuel.SelectionChanged += new Syncfusion.WinForms.DataGrid.Events.SelectionChangedEventHandler(this.DataGridFuel_SelectionChanged);
             // 
             // statusLabel
             // 
@@ -356,8 +286,6 @@ namespace Bus_Buddy.Forms
 
         private GradientPanel panelHeader;
         private AutoLabel labelTitle;
-        private AutoLabel lblTotalCost;
-        private AutoLabel lblTotalGallons;
         private GradientPanel panelControls;
         private Syncfusion.WinForms.Controls.SfButton btnAdd;
         private Syncfusion.WinForms.Controls.SfButton btnEdit;
@@ -366,14 +294,10 @@ namespace Bus_Buddy.Forms
         private Syncfusion.WinForms.Controls.SfButton btnViewDetails;
         private Syncfusion.Windows.Forms.Tools.TextBoxExt txtSearch;
         private AutoLabel labelSearch;
-        private Syncfusion.Windows.Forms.Tools.ComboBoxAdv cmbVehicleFilter;
+        private SfComboBox cmbVehicleFilter;
         private AutoLabel labelVehicle;
-        private Syncfusion.Windows.Forms.Tools.ComboBoxAdv cmbFuelTypeFilter;
-        private AutoLabel labelFuelType;
-        private Syncfusion.Windows.Forms.Tools.DateTimePickerAdv dtpStartDate;
-        private AutoLabel labelStartDate;
-        private Syncfusion.Windows.Forms.Tools.DateTimePickerAdv dtpEndDate;
-        private AutoLabel labelEndDate;
+        private SfDateTimeEdit dtpDateFilter;
+        private AutoLabel labelDateFilter;
         private GradientPanel panelGrid;
         private Syncfusion.WinForms.DataGrid.SfDataGrid dataGridFuel;
         private AutoLabel statusLabel;

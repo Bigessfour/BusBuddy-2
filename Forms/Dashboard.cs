@@ -26,19 +26,6 @@ public partial class Dashboard : MetroForm
     private readonly IServiceProvider _serviceProvider;
     private AIAssistantPanel? _aiAssistantPanel;
 
-    // Main tab control for dashboard sections
-    private TabControlAdv? mainTabControl;
-    private TabPageAdv? fleetTab;
-    private TabPageAdv? routesTab;
-    private TabPageAdv? maintenanceTab;
-    private TabPageAdv? studentsTab;
-    private TabPageAdv? reportsTab;
-    private TabPageAdv? aiAssistantTab;
-    private TabPageAdv? analyticsTab;
-
-    // Dashboard controls
-    private Label? subtitleLabel;
-
     public Dashboard(ILogger<Dashboard> logger, IBusService busService, IConfigurationService configService,
                      XAIService xaiService, GoogleEarthEngineService geeService, BusBuddyAIReportingService aiReportingService, IServiceProvider serviceProvider)
     {
@@ -62,13 +49,6 @@ public partial class Dashboard : MetroForm
 
     private void InitializeDashboard()
     {
-        // Apply enhanced visual theme system
-        VisualEnhancementManager.ApplyEnhancedTheme(this);
-
-        // Set Syncfusion MetroForm styles with enhanced colors
-        this.MetroColor = System.Drawing.Color.FromArgb(46, 125, 185);
-        this.CaptionBarColor = System.Drawing.Color.FromArgb(46, 125, 185);
-        this.CaptionForeColor = System.Drawing.Color.White;
         this.Text = "BusBuddy - Dashboard";
 
         // Enable high DPI scaling for this form
@@ -77,9 +57,6 @@ public partial class Dashboard : MetroForm
 
         // Create main tab control
         InitializeTabControl();
-
-        // Initialize subtitle label
-        InitializeSubtitleLabel();
 
         // Initialize AI Assistant Panel
         InitializeAIAssistantPanel();
@@ -92,18 +69,7 @@ public partial class Dashboard : MetroForm
 
     private void InitializeTabControl()
     {
-        // Create main tab control
-        mainTabControl = new TabControlAdv
-        {
-            Location = new System.Drawing.Point(10, 10),
-            Size = new System.Drawing.Size(1180, 700),
-            Dock = DockStyle.Fill,
-            TabStyle = typeof(TabRendererMetro),
-            ThemeName = "Metro"
-        };
-
         // Create Fleet Management tab
-        fleetTab = new TabPageAdv("Fleet Management");
         var fleetForm = new BusManagementForm(
             _serviceProvider.GetRequiredService<ILogger<BusManagementForm>>(),
             _busService);
@@ -114,7 +80,6 @@ public partial class Dashboard : MetroForm
         fleetForm.Show();
 
         // Create Routes tab
-        routesTab = new TabPageAdv("Routes");
         var routeForm = new RouteManagementForm(
             _serviceProvider.GetRequiredService<ILogger<RouteManagementForm>>(),
             _busService);
@@ -125,11 +90,10 @@ public partial class Dashboard : MetroForm
         routeForm.Show();
 
         // Create Maintenance tab
-        maintenanceTab = new TabPageAdv("Maintenance");
-        var maintenanceForm = new MaintenanceManagementForm(
-            _busService,
-            _serviceProvider.GetRequiredService<IMaintenanceService>(),
-            _serviceProvider.GetRequiredService<ILogger<MaintenanceManagementForm>>());
+        var maintenanceForm = new FuelManagementForm(
+            _serviceProvider.GetRequiredService<IBusService>(),
+            _serviceProvider.GetRequiredService<IFuelService>(),
+            _serviceProvider.GetRequiredService<ILogger<FuelManagementForm>>());
         maintenanceForm.TopLevel = false;
         maintenanceForm.FormBorderStyle = FormBorderStyle.None;
         maintenanceForm.Dock = DockStyle.Fill;
@@ -137,7 +101,6 @@ public partial class Dashboard : MetroForm
         maintenanceForm.Show();
 
         // Create Students tab
-        studentsTab = new TabPageAdv("Students");
         var studentForm = new StudentManagementForm(
             _serviceProvider.GetRequiredService<ILogger<StudentManagementForm>>(),
             _serviceProvider.GetRequiredService<IStudentService>(),
@@ -149,7 +112,6 @@ public partial class Dashboard : MetroForm
         studentForm.Show();
 
         // Create Reports tab
-        reportsTab = new TabPageAdv("Reports");
         var reportsForm = new BusReportsForm(_serviceProvider.GetRequiredService<BusRepository>());
         reportsForm.TopLevel = false;
         reportsForm.FormBorderStyle = FormBorderStyle.None;
@@ -158,25 +120,22 @@ public partial class Dashboard : MetroForm
         reportsForm.Show();
 
         // Create Analytics tab with Enhanced Dashboard Analytics
-        analyticsTab = new TabPageAdv("Analytics");
         var analyticsPanel = _serviceProvider.GetRequiredService<EnhancedDashboardAnalytics>();
         analyticsPanel.Dock = DockStyle.Fill;
         analyticsTab.Controls.Add(analyticsPanel);
 
-        // Create AI Assistant tab
-        aiAssistantTab = new TabPageAdv("AI Assistant");
+        // Create Settings tab
+        var settingsForm = _serviceProvider.GetRequiredService<Bus_Buddy.Forms.SettingsForm>();
+        settingsForm.TopLevel = false;
+        settingsForm.FormBorderStyle = FormBorderStyle.None;
+        settingsForm.Dock = DockStyle.Fill;
+        settingsTab.Controls.Add(settingsForm);
+        settingsForm.Show();
 
-        // Add tabs to control (Analytics first for prominence)
-        mainTabControl.TabPages.Add(analyticsTab);
-        mainTabControl.TabPages.Add(fleetTab);
-        mainTabControl.TabPages.Add(routesTab);
-        mainTabControl.TabPages.Add(maintenanceTab);
-        mainTabControl.TabPages.Add(studentsTab);
-        mainTabControl.TabPages.Add(reportsTab);
-        mainTabControl.TabPages.Add(aiAssistantTab);
-
-        // Add tab control to form
-        this.Controls.Add(mainTabControl);
+        // Create GEE Maps tab
+        var mapPanel = _serviceProvider.GetRequiredService<Bus_Buddy.Forms.MapPanel>();
+        mapPanel.Dock = DockStyle.Fill;
+        geeMapsTab.Controls.Add(mapPanel);
     }
 
     private void InitializeAIAssistantPanel()
@@ -216,22 +175,6 @@ public partial class Dashboard : MetroForm
             };
             this.Controls.Add(fallbackLabel);
         }
-    }
-
-    private void InitializeSubtitleLabel()
-    {
-        subtitleLabel = new Label
-        {
-            Text = "Loading fleet information...",
-            Location = new System.Drawing.Point(20, 50),
-            Size = new System.Drawing.Size(700, 30),
-            Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular),
-            ForeColor = System.Drawing.Color.FromArgb(102, 102, 102),
-            AutoSize = false,
-            TextAlign = ContentAlignment.MiddleLeft
-        };
-
-        this.Controls.Add(subtitleLabel);
     }
 
     private async void LoadDashboardDataAsync()
@@ -363,24 +306,6 @@ public partial class Dashboard : MetroForm
         }
     }
 
-    private void PassengerManagementButton_Click(object sender, EventArgs e)
-    {
-        try
-        {
-            _logger.LogInformation("Passenger Management button clicked");
-
-            // Open Passenger Management form using the service container
-            var passengerManagementForm = ServiceContainer.GetService<Bus_Buddy.Forms.PassengerManagementForm>();
-            passengerManagementForm.ShowDialog(this);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error opening Passenger Management");
-            MessageBoxAdv.Show($"Error opening Passenger Management: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
     private void StudentManagementButton_Click(object sender, EventArgs e)
     {
         try
@@ -388,7 +313,7 @@ public partial class Dashboard : MetroForm
             _logger.LogInformation("Student Management button clicked");
 
             // Open Student Management form using the service container
-            var studentManagementForm = ServiceContainer.GetService<Bus_Buddy.Forms.StudentManagementForm>();
+            var studentManagementForm = ServiceContainer.GetService<StudentManagementForm>();
             studentManagementForm.ShowDialog(this);
         }
         catch (Exception ex)
@@ -406,7 +331,7 @@ public partial class Dashboard : MetroForm
             _logger.LogInformation("Maintenance button clicked");
 
             // Open Maintenance Management form using the service container
-            var maintenanceForm = ServiceContainer.GetService<Bus_Buddy.Forms.MaintenanceManagementForm>();
+            var maintenanceForm = ServiceContainer.GetService<FuelManagementForm>();
             maintenanceForm.ShowDialog(this);
         }
         catch (Exception ex)
@@ -424,7 +349,7 @@ public partial class Dashboard : MetroForm
             _logger.LogInformation("Fuel Tracking button clicked");
 
             // Open Fuel Management form using the service container
-            var fuelForm = ServiceContainer.GetService<Bus_Buddy.Forms.FuelManagementForm>();
+            var fuelForm = ServiceContainer.GetService<FuelManagementForm>();
             fuelForm.ShowDialog(this);
         }
         catch (Exception ex)
@@ -449,24 +374,6 @@ public partial class Dashboard : MetroForm
         {
             _logger.LogError(ex, "Error opening Activity Log");
             MessageBoxAdv.Show($"Error opening Activity Log: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    private void TicketManagementButton_Click(object sender, EventArgs e)
-    {
-        try
-        {
-            _logger.LogInformation("Ticket Management button clicked");
-
-            // Open Ticket Management form using the service container
-            var ticketForm = ServiceContainer.GetService<Bus_Buddy.Forms.TicketManagementForm>();
-            ticketForm.ShowDialog(this);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error opening Ticket Management");
-            MessageBoxAdv.Show($"Error opening Ticket Management: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
@@ -551,46 +458,6 @@ public partial class Dashboard : MetroForm
         {
             _logger.LogError(ex, "Error opening settings");
             MessageBoxAdv.Show($"Settings error: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    /// <summary>
-    /// Opens the Enhanced Grid Layout Demo form to showcase improved Syncfusion grid formatting
-    /// </summary>
-    private void OpenEnhancedGridDemo()
-    {
-        try
-        {
-            _logger.LogInformation("Opening Enhanced Grid Layout Demo");
-
-            var demoForm = new EnhancedGridDemoForm();
-            demoForm.Show(); // Use Show() instead of ShowDialog() to allow multiple instances
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error opening Enhanced Grid Demo");
-            MessageBoxAdv.Show($"Error opening Enhanced Grid Demo: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    /// <summary>
-    /// Opens the Visual Enhancement Showcase to demonstrate comprehensive visual improvements
-    /// </summary>
-    private void OpenVisualEnhancementShowcase()
-    {
-        try
-        {
-            _logger.LogInformation("Opening Visual Enhancement Showcase");
-
-            var showcaseForm = ServiceContainer.GetService<VisualEnhancementShowcaseForm>();
-            showcaseForm.Show(); // Use Show() to allow multiple instances
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error opening Visual Enhancement Showcase");
-            MessageBoxAdv.Show($"Error opening Visual Enhancement Showcase: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }

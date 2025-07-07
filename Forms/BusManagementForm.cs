@@ -31,85 +31,15 @@ public partial class BusManagementForm : MetroForm
 
         _logger.LogInformation("Initializing Bus Management form");
         InitializeComponent();
-        InitializeBusManagement();
-    }
-
-    private void InitializeBusManagement()
-    {
-        // Apply enhanced visual theme system
-        VisualEnhancementManager.ApplyEnhancedTheme(this);
-
-        // Configure form for full screen using layout manager
-        SyncfusionLayoutManager.ConfigureFormForFullScreen(this);
-
-        // Apply Syncfusion theme integration with enhanced visuals
-        try
-        {
-            // Set Office2016 visual style using SkinManager
-            Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this, Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not apply Office2016 theme to Bus Management Form, using enhanced fallback styling");
-        }
-
-        // Set enhanced MetroForm styles
-        this.MetroColor = System.Drawing.Color.FromArgb(46, 125, 185);
-        this.CaptionBarColor = System.Drawing.Color.FromArgb(46, 125, 185);
-        this.CaptionForeColor = System.Drawing.Color.White;
-        this.Text = "Bus Management - Fleet Vehicles";
-
-        // Configure the data grid with standardized configuration
-        SyncfusionLayoutManager.ConfigureSfDataGrid(busDataGrid, true, true);
-        SyncfusionAdvancedManager.ApplyAdvancedConfiguration(busDataGrid);
-        SyncfusionLayoutManager.ConfigureBusManagementGrid(busDataGrid);
-        VisualEnhancementManager.ApplyEnhancedGridVisuals(busDataGrid);
-        SyncfusionLayoutManager.ApplyGridStyling(busDataGrid);
-        ConfigureDataGrid();
-
-        // Enable high-quality font rendering
-        VisualEnhancementManager.EnableHighQualityFontRendering(this);
-
-        _logger.LogInformation("Bus Management form initialized with enhanced visuals");
-
-        // Load bus data asynchronously with proper UI thread marshaling
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await LoadBusDataAsync();
-
-                // Update UI on main thread
-                this.Invoke(() =>
-                {
-                    if (statusLabel != null)
-                    {
-                        statusLabel.ForeColor = System.Drawing.Color.FromArgb(46, 204, 113);
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during initial bus data load");
-
-                // Update UI on main thread for error state
-                this.Invoke(() =>
-                {
-                    if (statusLabel != null)
-                    {
-                        statusLabel.Text = "Failed to load initial data";
-                        statusLabel.ForeColor = System.Drawing.Color.FromArgb(231, 76, 60);
-                    }
-                });
-            }
-        });
+        // Load data asynchronously after form is shown
+        Load += async (s, e) => await LoadBusDataAsync();
     }
 
     private void ConfigureDataGrid()
     {
         if (busDataGrid != null)
         {
-            // Note: Basic configuration now handled by standardized methods above
+            // Note: Basic configuration now handled by the designer file.
             // This method reserved for bus-specific customizations only
 
             _logger.LogInformation("Bus-specific data grid customizations applied");

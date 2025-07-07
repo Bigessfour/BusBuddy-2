@@ -192,6 +192,39 @@ partial class BusManagementForm
 
         // Resume layout
         this.ResumeLayout(false);
+
+        // Apply enhanced visual theme system
+        Utilities.VisualEnhancementManager.ApplyEnhancedTheme(this);
+
+        // Configure form for full screen using layout manager
+        Utilities.SyncfusionLayoutManager.ConfigureFormForFullScreen(this);
+
+        // Apply Syncfusion theme integration with enhanced visuals
+        try
+        {
+            // Set Office2016 visual style using SkinManager
+            Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this, Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
+        }
+        catch
+        {
+            // Fallback styling is handled by other managers
+        }
+
+        // Set enhanced MetroForm styles
+        this.MetroColor = System.Drawing.Color.FromArgb(46, 125, 185);
+        this.CaptionBarColor = System.Drawing.Color.FromArgb(46, 125, 185);
+        this.CaptionForeColor = System.Drawing.Color.White;
+        this.Text = "Bus Management - Fleet Vehicles";
+
+        // Configure the data grid with standardized configuration
+        Utilities.SyncfusionLayoutManager.ConfigureSfDataGrid(busDataGrid, true, true);
+        Utilities.SyncfusionAdvancedManager.ApplyAdvancedConfiguration(busDataGrid);
+        Utilities.SyncfusionLayoutManager.ConfigureBusManagementGrid(busDataGrid);
+        Utilities.VisualEnhancementManager.ApplyEnhancedGridVisuals(busDataGrid);
+        Utilities.SyncfusionLayoutManager.ApplyGridStyling(busDataGrid);
+
+        // Enable high-quality font rendering
+        Utilities.VisualEnhancementManager.EnableHighQualityFontRendering(this);
     }
 
     private void ConfigureActionButton(SfButton button, string title, int x, int y, int tabIndex, System.Drawing.Color color)

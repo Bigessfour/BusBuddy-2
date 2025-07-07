@@ -198,6 +198,63 @@ partial class RouteManagementForm
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
         this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 
+        // Apply Syncfusion theme integration
+        try
+        {
+            // Set Office2016 visual style using SkinManager
+            Syncfusion.Windows.Forms.SkinManager.SetVisualStyle(this, Syncfusion.Windows.Forms.VisualTheme.Office2016Colorful);
+        }
+        catch (System.Exception)
+        {
+            // Could not apply theme
+        }
+
+        // Set Syncfusion MetroForm styles
+        this.MetroColor = System.Drawing.Color.FromArgb(255, 87, 34);
+        this.CaptionBarColor = System.Drawing.Color.FromArgb(255, 87, 34);
+        this.CaptionForeColor = System.Drawing.Color.White;
+        this.Text = "Route Management - Bus Routes";
+
+        // Configure data grid columns
+        this.routeDataGrid.AutoGenerateColumns = false;
+        this.routeDataGrid.Columns.Clear();
+
+        // Apply Office2016 styling to the grid
+        this.routeDataGrid.Style.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(255, 87, 34);
+        this.routeDataGrid.Style.HeaderStyle.TextColor = System.Drawing.Color.White;
+        this.routeDataGrid.Style.HeaderStyle.Font.Bold = true;
+        this.routeDataGrid.Style.BorderColor = System.Drawing.Color.FromArgb(227, 227, 227);
+        this.routeDataGrid.Style.SelectionStyle.BackColor = System.Drawing.Color.FromArgb(255, 87, 34, 50);
+        this.routeDataGrid.Style.SelectionStyle.TextColor = System.Drawing.Color.Black;
+
+        // Add custom columns using Syncfusion GridTextColumn
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "RouteId", HeaderText = "Route ID", Width = 80, AllowEditing = false });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "RouteName", HeaderText = "Route Name", Width = 200, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "Description", HeaderText = "Description", Width = 300, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "AMVehicleId", HeaderText = "AM Vehicle ID", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "PMVehicleId", HeaderText = "PM Vehicle ID", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "AMDriverId", HeaderText = "AM Driver ID", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "PMDriverId", HeaderText = "PM Driver ID", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "AMBeginMiles", HeaderText = "AM Begin Miles", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "AMEndMiles", HeaderText = "AM End Miles", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "AMRiders", HeaderText = "AM Riders", Width = 80, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "PMBeginMiles", HeaderText = "PM Begin Miles", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "PMEndMiles", HeaderText = "PM End Miles", Width = 100, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridTextColumn() { MappingName = "PMRiders", HeaderText = "PM Riders", Width = 80, AllowSorting = true });
+        this.routeDataGrid.Columns.Add(new GridCheckBoxColumn() { MappingName = "IsActive", HeaderText = "Active", Width = 60, AllowSorting = true });
+
+        // Enable advanced grid features
+        this.routeDataGrid.AllowSorting = true;
+        this.routeDataGrid.AllowFiltering = false; // Disable built-in filtering for custom implementation
+        this.routeDataGrid.AllowResizingColumns = true;
+        this.routeDataGrid.ShowRowHeader = false;
+        this.routeDataGrid.AutoSizeColumnsMode = Syncfusion.WinForms.DataGrid.Enums.AutoSizeColumnsMode.None;
+
+        // Setup SfDataGrid event handlers
+        this.routeDataGrid.SelectionChanged += new Syncfusion.WinForms.DataGrid.Events.SelectionChangedEventHandler(this.RouteDataGrid_SelectionChanged);
+        this.routeDataGrid.CellDoubleClick += new Syncfusion.WinForms.DataGrid.Events.CellClickEventHandler(this.RouteDataGrid_CellDoubleClick);
+        this.routeDataGrid.QueryRowStyle += new Syncfusion.WinForms.DataGrid.Events.QueryRowStyleEventHandler(this.RouteDataGrid_QueryRowStyle);
+
         // Complete data grid initialization
         this.routeDataGrid.EndInit();
 

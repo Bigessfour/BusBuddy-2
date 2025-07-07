@@ -7,6 +7,7 @@ using Syncfusion.Windows.Forms.Tools;
 using Syncfusion.WinForms.Controls;
 using Syncfusion.WinForms.DataGrid;
 using Syncfusion.WinForms.DataGrid.Enums;
+using Syncfusion.WinForms.Input.Enums;
 using System.ComponentModel;
 
 namespace Bus_Buddy.Forms;
@@ -29,33 +30,6 @@ public partial class StudentManagementForm : MetroForm
 
     // Currently selected student for operations
     private Student? _selectedStudent;
-
-    // UI Components - Header and Layout using Syncfusion
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelHeader = null!;
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelControls = null!;
-    private Syncfusion.Windows.Forms.Tools.GradientPanel panelGrid = null!;
-    private Syncfusion.Windows.Forms.Tools.AutoLabel labelTitle = null!;
-
-    // Enhanced Data Grid with Syncfusion SfDataGrid
-    private SfDataGrid studentDataGrid = null!;
-
-    // Control Buttons using Syncfusion SfButton
-    private SfButton btnAddStudent = null!;
-    private SfButton btnEditStudent = null!;
-    private SfButton btnDeleteStudent = null!;
-    private SfButton btnRefresh = null!;
-    private SfButton btnViewDetails = null!;
-
-    // Filter and Search Controls using Syncfusion
-    private Syncfusion.Windows.Forms.Tools.TextBoxExt txtSearch = null!;
-    private ComboBoxAdv cmbGradeFilter = null!;
-    private ComboBoxAdv cmbRouteFilter = null!;
-    private ComboBoxAdv cmbActiveFilter = null!;
-
-    // Status and Info Labels using Syncfusion
-    private Syncfusion.Windows.Forms.Tools.AutoLabel lblStudentCount = null!;
-    private Syncfusion.Windows.Forms.Tools.AutoLabel lblActiveCount = null!;
-
     #endregion
 
     #region Constructor
@@ -115,32 +89,12 @@ public partial class StudentManagementForm : MetroForm
         _routes = new List<Route>();
     }
 
-    private void InitializeComponent()
-    {
-        SuspendLayout();
-
-        // Form Configuration
-        Text = "Bus Buddy - Student Management";
-        Size = new Size(1600, 1000);
-        StartPosition = FormStartPosition.CenterScreen;
-        MinimumSize = new Size(1200, 700);
-        WindowState = FormWindowState.Maximized;
-
-        // Syncfusion MetroForm Configuration
-        BackColor = Color.FromArgb(248, 249, 250);
-        ForeColor = Color.Black;
-
-        ResumeLayout(false);
-        _logger.LogInformation("Student Management Form basic initialization completed");
-    }
-
     private void SetupLayout()
     {
         try
         {
-            CreateHeaderPanel();
-            CreateControlsPanel();
-            CreateDataGridPanel();
+            SetupControlButtons();
+            SetupFilterControls();
 
             _logger.LogInformation("Student Management layout setup completed");
         }
@@ -152,243 +106,52 @@ public partial class StudentManagementForm : MetroForm
     }
     #endregion
 
-    #region Panel Creation
-    private void CreateHeaderPanel()
-    {
-        panelHeader = new Syncfusion.Windows.Forms.Tools.GradientPanel
-        {
-            Height = 80,
-            Dock = DockStyle.Top,
-            BackgroundColor = new Syncfusion.Drawing.BrushInfo(Color.FromArgb(248, 249, 250)),
-            BorderStyle = BorderStyle.None,
-            Padding = new Padding(20, 15, 20, 15)
-        };
-
-        labelTitle = new Syncfusion.Windows.Forms.Tools.AutoLabel
-        {
-            Text = "🎓 Student Transportation Management",
-            Font = new Font("Segoe UI", 20F, FontStyle.Bold),
-            ForeColor = Color.FromArgb(52, 152, 219),
-            AutoSize = true,
-            Location = new Point(20, 25),
-            BackColor = Color.Transparent
-        };
-
-        // Info labels for student counts
-        lblStudentCount = new Syncfusion.Windows.Forms.Tools.AutoLabel
-        {
-            Text = "Total Students: 0",
-            Font = new Font("Segoe UI", 10F),
-            ForeColor = Color.FromArgb(100, 100, 100),
-            Location = new Point(450, 25),
-            Size = new Size(150, 20),
-            BackColor = Color.Transparent
-        };
-
-        lblActiveCount = new Syncfusion.Windows.Forms.Tools.AutoLabel
-        {
-            Text = "Active: 0",
-            Font = new Font("Segoe UI", 10F),
-            ForeColor = Color.FromArgb(46, 125, 50),
-            Location = new Point(450, 45),
-            Size = new Size(150, 20),
-            BackColor = Color.Transparent
-        };
-
-        panelHeader.Controls.AddRange(new Control[] { labelTitle, lblStudentCount, lblActiveCount });
-        Controls.Add(panelHeader);
-    }
-
-    private void CreateControlsPanel()
-    {
-        panelControls = new Syncfusion.Windows.Forms.Tools.GradientPanel
-        {
-            Height = 120,
-            Dock = DockStyle.Top,
-            BackgroundColor = new Syncfusion.Drawing.BrushInfo(Color.White),
-            BorderStyle = BorderStyle.FixedSingle,
-            Padding = new Padding(20, 15, 20, 15)
-        };
-
-        SetupControlButtons();
-        SetupFilterControls();
-        Controls.Add(panelControls);
-    }
-
-    private void CreateDataGridPanel()
-    {
-        panelGrid = new Syncfusion.Windows.Forms.Tools.GradientPanel
-        {
-            Dock = DockStyle.Fill,
-            BackgroundColor = new Syncfusion.Drawing.BrushInfo(Color.White),
-            BorderStyle = BorderStyle.None,
-            Padding = new Padding(10)
-        };
-
-        Controls.Add(panelGrid);
-    }
-    #endregion
-
     #region Control Setup
     private void SetupControlButtons()
     {
         // Add Student Button
-        btnAddStudent = new SfButton
-        {
-            Text = "➕ Add Student",
-            Size = new Size(140, 40),
-            Location = new Point(20, 15),
-            AccessibleName = "Add Student"
-        };
         VisualEnhancementManager.ApplyEnhancedButtonStyling(btnAddStudent, Color.FromArgb(46, 204, 113));
         btnAddStudent.Click += BtnAddStudent_Click;
 
         // Edit Student Button  
-        btnEditStudent = new SfButton
-        {
-            Text = "✏️ Edit Student",
-            Size = new Size(140, 40),
-            Location = new Point(170, 15),
-            AccessibleName = "Edit Student"
-        };
         VisualEnhancementManager.ApplyEnhancedButtonStyling(btnEditStudent, Color.FromArgb(241, 196, 15));
         btnEditStudent.Click += BtnEditStudent_Click;
 
         // View Details Button
-        btnViewDetails = new SfButton
-        {
-            Text = "👁️ View Details",
-            Size = new Size(140, 40),
-            Location = new Point(320, 15),
-            AccessibleName = "View Details"
-        };
         VisualEnhancementManager.ApplyEnhancedButtonStyling(btnViewDetails, Color.FromArgb(52, 152, 219));
         btnViewDetails.Click += BtnViewDetails_Click;
 
         // Delete Student Button
-        btnDeleteStudent = new SfButton
-        {
-            Text = "🗑️ Delete",
-            Size = new Size(120, 40),
-            Location = new Point(470, 15),
-            AccessibleName = "Delete Student"
-        };
         VisualEnhancementManager.ApplyEnhancedButtonStyling(btnDeleteStudent, Color.FromArgb(231, 76, 60));
         btnDeleteStudent.Click += BtnDeleteStudent_Click;
 
         // Refresh Button
-        btnRefresh = new SfButton
-        {
-            Text = "🔄 Refresh",
-            Size = new Size(120, 40),
-            Location = new Point(600, 15),
-            AccessibleName = "Refresh Data"
-        };
         VisualEnhancementManager.ApplyEnhancedButtonStyling(btnRefresh, Color.FromArgb(155, 89, 182));
         btnRefresh.Click += BtnRefresh_Click;
-
-        panelControls.Controls.AddRange(new Control[]
-        {
-            btnAddStudent, btnEditStudent, btnViewDetails, btnDeleteStudent, btnRefresh
-        });
     }
 
     private void SetupFilterControls()
     {
         // Search TextBox
-        var lblSearch = new Syncfusion.Windows.Forms.Tools.AutoLabel
-        {
-            Text = "Search:",
-            Location = new Point(20, 75),
-            Size = new Size(60, 20),
-            Font = new Font("Segoe UI", 9F),
-            BackColor = Color.Transparent
-        };
-
-        txtSearch = new Syncfusion.Windows.Forms.Tools.TextBoxExt
-        {
-            Location = new Point(85, 70),
-            Size = new Size(200, 30),
-            Font = new Font("Segoe UI", 9F),
-            Text = "", // TextBoxExt doesn't have PlaceholderText
-            BorderStyle = BorderStyle.FixedSingle
-        };
         txtSearch.TextChanged += TxtSearch_TextChanged;
 
         // Grade Filter
-        var lblGrade = new Syncfusion.Windows.Forms.Tools.AutoLabel
-        {
-            Text = "Grade:",
-            Location = new Point(300, 75),
-            Size = new Size(50, 20),
-            Font = new Font("Segoe UI", 9F),
-            BackColor = Color.Transparent
-        };
-
-        cmbGradeFilter = new ComboBoxAdv
-        {
-            Location = new Point(355, 70),
-            Size = new Size(100, 30),
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = new Font("Segoe UI", 9F)
-        };
-        cmbGradeFilter.Items.Add("All Grades");
-        cmbGradeFilter.Items.Add("Pre-K");
-        cmbGradeFilter.Items.Add("K");
+        var gradeFilters = new List<string> { "All Grades", "Pre-K", "K" };
         for (int i = 1; i <= 12; i++)
         {
-            cmbGradeFilter.Items.Add($"Grade {i}");
+            gradeFilters.Add($"Grade {i}");
         }
+        cmbGradeFilter.DataSource = gradeFilters;
         cmbGradeFilter.SelectedIndex = 0;
         cmbGradeFilter.SelectedIndexChanged += CmbGradeFilter_SelectedIndexChanged;
 
         // Route Filter
-        var lblRoute = new Syncfusion.Windows.Forms.Tools.AutoLabel
-        {
-            Text = "Route:",
-            Location = new Point(470, 75),
-            Size = new Size(50, 20),
-            Font = new Font("Segoe UI", 9F),
-            BackColor = Color.Transparent
-        };
-
-        cmbRouteFilter = new ComboBoxAdv
-        {
-            Location = new Point(525, 70),
-            Size = new Size(150, 30),
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = new Font("Segoe UI", 9F)
-        };
         cmbRouteFilter.SelectedIndexChanged += CmbRouteFilter_SelectedIndexChanged;
 
         // Active Status Filter
-        var lblActive = new Syncfusion.Windows.Forms.Tools.AutoLabel
-        {
-            Text = "Status:",
-            Location = new Point(690, 75),
-            Size = new Size(50, 20),
-            Font = new Font("Segoe UI", 9F),
-            BackColor = Color.Transparent
-        };
-
-        cmbActiveFilter = new ComboBoxAdv
-        {
-            Location = new Point(745, 70),
-            Size = new Size(100, 30),
-            DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = new Font("Segoe UI", 9F)
-        };
-        cmbActiveFilter.Items.Add("All Students");
-        cmbActiveFilter.Items.Add("Active Only");
-        cmbActiveFilter.Items.Add("Inactive Only");
+        cmbActiveFilter.DataSource = new List<string> { "All Students", "Active Only", "Inactive Only" };
         cmbActiveFilter.SelectedIndex = 1; // Default to Active Only
         cmbActiveFilter.SelectedIndexChanged += CmbActiveFilter_SelectedIndexChanged;
-
-        panelControls.Controls.AddRange(new Control[]
-        {
-            lblSearch, txtSearch, lblGrade, cmbGradeFilter,
-            lblRoute, cmbRouteFilter, lblActive, cmbActiveFilter
-        });
     }
     #endregion
 
@@ -674,13 +437,9 @@ public partial class StudentManagementForm : MetroForm
             _routes = await _busService.GetAllRouteEntitiesAsync();
 
             // Update route filter dropdown
-            cmbRouteFilter.Items.Clear();
-            cmbRouteFilter.Items.Add("All Routes");
-
-            foreach (var route in _routes)
-            {
-                cmbRouteFilter.Items.Add(route.RouteName);
-            }
+            var routeNames = new List<string> { "All Routes" };
+            routeNames.AddRange(_routes.Select(r => r.RouteName));
+            cmbRouteFilter.DataSource = routeNames;
 
             cmbRouteFilter.SelectedIndex = 0;
 
@@ -1080,16 +839,6 @@ Transportation: {_selectedStudent.TransportationNotes ?? "None"}";
         _logger.LogInformation("Student Management Success: {Message}", message);
         Syncfusion.Windows.Forms.MessageBoxAdv.Show(this, message, "Success",
             MessageBoxButtons.OK, MessageBoxIcon.Information);
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            // Clear selected student
-            _selectedStudent = null;
-        }
-        base.Dispose(disposing);
     }
     #endregion
 }

@@ -7,7 +7,6 @@
     <RootNamespace>Bus_Buddy</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
     <ApplicationDefaultFont>Microsoft Sans Serif, 8.25pt</ApplicationDefaultFont>
@@ -17,7 +16,9 @@
   <ItemGroup>
     <Compile Remove="BusBuddy.Tests\**" />
     <Compile Remove="Utilities\Temporarily_Disabled\**" />
+    <Compile Remove="libs\**" />
     <EmbeddedResource Remove="BusBuddy.Tests\**" />
+    <EmbeddedResource Remove="libs\**" />
     <None Remove="BusBuddy.Tests\**" />
   </ItemGroup>
 
@@ -49,86 +50,50 @@
     </None>
   </ItemGroup>
 
+  <!-- Corrected Syncfusion References for .NET 8 -->
   <ItemGroup>
     <Reference Include="Syncfusion.Licensing">
-      <HintPath>libs/Syncfusion/Syncfusion.Licensing.dll</HintPath>
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Core.WinForms">
-      <HintPath>libs/Syncfusion/Syncfusion.Core.WinForms.dll</HintPath>
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Core.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Shared.Base">
-      <HintPath>libs/Syncfusion/Syncfusion.Shared.Base.dll</HintPath>
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Shared.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Syncfusion.Shared.Windows">
-      <HintPath>libs/Syncfusion/Syncfusion.Shared.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Grid.Windows">
-      <HintPath>libs/Syncfusion/Syncfusion.Grid.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.GridCommon.WinForms">
-      <HintPath>libs/Syncfusion/Syncfusion.GridCommon.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Tools.Windows">
-      <HintPath>libs/Syncfusion/Syncfusion.Tools.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Tools.Base">
-      <HintPath>libs/Syncfusion/Syncfusion.Tools.Base.dll</HintPath>
+    <Reference Include="Syncfusion.SfDataGrid.WinForms">
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.SfDataGrid.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.SfInput.WinForms">
-      <HintPath>libs/Syncfusion/Syncfusion.SfInput.WinForms.dll</HintPath>
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.SfInput.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Tools.Windows">
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Tools.Windows.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Office2019Theme.WinForms">
-      <HintPath>libs/Syncfusion/Syncfusion.Office2019Theme.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.SfDataGrid.WinForms">
-      <HintPath>libs/Syncfusion/Syncfusion.SfDataGrid.WinForms.dll</HintPath>
-    </Reference>
-    <!-- SfCalendar and SfDateTimePicker components are included in SfInput.WinForms assembly -->
-    <!-- Note: SfDateTimePicker is actually named SfDateTimeEdit according to API documentation -->
-    <!-- Removed: Syncfusion.SfCalendar.WinForms - components are in SfInput.WinForms -->
-    <!-- Removed: Syncfusion.SfDateTimePicker.WinForms - component is SfDateTimeEdit in SfInput.WinForms -->
-    <!-- Removed: Syncfusion.Themes.Office2019Colorful.WinForms - assembly does not exist -->
-    <Reference Include="Syncfusion.Schedule.Windows">
-      <HintPath>libs/Syncfusion/Syncfusion.Schedule.Windows.dll</HintPath>
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Office2019Theme.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Syncfusion.Schedule.Base">
-      <HintPath>libs/Syncfusion/Syncfusion.Schedule.Base.dll</HintPath>
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Schedule.Base.dll</HintPath>
     </Reference>
-    <!-- Add missing assemblies that are available locally -->
+    <Reference Include="Syncfusion.Schedule.Windows">
+      <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Schedule.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Grid.Windows">
+        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Grid.Windows.dll</HintPath>
+    </Reference>
     <Reference Include="Syncfusion.Grid.Base">
-      <HintPath>libs/Syncfusion/Syncfusion.Grid.Base.dll</HintPath>
+        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Grid.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Syncfusion.Chart.Windows">
-      <HintPath>libs/Syncfusion/Syncfusion.Chart.Windows.dll</HintPath>
+    <Reference Include="Syncfusion.Shared.Windows">
+        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Shared.Windows.dll</HintPath>
     </Reference>
-    <Reference Include="Syncfusion.Chart.Base">
-      <HintPath>libs/Syncfusion/Syncfusion.Chart.Base.dll</HintPath>
+    <Reference Include="Syncfusion.SfListView.WinForms">
+        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.SfListView.WinForms.dll</HintPath>
     </Reference>
-    <Reference Include="Syncfusion.DataSource.WinForms">
-      <HintPath>libs/Syncfusion/Syncfusion.DataSource.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Syncfusion.Data.WinForms">
-      <HintPath>libs/Syncfusion/Syncfusion.Data.WinForms.dll</HintPath>
+     <Reference Include="Syncfusion.Diagram.Windows">
+        <HintPath>libs\$(SyncfusionVersion)\precompiledassemblies\net8.0\Syncfusion.Diagram.Windows.dll</HintPath>
     </Reference>
   </ItemGroup>
 
-
-  <!-- SYNCFUSION_LOCAL_REFERENCES: Lock to local installation only -->
-  <PropertyGroup>
-    <SyncfusionLocalPath>C:\Program Files (x86)\Syncfusion\Essential Studio\Windows\30.1.37</SyncfusionLocalPath>
-    <SyncfusionAssembliesPath>$(SyncfusionLocalPath)\Assemblies</SyncfusionAssembliesPath>
-    <SyncfusionUseLocalOnly>true</SyncfusionUseLocalOnly>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(SyncfusionUseLocalOnly)' == 'true'">
-    <!-- Local Syncfusion References - NO EXTERNAL PACKAGES -->
-    <Reference Include="Syncfusion.SfDataGrid.WinForms">
-      <HintPath>$(SyncfusionAssembliesPath)\4.8\Syncfusion.SfDataGrid.WinForms.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Syncfusion.Shared.Base">
-      <HintPath>$(SyncfusionAssembliesPath)\4.8\Syncfusion.Shared.Base.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
 </Project>

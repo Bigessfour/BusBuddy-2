@@ -129,8 +129,10 @@ namespace Bus_Buddy.Forms
                 managementMenu.DropDownItems.Add(CreateMenuItem("&Students", "Manage student information",
                     (s, e) => OpenStudentManagement()));
                 managementMenu.DropDownItems.Add(new ToolStripSeparator());
+                /*
                 managementMenu.DropDownItems.Add(CreateMenuItem("&Maintenance", "Vehicle maintenance tracking",
                     (s, e) => OpenMaintenanceManagement()));
+                */
                 managementMenu.DropDownItems.Add(CreateMenuItem("&Fuel Tracking", "Fuel usage and costs",
                     (s, e) => OpenFuelManagement()));
 
@@ -396,19 +398,19 @@ namespace Bus_Buddy.Forms
         {
             try
             {
-                _logger.LogInformation("Opening Enhanced Bus Management");
+                _logger.LogInformation("Opening Bus Management");
 
-                var logger = _serviceProvider.GetRequiredService<ILogger<EnhancedBusManagementForm>>();
-                var enhancedBusForm = new EnhancedBusManagementForm(logger, _busService, _busRepository);
-                enhancedBusForm.ShowDialog(this);
+                var logger = _serviceProvider.GetRequiredService<ILogger<BusManagementForm>>();
+                var busForm = new BusManagementForm(logger, _busService);
+                busForm.ShowDialog(this);
 
                 // Refresh dashboard after closing
                 await RefreshDashboard();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error opening Enhanced Bus Management");
-                ShowErrorMessage("Error opening Enhanced Bus Management", ex.Message);
+                _logger.LogError(ex, "Error opening Bus Management");
+                ShowErrorMessage("Error opening Bus Management", ex.Message);
             }
         }
 
@@ -491,6 +493,7 @@ namespace Bus_Buddy.Forms
             }
         }
 
+        /*
         private void OpenMaintenanceManagement()
         {
             try
@@ -504,6 +507,7 @@ namespace Bus_Buddy.Forms
                 ShowErrorMessage("Error opening Maintenance Management", ex.Message);
             }
         }
+        */
 
         private void OpenFuelManagement()
         {
