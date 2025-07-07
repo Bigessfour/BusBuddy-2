@@ -13,6 +13,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+build-error-analysis.json
 
 # Syncfusion Development Resources (Symbolic Links)
 Syncfusion-Samples/
@@ -29,6 +30,7 @@ Generated\ Files/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+CoverageReport/
 
 # NUnit
 *.VisualState.xml
@@ -347,6 +349,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# Executables
+codecov.exe
+
 # VS Code files for those working on multiple tools
 .vscode/*
 !.vscode/settings.json
@@ -367,6 +372,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Local Config files
+BusBuddy-PS7Config.yml
 
 # Syncfusion license keys in individual files
 Syncfusion.Licensing.Key.txt
