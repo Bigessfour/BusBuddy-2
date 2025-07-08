@@ -1,47 +1,126 @@
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using BusBuddy.Core.Models;
+using BusBuddy.Core.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using BusBuddy.Core.Services;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public class RouteManagementViewModel : ObservableObject
+    public partial class RouteManagementViewModel : ObservableObject
     {
-        private readonly GoogleEarthEngineService _geeService;
-        public ICommand LoadRoutesCommand { get; }
-        public ICommand ZoomInCommand { get; }
-        public ICommand ZoomOutCommand { get; }
+        private readonly IRouteService _routeService;
+        private readonly IBusService _busService;
+        private readonly IDriverService _driverService;
 
-        public RouteManagementViewModel(GoogleEarthEngineService geeService)
+        [ObservableProperty]
+        private ObservableCollection<Route> _routes;
+
+        [ObservableProperty]
+        private ObservableCollection<Bus> _buses;
+
+        [ObservableProperty]
+        private ObservableCollection<Driver> _drivers;
+
+        [ObservableProperty]
+        private Route _selectedRoute;
+
+        public ICommand LoadRoutesCommand { get; }
+        public ICommand AddRouteCommand { get; }
+        public ICommand UpdateRouteCommand { get; }
+        public ICommand DeleteRouteCommand { get; }
+
+        public RouteManagementViewModel(IRouteService routeService, IBusService busService, IDriverService driverService)
         {
-            _geeService = geeService;
-            LoadRoutesCommand = new AsyncRelayCommand(LoadRoutesAsync);
-            ZoomInCommand = new RelayCommand(_ => ZoomIn());
-            ZoomOutCommand = new RelayCommand(_ => ZoomOut());
+            _routeService = routeService;
+            _busService = busService;
+            _driverService = driverService;
+
+            Routes = new ObservableCollection<Route>();
+            Buses = new ObservableCollection<Bus>();
+            Drivers = new ObservableCollection<Driver>();
+            SelectedRoute = new Route();
+
+            LoadRoutesCommand = new AsyncRelayCommand(LoadDataAsync);
+            AddRouteCommand = new AsyncRelayCommand(AddRouteAsync);
+            UpdateRouteCommand = new AsyncRelayCommand(UpdateRouteAsync, CanUpdateOrDelete);
+            DeleteRouteCommand = new AsyncRelayCommand(DeleteRouteAsync, CanUpdateOrDelete);
         }
 
-        // These methods can be used to communicate with the WebView2 control via JS interop
-
-        public async Task<string> GetLiveRouteGeoJsonAsync(string regionOrAsset)
+        private async Task LoadDataAsync()
         {
-            return await _geeService.GetRouteGeoJsonAsync(regionOrAsset);
+            await LoadRoutesAsync();
+            await LoadBusesAsync();
+            await LoadDriversAsync();
         }
 
         private async Task LoadRoutesAsync()
         {
-            // This method is now handled in the view for JS interop
-            await Task.CompletedTask;
+            var routes = await _routeService.GetAllActiveRoutesAsync();
+            Routes.Clear();
+            foreach (var route in routes)
+            {
+                Routes.Add(route);
+            }
         }
 
-        private void ZoomIn()
+        private async Task LoadBusesAsync()
         {
-            // Call JS interop to zoom in map in WebView2 (handled in code-behind)
+            var buses = await _busService.GetAllBusEntitiesAsync();
+            Buses.Clear();
+            foreach (var bus in buses)
+            {
+                Buses.Add(bus);
+            }
         }
 
-        private void ZoomOut()
+        private async Task LoadDriversAsync()
         {
-            // Call JS interop to zoom out map in WebView2 (handled in code-behind)
+            var drivers = await _driverService.GetAllDriversAsync();
+            Drivers.Clear();
+            foreach (var driver in drivers)
+            {
+                Drivers.Add(driver);
+            }
+        }
+
+        private async Task AddRouteAsync()
+        {
+            if (SelectedRoute != null)
+            {
+                await _routeService.CreateRouteAsync(SelectedRoute);
+                await LoadRoutesAsync();
+            }
+        }
+
+        private async Task UpdateRouteAsync()
+        {
+            if (SelectedRoute != null)
+            {
+                await _routeService.UpdateRouteAsync(SelectedRoute);
+                await LoadRoutesAsync();
+            }
+        }
+
+        private async Task DeleteRouteAsync()
+        {
+            if (SelectedRoute != null)
+            {
+                await _routeService.DeleteRouteAsync(SelectedRoute.RouteId);
+                await LoadRoutesAsync();
+            }
+        }
+
+        private bool CanUpdateOrDelete()
+        {
+            return SelectedRoute != null && SelectedRoute.RouteId != 0;
+        }
+
+        partial void OnSelectedRouteChanged(Route value)
+        {
+            (UpdateRouteCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+            (DeleteRouteCommand as IRelayCommand)?.NotifyCanExecuteChanged();
         }
     }
 }

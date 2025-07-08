@@ -1,7 +1,6 @@
 using BusBuddy.Core.Services;
 
 using System.Windows.Controls;
-using BusBuddy.WPF.ViewModels;
 
 namespace BusBuddy.WPF.Views
 {
@@ -10,12 +9,11 @@ namespace BusBuddy.WPF.Views
         public ScheduleManagementView()
         {
             InitializeComponent();
-            // Use DI to resolve the service and viewmodel
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            var service = ((App)System.Windows.Application.Current).Services;
-            var scheduleService = service.GetService(typeof(IScheduleService)) as IScheduleService;
-            DataContext = new ScheduleManagementViewModel(scheduleService!);
-#pragma warning restore CS8602
+            var app = (App)System.Windows.Application.Current;
+            if (app.Services != null)
+            {
+                DataContext = app.Services.GetService(typeof(ViewModels.ScheduleManagementViewModel));
+            }
         }
     }
 }

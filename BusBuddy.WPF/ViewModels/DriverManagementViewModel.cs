@@ -1,66 +1,68 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using BusBuddy.Core.Models;
-using System.Collections.Generic;
+using BusBuddy.Core.Services;
+using BusBuddy.WPF.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace BusBuddy.WPF.ViewModels
 {
-
-    // Demo/mock driver class for ViewModel use
-
-
-    public class DriverAvailability
+    public partial class DriverManagementViewModel : ObservableObject
     {
-        public int DriverId { get; set; }
-        public string DriverName { get; set; } = string.Empty;
-        public List<DateTime> AvailableDates { get; set; } = new();
-    }
+        private readonly IDriverService _driverService;
+        private readonly IDriverAvailabilityService _availabilityService;
+        private readonly IActivityLogService _activityLogService;
 
-    public class DriverManagementViewModel : INotifyPropertyChanged
-    {
+        [ObservableProperty]
+        private ObservableCollection<Driver> _drivers;
 
-        private readonly BusBuddy.Core.Services.IBusService _busService;
-        private readonly BusBuddy.WPF.Services.IDriverAvailabilityService _availabilityService;
+        [ObservableProperty]
+        private Driver _selectedDriver;
 
-        public ObservableCollection<Driver> Drivers { get; set; } = new();
-        public ObservableCollection<DriverAvailability> DriverAvailabilities { get; set; } = new();
-        public ICommand GenerateLicenseStatusReportCommand { get; }
-        public ObservableCollection<DriverLicenseStatus> LicenseStatusReport { get; set; } = new();
+        [ObservableProperty]
+        private ObservableCollection<DriverAvailability> _driverAvailabilities;
 
-        // Calendar properties
-        public DateTime CalendarStartDate { get; set; } = DateTime.Today.AddDays(-7);
-        public DateTime CalendarEndDate { get; set; } = DateTime.Today.AddDays(30);
+        [ObservableProperty]
         private ObservableCollection<DateTime> _selectedAvailabilityDates = new();
-        public ObservableCollection<DateTime> SelectedAvailabilityDates
+
+        [ObservableProperty]
+        private ObservableCollection<DriverLicenseStatus> _licenseStatusReport = new();
+
+        public ICommand LoadDriversCommand { get; }
+        public ICommand AddDriverCommand { get; }
+        public ICommand UpdateDriverCommand { get; }
+        public ICommand DeleteDriverCommand { get; }
+        public ICommand GenerateLicenseStatusReportCommand { get; }
+
+        public DriverManagementViewModel(IDriverService driverService, IDriverAvailabilityService availabilityService, IActivityLogService activityLogService)
         {
-            get => _selectedAvailabilityDates;
-            set { _selectedAvailabilityDates = value; OnPropertyChanged(); }
-        }
-
-
-
-        private readonly BusBuddy.Core.Services.IActivityLogService _activityLogService;
-
-        public DriverManagementViewModel(BusBuddy.Core.Services.IBusService busService, BusBuddy.WPF.Services.IDriverAvailabilityService availabilityService, BusBuddy.Core.Services.IActivityLogService activityLogService)
-        {
-            _busService = busService;
+            _driverService = driverService;
             _availabilityService = availabilityService;
             _activityLogService = activityLogService;
+
+            Drivers = new ObservableCollection<Driver>();
+            SelectedDriver = new Driver();
+            DriverAvailabilities = new ObservableCollection<DriverAvailability>();
+
+            LoadDriversCommand = new AsyncRelayCommand(LoadDriversAsync);
+            AddDriverCommand = new AsyncRelayCommand(AddDriverAsync);
+            UpdateDriverCommand = new AsyncRelayCommand(UpdateDriverAsync, CanUpdateOrDelete);
+            DeleteDriverCommand = new AsyncRelayCommand(DeleteDriverAsync, CanUpdateOrDelete);
+            GenerateLicenseStatusReportCommand = new RelayCommand(_ => GenerateLicenseStatusReport());
+
             _ = LoadDriversAsync();
             _ = LoadDriverAvailabilitiesAsync();
-            GenerateLicenseStatusReportCommand = new RelayCommand(_ => GenerateLicenseStatusReport());
         }
-
 
         private async Task LoadDriversAsync()
         {
             try
             {
+                var drivers = await _driverService.GetAllDriversAsync();
                 Drivers.Clear();
-                var drivers = await _busService.GetAllDriversAsync();
                 foreach (var driver in drivers)
                 {
                     Drivers.Add(driver);
@@ -73,13 +75,50 @@ namespace BusBuddy.WPF.ViewModels
             }
         }
 
+        private async Task AddDriverAsync()
+        {
+            if (SelectedDriver != null)
+            {
+                await _driverService.AddDriverAsync(SelectedDriver);
+                await LoadDriversAsync();
+            }
+        }
+
+        private async Task UpdateDriverAsync()
+        {
+            if (SelectedDriver != null)
+            {
+                await _driverService.UpdateDriverAsync(SelectedDriver);
+                await LoadDriversAsync();
+            }
+        }
+
+        private async Task DeleteDriverAsync()
+        {
+            if (SelectedDriver != null)
+            {
+                await _driverService.DeleteDriverAsync(SelectedDriver.DriverId);
+                await LoadDriversAsync();
+            }
+        }
+
+        private bool CanUpdateOrDelete()
+        {
+            return SelectedDriver != null && SelectedDriver.DriverId != 0;
+        }
+
+        partial void OnSelectedDriverChanged(Driver value)
+        {
+            (UpdateDriverCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+            (DeleteDriverCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+        }
 
         private async Task LoadDriverAvailabilitiesAsync()
         {
             try
             {
-                DriverAvailabilities.Clear();
                 var availabilities = await _availabilityService.GetDriverAvailabilitiesAsync();
+                DriverAvailabilities.Clear();
                 foreach (var info in availabilities)
                 {
                     DriverAvailabilities.Add(new DriverAvailability
@@ -89,7 +128,6 @@ namespace BusBuddy.WPF.ViewModels
                         AvailableDates = info.AvailableDates
                     });
                 }
-                // Show the first driver's dates in the calendar if available
                 if (DriverAvailabilities.Count > 0)
                     SelectedAvailabilityDates = new ObservableCollection<DateTime>(DriverAvailabilities[0].AvailableDates);
                 await _activityLogService.LogAsync("Loaded driver availabilities", "System");
@@ -118,18 +156,11 @@ namespace BusBuddy.WPF.ViewModels
                 }
                 LicenseStatusReport.Add(new DriverLicenseStatus
                 {
-                    DriverName = driver.DriverName,
+                    DriverName = driver.FullName,
                     LicenseStatus = status,
                     LicenseExpiry = driver.LicenseExpiryDate
                 });
             }
-            OnPropertyChanged(nameof(LicenseStatusReport));
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
@@ -140,5 +171,10 @@ namespace BusBuddy.WPF.ViewModels
         public DateTime? LicenseExpiry { get; set; }
     }
 
-    // Use existing RelayCommand from shared ViewModel base
+    public class DriverAvailability
+    {
+        public int DriverId { get; set; }
+        public string DriverName { get; set; } = string.Empty;
+        public System.Collections.Generic.List<DateTime> AvailableDates { get; set; } = new();
+    }
 }

@@ -1,82 +1,111 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
+using System.Threading.Tasks;
 using System.Windows.Input;
-using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
-using BusBuddy.WPF.ViewModels;
+using BusBuddy.Core.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    using BusBuddy.Core.Services;
-    using BusBuddy.Core.Models;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    public class ScheduleManagementViewModel : INotifyPropertyChanged
+    public partial class ScheduleManagementViewModel : ObservableObject
     {
-        private readonly IScheduleService _service;
-        public ObservableCollection<Activity> Schedules { get; } = new();
-        public ObservableCollection<string> AvailableBuses { get; } = new();
-        public ObservableCollection<string> AvailableDrivers { get; } = new();
-        public ICommand AddCommand { get; }
-        public ICommand EditCommand { get; }
-        public ICommand DeleteCommand { get; }
-        public ICommand AutoGenerateCommand { get; }
-        private Activity? _selectedSchedule;
-        public Activity? SelectedSchedule
+        private readonly IScheduleService _scheduleService;
+        private readonly IBusService _busService;
+        private readonly IDriverService _driverService;
+
+        [ObservableProperty]
+        private ObservableCollection<Activity> _schedules;
+
+        [ObservableProperty]
+        private ObservableCollection<Bus> _buses;
+
+        [ObservableProperty]
+        private ObservableCollection<Driver> _drivers;
+
+        [ObservableProperty]
+        private Activity _selectedSchedule;
+
+        public IAsyncRelayCommand LoadSchedulesCommand { get; }
+        public IAsyncRelayCommand AddScheduleCommand { get; }
+        public IAsyncRelayCommand UpdateScheduleCommand { get; }
+        public IAsyncRelayCommand DeleteScheduleCommand { get; }
+
+        public ScheduleManagementViewModel(IScheduleService scheduleService, IBusService busService, IDriverService driverService)
         {
-            get => _selectedSchedule;
-            set { _selectedSchedule = value; OnPropertyChanged(); }
+            _scheduleService = scheduleService;
+            _busService = busService;
+            _driverService = driverService;
+
+            Schedules = new ObservableCollection<Activity>();
+            Buses = new ObservableCollection<Bus>();
+            Drivers = new ObservableCollection<Driver>();
+            SelectedSchedule = new Activity();
+
+            LoadSchedulesCommand = new AsyncRelayCommand(LoadDataAsync);
+            AddScheduleCommand = new AsyncRelayCommand(AddScheduleAsync);
+            UpdateScheduleCommand = new AsyncRelayCommand(UpdateScheduleAsync, CanUpdateOrDelete);
+            DeleteScheduleCommand = new AsyncRelayCommand(DeleteScheduleAsync, CanUpdateOrDelete);
+
+            _ = LoadDataAsync();
         }
 
-        public ScheduleManagementViewModel(IScheduleService service)
+        private async Task LoadDataAsync()
         {
-            _service = service;
-            LoadSchedulesAsync();
-            AddCommand = new BusBuddy.WPF.RelayCommand(_ => AddScheduleAsyncWrapper());
-            EditCommand = new BusBuddy.WPF.RelayCommand(_ => EditScheduleAsyncWrapper());
-            DeleteCommand = new BusBuddy.WPF.RelayCommand(_ => DeleteScheduleAsyncWrapper());
-            AutoGenerateCommand = new BusBuddy.WPF.RelayCommand(_ => AutoGenerateSchedulesAsyncWrapper());
+            await LoadSchedulesAsync();
+            await LoadBusesAsync();
+            await LoadDriversAsync();
         }
 
-        private async void LoadSchedulesAsync()
+        private async Task LoadSchedulesAsync()
         {
+            var schedules = await _scheduleService.GetAllSchedulesAsync();
             Schedules.Clear();
-            var schedules = await _service.GetAllSchedulesAsync();
             foreach (var s in schedules)
+            {
                 Schedules.Add(s);
-            // Optionally populate AvailableBuses and AvailableDrivers
+            }
         }
 
-        private async void AddScheduleAsyncWrapper() => await AddScheduleAsync();
-        private async void EditScheduleAsyncWrapper() => await EditScheduleAsync();
-        private async void DeleteScheduleAsyncWrapper() => await DeleteScheduleAsync();
-        private void AutoGenerateSchedulesAsyncWrapper() => AutoGenerateSchedulesAsync();
+        private async Task LoadBusesAsync()
+        {
+            var buses = await _busService.GetAllBusEntitiesAsync();
+            Buses.Clear();
+            foreach (var bus in buses)
+            {
+                Buses.Add(bus);
+            }
+        }
+
+        private async Task LoadDriversAsync()
+        {
+            var drivers = await _driverService.GetAllDriversAsync();
+            Drivers.Clear();
+            foreach (var driver in drivers)
+            {
+                Drivers.Add(driver);
+            }
+        }
 
         private async Task AddScheduleAsync()
         {
-            var newSchedule = new Activity
+            if (SelectedSchedule != null)
             {
-                Date = DateTime.Now,
-                ActivityType = "Route",
-                Destination = "",
-                LeaveTime = DateTime.Now.TimeOfDay,
-                EventTime = DateTime.Now.AddHours(1).TimeOfDay,
-                Status = "Scheduled"
-            };
-            var created = await _service.AddScheduleAsync(newSchedule);
-            Schedules.Add(created);
+                // Set default values for a new schedule
+                SelectedSchedule.Date = DateTime.Now;
+                SelectedSchedule.ActivityType = "Scheduled Route";
+                await _scheduleService.AddScheduleAsync(SelectedSchedule);
+                await LoadSchedulesAsync();
+            }
         }
 
-        private async Task EditScheduleAsync()
+        private async Task UpdateScheduleAsync()
         {
             if (SelectedSchedule != null)
             {
-                await _service.UpdateScheduleAsync(SelectedSchedule);
-                // Optionally reload schedules
+                await _scheduleService.UpdateScheduleAsync(SelectedSchedule);
+                await LoadSchedulesAsync();
             }
         }
 
@@ -84,20 +113,20 @@ namespace BusBuddy.WPF.ViewModels
         {
             if (SelectedSchedule != null)
             {
-                await _service.DeleteScheduleAsync(SelectedSchedule.ActivityId);
-                Schedules.Remove(SelectedSchedule);
+                await _scheduleService.DeleteScheduleAsync(SelectedSchedule.ActivityId);
+                await LoadSchedulesAsync();
             }
         }
 
-        private void AutoGenerateSchedulesAsync()
+        private bool CanUpdateOrDelete()
         {
-            // Implement auto-generation logic using real service if needed
-            // For now, just reload all schedules
-            LoadSchedulesAsync();
+            return SelectedSchedule != null && SelectedSchedule.ActivityId != 0;
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        partial void OnSelectedScheduleChanged(Activity value)
+        {
+            (UpdateScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+            (DeleteScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+        }
     }
 }

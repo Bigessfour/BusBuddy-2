@@ -1,32 +1,42 @@
-using BusBuddy.Core.Services;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using BusBuddy.Core.Models;
+using BusBuddy.Core.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public class RidershipDataPoint
+    public partial class DashboardViewModel : ObservableObject
     {
-        public DateTime Date { get; set; }
-        public int PassengerCount { get; set; }
-    }
+        private readonly IScheduleService _scheduleService;
+        private readonly IBusService _busService;
 
-    public class DashboardViewModel : INotifyPropertyChanged
-    {
+        [ObservableProperty]
         private string _dashboardTitle = "Bus Buddy Dashboard";
-        public string DashboardTitle
-        {
-            get => _dashboardTitle;
-            set { _dashboardTitle = value; OnPropertyChanged(); }
-        }
 
-        public ObservableCollection<RidershipDataPoint> RidershipData { get; }
-        public ObservableCollection<Activity> BusSchedules { get; set; } = new ObservableCollection<Activity>();
+        [ObservableProperty]
+        private ObservableCollection<RidershipDataPoint> _ridershipData;
 
-        // Navigation commands for the 10 modules
+        [ObservableProperty]
+        private ObservableCollection<Activity> _busSchedules = new();
+
+        [ObservableProperty]
+        private int _totalActiveBuses;
+
+        [ObservableProperty]
+        private int _totalInactiveBuses;
+
+        [ObservableProperty]
+        private int _busesWithMaintenanceDue;
+
+        [ObservableProperty]
+        private bool _isSidebarVisible = true;
+
+        public ICommand ToggleSidebarCommand { get; }
         public ICommand NavigateToBusManagementCommand { get; }
         public ICommand NavigateToDriverManagementCommand { get; }
         public ICommand NavigateToRouteManagementCommand { get; }
@@ -38,52 +48,25 @@ namespace BusBuddy.WPF.ViewModels
         public ICommand NavigateToTicketManagementCommand { get; }
         public ICommand NavigateToSettingsCommand { get; }
 
-        // Event to notify view of navigation
         public event Action<string>? NavigateToModule;
 
-        private readonly IScheduleService _scheduleService;
-        private readonly BusBuddy.Core.Services.IBusService _busService;
-
-        // Fleet status summary properties
-        private int _totalActiveBuses;
-        public int TotalActiveBuses
-        {
-            get => _totalActiveBuses;
-            set { _totalActiveBuses = value; OnPropertyChanged(); }
-        }
-
-        private int _totalInactiveBuses;
-        public int TotalInactiveBuses
-        {
-            get => _totalInactiveBuses;
-            set { _totalInactiveBuses = value; OnPropertyChanged(); }
-        }
-
-        private int _busesWithMaintenanceDue;
-        public int BusesWithMaintenanceDue
-        {
-            get => _busesWithMaintenanceDue;
-            set { _busesWithMaintenanceDue = value; OnPropertyChanged(); }
-        }
-
-        public DashboardViewModel(IScheduleService scheduleService, BusBuddy.Core.Services.IBusService busService)
+        public DashboardViewModel(IScheduleService scheduleService, IBusService busService)
         {
             _scheduleService = scheduleService;
             _busService = busService;
-            RidershipData = new ObservableCollection<RidershipDataPoint>
-            {
-                new RidershipDataPoint { Date = DateTime.Now.AddDays(-6), PassengerCount = 120 },
-                new RidershipDataPoint { Date = DateTime.Now.AddDays(-5), PassengerCount = 135 },
-                new RidershipDataPoint { Date = DateTime.Now.AddDays(-4), PassengerCount = 140 },
-                new RidershipDataPoint { Date = DateTime.Now.AddDays(-3), PassengerCount = 160 },
-                new RidershipDataPoint { Date = DateTime.Now.AddDays(-2), PassengerCount = 155 },
-                new RidershipDataPoint { Date = DateTime.Now.AddDays(-1), PassengerCount = 170 },
-                new RidershipDataPoint { Date = DateTime.Now, PassengerCount = 180 }
-            };
-            LoadData();
-            LoadFleetStatusSummary();
 
-            // Initialize commands
+            _ridershipData = new ObservableCollection<RidershipDataPoint>
+            {
+                new() { Date = DateTime.Now.AddDays(-6), PassengerCount = 120 },
+                new() { Date = DateTime.Now.AddDays(-5), PassengerCount = 135 },
+                new() { Date = DateTime.Now.AddDays(-4), PassengerCount = 140 },
+                new() { Date = DateTime.Now.AddDays(-3), PassengerCount = 160 },
+                new() { Date = DateTime.Now.AddDays(-2), PassengerCount = 155 },
+                new() { Date = DateTime.Now.AddDays(-1), PassengerCount = 170 },
+                new() { Date = DateTime.Now, PassengerCount = 180 }
+            };
+
+            ToggleSidebarCommand = new RelayCommand(_ => IsSidebarVisible = !IsSidebarVisible);
             NavigateToBusManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("BusManagement"));
             NavigateToDriverManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("DriverManagement"));
             NavigateToRouteManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("RouteManagement"));
@@ -94,9 +77,17 @@ namespace BusBuddy.WPF.ViewModels
             NavigateToActivityLoggingCommand = new RelayCommand(_ => NavigateToModule?.Invoke("ActivityLogging"));
             NavigateToTicketManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("TicketManagement"));
             NavigateToSettingsCommand = new RelayCommand(_ => NavigateToModule?.Invoke("Settings"));
+
+            _ = LoadDataAsync();
         }
 
-        private async void LoadFleetStatusSummary()
+        private async Task LoadDataAsync()
+        {
+            await LoadBusSchedulesAsync();
+            await LoadFleetStatusSummaryAsync();
+        }
+
+        private async Task LoadFleetStatusSummaryAsync()
         {
             try
             {
@@ -107,31 +98,22 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch
             {
-                // Handle/log error as needed
                 TotalActiveBuses = 0;
                 TotalInactiveBuses = 0;
                 BusesWithMaintenanceDue = 0;
             }
         }
 
-        private void LoadData()
-        {
-            _ = LoadBusSchedulesAsync();
-        }
-
         private async Task LoadBusSchedulesAsync()
         {
             var activities = await _scheduleService.GetAllSchedulesAsync();
             BusSchedules = new ObservableCollection<Activity>(activities);
-            OnPropertyChanged(nameof(BusSchedules));
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
-    // ...existing code...
+    public class RidershipDataPoint
+    {
+        public DateTime Date { get; set; }
+        public int PassengerCount { get; set; }
+    }
 }

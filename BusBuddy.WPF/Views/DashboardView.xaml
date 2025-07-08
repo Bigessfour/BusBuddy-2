@@ -5,11 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BusBuddy.WPF.Views"
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <SolidColorBrush x:Key="HeaderBackground" Color="SteelBlue" />
         <Style TargetType="TextBlock" x:Key="HeaderTextStyle">
             <Setter Property="Foreground" Value="White" />
@@ -48,18 +50,19 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <!-- Sidebar Navigation -->
-        <Border x:Name="SidebarBorder" Grid.Column="0" Background="#2F4F4F" Width="220">
+        <Border x:Name="SidebarBorder" Grid.Column="0" Background="#2F4F4F" Width="220"
+                Visibility="{Binding IsSidebarVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel>
                 <TextBlock Text="Modules" Foreground="White" FontWeight="Bold" FontSize="18" Margin="12,16,0,12" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Bus Management" Command="{Binding NavigateToBusManagementCommand}" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Driver Management" Command="{Binding NavigateToDriverManagementCommand}" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Route Management" Command="{Binding NavigateToRouteManagementCommand}" />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Schedule Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Student Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Maintenance Tracking (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Fuel Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Activity Logging (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Ticket Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Schedule Management" Command="{Binding NavigateToScheduleManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Student Management" Command="{Binding NavigateToStudentManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Maintenance Tracking" Command="{Binding NavigateToMaintenanceTrackingCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Fuel Management" Command="{Binding NavigateToFuelManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Activity Logging" Command="{Binding NavigateToActivityLoggingCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Ticket Management" Command="{Binding NavigateToTicketManagementCommand}" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Settings" Command="{Binding NavigateToSettingsCommand}" />
             </StackPanel>
         </Border>
@@ -72,7 +75,11 @@
             </Grid.RowDefinitions>
             <!-- Header Panel with Hamburger Button -->
             <DockPanel Grid.Row="0" Background="{StaticResource HeaderBackground}" Height="56">
-                <Button x:Name="HamburgerButton" Content="☰" Width="40" Height="40" Margin="8,8,0,8" VerticalAlignment="Center" HorizontalAlignment="Left" Background="Transparent" Foreground="White" BorderThickness="0" FontSize="22" Cursor="Hand" Click="HamburgerButton_Click" />
+                <Button x:Name="HamburgerButton" Content="☰" Width="40" Height="40" Margin="8,8,0,8" 
+                        VerticalAlignment="Center" HorizontalAlignment="Left" 
+                        Background="Transparent" Foreground="White" BorderThickness="0" 
+                        FontSize="22" Cursor="Hand" 
+                        Command="{Binding ToggleSidebarCommand}" />
                 <TextBlock Text="{Binding DashboardTitle}" Style="{StaticResource HeaderTextStyle}" VerticalAlignment="Center" Margin="56,0,0,0" />
             </DockPanel>
             <!-- Dashboard Content -->
