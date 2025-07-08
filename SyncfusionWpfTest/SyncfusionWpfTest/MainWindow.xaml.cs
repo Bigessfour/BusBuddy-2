@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace BusBuddy.WPF;
+namespace SyncfusionWpfTest;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
@@ -19,8 +19,5 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        this.WindowState = WindowState.Maximized;
-        this.WindowStyle = WindowStyle.SingleBorderWindow;
-        this.ResizeMode = ResizeMode.CanResize;
     }
 }

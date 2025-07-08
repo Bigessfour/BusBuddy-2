@@ -4,15 +4,40 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BusBuddy.WPF.Views"
-             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
-             xmlns:panelViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Panels"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <converters:TypeConverter x:Key="TypeConverter" />
+        <SolidColorBrush x:Key="HeaderBackground" Color="SteelBlue" />
+        <Style TargetType="TextBlock" x:Key="HeaderTextStyle">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="28" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style x:Key="NavigationButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="0,4,0,4" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#445" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <UserControl.DataContext>
@@ -20,10 +45,59 @@
     </UserControl.DataContext>
 
     <Grid>
-        <syncfusion:DockingManager x:Name="dockingManager" 
-               UseDocumentContainer="True"
-               ItemsSource="{Binding Panels}">
-            <!-- Removed unsupported DocumentTabItemTemplate and DockWindowItemTemplate. Use supported properties or DataTemplates as per Syncfusion documentation. -->
-        </syncfusion:DockingManager>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!-- Sidebar Navigation -->
+        <Border x:Name="SidebarBorder" Grid.Column="0" Background="#2F4F4F" Width="220">
+            <StackPanel>
+                <TextBlock Text="Modules" Foreground="White" FontWeight="Bold" FontSize="18" Margin="12,16,0,12" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Bus Management" Command="{Binding NavigateToBusManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Driver Management" Command="{Binding NavigateToDriverManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Route Management" Command="{Binding NavigateToRouteManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Schedule Management" Command="{Binding NavigateToScheduleManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Student Management" Command="{Binding NavigateToStudentManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Maintenance Tracking" Command="{Binding NavigateToMaintenanceTrackingCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Fuel Management" Command="{Binding NavigateToFuelManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Activity Logging" Command="{Binding NavigateToActivityLoggingCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Ticket Management" Command="{Binding NavigateToTicketManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Settings" Command="{Binding NavigateToSettingsCommand}" />
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!-- Header Panel with Hamburger Button -->
+            <DockPanel Grid.Row="0" Background="{StaticResource HeaderBackground}" Height="56">
+                <Button x:Name="HamburgerButton" Content="☰" Width="40" Height="40" Margin="8,8,0,8" VerticalAlignment="Center" HorizontalAlignment="Left" Background="Transparent" Foreground="White" BorderThickness="0" FontSize="22" Cursor="Hand" Click="HamburgerButton_Click" />
+                <TextBlock Text="{Binding DashboardTitle}" Style="{StaticResource HeaderTextStyle}" VerticalAlignment="Center" Margin="56,0,0,0" />
+            </DockPanel>
+            <!-- Dashboard Content -->
+            <syncfusion:DockingManager Grid.Row="1" x:Name="dockingManager" UseDocumentContainer="True" PersistState="True" Margin="0,16,0,0">
+                <ContentControl syncfusion:DockingManager.Header="Dashboard" syncfusion:DockingManager.State="Document">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <syncfusion:SfChart Grid.Column="0" Margin="20" Header="Ridership Trends">
+                            <syncfusion:SfChart.PrimaryAxis>
+                                <syncfusion:CategoryAxis Header="Date" />
+                            </syncfusion:SfChart.PrimaryAxis>
+                            <syncfusion:SfChart.SecondaryAxis>
+                                <syncfusion:NumericalAxis Header="Passengers" />
+                            </syncfusion:SfChart.SecondaryAxis>
+                            <syncfusion:LineSeries ItemsSource="{Binding RidershipData}" XBindingPath="Date" YBindingPath="PassengerCount" />
+                        </syncfusion:SfChart>
+                        <syncfusion:SfDataGrid Grid.Column="1" Margin="20" ItemsSource="{Binding BusSchedules}" AutoGenerateColumns="True" />
+                    </Grid>
+                </ContentControl>
+            </syncfusion:DockingManager>
+        </Grid>
     </Grid>
 </UserControl>

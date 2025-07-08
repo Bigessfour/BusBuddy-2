@@ -8,17 +8,17 @@ namespace BusBuddy.WPF.ViewModels
     public class XaiChatViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<ChatMessage> Messages { get; set; } = new();
-        private string _input;
+        private string _input = string.Empty;
         public string Input
         {
             get => _input;
             set { _input = value; OnPropertyChanged(); }
         }
 
-        public ICommand SendXaiMessageCommand { get; set; }
+        public ICommand? SendXaiMessageCommand { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -26,8 +26,8 @@ namespace BusBuddy.WPF.ViewModels
 
     public class ChatMessage
     {
-        public string Sender { get; set; }
-        public string Message { get; set; }
+        public string Sender { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
         public bool IsUser { get; set; }
     }
 }

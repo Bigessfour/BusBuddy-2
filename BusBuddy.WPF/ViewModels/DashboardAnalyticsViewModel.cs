@@ -9,8 +9,8 @@ namespace BusBuddy.WPF.ViewModels
         public ObservableCollection<RouteUsage> RouteUsages { get; set; } = new();
         public ObservableCollection<ActivityTypeStat> ActivityTypes { get; set; } = new();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -18,13 +18,13 @@ namespace BusBuddy.WPF.ViewModels
 
     public class RouteUsage
     {
-        public string RouteName { get; set; }
+        public string RouteName { get; set; } = string.Empty;
         public double Miles { get; set; }
     }
 
     public class ActivityTypeStat
     {
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
         public int Count { get; set; }
     }
 }

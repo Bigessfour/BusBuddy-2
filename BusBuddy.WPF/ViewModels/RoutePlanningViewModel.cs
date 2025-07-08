@@ -27,12 +27,12 @@ namespace BusBuddy.WPF.ViewModels
             set { _showStudentAddresses = value; OnPropertyChanged(); }
         }
 
-        public ICommand OptimizeRoutesCommand { get; set; }
-        public ICommand AddStopCommand { get; set; }
-        public ICommand ExportToScheduleCommand { get; set; }
+        public ICommand? OptimizeRoutesCommand { get; set; }
+        public ICommand? AddStopCommand { get; set; }
+        public ICommand? ExportToScheduleCommand { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

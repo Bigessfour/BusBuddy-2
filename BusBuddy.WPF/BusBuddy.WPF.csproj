@@ -18,4 +18,15 @@
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <PackageReference Include="Syncfusion.Licensing" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.SfChart.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="30.1.38" />
+  </ItemGroup>
+
 </Project>
