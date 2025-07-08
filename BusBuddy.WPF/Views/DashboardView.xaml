@@ -7,6 +7,7 @@
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
              xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionNavigation="clr-namespace:Syncfusion.UI.Xaml.NavigationDrawer;assembly=Syncfusion.SfNavigationDrawer.WPF"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -49,9 +50,12 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <!-- Sidebar Navigation -->
-        <Border x:Name="SidebarBorder" Grid.Column="0" Background="#2F4F4F" Width="220"
-                Visibility="{Binding IsSidebarVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <!-- Sidebar Navigation: Syncfusion SfNavigationDrawer -->
+        <syncfusionNavigation:SfNavigationDrawer x:Name="SidebarDrawer"
+                                                Grid.Column="0"
+                                                DrawerWidth="220"
+                                                IsOpen="{Binding IsSidebarVisible}"
+                                                DrawerBackground="#2F4F4F">
             <StackPanel>
                 <TextBlock Text="Modules" Foreground="White" FontWeight="Bold" FontSize="18" Margin="12,16,0,12" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Bus Management" Command="{Binding NavigateToBusManagementCommand}" />
@@ -65,7 +69,7 @@
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Ticket Management" Command="{Binding NavigateToTicketManagementCommand}" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Settings" Command="{Binding NavigateToSettingsCommand}" />
             </StackPanel>
-        </Border>
+        </syncfusionNavigation:SfNavigationDrawer>
 
         <!-- Main Content with Syncfusion DockingManager -->
         <syncfusion:DockingManager x:Name="DockingManager" Grid.Column="1">
@@ -80,12 +84,18 @@
                     <TextBlock Text="{Binding DashboardTitle}" Style="{StaticResource HeaderTextStyle}" VerticalAlignment="Center" Margin="56,0,0,0" />
                 </DockPanel>
             </ContentControl>
-            <!-- Schedule Management Panel -->
-            <local:ScheduleView syncfusion:DockingManager.Header="Schedule Management" syncfusion:DockingManager.State="Dock" syncfusion:DockingManager.SideInDockedMode="Left" />
-            <!-- Main dynamic content as a docked panel -->
-            <ContentControl syncfusion:DockingManager.Header="Module Content" syncfusion:DockingManager.State="Document">
-                <ContentControl Content="{Binding CurrentModuleView}" />
-            </ContentControl>
+            
+            <local:BusManagementView syncfusion:DockingManager.Header="Bus Management" syncfusion:DockingManager.State="Document" x:Name="BusManagement" />
+            <local:DriverManagementView syncfusion:DockingManager.Header="Driver Management" syncfusion:DockingManager.State="Document" x:Name="DriverManagement" />
+            <local:RouteManagementView syncfusion:DockingManager.Header="Route Management" syncfusion:DockingManager.State="Document" x:Name="RouteManagement" />
+            <local:ScheduleManagementView syncfusion:DockingManager.Header="Schedule Management" syncfusion:DockingManager.State="Document" x:Name="ScheduleManagement" />
+            <local:StudentManagementView syncfusion:DockingManager.Header="Student Management" syncfusion:DockingManager.State="Document" x:Name="StudentManagement" />
+            <local:MaintenanceTrackingView syncfusion:DockingManager.Header="Maintenance Tracking" syncfusion:DockingManager.State="Document" x:Name="MaintenanceTracking" />
+            <local:FuelManagementView syncfusion:DockingManager.Header="Fuel Management" syncfusion:DockingManager.State="Document" x:Name="FuelManagement" />
+            <local:ActivityLoggingView syncfusion:DockingManager.Header="Activity Logging" syncfusion:DockingManager.State="Document" x:Name="ActivityLogging" />
+            <local:TicketManagementView syncfusion:DockingManager.Header="Ticket Management" syncfusion:DockingManager.State="Document" x:Name="TicketManagement" />
+            <local:SettingsView syncfusion:DockingManager.Header="Settings" syncfusion:DockingManager.State="Document" x:Name="Settings" />
+
         </syncfusion:DockingManager>
     </Grid>
 </UserControl>

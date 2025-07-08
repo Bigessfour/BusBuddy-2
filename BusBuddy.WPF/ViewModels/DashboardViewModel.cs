@@ -17,7 +17,7 @@ namespace BusBuddy.WPF.ViewModels
         private readonly IBusService _busService;
 
         [ObservableProperty]
-        private object? _currentModuleView;
+        private string? _selectedModule;
 
         [ObservableProperty]
         private string _dashboardTitle = "Bus Buddy Dashboard";
@@ -86,45 +86,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ShowModule(string moduleName)
         {
-            // Use DI to resolve the view for the module
-            var app = System.Windows.Application.Current as App;
-            if (app?.Services == null) return;
-            switch (moduleName)
-            {
-                case "BusManagement":
-                    CurrentModuleView = new BusBuddy.WPF.Views.BusManagementView();
-                    break;
-                case "DriverManagement":
-                    CurrentModuleView = new BusBuddy.WPF.Views.DriverManagementView();
-                    break;
-                case "RouteManagement":
-                    CurrentModuleView = new BusBuddy.WPF.Views.RouteManagementView();
-                    break;
-                case "ScheduleManagement":
-                    CurrentModuleView = new BusBuddy.WPF.Views.ScheduleManagementView();
-                    break;
-                case "StudentManagement":
-                    CurrentModuleView = new BusBuddy.WPF.Views.StudentManagementView();
-                    break;
-                case "MaintenanceTracking":
-                    CurrentModuleView = new BusBuddy.WPF.Views.MaintenanceTrackingView();
-                    break;
-                case "FuelManagement":
-                    CurrentModuleView = new BusBuddy.WPF.Views.FuelManagementView();
-                    break;
-                case "ActivityLogging":
-                    CurrentModuleView = new BusBuddy.WPF.Views.ActivityLoggingView();
-                    break;
-                case "TicketManagement":
-                    CurrentModuleView = new BusBuddy.WPF.Views.TicketManagementView();
-                    break;
-                case "Settings":
-                    CurrentModuleView = new BusBuddy.WPF.Views.SettingsView();
-                    break;
-                default:
-                    CurrentModuleView = null;
-                    break;
-            }
+            SelectedModule = moduleName;
         }
 
         private async Task LoadDataAsync()

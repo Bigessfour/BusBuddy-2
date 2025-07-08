@@ -1,7 +1,9 @@
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml;
+using BusBuddy.WPF.ViewModels;
 
 namespace BusBuddy.WPF.Views
 {
@@ -23,6 +25,19 @@ namespace BusBuddy.WPF.Views
             else
             {
                 // Fallback: DataContext remains null or set to a default instance if desired
+            }
+            if (DataContext is DashboardViewModel viewModel)
+            {
+                viewModel.PropertyChanged += ViewModel_PropertyChanged;
+            }
+        }
+
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DashboardViewModel.SelectedModule) && DataContext is DashboardViewModel viewModel)
+            {
+                // Activate the document by name (string) as required by Syncfusion DockingManager
+                DockingManager.ActivateWindow(viewModel.SelectedModule);
             }
         }
     }
