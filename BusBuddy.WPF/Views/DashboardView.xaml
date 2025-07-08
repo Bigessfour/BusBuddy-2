@@ -67,70 +67,25 @@
             </StackPanel>
         </Border>
 
-        <!-- Main Content -->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <!-- Header Panel with Hamburger Button -->
-            <DockPanel Grid.Row="0" Background="{StaticResource HeaderBackground}" Height="56">
-                <Button x:Name="HamburgerButton" Content="☰" Width="40" Height="40" Margin="8,8,0,8" 
-                        VerticalAlignment="Center" HorizontalAlignment="Left" 
-                        Background="Transparent" Foreground="White" BorderThickness="0" 
-                        FontSize="22" Cursor="Hand" 
-                        Command="{Binding ToggleSidebarCommand}" />
-                <TextBlock Text="{Binding DashboardTitle}" Style="{StaticResource HeaderTextStyle}" VerticalAlignment="Center" Margin="56,0,0,0" />
-            </DockPanel>
-            <!-- Dashboard Content -->
-            <syncfusion:DockingManager Grid.Row="1" x:Name="dockingManager" UseDocumentContainer="True" PersistState="True" Margin="0,16,0,0">
-                <ContentControl syncfusion:DockingManager.Header="Dashboard" syncfusion:DockingManager.State="Document">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <!-- Fleet Status Summary Cards (WPF Borders) -->
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                            <Border Width="180" Height="100" Margin="10" Background="#F0F4F8" CornerRadius="8" BorderBrush="#B0BEC5" BorderThickness="1">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="Active Buses" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,8,0,0" />
-                                    <TextBlock Text="{Binding TotalActiveBuses}" FontSize="32" FontWeight="Bold" Foreground="Green" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Border>
-                            <Border Width="180" Height="100" Margin="10" Background="#F0F4F8" CornerRadius="8" BorderBrush="#B0BEC5" BorderThickness="1">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="Inactive Buses" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,8,0,0" />
-                                    <TextBlock Text="{Binding TotalInactiveBuses}" FontSize="32" FontWeight="Bold" Foreground="DarkRed" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Border>
-                            <Border Width="220" Height="100" Margin="10" Background="#F0F4F8" CornerRadius="8" BorderBrush="#B0BEC5" BorderThickness="1">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="Maintenance Due" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,8,0,0" />
-                                    <TextBlock Text="{Binding BusesWithMaintenanceDue}" FontSize="32" FontWeight="Bold" Foreground="Orange" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                        <!-- Main Dashboard Content -->
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <syncfusion:SfChart Grid.Column="0" Margin="20" Header="Ridership Trends">
-                                <syncfusion:SfChart.PrimaryAxis>
-                                    <syncfusion:CategoryAxis Header="Date" />
-                                </syncfusion:SfChart.PrimaryAxis>
-                                <syncfusion:SfChart.SecondaryAxis>
-                                    <syncfusion:NumericalAxis Header="Passengers" />
-                                </syncfusion:SfChart.SecondaryAxis>
-                                <syncfusion:LineSeries ItemsSource="{Binding RidershipData}" XBindingPath="Date" YBindingPath="PassengerCount" />
-                            </syncfusion:SfChart>
-                            <syncfusion:SfDataGrid Grid.Column="1" Margin="20" ItemsSource="{Binding BusSchedules}" AutoGenerateColumns="True" />
-                        </Grid>
-                    </Grid>
-                </ContentControl>
-            </syncfusion:DockingManager>
-        </Grid>
+        <!-- Main Content with Syncfusion DockingManager -->
+        <syncfusion:DockingManager x:Name="DockingManager" Grid.Column="1">
+            <!-- Header Panel as a docked panel -->
+            <ContentControl syncfusion:DockingManager.Header="Dashboard Header" syncfusion:DockingManager.State="Dock" syncfusion:DockingManager.SideInDockedMode="Top">
+                <DockPanel Background="{StaticResource HeaderBackground}" Height="56">
+                    <Button x:Name="HamburgerButton" Content="☰" Width="40" Height="40" Margin="8,8,0,8" 
+                            VerticalAlignment="Center" HorizontalAlignment="Left" 
+                            Background="Transparent" Foreground="White" BorderThickness="0" 
+                            FontSize="22" Cursor="Hand" 
+                            Command="{Binding ToggleSidebarCommand}" />
+                    <TextBlock Text="{Binding DashboardTitle}" Style="{StaticResource HeaderTextStyle}" VerticalAlignment="Center" Margin="56,0,0,0" />
+                </DockPanel>
+            </ContentControl>
+            <!-- Schedule Management Panel -->
+            <local:ScheduleView syncfusion:DockingManager.Header="Schedule Management" syncfusion:DockingManager.State="Dock" syncfusion:DockingManager.SideInDockedMode="Left" />
+            <!-- Main dynamic content as a docked panel -->
+            <ContentControl syncfusion:DockingManager.Header="Module Content" syncfusion:DockingManager.State="Document">
+                <ContentControl Content="{Binding CurrentModuleView}" />
+            </ContentControl>
+        </syncfusion:DockingManager>
     </Grid>
 </UserControl>

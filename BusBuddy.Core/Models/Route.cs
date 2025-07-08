@@ -104,4 +104,5 @@ public class Route
     public virtual Bus? PMVehicle { get; set; }
     public virtual Driver? AMDriver { get; set; }
     public virtual Driver? PMDriver { get; set; }
+    public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
 }

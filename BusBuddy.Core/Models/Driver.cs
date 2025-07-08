@@ -335,6 +335,7 @@ public class Driver : INotifyPropertyChanged
     // Navigation properties
     public virtual ICollection<Route> AMRoutes { get; set; } = new List<Route>();
     public virtual ICollection<Route> PMRoutes { get; set; } = new List<Route>();
+    public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
     public virtual ICollection<ActivitySchedule> ScheduledActivities { get; set; } = new List<ActivitySchedule>();
 

@@ -374,24 +374,25 @@ public class BusBuddyDbContext : DbContext
 
             // Relationships
             entity.HasOne(s => s.Bus)
-                  .WithMany()
+                  .WithMany(b => b.Schedules)
                   .HasForeignKey(s => s.BusId)
                   .OnDelete(DeleteBehavior.Restrict)
                   .HasConstraintName("FK_Schedules_Bus");
 
             entity.HasOne(s => s.Route)
-                  .WithMany()
+                  .WithMany(r => r.Schedules)
                   .HasForeignKey(s => s.RouteId)
                   .OnDelete(DeleteBehavior.Restrict)
                   .HasConstraintName("FK_Schedules_Route");
 
             entity.HasOne(s => s.Driver)
-                  .WithMany()
+                  .WithMany(d => d.Schedules)
                   .HasForeignKey(s => s.DriverId)
                   .OnDelete(DeleteBehavior.Restrict)
                   .HasConstraintName("FK_Schedules_Driver");
 
             // Indexes
+            entity.HasIndex(e => new { e.RouteId, e.BusId, e.DepartureTime }).IsUnique().HasDatabaseName("IX_Schedules_RouteBusDeparture");
             entity.HasIndex(e => e.ScheduleDate).HasDatabaseName("IX_Schedules_Date");
             entity.HasIndex(e => e.BusId).HasDatabaseName("IX_Schedules_BusId");
             entity.HasIndex(e => e.DriverId).HasDatabaseName("IX_Schedules_DriverId");

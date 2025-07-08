@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using BusBuddy.Core.Services.Interfaces;
+
 namespace BusBuddy.Core.Services
 {
     public class ScheduleService : IScheduleService
@@ -17,138 +19,68 @@ namespace BusBuddy.Core.Services
             _context = context;
         }
 
-        public async Task<List<Activity>> GetAllSchedulesAsync()
+        public async Task<IEnumerable<Schedule>> GetSchedulesAsync()
         {
-            return await _context.Activities
-                .Include(a => a.AssignedVehicle)
-                .Include(a => a.Driver)
-                .Include(a => a.Route)
-                .OrderBy(a => a.Date)
-                .ThenBy(a => a.LeaveTime)
+            return await _context.Schedules
+                .Include(s => s.Route)
+                .Include(s => s.Bus)
+                .Include(s => s.Driver)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
-        public async Task<Activity> GetScheduleByIdAsync(int id)
+        public async Task<Schedule?> GetScheduleByIdAsync(int id)
         {
-            return await _context.Activities
-                .Include(a => a.AssignedVehicle)
-                .Include(a => a.Driver)
-                .Include(a => a.Route)
-                .FirstOrDefaultAsync(a => a.ActivityId == id) ?? throw new InvalidOperationException($"Activity with ID {id} not found.");
+            return await _context.Schedules
+                .Include(s => s.Route)
+                .Include(s => s.Bus)
+                .Include(s => s.Driver)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ScheduleId == id);
         }
 
-        public async Task<List<Activity>> GetSchedulesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task AddScheduleAsync(Schedule schedule)
         {
-            return await _context.Activities
-                .Include(a => a.AssignedVehicle)
-                .Include(a => a.Driver)
-                .Include(a => a.Route)
-                .Where(a => a.Date >= startDate && a.Date <= endDate)
-                .OrderBy(a => a.Date)
-                .ThenBy(a => a.LeaveTime)
-                .ToListAsync();
-        }
-
-        public async Task<Activity> AddScheduleAsync(Activity schedule)
-        {
-            // Validate schedule conflict before adding
-            if (await ValidateScheduleConflictAsync(schedule))
-            {
-                throw new InvalidOperationException("Schedule conflict detected. The vehicle or driver is already assigned during this time.");
-            }
-
-            _context.Activities.Add(schedule);
-            await _context.SaveChangesAsync();
-            return schedule;
-        }
-
-        public async Task<Activity> UpdateScheduleAsync(Activity schedule)
-        {
-            // Validate schedule conflict before updating (excluding current schedule)
-            var existingConflicts = await _context.Activities
-                .Where(a => a.ActivityId != schedule.ActivityId &&
-                           a.Date == schedule.Date &&
-                           ((a.AssignedVehicleId == schedule.AssignedVehicleId) ||
-                            (a.DriverId == schedule.DriverId)) &&
-                           ((a.LeaveTime <= schedule.LeaveTime && a.EventTime >= schedule.LeaveTime) ||
-                            (a.LeaveTime <= schedule.EventTime && a.EventTime >= schedule.EventTime) ||
-                            (schedule.LeaveTime <= a.LeaveTime && schedule.EventTime >= a.EventTime)))
-                .AnyAsync();
-
-            if (existingConflicts)
-            {
-                throw new InvalidOperationException("Schedule conflict detected. The vehicle or driver is already assigned during this time.");
-            }
-
-            _context.Activities.Update(schedule);
-            await _context.SaveChangesAsync();
-            return schedule;
-        }
-
-        public async Task<bool> DeleteScheduleAsync(int id)
-        {
-            var schedule = await _context.Activities.FindAsync(id);
             if (schedule == null)
-                return false;
-
-            _context.Activities.Remove(schedule);
+                throw new ArgumentNullException(nameof(schedule));
+            if (schedule.DepartureTime >= schedule.ArrivalTime)
+                throw new ArgumentException("Departure time must be before arrival time.");
+            if (!await _context.Routes.AnyAsync(r => r.RouteId == schedule.RouteId))
+                throw new ArgumentException("Invalid route ID.");
+            if (!await _context.Vehicles.AnyAsync(b => b.VehicleId == schedule.BusId))
+                throw new ArgumentException("Invalid bus ID.");
+            if (!await _context.Drivers.AnyAsync(d => d.DriverId == schedule.DriverId))
+                throw new ArgumentException("Invalid driver ID.");
+            await _context.Schedules.AddAsync(schedule);
             await _context.SaveChangesAsync();
-            return true;
         }
 
-        public async Task<List<Activity>> GetSchedulesByVehicleAsync(string vehicleId)
+        public async Task UpdateScheduleAsync(Schedule schedule)
         {
-            if (int.TryParse(vehicleId, out int parsedVehicleId))
-            {
-                return await _context.Activities
-                    .Include(a => a.AssignedVehicle)
-                    .Include(a => a.Driver)
-                    .Include(a => a.Route)
-                    .Where(a => a.AssignedVehicleId == parsedVehicleId)
-                    .OrderBy(a => a.Date)
-                    .ThenBy(a => a.LeaveTime)
-                    .ToListAsync();
-            }
-            return new List<Activity>();
+            if (schedule == null)
+                throw new ArgumentNullException(nameof(schedule));
+            var existing = await _context.Schedules.FindAsync(schedule.ScheduleId);
+            if (existing == null)
+                throw new InvalidOperationException("Schedule not found.");
+            if (schedule.DepartureTime >= schedule.ArrivalTime)
+                throw new ArgumentException("Departure time must be before arrival time.");
+            if (!await _context.Routes.AnyAsync(r => r.RouteId == schedule.RouteId))
+                throw new ArgumentException("Invalid route ID.");
+            if (!await _context.Vehicles.AnyAsync(b => b.VehicleId == schedule.BusId))
+                throw new ArgumentException("Invalid bus ID.");
+            if (!await _context.Drivers.AnyAsync(d => d.DriverId == schedule.DriverId))
+                throw new ArgumentException("Invalid driver ID.");
+            _context.Entry(existing).CurrentValues.SetValues(schedule);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Activity>> GetSchedulesByDriverAsync(string driverName)
+        public async Task DeleteScheduleAsync(int id)
         {
-            return await _context.Activities
-                .Include(a => a.AssignedVehicle)
-                .Include(a => a.Driver)
-                .Include(a => a.Route)
-                .Where(a => a.Driver != null && a.Driver.DriverName == driverName)
-                .OrderBy(a => a.Date)
-                .ThenBy(a => a.LeaveTime)
-                .ToListAsync();
-        }
-
-        public async Task<bool> ValidateScheduleConflictAsync(Activity schedule)
-        {
-            // Check for vehicle conflicts using mapped properties
-            var vehicleConflict = await _context.Activities
-                .Where(a => a.AssignedVehicleId == schedule.AssignedVehicleId &&
-                           a.Date == schedule.Date &&
-                           ((a.LeaveTime <= schedule.LeaveTime && a.EventTime >= schedule.LeaveTime) ||
-                            (a.LeaveTime <= schedule.EventTime && a.EventTime >= schedule.EventTime) ||
-                            (schedule.LeaveTime <= a.LeaveTime && schedule.EventTime >= a.EventTime)))
-                .AnyAsync();
-
-            if (vehicleConflict) return true;
-
-            // Check for driver conflicts using mapped properties
-            var driverConflict = await _context.Activities
-                .Where(a => a.DriverId == schedule.DriverId &&
-                           a.Date == schedule.Date &&
-                           ((a.LeaveTime <= schedule.LeaveTime && a.EventTime >= schedule.LeaveTime) ||
-                            (a.LeaveTime <= schedule.EventTime && a.EventTime >= schedule.EventTime) ||
-                            (schedule.LeaveTime <= a.LeaveTime && schedule.EventTime >= a.EventTime)))
-                .AnyAsync();
-
-            if (driverConflict) return true;
-
-            return false;
+            var schedule = await _context.Schedules.FindAsync(id);
+            if (schedule == null)
+                return;
+            _context.Schedules.Remove(schedule);
+            await _context.SaveChangesAsync();
         }
     }
 }

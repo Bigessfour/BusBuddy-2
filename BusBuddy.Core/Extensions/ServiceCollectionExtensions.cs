@@ -8,6 +8,7 @@ using BusBuddy.Core.Data.Interfaces;
 using BusBuddy.Core.Data.Repositories;
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 
 namespace BusBuddy.Core.Extensions;
 

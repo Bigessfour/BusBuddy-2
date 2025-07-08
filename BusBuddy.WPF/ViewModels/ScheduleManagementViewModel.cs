@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -16,7 +17,7 @@ namespace BusBuddy.WPF.ViewModels
         private readonly IDriverService _driverService;
 
         [ObservableProperty]
-        private ObservableCollection<Activity> _schedules;
+        private ObservableCollection<Schedule> _schedules;
 
         [ObservableProperty]
         private ObservableCollection<Bus> _buses;
@@ -25,7 +26,7 @@ namespace BusBuddy.WPF.ViewModels
         private ObservableCollection<Driver> _drivers;
 
         [ObservableProperty]
-        private Activity _selectedSchedule;
+        private Schedule _selectedSchedule;
 
         public IAsyncRelayCommand LoadSchedulesCommand { get; }
         public IAsyncRelayCommand AddScheduleCommand { get; }
@@ -38,10 +39,10 @@ namespace BusBuddy.WPF.ViewModels
             _busService = busService;
             _driverService = driverService;
 
-            Schedules = new ObservableCollection<Activity>();
+            Schedules = new ObservableCollection<Schedule>();
             Buses = new ObservableCollection<Bus>();
             Drivers = new ObservableCollection<Driver>();
-            SelectedSchedule = new Activity();
+            SelectedSchedule = new Schedule();
 
             LoadSchedulesCommand = new AsyncRelayCommand(LoadDataAsync);
             AddScheduleCommand = new AsyncRelayCommand(AddScheduleAsync);
@@ -60,7 +61,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task LoadSchedulesAsync()
         {
-            var schedules = await _scheduleService.GetAllSchedulesAsync();
+            var schedules = await _scheduleService.GetSchedulesAsync();
             Schedules.Clear();
             foreach (var s in schedules)
             {
@@ -93,8 +94,7 @@ namespace BusBuddy.WPF.ViewModels
             if (SelectedSchedule != null)
             {
                 // Set default values for a new schedule
-                SelectedSchedule.Date = DateTime.Now;
-                SelectedSchedule.ActivityType = "Scheduled Route";
+                SelectedSchedule.ScheduleDate = DateTime.Now;
                 await _scheduleService.AddScheduleAsync(SelectedSchedule);
                 await LoadSchedulesAsync();
             }
@@ -113,17 +113,17 @@ namespace BusBuddy.WPF.ViewModels
         {
             if (SelectedSchedule != null)
             {
-                await _scheduleService.DeleteScheduleAsync(SelectedSchedule.ActivityId);
+                await _scheduleService.DeleteScheduleAsync(SelectedSchedule.ScheduleId);
                 await LoadSchedulesAsync();
             }
         }
 
         private bool CanUpdateOrDelete()
         {
-            return SelectedSchedule != null && SelectedSchedule.ActivityId != 0;
+            return SelectedSchedule != null && SelectedSchedule.ScheduleId != 0;
         }
 
-        partial void OnSelectedScheduleChanged(Activity value)
+        partial void OnSelectedScheduleChanged(Schedule value)
         {
             (UpdateScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();
             (DeleteScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();
