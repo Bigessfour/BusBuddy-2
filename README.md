@@ -1,5 +1,13 @@
 # Bus Buddy - Transportation Management System
 
+**Current State:**
+- 100% WPF application using Syncfusion WPF UI components (no legacy WinForms code)
+- .NET 8 (net8.0-windows) with modern architecture
+- All Syncfusion licensing is handled via environment variable (`SYNCFUSION_LICENSE_KEY`) or `appsettings.json` fallback, per Syncfusion documentation
+- All required Syncfusion WPF NuGet packages are referenced and restored from NuGet.org
+- Project builds and tests cleanly with zero errors or warnings
+- See below for architecture, features, and compliance details
+
 [![CI/CD Pipeline](https://github.com/Bigessfour/BusBuddy_Syncfusion/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Bigessfour/BusBuddy_Syncfusion/actions/workflows/ci-cd.yml)
 [![codecov](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion/branch/master/graph/badge.svg)](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion)
 [![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
@@ -47,7 +55,10 @@ A comprehensive school bus transportation management system built with C# .NET 8
 ### Installation
 1. Clone the repository
 2. Configure the connection string in `appsettings.json`
-3. Add your Syncfusion license key to configuration
+3. **Syncfusion License Key:**
+   - Set the `SYNCFUSION_LICENSE_KEY` environment variable (recommended for security and CI/CD)
+   - Or add your license key to `appsettings.json` under `Syncfusion:LicenseKey` or `SyncfusionLicenseKey`
+   - The application will not start if the license key is missing (see `App.xaml.cs` for details)
 4. Run database migrations:
    ```bash
    dotnet ef database update
@@ -147,6 +158,13 @@ Special considerations for Syncfusion WPF testing:
 - Timeout protection to prevent test freezing
 - Enhanced logging for debugging test issues
 
+## Syncfusion Licensing Compliance
+
+- License key is registered at application startup from environment variable or config file
+- No legacy or duplicate license registration code remains
+- See [Syncfusion Licensing Documentation](https://help.syncfusion.com/common/essential-studio/licensing/license-key)
+
+
 For detailed testing documentation, see: [SYNCFUSION_TEST_FREEZE_MITIGATIONS.md](BusBuddy.Tests/SYNCFUSION_TEST_FREEZE_MITIGATIONS.md)
 
 ## Contributing
@@ -163,4 +181,4 @@ For questions or support, please refer to the development documentation in `DEVE
 
 ---
 
-**Status**: Active Development - Core modules implemented, additional features in progress.
+**Status**: Active Development - Core modules implemented, additional features in progress. Fully modernized and compliant as of July 2025.
