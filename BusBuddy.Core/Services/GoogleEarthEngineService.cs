@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using BusBuddy.Core.Models;
@@ -22,6 +25,13 @@ namespace BusBuddy.Core.Services
         private readonly string _serviceAccountKeyPath;
         private readonly bool _isConfigured;
 
+        /// <summary>
+        /// Required configuration keys:
+        ///   GoogleEarthEngine:ProjectId
+        ///   GoogleEarthEngine:ServiceAccountEmail
+        ///   GoogleEarthEngine:ServiceAccountKeyPath
+        /// Service account must have Earth Engine and Drive read/write permissions.
+        /// </summary>
         public GoogleEarthEngineService(ILogger<GoogleEarthEngineService> logger,
                                        IConfiguration configuration)
         {
@@ -50,332 +60,208 @@ namespace BusBuddy.Core.Services
         public bool IsConfigured => _isConfigured;
 
         /// <summary>
-        /// Retrieves satellite imagery for specified coordinates and layer
+        /// Retrieves GeoJSON route data from Google Earth Engine for a given region or asset using the official export workflow.
         /// </summary>
-        public async Task<SatelliteImageryData?> GetSatelliteImageryAsync(string layerName, double latitude, double longitude)
+
+        public async Task<string> GetRouteGeoJsonAsync(string assetIdOrRegion)
         {
-            try
+            if (!_isConfigured)
             {
-                _logger.LogInformation($"Requesting satellite imagery for layer: {layerName} at {latitude}, {longitude}");
-
-                // Simulate API call to Google Earth Engine
-                await Task.Delay(2000); // Simulate network delay
-
-                // Return mock data (replace with actual GEE API implementation)
-                return new SatelliteImageryData
-                {
-                    LayerName = layerName,
-                    Latitude = latitude,
-                    Longitude = longitude,
-                    ImageUrl = $"https://earthengine.googleapis.com/v1alpha/projects/your-project/thumbnails?...",
-                    Resolution = "30m",
-                    CaptureDate = DateTime.Now.AddDays(-7),
-                    CloudCoverage = 15.5,
-                    QualityScore = 0.92
-                };
+                _logger.LogWarning("GEE not configured. Returning mock GeoJSON.");
+                return "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-98.35,39.5],[-99.35,40.5],[-97.35,41.5]]},\"properties\":{}}]}";
             }
-            catch (Exception ex)
+
+            // 1. Authenticate and get access token (service account or OAuth2)
+            string accessToken = await GetGoogleAccessTokenAsync();
+            if (string.IsNullOrEmpty(accessToken))
+                throw new InvalidOperationException("Failed to obtain Google access token.");
+
+            // 2. Start export task to Google Drive (exportTable)
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var exportRequest = new
             {
-                _logger.LogError(ex, "Error retrieving satellite imagery");
-                return null;
+                description = "BusBuddyRouteExport",
+                driveDestination = new { folder = "BusBuddyExports", fileNamePrefix = "routes" },
+                collection = $"projects/{_projectId}/assets/{assetIdOrRegion}"
+            };
+            var exportUrl = $"https://earthengine.googleapis.com/v1/projects/{_projectId}/table:export";
+            var exportResponse = await httpClient.PostAsJsonAsync(exportUrl, exportRequest);
+            exportResponse.EnsureSuccessStatusCode();
+            var exportResultJson = await exportResponse.Content.ReadAsStringAsync();
+
+            // Parse exportResult to get the task name (ID)
+            var exportResult = System.Text.Json.JsonDocument.Parse(exportResultJson);
+            if (!exportResult.RootElement.TryGetProperty("name", out var taskNameElement))
+                throw new InvalidOperationException("Export response missing task name.");
+            string taskName = taskNameElement.GetString() ?? throw new InvalidOperationException("Task name is null.");
+
+            // 3. Poll for export task completion
+            // Configurable polling parameters
+            int maxAttempts = _configuration.GetValue<int?>("GoogleEarthEngine:ExportPollingMaxAttempts") ?? 30;
+            int initialDelayMs = _configuration.GetValue<int?>("GoogleEarthEngine:ExportPollingInitialDelayMs") ?? 4000;
+
+            string driveFileId = await PollForExportAndGetDriveFileIdAsync(taskName, accessToken, maxAttempts, initialDelayMs);
+            if (string.IsNullOrEmpty(driveFileId))
+            {
+                _logger.LogError("Export did not complete or file ID not found. Task: {TaskName}", taskName);
+                throw new InvalidOperationException("Export did not complete or file ID not found.");
             }
+
+            // 4. Download the resulting GeoJSON from Google Drive
+            string geoJson = await DownloadGeoJsonFromDriveAsync(driveFileId, accessToken);
+
+            // 5. Clean up: Delete file from Drive after download
+            bool deleted = await TryDeleteDriveFileAsync(driveFileId, accessToken);
+            if (!deleted)
+                _logger.LogWarning("Failed to delete exported file from Drive: {FileId}", driveFileId);
+
+            return geoJson;
         }
-
         /// <summary>
-        /// Performs terrain analysis using Google Earth Engine elevation data
+        /// Polls the GEE export task until completion and returns the resulting Drive file ID.
         /// </summary>
-        public async Task<TerrainAnalysisResult?> GetTerrainAnalysisAsync(double latitude, double longitude, int zoomLevel)
+        private async Task<string> PollForExportAndGetDriveFileIdAsync(string taskName, string accessToken, int maxAttempts, int initialDelayMs)
         {
-            try
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var statusUrl = $"https://earthengine.googleapis.com/v1/{taskName}";
+            int delayMs = initialDelayMs;
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
             {
-                _logger.LogInformation($"Performing terrain analysis at {latitude}, {longitude}, zoom: {zoomLevel}");
-
-                // Simulate GEE terrain analysis
-                await Task.Delay(3000);
-
-                // Generate mock terrain data (replace with actual GEE analysis)
-                var random = new Random();
-                return new TerrainAnalysisResult
+                try
                 {
-                    MinElevation = 50 + random.Next(0, 100),
-                    MaxElevation = 200 + random.Next(0, 300),
-                    AverageSlope = 2.5 + random.NextDouble() * 8.0,
-                    TerrainType = GetTerrainType(latitude, longitude),
-                    RouteDifficulty = GetRouteDifficulty(2.5 + random.NextDouble() * 8.0)
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error performing terrain analysis");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Optimizes routes using Google Earth Engine computational capabilities
-        /// </summary>
-        public async Task<List<RouteOptimizationResult>> OptimizeRoutesAsync(IEnumerable<Route> routes)
-        {
-            try
-            {
-                _logger.LogInformation($"Optimizing {routes.Count()} routes with Google Earth Engine");
-
-                var results = new List<RouteOptimizationResult>();
-
-                foreach (var route in routes)
-                {
-                    // Simulate GEE route optimization
-                    await Task.Delay(1000);
-
-                    var random = new Random();
-                    var optimizationResult = new RouteOptimizationResult
+                    var statusResponse = await httpClient.GetAsync(statusUrl);
+                    if (!statusResponse.IsSuccessStatusCode)
                     {
-                        RouteId = route.RouteId,
-                        FuelSavingsPercent = random.NextDouble() * 15.0, // 0-15% savings
-                        TimeEfficiencyGain = random.NextDouble() * 20.0, // 0-20% time improvement
-                        HasAlternative = random.Next(0, 100) < 70, // 70% chance of alternative
-                        OptimizationNotes = GenerateOptimizationNotes(route)
-                    };
-
-                    results.Add(optimizationResult);
-                }
-
-                _logger.LogInformation($"Route optimization completed for {results.Count} routes");
-                return results;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error optimizing routes");
-                return new List<RouteOptimizationResult>();
-            }
-        }
-
-        /// <summary>
-        /// Gets real-time traffic data using Google Earth Engine and traffic APIs
-        /// </summary>
-        public async Task<TrafficData?> GetTrafficDataAsync()
-        {
-            try
-            {
-                _logger.LogDebug("Retrieving real-time traffic data");
-
-                // Simulate traffic API call
-                await Task.Delay(1500);
-
-                var random = new Random();
-                var conditions = new[] { "Good", "Moderate", "Heavy", "Severe" };
-                var weights = new[] { 50, 30, 15, 5 }; // Probability weights
-
-                return new TrafficData
-                {
-                    OverallCondition = GetWeightedRandomChoice(conditions, weights),
-                    RouteConditions = new Dictionary<string, string>
-                    {
-                        { "Route 1", GetWeightedRandomChoice(conditions, weights) },
-                        { "Route 2", GetWeightedRandomChoice(conditions, weights) },
-                        { "Route 3", GetWeightedRandomChoice(conditions, weights) }
+                        _logger.LogWarning("Polling attempt {Attempt}: Non-success status {StatusCode}", attempt, statusResponse.StatusCode);
+                        if ((int)statusResponse.StatusCode == 429 || (int)statusResponse.StatusCode == 503)
+                        {
+                            // Quota or service unavailable, exponential backoff
+                            await Task.Delay(delayMs);
+                            delayMs = Math.Min(delayMs * 2, 60000); // Cap at 60s
+                            continue;
+                        }
+                        statusResponse.EnsureSuccessStatusCode();
                     }
-                };
+                    var statusJson = await statusResponse.Content.ReadAsStringAsync();
+                    var statusDoc = System.Text.Json.JsonDocument.Parse(statusJson);
+                    if (statusDoc.RootElement.TryGetProperty("state", out var stateElem))
+                    {
+                        string state = stateElem.GetString() ?? "";
+                        if (state == "SUCCEEDED")
+                        {
+                            // Get Drive file ID
+                            if (statusDoc.RootElement.TryGetProperty("driveDestination", out var driveElem) &&
+                                driveElem.TryGetProperty("fileId", out var fileIdElem))
+                            {
+                                return fileIdElem.GetString() ?? string.Empty;
+                            }
+                            _logger.LogError("Export succeeded but fileId not found in response.");
+                            return string.Empty;
+                        }
+                        else if (state == "FAILED" || state == "CANCELLED")
+                        {
+                            _logger.LogError("GEE export failed or cancelled: {State}. Task: {TaskName}", state, taskName);
+                            return string.Empty;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception during export polling attempt {Attempt}", attempt);
+                }
+                await Task.Delay(delayMs);
+                delayMs = Math.Min(delayMs * 2, 60000); // Exponential backoff, cap at 60s
+            }
+            _logger.LogError("GEE export polling timed out. Task: {TaskName}", taskName);
+            return string.Empty;
+        }
+        /// <summary>
+        /// Attempts to delete a file from Google Drive after download to avoid clutter/quota issues.
+        /// </summary>
+        private async Task<bool> TryDeleteDriveFileAsync(string fileId, string accessToken)
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var deleteUrl = $"https://www.googleapis.com/drive/v3/files/{fileId}";
+                var response = await httpClient.DeleteAsync(deleteUrl);
+                if (response.IsSuccessStatusCode)
+                    return true;
+                _logger.LogWarning("Drive file delete returned status {StatusCode} for file {FileId}", response.StatusCode, fileId);
+                return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving traffic data");
-                return null;
+                _logger.LogError(ex, "Exception deleting Drive file {FileId}", fileId);
+                return false;
             }
         }
 
         /// <summary>
-        /// Gets weather data for route planning
+        /// Downloads the exported GeoJSON file from Google Drive using the Drive API.
         /// </summary>
-        public async Task<WeatherData?> GetWeatherDataAsync()
+        private async Task<string> DownloadGeoJsonFromDriveAsync(string fileId, string accessToken)
         {
+
             try
             {
-                _logger.LogDebug("Retrieving weather data");
-
-                // Simulate weather API call
-                await Task.Delay(1000);
-
-                var random = new Random();
-                var conditions = new[] { "Clear", "Partly Cloudy", "Cloudy", "Light Rain", "Heavy Rain", "Snow" };
-                var weights = new[] { 30, 25, 20, 15, 7, 3 };
-
-                return new WeatherData
+                var driveService = new Google.Apis.Drive.v3.DriveService(new Google.Apis.Services.BaseClientService.Initializer
                 {
-                    Condition = GetWeightedRandomChoice(conditions, weights),
-                    Temperature = 15 + random.NextDouble() * 20, // 15-35°C
-                    Visibility = 5 + random.NextDouble() * 15, // 5-20 km
-                    WindCondition = random.Next(0, 100) < 20 ? "Windy" : "Calm"
-                };
+                    HttpClientInitializer = null, // We use raw HTTP for this download
+                    ApplicationName = "BusBuddy"
+                });
+
+                // Use HttpClient with Bearer token for direct download
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                var downloadUrl = $"https://www.googleapis.com/drive/v3/files/{fileId}?alt=media";
+                var response = await httpClient.GetAsync(downloadUrl);
+                response.EnsureSuccessStatusCode();
+                var geoJson = await response.Content.ReadAsStringAsync();
+                return geoJson;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving weather data");
-                return null;
+                _logger.LogError(ex, "Failed to download GeoJSON from Google Drive.");
+                return string.Empty;
             }
         }
 
         /// <summary>
-        /// Analyzes bus route efficiency using satellite imagery and traffic patterns
+        /// Authenticates using a Google service account key and returns an OAuth2 access token for Earth Engine and Drive APIs.
         /// </summary>
-        public async Task<RouteEfficiencyAnalysis?> AnalyzeRouteEfficiencyAsync(int routeId)
+        private async Task<string> GetGoogleAccessTokenAsync()
         {
+            if (string.IsNullOrEmpty(_serviceAccountKeyPath) || !System.IO.File.Exists(_serviceAccountKeyPath))
+            {
+                _logger.LogError($"Service account key file not found: {_serviceAccountKeyPath}");
+                return string.Empty;
+            }
+
             try
             {
-                _logger.LogInformation($"Analyzing route efficiency for route {routeId}");
-
-                // Simulate comprehensive route analysis
-                await Task.Delay(2500);
-
-                var random = new Random();
-                return new RouteEfficiencyAnalysis
-                {
-                    RouteId = routeId,
-                    OverallEfficiencyScore = 70 + random.NextDouble() * 25, // 70-95% efficiency
-                    FuelEfficiencyRating = random.Next(6, 11), // 6-10 rating
-                    TimeEfficiencyRating = random.Next(6, 11),
-                    SafetyRating = random.Next(7, 11),
-                    EnvironmentalImpactScore = 60 + random.NextDouble() * 35,
-                    RecommendedImprovements = GenerateRouteImprovements(),
-                    AnalysisDate = DateTime.Now
+                // Scopes required for Earth Engine and Drive export
+                var scopes = new[] {
+                    "https://www.googleapis.com/auth/earthengine",
+                    "https://www.googleapis.com/auth/drive.readonly"
                 };
+
+                using var stream = System.IO.File.OpenRead(_serviceAccountKeyPath);
+                var credential = await Google.Apis.Auth.OAuth2.GoogleCredential.FromStreamAsync(stream, System.Threading.CancellationToken.None);
+                var scoped = credential.CreateScoped(scopes);
+                var token = await scoped.UnderlyingCredential.GetAccessTokenForRequestAsync();
+                return token;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error analyzing route efficiency");
-                return null;
+                _logger.LogError(ex, "Failed to obtain Google access token from service account.");
+                return string.Empty;
             }
         }
-
-        #region Helper Methods
-
-        private string GetTerrainType(double latitude, double longitude)
-        {
-            // Simple terrain classification based on coordinates
-            var terrainTypes = new[] { "Urban", "Suburban", "Rural", "Mountainous", "Coastal", "Desert" };
-            var hash = Math.Abs((latitude + longitude).GetHashCode());
-            return terrainTypes[hash % terrainTypes.Length];
-        }
-
-        private string GetRouteDifficulty(double averageSlope)
-        {
-            return averageSlope switch
-            {
-                < 3.0 => "Easy",
-                < 6.0 => "Moderate",
-                < 10.0 => "Challenging",
-                _ => "Difficult"
-            };
-        }
-
-        private string GenerateOptimizationNotes(Route route)
-        {
-            var notes = new[]
-            {
-                "Alternative route found with less traffic congestion",
-                "Terrain analysis suggests fuel-efficient path available",
-                "Minor adjustments could improve schedule reliability",
-                "Consider bypass roads during peak hours",
-                "Weather patterns indicate seasonal route modifications beneficial"
-            };
-
-            var random = new Random();
-            return notes[random.Next(notes.Length)];
-        }
-
-        private string GetWeightedRandomChoice(string[] choices, int[] weights)
-        {
-            var random = new Random();
-            var totalWeight = weights.Sum();
-            var randomValue = random.Next(totalWeight);
-
-            for (int i = 0; i < choices.Length; i++)
-            {
-                randomValue -= weights[i];
-                if (randomValue < 0)
-                    return choices[i];
-            }
-
-            return choices[0];
-        }
-
-        private List<string> GenerateRouteImprovements()
-        {
-            var improvements = new[]
-            {
-                "Consider alternative route during peak hours",
-                "Optimize stop locations for better accessibility",
-                "Adjust timing to avoid high-traffic periods",
-                "Implement eco-friendly driving practices",
-                "Review route for potential safety improvements",
-                "Evaluate stop consolidation opportunities"
-            };
-
-            var random = new Random();
-            var count = random.Next(2, 5);
-            return improvements.OrderBy(x => random.Next()).Take(count).ToList();
-        }
-
-        #endregion
     }
-
-    #region Supporting Data Classes
-
-    public class SatelliteImageryData
-    {
-        public string LayerName { get; set; } = string.Empty;
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public string ImageUrl { get; set; } = string.Empty;
-        public string Resolution { get; set; } = string.Empty;
-        public DateTime CaptureDate { get; set; }
-        public double CloudCoverage { get; set; }
-        public double QualityScore { get; set; }
-    }
-
-    public class RouteEfficiencyAnalysis
-    {
-        public int RouteId { get; set; }
-        public double OverallEfficiencyScore { get; set; }
-        public int FuelEfficiencyRating { get; set; }
-        public int TimeEfficiencyRating { get; set; }
-        public int SafetyRating { get; set; }
-        public double EnvironmentalImpactScore { get; set; }
-        public List<string> RecommendedImprovements { get; set; } = new();
-        public DateTime AnalysisDate { get; set; }
-    }
-
-    public class TerrainAnalysisResult
-    {
-        public double MinElevation { get; set; }
-        public double MaxElevation { get; set; }
-        public double AverageSlope { get; set; }
-        public string TerrainType { get; set; } = string.Empty;
-        public string RouteDifficulty { get; set; } = string.Empty;
-    }
-
-    public class RouteOptimizationResult
-    {
-        public int RouteId { get; set; }
-        public double FuelSavingsPercent { get; set; }
-        public double TimeEfficiencyGain { get; set; }
-        public bool HasAlternative { get; set; }
-        public string OptimizationNotes { get; set; } = string.Empty;
-    }
-
-    public class TrafficData
-    {
-        public string OverallCondition { get; set; } = string.Empty;
-        public Dictionary<string, string> RouteConditions { get; set; } = new();
-    }
-
-    public class WeatherData
-    {
-        public string Condition { get; set; } = string.Empty;
-        public double Temperature { get; set; }
-        public double Visibility { get; set; }
-        public string WindCondition { get; set; } = string.Empty;
-    }
-
-    #endregion
 }
+
