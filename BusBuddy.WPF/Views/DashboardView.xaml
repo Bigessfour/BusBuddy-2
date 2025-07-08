@@ -54,12 +54,12 @@
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Bus Management" Command="{Binding NavigateToBusManagementCommand}" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Driver Management" Command="{Binding NavigateToDriverManagementCommand}" />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Route Management" Command="{Binding NavigateToRouteManagementCommand}" />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Schedule Management" Command="{Binding NavigateToScheduleManagementCommand}" />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Student Management" Command="{Binding NavigateToStudentManagementCommand}" />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Maintenance Tracking" Command="{Binding NavigateToMaintenanceTrackingCommand}" />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Fuel Management" Command="{Binding NavigateToFuelManagementCommand}" />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Activity Logging" Command="{Binding NavigateToActivityLoggingCommand}" />
-                <Button Style="{StaticResource NavigationButtonStyle}" Content="Ticket Management" Command="{Binding NavigateToTicketManagementCommand}" />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Schedule Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Student Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Maintenance Tracking (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Fuel Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Activity Logging (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
+                <Button Style="{StaticResource NavigationButtonStyle}" Content="Ticket Management (Coming Soon)" IsEnabled="False" ToolTip="This feature is under development." />
                 <Button Style="{StaticResource NavigationButtonStyle}" Content="Settings" Command="{Binding NavigateToSettingsCommand}" />
             </StackPanel>
         </Border>

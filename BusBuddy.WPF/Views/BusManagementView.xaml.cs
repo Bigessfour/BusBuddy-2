@@ -7,8 +7,13 @@ namespace BusBuddy.WPF.Views
         public BusManagementView()
         {
             InitializeComponent();
-            // For demo/testing: instantiate service and viewmodel directly. Replace with DI as needed.
-            DataContext = new BusBuddy.WPF.ViewModels.BusManagementViewModel(new BusBuddy.WPF.ViewModels.BusService());
+            // Use DI to resolve the real IBusService and viewmodel
+            var app = System.Windows.Application.Current as App;
+            if (app?.Services != null)
+            {
+                var vm = app.Services.GetService(typeof(BusBuddy.WPF.ViewModels.BusManagementViewModel)) as BusBuddy.WPF.ViewModels.BusManagementViewModel;
+                DataContext = vm;
+            }
         }
     }
 }

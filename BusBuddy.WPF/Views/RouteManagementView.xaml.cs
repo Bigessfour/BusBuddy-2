@@ -11,6 +11,13 @@ namespace BusBuddy.WPF.Views
         public RouteManagementView()
         {
             InitializeComponent();
+            // Use DI to resolve the real RouteManagementViewModel
+            var app = System.Windows.Application.Current as App;
+            if (app?.Services != null)
+            {
+                var vm = app.Services.GetService(typeof(BusBuddy.WPF.ViewModels.RouteManagementViewModel)) as BusBuddy.WPF.ViewModels.RouteManagementViewModel;
+                DataContext = vm;
+            }
             Loaded += RouteManagementView_Loaded;
         }
 

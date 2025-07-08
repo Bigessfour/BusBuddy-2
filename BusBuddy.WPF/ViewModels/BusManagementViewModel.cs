@@ -6,49 +6,14 @@ using System;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public class Bus : INotifyPropertyChanged
-    {
-        public int Id { get; set; }
-        public string? Number { get; set; }
-        public string? Model { get; set; }
-        public int Capacity { get; set; }
-        public string? Status { get; set; }
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
-
-    public interface IBusService
-    {
-        ObservableCollection<Bus> GetBuses();
-        void AddBus(Bus bus);
-        void UpdateBus(Bus bus);
-        void DeleteBus(Bus bus);
-    }
-
-    public class BusService : IBusService
-    {
-        private ObservableCollection<Bus> _buses = new();
-        public ObservableCollection<Bus> GetBuses() => _buses;
-        public void AddBus(Bus bus) => _buses.Add(bus);
-        public void UpdateBus(Bus bus)
-        {
-            var existing = _buses.FirstOrDefault(b => b.Id == bus.Id);
-            if (existing != null)
-            {
-                existing.Number = bus.Number;
-                existing.Model = bus.Model;
-                existing.Capacity = bus.Capacity;
-                existing.Status = bus.Status;
-            }
-        }
-        public void DeleteBus(Bus bus) => _buses.Remove(bus);
-    }
+    using BusBuddy.Core.Services;
+    using BusBuddy.Core.Models;
+    using System.Threading.Tasks;
 
     public class BusManagementViewModel : INotifyPropertyChanged
     {
         private readonly IBusService _service;
-        public ObservableCollection<Bus> Buses { get; }
+        public ObservableCollection<Bus> Buses { get; } = new();
         public ICommand AddBusCommand { get; }
         public ICommand EditBusCommand { get; }
         public ICommand DeleteBusCommand { get; }
@@ -58,64 +23,62 @@ namespace BusBuddy.WPF.ViewModels
             get => _selectedBus;
             set { _selectedBus = value; OnPropertyChanged(); }
         }
-
-        // Multi-selection support
-        private ObservableCollection<Bus> _selectedBuses = new();
-        public ObservableCollection<Bus> SelectedBuses
-        {
-            get => _selectedBuses;
-            set { _selectedBuses = value; OnPropertyChanged(); }
-        }
-
-        public ICommand BulkUpdateStatusCommand { get; }
         public BusManagementViewModel(IBusService service)
         {
             _service = service;
-            Buses = _service.GetBuses();
-            AddBusCommand = new RelayCommand(AddBus);
-            EditBusCommand = new RelayCommand(EditBus);
-            DeleteBusCommand = new RelayCommand(DeleteBus);
-            BulkUpdateStatusCommand = new RelayCommand(BulkUpdateStatus);
+            LoadBusesAsync();
+            AddBusCommand = new BusBuddy.WPF.RelayCommand(_ => AddBusAsyncWrapper());
+            EditBusCommand = new BusBuddy.WPF.RelayCommand(_ => EditBusAsyncWrapper());
+            DeleteBusCommand = new BusBuddy.WPF.RelayCommand(_ => DeleteBusAsyncWrapper());
         }
 
-        private void BulkUpdateStatus()
+        private async void LoadBusesAsync()
         {
-            if (SelectedBuses == null || SelectedBuses.Count == 0)
-                return;
-
-            // Example: Mark all selected as Inactive
-            foreach (var bus in SelectedBuses)
-            {
-                bus.Status = "Inactive";
-                _service.UpdateBus(bus);
-            }
-            // Notify UI
-            OnPropertyChanged(nameof(Buses));
+            Buses.Clear();
+            var buses = await _service.GetAllBusEntitiesAsync();
+            foreach (var b in buses)
+                Buses.Add(b);
         }
-        private void AddBus()
+
+        private async void AddBusAsyncWrapper() => await AddBusAsync();
+        private async void EditBusAsyncWrapper() => await EditBusAsync();
+        private async void DeleteBusAsyncWrapper() => await DeleteBusAsync();
+
+        private async Task AddBusAsync()
         {
             var newBus = new Bus
             {
-                Id = Buses.Count + 1,
-                Number = "New Bus",
+                BusNumber = "New Bus",
                 Model = "Model X",
-                Capacity = 50,
+                SeatingCapacity = 50,
                 Status = "Active"
             };
-            _service.AddBus(newBus);
+            var created = await _service.AddBusEntityAsync(newBus);
+            Buses.Add(created);
         }
-        private void EditBus()
+
+        private async Task EditBusAsync()
         {
             if (SelectedBus != null)
-                _service.UpdateBus(SelectedBus);
+            {
+                await _service.UpdateBusEntityAsync(SelectedBus);
+                // Optionally reload buses
+            }
         }
-        private void DeleteBus()
+
+        private async Task DeleteBusAsync()
         {
             if (SelectedBus != null)
-                _service.DeleteBus(SelectedBus);
+            {
+                await _service.DeleteBusEntityAsync(SelectedBus.VehicleId);
+                Buses.Remove(SelectedBus);
+            }
         }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
+
+    // ...existing code...
 }

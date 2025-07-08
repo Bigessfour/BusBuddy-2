@@ -6,59 +6,18 @@ using System.Windows.Input;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public class Student : INotifyPropertyChanged
-    {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Grade { get; set; }
-        public string? AssignedBus { get; set; }
-        public string? AssignedRoute { get; set; }
-        public string? Status { get; set; }
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
 
-    public interface IStudentService
-    {
-        ObservableCollection<Student> GetStudents();
-        ObservableCollection<string> GetAvailableBuses();
-        ObservableCollection<string> GetAvailableRoutes();
-        void AddStudent(Student student);
-        void UpdateStudent(Student student);
-        void DeleteStudent(Student student);
-    }
-
-    public class StudentService : IStudentService
-    {
-        private ObservableCollection<Student> _students = new();
-        private ObservableCollection<string> _buses = new() { "Bus 1", "Bus 2", "Bus 3" };
-        private ObservableCollection<string> _routes = new() { "Route 101", "Route 102", "Route 103" };
-        public ObservableCollection<Student> GetStudents() => _students;
-        public ObservableCollection<string> GetAvailableBuses() => _buses;
-        public ObservableCollection<string> GetAvailableRoutes() => _routes;
-        public void AddStudent(Student student) => _students.Add(student);
-        public void UpdateStudent(Student student)
-        {
-            var existing = _students.FirstOrDefault(s => s.Id == student.Id);
-            if (existing != null)
-            {
-                existing.Name = student.Name;
-                existing.Grade = student.Grade;
-                existing.AssignedBus = student.AssignedBus;
-                existing.AssignedRoute = student.AssignedRoute;
-                existing.Status = student.Status;
-            }
-        }
-        public void DeleteStudent(Student student) => _students.Remove(student);
-    }
+    using BusBuddy.Core.Models;
+    using BusBuddy.Core.Services;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public class StudentManagementViewModel : INotifyPropertyChanged
     {
         private readonly IStudentService _service;
-        public ObservableCollection<Student> Students { get; }
-        public ObservableCollection<string> AvailableBuses { get; }
-        public ObservableCollection<string> AvailableRoutes { get; }
+        public ObservableCollection<Student> Students { get; } = new();
+        public ObservableCollection<string> AvailableBuses { get; } = new();
+        public ObservableCollection<string> AvailableRoutes { get; } = new();
         public ICommand AddCommand { get; }
         public ICommand EditCommand { get; }
         public ICommand DeleteCommand { get; }
@@ -71,38 +30,60 @@ namespace BusBuddy.WPF.ViewModels
         public StudentManagementViewModel(IStudentService service)
         {
             _service = service;
-            Students = _service.GetStudents();
-            AvailableBuses = _service.GetAvailableBuses();
-            AvailableRoutes = _service.GetAvailableRoutes();
-            AddCommand = new RelayCommand(AddStudent);
-            EditCommand = new RelayCommand(EditStudent);
-            DeleteCommand = new RelayCommand(DeleteStudent);
+            LoadStudents();
+            // TODO: Load real buses and routes from service if available
+            AddCommand = new BusBuddy.WPF.RelayCommand(_ => AddStudentAsyncWrapper());
+            EditCommand = new BusBuddy.WPF.RelayCommand(_ => EditStudentAsyncWrapper());
+            DeleteCommand = new BusBuddy.WPF.RelayCommand(_ => DeleteStudentAsyncWrapper());
         }
-        private void AddStudent()
+
+        // ICommand async wrappers
+        private async void AddStudentAsyncWrapper() => await AddStudentAsync();
+        private async void EditStudentAsyncWrapper() => await EditStudentAsync();
+        private async void DeleteStudentAsyncWrapper() => await DeleteStudentAsync();
+
+        private async void LoadStudents()
+        {
+            Students.Clear();
+            var students = await _service.GetAllStudentsAsync();
+            foreach (var s in students)
+                Students.Add(s);
+        }
+
+        private async Task AddStudentAsync()
         {
             var newStudent = new Student
             {
-                Id = Students.Count + 1,
-                Name = "New Student",
+                StudentName = "New Student",
                 Grade = "K",
-                AssignedBus = AvailableBuses.FirstOrDefault() ?? string.Empty,
-                AssignedRoute = AvailableRoutes.FirstOrDefault() ?? string.Empty,
-                Status = "Active"
+                Active = true
             };
-            _service.AddStudent(newStudent);
+            var created = await _service.AddStudentAsync(newStudent);
+            Students.Add(created);
         }
-        private void EditStudent()
+
+        private async Task EditStudentAsync()
         {
             if (SelectedStudent != null)
-                _service.UpdateStudent(SelectedStudent);
+            {
+                await _service.UpdateStudentAsync(SelectedStudent);
+                // Optionally reload students
+            }
         }
-        private void DeleteStudent()
+
+        private async Task DeleteStudentAsync()
         {
             if (SelectedStudent != null)
-                _service.DeleteStudent(SelectedStudent);
+            {
+                await _service.DeleteStudentAsync(SelectedStudent.StudentId);
+                Students.Remove(SelectedStudent);
+            }
         }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
+
+    // Removed duplicate legacy StudentManagementViewModel. Only the refactored version remains.
 }

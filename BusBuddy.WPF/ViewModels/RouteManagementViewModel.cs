@@ -17,8 +17,8 @@ namespace BusBuddy.WPF.ViewModels
         {
             _geeService = geeService;
             LoadRoutesCommand = new AsyncRelayCommand(LoadRoutesAsync);
-            ZoomInCommand = new RelayCommand(ZoomIn);
-            ZoomOutCommand = new RelayCommand(ZoomOut);
+            ZoomInCommand = new RelayCommand(_ => ZoomIn());
+            ZoomOutCommand = new RelayCommand(_ => ZoomOut());
         }
 
         // These methods can be used to communicate with the WebView2 control via JS interop

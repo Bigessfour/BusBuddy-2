@@ -1,3 +1,4 @@
+using BusBuddy.Core.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -23,7 +24,7 @@ namespace BusBuddy.WPF.ViewModels
         }
 
         public ObservableCollection<RidershipDataPoint> RidershipData { get; }
-        public ObservableCollection<Schedule> BusSchedules { get; set; } = new ObservableCollection<Schedule>();
+        public ObservableCollection<Activity> BusSchedules { get; set; } = new ObservableCollection<Activity>();
 
         // Navigation commands for the 10 modules
         public ICommand NavigateToBusManagementCommand { get; }
@@ -83,16 +84,16 @@ namespace BusBuddy.WPF.ViewModels
             LoadFleetStatusSummary();
 
             // Initialize commands
-            NavigateToBusManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("BusManagement"));
-            NavigateToDriverManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("DriverManagement"));
-            NavigateToRouteManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("RouteManagement"));
-            NavigateToScheduleManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("ScheduleManagement"));
-            NavigateToStudentManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("StudentManagement"));
-            NavigateToMaintenanceTrackingCommand = new RelayCommand(() => NavigateToModule?.Invoke("MaintenanceTracking"));
-            NavigateToFuelManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("FuelManagement"));
-            NavigateToActivityLoggingCommand = new RelayCommand(() => NavigateToModule?.Invoke("ActivityLogging"));
-            NavigateToTicketManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("TicketManagement"));
-            NavigateToSettingsCommand = new RelayCommand(() => NavigateToModule?.Invoke("Settings"));
+            NavigateToBusManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("BusManagement"));
+            NavigateToDriverManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("DriverManagement"));
+            NavigateToRouteManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("RouteManagement"));
+            NavigateToScheduleManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("ScheduleManagement"));
+            NavigateToStudentManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("StudentManagement"));
+            NavigateToMaintenanceTrackingCommand = new RelayCommand(_ => NavigateToModule?.Invoke("MaintenanceTracking"));
+            NavigateToFuelManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("FuelManagement"));
+            NavigateToActivityLoggingCommand = new RelayCommand(_ => NavigateToModule?.Invoke("ActivityLogging"));
+            NavigateToTicketManagementCommand = new RelayCommand(_ => NavigateToModule?.Invoke("TicketManagement"));
+            NavigateToSettingsCommand = new RelayCommand(_ => NavigateToModule?.Invoke("Settings"));
         }
 
         private async void LoadFleetStatusSummary()
@@ -115,7 +116,13 @@ namespace BusBuddy.WPF.ViewModels
 
         private void LoadData()
         {
-            BusSchedules = new ObservableCollection<Schedule>(_scheduleService.GetSchedules());
+            _ = LoadBusSchedulesAsync();
+        }
+
+        private async Task LoadBusSchedulesAsync()
+        {
+            var activities = await _scheduleService.GetAllSchedulesAsync();
+            BusSchedules = new ObservableCollection<Activity>(activities);
             OnPropertyChanged(nameof(BusSchedules));
         }
 
@@ -126,13 +133,5 @@ namespace BusBuddy.WPF.ViewModels
         }
     }
 
-    // Simple RelayCommand implementation for ICommand
-    public class RelayCommand : ICommand
-    {
-        private readonly Action _execute;
-        public RelayCommand(Action execute) => _execute = execute;
-        public bool CanExecute(object? parameter) => true;
-        public void Execute(object? parameter) => _execute();
-        public event EventHandler? CanExecuteChanged { add { } remove { } }
-    }
+    // ...existing code...
 }

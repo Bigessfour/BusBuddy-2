@@ -18,11 +18,20 @@
                                AutoGenerateColumns="False"
                                Margin="0,40,0,0">
             <syncfusion:SfDataGrid.Columns>
-                <syncfusion:GridComboBoxColumn MappingName="BusNumber" HeaderText="Bus" ItemsSource="{Binding AvailableBuses}" />
-                <syncfusion:GridTextColumn MappingName="Description" HeaderText="Description"/>
-                <syncfusion:GridDateTimeColumn MappingName="ScheduledDate" HeaderText="Scheduled"/>
-                <syncfusion:GridDateTimeColumn MappingName="CompletedDate" HeaderText="Completed"/>
+                <!-- Bus selection by BusNumber -->
+                <syncfusion:GridComboBoxColumn MappingName="VehicleId"
+                                              HeaderText="Bus"
+                                              ItemsSource="{Binding AvailableBuses}"
+                                              DisplayMemberPath="BusNumber"
+                                              SelectedValuePath="VehicleId" />
+                <syncfusion:GridDateTimeColumn MappingName="Date" HeaderText="Date"/>
+                <syncfusion:GridTextColumn MappingName="OdometerReading" HeaderText="Odometer"/>
+                <syncfusion:GridTextColumn MappingName="MaintenanceCompleted" HeaderText="Maintenance Completed"/>
+                <syncfusion:GridTextColumn MappingName="Vendor" HeaderText="Vendor"/>
+                <syncfusion:GridTextColumn MappingName="RepairCost" HeaderText="Repair Cost"/>
                 <syncfusion:GridTextColumn MappingName="Status" HeaderText="Status"/>
+                <syncfusion:GridTextColumn MappingName="Priority" HeaderText="Priority"/>
+                <syncfusion:GridTextColumn MappingName="Notes" HeaderText="Notes"/>
             </syncfusion:SfDataGrid.Columns>
         </syncfusion:SfDataGrid>
     </Grid>

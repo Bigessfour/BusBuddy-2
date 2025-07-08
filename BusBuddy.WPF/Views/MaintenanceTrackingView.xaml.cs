@@ -7,8 +7,10 @@ namespace BusBuddy.WPF.Views
         public MaintenanceTrackingView()
         {
             InitializeComponent();
-            // For demo/testing: instantiate service and viewmodel directly. Replace with DI as needed.
-            DataContext = new BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel(new BusBuddy.WPF.ViewModels.MaintenanceService());
+            if (App.Current is App app && app.Services != null)
+            {
+                DataContext = app.Services.GetService(typeof(BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel));
+            }
         }
     }
 }

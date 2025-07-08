@@ -38,6 +38,11 @@ public partial class App : Application
 
     private void ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
     {
+        // Register GoogleEarthEngineService and RouteManagementViewModel for DI
+        services.AddScoped<BusBuddy.Core.Services.GoogleEarthEngineService>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.RouteManagementViewModel>();
+        // Register DriverManagementViewModel for DI
+        services.AddScoped<BusBuddy.WPF.ViewModels.DriverManagementViewModel>();
         // Register your view models and services here
         services.AddScoped<DashboardViewModel>();
         services.AddScoped<ActivityLogViewModel>();
@@ -50,9 +55,11 @@ public partial class App : Application
         // Register DbContext (update connection string as needed)
         services.AddDbContext<BusBuddyDbContext>(options =>
             options.UseSqlite("Data Source=busbuddy.db"));
-        // Register IScheduleService implementation
-        services.AddScoped<IScheduleService, ScheduleService>();
-        // Register ActivityLogService for logging
+        // Register IScheduleService with real implementation
+        services.AddScoped<BusBuddy.Core.Services.IScheduleService, BusBuddy.Core.Services.ScheduleService>();
+        // Register IStudentService with real implementation
+        services.AddScoped<BusBuddy.Core.Services.IStudentService, BusBuddy.Core.Services.StudentService>();
+        // Register ActivityLogService for logging (if needed for other logging)
         services.AddScoped<BusBuddy.Core.Services.IActivityLogService, BusBuddy.Core.Services.ActivityLogService>();
         // Register Fuel service and view model
         services.AddScoped<BusBuddy.Core.Services.IFuelService, BusBuddy.Core.Services.FuelService>();
@@ -61,6 +68,9 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
         // Add other services as needed
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
+        // Register Maintenance service and view model
+        services.AddScoped<BusBuddy.Core.Services.IMaintenanceService, BusBuddy.Core.Services.MaintenanceService>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel>();
     }
 }
 

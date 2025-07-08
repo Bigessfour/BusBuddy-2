@@ -51,7 +51,7 @@ namespace BusBuddy.WPF.ViewModels
             _activityLogService = activityLogService;
             _ = LoadDriversAsync();
             _ = LoadDriverAvailabilitiesAsync();
-            GenerateLicenseStatusReportCommand = new RelayCommand(GenerateLicenseStatusReport);
+            GenerateLicenseStatusReportCommand = new RelayCommand(_ => GenerateLicenseStatusReport());
         }
 
 
