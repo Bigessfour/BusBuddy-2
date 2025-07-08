@@ -40,11 +40,7 @@ namespace Bus_Buddy.Utilities
                 // Step 1: Configure form-level background (CRITICAL!)
                 ConfigureFormBackground(form);
 
-                // Step 2: Fix MetroForm specific issues
-                if (form is MetroForm metroForm)
-                {
-                    FixMetroFormBackground(metroForm);
-                }
+                // Step 2: (MetroForm-specific hack removed; use Syncfusion ThemeName property instead)
 
                 // Step 3: Ensure proper panel layering
                 FixPanelLayering(form);
@@ -88,27 +84,7 @@ namespace Bus_Buddy.Utilities
 
         #endregion
 
-        #region Step 2: MetroForm Specific Fixes
-
-        private static void FixMetroFormBackground(MetroForm metroForm)
-        {
-            // Set MetroForm specific background properties
-            metroForm.BackColor = Color.FromArgb(240, 246, 252);
-            metroForm.MetroColor = Color.FromArgb(11, 95, 178); // Bus Buddy blue
-
-            // Configure border and appearance
-            metroForm.BorderColor = Color.FromArgb(11, 95, 178);
-            metroForm.CaptionBarColor = Color.FromArgb(11, 95, 178);
-            metroForm.CaptionForeColor = Color.White;
-
-            // Ensure background fills completely
-            // metroForm.UseCustomBackColor = true;
-
-            // Force background rendering
-            metroForm.Invalidate(true);
-        }
-
-        #endregion
+        // Step 2: MetroForm-specific hack removed; use Syncfusion ThemeName property instead
 
         #region Step 3: Panel Layering Fix
 

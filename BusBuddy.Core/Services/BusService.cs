@@ -168,7 +168,7 @@ namespace BusBuddy.Core.Services
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Could not retrieve from database, using sample data");
-                await Task.Delay(10); // Simulate async operation
+                // If DB unavailable, return in-memory sample data (already logged above)
                 return new List<BusInfo>(_buses);
             }
         }

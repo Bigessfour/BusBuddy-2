@@ -39,16 +39,23 @@ public interface IScheduleService
 public class ScheduleService : IScheduleService
 {
     private ObservableCollection<BusBuddy.WPF.ViewModels.Schedule> _schedules = new();
-    private ObservableCollection<string> _buses = new() { "Bus 1", "Bus 2", "Bus 3" };
-    private ObservableCollection<string> _drivers = new() { "Alice", "Bob", "Charlie" };
-    private ObservableCollection<string> _routes = new() { "Elementary Route 1", "Middle School Express", "High School Route" };
+    private ObservableCollection<string> _buses;
+    private ObservableCollection<string> _drivers;
+    private ObservableCollection<string> _routes;
 
     // Use the real EF DbContext
     private readonly BusBuddyDbContext _dbContext;
+    private readonly BusBuddy.Core.Services.IActivityLogService? _logService;
 
-    public ScheduleService(BusBuddyDbContext dbContext)
+    public ScheduleService(BusBuddyDbContext dbContext, BusBuddy.Core.Services.IActivityLogService? logService = null)
     {
         _dbContext = dbContext;
+        _logService = logService;
+
+        // Populate buses, drivers, and routes from the database
+        _buses = new ObservableCollection<string>(_dbContext.Vehicles.Select(b => b.BusNumber).ToList());
+        _drivers = new ObservableCollection<string>(_dbContext.Drivers.Select(d => d.DriverName).ToList());
+        _routes = new ObservableCollection<string>(_dbContext.Routes.Select(r => r.RouteName).ToList());
     }
 
     public ObservableCollection<BusBuddy.WPF.ViewModels.Schedule> GetSchedules() => _schedules;
@@ -95,21 +102,35 @@ public class ScheduleService : IScheduleService
     // Implements actual EF/database save logic
     private async Task SaveScheduleToDatabaseAsync(BusBuddy.WPF.ViewModels.Schedule schedule)
     {
-        // Map WPF Schedule to EF Activity entity
-        var entity = new Activity
+        try
         {
-            Date = schedule.DepartureTime.Date,
-            ActivityType = "Route",
-            Destination = schedule.Route ?? string.Empty,
-            LeaveTime = schedule.DepartureTime.TimeOfDay,
-            EventTime = schedule.ArrivalTime.TimeOfDay,
-            AssignedVehicleId = GetBusIdByNumber(schedule.BusNumber),
-            DriverId = GetDriverIdByName(schedule.DriverName),
-            Status = "Scheduled"
-        };
+            // Map WPF Schedule to EF Activity entity
+            var entity = new Activity
+            {
+                Date = schedule.DepartureTime.Date,
+                ActivityType = "Route",
+                Destination = schedule.Route ?? string.Empty,
+                LeaveTime = schedule.DepartureTime.TimeOfDay,
+                EventTime = schedule.ArrivalTime.TimeOfDay,
+                AssignedVehicleId = GetBusIdByNumber(schedule.BusNumber),
+                DriverId = GetDriverIdByName(schedule.DriverName),
+                Status = "Scheduled"
+            };
 
-        _dbContext.Activities.Add(entity);
-        await _dbContext.SaveChangesAsync();
+            _dbContext.Activities.Add(entity);
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            if (_logService != null)
+            {
+                await _logService.LogAsync("Schedule Save Failed", "System", ex.ToString());
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"[ScheduleService] Error saving schedule: {ex}");
+            }
+        }
     }
 
     // Helper methods for lookup (implement as needed)

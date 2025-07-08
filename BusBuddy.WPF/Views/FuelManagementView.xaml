@@ -3,13 +3,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:syncfusionGrid="clr-namespace:Syncfusion.UI.Xaml.Grid;assembly=Syncfusion.SfGrid.WPF"
+             xmlns:syncfusionChart="clr-namespace:Syncfusion.UI.Xaml.Charts;assembly=Syncfusion.SfChart.WPF"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
-    <Grid>
-        <TextBlock Text="Fuel Management Module Placeholder"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="24"
-                   Foreground="Gray"/>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <syncfusionGrid:SfDataGrid x:Name="FuelDataGrid"
+                                   Grid.Row="0"
+                                   ItemsSource="{Binding FuelRecords}"
+                                   AutoGenerateColumns="True"
+                                   SelectionMode="Single"
+                                   Margin="0,0,0,12"/>
+        <syncfusionChart:SfChart x:Name="FuelTrendChart" Grid.Row="1" Margin="0">
+            <syncfusionChart:LineSeries ItemsSource="{Binding FuelTrends}" XBindingPath="Period" YBindingPath="AvgMPG" Label="Avg MPG"/>
+            <syncfusionChart:SfChart.PrimaryAxis>
+                <syncfusionChart:DateTimeAxis IntervalType="Months" LabelFormat="MMM yyyy"/>
+            </syncfusionChart:SfChart.PrimaryAxis>
+            <syncfusionChart:SfChart.SecondaryAxis>
+                <syncfusionChart:NumericalAxis/>
+            </syncfusionChart:SfChart.SecondaryAxis>
+        </syncfusionChart:SfChart>
     </Grid>
 </UserControl>

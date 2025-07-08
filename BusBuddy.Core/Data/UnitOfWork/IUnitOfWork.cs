@@ -1,4 +1,5 @@
 using BusBuddy.Core.Data.Interfaces;
+using BusBuddy.Core.Data.Repositories;
 
 namespace BusBuddy.Core.Data.UnitOfWork;
 

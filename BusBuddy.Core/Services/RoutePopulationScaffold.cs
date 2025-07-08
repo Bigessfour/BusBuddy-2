@@ -2,6 +2,25 @@ namespace BusBuddy.Core.Services
 {
     public class RoutePopulationScaffold
     {
-        // Placeholder for route population/optimization logic
+        private readonly BusService _busService;
+
+        public RoutePopulationScaffold(BusService busService)
+        {
+            _busService = busService;
+        }
+
+        /// <summary>
+        /// Returns a list of routes sorted by distance (shortest first)
+        /// </summary>
+        public async Task<List<BusBuddy.Core.Models.Route>> GetOptimizedRoutesAsync()
+        {
+            var routes = await _busService.GetAllRouteEntitiesAsync();
+            // Simple heuristic: sort by distance (nulls last)
+            var optimized = routes
+                .OrderBy(r => r.Distance ?? decimal.MaxValue)
+                .ThenBy(r => r.EstimatedDuration ?? int.MaxValue)
+                .ToList();
+            return optimized;
+        }
     }
 }

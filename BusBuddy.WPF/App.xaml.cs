@@ -41,6 +41,12 @@ public partial class App : Application
         // Register your view models and services here
         services.AddScoped<DashboardViewModel>();
         services.AddScoped<ActivityLogViewModel>();
+        // Register RoutePopulationScaffold and proxy for DI
+        services.AddScoped<BusBuddy.Core.Services.IBusService, BusBuddy.Core.Services.BusService>();
+        services.AddScoped<BusBuddy.Core.Services.RoutePopulationScaffold>();
+        services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffoldProxy>(sp =>
+            new BusBuddy.WPF.Services.RoutePopulationScaffoldProxy(sp.GetRequiredService<BusBuddy.Core.Services.RoutePopulationScaffold>()));
+        services.AddScoped<BusBuddy.WPF.ViewModels.RoutePlanningViewModel>();
         // Register DbContext (update connection string as needed)
         services.AddDbContext<BusBuddyDbContext>(options =>
             options.UseSqlite("Data Source=busbuddy.db"));
@@ -48,7 +54,13 @@ public partial class App : Application
         services.AddScoped<IScheduleService, ScheduleService>();
         // Register ActivityLogService for logging
         services.AddScoped<BusBuddy.Core.Services.IActivityLogService, BusBuddy.Core.Services.ActivityLogService>();
+        // Register Fuel service and view model
+        services.AddScoped<BusBuddy.Core.Services.IFuelService, BusBuddy.Core.Services.FuelService>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();
+        // Register Settings view model
+        services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
         // Add other services as needed
+        services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
     }
 }
 

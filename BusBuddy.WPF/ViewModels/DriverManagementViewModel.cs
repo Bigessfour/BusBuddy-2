@@ -10,10 +10,7 @@ namespace BusBuddy.WPF.ViewModels
 {
 
     // Demo/mock driver class for ViewModel use
-    public class DemoDriver : Driver
-    {
-        public DateTime? LicenseExpiry { get; set; }
-    }
+
 
     public class DriverAvailability
     {
@@ -25,7 +22,10 @@ namespace BusBuddy.WPF.ViewModels
     public class DriverManagementViewModel : INotifyPropertyChanged
     {
 
-        public ObservableCollection<DemoDriver> Drivers { get; set; } = new();
+        private readonly BusBuddy.Core.Services.IBusService _busService;
+        private readonly BusBuddy.WPF.Services.IDriverAvailabilityService _availabilityService;
+
+        public ObservableCollection<Driver> Drivers { get; set; } = new();
         public ObservableCollection<DriverAvailability> DriverAvailabilities { get; set; } = new();
         public ICommand GenerateLicenseStatusReportCommand { get; }
         public ObservableCollection<DriverLicenseStatus> LicenseStatusReport { get; set; } = new();
@@ -40,32 +40,64 @@ namespace BusBuddy.WPF.ViewModels
             set { _selectedAvailabilityDates = value; OnPropertyChanged(); }
         }
 
-        public DriverManagementViewModel()
+
+
+        private readonly BusBuddy.Core.Services.IActivityLogService _activityLogService;
+
+        public DriverManagementViewModel(BusBuddy.Core.Services.IBusService busService, BusBuddy.WPF.Services.IDriverAvailabilityService availabilityService, BusBuddy.Core.Services.IActivityLogService activityLogService)
         {
-            // Placeholder: Load drivers and assignments from service
-            LoadDrivers();
-            LoadDriverAvailabilities();
+            _busService = busService;
+            _availabilityService = availabilityService;
+            _activityLogService = activityLogService;
+            _ = LoadDriversAsync();
+            _ = LoadDriverAvailabilitiesAsync();
             GenerateLicenseStatusReportCommand = new RelayCommand(GenerateLicenseStatusReport);
         }
 
-        private void LoadDrivers()
+
+        private async Task LoadDriversAsync()
         {
-            // TODO: Replace with real data service
-            Drivers.Clear();
-            Drivers.Add(new DemoDriver { DriverId = 1, DriverName = "Alice Smith", Status = "Active", LicenseExpiry = DateTime.Today.AddDays(10) });
-            Drivers.Add(new DemoDriver { DriverId = 2, DriverName = "Bob Jones", Status = "Active", LicenseExpiry = DateTime.Today.AddDays(-5) });
-            Drivers.Add(new DemoDriver { DriverId = 3, DriverName = "Carol Lee", Status = "Inactive", LicenseExpiry = DateTime.Today.AddDays(40) });
+            try
+            {
+                Drivers.Clear();
+                var drivers = await _busService.GetAllDriversAsync();
+                foreach (var driver in drivers)
+                {
+                    Drivers.Add(driver);
+                }
+                await _activityLogService.LogAsync("Loaded drivers", "System");
+            }
+            catch (Exception ex)
+            {
+                await _activityLogService.LogAsync("Error loading drivers", "System", ex.ToString());
+            }
         }
 
-        private void LoadDriverAvailabilities()
+
+        private async Task LoadDriverAvailabilitiesAsync()
         {
-            // Placeholder: Simulate driver availability
-            DriverAvailabilities.Clear();
-            DriverAvailabilities.Add(new DriverAvailability { DriverId = 1, DriverName = "Alice Smith", AvailableDates = new List<DateTime> { DateTime.Today, DateTime.Today.AddDays(1), DateTime.Today.AddDays(2) } });
-            DriverAvailabilities.Add(new DriverAvailability { DriverId = 2, DriverName = "Bob Jones", AvailableDates = new List<DateTime> { DateTime.Today.AddDays(3), DateTime.Today.AddDays(4) } });
-            DriverAvailabilities.Add(new DriverAvailability { DriverId = 3, DriverName = "Carol Lee", AvailableDates = new List<DateTime> { DateTime.Today.AddDays(5) } });
-            // For demo, just show Alice's dates in the calendar
-            SelectedAvailabilityDates = new ObservableCollection<DateTime>(DriverAvailabilities[0].AvailableDates);
+            try
+            {
+                DriverAvailabilities.Clear();
+                var availabilities = await _availabilityService.GetDriverAvailabilitiesAsync();
+                foreach (var info in availabilities)
+                {
+                    DriverAvailabilities.Add(new DriverAvailability
+                    {
+                        DriverId = info.DriverId,
+                        DriverName = info.DriverName,
+                        AvailableDates = info.AvailableDates
+                    });
+                }
+                // Show the first driver's dates in the calendar if available
+                if (DriverAvailabilities.Count > 0)
+                    SelectedAvailabilityDates = new ObservableCollection<DateTime>(DriverAvailabilities[0].AvailableDates);
+                await _activityLogService.LogAsync("Loaded driver availabilities", "System");
+            }
+            catch (Exception ex)
+            {
+                await _activityLogService.LogAsync("Error loading driver availabilities", "System", ex.ToString());
+            }
         }
 
         private void GenerateLicenseStatusReport()
@@ -74,9 +106,9 @@ namespace BusBuddy.WPF.ViewModels
             foreach (var driver in Drivers)
             {
                 var status = "Current";
-                if (driver.LicenseExpiry.HasValue)
+                if (driver.LicenseExpiryDate.HasValue)
                 {
-                    var days = (driver.LicenseExpiry.Value - DateTime.Today).Days;
+                    var days = (driver.LicenseExpiryDate.Value - DateTime.Today).Days;
                     if (days < 0) status = "Expired";
                     else if (days < 30) status = "Expiring Soon";
                 }
@@ -88,7 +120,7 @@ namespace BusBuddy.WPF.ViewModels
                 {
                     DriverName = driver.DriverName,
                     LicenseStatus = status,
-                    LicenseExpiry = driver.LicenseExpiry
+                    LicenseExpiry = driver.LicenseExpiryDate
                 });
             }
             OnPropertyChanged(nameof(LicenseStatusReport));

@@ -1,16 +1,21 @@
+
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Collections.Generic;
 using BusBuddy.Core.Models;
+using BusBuddy.WPF.Services;
+using BusBuddy.WPF;
 
 namespace BusBuddy.WPF.ViewModels
 {
     public class RoutePlanningViewModel : INotifyPropertyChanged
     {
+
+        private readonly IRoutePopulationScaffold _routePopulationScaffold;
+
         private bool _showDistrictBoundaries;
         public bool ShowDistrictBoundaries
         {
@@ -32,43 +37,46 @@ namespace BusBuddy.WPF.ViewModels
             set { _showStudentAddresses = value; OnPropertyChanged(); }
         }
 
-
         public ICommand OptimizeRoutesCommand { get; }
         public ICommand ExportAssignmentsCommand { get; }
 
         public ObservableCollection<Route> Routes { get; set; } = new();
         public ObservableCollection<Route> OptimizedRoutes { get; set; } = new();
 
-        public RoutePlanningViewModel()
+        public RoutePlanningViewModel(IRoutePopulationScaffold routePopulationScaffold)
         {
-            // Load demo routes
-            LoadRoutes();
-            OptimizeRoutesCommand = new RelayCommand(OptimizeRoutes);
-            ExportAssignmentsCommand = new RelayCommand(ExportAssignmentsToCsv);
+            _routePopulationScaffold = routePopulationScaffold;
+            OptimizeRoutesCommand = new global::BusBuddy.WPF.RelayCommand(_ => OptimizeRoutesAsync().GetAwaiter().GetResult());
+            ExportAssignmentsCommand = new global::BusBuddy.WPF.RelayCommand(_ => ExportAssignmentsToCsv());
+            _ = LoadRoutesAsync();
         }
 
-        private void LoadRoutes()
+        private async Task LoadRoutesAsync()
         {
+            var routes = await _routePopulationScaffold.GetOptimizedRoutesAsync();
             Routes.Clear();
-            Routes.Add(new BusBuddy.Core.Models.Route { RouteId = 1, RouteName = "East Route", Distance = 12.5m, AMDriverId = 1, AMVehicleId = 1, PMDriverId = 2, PMVehicleId = 2, BusNumber = "101", DriverName = "Alice Smith" });
-            Routes.Add(new BusBuddy.Core.Models.Route { RouteId = 2, RouteName = "West Route", Distance = 8.2m, AMDriverId = 2, AMVehicleId = 2, PMDriverId = 1, PMVehicleId = 1, BusNumber = "102", DriverName = "Bob Jones" });
-            Routes.Add(new BusBuddy.Core.Models.Route { RouteId = 3, RouteName = "North Route", Distance = 15.0m, AMDriverId = 3, AMVehicleId = 3, PMDriverId = 3, PMVehicleId = 3, BusNumber = "103", DriverName = "Carol Lee" });
+            foreach (var route in routes)
+                Routes.Add(route);
+            OptimizedRoutes.Clear();
+            foreach (var route in routes)
+                OptimizedRoutes.Add(route);
+            OnPropertyChanged(nameof(Routes));
+            OnPropertyChanged(nameof(OptimizedRoutes));
         }
 
-        private void OptimizeRoutes()
+        private async Task OptimizeRoutesAsync()
         {
-            // Simple heuristic: sort by Distance ascending
-            var sorted = Routes.OrderBy(r => r.Distance ?? 0).ToList();
+            var optimized = await _routePopulationScaffold.GetOptimizedRoutesAsync();
             OptimizedRoutes.Clear();
-            foreach (var route in sorted)
+            foreach (var route in optimized)
                 OptimizedRoutes.Add(route);
             OnPropertyChanged(nameof(OptimizedRoutes));
         }
 
         private void ExportAssignmentsToCsv()
         {
-            var csvLines = new List<string> { "Route Name,AM/PM,Bus Number,Driver Name" };
-            foreach (var route in Routes)
+            var csvLines = new System.Collections.Generic.List<string> { "Route Name,AM/PM,Bus Number,Driver Name" };
+            foreach (var route in OptimizedRoutes)
             {
                 csvLines.Add($"{route.RouteName},AM,{route.BusNumber},{route.DriverName}");
                 csvLines.Add($"{route.RouteName},PM,{route.BusNumber},{route.DriverName}");

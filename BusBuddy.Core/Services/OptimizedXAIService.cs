@@ -115,9 +115,8 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<string> ProcessRequestAsync(string prompt, string? context = null)
         {
-            _requestCount.Add(1);
+            Interlocked.Increment(ref _totalRequests);
             var stopwatch = Stopwatch.StartNew();
-
             try
             {
                 var optimizedPrompt = OptimizePrompt(prompt, context);
@@ -125,24 +124,24 @@ namespace BusBuddy.Core.Services
 
                 if (!_budgetManager.CanProcess(estimatedTokens))
                 {
-                    _errorCount.Add(1);
+                    Interlocked.Increment(ref _totalErrors);
                     throw new InvalidOperationException("Token budget exceeded for the current period");
                 }
 
                 var response = await GetCachedOrExecuteAsync(optimizedPrompt);
-
-                _requestDuration.Record(stopwatch.Elapsed.TotalSeconds);
                 return response;
             }
             catch (Exception ex)
             {
-                _errorCount.Add(1);
+                Interlocked.Increment(ref _totalErrors);
                 _logger.LogError(ex, "Error processing XAI request");
                 throw;
             }
             finally
             {
                 stopwatch.Stop();
+                Interlocked.Add(ref _totalResponseTime, (long)stopwatch.Elapsed.TotalMilliseconds);
+                Interlocked.Increment(ref _responseTimeSamples);
             }
         }
 
@@ -239,18 +238,23 @@ namespace BusBuddy.Core.Services
         /// <summary>
         /// Get current performance metrics
         /// </summary>
+        private long _totalRequests = 0;
+        private long _totalErrors = 0;
+        private long _totalTokensUsed = 0;
+        private long _cacheHitCount = 0;
+        private long _totalResponseTime = 0;
+        private long _responseTimeSamples = 0;
+
         public PerformanceMetrics GetPerformanceMetrics()
         {
-            // Note: .NET System.Diagnostics.Metrics doesn't provide direct access to current values
-            // This is a temporary implementation - proper metrics collection would need a separate tracking system
             return new PerformanceMetrics
             {
-                TotalRequests = 0, // TODO: Implement proper counter tracking
-                TotalErrors = 0, // TODO: Implement proper counter tracking  
-                TotalTokensUsed = 0, // TODO: Implement proper counter tracking
-                CacheHitCount = 0, // TODO: Implement proper counter tracking
+                TotalRequests = Interlocked.Read(ref _totalRequests),
+                TotalErrors = Interlocked.Read(ref _totalErrors),
+                TotalTokensUsed = Interlocked.Read(ref _totalTokensUsed),
+                CacheHitCount = Interlocked.Read(ref _cacheHitCount),
                 RemainingTokenBudget = _budgetManager.GetRemainingBudget(),
-                AverageResponseTime = 0 // TODO: Implement proper histogram tracking
+                AverageResponseTime = _responseTimeSamples > 0 ? (double)_totalResponseTime / _responseTimeSamples : 0
             };
         }
 
@@ -316,6 +320,7 @@ namespace BusBuddy.Core.Services
             if (_cache.TryGetValue(cacheKey, out string? cachedResponse) && cachedResponse != null)
             {
                 _cacheHits.Add(1);
+                Interlocked.Increment(ref _cacheHitCount);
                 _logger.LogDebug("Cache hit for prompt hash: {CacheKey}", cacheKey);
                 return cachedResponse;
             }
@@ -368,6 +373,7 @@ namespace BusBuddy.Core.Services
                         {
                             _budgetManager.RecordUsage(jsonResponse.Usage.TotalTokens);
                             _tokenUsage.Add(jsonResponse.Usage.TotalTokens);
+                            Interlocked.Add(ref _totalTokensUsed, jsonResponse.Usage.TotalTokens);
                         }
                         else
                         {
@@ -375,6 +381,7 @@ namespace BusBuddy.Core.Services
                             var estimatedTokens = EstimateTokens(prompt + responseText);
                             _budgetManager.RecordUsage(estimatedTokens);
                             _tokenUsage.Add(estimatedTokens);
+                            Interlocked.Add(ref _totalTokensUsed, estimatedTokens);
                         }
 
                         return responseText;
@@ -532,6 +539,11 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class PerformanceMetrics
     {
+        // These properties are now tracked in-memory and exposed via GetPerformanceMetrics
+        // public long TotalRequests { get; set; }
+        // public long TotalErrors { get; set; }
+        // public long TotalTokensUsed { get; set; }
+        // public long CacheHitCount { get; set; }
         public long TotalRequests { get; set; }
         public long TotalErrors { get; set; }
         public long TotalTokensUsed { get; set; }

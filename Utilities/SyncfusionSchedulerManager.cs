@@ -20,7 +20,12 @@ namespace Bus_Buddy.Utilities
         private TimeSpan _workingHoursStart = TimeSpan.FromHours(9);
         private TimeSpan _workingHoursEnd = TimeSpan.FromHours(17);
         private bool _dragDropEnabled = true;
-        private List<ActivitySchedule> _schedules = new List<ActivitySchedule>();
+        private System.Collections.ObjectModel.ObservableCollection<ActivitySchedule> _schedules = new System.Collections.ObjectModel.ObservableCollection<ActivitySchedule>();
+
+        /// <summary>
+        /// Observable collection of appointments for data binding
+        /// </summary>
+        public System.Collections.ObjectModel.ObservableCollection<ActivitySchedule> Schedules => _schedules;
 
         #endregion
 
@@ -54,12 +59,13 @@ namespace Bus_Buddy.Utilities
         /// <summary>
         /// Load schedule data into the scheduler
         /// </summary>
-        public void LoadScheduleData(List<ActivitySchedule> schedules)
+        public void LoadScheduleData(IEnumerable<ActivitySchedule> schedules)
         {
             if (schedules == null)
                 throw new ArgumentNullException(nameof(schedules));
-
-            _schedules = new List<ActivitySchedule>(schedules);
+            _schedules.Clear();
+            foreach (var s in schedules)
+                _schedules.Add(s);
         }
 
         /// <summary>
@@ -69,7 +75,6 @@ namespace Bus_Buddy.Utilities
         {
             if (schedule == null)
                 throw new ArgumentNullException(nameof(schedule));
-
             _schedules.Add(schedule);
         }
 
@@ -80,11 +85,11 @@ namespace Bus_Buddy.Utilities
         {
             if (schedule == null)
                 throw new ArgumentNullException(nameof(schedule));
-
-            var existingIndex = _schedules.FindIndex(s => s.ActivityScheduleId == schedule.ActivityScheduleId);
-            if (existingIndex >= 0)
+            var existing = _schedules.FirstOrDefault(s => s.ActivityScheduleId == schedule.ActivityScheduleId);
+            if (existing != null)
             {
-                _schedules[existingIndex] = schedule;
+                var idx = _schedules.IndexOf(existing);
+                _schedules[idx] = schedule;
             }
         }
 
@@ -93,7 +98,9 @@ namespace Bus_Buddy.Utilities
         /// </summary>
         public void RemoveAppointment(int scheduleId)
         {
-            _schedules.RemoveAll(s => s.ActivityScheduleId == scheduleId);
+            var toRemove = _schedules.Where(s => s.ActivityScheduleId == scheduleId).ToList();
+            foreach (var s in toRemove)
+                _schedules.Remove(s);
         }
 
         #endregion
@@ -131,20 +138,19 @@ namespace Bus_Buddy.Utilities
         /// <summary>
         /// Get appointments for a specific date
         /// </summary>
-        public List<ActivitySchedule> GetAppointmentsForDate(DateTime date)
+        public IEnumerable<ActivitySchedule> GetAppointmentsForDate(DateTime date)
         {
-            return _schedules.FindAll(s => s.ScheduledDate.Date == date.Date);
+            return _schedules.Where(s => s.ScheduledDate.Date == date.Date);
         }
 
         /// <summary>
         /// Get appointments for a date range
         /// </summary>
-        public List<ActivitySchedule> GetAppointmentsForDateRange(DateTime startDate, DateTime endDate)
+        public IEnumerable<ActivitySchedule> GetAppointmentsForDateRange(DateTime startDate, DateTime endDate)
         {
             if (endDate < startDate)
                 throw new ArgumentException("End date must be after start date");
-
-            return _schedules.FindAll(s =>
+            return _schedules.Where(s =>
                 s.ScheduledDate.Date >= startDate.Date &&
                 s.ScheduledDate.Date <= endDate.Date);
         }

@@ -32,6 +32,11 @@ public class UnitOfWork : IUnitOfWork
     private IScheduleRepository? _schedules;
     private ISchoolCalendarRepository? _schoolCalendar;
     private IActivityScheduleRepository? _activitySchedules;
+    private ITicketRepository? _tickets;
+    public ITicketRepository Tickets
+    {
+        get { return _tickets ??= new TicketRepository(_context, _userContextService); }
+    }
 
     // Generic repository cache
     private readonly Dictionary<Type, object> _repositories = new();
