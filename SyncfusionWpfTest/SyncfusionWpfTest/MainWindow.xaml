@@ -8,10 +8,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <syncfusion:SfDockingManager x:Name="dockingManager" >
-            <ContentControl syncfusion:SfDockingManager.Header="Left" syncfusion:SfDockingManager.Side="Left" syncfusion:SfDockingManager.DockState="Dock" >
+        <syncfusion:DockingManager x:Name="dockingManager">
+            <ContentControl syncfusion:DockingManager.Header="Left Panel">
                 <TextBlock Text="This is a docked window" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </ContentControl>
-        </syncfusion:SfDockingManager>
+            <ContentControl syncfusion:DockingManager.Header="Right Panel" syncfusion:DockingManager.SideInDockedMode="Right">
+                <TextBlock Text="This is a right docked window" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </ContentControl>
+        </syncfusion:DockingManager>
     </Grid>
 </Window>

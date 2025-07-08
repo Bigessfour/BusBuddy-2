@@ -21,13 +21,33 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Register your Syncfusion license key from appsettings.json
-        var licenseConfig = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddEnvironmentVariables()
-            .Build();
-        var licenseKey = licenseConfig["Syncfusion:LicenseKey"] ?? licenseConfig["SyncfusionLicenseKey"];
+        // Register Syncfusion license key from environment variable (recommended) or appsettings.json as fallback
+        // Per Syncfusion documentation: https://help.syncfusion.com/common/essential-studio/licensing/license-key
+        // Set the SYNCFUSION_LICENSE_KEY environment variable in your system or CI/CD environment for security
+        var envLicenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
+        string? licenseKey = !string.IsNullOrWhiteSpace(envLicenseKey)
+            ? envLicenseKey
+            : new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build()["Syncfusion:LicenseKey"]
+                ?? new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddEnvironmentVariables()
+                    .Build()["SyncfusionLicenseKey"];
+
+        if (string.IsNullOrWhiteSpace(licenseKey))
+        {
+            MessageBox.Show(
+                "Syncfusion license key is missing. Please set the SYNCFUSION_LICENSE_KEY environment variable or add it to appsettings.json.",
+                "License Key Missing",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown();
+            return;
+        }
         Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
 
         // Build configuration for Serilog and DI
