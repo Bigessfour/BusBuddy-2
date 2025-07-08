@@ -23,7 +23,7 @@ namespace BusBuddy.WPF.ViewModels
         }
 
         public ObservableCollection<RidershipDataPoint> RidershipData { get; }
-        public ObservableCollection<Schedule> BusSchedules { get; }
+        public ObservableCollection<Schedule> BusSchedules { get; set; } = new ObservableCollection<Schedule>();
 
         // Navigation commands for the 10 modules
         public ICommand NavigateToBusManagementCommand { get; }
@@ -40,8 +40,35 @@ namespace BusBuddy.WPF.ViewModels
         // Event to notify view of navigation
         public event Action<string>? NavigateToModule;
 
-        public DashboardViewModel()
+        private readonly IScheduleService _scheduleService;
+        private readonly BusBuddy.Core.Services.IBusService _busService;
+
+        // Fleet status summary properties
+        private int _totalActiveBuses;
+        public int TotalActiveBuses
         {
+            get => _totalActiveBuses;
+            set { _totalActiveBuses = value; OnPropertyChanged(); }
+        }
+
+        private int _totalInactiveBuses;
+        public int TotalInactiveBuses
+        {
+            get => _totalInactiveBuses;
+            set { _totalInactiveBuses = value; OnPropertyChanged(); }
+        }
+
+        private int _busesWithMaintenanceDue;
+        public int BusesWithMaintenanceDue
+        {
+            get => _busesWithMaintenanceDue;
+            set { _busesWithMaintenanceDue = value; OnPropertyChanged(); }
+        }
+
+        public DashboardViewModel(IScheduleService scheduleService, BusBuddy.Core.Services.IBusService busService)
+        {
+            _scheduleService = scheduleService;
+            _busService = busService;
             RidershipData = new ObservableCollection<RidershipDataPoint>
             {
                 new RidershipDataPoint { Date = DateTime.Now.AddDays(-6), PassengerCount = 120 },
@@ -52,14 +79,8 @@ namespace BusBuddy.WPF.ViewModels
                 new RidershipDataPoint { Date = DateTime.Now.AddDays(-1), PassengerCount = 170 },
                 new RidershipDataPoint { Date = DateTime.Now, PassengerCount = 180 }
             };
-            BusSchedules = new ObservableCollection<Schedule>
-            {
-                new Schedule { BusId = 1, RouteId = 101, DriverId = 1, DepartureTime = DateTime.Now.AddHours(1), ArrivalTime = DateTime.Now.AddHours(2), Status = "Scheduled" },
-                new Schedule { BusId = 2, RouteId = 102, DriverId = 2, DepartureTime = DateTime.Now.AddHours(1.5), ArrivalTime = DateTime.Now.AddHours(2.5), Status = "Scheduled" },
-                new Schedule { BusId = 3, RouteId = 103, DriverId = 3, DepartureTime = DateTime.Now.AddHours(2), ArrivalTime = DateTime.Now.AddHours(3), Status = "Delayed" },
-                new Schedule { BusId = 4, RouteId = 104, DriverId = 4, DepartureTime = DateTime.Now.AddHours(2.5), ArrivalTime = DateTime.Now.AddHours(3.5), Status = "Scheduled" },
-                new Schedule { BusId = 5, RouteId = 105, DriverId = 5, DepartureTime = DateTime.Now.AddHours(3), ArrivalTime = DateTime.Now.AddHours(4), Status = "Cancelled" }
-            };
+            LoadData();
+            LoadFleetStatusSummary();
 
             // Initialize commands
             NavigateToBusManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("BusManagement"));
@@ -72,6 +93,30 @@ namespace BusBuddy.WPF.ViewModels
             NavigateToActivityLoggingCommand = new RelayCommand(() => NavigateToModule?.Invoke("ActivityLogging"));
             NavigateToTicketManagementCommand = new RelayCommand(() => NavigateToModule?.Invoke("TicketManagement"));
             NavigateToSettingsCommand = new RelayCommand(() => NavigateToModule?.Invoke("Settings"));
+        }
+
+        private async void LoadFleetStatusSummary()
+        {
+            try
+            {
+                var buses = await _busService.GetAllBusEntitiesAsync();
+                TotalActiveBuses = buses.Count(b => b.Status == "Active");
+                TotalInactiveBuses = buses.Count(b => b.Status == "Inactive");
+                BusesWithMaintenanceDue = buses.Count(b => b.NextMaintenanceDue.HasValue && b.NextMaintenanceDue.Value <= DateTime.Now);
+            }
+            catch
+            {
+                // Handle/log error as needed
+                TotalActiveBuses = 0;
+                TotalInactiveBuses = 0;
+                BusesWithMaintenanceDue = 0;
+            }
+        }
+
+        private void LoadData()
+        {
+            BusSchedules = new ObservableCollection<Schedule>(_scheduleService.GetSchedules());
+            OnPropertyChanged(nameof(BusSchedules));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

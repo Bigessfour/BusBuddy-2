@@ -3,13 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
-        <TextBlock Text="Schedule Management Module Placeholder"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="24"
-                   Foreground="Gray"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Add" Command="{Binding AddCommand}" Margin="0,0,10,0"/>
+            <Button Content="Edit" Command="{Binding EditCommand}" Margin="0,0,10,0"/>
+            <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="0,0,10,0"/>
+            <Button Content="Auto-Generate Schedules" Command="{Binding AutoGenerateCommand}"/>
+        </StackPanel>
+        <syncfusion:SfDataGrid x:Name="ScheduleGrid"
+                               ItemsSource="{Binding Schedules}"
+                               SelectedItem="{Binding SelectedSchedule, Mode=TwoWay}"
+                               AutoGenerateColumns="False"
+                               Margin="0,40,0,0">
+            <syncfusion:SfDataGrid.Columns>
+                <syncfusion:GridTextColumn MappingName="Route" HeaderText="Route"/>
+                <syncfusion:GridComboBoxColumn MappingName="BusNumber" HeaderText="Bus" ItemsSource="{Binding AvailableBuses}" />
+                <syncfusion:GridComboBoxColumn MappingName="DriverName" HeaderText="Driver" ItemsSource="{Binding AvailableDrivers}" />
+                <syncfusion:GridDateTimeColumn MappingName="DepartureTime" HeaderText="Departure"/>
+                <syncfusion:GridDateTimeColumn MappingName="ArrivalTime" HeaderText="Arrival"/>
+            </syncfusion:SfDataGrid.Columns>
+        </syncfusion:SfDataGrid>
     </Grid>
 </UserControl>

@@ -49,6 +49,7 @@ public class BusBuddyDbContext : DbContext
 
     // DbSets for all entities
     public virtual DbSet<Bus> Vehicles { get; set; }
+    public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
     public virtual DbSet<Driver> Drivers { get; set; }
     public virtual DbSet<Route> Routes { get; set; }
     public virtual DbSet<Activity> Activities { get; set; }
@@ -63,6 +64,17 @@ public class BusBuddyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // ActivityLog entity
+        modelBuilder.Entity<ActivityLog>(entity =>
+        {
+            entity.ToTable("ActivityLogs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Timestamp).IsRequired();
+            entity.Property(e => e.Action).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.User).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Details).HasMaxLength(1000);
+        });
+
         // DEBUG: Output the value of SkipGlobalSeedData to verify test isolation
         System.Diagnostics.Debug.WriteLine($"[BusBuddyDbContext] SkipGlobalSeedData: {SkipGlobalSeedData}");
         base.OnModelCreating(modelBuilder);

@@ -7,6 +7,8 @@ namespace BusBuddy.WPF.Views
         public StudentManagementView()
         {
             InitializeComponent();
+            // For demo/testing: instantiate service and viewmodel directly. Replace with DI as needed.
+            DataContext = new BusBuddy.WPF.ViewModels.StudentManagementViewModel(new BusBuddy.WPF.ViewModels.StudentService());
         }
     }
 }

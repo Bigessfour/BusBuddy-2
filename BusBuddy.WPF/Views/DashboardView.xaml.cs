@@ -14,6 +14,16 @@ namespace BusBuddy.WPF.Views
         public DashboardView()
         {
             InitializeComponent();
+            // Set DataContext using DI with null checks to avoid CS8602
+            var app = Application.Current as App;
+            if (app?.Services != null)
+            {
+                DataContext = app.Services.GetService(typeof(BusBuddy.WPF.ViewModels.DashboardViewModel));
+            }
+            else
+            {
+                // Fallback: DataContext remains null or set to a default instance if desired
+            }
             this.Loaded += OnDashboardViewLoaded;
         }
 

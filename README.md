@@ -5,7 +5,7 @@
 [![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![Syncfusion](https://img.shields.io/badge/Syncfusion-30.1.37-orange.svg)](https://www.syncfusion.com/)
 
-A comprehensive school bus transportation management system built with C# .NET 8, Windows Forms, and Syncfusion UI components.
+A comprehensive school bus transportation management system built with C# .NET 8, WPF, and Syncfusion WPF UI components.
 
 ## Features
 
@@ -22,7 +22,7 @@ A comprehensive school bus transportation management system built with C# .NET 8
 - 🚧 **Ticket Management**: Passenger ticketing system (in development)
 
 ### Core Features
-- **Professional UI**: Modern Syncfusion Windows Forms interface
+- **Professional UI**: Modern Syncfusion WPF interface
 - **Database Integration**: Entity Framework Core with SQL Server
 - **Dependency Injection**: Clean architecture with service containers
 - **Comprehensive Logging**: Structured logging throughout the application
@@ -30,10 +30,10 @@ A comprehensive school bus transportation management system built with C# .NET 8
 - **Exception Handling**: Robust error handling with graceful degradation
 
 ## Technology Stack
-- **.NET 8** - Windows Forms Application
+- **.NET 8** - WPF Application
 - **Entity Framework Core** - Database ORM
 - **SQL Server** - Database
-- **Syncfusion Windows Forms** - UI Components
+- **Syncfusion WPF Components** - UI Components
 - **Microsoft Extensions** - Logging, DI, Configuration
 
 ## Getting Started
@@ -54,7 +54,8 @@ A comprehensive school bus transportation management system built with C# .NET 8
    ```
 5. Build and run the application:
    ```bash
-   dotnet run
+   dotnet build
+   dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
    ```
 
 ## Architecture
@@ -62,8 +63,9 @@ A comprehensive school bus transportation management system built with C# .NET 8
 ### Project Structure
 ```
 Bus Buddy/
-├── Data/              # Entity Framework DbContext
-├── Forms/             # Windows Forms UI
+├── BusBuddy.WPF/      # WPF UI (Syncfusion)
+├── BusBuddy.Core/     # Core logic, models, and services
+├── Data/              # Entity Framework DbContext (if present)
 ├── Models/            # Entity Framework Models
 ├── Services/          # Business Logic Layer
 ├── Migrations/        # EF Database Migrations
@@ -137,8 +139,9 @@ dotnet test --filter "Category=Integration"
 dotnet test --collect:"XPlat Code Coverage"
 ```
 
+
 ### Syncfusion Test Mitigations
-Special considerations for Syncfusion Windows Forms testing:
+Special considerations for Syncfusion WPF testing:
 - STA apartment threading for UI components
 - Proper resource disposal with comprehensive cleanup
 - Timeout protection to prevent test freezing
