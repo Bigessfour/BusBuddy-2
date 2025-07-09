@@ -1,5 +1,3 @@
-using System;
-
 namespace BusBuddy.Core.Models
 {
     // Stub for IScheduleAppointment

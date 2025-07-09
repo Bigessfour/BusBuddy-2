@@ -1,8 +1,8 @@
-using System.Linq.Expressions;
 using BusBuddy.Core.Data.Interfaces;
 using BusBuddy.Core.Models.Base;
 using BusBuddy.Core.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BusBuddy.Core.Data.Repositories;
 

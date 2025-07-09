@@ -17,12 +17,12 @@ namespace Bus_Buddy.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Bus_Buddy.Models.Activity", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Activity", b =>
                 {
                     b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd()
@@ -177,7 +177,37 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Activities", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.ActivitySchedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Details")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ActivityLogs", (string)null);
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.ActivitySchedule", b =>
                 {
                     b.Property<int>("ActivityScheduleId")
                         .ValueGeneratedOnAdd()
@@ -258,7 +288,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("ActivitySchedule", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Bus", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Bus", b =>
                 {
                     b.Property<int>("VehicleId")
                         .ValueGeneratedOnAdd()
@@ -417,7 +447,7 @@ namespace Bus_Buddy.Migrations
                         {
                             VehicleId = 1,
                             BusNumber = "001",
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7792),
+                            CreatedDate = new DateTime(2025, 7, 8, 23, 37, 55, 599, DateTimeKind.Utc).AddTicks(5868),
                             GPSTracking = false,
                             LicenseNumber = "TX123456",
                             Make = "Blue Bird",
@@ -433,7 +463,7 @@ namespace Bus_Buddy.Migrations
                         {
                             VehicleId = 2,
                             BusNumber = "002",
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7835),
+                            CreatedDate = new DateTime(2025, 7, 8, 23, 37, 55, 599, DateTimeKind.Utc).AddTicks(5904),
                             GPSTracking = false,
                             LicenseNumber = "TX654321",
                             Make = "Thomas Built",
@@ -447,7 +477,7 @@ namespace Bus_Buddy.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Driver", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Driver", b =>
                 {
                     b.Property<int>("DriverId")
                         .ValueGeneratedOnAdd()
@@ -599,7 +629,7 @@ namespace Bus_Buddy.Migrations
                         new
                         {
                             DriverId = 1,
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7895),
+                            CreatedDate = new DateTime(2025, 7, 8, 23, 37, 55, 599, DateTimeKind.Utc).AddTicks(6046),
                             DriverEmail = "john.smith@school.edu",
                             DriverName = "John Smith",
                             DriverPhone = "555-0123",
@@ -610,7 +640,7 @@ namespace Bus_Buddy.Migrations
                         new
                         {
                             DriverId = 2,
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7907),
+                            CreatedDate = new DateTime(2025, 7, 8, 23, 37, 55, 599, DateTimeKind.Utc).AddTicks(6056),
                             DriverEmail = "mary.johnson@school.edu",
                             DriverName = "Mary Johnson",
                             DriverPhone = "555-0456",
@@ -620,7 +650,7 @@ namespace Bus_Buddy.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Fuel", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Fuel", b =>
                 {
                     b.Property<int>("FuelId")
                         .ValueGeneratedOnAdd()
@@ -682,7 +712,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Fuel", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Maintenance", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Maintenance", b =>
                 {
                     b.Property<int>("MaintenanceId")
                         .ValueGeneratedOnAdd()
@@ -801,7 +831,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Maintenance", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Route", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Route", b =>
                 {
                     b.Property<int>("RouteId")
                         .ValueGeneratedOnAdd()
@@ -907,7 +937,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Routes", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.RouteStop", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.RouteStop", b =>
                 {
                     b.Property<int>("RouteStopId")
                         .ValueGeneratedOnAdd()
@@ -971,7 +1001,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("RouteStops", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Schedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Schedule", b =>
                 {
                     b.Property<int>("ScheduleId")
                         .ValueGeneratedOnAdd()
@@ -1026,10 +1056,14 @@ namespace Bus_Buddy.Migrations
                     b.HasIndex("ScheduleDate")
                         .HasDatabaseName("IX_Schedules_Date");
 
+                    b.HasIndex("RouteId", "BusId", "DepartureTime")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Schedules_RouteBusDeparture");
+
                     b.ToTable("Schedules", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.SchoolCalendar", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.SchoolCalendar", b =>
                 {
                     b.Property<int>("CalendarId")
                         .ValueGeneratedOnAdd()
@@ -1098,7 +1132,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("SchoolCalendar", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Student", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Student", b =>
                 {
                     b.Property<int>("StudentId")
                         .ValueGeneratedOnAdd()
@@ -1262,7 +1296,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Students", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Ticket", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Ticket", b =>
                 {
                     b.Property<int>("TicketId")
                         .ValueGeneratedOnAdd()
@@ -1395,22 +1429,22 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Tickets", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Activity", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Activity", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "AssignedVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "AssignedVehicle")
                         .WithMany("Activities")
                         .HasForeignKey("AssignedVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Activities_Vehicle");
 
-                    b.HasOne("Bus_Buddy.Models.Driver", "Driver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "Driver")
                         .WithMany("Activities")
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Activities_Driver");
 
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
                         .WithMany()
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -1423,16 +1457,16 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.ActivitySchedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.ActivitySchedule", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Driver", "ScheduledDriver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "ScheduledDriver")
                         .WithMany("ScheduledActivities")
                         .HasForeignKey("ScheduledDriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ActivitySchedule_Driver");
 
-                    b.HasOne("Bus_Buddy.Models.Bus", "ScheduledVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "ScheduledVehicle")
                         .WithMany("ScheduledActivities")
                         .HasForeignKey("ScheduledVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1444,9 +1478,9 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("ScheduledVehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Fuel", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Fuel", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "Vehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "Vehicle")
                         .WithMany("FuelRecords")
                         .HasForeignKey("VehicleFueledId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1456,9 +1490,9 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Maintenance", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Maintenance", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "Vehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "Vehicle")
                         .WithMany("MaintenanceRecords")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1468,27 +1502,27 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Route", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Route", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Driver", "AMDriver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "AMDriver")
                         .WithMany("AMRoutes")
                         .HasForeignKey("AMDriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Routes_AMDriver");
 
-                    b.HasOne("Bus_Buddy.Models.Bus", "AMVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "AMVehicle")
                         .WithMany("AMRoutes")
                         .HasForeignKey("AMVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Routes_AMVehicle");
 
-                    b.HasOne("Bus_Buddy.Models.Driver", "PMDriver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "PMDriver")
                         .WithMany("PMRoutes")
                         .HasForeignKey("PMDriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Routes_PMDriver");
 
-                    b.HasOne("Bus_Buddy.Models.Bus", "PMVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "PMVehicle")
                         .WithMany("PMRoutes")
                         .HasForeignKey("PMVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1503,9 +1537,9 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("PMVehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.RouteStop", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.RouteStop", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
                         .WithMany()
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1515,24 +1549,24 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Schedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Schedule", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "Bus")
-                        .WithMany()
+                    b.HasOne("BusBuddy.Core.Models.Bus", "Bus")
+                        .WithMany("Schedules")
                         .HasForeignKey("BusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Schedules_Bus");
 
-                    b.HasOne("Bus_Buddy.Models.Driver", "Driver")
-                        .WithMany()
+                    b.HasOne("BusBuddy.Core.Models.Driver", "Driver")
+                        .WithMany("Schedules")
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Schedules_Driver");
 
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
-                        .WithMany()
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
+                        .WithMany("Schedules")
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
@@ -1545,16 +1579,16 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Ticket", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Ticket", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
                         .WithMany()
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Tickets_Route");
 
-                    b.HasOne("Bus_Buddy.Models.Student", "Student")
+                    b.HasOne("BusBuddy.Core.Models.Student", "Student")
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1566,7 +1600,7 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Bus", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Bus", b =>
                 {
                     b.Navigation("AMRoutes");
 
@@ -1579,9 +1613,11 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("PMRoutes");
 
                     b.Navigation("ScheduledActivities");
+
+                    b.Navigation("Schedules");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Driver", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Driver", b =>
                 {
                     b.Navigation("AMRoutes");
 
@@ -1590,6 +1626,13 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("PMRoutes");
 
                     b.Navigation("ScheduledActivities");
+
+                    b.Navigation("Schedules");
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.Route", b =>
+                {
+                    b.Navigation("Schedules");
                 });
 #pragma warning restore 612, 618
         }

@@ -136,7 +136,7 @@ curl --data-binary @codecov.yml https://codecov.io/validate
 ### Check Coverage Locally
 ```bash
 dotnet test --collect:"XPlat Code Coverage"
-reportgenerator -reports:"TestResults/*/coverage.cobertura.xml" -targetdir:"CoverageReport" -reporttypes:Html
+
 ```
 
 ## 📋 Security Checklist

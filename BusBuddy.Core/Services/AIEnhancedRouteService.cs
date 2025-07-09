@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using BusBuddy.Core.Data.Repositories;
 using BusBuddy.Core.Data.Interfaces;
 using BusBuddy.Core.Models;
+using Microsoft.Extensions.Logging;
 // ...existing code...
 
 namespace BusBuddy.Core.Services

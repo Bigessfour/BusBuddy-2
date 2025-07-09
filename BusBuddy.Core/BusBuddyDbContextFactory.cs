@@ -1,8 +1,7 @@
+using BusBuddy.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using BusBuddy.Core.Data;
-using System.IO;
 
 namespace Bus_Buddy;
 

@@ -1,6 +1,5 @@
-using System.Windows;
-using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.SfSkinManager;
+using Syncfusion.UI.Xaml.Grid;
 
 namespace BusBuddy.WPF.Utilities
 {

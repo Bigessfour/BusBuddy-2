@@ -3,7 +3,7 @@
   shell: pwsh
   run: |
     # Load PowerShell 7.x enhanced tools
-    . ./Scripts/Enhanced-CI-Integration.ps1
+
 
     # Run comprehensive analysis
     Start-CIIntegrationDemo -GenerateReports -UploadCoverage

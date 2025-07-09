@@ -5,9 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusBuddy.WPF"
         xmlns:views="clr-namespace:BusBuddy.WPF.Views"
+        xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
+        xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Bus Buddy - Transportation Management System" 
+        Height="900" Width="1600" 
+        WindowStartupLocation="CenterScreen">
     <Grid>
-        <views:DashboardView />
+        <Grid.Resources>
+            <!-- Add resources for consistent styling if needed -->
+        </Grid.Resources>
+        
+        <!-- Main content container with proper margins -->
+        <TabControl>
+            <TabItem Header="Dashboard">
+                <dashboard:DashboardView Margin="0" 
+                                   HorizontalAlignment="Stretch" 
+                                   VerticalAlignment="Stretch" />
+            </TabItem>
+            <TabItem Header="Students" x:Name="StudentListTab">
+                <views:StudentListView />
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Models.Base;
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BusBuddy.Core.Data;
@@ -32,6 +31,15 @@ public class BusBuddyDbContext : DbContext
 
     public BusBuddyDbContext(DbContextOptions<BusBuddyDbContext> options) : base(options)
     {
+        // Configure EF Core to detect and report threading issues
+        this.ChangeTracker.LazyLoadingEnabled = false;
+        this.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+        // Disable automatic relationship discovery in production for better performance
+        if (!System.Diagnostics.Debugger.IsAttached)
+        {
+            this.ChangeTracker.AutoDetectChangesEnabled = false;
+        }
     }
 
     /// <summary>
@@ -614,21 +622,71 @@ public class BusBuddyDbContext : DbContext
     }
 
     /// <summary>
-    /// Override SaveChanges to apply audit fields
+    /// Override SaveChanges to apply audit fields with concurrency protection
     /// </summary>
     public override int SaveChanges()
     {
-        ApplyAuditFields();
-        return base.SaveChanges();
+        try
+        {
+            ApplyAuditFields();
+            return base.SaveChanges();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // Log the concurrency exception
+            HandleConcurrencyException(ex);
+            throw; // Re-throw after logging
+        }
     }
 
     /// <summary>
-    /// Override SaveChangesAsync to apply audit fields
+    /// Override SaveChangesAsync to apply audit fields with concurrency protection
     /// </summary>
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        ApplyAuditFields();
-        return base.SaveChangesAsync(cancellationToken);
+        try
+        {
+            ApplyAuditFields();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // Log the concurrency exception
+            HandleConcurrencyException(ex);
+            throw; // Re-throw after logging
+        }
+    }
+
+    /// <summary>
+    /// Handle database concurrency exceptions with detailed logging
+    /// </summary>
+    private void HandleConcurrencyException(DbUpdateConcurrencyException ex)
+    {
+        // Log the detailed concurrency information to help with debugging
+        var failedEntries = ex.Entries.ToList();
+        foreach (var entry in failedEntries)
+        {
+            var proposedValues = entry.CurrentValues;
+            var databaseValues = entry.GetDatabaseValues();
+
+            var propNames = proposedValues.Properties.Select(p => p.Name).ToList();
+            var conflictDetails = new System.Text.StringBuilder();
+            conflictDetails.AppendLine($"Concurrency conflict for entity: {entry.Entity.GetType().Name}");
+
+            foreach (var propName in propNames)
+            {
+                var proposedValue = proposedValues[propName]?.ToString() ?? "null";
+                var databaseValue = databaseValues?[propName]?.ToString() ?? "null";
+
+                if (proposedValue != databaseValue)
+                {
+                    conflictDetails.AppendLine($"Property: {propName}, Proposed: {proposedValue}, Database: {databaseValue}");
+                }
+            }
+
+            // Output to debug - in a production app, use proper logging
+            System.Diagnostics.Debug.WriteLine(conflictDetails.ToString());
+        }
     }
 
     /// <summary>

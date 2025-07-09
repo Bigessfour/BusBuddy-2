@@ -18,6 +18,89 @@
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Views\Dashboard\DashboardView.xaml.cs">
+      <DependentUpon>DashboardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Bus\BusManagementView.xaml.cs">
+      <DependentUpon>BusManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Driver\DriverManagementView.xaml.cs">
+      <DependentUpon>DriverManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Route\RouteManagementView.xaml.cs">
+      <DependentUpon>RouteManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Schedule\ScheduleManagementView.xaml.cs">
+      <DependentUpon>ScheduleManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Student\StudentManagementView.xaml.cs">
+      <DependentUpon>StudentManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Maintenance\MaintenanceTrackingView.xaml.cs">
+      <DependentUpon>MaintenanceTrackingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Fuel\FuelManagementView.xaml.cs">
+      <DependentUpon>FuelManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Activity\ActivityLoggingView.xaml.cs">
+      <DependentUpon>ActivityLoggingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Ticket\TicketManagementView.xaml.cs">
+      <DependentUpon>TicketManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Settings\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\StudentDetailView.xaml.cs">
+      <DependentUpon>StudentDetailView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\StudentListView.xaml.cs">
+      <DependentUpon>StudentListView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Dashboard\DashboardView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Bus\BusManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Driver\DriverManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Route\RouteManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Schedule\ScheduleManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Student\StudentManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Maintenance\MaintenanceTrackingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Fuel\FuelManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Activity\ActivityLoggingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Ticket\TicketManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Settings\SettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\StudentDetailView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\StudentListView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
@@ -33,13 +116,13 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
     <PackageReference Include="Syncfusion.Licensing" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfChart.WPF" Version="30.1.38" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="26.1.35" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfInput.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfNavigationDrawer.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="30.1.38" />
-    <PackageReference Include="Syncfusion.Tools.WPF" Version="26.1.35" />
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="30.1.38" />
     <PackageReference Include="System.Net.Http.Json" Version="9.0.6" />
   </ItemGroup>
 

@@ -1,12 +1,7 @@
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using BusBuddy.Core.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusBuddy.Core.Services
 {

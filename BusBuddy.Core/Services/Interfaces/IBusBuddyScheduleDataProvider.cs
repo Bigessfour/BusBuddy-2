@@ -1,6 +1,4 @@
 using BusBuddy.Core.Models;
-using System;
-using System.Collections.Generic;
 
 namespace BusBuddy.Core.Services.Interfaces
 {

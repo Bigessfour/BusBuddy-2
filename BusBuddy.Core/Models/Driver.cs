@@ -328,6 +328,36 @@ public class Driver : INotifyPropertyChanged
     [Display(Name = "Needs Attention")]
     public bool NeedsAttention => !TrainingComplete || LicenseStatus == "Expired" || LicenseStatus == "Expiring Soon";
 
+    [NotMapped]
+    [Display(Name = "Contact Phone")]
+    public string? ContactPhone
+    {
+        get => DriverPhone;
+        set
+        {
+            if (DriverPhone != value)
+            {
+                DriverPhone = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    [NotMapped]
+    [Display(Name = "Contact Email")]
+    public string? ContactEmail
+    {
+        get => DriverEmail;
+        set
+        {
+            if (DriverEmail != value)
+            {
+                DriverEmail = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     // Compatibility properties
     [NotMapped]
     public string? Phone => DriverPhone;

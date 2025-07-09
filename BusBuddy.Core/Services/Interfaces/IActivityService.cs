@@ -1,8 +1,3 @@
-using BusBuddy.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace BusBuddy.Core.Models
 {
     public interface IActivityService

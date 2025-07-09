@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+using BusBuddy.Configuration;
+using BusBuddy.Core.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BusBuddy.Core.Models;
-using BusBuddy.Configuration;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace BusBuddy.Core.Services
 {

@@ -1,10 +1,8 @@
+using BusBuddy.Core.Data;
+using BusBuddy.Core.Data.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using BusBuddy.Core.Data;
-using BusBuddy.Core.Data.Repositories;
-using BusBuddy.Core.Data.UnitOfWork;
-using BusBuddy.Core.Services.Interfaces;
 
 namespace BusBuddy.Core.Services
 {

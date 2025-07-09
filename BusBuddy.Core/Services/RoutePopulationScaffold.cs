@@ -2,9 +2,9 @@ namespace BusBuddy.Core.Services
 {
     public class RoutePopulationScaffold
     {
-        private readonly BusService _busService;
+        private readonly IBusService _busService;
 
-        public RoutePopulationScaffold(BusService busService)
+        public RoutePopulationScaffold(IBusService busService)
         {
             _busService = busService;
         }

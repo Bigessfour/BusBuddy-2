@@ -1,6 +1,6 @@
-using System.Windows;
-using Syncfusion.Windows.Tools.Controls;
 using Syncfusion.SfSkinManager;
+using Syncfusion.Windows.Tools.Controls;
+using System.Windows;
 
 namespace BusBuddy.WPF.Utilities
 {

@@ -1,6 +1,6 @@
-using System.Windows;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.Office2019Colorful.WPF;
+using System.Windows;
 
 namespace BusBuddy.WPF.Utilities
 {

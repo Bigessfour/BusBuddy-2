@@ -1,9 +1,5 @@
-using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.Collections.Generic;
 
 namespace BusBuddy.Core.Services
 {

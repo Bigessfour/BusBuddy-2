@@ -1,13 +1,6 @@
-﻿using System.Text;
+﻿using BusBuddy.WPF.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace BusBuddy.WPF;
 
@@ -16,11 +9,26 @@ namespace BusBuddy.WPF;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(StudentListViewModel studentListViewModel)
     {
         InitializeComponent();
         this.WindowState = WindowState.Maximized;
         this.WindowStyle = WindowStyle.SingleBorderWindow;
         this.ResizeMode = ResizeMode.CanResize;
+
+        // Set DataContext for the student list view
+        var studentListTab = (TabItem)this.FindName("StudentListTab");
+        if (studentListTab != null)
+        {
+            studentListTab.DataContext = studentListViewModel;
+        }
+
+
+        // Set DataContext for MainWindow if needed
+        if (Application.Current is App app && app.Services != null)
+        {
+            // If you have a MainWindowViewModel, you can set it here
+            // DataContext = app.Services.GetRequiredService<MainWindowViewModel>();
+        }
     }
 }

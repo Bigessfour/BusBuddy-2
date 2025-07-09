@@ -1,14 +1,13 @@
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Http;
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Data.Interfaces;
 using BusBuddy.Core.Data.Repositories;
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BusBuddy.Core.Extensions;
 
@@ -23,14 +22,18 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Register DbContext with SQL Server
-        services.AddDbContext<BusBuddyDbContext>(options =>
+        // Register DbContext with transient lifetime for thread safety
+        services.AddTransient<BusBuddyDbContext>(provider =>
         {
-            options.UseInMemoryDatabase("BusBuddyDb");
+            var optionsBuilder = new DbContextOptionsBuilder<BusBuddyDbContext>();
+
+            // Configure for InMemoryDatabase (for development)
+            optionsBuilder.UseInMemoryDatabase("BusBuddyDb");
+
+            // Uncomment for SQL Server in production
             //var connectionString = configuration.GetConnectionString("DefaultConnection")
             //    ?? throw new InvalidOperationException("DefaultConnection string is not configured.");
-
-            //options.UseSqlServer(connectionString, sqlOptions =>
+            //optionsBuilder.UseSqlServer(connectionString, sqlOptions =>
             //{
             //    sqlOptions.EnableRetryOnFailure(
             //        maxRetryCount: 3,
@@ -41,13 +44,29 @@ public static class ServiceCollectionExtensions
 
             // Enable sensitive data logging in development
 #if DEBUG
-            options.EnableSensitiveDataLogging();
-            options.EnableDetailedErrors();
+            optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder.EnableDetailedErrors();
 #endif
+
+            // Configure split query behavior globally (can be overridden for specific queries)
+            var querySplittingBehavior = configuration.GetSection("Database:QuerySplittingBehavior").Value;
+            if (!string.IsNullOrEmpty(querySplittingBehavior) &&
+                Enum.TryParse<QuerySplittingBehavior>(querySplittingBehavior, out var splitBehavior))
+            {
+                optionsBuilder.ConfigureWarnings(warnings =>
+                    warnings.Throw(Microsoft.EntityFrameworkCore.Diagnostics.CoreEventId.RowLimitingOperationWithoutOrderByWarning));
+
+                // We'll pass this behavior to the context constructor
+            }
+
+            return new BusBuddyDbContext(optionsBuilder.Options);
         });
 
-        // Register repositories - use fully qualified names to avoid ambiguity
+        // Register DbContext Factory for thread-safe context creation
+        services.AddSingleton<IBusBuddyDbContextFactory, BusBuddyDbContextFactory>();
 
+        // Register repositories - use fully qualified names to avoid ambiguity
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
         services.AddScoped<IActivityRepository, BusBuddy.Core.Data.Repositories.ActivityRepository>();
         services.AddScoped<IBusRepository, BusBuddy.Core.Data.Repositories.BusRepository>();
         services.AddScoped<IDriverRepository, BusBuddy.Core.Data.Repositories.DriverRepository>();

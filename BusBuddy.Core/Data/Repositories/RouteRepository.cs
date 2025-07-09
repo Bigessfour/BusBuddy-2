@@ -1,9 +1,9 @@
 
 
-using Microsoft.EntityFrameworkCore;
 using BusBuddy.Core.Data.Interfaces;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusBuddy.Core.Data.Repositories;
 /// <summary>

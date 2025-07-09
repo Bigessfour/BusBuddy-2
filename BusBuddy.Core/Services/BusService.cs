@@ -1,10 +1,12 @@
 using BusBuddy.Core.Data;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
+using BusBuddy.Core.Extensions;
 using BusBuddy.Core.Models;
+using BusBuddy.Core.Utilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Serilog.Context;
+using System.Diagnostics;
+using ActivityType = BusBuddy.Core.Models.Activity;
 
 namespace BusBuddy.Core.Services
 {
@@ -12,14 +14,19 @@ namespace BusBuddy.Core.Services
     {
         private readonly ILogger<BusService> _logger;
         private readonly BusBuddyDbContext _context;
+        private readonly IBusCachingService _cacheService;
         private readonly List<BusInfo> _buses;
         private readonly List<RouteInfo> _routes;
         private readonly List<ScheduleInfo> _schedules;
 
-        public BusService(ILogger<BusService> logger, BusBuddyDbContext context)
+        public BusService(
+            ILogger<BusService> logger,
+            BusBuddyDbContext context,
+            IBusCachingService cacheService)
         {
             _logger = logger;
             _context = context;
+            _cacheService = cacheService;
             _buses = new List<BusInfo>();
             _routes = new List<RouteInfo>();
             _schedules = new List<ScheduleInfo>();
@@ -28,71 +35,197 @@ namespace BusBuddy.Core.Services
             InitializeSampleData();
         }
 
-        // Entity Framework methods for actual database operations
+        // Entity Framework methods for actual database operations using caching
         public async Task<List<Bus>> GetAllBusEntitiesAsync()
         {
-            _logger.LogInformation("Retrieving all bus entities from database");
-            return await _context.Vehicles
-                .Include(v => v.AMRoutes)
-                .Include(v => v.PMRoutes)
-                .ToListAsync();
+            using (LogContext.PushProperty("QueryType", "GetAllBusEntities"))
+            using (LogContext.PushProperty("OperationName", "DatabaseQuery"))
+            {
+                var stopwatch = Stopwatch.StartNew();
+                _logger.LogInformation("Retrieving all bus entities (with caching)");
+
+                try
+                {
+                    var result = await _cacheService.GetAllBusesAsync(async () =>
+                    {
+                        _logger.LogInformation("Cache miss - retrieving all bus entities from database");
+                        return await _context.Vehicles
+                            .Include(v => v.AMRoutes)
+                            .Include(v => v.PMRoutes)
+                            .ToListAsync();
+                    });
+
+                    stopwatch.Stop();
+                    _logger.LogInformation("Retrieved {BusCount} bus entities in {Duration}ms",
+                        result.Count, stopwatch.ElapsedMilliseconds);
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _logger.LogError(ex, "Error retrieving all bus entities after {Duration}ms",
+                        stopwatch.ElapsedMilliseconds);
+                    throw;
+                }
+            }
         }
 
         public async Task<Bus?> GetBusEntityByIdAsync(int busId)
         {
-            _logger.LogInformation("Retrieving bus entity with ID: {BusId}", busId);
-            return await _context.Vehicles
-                .Include(v => v.AMRoutes)
-                .Include(v => v.PMRoutes)
-                .Include(v => v.Activities)
-                .Include(v => v.FuelRecords)
-                .Include(v => v.MaintenanceRecords)
-                .FirstOrDefaultAsync(v => v.VehicleId == busId);
+            using (LogContext.PushProperty("QueryType", "GetBusEntityById"))
+            using (LogContext.PushProperty("BusId", busId))
+            using (LogContext.PushProperty("OperationName", "DatabaseQuery"))
+            {
+                var stopwatch = Stopwatch.StartNew();
+                _logger.LogInformation("Retrieving bus entity with ID: {BusId} (with caching)", busId);
+
+                try
+                {
+                    var result = await _cacheService.GetBusByIdAsync(busId, async (id) =>
+                    {
+                        _logger.LogInformation("Cache miss - retrieving bus entity with ID: {BusId} from database", id);
+                        return await _context.Vehicles
+                            .Include(v => v.AMRoutes)
+                            .Include(v => v.PMRoutes)
+                            .Include(v => v.Activities)
+                            .Include(v => v.FuelRecords)
+                            .Include(v => v.MaintenanceRecords)
+                            .FirstOrDefaultAsync(v => v.VehicleId == id);
+                    });
+
+                    stopwatch.Stop();
+                    if (result != null)
+                    {
+                        _logger.LogInformation("Retrieved bus entity {BusId} in {Duration}ms",
+                            busId, stopwatch.ElapsedMilliseconds);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Bus entity {BusId} not found after {Duration}ms",
+                            busId, stopwatch.ElapsedMilliseconds);
+                    }
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    _logger.LogError(ex, "Error retrieving bus entity {BusId} after {Duration}ms",
+                        busId, stopwatch.ElapsedMilliseconds);
+                    throw;
+                }
+            }
         }
 
         public async Task<Bus> AddBusEntityAsync(Bus bus)
         {
-            _logger.LogInformation("Adding new bus entity: {BusNumber}", bus.BusNumber);
-            _context.Vehicles.Add(bus);
-            await _context.SaveChangesAsync();
-            return bus;
+            using (LogContext.PushProperty("OperationType", "AddBusEntity"))
+            using (LogContext.PushProperty("BusNumber", bus.BusNumber))
+            {
+                _logger.LogInformation("Adding new bus entity: {BusNumber}", bus.BusNumber);
+
+                _context.Vehicles.Add(bus);
+                await _context.SaveChangesWithLoggingAsync(_logger, "AddBus", "BusNumber", bus.BusNumber);
+                _cacheService.InvalidateAllBusCache();
+
+                _logger.LogInformation("Successfully added bus: {BusNumber} with ID {BusId}",
+                    bus.BusNumber, bus.VehicleId);
+
+                return bus;
+            }
         }
 
         public async Task<bool> UpdateBusEntityAsync(Bus bus)
         {
-            _logger.LogInformation("Updating bus entity with ID: {BusId}", bus.VehicleId);
-            _context.Vehicles.Update(bus);
-            var result = await _context.SaveChangesAsync();
-            return result > 0;
+            using (LogContext.PushProperty("OperationType", "UpdateBusEntity"))
+            using (LogContext.PushProperty("BusId", bus.VehicleId))
+            using (LogContext.PushProperty("BusNumber", bus.BusNumber))
+            {
+                _logger.LogInformation("Updating bus entity with ID: {BusId}, Number: {BusNumber}",
+                    bus.VehicleId, bus.BusNumber);
+
+                _context.Vehicles.Update(bus);
+                var result = await _context.SaveChangesWithLoggingAsync(_logger, "UpdateBus", "BusId", bus.VehicleId);
+
+                if (result > 0)
+                {
+                    _cacheService.InvalidateBusCache(bus.VehicleId);
+                    _logger.LogInformation("Successfully updated bus with ID: {BusId}", bus.VehicleId);
+                }
+                else
+                {
+                    _logger.LogWarning("No changes detected when updating bus with ID: {BusId}", bus.VehicleId);
+                }
+
+                return result > 0;
+            }
         }
 
         public async Task<bool> DeleteBusEntityAsync(int busId)
         {
-            _logger.LogInformation("Deleting bus entity with ID: {BusId}", busId);
-            var bus = await _context.Vehicles.FindAsync(busId);
-            if (bus != null)
+            using (LogContext.PushProperty("OperationType", "DeleteBusEntity"))
+            using (LogContext.PushProperty("BusId", busId))
             {
-                _context.Vehicles.Remove(bus);
-                var result = await _context.SaveChangesAsync();
-                return result > 0;
+                _logger.LogInformation("Deleting bus entity with ID: {BusId}", busId);
+
+                var bus = await _context.Vehicles.FindAsync(busId);
+                if (bus != null)
+                {
+                    using (LogContext.PushProperty("BusNumber", bus.BusNumber))
+                    {
+                        _logger.LogInformation("Found bus to delete: {BusNumber} (ID: {BusId})",
+                            bus.BusNumber, busId);
+
+                        _context.Vehicles.Remove(bus);
+                        var result = await _context.SaveChangesWithLoggingAsync(_logger, "DeleteBus", "BusId", busId);
+
+                        if (result > 0)
+                        {
+                            _cacheService.InvalidateBusCache(busId);
+                            _logger.LogInformation("Successfully deleted bus with ID: {BusId}", busId);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("No changes detected when deleting bus with ID: {BusId}", busId);
+                        }
+
+                        return result > 0;
+                    }
+                }
+
+                _logger.LogWarning("Bus with ID: {BusId} not found for deletion", busId);
+                return false;
             }
-            return false;
         }
 
         public async Task<List<Driver>> GetAllDriversAsync()
         {
-            _logger.LogInformation("Retrieving all drivers from database");
-            return await _context.Drivers.ToListAsync();
+            using (LogContext.PushProperty("QueryType", "GetAllDrivers"))
+            {
+                return await _logger.TrackPerformanceAsync("GetAllDrivers", async () =>
+                {
+                    _logger.LogInformation("Retrieving all drivers from database");
+                    return await _context.Drivers.ToListAsync();
+                });
+            }
         }
 
         public async Task<Driver?> GetDriverEntityByIdAsync(int driverId)
         {
-            _logger.LogInformation("Retrieving driver entity with ID: {DriverId}", driverId);
-            return await _context.Drivers
-                .Include(d => d.AMRoutes)
-                .Include(d => d.PMRoutes)
-                .Include(d => d.Activities)
-                .FirstOrDefaultAsync(d => d.DriverId == driverId);
+            using (LogContext.PushProperty("QueryType", "GetDriverEntityById"))
+            using (LogContext.PushProperty("DriverId", driverId))
+            {
+                return await _logger.TrackPerformanceAsync("GetDriverById", async () =>
+                {
+                    _logger.LogInformation("Retrieving driver entity with ID: {DriverId}", driverId);
+                    return await _context.Drivers
+                        .Include(d => d.AMRoutes)
+                        .Include(d => d.PMRoutes)
+                        .Include(d => d.Activities)
+                        .FirstOrDefaultAsync(d => d.DriverId == driverId);
+                }, "DriverId", driverId);
+            }
         }
 
         public async Task<Driver> AddDriverEntityAsync(Driver driver)
@@ -135,41 +268,62 @@ namespace BusBuddy.Core.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Activity>> GetActivitiesByDateAsync(DateTime date)
+        public async Task<List<ActivityType>> GetActivitiesByDateAsync(DateTime date)
         {
-            _logger.LogInformation("Retrieving activities for date: {Date}", date.ToShortDateString());
-            return await _context.Activities
-                .Include(a => a.Vehicle)
-                .Include(a => a.Driver)
-                .Include(a => a.Route)
-                .Where(a => a.ActivityDate.Date == date.Date)
-                .ToListAsync();
+            using (LogContext.PushProperty("QueryType", "GetActivitiesByDate"))
+            using (LogContext.PushProperty("ActivityDate", date.ToString("yyyy-MM-dd")))
+            {
+                return await _logger.TrackPerformanceAsync("GetActivitiesByDate", async () =>
+                {
+                    _logger.LogInformation("Retrieving activities for date: {Date}", date.ToShortDateString());
+
+                    return await _context.ExecuteWithLoggingAsync(_logger, "GetActivitiesByDate", async () =>
+                    {
+                        return await _context.Activities
+                            .Include(a => a.Vehicle)
+                            .Include(a => a.Driver)
+                            .Include(a => a.Route)
+                            .Where(a => a.ActivityDate.Date == date.Date)
+                            .ToListAsync();
+                    }, "ActivityDate", date.ToString("yyyy-MM-dd"));
+                });
+            }
         }
 
-        // Legacy methods for backward compatibility with existing interface
+        // Legacy methods for backward compatibility
         public async Task<List<BusInfo>> GetAllBusesAsync()
         {
-            _logger.LogInformation("Retrieving all buses (legacy method)");
-
-            // Try to get from database first
-            try
+            using (LogContext.PushProperty("QueryType", "GetAllBuses"))
+            using (LogContext.PushProperty("LegacyMethod", true))
             {
-                var buses = await GetAllBusEntitiesAsync();
-                return buses.Select(b => new BusInfo
+                return await _logger.TrackPerformanceAsync("GetAllBuses_Legacy", async () =>
                 {
-                    BusId = b.VehicleId,
-                    BusNumber = b.BusNumber,
-                    Model = $"{b.Make} {b.Model}",
-                    Capacity = b.SeatingCapacity,
-                    Status = b.Status,
-                    LastMaintenance = b.DateLastInspection ?? DateTime.MinValue
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Could not retrieve from database, using sample data");
-                // If DB unavailable, return in-memory sample data (already logged above)
-                return new List<BusInfo>(_buses);
+                    _logger.LogInformation("Retrieving all buses (legacy method - using cached entities)");
+
+                    // Try to get from database first
+                    try
+                    {
+                        var buses = await GetAllBusEntitiesAsync();
+                        var result = buses.Select(b => new BusInfo
+                        {
+                            BusId = b.VehicleId,
+                            BusNumber = b.BusNumber,
+                            Model = $"{b.Make} {b.Model}",
+                            Capacity = b.SeatingCapacity,
+                            Status = b.Status,
+                            LastMaintenance = b.DateLastInspection ?? DateTime.MinValue
+                        }).ToList();
+
+                        _logger.LogInformation("Retrieved {BusCount} buses from database entities", result.Count);
+                        return result;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Could not retrieve from database, using sample data");
+                        // If DB unavailable, return in-memory sample data (already logged above)
+                        return new List<BusInfo>(_buses);
+                    }
+                });
             }
         }
 
