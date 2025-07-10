@@ -13,29 +13,45 @@ namespace BusBuddy.Core.Services;
 public class StudentService : IStudentService
 {
     private readonly ILogger<StudentService> _logger;
-    private readonly BusBuddyDbContext _context;
+    private readonly IBusBuddyDbContextFactory _contextFactory;
+    private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
-    public StudentService(ILogger<StudentService> logger, BusBuddyDbContext context)
+    public StudentService(ILogger<StudentService> logger, IBusBuddyDbContextFactory contextFactory)
     {
         _logger = logger;
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     #region Read Operations
 
     public async Task<List<Student>> GetAllStudentsAsync()
     {
+        await _semaphore.WaitAsync();
         try
         {
             _logger.LogInformation("Retrieving all students from database");
-            return await _context.Students
-                .OrderBy(s => s.StudentName)
-                .ToListAsync();
+            var context = _contextFactory.CreateDbContext();
+            try
+            {
+                return await context.Students
+                    .AsNoTracking() // Use AsNoTracking for better performance in read operations
+                    .OrderBy(s => s.StudentName)
+                    .ToListAsync();
+            }
+            finally
+            {
+                // Properly dispose the context when done
+                await context.DisposeAsync();
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving all students");
             throw;
+        }
+        finally
+        {
+            _semaphore.Release();
         }
     }
 
@@ -44,8 +60,18 @@ public class StudentService : IStudentService
         try
         {
             _logger.LogInformation("Retrieving student with ID: {StudentId}", studentId);
-            return await _context.Students
-                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+            var context = _contextFactory.CreateDbContext();
+            try
+            {
+                return await context.Students
+                    .AsNoTracking() // Use AsNoTracking for better performance in read operations
+                    .FirstOrDefaultAsync(s => s.StudentId == studentId);
+            }
+            finally
+            {
+                // Properly dispose the context when done
+                await context.DisposeAsync();
+            }
         }
         catch (Exception ex)
         {
@@ -59,10 +85,20 @@ public class StudentService : IStudentService
         try
         {
             _logger.LogInformation("Retrieving students in grade: {Grade}", grade);
-            return await _context.Students
-                .Where(s => s.Grade == grade)
-                .OrderBy(s => s.StudentName)
-                .ToListAsync();
+            var context = _contextFactory.CreateDbContext();
+            try
+            {
+                return await context.Students
+                    .AsNoTracking() // Use AsNoTracking for better performance in read operations
+                    .Where(s => s.Grade == grade)
+                    .OrderBy(s => s.StudentName)
+                    .ToListAsync();
+            }
+            finally
+            {
+                // Properly dispose the context when done
+                await context.DisposeAsync();
+            }
         }
         catch (Exception ex)
         {
@@ -76,7 +112,9 @@ public class StudentService : IStudentService
         try
         {
             _logger.LogInformation("Retrieving students on route: {RouteName}", routeName);
-            return await _context.Students
+            // Don't dispose the context here as it might be needed after the method returns
+            var context = _contextFactory.CreateDbContext();
+            return await context.Students
                 .Where(s => s.AMRoute == routeName || s.PMRoute == routeName)
                 .OrderBy(s => s.StudentName)
                 .ToListAsync();
@@ -93,7 +131,9 @@ public class StudentService : IStudentService
         try
         {
             _logger.LogInformation("Retrieving active students");
-            return await _context.Students
+            // Don't dispose the context here as it might be needed after the method returns
+            var context = _contextFactory.CreateDbContext();
+            return await context.Students
                 .Where(s => s.Active)
                 .OrderBy(s => s.StudentName)
                 .ToListAsync();
@@ -110,7 +150,9 @@ public class StudentService : IStudentService
         try
         {
             _logger.LogInformation("Retrieving students from school: {School}", school);
-            return await _context.Students
+            // Don't dispose the context here as it might be needed after the method returns
+            var context = _contextFactory.CreateDbContext();
+            return await context.Students
                 .Where(s => s.School == school)
                 .OrderBy(s => s.StudentName)
                 .ToListAsync();
@@ -129,7 +171,9 @@ public class StudentService : IStudentService
             _logger.LogInformation("Searching students with term: {SearchTerm}", searchTerm);
 
             var term = searchTerm.ToLower();
-            return await _context.Students
+            // Don't dispose the context here as it might be needed after the method returns
+            var context = _contextFactory.CreateDbContext();
+            return await context.Students
                 .Where(s => s.StudentName.ToLower().Contains(term) ||
                            (s.StudentNumber != null && s.StudentNumber.ToLower().Contains(term)))
                 .OrderBy(s => s.StudentName)
@@ -165,8 +209,9 @@ public class StudentService : IStudentService
                 student.EnrollmentDate = DateTime.Today;
             }
 
-            _context.Students.Add(student);
-            await _context.SaveChangesAsync();
+            using var context = _contextFactory.CreateWriteDbContext();
+            context.Students.Add(student);
+            await context.SaveChangesAsync();
 
             _logger.LogInformation("Successfully added student with ID: {StudentId}", student.StudentId);
             return student;
@@ -191,8 +236,9 @@ public class StudentService : IStudentService
                 throw new ArgumentException($"Student validation failed: {string.Join(", ", validationErrors)}");
             }
 
-            _context.Students.Update(student);
-            var result = await _context.SaveChangesAsync();
+            using var context = _contextFactory.CreateWriteDbContext();
+            context.Students.Update(student);
+            var result = await context.SaveChangesAsync();
 
             var success = result > 0;
             if (success)
@@ -219,11 +265,12 @@ public class StudentService : IStudentService
         {
             _logger.LogInformation("Deleting student with ID: {StudentId}", studentId);
 
-            var student = await _context.Students.FindAsync(studentId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var student = await context.Students.FindAsync(studentId);
             if (student != null)
             {
-                _context.Students.Remove(student);
-                var result = await _context.SaveChangesAsync();
+                context.Students.Remove(student);
+                var result = await context.SaveChangesAsync();
 
                 var success = result > 0;
                 if (success)
@@ -260,10 +307,14 @@ public class StudentService : IStudentService
                 errors.Add("Student name is required");
             }
 
+            // Create a context that will be disposed at the end of this method,
+            // since the validation results are returned as a new list (not dependent on the context)
+            using var context = _contextFactory.CreateDbContext();
+
             // Student number uniqueness check (if provided)
             if (!string.IsNullOrWhiteSpace(student.StudentNumber))
             {
-                var existingStudent = await _context.Students
+                var existingStudent = await context.Students
                     .Where(s => s.StudentNumber == student.StudentNumber && s.StudentId != student.StudentId)
                     .FirstOrDefaultAsync();
 
@@ -326,7 +377,7 @@ public class StudentService : IStudentService
             {
                 try
                 {
-                    var amRouteExists = await _context.Routes.AnyAsync(r => r.RouteName == student.AMRoute);
+                    var amRouteExists = await context.Routes.AnyAsync(r => r.RouteName == student.AMRoute);
                     if (!amRouteExists)
                     {
                         errors.Add($"AM Route '{student.AMRoute}' does not exist");
@@ -343,7 +394,7 @@ public class StudentService : IStudentService
             {
                 try
                 {
-                    var pmRouteExists = await _context.Routes.AnyAsync(r => r.RouteName == student.PMRoute);
+                    var pmRouteExists = await context.Routes.AnyAsync(r => r.RouteName == student.PMRoute);
                     if (!pmRouteExists)
                     {
                         errors.Add($"PM Route '{student.PMRoute}' does not exist");
@@ -375,17 +426,18 @@ public class StudentService : IStudentService
         {
             _logger.LogInformation("Calculating student statistics");
 
+            using var context = _contextFactory.CreateDbContext();
             var stats = new Dictionary<string, int>
             {
-                ["TotalStudents"] = await _context.Students.CountAsync(),
-                ["ActiveStudents"] = await _context.Students.CountAsync(s => s.Active),
-                ["InactiveStudents"] = await _context.Students.CountAsync(s => !s.Active),
-                ["StudentsWithRoutes"] = await _context.Students.CountAsync(s => !string.IsNullOrEmpty(s.AMRoute) || !string.IsNullOrEmpty(s.PMRoute)),
-                ["StudentsWithoutRoutes"] = await _context.Students.CountAsync(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute))
+                ["TotalStudents"] = await context.Students.CountAsync(),
+                ["ActiveStudents"] = await context.Students.CountAsync(s => s.Active),
+                ["InactiveStudents"] = await context.Students.CountAsync(s => !s.Active),
+                ["StudentsWithRoutes"] = await context.Students.CountAsync(s => !string.IsNullOrEmpty(s.AMRoute) || !string.IsNullOrEmpty(s.PMRoute)),
+                ["StudentsWithoutRoutes"] = await context.Students.CountAsync(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute))
             };
 
             // Grade level counts
-            var gradeCounts = await _context.Students
+            var gradeCounts = await context.Students
                 .Where(s => !string.IsNullOrEmpty(s.Grade))
                 .GroupBy(s => s.Grade)
                 .Select(g => new { Grade = g.Key, Count = g.Count() })
@@ -411,7 +463,8 @@ public class StudentService : IStudentService
         {
             _logger.LogInformation("Finding students with missing required information");
 
-            return await _context.Students
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Students
                 .Where(s => string.IsNullOrEmpty(s.ParentGuardian) ||
                            string.IsNullOrEmpty(s.EmergencyPhone) ||
                            string.IsNullOrEmpty(s.HomeAddress) ||
@@ -437,7 +490,8 @@ public class StudentService : IStudentService
             _logger.LogInformation("Assigning student {StudentId} to routes - AM: {AMRoute}, PM: {PMRoute}",
                 studentId, amRoute, pmRoute);
 
-            var student = await _context.Students.FindAsync(studentId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
                 _logger.LogWarning("Student with ID {StudentId} not found", studentId);
@@ -447,7 +501,7 @@ public class StudentService : IStudentService
             student.AMRoute = amRoute;
             student.PMRoute = pmRoute;
 
-            var result = await _context.SaveChangesAsync();
+            var result = await context.SaveChangesAsync();
             var success = result > 0;
 
             if (success)
@@ -470,7 +524,8 @@ public class StudentService : IStudentService
         {
             _logger.LogInformation("Updating active status for student {StudentId} to {IsActive}", studentId, isActive);
 
-            var student = await _context.Students.FindAsync(studentId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
                 _logger.LogWarning("Student with ID {StudentId} not found", studentId);
@@ -478,7 +533,7 @@ public class StudentService : IStudentService
             }
 
             student.Active = isActive;
-            var result = await _context.SaveChangesAsync();
+            var result = await context.SaveChangesAsync();
             var success = result > 0;
 
             if (success)

@@ -14,12 +14,19 @@ namespace BusBuddy.Core.Services
 
         public async Task LogAsync(string action, string user, string? details = null)
         {
+            // Truncate details if they exceed the database column size (1000 chars)
+            string? truncatedDetails = details;
+            if (details != null && details.Length > 995)
+            {
+                truncatedDetails = details.Substring(0, 990) + "[...]";
+            }
+
             var log = new ActivityLog
             {
                 Timestamp = DateTime.Now,
                 Action = action,
                 User = user,
-                Details = details
+                Details = truncatedDetails
             };
             _db.ActivityLogs.Add(log);
             await _db.SaveChangesAsync();

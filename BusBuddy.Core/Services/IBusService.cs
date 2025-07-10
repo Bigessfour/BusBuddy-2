@@ -15,6 +15,8 @@ namespace BusBuddy.Core.Services
 
         // Entity Framework methods for direct database operations
         Task<List<Bus>> GetAllBusEntitiesAsync();
+        // New pagination method
+        Task<(List<Bus> Buses, int TotalCount)> GetBusesPaginatedAsync(int pageNumber, int pageSize, string? sortColumn = null, bool isAscending = true);
         Task<Bus?> GetBusEntityByIdAsync(int busId);
         Task<Bus> AddBusEntityAsync(Bus bus);
         Task<bool> UpdateBusEntityAsync(Bus bus);

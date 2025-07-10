@@ -42,11 +42,13 @@ public static class ServiceCollectionExtensions
             //    sqlOptions.CommandTimeout(30);
             //});
 
-            // Enable sensitive data logging in development
-#if DEBUG
-            optionsBuilder.EnableSensitiveDataLogging();
-            optionsBuilder.EnableDetailedErrors();
-#endif
+            // Enable sensitive data logging only in development with proper controls
+            if (BusBuddy.Core.Utilities.EnvironmentHelper.IsSensitiveDataLoggingEnabled())
+            {
+                Console.WriteLine("WARNING: Sensitive data logging is enabled. This should NEVER be used in production.");
+                optionsBuilder.EnableSensitiveDataLogging();
+                optionsBuilder.EnableDetailedErrors();
+            }
 
             // Configure split query behavior globally (can be overridden for specific queries)
             var querySplittingBehavior = configuration.GetSection("Database:QuerySplittingBehavior").Value;

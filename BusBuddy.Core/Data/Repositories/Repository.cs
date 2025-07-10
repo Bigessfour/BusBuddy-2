@@ -18,6 +18,7 @@ public class Repository<T> : IRepository<T> where T : class
     protected readonly DbSet<T> _dbSet;
     protected readonly IUserContextService _userContextService;
     private readonly bool _supportsSoftDelete;
+    private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
     public Repository(BusBuddyDbContext context, IUserContextService userContextService)
     {
@@ -86,30 +87,40 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<IEnumerable<T>> GetAllAsync()
     {
-        IQueryable<T> query = _dbSet;
-
-        if (_supportsSoftDelete)
+        await _semaphore.WaitAsync();
+        try
         {
-            // Handle BaseEntity pattern (IsDeleted property)
-            if (typeof(BaseEntity).IsAssignableFrom(typeof(T)))
-            {
-                query = query.Where(e => !((BaseEntity)(object)e).IsDeleted);
-            }
-            // Handle Student/Driver pattern (Active property)
-            else if (typeof(T).GetProperty("Active")?.PropertyType == typeof(bool))
-            {
-                // Create expression: e => ((T)e).Active == true
-                var parameter = Expression.Parameter(typeof(T), "e");
-                var property = Expression.Property(parameter, "Active");
-                var constant = Expression.Constant(true);
-                var equal = Expression.Equal(property, constant);
-                var lambda = Expression.Lambda<Func<T, bool>>(equal, parameter);
+            // Create a query with appropriate filters
+            IQueryable<T> query = _dbSet.AsNoTracking(); // Use AsNoTracking for better concurrency
 
-                query = query.Where(lambda);
+            if (_supportsSoftDelete)
+            {
+                // Handle BaseEntity pattern (IsDeleted property)
+                if (typeof(BaseEntity).IsAssignableFrom(typeof(T)))
+                {
+                    query = query.Where(e => !((BaseEntity)(object)e).IsDeleted);
+                }
+                // Handle Student/Driver pattern (Active property)
+                else if (typeof(T).GetProperty("Active")?.PropertyType == typeof(bool))
+                {
+                    // Create expression: e => ((T)e).Active == true
+                    var parameter = Expression.Parameter(typeof(T), "e");
+                    var property = Expression.Property(parameter, "Active");
+                    var constant = Expression.Constant(true);
+                    var equal = Expression.Equal(property, constant);
+                    var lambda = Expression.Lambda<Func<T, bool>>(equal, parameter);
+
+                    query = query.Where(lambda);
+                }
             }
+
+            // Materialize the query to avoid context sharing issues
+            return await query.ToListAsync();
         }
-
-        return await query.ToListAsync();
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 
     public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)

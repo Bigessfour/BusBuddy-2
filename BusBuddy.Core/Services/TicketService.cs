@@ -10,12 +10,12 @@ namespace BusBuddy.Core.Services;
 /// </summary>
 public class TicketService : ITicketService
 {
-    private readonly BusBuddyDbContext _context;
+    private readonly IBusBuddyDbContextFactory _contextFactory;
     private readonly ILogger<TicketService> _logger;
 
-    public TicketService(BusBuddyDbContext context, ILogger<TicketService> logger)
+    public TicketService(IBusBuddyDbContextFactory contextFactory, ILogger<TicketService> logger)
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
+        _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -23,7 +23,9 @@ public class TicketService : ITicketService
     {
         try
         {
-            return await _context.Tickets
+            _logger.LogInformation("Retrieving all tickets");
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .OrderByDescending(t => t.IssuedDate)
@@ -40,7 +42,9 @@ public class TicketService : ITicketService
     {
         try
         {
-            return await _context.Tickets
+            _logger.LogInformation("Retrieving ticket {TicketId}", ticketId);
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .FirstOrDefaultAsync(t => t.TicketId == ticketId);
@@ -56,7 +60,9 @@ public class TicketService : ITicketService
     {
         try
         {
-            return await _context.Tickets
+            _logger.LogInformation("Retrieving tickets for student {StudentId}", studentId);
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.StudentId == studentId)
@@ -74,7 +80,8 @@ public class TicketService : ITicketService
     {
         try
         {
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.RouteId == routeId)
@@ -93,7 +100,8 @@ public class TicketService : ITicketService
         try
         {
             var date = travelDate.Date;
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.TravelDate.Date == date)
@@ -111,7 +119,8 @@ public class TicketService : ITicketService
     {
         try
         {
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.Status == status)
@@ -129,7 +138,8 @@ public class TicketService : ITicketService
     {
         try
         {
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.TicketType == ticketType)
@@ -148,7 +158,8 @@ public class TicketService : ITicketService
         try
         {
             var today = DateTime.Today;
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.Status == "Valid" && (!t.ValidUntil.HasValue || t.ValidUntil.Value >= today))
@@ -168,8 +179,8 @@ public class TicketService : ITicketService
         {
             var from = fromDate.Date;
             var to = toDate.Date.AddDays(1); // Include end date
-
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.IssuedDate >= from && t.IssuedDate < to)
@@ -188,7 +199,8 @@ public class TicketService : ITicketService
         try
         {
             var term = searchTerm.ToLower();
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.Student!.FullName.ToLower().Contains(term) ||
@@ -208,19 +220,15 @@ public class TicketService : ITicketService
     {
         try
         {
+            _logger.LogInformation("Creating ticket for student {StudentId}", ticket.StudentId);
             // Set default values
             ticket.IssuedDate = DateTime.Now;
             ticket.Status = "Valid";
-
-            // Set validity period
             ticket.SetValidityPeriod();
-
-            // Generate QR code
             ticket.GenerateQRCode();
-
-            _context.Tickets.Add(ticket);
-            await _context.SaveChangesAsync();
-
+            using var context = _contextFactory.CreateWriteDbContext();
+            context.Tickets.Add(ticket);
+            await context.SaveChangesAsync();
             _logger.LogInformation("Created ticket {TicketId} for student {StudentId}", ticket.TicketId, ticket.StudentId);
             return ticket;
         }
@@ -235,10 +243,10 @@ public class TicketService : ITicketService
     {
         try
         {
-            _context.Tickets.Update(ticket);
-            var result = await _context.SaveChangesAsync();
-
-            _logger.LogInformation("Updated ticket {TicketId}", ticket.TicketId);
+            _logger.LogInformation("Updating ticket {TicketId}", ticket.TicketId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            context.Tickets.Update(ticket);
+            var result = await context.SaveChangesAsync();
             return result > 0;
         }
         catch (Exception ex)
@@ -252,12 +260,12 @@ public class TicketService : ITicketService
     {
         try
         {
-            var ticket = await _context.Tickets.FindAsync(ticketId);
+            _logger.LogInformation("Deleting ticket {TicketId}", ticketId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var ticket = await context.Tickets.FindAsync(ticketId);
             if (ticket == null) return false;
-
-            _context.Tickets.Remove(ticket);
-            var result = await _context.SaveChangesAsync();
-
+            context.Tickets.Remove(ticket);
+            var result = await context.SaveChangesAsync();
             _logger.LogInformation("Deleted ticket {TicketId}", ticketId);
             return result > 0;
         }
@@ -272,13 +280,14 @@ public class TicketService : ITicketService
     {
         try
         {
-            var ticket = await _context.Tickets.FindAsync(ticketId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var ticket = await context.Tickets.FindAsync(ticketId);
             if (ticket == null) return false;
 
             ticket.CancelTicket();
             ticket.Notes = $"Cancelled: {reason}";
 
-            var result = await _context.SaveChangesAsync();
+            var result = await context.SaveChangesAsync();
 
             _logger.LogInformation("Cancelled ticket {TicketId} - {Reason}", ticketId, reason);
             return result > 0;
@@ -294,12 +303,13 @@ public class TicketService : ITicketService
     {
         try
         {
-            var ticket = await _context.Tickets.FindAsync(ticketId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var ticket = await context.Tickets.FindAsync(ticketId);
             if (ticket == null || !ticket.CanBeUsed) return false;
 
             ticket.MarkAsUsed(driverName);
 
-            var result = await _context.SaveChangesAsync();
+            var result = await context.SaveChangesAsync();
 
             _logger.LogInformation("Used ticket {TicketId} by driver {DriverName}", ticketId, driverName);
             return result > 0;
@@ -336,10 +346,11 @@ public class TicketService : ITicketService
             if (string.IsNullOrWhiteSpace(ticket.PaymentMethod))
                 errors.Add("Payment method is required");
 
+            using var context = _contextFactory.CreateDbContext();
             // Check if student exists
             if (ticket.StudentId > 0)
             {
-                var studentExists = await _context.Students.AnyAsync(s => s.StudentId == ticket.StudentId);
+                var studentExists = await context.Students.AnyAsync(s => s.StudentId == ticket.StudentId);
                 if (!studentExists)
                     errors.Add("Student does not exist");
             }
@@ -347,7 +358,7 @@ public class TicketService : ITicketService
             // Check if route exists
             if (ticket.RouteId > 0)
             {
-                var routeExists = await _context.Routes.AnyAsync(r => r.RouteId == ticket.RouteId);
+                var routeExists = await context.Routes.AnyAsync(r => r.RouteId == ticket.RouteId);
                 if (!routeExists)
                     errors.Add("Route does not exist");
             }
@@ -355,7 +366,7 @@ public class TicketService : ITicketService
             // Check for duplicate tickets
             if (ticket.TicketId == 0) // New ticket
             {
-                var duplicateExists = await _context.Tickets.AnyAsync(t =>
+                var duplicateExists = await context.Tickets.AnyAsync(t =>
                     t.StudentId == ticket.StudentId &&
                     t.RouteId == ticket.RouteId &&
                     t.TravelDate.Date == ticket.TravelDate.Date &&
@@ -380,7 +391,8 @@ public class TicketService : ITicketService
         {
             var stats = new Dictionary<string, decimal>();
 
-            var tickets = await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            var tickets = await context.Tickets
                 .Where(t => t.Status == "Valid" || t.Status == "Used")
                 .ToListAsync();
 
@@ -404,11 +416,12 @@ public class TicketService : ITicketService
         {
             var stats = new Dictionary<string, int>();
 
-            stats["TotalTickets"] = await _context.Tickets.CountAsync();
-            stats["ValidTickets"] = await _context.Tickets.CountAsync(t => t.Status == "Valid");
-            stats["UsedTickets"] = await _context.Tickets.CountAsync(t => t.Status == "Used");
-            stats["CancelledTickets"] = await _context.Tickets.CountAsync(t => t.Status == "Cancelled");
-            stats["ExpiredTickets"] = await _context.Tickets.CountAsync(t => t.Status == "Expired");
+            using var context = _contextFactory.CreateDbContext();
+            stats["TotalTickets"] = await context.Tickets.CountAsync();
+            stats["ValidTickets"] = await context.Tickets.CountAsync(t => t.Status == "Valid");
+            stats["UsedTickets"] = await context.Tickets.CountAsync(t => t.Status == "Used");
+            stats["CancelledTickets"] = await context.Tickets.CountAsync(t => t.Status == "Cancelled");
+            stats["ExpiredTickets"] = await context.Tickets.CountAsync(t => t.Status == "Expired");
 
             return stats;
         }
@@ -424,7 +437,8 @@ public class TicketService : ITicketService
         try
         {
             var today = DateTime.Today;
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.ValidUntil.HasValue && t.ValidUntil.Value < today && t.Status == "Valid")
@@ -443,7 +457,8 @@ public class TicketService : ITicketService
         try
         {
             var futureDate = DateTime.Today.AddDays(days);
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .Where(t => t.ValidUntil.HasValue &&
@@ -464,7 +479,8 @@ public class TicketService : ITicketService
     {
         try
         {
-            return await _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .FirstOrDefaultAsync(t => t.QRCode == qrCode && t.CanBeUsed);
@@ -480,11 +496,12 @@ public class TicketService : ITicketService
     {
         try
         {
-            var ticket = await _context.Tickets.FindAsync(ticketId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var ticket = await context.Tickets.FindAsync(ticketId);
             if (ticket == null) throw new ArgumentException("Ticket not found");
 
             ticket.GenerateQRCode();
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return ticket.QRCode;
         }
@@ -499,7 +516,8 @@ public class TicketService : ITicketService
     {
         try
         {
-            var query = _context.Tickets
+            using var context = _contextFactory.CreateDbContext();
+            var query = context.Tickets
                 .Include(t => t.Student)
                 .Include(t => t.Route)
                 .AsQueryable();

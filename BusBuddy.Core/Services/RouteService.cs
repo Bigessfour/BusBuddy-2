@@ -11,28 +11,90 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class RouteService : IRouteService
     {
-        private readonly BusBuddyDbContext _context;
+        private readonly IBusBuddyDbContextFactory _contextFactory;
 
-        public RouteService(BusBuddyDbContext context)
+        public RouteService(IBusBuddyDbContextFactory contextFactory)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
         }
 
         public async Task<IEnumerable<Route>> GetAllActiveRoutesAsync()
         {
-            return await _context.Routes
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Routes
                 .Where(r => r.IsActive)
-                .Include(r => r.AMVehicle)
-                .Include(r => r.PMVehicle)
-                .Include(r => r.AMDriver)
-                .Include(r => r.PMDriver)
+                .AsNoTracking()
+                .Select(r => new Route
+                {
+                    RouteId = r.RouteId,
+                    RouteName = r.RouteName,
+                    Date = r.Date,
+                    Description = r.Description,
+                    IsActive = r.IsActive,
+                    Distance = r.Distance,
+                    EstimatedDuration = r.EstimatedDuration,
+                    StudentCount = r.StudentCount,
+
+                    // AM details
+                    AMVehicleId = r.AMVehicleId,
+                    AMDriverId = r.AMDriverId,
+                    AMBeginMiles = r.AMBeginMiles,
+                    AMEndMiles = r.AMEndMiles,
+                    AMRiders = r.AMRiders,
+                    AMBeginTime = r.AMBeginTime,
+
+                    // PM details
+                    PMVehicleId = r.PMVehicleId,
+                    PMDriverId = r.PMDriverId,
+                    PMBeginMiles = r.PMBeginMiles,
+                    PMEndMiles = r.PMEndMiles,
+                    PMRiders = r.PMRiders,
+                    PMBeginTime = r.PMBeginTime,
+
+                    // Basic reference data for display
+                    BusNumber = r.BusNumber,
+                    DriverName = r.DriverName,
+
+                    // Join to minimal vehicle info
+                    AMVehicle = r.AMVehicleId != null ? new Bus
+                    {
+                        VehicleId = (int)r.AMVehicleId,
+                        BusNumber = r.AMVehicle != null ? r.AMVehicle.BusNumber : string.Empty,
+                        Status = r.AMVehicle != null ? r.AMVehicle.Status : "Unknown"
+                    } : null,
+
+                    // Join to minimal driver info
+                    AMDriver = r.AMDriverId != null ? new Driver
+                    {
+                        DriverId = (int)r.AMDriverId,
+                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty,
+                        Status = r.AMDriver != null ? r.AMDriver.Status : "Unknown"
+                    } : null,
+
+                    // Join to minimal vehicle info for PM
+                    PMVehicle = r.PMVehicleId != null ? new Bus
+                    {
+                        VehicleId = (int)r.PMVehicleId,
+                        BusNumber = r.PMVehicle != null ? r.PMVehicle.BusNumber : string.Empty,
+                        Status = r.PMVehicle != null ? r.PMVehicle.Status : "Unknown"
+                    } : null,
+
+                    // Join to minimal driver info for PM
+                    PMDriver = r.PMDriverId != null ? new Driver
+                    {
+                        DriverId = (int)r.PMDriverId,
+                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty,
+                        Status = r.PMDriver != null ? r.PMDriver.Status : "Unknown"
+                    } : null
+                })
                 .OrderBy(r => r.RouteName)
                 .ToListAsync();
         }
 
         public async Task<Route> GetRouteByIdAsync(int id)
         {
-            var route = await _context.Routes
+            using var context = _contextFactory.CreateDbContext();
+            var route = await context.Routes
                 .Include(r => r.AMVehicle)
                 .Include(r => r.PMVehicle)
                 .Include(r => r.AMDriver)
@@ -50,14 +112,15 @@ namespace BusBuddy.Core.Services
             if (route == null)
                 throw new ArgumentNullException(nameof(route));
 
+            using var context = _contextFactory.CreateWriteDbContext();
             // Validate route name uniqueness for the same date
             if (await IsRouteNameExistsForDateAsync(route.RouteName, route.Date))
                 throw new InvalidOperationException($"Route '{route.RouteName}' already exists for date {route.Date:yyyy-MM-dd}.");
 
             route.IsActive = true;
 
-            _context.Routes.Add(route);
-            await _context.SaveChangesAsync();
+            context.Routes.Add(route);
+            await context.SaveChangesAsync();
 
             return route;
         }
@@ -67,7 +130,8 @@ namespace BusBuddy.Core.Services
             if (route == null)
                 throw new ArgumentNullException(nameof(route));
 
-            var existingRoute = await _context.Routes.FindAsync(route.RouteId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var existingRoute = await context.Routes.FindAsync(route.RouteId);
             if (existingRoute == null)
                 throw new InvalidOperationException($"Route with ID {route.RouteId} not found.");
 
@@ -95,51 +159,139 @@ namespace BusBuddy.Core.Services
             existingRoute.PMRiders = route.PMRiders;
             existingRoute.PMDriverId = route.PMDriverId;
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return existingRoute;
         }
 
         public async Task<bool> DeleteRouteAsync(int id)
         {
-            var route = await _context.Routes.FindAsync(id);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var route = await context.Routes.FindAsync(id);
             if (route == null)
                 return false;
 
             // Soft delete - mark as inactive instead of removing
             route.IsActive = false;
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return true;
         }
 
         public async Task<IEnumerable<Route>> SearchRoutesAsync(string searchTerm)
         {
+            using var context = _contextFactory.CreateDbContext();
+            IQueryable<Route> query;
+
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return await GetAllActiveRoutesAsync();
+            {
+                query = context.Routes
+                    .Where(r => r.IsActive)
+                    .AsNoTracking();
+            }
+            else
+            {
+                var lowerSearchTerm = searchTerm.ToLower();
 
-            var lowerSearchTerm = searchTerm.ToLower();
+                query = context.Routes
+                    .Where(r => r.IsActive && (
+                        r.RouteName.ToLower().Contains(lowerSearchTerm) ||
+                        (r.Description != null && r.Description.ToLower().Contains(lowerSearchTerm))
+                    ))
+                    .AsNoTracking();
+            }
 
-            return await _context.Routes
-                .Where(r => r.IsActive && (
-                    r.RouteName.ToLower().Contains(lowerSearchTerm) ||
-                    (r.Description != null && r.Description.ToLower().Contains(lowerSearchTerm))
-                ))
-                .Include(r => r.AMVehicle)
-                .Include(r => r.PMVehicle)
-                .Include(r => r.AMDriver)
-                .Include(r => r.PMDriver)
+            // Apply projection to select only needed fields
+            return await query
+                .Select(r => new Route
+                {
+                    RouteId = r.RouteId,
+                    RouteName = r.RouteName,
+                    Date = r.Date,
+                    Description = r.Description,
+                    IsActive = r.IsActive,
+                    Distance = r.Distance,
+                    EstimatedDuration = r.EstimatedDuration,
+                    StudentCount = r.StudentCount,
+
+                    // AM/PM basics
+                    AMVehicleId = r.AMVehicleId,
+                    AMDriverId = r.AMDriverId,
+                    PMVehicleId = r.PMVehicleId,
+                    PMDriverId = r.PMDriverId,
+
+                    // Display info
+                    BusNumber = r.BusNumber,
+                    DriverName = r.DriverName,
+
+                    // Minimal navigation properties with null checks
+                    AMVehicle = r.AMVehicleId != null ? new Bus
+                    {
+                        VehicleId = (int)r.AMVehicleId,
+                        BusNumber = r.AMVehicle != null ? r.AMVehicle.BusNumber : string.Empty
+                    } : null,
+
+                    AMDriver = r.AMDriverId != null ? new Driver
+                    {
+                        DriverId = (int)r.AMDriverId,
+                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty
+                    } : null,
+
+                    PMVehicle = r.PMVehicleId != null ? new Bus
+                    {
+                        VehicleId = (int)r.PMVehicleId,
+                        BusNumber = r.PMVehicle != null ? r.PMVehicle.BusNumber : string.Empty
+                    } : null,
+
+                    PMDriver = r.PMDriverId != null ? new Driver
+                    {
+                        DriverId = (int)r.PMDriverId,
+                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty
+                    } : null
+                })
                 .OrderBy(r => r.RouteName)
                 .ToListAsync();
         }
 
         public async Task<IEnumerable<Route>> GetRoutesByBusIdAsync(int busId)
         {
-            return await _context.Routes
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Routes
                 .Where(r => r.IsActive && (r.AMVehicleId == busId || r.PMVehicleId == busId))
-                .Include(r => r.AMVehicle)
-                .Include(r => r.PMVehicle)
-                .Include(r => r.AMDriver)
-                .Include(r => r.PMDriver)
+                .AsNoTracking()
+                .Select(r => new Route
+                {
+                    RouteId = r.RouteId,
+                    RouteName = r.RouteName,
+                    Date = r.Date,
+                    Description = r.Description,
+                    IsActive = r.IsActive,
+                    Distance = r.Distance,
+                    EstimatedDuration = r.EstimatedDuration,
+
+                    // AM/PM basics - focus on the bus we're filtering by
+                    AMVehicleId = r.AMVehicleId,
+                    AMBeginMiles = r.AMVehicleId == busId ? r.AMBeginMiles : null,
+                    AMEndMiles = r.AMVehicleId == busId ? r.AMEndMiles : null,
+                    AMDriverId = r.AMVehicleId == busId ? r.AMDriverId : null,
+
+                    PMVehicleId = r.PMVehicleId,
+                    PMBeginMiles = r.PMVehicleId == busId ? r.PMBeginMiles : null,
+                    PMEndMiles = r.PMVehicleId == busId ? r.PMEndMiles : null,
+                    PMDriverId = r.PMVehicleId == busId ? r.PMDriverId : null,
+
+                    // Minimal navigation properties
+                    AMDriver = r.AMVehicleId == busId && r.AMDriverId != null ? new Driver
+                    {
+                        DriverId = (int)r.AMDriverId,
+                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty
+                    } : null,
+
+                    PMDriver = r.PMVehicleId == busId && r.PMDriverId != null ? new Driver
+                    {
+                        DriverId = (int)r.PMDriverId,
+                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty
+                    } : null
+                })
                 .OrderBy(r => r.Date)
                 .ThenBy(r => r.RouteName)
                 .ToListAsync();
@@ -147,8 +299,9 @@ namespace BusBuddy.Core.Services
 
         public async Task<bool> IsRouteNumberUniqueAsync(string routeNumber, int? excludeId = null)
         {
+            using var context = _contextFactory.CreateDbContext();
             // Adapted to work with RouteName instead of RouteNumber
-            var query = _context.Routes.Where(r => r.RouteName == routeNumber && r.IsActive);
+            var query = context.Routes.Where(r => r.RouteName == routeNumber && r.IsActive);
 
             if (excludeId.HasValue)
                 query = query.Where(r => r.RouteId != excludeId.Value);
@@ -158,7 +311,8 @@ namespace BusBuddy.Core.Services
 
         public async Task<IEnumerable<RouteStop>> GetRouteStopsAsync(int routeId)
         {
-            return await _context.RouteStops
+            using var context = _contextFactory.CreateDbContext();
+            return await context.RouteStops
                 .Where(rs => rs.RouteId == routeId)
                 .OrderBy(rs => rs.StopOrder)
                 .ToListAsync();
@@ -169,14 +323,15 @@ namespace BusBuddy.Core.Services
             if (routeStop == null)
                 throw new ArgumentNullException(nameof(routeStop));
 
+            using var context = _contextFactory.CreateWriteDbContext();
             // Validate route exists
-            var routeExists = await _context.Routes.AnyAsync(r => r.RouteId == routeStop.RouteId);
+            var routeExists = await context.Routes.AnyAsync(r => r.RouteId == routeStop.RouteId);
             if (!routeExists)
                 throw new InvalidOperationException($"Route with ID {routeStop.RouteId} not found.");
 
             routeStop.CreatedDate = DateTime.UtcNow;
-            _context.RouteStops.Add(routeStop);
-            await _context.SaveChangesAsync();
+            context.RouteStops.Add(routeStop);
+            await context.SaveChangesAsync();
 
             return routeStop;
         }
@@ -186,7 +341,8 @@ namespace BusBuddy.Core.Services
             if (routeStop == null)
                 throw new ArgumentNullException(nameof(routeStop));
 
-            var existingStop = await _context.RouteStops.FindAsync(routeStop.RouteStopId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var existingStop = await context.RouteStops.FindAsync(routeStop.RouteStopId);
             if (existingStop == null)
                 throw new InvalidOperationException($"Route stop with ID {routeStop.RouteStopId} not found.");
 
@@ -203,24 +359,26 @@ namespace BusBuddy.Core.Services
             existingStop.Notes = routeStop.Notes;
             existingStop.UpdatedDate = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return existingStop;
         }
 
         public async Task<bool> DeleteRouteStopAsync(int routeStopId)
         {
-            var routeStop = await _context.RouteStops.FindAsync(routeStopId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var routeStop = await context.RouteStops.FindAsync(routeStopId);
             if (routeStop == null)
                 return false;
 
-            _context.RouteStops.Remove(routeStop);
-            await _context.SaveChangesAsync();
+            context.RouteStops.Remove(routeStop);
+            await context.SaveChangesAsync();
             return true;
         }
 
         public async Task<decimal> GetRouteTotalDistanceAsync(int routeId)
         {
-            var route = await _context.Routes.FindAsync(routeId);
+            using var context = _contextFactory.CreateDbContext();
+            var route = await context.Routes.FindAsync(routeId);
             if (route == null)
                 return 0;
 
@@ -253,7 +411,8 @@ namespace BusBuddy.Core.Services
 
         private async Task<bool> IsRouteNameExistsForDateAsync(string routeName, DateTime date, int? excludeId = null)
         {
-            var query = _context.Routes.Where(r => r.RouteName == routeName && r.Date.Date == date.Date && r.IsActive);
+            using var context = _contextFactory.CreateDbContext();
+            var query = context.Routes.Where(r => r.RouteName == routeName && r.Date.Date == date.Date && r.IsActive);
 
             if (excludeId.HasValue)
                 query = query.Where(r => r.RouteId != excludeId.Value);

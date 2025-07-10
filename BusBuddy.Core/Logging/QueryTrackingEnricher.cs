@@ -66,6 +66,14 @@ namespace BusBuddy.Core.Logging
                     logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("RedundancySeverity", "High"));
                 }
             }
+
+            // Add query tracking information to log events
+            var queryTrackingProperty = propertyFactory.CreateProperty("QueryTracking", "Enabled");
+            logEvent.AddPropertyIfAbsent(queryTrackingProperty);
+
+            // Add timestamp for query tracking
+            var timestampProperty = propertyFactory.CreateProperty("QueryTimestamp", DateTimeOffset.Now);
+            logEvent.AddPropertyIfAbsent(timestampProperty);
         }
     }
 }

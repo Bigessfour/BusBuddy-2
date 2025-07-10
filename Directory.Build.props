@@ -1,5 +1,8 @@
 <Project>
   <PropertyGroup>
     <SyncfusionVersion>30.1.37</SyncfusionVersion>
+    <!-- Ensure WPF Temporary Project references the core assembly and includes all relevant namespaces -->
+    <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
+    <MarkupCompilePass1UsesDependencyPaths>true</MarkupCompilePass1UsesDependencyPaths>
   </PropertyGroup>
 </Project>

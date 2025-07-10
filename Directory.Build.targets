@@ -1,0 +1,6 @@
+<Project>
+  <!-- When running from solution root, target BusBuddy.WPF by default -->
+  <PropertyGroup Condition="'$(MSBuildProjectFile)' == '$(MSBuildProjectDirectory)\BusBuddy.sln'">
+    <DefaultProject>BusBuddy.WPF</DefaultProject>
+  </PropertyGroup>
+</Project>

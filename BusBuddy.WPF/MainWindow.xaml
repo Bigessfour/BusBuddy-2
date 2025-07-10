@@ -5,28 +5,124 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusBuddy.WPF"
         xmlns:views="clr-namespace:BusBuddy.WPF.Views"
+        xmlns:bus="clr-namespace:BusBuddy.WPF.Views.Bus"
         xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
+        xmlns:route="clr-namespace:BusBuddy.WPF.Views.Route"
+        xmlns:driver="clr-namespace:BusBuddy.WPF.Views.Driver"
+        xmlns:schedule="clr-namespace:BusBuddy.WPF.Views.Schedule"
         xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+        xmlns:ticket="clr-namespace:BusBuddy.WPF.Views.Ticket"
+        xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
+        xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
+        xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
+        xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
+        xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         mc:Ignorable="d"
         Title="Bus Buddy - Transportation Management System" 
         Height="900" Width="1600" 
         WindowStartupLocation="CenterScreen">
-    <Grid>
-        <Grid.Resources>
-            <!-- Add resources for consistent styling if needed -->
-        </Grid.Resources>
+
+    <Window.Resources>
+        <!-- Add a converter to debug binding issues -->
+        <local:DebugConverter x:Key="DebugConverter" />
         
-        <!-- Main content container with proper margins -->
-        <TabControl>
-            <TabItem Header="Dashboard">
-                <dashboard:DashboardView Margin="0" 
-                                   HorizontalAlignment="Stretch" 
-                                   VerticalAlignment="Stretch" />
-            </TabItem>
-            <TabItem Header="Students" x:Name="StudentListTab">
-                <views:StudentListView />
-            </TabItem>
-        </TabControl>
-    </Grid>
+        <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
+            <dashboard:DashboardView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
+            <bus:BusManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:DriverManagementViewModel}">
+            <driver:DriverManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
+            <route:RouteManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ScheduleManagementViewModel}">
+            <schedule:ScheduleManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
+            <student:StudentManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
+            <maintenance:MaintenanceTrackingView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
+            <fuel:FuelManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
+            <activity:ActivityLoggingView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+            <settings:SettingsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
+            <views:StudentListView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:TicketManagementViewModel}">
+            <ticket:TicketManagementView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <syncfusion:SfNavigationDrawer x:Name="navigationDrawer" DisplayMode="Expanded" DrawerWidth="240" DrawerHeight="400" AnimationDuration="250" IsOpen="True">
+        <syncfusion:SfNavigationDrawer.ContentView>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Background="#005A9E" Height="50">
+                    <StackPanel Orientation="Horizontal">
+                        <Button HorizontalAlignment="Left" Margin="10" Content="☰" Command="{Binding ElementName=navigationDrawer, Path=ToggleDrawer}" Background="Transparent" Foreground="White" BorderThickness="0" />
+                        <TextBlock Text="Bus Buddy" VerticalAlignment="Center" Foreground="White" FontSize="18" FontWeight="SemiBold" />
+                        <!-- Debug info -->
+                        <TextBlock Text="{Binding CurrentViewModel, Converter={StaticResource DebugConverter}, StringFormat='Current View: {0}'}" 
+                                   Foreground="White" Margin="20,0,0,0" VerticalAlignment="Center" />
+                        <!-- Direct navigation buttons for debugging -->
+                        <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                            <Button Content="Dashboard" Command="{Binding NavigateToCommand}" CommandParameter="Dashboard" 
+                                    Margin="5,0" Padding="5,2" Background="#003366" Foreground="White" BorderThickness="0" />
+                            <Button Content="Tickets" Command="{Binding NavigateToCommand}" CommandParameter="Tickets" 
+                                    Margin="5,0" Padding="5,2" Background="#003366" Foreground="White" BorderThickness="0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel, Converter={StaticResource DebugConverter}}" />
+            </Grid>
+        </syncfusion:SfNavigationDrawer.ContentView>
+        <syncfusion:SfNavigationDrawer.DrawerContentView>
+            <Grid Background="#f0f0f0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Background="#005A9E" Height="60">
+                    <TextBlock Text="Menu" Foreground="White" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" Margin="15,0,0,0"/>
+                </Border>
+                <ListView Grid.Row="1" ItemsSource="{Binding NavigationItems}" BorderThickness="0" Background="Transparent">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="10,8"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding Name}" 
+                                    Command="{Binding Path=DataContext.NavigateToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
+                                    CommandParameter="{Binding ViewModelName}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    HorizontalContentAlignment="Left"
+                                    Width="200"
+                                    Height="40"
+                                    FontSize="14"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </syncfusion:SfNavigationDrawer.DrawerContentView>
+    </syncfusion:SfNavigationDrawer>
 </Window>

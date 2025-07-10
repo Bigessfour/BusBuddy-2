@@ -9,16 +9,17 @@ namespace BusBuddy.Core.Services;
 /// </summary>
 public class FuelService : IFuelService
 {
-    private readonly BusBuddyDbContext _context;
+    private readonly IBusBuddyDbContextFactory _contextFactory;
 
-    public FuelService(BusBuddyDbContext context)
+    public FuelService(IBusBuddyDbContextFactory contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     public async Task<IEnumerable<Fuel>> GetAllFuelRecordsAsync()
     {
-        return await _context.FuelRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.FuelRecords
             .Include(f => f.Vehicle)
             .OrderByDescending(f => f.FuelDate)
             .ToListAsync();
@@ -26,7 +27,8 @@ public class FuelService : IFuelService
 
     public async Task<Fuel?> GetFuelRecordByIdAsync(int id)
     {
-        return await _context.FuelRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.FuelRecords
             .Include(f => f.Vehicle)
             .FirstOrDefaultAsync(f => f.FuelId == id);
     }
@@ -39,32 +41,36 @@ public class FuelService : IFuelService
         if (fuel.Gallons.HasValue && fuel.Gallons.Value < 0)
             throw new ArgumentException("Gallons cannot be negative.", nameof(fuel));
 
-        _context.FuelRecords.Add(fuel);
-        await _context.SaveChangesAsync();
+        using var context = _contextFactory.CreateWriteDbContext();
+        context.FuelRecords.Add(fuel);
+        await context.SaveChangesAsync();
         return fuel;
     }
 
     public async Task<Fuel> UpdateFuelRecordAsync(Fuel fuel)
     {
-        _context.FuelRecords.Update(fuel);
-        await _context.SaveChangesAsync();
+        using var context = _contextFactory.CreateWriteDbContext();
+        context.FuelRecords.Update(fuel);
+        await context.SaveChangesAsync();
         return fuel;
     }
 
     public async Task<bool> DeleteFuelRecordAsync(int id)
     {
-        var fuel = await _context.FuelRecords.FindAsync(id);
+        using var context = _contextFactory.CreateWriteDbContext();
+        var fuel = await context.FuelRecords.FindAsync(id);
         if (fuel == null)
             return false;
 
-        _context.FuelRecords.Remove(fuel);
-        await _context.SaveChangesAsync();
+        context.FuelRecords.Remove(fuel);
+        await context.SaveChangesAsync();
         return true;
     }
 
     public async Task<IEnumerable<Fuel>> GetFuelRecordsByVehicleAsync(int vehicleId)
     {
-        return await _context.FuelRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.FuelRecords
             .Include(f => f.Vehicle)
             .Where(f => f.VehicleFueledId == vehicleId)
             .OrderByDescending(f => f.FuelDate)
@@ -73,7 +79,8 @@ public class FuelService : IFuelService
 
     public async Task<IEnumerable<Fuel>> GetFuelRecordsByDateRangeAsync(DateTime startDate, DateTime endDate)
     {
-        return await _context.FuelRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.FuelRecords
             .Include(f => f.Vehicle)
             .Where(f => f.FuelDate >= startDate && f.FuelDate <= endDate)
             .OrderByDescending(f => f.FuelDate)
@@ -82,7 +89,8 @@ public class FuelService : IFuelService
 
     public async Task<decimal> GetTotalFuelCostAsync(int vehicleId, DateTime? startDate = null, DateTime? endDate = null)
     {
-        var query = _context.FuelRecords
+        using var context = _contextFactory.CreateDbContext();
+        var query = context.FuelRecords
             .Where(f => f.VehicleFueledId == vehicleId && f.TotalCost.HasValue);
 
         if (startDate.HasValue)
@@ -96,7 +104,8 @@ public class FuelService : IFuelService
 
     public async Task<decimal> GetTotalGallonsAsync(int vehicleId, DateTime? startDate = null, DateTime? endDate = null)
     {
-        var query = _context.FuelRecords
+        using var context = _contextFactory.CreateDbContext();
+        var query = context.FuelRecords
             .Where(f => f.VehicleFueledId == vehicleId && f.Gallons.HasValue);
 
         if (startDate.HasValue)
@@ -110,8 +119,9 @@ public class FuelService : IFuelService
 
     public async Task<decimal> GetAverageMPGAsync(int vehicleId, DateTime? startDate = null, DateTime? endDate = null)
     {
+        using var context = _contextFactory.CreateDbContext();
         // This is a simplified calculation - in a real system you'd track odometer readings
-        var vehicle = await _context.Vehicles.FindAsync(vehicleId);
+        var vehicle = await context.Vehicles.FindAsync(vehicleId);
         if (vehicle?.MilesPerGallon.HasValue == true)
         {
             return vehicle.MilesPerGallon.Value;

@@ -1,6 +1,7 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Models.Base;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Linq.Expressions;
 
 namespace BusBuddy.Core.Data;
@@ -69,6 +70,19 @@ public class BusBuddyDbContext : DbContext
     public virtual DbSet<SchoolCalendar> SchoolCalendar { get; set; }
     public virtual DbSet<ActivitySchedule> ActivitySchedule { get; set; }
     public virtual DbSet<Ticket> Tickets { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

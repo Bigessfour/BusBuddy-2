@@ -1,190 +1,159 @@
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using BusBuddy.Core.Models;
-using BusBuddy.Core.Services;
-using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.Services;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using BusBuddy.WPF.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using BusBuddy.WPF.Utilities;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public partial class DashboardViewModel : BaseViewModel
+    public class DashboardViewModel : BaseViewModel
     {
-        private readonly IBusService _busService;
-        private readonly IScheduleService _scheduleService;
         private readonly IRoutePopulationScaffold _routePopulationScaffold;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<DashboardViewModel> _logger;
+        private StudentListViewModel? _studentListViewModel;
 
-        [ObservableProperty]
-        private int _totalActiveBuses;
-        [ObservableProperty]
-        private int _totalInactiveBuses;
-        [ObservableProperty]
-        private int _busesWithMaintenanceDue;
-        [ObservableProperty]
-        private ObservableCollection<Activity> _busSchedules = new();
-        [ObservableProperty]
-        private string _selectedModule = "Bus Management";
-        [ObservableProperty]
-        private string _dashboardTitle;
-        [ObservableProperty]
-        private bool _isSidebarVisible = true;
-        [ObservableProperty]
-        private int _selectedTabIndex = 0;
+        // Performance tracking metrics
+        private TimeSpan _initializationTime;
+        private TimeSpan _routePopulationTime;
+        private TimeSpan _studentListLoadTime;
 
-        public ObservableCollection<NavigationItemViewModel> NavigationItems { get; }
+        protected override ILogger? GetLogger() => _logger;
 
-        public DashboardViewModel(IScheduleService scheduleService, IBusService busService, IRoutePopulationScaffold routePopulationScaffold)
+        public StudentListViewModel StudentListViewModel
         {
-            _scheduleService = scheduleService;
-            _busService = busService;
-            _routePopulationScaffold = routePopulationScaffold;
-
-            // Set initial values
-            SelectedModule = "Bus Management";
-            DashboardTitle = "Bus Buddy - Bus Management";
-            IsSidebarVisible = true;
-
-            NavigationItems = new ObservableCollection<NavigationItemViewModel>
+            get
             {
-                new NavigationItemViewModel { Content = "Bus Management", Command = new RelayCommand(_ => NavigateTo("Bus Management")), IsSelected = true },
-                new NavigationItemViewModel { Content = "Driver Management", Command = new RelayCommand(_ => NavigateTo("Driver Management")) },
-                new NavigationItemViewModel { Content = "Route Management", Command = new RelayCommand(_ => NavigateTo("Route Management")) },
-                new NavigationItemViewModel { Content = "Schedule Management", Command = new RelayCommand(_ => NavigateTo("Schedule Management")) },
-                new NavigationItemViewModel { Content = "Student Management", Command = new RelayCommand(_ => NavigateTo("Student Management")) },
-                new NavigationItemViewModel { Content = "Maintenance Tracking", Command = new RelayCommand(_ => NavigateTo("Maintenance Tracking")) },
-                new NavigationItemViewModel { Content = "Fuel Management", Command = new RelayCommand(_ => NavigateTo("Fuel Management")) },
-                new NavigationItemViewModel { Content = "Activity Logging", Command = new RelayCommand(_ => NavigateTo("Activity Logging")) },
-                new NavigationItemViewModel { Content = "Ticket Management", Command = new RelayCommand(_ => NavigateTo("Ticket Management")) },
-                new NavigationItemViewModel { Content = "Settings", Command = new RelayCommand(_ => NavigateTo("Settings")) }
-            };
-
-            LoadDashboardDataCommand.Execute(null);
-        }
-
-        [RelayCommand]
-        private void ToggleSidebar()
-        {
-            IsSidebarVisible = !IsSidebarVisible;
-        }
-        [RelayCommand]
-        private void NavigateTo(string moduleName)
-        {
-            SelectedModule = moduleName;
-            DashboardTitle = $"Bus Buddy - {moduleName}";
-
-            // Update selected status of navigation items
-            foreach (var item in NavigationItems)
-            {
-                item.IsSelected = item.Content == moduleName;
-            }
-
-            // Update SelectedTabIndex based on the module name
-            SelectedTabIndex = moduleName switch
-            {
-                "Bus Management" => 0,
-                "Driver Management" => 1,
-                "Route Management" => 2,
-                "Schedule Management" => 3,
-                "Student Management" => 4,
-                "Maintenance Tracking" => 5,
-                "Fuel Management" => 6,
-                "Activity Logging" => 7,
-                "Ticket Management" => 8,
-                "Settings" => 9,
-                _ => 0
-            };
-
-            // Refresh data when switching to certain modules
-            if (moduleName == "Bus Management" || moduleName == "Fuel Management")
-            {
-                LoadDashboardDataCommand.Execute(null);
+                try
+                {
+                    if (_studentListViewModel == null)
+                    {
+                        _logger.LogInformation("Resolving StudentListViewModel from service provider");
+                        _studentListViewModel = _serviceProvider.GetRequiredService<StudentListViewModel>();
+                        _logger.LogInformation("Successfully resolved StudentListViewModel");
+                    }
+                    return _studentListViewModel;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to resolve StudentListViewModel: {0}", ex.Message);
+                    // Re-throw to ensure the error is caught by LoadDataAsync
+                    throw;
+                }
             }
         }
 
-        [RelayCommand]
-        private async Task LoadDashboardData()
+        public DashboardViewModel(
+            IRoutePopulationScaffold routePopulationScaffold,
+            IServiceProvider serviceProvider,
+            ILogger<DashboardViewModel> logger)
         {
-            try
-            {
-                var buses = await _busService.GetAllBusesAsync();
-                TotalActiveBuses = buses.Count(b => b.Status == "Active");
-                TotalInactiveBuses = buses.Count(b => b.Status == "Inactive");
-                BusesWithMaintenanceDue = buses.Count(b => b.Status == "Maintenance");
-            }
-            catch (Exception)
-            {
-                TotalActiveBuses = 0;
-                TotalInactiveBuses = 0;
-                BusesWithMaintenanceDue = 0;
-            }
+            _routePopulationScaffold = routePopulationScaffold ?? throw new ArgumentNullException(nameof(routePopulationScaffold));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _logger.LogInformation("DashboardViewModel constructor completed successfully");
+        }
+
+        // Expose performance metrics as public properties
+        public string InitializationTimeFormatted => FormatUtils.FormatDuration((int)_initializationTime.TotalMilliseconds / 1000);
+        public string RoutePopulationTimeFormatted => FormatUtils.FormatDuration((int)_routePopulationTime.TotalMilliseconds / 1000);
+        public string StudentListLoadTimeFormatted => FormatUtils.FormatDuration((int)_studentListLoadTime.TotalMilliseconds / 1000);
+
+        public async Task InitializeAsync()
+        {
+            var totalStopwatch = Stopwatch.StartNew();
+
+            _logger.LogInformation("DashboardViewModel.InitializeAsync called");
+            Debug.WriteLine("DashboardViewModel.InitializeAsync called");
 
             try
             {
-                var schedules = await _scheduleService.GetSchedulesAsync();
-                var todaySchedules = schedules.Where(s => s.ScheduleDate.Date == DateTime.Today).ToList();
+                await LoadDashboardDataAsync();
 
-                // Convert schedules to activities using the helper method
-                var activities = todaySchedules.Select(ConvertScheduleToActivity).ToList();
+                // Record total initialization time
+                totalStopwatch.Stop();
+                _initializationTime = totalStopwatch.Elapsed;
 
-                BusSchedules = new ObservableCollection<Activity>(activities);
+                _logger.LogInformation("DashboardViewModel.InitializeAsync completed successfully in {0}ms", _initializationTime.TotalMilliseconds);
+                Debug.WriteLine($"DashboardViewModel.InitializeAsync completed successfully in {_initializationTime.TotalMilliseconds}ms");
+
+                // Log detailed performance metrics
+                _logger.LogInformation("Performance Metrics - Total: {0}ms, Routes: {1}ms, StudentList: {2}ms",
+                    _initializationTime.TotalMilliseconds,
+                    _routePopulationTime.TotalMilliseconds,
+                    _studentListLoadTime.TotalMilliseconds);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                BusSchedules.Clear();
+                totalStopwatch.Stop();
+                ErrorMessage = $"Initialize failed: {ex.Message}";
+                _logger.LogError(ex, "DashboardViewModel.InitializeAsync failed with exception after {0}ms: {1}",
+                    totalStopwatch.ElapsedMilliseconds, ex.Message);
+                Debug.WriteLine($"InitializeAsync error after {totalStopwatch.ElapsedMilliseconds}ms: {ex}");
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError(ex.InnerException, "Inner exception: {0}", ex.InnerException.Message);
+                    Debug.WriteLine($"Inner exception: {ex.InnerException}");
+                }
             }
         }
 
-        // Helper method to convert Schedule objects to Activity objects
-        private Activity ConvertScheduleToActivity(Schedule schedule)
+        private async Task LoadDashboardDataAsync()
         {
-            return new Activity
+            _logger.LogInformation("Starting LoadDashboardDataAsync");
+            Debug.WriteLine("Starting LoadDashboardDataAsync");
+
+            await LoadDataAsync(async () =>
             {
-                ActivityId = schedule.ScheduleId,
-                AssignedVehicleId = schedule.BusId,
-                DriverId = schedule.DriverId,
-                Date = schedule.ScheduleDate,
-                LeaveTime = schedule.DepartureTime.TimeOfDay,
-                EventTime = schedule.ArrivalTime.TimeOfDay,
-                ActivityType = "Route Run",
-                Status = schedule.Status,
-                RouteId = schedule.RouteId,
-                Destination = "Route Destination",
-                RequestedBy = "System" // Default value for required field
-            };
-        }
-    }
+                try
+                {
+                    // Measure route population time
+                    var routeStopwatch = Stopwatch.StartNew();
+                    _logger.LogInformation("Populating routes via _routePopulationScaffold.PopulateRoutesAsync()");
+                    Debug.WriteLine("Starting route population");
 
-    public class RidershipDataPoint
-    {
-        public DateTime Date { get; set; }
-        public int PassengerCount { get; set; }
-    }
+                    await _routePopulationScaffold.PopulateRoutesAsync();
 
-    public class NavigationItemViewModel : ObservableObject
-    {
-        private string _content = string.Empty;
-        public string Content
-        {
-            get => _content;
-            set => SetProperty(ref _content, value);
-        }
+                    routeStopwatch.Stop();
+                    _routePopulationTime = routeStopwatch.Elapsed;
+                    _logger.LogInformation("Routes populated successfully in {0}ms", _routePopulationTime.TotalMilliseconds);
+                    Debug.WriteLine($"Route population completed successfully in {_routePopulationTime.TotalMilliseconds}ms");
 
-        private ICommand _command = null!;
-        public ICommand Command
-        {
-            get => _command;
-            set => SetProperty(ref _command, value);
-        }
+                    // Initialize StudentListViewModel by accessing the property
+                    // This will trigger the lazy loading through the service provider
+                    _logger.LogInformation("Initializing StudentListViewModel through service provider");
+                    Debug.WriteLine("Attempting to initialize StudentListViewModel");
 
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set => SetProperty(ref _isSelected, value);
+                    // Measure student list loading time
+                    var studentListStopwatch = Stopwatch.StartNew();
+                    var viewModel = StudentListViewModel;
+
+                    // Wait for the view model to finish loading its data
+                    if (viewModel?.Initialized != null)
+                    {
+                        await viewModel.Initialized;
+                    }
+
+                    studentListStopwatch.Stop();
+                    _studentListLoadTime = studentListStopwatch.Elapsed;
+
+                    _logger.LogInformation("StudentListViewModel initialized successfully in {0}ms: {1}",
+                        _studentListLoadTime.TotalMilliseconds,
+                        viewModel != null ? "Instance created" : "NULL");
+                    Debug.WriteLine($"StudentListViewModel initialized in {_studentListLoadTime.TotalMilliseconds}ms: {(viewModel != null ? "SUCCESS" : "FAILED - NULL INSTANCE")}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error loading dashboard data: {0}", ex.Message);
+                    Debug.WriteLine($"LoadDashboardDataAsync ERROR: {ex.Message}");
+                    Debug.WriteLine($"STACK TRACE: {ex.StackTrace}");
+                    throw; // Re-throw to be caught by LoadDataAsync
+                }
+            });
         }
     }
 }

@@ -13,7 +13,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <sf:SfDataGrid Grid.Row="0"
+        <sf:SfDataGrid x:Name="driversGrid" Grid.Row="0"
                        ItemsSource="{Binding Drivers}"
                        SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
                        AutoGenerateColumns="False">
@@ -36,7 +36,7 @@
         <Expander Grid.Row="2" Header="License Status Report" Margin="0,10,0,0">
             <StackPanel>
                 <Button Content="Generate Report" Command="{Binding GenerateLicenseStatusReportCommand}" HorizontalAlignment="Left" Margin="5"/>
-                <sf:SfDataGrid ItemsSource="{Binding LicenseStatusReport}" AutoGenerateColumns="False" Margin="0,5,0,0">
+                <sf:SfDataGrid x:Name="licenseStatusGrid" ItemsSource="{Binding LicenseStatusReport}" AutoGenerateColumns="False" Margin="0,5,0,0">
                     <sf:SfDataGrid.Columns>
                         <sf:GridTextColumn MappingName="DriverName" HeaderText="Driver Name"/>
                         <sf:GridTextColumn MappingName="LicenseStatus" HeaderText="Status"/>

@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BusBuddy.Core.Data;
@@ -7,7 +9,7 @@ namespace BusBuddy.Core.Data;
 /// Factory for creating DbContext instances, useful for async and multi-threaded scenarios
 /// where a context might be needed outside the standard DI lifecycle
 /// </summary>
-public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory
+public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory, IDesignTimeDbContextFactory<BusBuddyDbContext>
 {
     private readonly IServiceProvider _serviceProvider;
 
@@ -23,8 +25,8 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory
     /// <returns>A new instance of BusBuddyDbContext</returns>
     public BusBuddyDbContext CreateDbContext()
     {
-        // Create a new scope to ensure proper dependency resolution
-        using var scope = _serviceProvider.CreateScope();
+        // Create a scope to ensure proper dependency resolution
+        var scope = _serviceProvider.CreateScope();
 
         // Get a fresh DbContext instance from the DI container
         var context = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();
@@ -41,8 +43,8 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory
     /// <returns>A new instance of BusBuddyDbContext configured for tracking changes</returns>
     public BusBuddyDbContext CreateWriteDbContext()
     {
-        // Create a new scope to ensure proper dependency resolution
-        using var scope = _serviceProvider.CreateScope();
+        // Create a scope to ensure proper dependency resolution
+        var scope = _serviceProvider.CreateScope();
 
         // Get a fresh DbContext instance from the DI container
         var context = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();
@@ -51,6 +53,25 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory
         context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
 
         return context;
+    }
+
+    /// <summary>
+    /// Creates a new instance of BusBuddyDbContext for design-time use
+    /// This is typically used by EF Core tools for migrations and scaffolding
+    /// </summary>
+    /// <param name="args">Command-line arguments (not used)</param>
+    /// <returns>A new instance of BusBuddyDbContext configured for design-time services</returns>
+    public BusBuddyDbContext CreateDbContext(string[] args)
+    {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        var optionsBuilder = new DbContextOptionsBuilder<BusBuddyDbContext>();
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+
+        return new BusBuddyDbContext(optionsBuilder.Options);
     }
 }
 

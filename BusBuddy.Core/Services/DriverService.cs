@@ -6,41 +6,69 @@ namespace BusBuddy.Core.Services
 {
     public class DriverService : IDriverService
     {
-        private readonly BusBuddyDbContext _context;
+        private readonly IBusBuddyDbContextFactory _contextFactory;
 
-        public DriverService(BusBuddyDbContext context)
+        public DriverService(IBusBuddyDbContextFactory contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
         public async Task<List<Driver>> GetAllDriversAsync()
         {
-            return await _context.Drivers.ToListAsync();
+            using var context = _contextFactory.CreateDbContext();
+            return await context.Drivers
+                .AsNoTracking()
+                .Select(d => new Driver
+                {
+                    DriverId = d.DriverId,
+                    DriverName = d.DriverName,
+                    DriverPhone = d.DriverPhone,
+                    DriverEmail = d.DriverEmail,
+                    Address = d.Address,
+                    City = d.City,
+                    State = d.State,
+                    Zip = d.Zip,
+                    DriversLicenceType = d.DriversLicenceType,
+                    TrainingComplete = d.TrainingComplete,
+                    Status = d.Status,
+                    LicenseNumber = d.LicenseNumber,
+                    LicenseExpiryDate = d.LicenseExpiryDate,
+                    HireDate = d.HireDate
+                    // Only including fields likely needed for display in grids or lists
+                })
+                .ToListAsync();
         }
 
         public async Task<Driver?> GetDriverByIdAsync(int driverId)
         {
-            return await _context.Drivers.FindAsync(driverId);
+            using var context = _contextFactory.CreateDbContext();
+            // For a single entity lookup, we need all properties since this 
+            // is likely for detail views or editing
+            return await context.Drivers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.DriverId == driverId);
         }
 
         public async Task<Driver> AddDriverAsync(Driver driver)
         {
-            _context.Drivers.Add(driver);
-            await _context.SaveChangesAsync();
+            using var context = _contextFactory.CreateWriteDbContext();
+            context.Drivers.Add(driver);
+            await context.SaveChangesAsync();
             return driver;
         }
 
         public async Task<bool> UpdateDriverAsync(Driver driver)
         {
-            _context.Entry(driver).State = EntityState.Modified;
+            using var context = _contextFactory.CreateWriteDbContext();
+            context.Entry(driver).State = EntityState.Modified;
             try
             {
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
                 return true;
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Drivers.Any(e => e.DriverId == driver.DriverId))
+                if (!context.Drivers.Any(e => e.DriverId == driver.DriverId))
                 {
                     return false;
                 }
@@ -53,14 +81,15 @@ namespace BusBuddy.Core.Services
 
         public async Task<bool> DeleteDriverAsync(int driverId)
         {
-            var driver = await _context.Drivers.FindAsync(driverId);
+            using var context = _contextFactory.CreateWriteDbContext();
+            var driver = await context.Drivers.FindAsync(driverId);
             if (driver == null)
             {
                 return false;
             }
 
-            _context.Drivers.Remove(driver);
-            await _context.SaveChangesAsync();
+            context.Drivers.Remove(driver);
+            await context.SaveChangesAsync();
             return true;
         }
     }

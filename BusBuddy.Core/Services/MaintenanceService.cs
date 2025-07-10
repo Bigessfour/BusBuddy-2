@@ -9,16 +9,17 @@ namespace BusBuddy.Core.Services;
 /// </summary>
 public class MaintenanceService : IMaintenanceService
 {
-    private readonly BusBuddyDbContext _context;
+    private readonly IBusBuddyDbContextFactory _contextFactory;
 
-    public MaintenanceService(BusBuddyDbContext context)
+    public MaintenanceService(IBusBuddyDbContextFactory contextFactory)
     {
-        _context = context;
+        _contextFactory = contextFactory;
     }
 
     public async Task<IEnumerable<Maintenance>> GetAllMaintenanceRecordsAsync()
     {
-        return await _context.MaintenanceRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.MaintenanceRecords
             .Include(m => m.Vehicle)
             .OrderByDescending(m => m.Date)
             .ToListAsync();
@@ -26,7 +27,8 @@ public class MaintenanceService : IMaintenanceService
 
     public async Task<Maintenance?> GetMaintenanceRecordByIdAsync(int id)
     {
-        return await _context.MaintenanceRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.MaintenanceRecords
             .Include(m => m.Vehicle)
             .FirstOrDefaultAsync(m => m.MaintenanceId == id);
     }
@@ -34,33 +36,37 @@ public class MaintenanceService : IMaintenanceService
     public async Task<Maintenance> CreateMaintenanceRecordAsync(Maintenance maintenance)
     {
         maintenance.CreatedDate = DateTime.UtcNow;
-        _context.MaintenanceRecords.Add(maintenance);
-        await _context.SaveChangesAsync();
+        using var context = _contextFactory.CreateWriteDbContext();
+        context.MaintenanceRecords.Add(maintenance);
+        await context.SaveChangesAsync();
         return maintenance;
     }
 
     public async Task<Maintenance> UpdateMaintenanceRecordAsync(Maintenance maintenance)
     {
         maintenance.UpdatedDate = DateTime.UtcNow;
-        _context.MaintenanceRecords.Update(maintenance);
-        await _context.SaveChangesAsync();
+        using var context = _contextFactory.CreateWriteDbContext();
+        context.MaintenanceRecords.Update(maintenance);
+        await context.SaveChangesAsync();
         return maintenance;
     }
 
     public async Task<bool> DeleteMaintenanceRecordAsync(int id)
     {
-        var maintenance = await _context.MaintenanceRecords.FindAsync(id);
+        using var context = _contextFactory.CreateWriteDbContext();
+        var maintenance = await context.MaintenanceRecords.FindAsync(id);
         if (maintenance == null)
             return false;
 
-        _context.MaintenanceRecords.Remove(maintenance);
-        await _context.SaveChangesAsync();
+        context.MaintenanceRecords.Remove(maintenance);
+        await context.SaveChangesAsync();
         return true;
     }
 
     public async Task<IEnumerable<Maintenance>> GetMaintenanceRecordsByVehicleAsync(int vehicleId)
     {
-        return await _context.MaintenanceRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.MaintenanceRecords
             .Include(m => m.Vehicle)
             .Where(m => m.VehicleId == vehicleId)
             .OrderByDescending(m => m.Date)
@@ -69,7 +75,8 @@ public class MaintenanceService : IMaintenanceService
 
     public async Task<IEnumerable<Maintenance>> GetMaintenanceRecordsByDateRangeAsync(DateTime startDate, DateTime endDate)
     {
-        return await _context.MaintenanceRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.MaintenanceRecords
             .Include(m => m.Vehicle)
             .Where(m => m.Date >= startDate && m.Date <= endDate)
             .OrderByDescending(m => m.Date)
@@ -78,7 +85,8 @@ public class MaintenanceService : IMaintenanceService
 
     public async Task<IEnumerable<Maintenance>> GetMaintenanceRecordsByPriorityAsync(string priority)
     {
-        return await _context.MaintenanceRecords
+        using var context = _contextFactory.CreateDbContext();
+        return await context.MaintenanceRecords
             .Include(m => m.Vehicle)
             .Where(m => m.Priority == priority)
             .OrderByDescending(m => m.Date)
@@ -87,7 +95,8 @@ public class MaintenanceService : IMaintenanceService
 
     public async Task<decimal> GetMaintenanceCostTotalAsync(int vehicleId, DateTime? startDate = null, DateTime? endDate = null)
     {
-        var query = _context.MaintenanceRecords
+        using var context = _contextFactory.CreateDbContext();
+        var query = context.MaintenanceRecords
             .Where(m => m.VehicleId == vehicleId && m.RepairCost > 0);
 
         if (startDate.HasValue)

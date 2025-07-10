@@ -8,10 +8,14 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:BusManagementViewModel}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -41,16 +45,70 @@
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Stretch">
             <sf:SfDataGrid.Columns>
-                <sf:GridTextColumn MappingName="BusNumber" HeaderText="Bus Number" Width="120"/>
-                <sf:GridTextColumn MappingName="Year" HeaderText="Year" Width="80"/>
-                <sf:GridTextColumn MappingName="Make" HeaderText="Make" Width="120"/>
-                <sf:GridTextColumn MappingName="Model" HeaderText="Model" Width="120"/>
-                <sf:GridTextColumn MappingName="SeatingCapacity" HeaderText="Capacity" Width="80"/>
-                <sf:GridTextColumn MappingName="Status" HeaderText="Status" Width="100"/>
+                <sf:GridTextColumn MappingName="BusNumber" HeaderText="Bus Number" Width="120" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
+                <sf:GridTextColumn MappingName="Year" HeaderText="Year" Width="80" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
+                <sf:GridTextColumn MappingName="Make" HeaderText="Make" Width="120" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
+                <sf:GridTextColumn MappingName="Model" HeaderText="Model" Width="120" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
+                <sf:GridTextColumn MappingName="SeatingCapacity" HeaderText="Capacity" Width="80" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
+                <sf:GridTextColumn MappingName="Status" HeaderText="Status" Width="100" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
                 <sf:GridDateTimeColumn MappingName="DateLastInspection" HeaderText="Last Inspection" Width="140"
-                                       Pattern="ShortDate"/>
-                <sf:GridTextColumn MappingName="InspectionStatus" HeaderText="Inspection Status" Width="120"/>
-                <sf:GridTextColumn MappingName="CurrentOdometer" HeaderText="Odometer" Width="100"/>
+                                       Pattern="ShortDate" AllowSorting="True">
+                    <sf:GridDateTimeColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridDateTimeColumn.HeaderStyle>
+                </sf:GridDateTimeColumn>
+                <sf:GridTextColumn MappingName="InspectionStatus" HeaderText="Inspection Status" Width="120" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
+                <sf:GridTextColumn MappingName="CurrentOdometer" HeaderText="Odometer" Width="100" AllowSorting="True">
+                    <sf:GridTextColumn.HeaderStyle>
+                        <Style TargetType="sf:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </sf:GridTextColumn.HeaderStyle>
+                </sf:GridTextColumn>
             </sf:SfDataGrid.Columns>
             <sf:SfDataGrid.Style>
                 <Style TargetType="sf:SfDataGrid">
@@ -60,11 +118,97 @@
             </sf:SfDataGrid.Style>
         </sf:SfDataGrid>
 
+        <!-- Pagination Controls -->
+        <Grid Grid.Row="2" Margin="0,10,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Records Info -->
+            <TextBlock Grid.Column="0" VerticalAlignment="Center">
+                <Run Text="Showing "/>
+                <Run Text="{Binding Buses.Count, Mode=OneWay}"/>
+                <Run Text=" of "/>
+                <Run Text="{Binding TotalRecords, Mode=OneWay}"/>
+                <Run Text=" records"/>
+            </TextBlock>
+
+            <!-- Page Navigation -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding FirstPageCommand}" 
+                        Content="&#xE892;" 
+                        FontFamily="Segoe MDL2 Assets" 
+                        Width="40" Height="30" 
+                        Margin="2,0"
+                        ToolTip="First Page"/>
+                <Button Command="{Binding PreviousPageCommand}" 
+                        Content="&#xE76B;" 
+                        FontFamily="Segoe MDL2 Assets" 
+                        Width="40" Height="30" 
+                        Margin="2,0"
+                        ToolTip="Previous Page"/>
+                
+                <!-- Page Number Display -->
+                <Border BorderBrush="#DDDDDD" BorderThickness="1" Margin="5,0" Padding="8,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Page " VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Center"/>
+                        <TextBlock Text=" of " VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TotalPages, Mode=OneWay}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                
+                <Button Command="{Binding NextPageCommand}" 
+                        Content="&#xE76C;" 
+                        FontFamily="Segoe MDL2 Assets" 
+                        Width="40" Height="30" 
+                        Margin="2,0"
+                        ToolTip="Next Page"/>
+                <Button Command="{Binding LastPageCommand}" 
+                        Content="&#xE893;" 
+                        FontFamily="Segoe MDL2 Assets" 
+                        Width="40" Height="30" 
+                        Margin="2,0"
+                        ToolTip="Last Page"/>
+                
+                <!-- Page Size Selector -->
+                <ComboBox Width="65" Height="30" Margin="10,0,0,0"
+                          SelectedValue="{Binding PageSize, Mode=TwoWay}"
+                          SelectionChanged="PageSize_SelectionChanged">
+                    <ComboBoxItem Content="10"/>
+                    <ComboBoxItem Content="20"/>
+                    <ComboBoxItem Content="50"/>
+                    <ComboBoxItem Content="100"/>
+                </ComboBox>
+                <TextBlock Text="per page" VerticalAlignment="Center" Margin="5,0,0,0"/>
+            </StackPanel>
+        </Grid>
+
         <!-- Button Panel -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
             <Button Content="Add" Command="{Binding AddBusCommand}" Margin="5" Padding="15,5" />
             <Button Content="Update" Command="{Binding UpdateBusCommand}" Margin="5" Padding="15,5" />
             <Button Content="Delete" Command="{Binding DeleteBusCommand}" Margin="5" Padding="15,5" />
         </StackPanel>
+        
+        <!-- Loading Indicator -->
+        <Border Grid.Row="0" Grid.RowSpan="4" 
+                Background="#80000000" 
+                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <sf:SfBusyIndicator IsBusy="True" 
+                                   AnimationType="SingleCircle" 
+                                   Foreground="White"
+                                   ViewboxHeight="50" 
+                                   ViewboxWidth="50"/>
+                <TextBlock Text="Loading..." 
+                           Foreground="White" 
+                           FontSize="16" 
+                           Margin="0,10,0,0" 
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

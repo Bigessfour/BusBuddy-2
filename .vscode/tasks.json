@@ -2,16 +2,69 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "restore",
+                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "build",
             "command": "dotnet",
             "type": "process",
-        "args": [
-            "build",
-            "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
-            "/property:GenerateFullPaths=true",
-            "/consoleloggerparameters:NoSummary"
-        ],
-            "problemMatcher": "$msCompile"
+            "args": [
+                "build",
+                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$msCompile",
+            "dependsOn": "restore"
         },
         {
             "label": "publish",
@@ -34,7 +87,17 @@
                 "--project",
                 "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj"
             ],
-            "problemMatcher": "$msCompile"
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$msCompile",
+            "dependsOn": "build"
         },
         {
             "label": "Run Tests and Log Output",

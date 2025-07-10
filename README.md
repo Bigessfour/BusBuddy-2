@@ -59,11 +59,17 @@ A comprehensive school bus transportation management system built with C# .NET 8
    - Set the `SYNCFUSION_LICENSE_KEY` environment variable (recommended for security and CI/CD)
    - Or add your license key to `appsettings.json` under `Syncfusion:LicenseKey` or `SyncfusionLicenseKey`
    - The application will not start if the license key is missing (see `App.xaml.cs` for details)
-4. Run database migrations:
+4. **Environment Configuration:**
+   - Set the `ASPNETCORE_ENVIRONMENT` environment variable to control application behavior:
+     - `Development`: Enables detailed error messages and sensitive data logging (NEVER use in production)
+     - `Staging`: Production-like environment with some debugging features
+     - `Production`: Full production mode with security safeguards (default if not set)
+   - The application will prevent sensitive data logging in production for security
+5. Run database migrations:
    ```bash
    dotnet ef database update
    ```
-5. Build and run the application:
+6. Build and run the application:
    ```bash
    dotnet build
    dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
