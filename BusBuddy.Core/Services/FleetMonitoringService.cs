@@ -1,7 +1,8 @@
+using BusBuddy.Core.Models;
+using BusBuddy.Core.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-// ...existing code...
 
 namespace BusBuddy.Core.Services
 {
@@ -87,20 +88,21 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        private async Task CheckMaintenanceAlerts(List<BusInfo> buses, IMaintenanceService maintenanceService)
+        private async Task CheckMaintenanceAlerts(List<Bus> buses, IMaintenanceService maintenanceService)
         {
             var alerts = new List<FleetAlert>();
 
             foreach (var bus in buses)
             {
-                var daysSinceLastMaintenance = (DateTime.Now - bus.LastMaintenance).Days;
+                var lastMaintenance = bus.DateLastInspection ?? DateTime.MinValue;
+                var daysSinceLastMaintenance = (DateTime.Now - lastMaintenance).Days;
 
                 // Critical maintenance alert (overdue)
                 if (daysSinceLastMaintenance > 90)
                 {
                     alerts.Add(new FleetAlert
                     {
-                        BusId = bus.BusId,
+                        BusId = bus.VehicleId,
                         BusNumber = bus.BusNumber,
                         AlertType = FleetAlertType.MaintenanceOverdue,
                         Priority = AlertPriority.Critical,
@@ -114,7 +116,7 @@ namespace BusBuddy.Core.Services
                 {
                     alerts.Add(new FleetAlert
                     {
-                        BusId = bus.BusId,
+                        BusId = bus.VehicleId,
                         BusNumber = bus.BusNumber,
                         AlertType = FleetAlertType.MaintenanceDue,
                         Priority = AlertPriority.Medium,
@@ -132,7 +134,7 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        private async Task CheckFleetUtilization(List<BusInfo> buses)
+        private async Task CheckFleetUtilization(List<Bus> buses)
         {
             var activeBuses = buses.Count(b => b.Status == "Active");
             var totalBuses = buses.Count;
@@ -159,12 +161,12 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        private async Task GenerateProactiveInsights(List<BusInfo> buses)
+        private async Task GenerateProactiveInsights(List<Bus> buses)
         {
             try
             {
                 // Only generate insights if there are significant issues
-                var criticalIssues = buses.Count(b => (DateTime.Now - b.LastMaintenance).Days > 90);
+                var criticalIssues = buses.Count(b => b.DateLastInspection.HasValue && (DateTime.Now - b.DateLastInspection.Value).Days > 90);
                 var inactiveBuses = buses.Count(b => b.Status != "Active");
 
                 if (criticalIssues > 0 || inactiveBuses > buses.Count * 0.2) // More than 20% inactive

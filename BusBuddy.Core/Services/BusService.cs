@@ -1,6 +1,7 @@
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Extensions;
 using BusBuddy.Core.Models;
+using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.Core.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -482,13 +483,208 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        // Legacy methods for backward compatibility
-        public async Task<List<BusInfo>> GetAllBusesAsync()
+        #region IBusService Implementation
+
+        public async Task<IEnumerable<Bus>> GetAllBusesAsync()
         {
             using (LogContext.PushProperty("QueryType", "GetAllBuses"))
+            {
+                _logger.LogInformation("Retrieving all buses");
+
+                try
+                {
+                    var buses = await GetAllBusEntitiesAsync();
+                    return buses;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to retrieve all buses");
+                    throw;
+                }
+            }
+        }
+
+        public async Task<Bus?> GetBusByIdAsync(int busId)
+        {
+            using (LogContext.PushProperty("QueryType", "GetBusById"))
+            {
+                _logger.LogInformation("Retrieving bus with ID: {BusId}", busId);
+
+                try
+                {
+                    return await GetBusEntityByIdAsync(busId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to retrieve bus with ID: {BusId}", busId);
+                    throw;
+                }
+            }
+        }
+
+        public async Task<Bus> AddBusAsync(Bus bus)
+        {
+            using (LogContext.PushProperty("QueryType", "AddBus"))
+            {
+                _logger.LogInformation("Adding new bus: {BusNumber}", bus.BusNumber);
+
+                try
+                {
+                    return await AddBusEntityAsync(bus);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to add bus: {BusNumber}", bus.BusNumber);
+                    throw;
+                }
+            }
+        }
+
+        public async Task<bool> UpdateBusAsync(Bus bus)
+        {
+            using (LogContext.PushProperty("QueryType", "UpdateBus"))
+            {
+                _logger.LogInformation("Updating bus with ID: {BusId}", bus.VehicleId);
+
+                try
+                {
+                    return await UpdateBusEntityAsync(bus);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to update bus with ID: {BusId}", bus.VehicleId);
+                    throw;
+                }
+            }
+        }
+
+        public async Task<bool> DeleteBusAsync(int busId)
+        {
+            using (LogContext.PushProperty("QueryType", "DeleteBus"))
+            {
+                _logger.LogInformation("Deleting bus with ID: {BusId}", busId);
+
+                try
+                {
+                    return await DeleteBusEntityAsync(busId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to delete bus with ID: {BusId}", busId);
+                    throw;
+                }
+            }
+        }
+
+        public async Task<IEnumerable<Bus>> GetActiveBusesAsync()
+        {
+            using (LogContext.PushProperty("QueryType", "GetActiveBuses"))
+            {
+                _logger.LogInformation("Retrieving active buses");
+
+                try
+                {
+                    using var context = _contextFactory.CreateDbContext();
+                    return await context.Vehicles
+                        .AsNoTracking()
+                        .Where(b => b.Status == "Active")
+                        .ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to retrieve active buses");
+                    throw;
+                }
+            }
+        }
+
+        public async Task<IEnumerable<Bus>> GetBusesByStatusAsync(string status)
+        {
+            using (LogContext.PushProperty("QueryType", "GetBusesByStatus"))
+            using (LogContext.PushProperty("Status", status))
+            {
+                _logger.LogInformation("Retrieving buses with status: {Status}", status);
+
+                try
+                {
+                    using var context = _contextFactory.CreateDbContext();
+                    return await context.Vehicles
+                        .AsNoTracking()
+                        .Where(b => b.Status == status)
+                        .ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to retrieve buses with status: {Status}", status);
+                    throw;
+                }
+            }
+        }
+
+        public async Task<IEnumerable<Bus>> GetBusesByTypeAsync(string type)
+        {
+            using (LogContext.PushProperty("QueryType", "GetBusesByType"))
+            using (LogContext.PushProperty("Type", type))
+            {
+                _logger.LogInformation("Retrieving buses with type: {Type}", type);
+
+                try
+                {
+                    using var context = _contextFactory.CreateDbContext();
+                    return await context.Vehicles
+                        .AsNoTracking()
+                        .Where(b => b.FleetType == type)
+                        .ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to retrieve buses with type: {Type}", type);
+                    throw;
+                }
+            }
+        }
+
+        public async Task<IEnumerable<Bus>> SearchBusesAsync(string searchTerm)
+        {
+            using (LogContext.PushProperty("QueryType", "SearchBuses"))
+            using (LogContext.PushProperty("SearchTerm", searchTerm))
+            {
+                _logger.LogInformation("Searching buses with term: {SearchTerm}", searchTerm);
+
+                try
+                {
+                    using var context = _contextFactory.CreateDbContext();
+                    return await context.Vehicles
+                        .AsNoTracking()
+                        .Where(b =>
+                            b.BusNumber.Contains(searchTerm) ||
+                            b.Make.Contains(searchTerm) ||
+                            b.Model.Contains(searchTerm) ||
+                            b.LicenseNumber.Contains(searchTerm) ||
+                            (b.FleetType != null && b.FleetType.Contains(searchTerm)))
+                        .ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to search buses with term: {SearchTerm}", searchTerm);
+                    throw;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Legacy Methods
+
+        // These methods are kept for backward compatibility
+        // They should be deprecated in favor of the new interface methods
+
+        public async Task<List<BusInfo>> GetBusInfoListAsync()
+        {
+            using (LogContext.PushProperty("QueryType", "GetBusInfoList"))
             using (LogContext.PushProperty("LegacyMethod", true))
             {
-                return await _logger.TrackPerformanceAsync("GetAllBuses_Legacy", async () =>
+                return await _logger.TrackPerformanceAsync("GetBusInfoList_Legacy", async () =>
                 {
                     _logger.LogInformation("Retrieving all buses (legacy method - using projection)");
 
@@ -530,11 +726,11 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        public async Task<BusInfo?> GetBusByIdAsync(int busId)
+        public async Task<BusInfo?> GetBusInfoByIdAsync(int busId)
         {
             try
             {
-                _logger.LogInformation("Retrieving bus with ID: {BusId}", busId);
+                _logger.LogInformation("Retrieving bus info with ID: {BusId}", busId);
 
                 // Create a fresh context for this operation
                 var context = _contextFactory.CreateDbContext();
@@ -575,35 +771,7 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        public Task<bool> AddBusAsync(BusInfo bus)
-        {
-            _logger.LogInformation("Adding new bus: {BusNumber} (legacy method - deprecated)", bus.BusNumber);
-
-            // This method should be replaced with proper entity framework operations
-            // Use entity-based methods instead of BusInfo DTOs
-            throw new NotImplementedException(
-                "AddBusAsync is deprecated. Use entity-based methods for database operations.");
-        }
-
-        public Task<bool> UpdateBusAsync(BusInfo bus)
-        {
-            _logger.LogInformation("Updating bus with ID: {BusId} (legacy method - deprecated)", bus.BusId);
-
-            // This method should be replaced with proper entity framework operations
-            // Use entity-based methods instead of BusInfo DTOs
-            throw new NotImplementedException(
-                "UpdateBusAsync is deprecated. Use entity-based methods for database operations.");
-        }
-
-        public Task<bool> DeleteBusAsync(int busId)
-        {
-            _logger.LogInformation("Deleting bus with ID: {BusId} (legacy method - deprecated)", busId);
-
-            // This method should be replaced with proper entity framework operations
-            // Use entity-based methods instead of BusInfo DTOs
-            throw new NotImplementedException(
-                "DeleteBusAsync is deprecated. Use entity-based methods for database operations.");
-        }
+        #endregion
 
         public Task<List<RouteInfo>> GetAllRoutesAsync()
         {

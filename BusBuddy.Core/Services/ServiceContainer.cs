@@ -1,5 +1,6 @@
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Data.UnitOfWork;
+using BusBuddy.Core.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

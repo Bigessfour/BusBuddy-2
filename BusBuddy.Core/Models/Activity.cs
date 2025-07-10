@@ -27,6 +27,10 @@ public class Activity : INotifyPropertyChanged
     private int? _routeId;
     private int? _startOdometer;
     private int? _endOdometer;
+    private string? _description;
+    private TimeSpan _returnTime;
+    private int? _expectedPassengers;
+    private int? _recurringSeriesId;
 
     [Key]
     public int ActivityId { get; set; }
@@ -278,6 +282,64 @@ public class Activity : INotifyPropertyChanged
             if (_endOdometer != value)
             {
                 _endOdometer = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    // Properties needed for ActivityService implementation
+    [StringLength(500)]
+    [Display(Name = "Description")]
+    public string? Description
+    {
+        get => _description;
+        set
+        {
+            if (_description != value)
+            {
+                _description = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    [Display(Name = "Return Time")]
+    public TimeSpan ReturnTime
+    {
+        get => _returnTime;
+        set
+        {
+            if (_returnTime != value)
+            {
+                _returnTime = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    [Display(Name = "Expected Passengers")]
+    public int? ExpectedPassengers
+    {
+        get => _expectedPassengers;
+        set
+        {
+            if (_expectedPassengers != value)
+            {
+                _expectedPassengers = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    [Display(Name = "Recurring Series ID")]
+    public int? RecurringSeriesId
+    {
+        get => _recurringSeriesId;
+        set
+        {
+            if (_recurringSeriesId != value)
+            {
+                _recurringSeriesId = value;
                 OnPropertyChanged();
             }
         }
