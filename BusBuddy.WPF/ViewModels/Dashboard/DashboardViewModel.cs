@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using BusBuddy.WPF.Utilities;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -14,6 +15,7 @@ namespace BusBuddy.WPF.ViewModels
         private readonly IRoutePopulationScaffold _routePopulationScaffold;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<DashboardViewModel> _logger;
+        private readonly PerformanceMonitor _performanceMonitor;
         private StudentListViewModel? _studentListViewModel;
 
         // Performance tracking metrics
@@ -49,11 +51,13 @@ namespace BusBuddy.WPF.ViewModels
         public DashboardViewModel(
             IRoutePopulationScaffold routePopulationScaffold,
             IServiceProvider serviceProvider,
-            ILogger<DashboardViewModel> logger)
+            ILogger<DashboardViewModel> logger,
+            PerformanceMonitor performanceMonitor)
         {
             _routePopulationScaffold = routePopulationScaffold ?? throw new ArgumentNullException(nameof(routePopulationScaffold));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
 
             _logger.LogInformation("DashboardViewModel constructor completed successfully");
         }
@@ -72,31 +76,42 @@ namespace BusBuddy.WPF.ViewModels
 
             try
             {
-                await LoadDashboardDataAsync();
+                // Use LogContext to add structured properties to all log entries within this scope
+                using (LogContext.PushProperty("StartupStep", "DashboardInitialization"))
+                {
+                    await LoadDashboardDataAsync();
 
-                // Record total initialization time
-                totalStopwatch.Stop();
-                _initializationTime = totalStopwatch.Elapsed;
+                    // Record total initialization time
+                    totalStopwatch.Stop();
+                    _initializationTime = totalStopwatch.Elapsed;
 
-                _logger.LogInformation("DashboardViewModel.InitializeAsync completed successfully in {0}ms", _initializationTime.TotalMilliseconds);
-                Debug.WriteLine($"DashboardViewModel.InitializeAsync completed successfully in {_initializationTime.TotalMilliseconds}ms");
+                    _logger.LogInformation("DashboardViewModel.InitializeAsync completed successfully in {DurationMs}ms",
+                        _initializationTime.TotalMilliseconds);
+                    Debug.WriteLine($"DashboardViewModel.InitializeAsync completed successfully in {_initializationTime.TotalMilliseconds}ms");
 
-                // Log detailed performance metrics
-                _logger.LogInformation("Performance Metrics - Total: {0}ms, Routes: {1}ms, StudentList: {2}ms",
-                    _initializationTime.TotalMilliseconds,
-                    _routePopulationTime.TotalMilliseconds,
-                    _studentListLoadTime.TotalMilliseconds);
+                    // Log detailed performance metrics with structured duration fields
+                    _logger.LogInformation(
+                        "Performance Metrics - Total:{TotalMs}ms Routes:{RoutesMs}ms StudentList:{StudentListMs}ms",
+                        _initializationTime.TotalMilliseconds,
+                        _routePopulationTime.TotalMilliseconds,
+                        _studentListLoadTime.TotalMilliseconds);
+
+                    // Also log using the PerformanceMonitor for consistent tracking
+                    _performanceMonitor.RecordMetric("DashboardViewModel.Initialize", _initializationTime);
+                    _performanceMonitor.RecordMetric("DashboardViewModel.RoutePopulation", _routePopulationTime);
+                    _performanceMonitor.RecordMetric("DashboardViewModel.StudentListLoad", _studentListLoadTime);
+                }
             }
             catch (Exception ex)
             {
                 totalStopwatch.Stop();
                 ErrorMessage = $"Initialize failed: {ex.Message}";
-                _logger.LogError(ex, "DashboardViewModel.InitializeAsync failed with exception after {0}ms: {1}",
+                _logger.LogError(ex, "DashboardViewModel.InitializeAsync failed with exception after {ElapsedMs}ms: {ErrorMessage}",
                     totalStopwatch.ElapsedMilliseconds, ex.Message);
                 Debug.WriteLine($"InitializeAsync error after {totalStopwatch.ElapsedMilliseconds}ms: {ex}");
                 if (ex.InnerException != null)
                 {
-                    _logger.LogError(ex.InnerException, "Inner exception: {0}", ex.InnerException.Message);
+                    _logger.LogError(ex.InnerException, "Inner exception: {ErrorMessage}", ex.InnerException.Message);
                     Debug.WriteLine($"Inner exception: {ex.InnerException}");
                 }
             }
@@ -116,11 +131,15 @@ namespace BusBuddy.WPF.ViewModels
                     _logger.LogInformation("Populating routes via _routePopulationScaffold.PopulateRoutesAsync()");
                     Debug.WriteLine("Starting route population");
 
-                    await _routePopulationScaffold.PopulateRoutesAsync();
+                    // Use LogContext to track this specific operation
+                    using (LogContext.PushProperty("Operation", "RoutePopulation"))
+                    {
+                        await _routePopulationScaffold.PopulateRoutesAsync();
+                    }
 
                     routeStopwatch.Stop();
                     _routePopulationTime = routeStopwatch.Elapsed;
-                    _logger.LogInformation("Routes populated successfully in {0}ms", _routePopulationTime.TotalMilliseconds);
+                    _logger.LogInformation("Routes populated successfully in {DurationMs}ms", _routePopulationTime.TotalMilliseconds);
                     Debug.WriteLine($"Route population completed successfully in {_routePopulationTime.TotalMilliseconds}ms");
 
                     // Initialize StudentListViewModel by accessing the property
@@ -130,25 +149,30 @@ namespace BusBuddy.WPF.ViewModels
 
                     // Measure student list loading time
                     var studentListStopwatch = Stopwatch.StartNew();
-                    var viewModel = StudentListViewModel;
 
-                    // Wait for the view model to finish loading its data
-                    if (viewModel?.Initialized != null)
+                    // Use LogContext to track this specific operation
+                    using (LogContext.PushProperty("Operation", "StudentListLoading"))
                     {
-                        await viewModel.Initialized;
+                        var viewModel = StudentListViewModel;
+
+                        // Wait for the view model to finish loading its data
+                        if (viewModel?.Initialized != null)
+                        {
+                            await viewModel.Initialized;
+                        }
                     }
 
                     studentListStopwatch.Stop();
                     _studentListLoadTime = studentListStopwatch.Elapsed;
 
-                    _logger.LogInformation("StudentListViewModel initialized successfully in {0}ms: {1}",
+                    _logger.LogInformation("StudentListViewModel initialized successfully in {DurationMs}ms: {Status}",
                         _studentListLoadTime.TotalMilliseconds,
-                        viewModel != null ? "Instance created" : "NULL");
-                    Debug.WriteLine($"StudentListViewModel initialized in {_studentListLoadTime.TotalMilliseconds}ms: {(viewModel != null ? "SUCCESS" : "FAILED - NULL INSTANCE")}");
+                        _studentListViewModel != null ? "Instance created" : "NULL");
+                    Debug.WriteLine($"StudentListViewModel initialized in {_studentListLoadTime.TotalMilliseconds}ms: {(_studentListViewModel != null ? "SUCCESS" : "FAILED - NULL INSTANCE")}");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error loading dashboard data: {0}", ex.Message);
+                    _logger.LogError(ex, "Error loading dashboard data: {ErrorMessage}", ex.Message);
                     Debug.WriteLine($"LoadDashboardDataAsync ERROR: {ex.Message}");
                     Debug.WriteLine($"STACK TRACE: {ex.StackTrace}");
                     throw; // Re-throw to be caught by LoadDataAsync

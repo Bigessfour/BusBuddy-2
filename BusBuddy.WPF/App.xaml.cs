@@ -1,13 +1,18 @@
 ﻿using BusBuddy.Core.Data;
 using BusBuddy.Core.Data.UnitOfWork;
+using BusBuddy.WPF.Logging;
+using BusBuddy.WPF.Utilities;
 using BusBuddy.WPF.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Context;
 using Syncfusion.SfSkinManager;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,6 +26,7 @@ namespace BusBuddy.WPF;
 public partial class App : Application
 {
     private IHost _host;
+    private StartupPerformanceMonitor? _startupMonitor;
 
     /// <summary>
     /// Gets the service provider for the application.
@@ -49,6 +55,9 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        // Start performance monitoring
+        var stopwatch = Stopwatch.StartNew();
+
         // Security check: Ensure sensitive data logging is not enabled in production
         if (!BusBuddy.Core.Utilities.EnvironmentHelper.IsDevelopment() &&
             Environment.GetEnvironmentVariable("ENABLE_SENSITIVE_DATA_LOGGING") == "true")
@@ -202,6 +211,7 @@ public partial class App : Application
                 .Enrich.WithProperty("BuildTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Enrich.WithMachineName()
                 .Enrich.WithThreadId()
+                .Enrich.With(new PerformanceEnricher())  // Add our custom performance enricher
                 .WriteTo.File(buildLogPath,
                     rollingInterval: RollingInterval.Infinite,
                     shared: true,
@@ -243,6 +253,14 @@ public partial class App : Application
 
         // Set the Services property to the host's service provider for backward compatibility
         Services = _host.Services;
+
+        // Create and initialize startup performance monitor
+        var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+        _startupMonitor = new StartupPerformanceMonitor(loggerFactory.CreateLogger<StartupPerformanceMonitor>());
+        _startupMonitor.Start();
+
+        // Log basic startup timing
+        Log.Information("[STARTUP_PERF] Initial startup setup completed in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
 
         // Pre-warm the bus cache on startup to reduce initial DB load
         // This is done in a background task to avoid blocking the UI
@@ -298,6 +316,9 @@ public partial class App : Application
             // Create marker file to indicate we reached this point
             File.WriteAllText(Path.Combine(logsDirectory, "pre_dashboard_init.marker"), DateTime.Now.ToString("o"));
 
+            // Begin tracking DashboardViewModel resolution
+            _startupMonitor.BeginStep("ResolveDashboardViewModel");
+
             // Log that we're about to resolve the DashboardViewModel
             Log.Information("[STARTUP] Resolving DashboardViewModel from service provider");
 
@@ -305,33 +326,68 @@ public partial class App : Application
 
             // Log successful resolution
             Log.Information("[STARTUP] Successfully resolved DashboardViewModel");
+            _startupMonitor.EndStep();
 
             // Create another marker file
             File.WriteAllText(Path.Combine(logsDirectory, "post_dashboard_resolve.marker"), DateTime.Now.ToString("o"));
+
+            // Begin tracking MainWindow creation
+            _startupMonitor.BeginStep("CreateMainWindow");
+            var mainWindowStopwatch = Stopwatch.StartNew();
 
             var mainWindow = new MainWindow
             {
                 DataContext = dashboardViewModel
             };
 
-            // Log window creation
-            Log.Information("[STARTUP] Created MainWindow with DashboardViewModel");
+            // Log window creation with timing
+            mainWindowStopwatch.Stop();
+            Log.Information("[STARTUP] Created MainWindow with DashboardViewModel in {ElapsedMs}ms",
+                mainWindowStopwatch.ElapsedMilliseconds);
+            _startupMonitor.EndStep();
+
+            // Begin tracking MainWindow Show
+            _startupMonitor.BeginStep("ShowMainWindow");
+            var showWindowStopwatch = Stopwatch.StartNew();
 
             mainWindow.Show();
 
-            // Log window display
-            Log.Information("[STARTUP] MainWindow.Show() called");
+            // Log window display with timing
+            showWindowStopwatch.Stop();
+            Log.Information("[STARTUP] MainWindow.Show() called and completed in {ElapsedMs}ms",
+                showWindowStopwatch.ElapsedMilliseconds);
+            _startupMonitor.EndStep();
 
             // Create another marker file
             File.WriteAllText(Path.Combine(logsDirectory, "pre_initialize_async.marker"), DateTime.Now.ToString("o"));
 
+            // Begin tracking DashboardViewModel initialization
+            _startupMonitor.BeginStep("InitializeDashboardViewModel");
+
             // Log that we're about to initialize the dashboard
             Log.Information("[STARTUP] Calling DashboardViewModel.InitializeAsync()");
 
-            await dashboardViewModel.InitializeAsync();
+            // Use LogContext to add duration tracking to the async operation
+            using (LogContext.PushProperty("StartTime", DateTime.Now))
+            {
+                var initStopwatch = Stopwatch.StartNew();
+                await dashboardViewModel.InitializeAsync();
+                initStopwatch.Stop();
 
-            // Log successful initialization
-            Log.Information("[STARTUP] DashboardViewModel initialization completed successfully");
+                // Log successful initialization with timing
+                Log.Information("[STARTUP] DashboardViewModel initialization completed successfully in {ElapsedMs}ms",
+                    initStopwatch.ElapsedMilliseconds);
+            }
+
+            _startupMonitor.EndStep();
+
+            // Complete startup performance monitoring
+            _startupMonitor.Complete();
+
+            // Log total time from the original stopwatch
+            stopwatch.Stop();
+            Log.Information("[STARTUP_PERF] Total application startup completed in {ElapsedMs}ms",
+                stopwatch.ElapsedMilliseconds);
 
             // Final marker file for successful startup
             File.WriteAllText(Path.Combine(logsDirectory, "application_started_successfully.marker"), DateTime.Now.ToString("o"));
@@ -381,8 +437,9 @@ public partial class App : Application
         services.AddAutoMapper(typeof(BusBuddy.WPF.Mapping.MappingProfile));
         services.AddSingleton<BusBuddy.WPF.Services.IMappingService, BusBuddy.WPF.Services.MappingService>();
 
-        // Register performance monitoring utility
+        // Register performance monitoring utilities
         services.AddSingleton<BusBuddy.WPF.Utilities.PerformanceMonitor>();
+        services.AddSingleton<BusBuddy.WPF.Utilities.StartupPerformanceMonitor>();
 
         // Register DbContext using SQL Server and connection string from appsettings.json with scoped lifetime
         string? connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -449,6 +506,7 @@ public partial class App : Application
         // Register WPF Services
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
+        services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
 
         // Register Main Window
         services.AddTransient<MainWindow>();
