@@ -8,5 +8,6 @@ namespace BusBuddy.WPF.Services
     {
         Task<List<Route>> GetOptimizedRoutesAsync();
         Task PopulateRoutesAsync();
+        Task PopulateRouteMetadataAsync();
     }
 }

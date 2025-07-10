@@ -30,6 +30,7 @@ namespace BusBuddy.WPF.ViewModels
         private readonly SettingsViewModel _settingsViewModel;
         private readonly StudentListViewModel _studentListViewModel;
         private readonly TicketManagementViewModel _ticketManagementViewModel;
+        private readonly LoadingViewModel _loadingViewModel;
 
         public ObservableCollection<NavigationItem> NavigationItems { get; }
 
@@ -46,6 +47,7 @@ namespace BusBuddy.WPF.ViewModels
             SettingsViewModel settingsViewModel,
             StudentListViewModel studentListViewModel,
             TicketManagementViewModel ticketManagementViewModel,
+            LoadingViewModel loadingViewModel,
             ILogger<MainViewModel>? logger = null)
         {
             _dashboardViewModel = dashboardViewModel;
@@ -60,6 +62,7 @@ namespace BusBuddy.WPF.ViewModels
             _settingsViewModel = settingsViewModel;
             _studentListViewModel = studentListViewModel;
             _ticketManagementViewModel = ticketManagementViewModel;
+            _loadingViewModel = loadingViewModel;
             _logger = logger;
 
             NavigationItems = new ObservableCollection<NavigationItem>
@@ -91,12 +94,16 @@ namespace BusBuddy.WPF.ViewModels
         partial void OnCurrentViewModelChanged(object? value)
         {
             System.Diagnostics.Debug.WriteLine($"CurrentViewModel changed to: {value?.GetType().Name ?? "null"}");
+            _logger?.LogInformation("CurrentViewModel changed to: {ViewModelType}", value?.GetType().Name ?? "null");
         }
 
         [RelayCommand]
         private void NavigateTo(string viewModelName)
         {
             _logger?.LogInformation("Navigating to {ViewModelName}", viewModelName);
+            System.Diagnostics.Debug.WriteLine($"NavigateTo called with parameter: {viewModelName}");
+
+            object? previousViewModel = CurrentViewModel;
 
             CurrentViewModel = viewModelName switch
             {
@@ -112,10 +119,15 @@ namespace BusBuddy.WPF.ViewModels
                 "Settings" => _settingsViewModel,
                 "StudentList" => _studentListViewModel,
                 "Tickets" => _ticketManagementViewModel,
+                "Loading" => _loadingViewModel,
+                "Error" => _loadingViewModel, // Use loading view for errors too
                 _ => _dashboardViewModel
             };
 
-            _logger?.LogInformation("Successfully navigated to {ViewModel}", CurrentViewModel?.GetType().Name);
+            _logger?.LogInformation("Successfully navigated to {ViewModel} from {PreviousViewModel}",
+                CurrentViewModel?.GetType().Name,
+                previousViewModel?.GetType().Name ?? "null");
+            System.Diagnostics.Debug.WriteLine($"Navigation completed: {previousViewModel?.GetType().Name ?? "null"} → {CurrentViewModel?.GetType().Name}");
         }
     }
 }

@@ -88,7 +88,7 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
-                <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel, Converter={StaticResource DebugConverter}}" />
+                <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}" />
             </Grid>
         </syncfusion:SfNavigationDrawer.ContentView>
         <syncfusion:SfNavigationDrawer.DrawerContentView>

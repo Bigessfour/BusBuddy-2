@@ -53,7 +53,7 @@ public partial class App : Application
             .Build();
     }
 
-    protected override async void OnStartup(StartupEventArgs e)
+    protected override void OnStartup(StartupEventArgs e)
     {
         // Start performance monitoring
         var stopwatch = Stopwatch.StartNew();
@@ -316,40 +316,38 @@ public partial class App : Application
             // Create marker file to indicate we reached this point
             File.WriteAllText(Path.Combine(logsDirectory, "pre_dashboard_init.marker"), DateTime.Now.ToString("o"));
 
-            // Begin tracking DashboardViewModel resolution
-            _startupMonitor.BeginStep("ResolveDashboardViewModel");
+            // Log that we're about to initialize the UI
+            Log.Information("[STARTUP] Creating and showing MainWindow");
 
-            // Log that we're about to resolve the DashboardViewModel
-            Log.Information("[STARTUP] Resolving DashboardViewModel from service provider");
-
-            var dashboardViewModel = serviceProvider.GetRequiredService<DashboardViewModel>();
-
-            // Log successful resolution
-            Log.Information("[STARTUP] Successfully resolved DashboardViewModel");
+            // Get the MainViewModel - this is now a singleton
+            _startupMonitor.BeginStep("ResolveMainViewModel");
+            var mainViewModel = serviceProvider.GetRequiredService<MainViewModel>();
             _startupMonitor.EndStep();
-
-            // Create another marker file
-            File.WriteAllText(Path.Combine(logsDirectory, "post_dashboard_resolve.marker"), DateTime.Now.ToString("o"));
 
             // Begin tracking MainWindow creation
             _startupMonitor.BeginStep("CreateMainWindow");
             var mainWindowStopwatch = Stopwatch.StartNew();
 
+            // Create the main window with MainViewModel
             var mainWindow = new MainWindow
             {
-                DataContext = dashboardViewModel
+                DataContext = mainViewModel
             };
 
             // Log window creation with timing
             mainWindowStopwatch.Stop();
-            Log.Information("[STARTUP] Created MainWindow with DashboardViewModel in {ElapsedMs}ms",
+            Log.Information("[STARTUP] Created MainWindow with MainViewModel in {ElapsedMs}ms",
                 mainWindowStopwatch.ElapsedMilliseconds);
             _startupMonitor.EndStep();
 
-            // Begin tracking MainWindow Show
+            // Show window immediately to improve perceived performance
             _startupMonitor.BeginStep("ShowMainWindow");
             var showWindowStopwatch = Stopwatch.StartNew();
 
+            // Set initial view to a lightweight loading screen
+            mainViewModel.NavigateToCommand.Execute("Loading");
+
+            // Show the main window
             mainWindow.Show();
 
             // Log window display with timing
@@ -361,32 +359,74 @@ public partial class App : Application
             // Create another marker file
             File.WriteAllText(Path.Combine(logsDirectory, "pre_initialize_async.marker"), DateTime.Now.ToString("o"));
 
-            // Begin tracking DashboardViewModel initialization
-            _startupMonitor.BeginStep("InitializeDashboardViewModel");
+            // Begin tracking DashboardViewModel resolution and initialization
+            _startupMonitor.BeginStep("ResolveDashboardViewModel");
 
-            // Log that we're about to initialize the dashboard
-            Log.Information("[STARTUP] Calling DashboardViewModel.InitializeAsync()");
+            // Log that we're about to resolve the DashboardViewModel
+            Log.Information("[STARTUP] Resolving DashboardViewModel from service provider");
 
-            // Use LogContext to add duration tracking to the async operation
-            using (LogContext.PushProperty("StartTime", DateTime.Now))
-            {
-                var initStopwatch = Stopwatch.StartNew();
-                await dashboardViewModel.InitializeAsync();
-                initStopwatch.Stop();
+            // Get dashboard view model but don't initialize it yet
+            var dashboardViewModel = serviceProvider.GetRequiredService<DashboardViewModel>();
 
-                // Log successful initialization with timing
-                Log.Information("[STARTUP] DashboardViewModel initialization completed successfully in {ElapsedMs}ms",
-                    initStopwatch.ElapsedMilliseconds);
-            }
-
+            // Log successful resolution
+            Log.Information("[STARTUP] Successfully resolved DashboardViewModel");
             _startupMonitor.EndStep();
 
-            // Complete startup performance monitoring
+            // Create background task manager
+            var backgroundTaskManager = new BackgroundTaskManager(loggerFactory.CreateLogger<BackgroundTaskManager>());
+
+            // OPTIMIZATION: Show the main window immediately with default or loading UI
+            // Start background pre-warming of caches
+            PreWarmCaches(backgroundTaskManager, serviceProvider);
+
+            // Initialize dashboard in a higher priority background task to ensure UI responsiveness
+            _startupMonitor.BeginStep("InitializeDashboardViewModel");
+
+            // OPTIMIZATION: Use a higher thread priority for dashboard initialization
+            var dashboardInitTask = Task.Factory.StartNew(async () =>
+            {
+                try
+                {
+                    // Initialize the dashboard asynchronously
+                    await dashboardViewModel.InitializeAsync();
+
+                    // Switch to dashboard when it's ready
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        mainViewModel.NavigateToCommand.Execute("Dashboard");
+                        _startupMonitor.EndStep();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error initializing dashboard");
+
+                    // Handle initialization error on UI thread
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // Show error view or dashboard with error state
+                        mainViewModel.NavigateToCommand.Execute("Error");
+                        _startupMonitor.EndStep();
+                    });
+                }
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default)
+            .Unwrap();
+
+            // Observe the task in case of exceptions
+            dashboardInitTask.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    Log.Error(t.Exception, "Unhandled exception in dashboard initialization task");
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+
+            // Complete startup performance monitoring after window is shown
             _startupMonitor.Complete();
 
             // Log total time from the original stopwatch
             stopwatch.Stop();
-            Log.Information("[STARTUP_PERF] Total application startup completed in {ElapsedMs}ms",
+            Log.Information("[STARTUP_PERF] Initial application startup completed in {ElapsedMs}ms",
                 stopwatch.ElapsedMilliseconds);
 
             // Final marker file for successful startup
@@ -447,20 +487,21 @@ public partial class App : Application
         {
             options.UseSqlServer(connectionString, sqlOptions =>
             {
-                // Configure SQL options for better performance and resilience
+                // OPTIMIZATION: Configure SQL options for better performance and resilience
                 sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    maxRetryCount: 3,         // Reduced from 5
+                    maxRetryDelay: TimeSpan.FromSeconds(10), // Reduced from 30
                     errorNumbersToAdd: null);
 
-                // Improve command timeout for complex queries
-                sqlOptions.CommandTimeout(60);
-                // Set query splitting behavior to avoid EF Core warnings and improve performance
+                // OPTIMIZATION: Improved command timeout for faster queries during startup
+                sqlOptions.CommandTimeout(15); // Reduced from 60 seconds
+
+                // OPTIMIZATION: Set query splitting behavior to improve performance
                 sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
 
-            // Set query tracking behavior for better performance in read-only scenarios
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll); // Changed from NoTracking to allow updates
+            // OPTIMIZATION: For dashboard read-only operations, use NoTracking for better performance
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
             // Configure warnings
             options.ConfigureWarnings(warnings =>
@@ -508,15 +549,17 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
         services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
 
-        // Register Main Window
-        services.AddTransient<MainWindow>();
+        // Register performance utilities
+        services.AddSingleton<BusBuddy.WPF.Utilities.BackgroundTaskManager>();
 
-        // Register ViewModels with consistent lifetimes
-        // Main/Dashboard/Navigation ViewModels
-        services.AddTransient<BusBuddy.WPF.ViewModels.MainViewModel>();
+        // Register Main Window
+        services.AddTransient<MainWindow>();            // Register ViewModels with consistent lifetimes
+                                                        // Main/Dashboard/Navigation ViewModels
+        services.AddSingleton<BusBuddy.WPF.ViewModels.MainViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.ActivityLogViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.LoadingViewModel>();
 
         // Management ViewModels
         services.AddScoped<BusBuddy.WPF.ViewModels.BusManagementViewModel>();
@@ -737,6 +780,76 @@ public partial class App : Application
     }
 
     #endregion
+
+    /// <summary>
+    /// Pre-warms caches in the background to improve performance of first access
+    /// </summary>
+    private void PreWarmCaches(BackgroundTaskManager backgroundTaskManager, IServiceProvider serviceProvider)
+    {
+        Log.Information("[STARTUP] Starting cache pre-warming in background");
+
+        // Start cache pre-warming with a short delay to let UI initialize first
+        backgroundTaskManager.RunLowPriorityTaskAsync(async () =>
+        {
+            try
+            {
+                // Delay slightly to prioritize UI initialization
+                await Task.Delay(500);
+
+                // Get caching and data services
+                var cacheService = serviceProvider.GetService<BusBuddy.Core.Services.IEnhancedCachingService>();
+                var busService = serviceProvider.GetService<BusBuddy.Core.Services.IBusService>();
+                var driverService = serviceProvider.GetService<BusBuddy.Core.Services.IDriverService>();
+                var routeService = serviceProvider.GetService<BusBuddy.Core.Services.IRouteService>();
+                var dashboardMetricsService = serviceProvider.GetService<BusBuddy.Core.Services.IDashboardMetricsService>();
+
+                if (cacheService == null)
+                {
+                    Log.Warning("[STARTUP] Cache service not found - pre-warming skipped");
+                    return;
+                }
+
+                // Start pre-warming tasks
+                var tasks = new List<Task>();
+
+                // Pre-warm dashboard metrics cache
+                if (dashboardMetricsService != null)
+                {
+                    tasks.Add(cacheService.GetDashboardMetricsAsync(async () =>
+                        await dashboardMetricsService.GetDashboardMetricsAsync()));
+                }
+
+                // Pre-warm bus data cache
+                if (busService != null)
+                {
+                    tasks.Add(cacheService.GetAllBusesAsync(async () =>
+                        await busService.GetAllBusEntitiesAsync()));
+                }
+
+                // Pre-warm driver data cache
+                if (driverService != null)
+                {
+                    tasks.Add(cacheService.GetAllDriversAsync(async () =>
+                        await driverService.GetAllDriversAsync()));
+                }
+
+                // Pre-warm route data cache
+                if (routeService != null)
+                {
+                    tasks.Add(cacheService.GetAllRoutesAsync(async () =>
+                        await routeService.GetAllActiveRoutesAsync()));
+                }
+
+                // Wait for all pre-warming tasks to complete
+                await Task.WhenAll(tasks);
+                Log.Information("[STARTUP] Cache pre-warming completed successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "[STARTUP] Error during cache pre-warming: {ErrorMessage}", ex.Message);
+            }
+        }, "CachePreWarming", 500);
+    }
 }
 
 

@@ -3,6 +3,8 @@ using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
 using System.Collections.Generic;
 using BusBuddy.Core.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace BusBuddy.WPF.Services
 {
@@ -28,6 +30,26 @@ namespace BusBuddy.WPF.Services
             // such as fetching from a remote source, calculating routes, etc.
             // For now, we just ensure the service is working.
             await GetOptimizedRoutesAsync();
+        }
+
+        public async Task PopulateRouteMetadataAsync()
+        {
+            // OPTIMIZATION: This is a lightweight version that only retrieves
+            // minimal route data needed for the dashboard
+            try
+            {
+                // Direct database access could be used here for a more targeted query
+                // that only fetches the exact fields needed for the dashboard
+                var routes = await _routeService.GetAllActiveRoutesAsync();
+
+                // Here we could perform any necessary processing or caching
+                // but we're keeping it minimal for faster startup
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in PopulateRouteMetadataAsync: {ex.Message}");
+                // Log but don't throw to avoid startup failures
+            }
         }
     }
 }

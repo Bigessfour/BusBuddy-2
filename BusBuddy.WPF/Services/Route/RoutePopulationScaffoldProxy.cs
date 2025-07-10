@@ -17,5 +17,10 @@ namespace BusBuddy.WPF.Services
         {
             return Task.CompletedTask;
         }
+
+        public Task PopulateRouteMetadataAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }
