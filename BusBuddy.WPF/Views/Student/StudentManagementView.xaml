@@ -7,6 +7,15 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
+        <!-- Placeholder message overlay -->
+        <Border Background="#80FFFFFF" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+            <TextBlock Text="Student Management - In Development"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Foreground="Gray"/>
+        </Border>
+        
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
             <Button Content="Add" Command="{Binding AddCommand}" Margin="0,0,10,0"/>
             <Button Content="Edit" Command="{Binding EditCommand}" Margin="0,0,10,0"/>

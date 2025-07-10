@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using BusBuddy.WPF.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -16,6 +17,7 @@ namespace BusBuddy.WPF.ViewModels
         [ObservableProperty]
         private object? _currentViewModel;
 
+        private readonly ILogger<MainViewModel>? _logger;
         private readonly DashboardViewModel _dashboardViewModel;
         private readonly BusManagementViewModel _busManagementViewModel;
         private readonly DriverManagementViewModel _driverManagementViewModel;
@@ -24,7 +26,7 @@ namespace BusBuddy.WPF.ViewModels
         private readonly StudentManagementViewModel _studentManagementViewModel;
         private readonly MaintenanceTrackingViewModel _maintenanceTrackingViewModel;
         private readonly FuelManagementViewModel _fuelManagementViewModel;
-        private readonly ActivityLogViewModel _activityLoggingViewModel;
+        private readonly ActivityLogViewModel _activityLogViewModel;
         private readonly SettingsViewModel _settingsViewModel;
         private readonly StudentListViewModel _studentListViewModel;
         private readonly TicketManagementViewModel _ticketManagementViewModel;
@@ -40,10 +42,11 @@ namespace BusBuddy.WPF.ViewModels
             StudentManagementViewModel studentManagementViewModel,
             MaintenanceTrackingViewModel maintenanceTrackingViewModel,
             FuelManagementViewModel fuelManagementViewModel,
-            ActivityLogViewModel activityLoggingViewModel,
+            ActivityLogViewModel activityLogViewModel,
             SettingsViewModel settingsViewModel,
             StudentListViewModel studentListViewModel,
-            TicketManagementViewModel ticketManagementViewModel)
+            TicketManagementViewModel ticketManagementViewModel,
+            ILogger<MainViewModel>? logger = null)
         {
             _dashboardViewModel = dashboardViewModel;
             _busManagementViewModel = busManagementViewModel;
@@ -53,10 +56,11 @@ namespace BusBuddy.WPF.ViewModels
             _studentManagementViewModel = studentManagementViewModel;
             _maintenanceTrackingViewModel = maintenanceTrackingViewModel;
             _fuelManagementViewModel = fuelManagementViewModel;
-            _activityLoggingViewModel = activityLoggingViewModel;
+            _activityLogViewModel = activityLogViewModel;
             _settingsViewModel = settingsViewModel;
             _studentListViewModel = studentListViewModel;
             _ticketManagementViewModel = ticketManagementViewModel;
+            _logger = logger;
 
             NavigationItems = new ObservableCollection<NavigationItem>
             {
@@ -80,6 +84,8 @@ namespace BusBuddy.WPF.ViewModels
             // Log initialization for debugging
             System.Diagnostics.Debug.WriteLine($"MainViewModel initialized with current view: {CurrentViewModel?.GetType().Name}");
             System.Diagnostics.Debug.WriteLine($"Navigation items count: {NavigationItems.Count}");
+            _logger?.LogInformation("MainViewModel initialized with {Count} navigation items", NavigationItems.Count);
+            _logger?.LogInformation("In-Development Modules added to navigation: Schedule, Students, Maintenance, Fuel, Activity, Tickets");
         }
 
         partial void OnCurrentViewModelChanged(object? value)
@@ -90,6 +96,8 @@ namespace BusBuddy.WPF.ViewModels
         [RelayCommand]
         private void NavigateTo(string viewModelName)
         {
+            _logger?.LogInformation("Navigating to {ViewModelName}", viewModelName);
+
             CurrentViewModel = viewModelName switch
             {
                 "Dashboard" => _dashboardViewModel,
@@ -100,12 +108,14 @@ namespace BusBuddy.WPF.ViewModels
                 "Students" => _studentManagementViewModel,
                 "Maintenance" => _maintenanceTrackingViewModel,
                 "Fuel" => _fuelManagementViewModel,
-                "Activity" => _activityLoggingViewModel,
+                "Activity" => _activityLogViewModel,
                 "Settings" => _settingsViewModel,
                 "StudentList" => _studentListViewModel,
                 "Tickets" => _ticketManagementViewModel,
                 _ => _dashboardViewModel
             };
+
+            _logger?.LogInformation("Successfully navigated to {ViewModel}", CurrentViewModel?.GetType().Name);
         }
     }
 }

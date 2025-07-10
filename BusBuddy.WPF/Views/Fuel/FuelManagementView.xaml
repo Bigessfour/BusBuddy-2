@@ -12,11 +12,22 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        
+        <!-- Placeholder message overlay -->
+        <Border Grid.RowSpan="2" Background="#80FFFFFF" Margin="-16" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+            <TextBlock Text="Fuel Management - In Development"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Foreground="Gray"/>
+        </Border>
+        
         <syncfusionGrid:SfDataGrid x:Name="FuelDataGrid"
                                    Grid.Row="0"
                                    ItemsSource="{Binding FuelRecords}"
                                    AutoGenerateColumns="True"
                                    SelectionMode="Single"
+                                   IsEnabled="{Binding IsInDevelopment, Converter={StaticResource InverseBooleanConverter}, FallbackValue=False}"
                                    Margin="0,0,0,12"/>
         <syncfusionChart:SfChart x:Name="FuelTrendChart" Grid.Row="1" Margin="0">
             <syncfusionChart:LineSeries ItemsSource="{Binding FuelTrends}" XBindingPath="Period" YBindingPath="AvgMPG" Label="Avg MPG"/>

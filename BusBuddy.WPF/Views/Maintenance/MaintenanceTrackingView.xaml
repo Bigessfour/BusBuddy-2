@@ -12,11 +12,22 @@
             <Button Content="Edit" Command="{Binding EditCommand}" Margin="0,0,10,0"/>
             <Button Content="Delete" Command="{Binding DeleteCommand}"/>
         </StackPanel>
+        
+        <!-- Placeholder message overlay -->
+        <Border Background="#80FFFFFF" Margin="-10" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+            <TextBlock Text="Maintenance Tracking - In Development"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Foreground="Gray"/>
+        </Border>
+        
         <syncfusion:SfDataGrid x:Name="MaintenanceGrid"
                                ItemsSource="{Binding MaintenanceRecords}"
                                SelectedItem="{Binding SelectedRecord, Mode=TwoWay}"
                                AutoGenerateColumns="False"
-                               Margin="0,40,0,0">
+                               Margin="0,40,0,0"
+                               IsEnabled="{Binding IsInDevelopment, Converter={StaticResource InverseBooleanConverter}, FallbackValue=False}">
             <syncfusion:SfDataGrid.Columns>
                 <!-- Bus selection by BusNumber -->
                 <syncfusion:GridComboBoxColumn MappingName="VehicleId"

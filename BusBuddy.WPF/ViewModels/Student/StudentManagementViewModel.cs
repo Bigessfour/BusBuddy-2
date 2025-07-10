@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public partial class StudentManagementViewModel : ObservableObject
+    public partial class StudentManagementViewModel : BaseInDevelopmentViewModel
     {
         private readonly IStudentService _studentService;
         private readonly IBusService _busService;
         private readonly IRouteService _routeService;
-        private readonly ILogger<StudentManagementViewModel> _logger;
 
         public ObservableCollection<Student> Students { get; } = new();
         public ObservableCollection<Bus> Buses { get; private set; } = new();
@@ -27,15 +26,17 @@ namespace BusBuddy.WPF.ViewModels
             IStudentService studentService,
             IBusService busService,
             IRouteService routeService,
-            ILogger<StudentManagementViewModel> logger)
+            ILogger<StudentManagementViewModel> logger) : base(logger)
         {
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
             _routeService = routeService ?? throw new ArgumentNullException(nameof(routeService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Load data asynchronously in sequence to avoid DbContext concurrency issues
             _ = InitializeAsync();
+
+            // Set as in-development
+            IsInDevelopment = true;
         }
 
         private async Task InitializeAsync()
@@ -48,7 +49,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during ViewModel initialization");
+                Logger?.LogError(ex, "Error during ViewModel initialization");
             }
         }
 
@@ -64,11 +65,11 @@ namespace BusBuddy.WPF.ViewModels
                 Routes = new ObservableCollection<Route>(routes);
                 OnPropertyChanged(nameof(Routes));
 
-                _logger.LogInformation("Loaded {BusCount} buses and {RouteCount} routes", Buses.Count, Routes.Count);
+                Logger?.LogInformation("Loaded {BusCount} buses and {RouteCount} routes", Buses.Count, Routes.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading buses and routes");
+                Logger?.LogError(ex, "Error loading buses and routes");
             }
         }
 
@@ -83,7 +84,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading students");
+                Logger?.LogError(ex, "Error loading students");
             }
         }
 
@@ -100,11 +101,11 @@ namespace BusBuddy.WPF.ViewModels
                 };
                 var created = await _studentService.AddStudentAsync(newStudent);
                 Students.Add(created);
-                _logger.LogInformation("Added new student with ID {StudentId}", created.StudentId);
+                Logger?.LogInformation("Added new student with ID {StudentId}", created.StudentId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding student");
+                Logger?.LogError(ex, "Error adding student");
             }
         }
 
@@ -116,13 +117,13 @@ namespace BusBuddy.WPF.ViewModels
             try
             {
                 await _studentService.UpdateStudentAsync(SelectedStudent);
-                _logger.LogInformation("Updated student with ID {StudentId}", SelectedStudent.StudentId);
+                Logger?.LogInformation("Updated student with ID {StudentId}", SelectedStudent.StudentId);
                 // Refresh data
                 await LoadStudentsAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating student {StudentId}", SelectedStudent.StudentId);
+                Logger?.LogError(ex, "Error updating student {StudentId}", SelectedStudent.StudentId);
             }
         }
 
@@ -135,11 +136,11 @@ namespace BusBuddy.WPF.ViewModels
             {
                 await _studentService.DeleteStudentAsync(SelectedStudent.StudentId);
                 Students.Remove(SelectedStudent);
-                _logger.LogInformation("Deleted student with ID {StudentId}", SelectedStudent.StudentId);
+                Logger?.LogInformation("Deleted student with ID {StudentId}", SelectedStudent.StudentId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting student {StudentId}", SelectedStudent.StudentId);
+                Logger?.LogError(ex, "Error deleting student {StudentId}", SelectedStudent.StudentId);
             }
         }
 

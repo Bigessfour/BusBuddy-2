@@ -11,6 +11,15 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <!-- Placeholder message overlay -->
+        <Border Background="#80FFFFFF" Margin="-20" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+            <TextBlock Text="Schedule Management - In Development"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Foreground="Gray"/>
+        </Border>
 
         <sf:SfDataGrid Grid.Row="0"
                        ItemsSource="{Binding Schedules}"

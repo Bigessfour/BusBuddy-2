@@ -3,11 +3,14 @@ using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public partial class ScheduleManagementViewModel : ObservableObject
+    public partial class ScheduleManagementViewModel : BaseInDevelopmentViewModel
     {
         private readonly IScheduleService _scheduleService;
         private readonly IBusService _busService;
@@ -30,7 +33,12 @@ namespace BusBuddy.WPF.ViewModels
         public IAsyncRelayCommand UpdateScheduleCommand { get; }
         public IAsyncRelayCommand DeleteScheduleCommand { get; }
 
-        public ScheduleManagementViewModel(IScheduleService scheduleService, IBusService busService, IDriverService driverService)
+        public ScheduleManagementViewModel(
+            IScheduleService scheduleService,
+            IBusService busService,
+            IDriverService driverService,
+            ILogger<ScheduleManagementViewModel>? logger = null)
+            : base(logger)
         {
             _scheduleService = scheduleService;
             _busService = busService;
@@ -46,43 +54,79 @@ namespace BusBuddy.WPF.ViewModels
             UpdateScheduleCommand = new AsyncRelayCommand(UpdateScheduleAsync, CanUpdateOrDelete);
             DeleteScheduleCommand = new AsyncRelayCommand(DeleteScheduleAsync, CanUpdateOrDelete);
 
+            // Set as in-development
+            IsInDevelopment = true;
+
             _ = LoadDataAsync();
         }
 
         private async Task LoadDataAsync()
         {
-            await LoadSchedulesAsync();
-            await LoadBusesAsync();
-            await LoadDriversAsync();
+            try
+            {
+                await LoadSchedulesAsync();
+                await LoadBusesAsync();
+                await LoadDriversAsync();
+
+                Logger?.LogInformation("Loaded schedules, buses, and drivers data");
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error loading schedule data");
+            }
         }
 
         private async Task LoadSchedulesAsync()
         {
-            var schedules = await _scheduleService.GetSchedulesAsync();
-            Schedules.Clear();
-            foreach (var s in schedules)
+            try
             {
-                Schedules.Add(s);
+                var schedules = await _scheduleService.GetSchedulesAsync();
+                Schedules.Clear();
+                foreach (var s in schedules)
+                {
+                    Schedules.Add(s);
+                }
+                Logger?.LogInformation("Loaded {ScheduleCount} schedules", Schedules.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error loading schedules");
             }
         }
 
         private async Task LoadBusesAsync()
         {
-            var buses = await _busService.GetAllBusEntitiesAsync();
-            Buses.Clear();
-            foreach (var bus in buses)
+            try
             {
-                Buses.Add(bus);
+                var buses = await _busService.GetAllBusEntitiesAsync();
+                Buses.Clear();
+                foreach (var bus in buses)
+                {
+                    Buses.Add(bus);
+                }
+                Logger?.LogInformation("Loaded {BusCount} buses", Buses.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error loading buses");
             }
         }
 
         private async Task LoadDriversAsync()
         {
-            var drivers = await _driverService.GetAllDriversAsync();
-            Drivers.Clear();
-            foreach (var driver in drivers)
+            try
             {
-                Drivers.Add(driver);
+                var drivers = await _driverService.GetAllDriversAsync();
+                Drivers.Clear();
+                foreach (var driver in drivers)
+                {
+                    Drivers.Add(driver);
+                }
+                Logger?.LogInformation("Loaded {DriverCount} drivers", Drivers.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error loading drivers");
             }
         }
 
@@ -90,10 +134,18 @@ namespace BusBuddy.WPF.ViewModels
         {
             if (SelectedSchedule != null)
             {
-                // Set default values for a new schedule
-                SelectedSchedule.ScheduleDate = DateTime.Now;
-                await _scheduleService.AddScheduleAsync(SelectedSchedule);
-                await LoadSchedulesAsync();
+                try
+                {
+                    // Set default values for a new schedule
+                    SelectedSchedule.ScheduleDate = DateTime.Now;
+                    await _scheduleService.AddScheduleAsync(SelectedSchedule);
+                    await LoadSchedulesAsync();
+                    Logger?.LogInformation("Added new schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
+                }
+                catch (Exception ex)
+                {
+                    Logger?.LogError(ex, "Error adding schedule");
+                }
             }
         }
 
@@ -101,8 +153,16 @@ namespace BusBuddy.WPF.ViewModels
         {
             if (SelectedSchedule != null)
             {
-                await _scheduleService.UpdateScheduleAsync(SelectedSchedule);
-                await LoadSchedulesAsync();
+                try
+                {
+                    await _scheduleService.UpdateScheduleAsync(SelectedSchedule);
+                    await LoadSchedulesAsync();
+                    Logger?.LogInformation("Updated schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
+                }
+                catch (Exception ex)
+                {
+                    Logger?.LogError(ex, "Error updating schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                }
             }
         }
 
@@ -110,8 +170,16 @@ namespace BusBuddy.WPF.ViewModels
         {
             if (SelectedSchedule != null)
             {
-                await _scheduleService.DeleteScheduleAsync(SelectedSchedule.ScheduleId);
-                await LoadSchedulesAsync();
+                try
+                {
+                    await _scheduleService.DeleteScheduleAsync(SelectedSchedule.ScheduleId);
+                    await LoadSchedulesAsync();
+                    Logger?.LogInformation("Deleted schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
+                }
+                catch (Exception ex)
+                {
+                    Logger?.LogError(ex, "Error deleting schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                }
             }
         }
 
@@ -124,6 +192,11 @@ namespace BusBuddy.WPF.ViewModels
         {
             (UpdateScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();
             (DeleteScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();
+
+            if (value != null)
+            {
+                Logger?.LogDebug("Selected schedule changed to ID {ScheduleId}", value.ScheduleId);
+            }
         }
     }
 }

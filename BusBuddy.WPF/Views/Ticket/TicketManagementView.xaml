@@ -18,6 +18,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
+        <!-- Placeholder message overlay -->
+        <Border Background="#80FFFFFF" Margin="-10" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+            <TextBlock Text="Ticket Management - In Development"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Foreground="Gray"/>
+        </Border>
+        
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0 0 0 10">
             <TextBlock Text="Ticket Management" FontSize="24" FontWeight="Bold"/>

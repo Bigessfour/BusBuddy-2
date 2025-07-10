@@ -1,5 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
@@ -7,7 +8,7 @@ using System;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public class FuelManagementViewModel : BaseViewModel
+    public class FuelManagementViewModel : BaseInDevelopmentViewModel
     {
         private readonly IFuelService _fuelService;
 
@@ -25,34 +26,56 @@ namespace BusBuddy.WPF.ViewModels
             set => SetProperty(ref _fuelTrends, value);
         }
 
-        public FuelManagementViewModel(IFuelService fuelService)
+        public FuelManagementViewModel(IFuelService fuelService, ILogger<FuelManagementViewModel>? logger = null)
+            : base(logger)
         {
             _fuelService = fuelService;
             _ = LoadFuelRecordsAsync();
+
+            // Set as in-development
+            IsInDevelopment = true;
         }
 
         private async Task LoadFuelRecordsAsync()
         {
-            FuelRecords.Clear();
-            var records = await _fuelService.GetAllFuelRecordsAsync();
-            foreach (var record in records)
-                FuelRecords.Add(record);
-            CalculateTrends();
+            try
+            {
+                FuelRecords.Clear();
+                var records = await _fuelService.GetAllFuelRecordsAsync();
+                foreach (var record in records)
+                    FuelRecords.Add(record);
+                CalculateTrends();
+
+                Logger?.LogInformation("Loaded {RecordCount} fuel records", FuelRecords.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error loading fuel records");
+            }
         }
 
         private void CalculateTrends()
         {
-            FuelTrends.Clear();
-            // Simple trend: average MPG per month
-            var grouped = new System.Linq.EnumerableQuery<Fuel>(FuelRecords)
-                .GroupBy(f => new { f.FuelDate.Year, f.FuelDate.Month })
-                .Select(g => new FuelTrendPoint
-                {
-                    Period = new DateTime(g.Key.Year, g.Key.Month, 1),
-                    AvgMPG = g.Average(f => f.Gallons.HasValue && f.Gallons > 0 ? (f.VehicleOdometerReading / (double)f.Gallons.Value) : 0)
-                });
-            foreach (var pt in grouped)
-                FuelTrends.Add(pt);
+            try
+            {
+                FuelTrends.Clear();
+                // Simple trend: average MPG per month
+                var grouped = new System.Linq.EnumerableQuery<Fuel>(FuelRecords)
+                    .GroupBy(f => new { f.FuelDate.Year, f.FuelDate.Month })
+                    .Select(g => new FuelTrendPoint
+                    {
+                        Period = new DateTime(g.Key.Year, g.Key.Month, 1),
+                        AvgMPG = g.Average(f => f.Gallons.HasValue && f.Gallons > 0 ? (f.VehicleOdometerReading / (double)f.Gallons.Value) : 0)
+                    });
+                foreach (var pt in grouped)
+                    FuelTrends.Add(pt);
+
+                Logger?.LogInformation("Calculated {TrendPointCount} fuel trend points", FuelTrends.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error calculating fuel trends");
+            }
         }
 
         // BaseViewModel already provides PropertyChanged functionality

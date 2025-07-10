@@ -6,10 +6,10 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
-        <TextBlock Text="Activity Logging Module Placeholder"
+        <TextBlock Text="Activity Logging - In Development"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
-                   FontSize="24"
+                   FontSize="16"
                    Foreground="Gray"/>
     </Grid>
 </UserControl>

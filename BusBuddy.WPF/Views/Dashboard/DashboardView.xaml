@@ -5,10 +5,138 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BusBuddy.WPF.Views.Dashboard"
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:busView="clr-namespace:BusBuddy.WPF.Views.Bus"
+             xmlns:driverView="clr-namespace:BusBuddy.WPF.Views.Driver"
+             xmlns:routeView="clr-namespace:BusBuddy.WPF.Views.Route"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
     <Grid>
-        <TextBlock Text="Dashboard Content" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Text="Bus Buddy Dashboard" FontSize="24" Margin="10" HorizontalAlignment="Left" />
+        
+        <TabControl Grid.Row="1" TabStripPlacement="Top" Background="White" Margin="10">
+            <TabItem Header="Overview" IsSelected="True">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="System Overview" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Border Grid.Column="0" Margin="5" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="5">
+                            <StackPanel Margin="10">
+                                <TextBlock Text="Fleet Summary" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                
+                                <!-- Fleet Summary Data -->
+                                <Grid Margin="0,10,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- Buses -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Total Buses:" Margin="0,5,0,5"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TotalBuses}" FontWeight="SemiBold" Margin="10,5,0,5"/>
+                                    
+                                    <!-- Drivers -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Total Drivers:" Margin="0,5,0,5"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TotalDrivers}" FontWeight="SemiBold" Margin="10,5,0,5"/>
+                                    
+                                    <!-- Routes -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Active Routes:" Margin="0,5,0,5"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TotalActiveRoutes}" FontWeight="SemiBold" Margin="10,5,0,5"/>
+                                </Grid>
+                                
+                                <Separator Margin="0,10"/>
+                                
+                                <TextBlock Text="Performance Metrics" FontWeight="SemiBold" Margin="0,10,0,10"/>
+                                <TextBlock Text="Initialization Time:" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding InitializationTimeFormatted}" FontWeight="Medium" Margin="10,0,0,5"/>
+                                <TextBlock Text="Route Population Time:" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding RoutePopulationTimeFormatted}" FontWeight="Medium" Margin="10,0,0,5"/>
+                                <TextBlock Text="Student List Load Time:" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding StudentListLoadTimeFormatted}" FontWeight="Medium" Margin="10,0,0,5"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <Border Grid.Column="1" Margin="5" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="5">
+                            <StackPanel Margin="10">
+                                <TextBlock Text="System Status" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <TextBlock Text="All systems operational" Foreground="Green" FontWeight="Medium"/>
+                                <TextBlock Text="Database: Connected" Margin="0,10,0,0"/>
+                                <TextBlock Text="Services: Online" Margin="0,5,0,0"/>
+                                <TextBlock Text="Last Update: July 9, 2025" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Bus Management">
+                <busView:BusManagementView DataContext="{Binding BusManagementViewModel}" Margin="10"/>
+            </TabItem>
+            
+            <TabItem Header="Driver Management">
+                <driverView:DriverManagementView DataContext="{Binding DriverManagementViewModel}" Margin="10"/>
+            </TabItem>
+            
+            <TabItem Header="Route Management">
+                <routeView:RouteManagementView DataContext="{Binding RouteManagementViewModel}" Margin="10"/>
+            </TabItem>
+            
+            <TabItem Header="Schedule Management">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding ScheduleManagementViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Student Management">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding StudentManagementViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Maintenance Tracking">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding MaintenanceTrackingViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Fuel Management">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding FuelManagementViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Activity Logging">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding ActivityLogViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Ticket Management">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding TicketManagementViewModel}" />
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

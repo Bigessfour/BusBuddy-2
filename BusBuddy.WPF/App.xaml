@@ -6,6 +6,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -16,12 +16,11 @@ namespace BusBuddy.WPF.ViewModels
     /// <summary>
     /// ViewModel for managing tickets in the Ticket Management module
     /// </summary>
-    public partial class TicketManagementViewModel : BaseViewModel
+    public partial class TicketManagementViewModel : BaseInDevelopmentViewModel
     {
         private readonly ITicketService _ticketService;
         private readonly IStudentService _studentService;
         private readonly IRouteService _routeService;
-        private readonly ILogger<TicketManagementViewModel> _logger;
 
         // Observable collections
         public ObservableCollection<Ticket> Tickets { get; } = new();
@@ -126,12 +125,11 @@ namespace BusBuddy.WPF.ViewModels
             ITicketService ticketService,
             IStudentService studentService,
             IRouteService routeService,
-            ILogger<TicketManagementViewModel> logger)
+            ILogger<TicketManagementViewModel> logger) : base(logger)
         {
             _ticketService = ticketService ?? throw new ArgumentNullException(nameof(ticketService));
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
             _routeService = routeService ?? throw new ArgumentNullException(nameof(routeService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Initialize collection view source
             _ticketsViewSource.Source = Tickets;
@@ -144,6 +142,9 @@ namespace BusBuddy.WPF.ViewModels
             // Set dates for filter
             FromDate = DateTime.Today.AddDays(-30);
             ToDate = DateTime.Today;
+
+            // Set as in-development
+            IsInDevelopment = true;
 
             // We need to initialize data in the view, not in the constructor
             // to avoid DbContext concurrency issues
@@ -179,14 +180,24 @@ namespace BusBuddy.WPF.ViewModels
         /// </summary>
         public async Task LoadAllDataAsync()
         {
-            await LoadDataAsync(async () =>
+            try
             {
+                IsLoading = true;
                 // Load sequentially to prevent DbContext concurrency issues
                 await LoadTicketsAsync();
                 await LoadStudentsAsync();
                 await LoadRoutesAsync();
                 await LoadStatisticsAsync();
-            });
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "Error loading all data");
+                ErrorMessage = $"Failed to load data: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         /// <summary>
@@ -206,10 +217,10 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading tickets");
+                Logger?.LogError(ex, "Error loading tickets");
             }
         }
-        // Removed parameterless call to LoadDataAsync to fix compile error
+
         private async Task LoadStudentsAsync()
         {
             try
@@ -221,7 +232,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading students");
+                Logger?.LogError(ex, "Error loading students");
             }
         }
 
@@ -239,7 +250,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading routes");
+                Logger?.LogError(ex, "Error loading routes");
             }
         }
 
@@ -255,7 +266,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading ticket statistics");
+                Logger?.LogError(ex, "Error loading ticket statistics");
                 // Initialize with empty dictionaries to prevent null reference exceptions
                 RevenueStats = new Dictionary<string, decimal>();
                 CountStats = new Dictionary<string, int>();
@@ -283,14 +294,14 @@ namespace BusBuddy.WPF.ViewModels
             {
                 if (NewTicket.StudentId <= 0 || NewTicket.RouteId <= 0)
                 {
-                    _logger.LogWarning("Cannot create ticket: Student or Route not selected");
+                    Logger?.LogWarning("Cannot create ticket: Student or Route not selected");
                     return;
                 }
 
                 var validationErrors = await _ticketService.ValidateTicketAsync(NewTicket);
                 if (validationErrors.Any())
                 {
-                    _logger.LogWarning("Ticket validation failed: {Errors}", string.Join(", ", validationErrors));
+                    Logger?.LogWarning("Ticket validation failed: {Errors}", string.Join(", ", validationErrors));
                     return;
                 }
 
@@ -311,11 +322,11 @@ namespace BusBuddy.WPF.ViewModels
 
                 await LoadStatisticsAsync();
 
-                _logger.LogInformation("Created new ticket {TicketId}", createdTicket.TicketId);
+                Logger?.LogInformation("Created new ticket {TicketId}", createdTicket.TicketId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating new ticket");
+                Logger?.LogError(ex, "Error creating new ticket");
             }
         }
 
@@ -332,7 +343,7 @@ namespace BusBuddy.WPF.ViewModels
                 var validationErrors = await _ticketService.ValidateTicketAsync(SelectedTicket);
                 if (validationErrors.Any())
                 {
-                    _logger.LogWarning("Ticket validation failed: {Errors}", string.Join(", ", validationErrors));
+                    Logger?.LogWarning("Ticket validation failed: {Errors}", string.Join(", ", validationErrors));
                     return;
                 }
 
@@ -340,11 +351,11 @@ namespace BusBuddy.WPF.ViewModels
                 _ticketsViewSource.View?.Refresh();
                 await LoadStatisticsAsync();
 
-                _logger.LogInformation("Updated ticket {TicketId}", SelectedTicket.TicketId);
+                Logger?.LogInformation("Updated ticket {TicketId}", SelectedTicket.TicketId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating ticket {TicketId}", SelectedTicket.TicketId);
+                Logger?.LogError(ex, "Error updating ticket {TicketId}", SelectedTicket.TicketId);
             }
         }
 
@@ -363,11 +374,11 @@ namespace BusBuddy.WPF.ViewModels
                 _ticketsViewSource.View?.Refresh();
                 await LoadStatisticsAsync();
 
-                _logger.LogInformation("Deleted ticket {TicketId}", SelectedTicket.TicketId);
+                Logger?.LogInformation("Deleted ticket {TicketId}", SelectedTicket.TicketId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting ticket {TicketId}", SelectedTicket.TicketId);
+                Logger?.LogError(ex, "Error deleting ticket {TicketId}", SelectedTicket.TicketId);
             }
         }
 
@@ -385,11 +396,11 @@ namespace BusBuddy.WPF.ViewModels
                 await LoadTicketsAsync();
                 await LoadStatisticsAsync();
 
-                _logger.LogInformation("Cancelled ticket {TicketId}", SelectedTicket.TicketId);
+                Logger?.LogInformation("Cancelled ticket {TicketId}", SelectedTicket.TicketId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cancelling ticket {TicketId}", SelectedTicket.TicketId);
+                Logger?.LogError(ex, "Error cancelling ticket {TicketId}", SelectedTicket.TicketId);
             }
         }
 
@@ -407,11 +418,11 @@ namespace BusBuddy.WPF.ViewModels
                 await LoadTicketsAsync();
                 await LoadStatisticsAsync();
 
-                _logger.LogInformation("Marked ticket {TicketId} as used", SelectedTicket.TicketId);
+                Logger?.LogInformation("Marked ticket {TicketId} as used", SelectedTicket.TicketId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error marking ticket {TicketId} as used", SelectedTicket.TicketId);
+                Logger?.LogError(ex, "Error marking ticket {TicketId} as used", SelectedTicket.TicketId);
             }
         }
 
@@ -449,11 +460,11 @@ namespace BusBuddy.WPF.ViewModels
             {
                 var csv = await _ticketService.ExportTicketsToCsvAsync(FromDate, ToDate);
                 // In a real app, you would save this to a file or clipboard
-                _logger.LogInformation("Exported {Length} bytes of CSV data", csv.Length);
+                Logger?.LogInformation("Exported {Length} bytes of CSV data", csv.Length);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error exporting tickets to CSV");
+                Logger?.LogError(ex, "Error exporting tickets to CSV");
             }
         }
 
@@ -470,14 +481,16 @@ namespace BusBuddy.WPF.ViewModels
                 var qrCode = await _ticketService.GenerateQRCodeAsync(SelectedTicket.TicketId);
                 await LoadTicketsAsync();
 
-                _logger.LogInformation("Generated QR code for ticket {TicketId}: {QRCode}", SelectedTicket.TicketId, qrCode);
+                Logger?.LogInformation("Generated QR code for ticket {TicketId}: {QRCode}", SelectedTicket.TicketId, qrCode);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating QR code for ticket {TicketId}", SelectedTicket.TicketId);
+                Logger?.LogError(ex, "Error generating QR code for ticket {TicketId}", SelectedTicket.TicketId);
             }
         }
 
         #endregion
     }
 }
+
+
