@@ -36,14 +36,19 @@
                        AllowFiltering="True"
                        ColumnSizer="Star"
                        SelectionMode="Single"
-                       NavigationMode="Cell"
-                       AllowEditing="True"
+                       SelectionUnit="Row"
+                       NavigationMode="Row"
+                       AllowEditing="False"
                        ShowRowHeader="True"
                        EnableDataVirtualization="True"
                        BorderThickness="1"
                        BorderBrush="#DDDDDD"
                        HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch">
+                       VerticalAlignment="Stretch"
+                       RowSelectionBrush="#E0F0FF"
+                       CurrentCellBorderBrush="#0078D7"
+                       CurrentCellBorderThickness="1"
+                       SelectionChanged="DataGrid_SelectionChanged">
             <sf:SfDataGrid.Columns>
                 <sf:GridTextColumn MappingName="BusNumber" HeaderText="Bus Number" Width="120" AllowSorting="True">
                     <sf:GridTextColumn.HeaderStyle>
@@ -188,9 +193,12 @@
 
         <!-- Button Panel -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-            <Button Content="Add" Command="{Binding AddBusCommand}" Margin="5" Padding="15,5" />
-            <Button Content="Update" Command="{Binding UpdateBusCommand}" Margin="5" Padding="15,5" />
-            <Button Content="Delete" Command="{Binding DeleteBusCommand}" Margin="5" Padding="15,5" />
+            <Button Content="Add New Bus" Command="{Binding AddBusCommand}" Margin="5" Padding="15,5" 
+                    ToolTip="Add a new bus to the fleet"/>
+            <Button Content="Edit Selected" Command="{Binding UpdateBusCommand}" Margin="5" Padding="15,5" 
+                    ToolTip="Edit the currently selected bus"/>
+            <Button Content="Delete" Command="{Binding DeleteBusCommand}" Margin="5" Padding="15,5" 
+                    ToolTip="Delete the currently selected bus" Background="#FFDDDD"/>
         </StackPanel>
         
         <!-- Loading Indicator -->

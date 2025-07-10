@@ -2,7 +2,11 @@ using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -169,47 +173,181 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task AddBusAsync()
         {
-            if (SelectedBus != null)
+            IsBusy = true;
+            try
             {
-                IsBusy = true;
-                try
+                // Create a new bus instance
+                var newBus = new Bus
                 {
-                    await _busService.AddBusEntityAsync(SelectedBus);
+                    Status = "Active",
+                    Year = DateTime.Now.Year
+                };
+
+                // Show the edit dialog
+                var dialog = new Views.Bus.BusEditDialog(newBus, true);
+                dialog.Owner = Application.Current.MainWindow;
+
+                var result = dialog.ShowDialog();
+
+                if (result == true)
+                {
+                    // Add the new bus to the database
+                    var addedBus = await _busService.AddBusEntityAsync(dialog.Bus);
+
+                    // Reload the data
                     await LoadBusesAsync();
+
+                    // Select the newly added bus
+                    var busInList = Buses.FirstOrDefault(b => b.VehicleId == addedBus.VehicleId);
+                    if (busInList != null)
+                    {
+                        SelectedBus = busInList;
+                    }
+
+                    // Show success notification
+                    var notification = new Views.Bus.NotificationWindow(
+                        $"Bus #{dialog.Bus.BusNumber} was successfully added.",
+                        "Bus Added",
+                        Views.Bus.NotificationWindow.NotificationType.Success);
+                    notification.Owner = Application.Current.MainWindow;
+                    notification.ShowDialog();
                 }
-                finally
-                {
-                    IsBusy = false;
-                }
+            }
+            catch (Exception ex)
+            {
+                // Show error notification
+                var notification = new Views.Bus.NotificationWindow(
+                    $"Failed to add bus: {ex.Message}",
+                    "Error",
+                    Views.Bus.NotificationWindow.NotificationType.Error);
+                notification.Owner = Application.Current.MainWindow;
+                notification.ShowDialog();
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
         private async Task UpdateBusAsync()
         {
-            if (SelectedBus != null)
+            if (SelectedBus == null)
             {
-                IsBusy = true;
-                try
+                // Show notification to select a bus first
+                var notification = new Views.Bus.NotificationWindow(
+                    "Please select a bus to update.",
+                    "No Bus Selected",
+                    Views.Bus.NotificationWindow.NotificationType.Warning);
+                notification.Owner = Application.Current.MainWindow;
+                notification.ShowDialog();
+                return;
+            }
+
+            IsBusy = true;
+            try
+            {
+                // Create a clone for editing
+                var busToEdit = SelectedBus;
+
+                // Show the edit dialog
+                var dialog = new Views.Bus.BusEditDialog(busToEdit, false);
+                dialog.Owner = Application.Current.MainWindow;
+
+                var result = dialog.ShowDialog();
+
+                if (result == true)
                 {
-                    await _busService.UpdateBusEntityAsync(SelectedBus);
+                    // Update the bus in the database
+                    await _busService.UpdateBusEntityAsync(dialog.Bus);
+
+                    // Reload the data
                     await LoadBusesAsync();
+
+                    // Try to re-select the same bus
+                    var updatedBus = Buses.FirstOrDefault(b => b.VehicleId == busToEdit.VehicleId);
+                    if (updatedBus != null)
+                    {
+                        SelectedBus = updatedBus;
+                    }
+
+                    // Show success notification
+                    var notification = new Views.Bus.NotificationWindow(
+                        $"Bus #{dialog.Bus.BusNumber} was successfully updated.",
+                        "Bus Updated",
+                        Views.Bus.NotificationWindow.NotificationType.Success);
+                    notification.Owner = Application.Current.MainWindow;
+                    notification.ShowDialog();
                 }
-                finally
-                {
-                    IsBusy = false;
-                }
+            }
+            catch (Exception ex)
+            {
+                // Show error notification
+                var notification = new Views.Bus.NotificationWindow(
+                    $"Failed to update bus: {ex.Message}",
+                    "Error",
+                    Views.Bus.NotificationWindow.NotificationType.Error);
+                notification.Owner = Application.Current.MainWindow;
+                notification.ShowDialog();
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
         private async Task DeleteBusAsync()
         {
-            if (SelectedBus != null)
+            if (SelectedBus == null)
+            {
+                // Show notification to select a bus first
+                var notification = new Views.Bus.NotificationWindow(
+                    "Please select a bus to delete.",
+                    "No Bus Selected",
+                    Views.Bus.NotificationWindow.NotificationType.Warning);
+                notification.Owner = Application.Current.MainWindow;
+                notification.ShowDialog();
+                return;
+            }
+
+            // Show confirmation dialog
+            var busNumber = SelectedBus.BusNumber;
+            var busId = SelectedBus.VehicleId;
+
+            var confirmDialog = new Views.Bus.ConfirmationDialog(
+                $"Are you sure you want to delete Bus #{busNumber}? This action cannot be undone.",
+                "Confirm Delete");
+            confirmDialog.Owner = Application.Current.MainWindow;
+
+            var result = confirmDialog.ShowDialog();
+
+            if (result == true)
             {
                 IsBusy = true;
                 try
                 {
-                    await _busService.DeleteBusEntityAsync(SelectedBus.VehicleId);
+                    // Delete the bus from the database
+                    await _busService.DeleteBusEntityAsync(busId);
+
+                    // Reload the data
                     await LoadBusesAsync();
+
+                    // Show success notification
+                    var notification = new Views.Bus.NotificationWindow(
+                        $"Bus #{busNumber} was successfully deleted.",
+                        "Bus Deleted",
+                        Views.Bus.NotificationWindow.NotificationType.Success);
+                    notification.Owner = Application.Current.MainWindow;
+                    notification.ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    // Show error notification
+                    var notification = new Views.Bus.NotificationWindow(
+                        $"Failed to delete bus: {ex.Message}",
+                        "Error",
+                        Views.Bus.NotificationWindow.NotificationType.Error);
+                    notification.Owner = Application.Current.MainWindow;
+                    notification.ShowDialog();
                 }
                 finally
                 {

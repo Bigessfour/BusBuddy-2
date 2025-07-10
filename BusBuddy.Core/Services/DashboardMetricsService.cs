@@ -31,17 +31,16 @@ namespace BusBuddy.Core.Services
 
             try
             {
-                // OPTIMIZATION: Get counts directly from repositories for faster performance
-                // These operations will be much faster than SQL queries as they're just in-memory counts
-                var busCount = await Task.Run(() => _unitOfWork.Buses.Query().Count(b => b.Status == "Active"));
-                var driverCount = await Task.Run(() => _unitOfWork.Drivers.Query().Count(d => d.Status == "Active"));
-                var routeCount = await Task.Run(() => _unitOfWork.Routes.Query().Count(r => r.IsActive));
+                // Use EF Core async methods to avoid DbContext threading issues
+                var busCount = await _unitOfWork.Buses.Query().CountAsync(b => b.Status == "Active");
+                var driverCount = await _unitOfWork.Drivers.Query().CountAsync(d => d.Status == "Active");
+                var routeCount = await _unitOfWork.Routes.Query().CountAsync(r => r.IsActive);
 
                 result["BusCount"] = busCount;
                 result["DriverCount"] = driverCount;
                 result["RouteCount"] = routeCount;
 
-                // OPTIMIZATION: Set placeholders for metrics that will be populated later
+                // Placeholders for future metrics
                 result["StudentCount"] = 0;
                 result["OpenTicketCount"] = 0;
 

@@ -50,5 +50,24 @@ namespace BusBuddy.WPF.Views.Bus
                 }
             }
         }
+
+        /// <summary>
+        /// Handles the selection changed event for the DataGrid
+        /// </summary>
+        private void DataGrid_SelectionChanged(object sender, Syncfusion.UI.Xaml.Grid.GridSelectionChangedEventArgs e)
+        {
+            if (DataContext is BusManagementViewModel viewModel && sender is SfDataGrid dataGrid)
+            {
+                // The SelectedItem binding already updates the ViewModel's SelectedBus property
+                // This method can be used for additional actions when selection changes
+
+                // Enable/disable buttons based on selection
+                if (viewModel.UpdateBusCommand is CommunityToolkit.Mvvm.Input.IRelayCommand updateCommand)
+                    updateCommand.NotifyCanExecuteChanged();
+
+                if (viewModel.DeleteBusCommand is CommunityToolkit.Mvvm.Input.IRelayCommand deleteCommand)
+                    deleteCommand.NotifyCanExecuteChanged();
+            }
+        }
     }
 }

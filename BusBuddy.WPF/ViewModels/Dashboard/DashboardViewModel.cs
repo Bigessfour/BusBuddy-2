@@ -369,6 +369,8 @@ namespace BusBuddy.WPF.ViewModels
         public async Task InitializeAsync()
         {
             var totalStopwatch = Stopwatch.StartNew();
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)); // Add 10-second timeout
+            var ct = cts.Token;
 
             _logger.LogInformation("DashboardViewModel.InitializeAsync called");
             Debug.WriteLine("DashboardViewModel.InitializeAsync called");
@@ -378,26 +380,36 @@ namespace BusBuddy.WPF.ViewModels
                 // Use LogContext to add structured properties to all log entries within this scope
                 using (LogContext.PushProperty("StartupStep", "DashboardInitialization"))
                 {
-                    // OPTIMIZATION: Check for cached metrics first before any database operations
+                    // CRITICAL OPTIMIZATION: Always show UI first, then load data
+                    // This ensures the dashboard is visible even if data takes time to load
+                    IsCriticalDataLoaded = true;
+
+                    // First try quick cache load - avoid any DB hits if possible
                     if (await TryLoadFromCacheAsync())
                     {
                         _logger.LogInformation("Loaded dashboard data from cache in {DurationMs}ms",
                             totalStopwatch.ElapsedMilliseconds);
 
-                        // Mark critical data as loaded immediately from cache
-                        IsCriticalDataLoaded = true;
-
-                        // Start loading full data in background but don't await it
+                        // Still load remaining data, but don't block UI on it
                         _ = LoadRemainingDataInBackgroundAsync(totalStopwatch);
-
                         return;
                     }
 
-                    // Phase 1: Only load critical overview data first (minimal DB queries)
-                    await LoadCriticalDataAsync();
+                    // Use a Task.Delay to ensure UI responsiveness even if data loading is in progress
+                    await Task.Delay(50, ct);
 
-                    // Mark critical data as loaded
-                    IsCriticalDataLoaded = true;
+                    // Phase 1: Quick load of critical metrics with timeout protection
+                    Task criticalDataTask = Task.Run(async () =>
+                    {
+                        await LoadCriticalDataAsync(ct);
+                    }, ct);
+
+                    // Use a timeout to ensure we don't block the UI for too long
+                    if (await Task.WhenAny(criticalDataTask, Task.Delay(2000, ct)) != criticalDataTask)
+                    {
+                        _logger.LogWarning("Critical data load taking too long, continuing with UI display");
+                        // Continue anyway - we'll show default values
+                    }
 
                     // Record time for critical path
                     var criticalPathTime = totalStopwatch.Elapsed;
@@ -405,8 +417,17 @@ namespace BusBuddy.WPF.ViewModels
                         criticalPathTime.TotalMilliseconds);
 
                     // Phase 2: Load remaining data in low-priority background thread
-                    _ = LoadRemainingDataInBackgroundAsync(totalStopwatch);
+                    // Using ConfigureAwait(false) to avoid blocking the UI thread
+                    _ = LoadRemainingDataInBackgroundAsync(totalStopwatch).ConfigureAwait(false);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("Dashboard initialization was canceled due to timeout after {ElapsedMs}ms",
+                    totalStopwatch.ElapsedMilliseconds);
+
+                // Still mark as loaded so UI is visible
+                IsCriticalDataLoaded = true;
             }
             catch (Exception ex)
             {
@@ -414,11 +435,13 @@ namespace BusBuddy.WPF.ViewModels
                 ErrorMessage = $"Initialize failed: {ex.Message}";
                 _logger.LogError(ex, "DashboardViewModel.InitializeAsync failed with exception after {ElapsedMs}ms: {ErrorMessage}",
                     totalStopwatch.ElapsedMilliseconds, ex.Message);
-                Debug.WriteLine($"InitializeAsync error after {totalStopwatch.ElapsedMilliseconds}ms: {ex}");
+
+                // Still mark as loaded so UI is visible with error state
+                IsCriticalDataLoaded = true;
+
                 if (ex.InnerException != null)
                 {
                     _logger.LogError(ex.InnerException, "Inner exception: {ErrorMessage}", ex.InnerException.Message);
-                    Debug.WriteLine($"Inner exception: {ex.InnerException}");
                 }
             }
         }
@@ -426,15 +449,65 @@ namespace BusBuddy.WPF.ViewModels
         // Extracted background loading into a separate method for clarity
         private async Task LoadRemainingDataInBackgroundAsync(Stopwatch totalStopwatch)
         {
+            // Use a background CancellationTokenSource with a much longer timeout
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var ct = cts.Token;
+
             try
             {
                 // Lower thread priority to avoid impacting UI responsiveness
                 Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
 
-                // OPTIMIZATION: Delay non-critical loading to give UI time to render and respond
-                await Task.Delay(300);
+                // OPTIMIZATION: Longer delay for non-critical loading to ensure UI is fully rendered
+                await Task.Delay(500, ct);
 
-                await LoadNonCriticalDataAsync();
+                // OPTIMIZATION: Load minimal data for display first, then incrementally load more
+                // Create multiple stages with increasing timeouts to prioritize important data
+
+                // Stage 1: Minimal route data - 5 second timeout (highest priority)
+                var routeMetadataTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var routeStopwatch = Stopwatch.StartNew();
+                        await LoadMinimalRouteDataAsync(ct);
+                        routeStopwatch.Stop();
+                        _routePopulationTime = routeStopwatch.Elapsed;
+                        _logger.LogInformation("Minimal route data loaded in {ElapsedMs}ms",
+                            _routePopulationTime.TotalMilliseconds);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error loading minimal route data");
+                    }
+                }, ct);
+
+                // Wait for route metadata with a reasonable timeout
+                if (!await WaitForTaskWithTimeout(routeMetadataTask, 5000, "route metadata loading"))
+                {
+                    _logger.LogWarning("Route metadata loading timed out, continuing with other initializations");
+                }
+
+                // Mark progress to update UI
+                IsFullyInitialized = true;
+
+                // Stage 2: Perform remaining non-critical initialization
+                // Use Task.WhenAny instead of Task.WhenAll to avoid waiting for slow tasks
+                await Task.Run(async () =>
+                {
+                    try
+                    {
+                        await LoadNonCriticalDataAsync(ct);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogWarning("Non-critical data loading canceled due to timeout");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Error during non-critical data loading");
+                    }
+                }, ct);
 
                 // Record total initialization time
                 totalStopwatch.Stop();
@@ -454,14 +527,46 @@ namespace BusBuddy.WPF.ViewModels
                 _performanceMonitor.RecordMetric("DashboardViewModel.Initialize", _initializationTime);
                 _performanceMonitor.RecordMetric("DashboardViewModel.RoutePopulation", _routePopulationTime);
                 _performanceMonitor.RecordMetric("DashboardViewModel.StudentListLoad", _studentListLoadTime);
-
-                // Mark as fully initialized
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("Background initialization was canceled due to timeout after {ElapsedMs}ms",
+                    totalStopwatch.ElapsedMilliseconds);
+                // Still mark as initialized even if we had to cancel
                 IsFullyInitialized = true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during background initialization: {ErrorMessage}", ex.Message);
                 // We don't set error message here since critical data is already loaded
+                IsFullyInitialized = true; // Mark as initialized even with errors
+            }
+        }
+
+        // Helper method to wait for a task with a timeout
+        private async Task<bool> WaitForTaskWithTimeout(Task task, int timeoutMs, string operationName)
+        {
+            if (await Task.WhenAny(task, Task.Delay(timeoutMs)) == task)
+            {
+                return true;
+            }
+            _logger.LogWarning("Operation '{Operation}' timed out after {Timeout}ms", operationName, timeoutMs);
+            return false;
+        }
+
+        // Load minimal route data for initial display
+        private async Task LoadMinimalRouteDataAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                // OPTIMIZATION: Only load essential route data needed for dashboard display
+                // This avoids loading full route details during startup
+                await _routePopulationScaffold.PopulateRouteMetadataAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error loading minimal route data");
+                // Don't rethrow - allow other initialization to continue
             }
         }
 
@@ -470,23 +575,55 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                // Check if metrics are cached
-                var metrics = await _cachingService.GetCachedDashboardMetricsAsync();
+                // OPTIMIZATION: Use a timeout to avoid blocking on cache access
+                var cacheTask = Task.Run(async () =>
+                {
+                    return await _cachingService.GetCachedDashboardMetricsAsync();
+                });
+
+                // Use a very short timeout since this is supposed to be fast
+                if (await Task.WhenAny(cacheTask, Task.Delay(300)) != cacheTask)
+                {
+                    _logger.LogWarning("Cache access timed out after 300ms, falling back to database");
+                    return false;
+                }
+
+                var metrics = await cacheTask;
+
+                // Check if we got meaningful cache data
                 if (metrics != null && metrics.Count > 0)
                 {
+                    _logger.LogDebug("Found cached metrics with {Count} values", metrics.Count);
+                    bool hasValidData = false;
+
                     // Update metrics properties from cache
                     if (metrics.TryGetValue("BusCount", out int busCount))
+                    {
                         TotalBuses = busCount;
+                        hasValidData = true;
+                    }
 
                     if (metrics.TryGetValue("DriverCount", out int driverCount))
+                    {
                         TotalDrivers = driverCount;
+                        hasValidData = true;
+                    }
 
                     if (metrics.TryGetValue("RouteCount", out int routeCount))
+                    {
                         TotalActiveRoutes = routeCount;
+                        hasValidData = true;
+                    }
 
-                    _logger.LogInformation("Successfully loaded dashboard metrics from cache");
-                    return true;
+                    if (hasValidData)
+                    {
+                        _logger.LogInformation("Successfully loaded dashboard metrics from cache: Buses={Buses}, Drivers={Drivers}, Routes={Routes}",
+                            TotalBuses, TotalDrivers, TotalActiveRoutes);
+                        return true;
+                    }
                 }
+
+                _logger.LogDebug("No usable cache data found, falling back to database");
                 return false;
             }
             catch (Exception ex)
@@ -680,7 +817,7 @@ namespace BusBuddy.WPF.ViewModels
         /// <summary>
         /// Phase 1: Loads only the critical dashboard data for fast initial display
         /// </summary>
-        private async Task LoadCriticalDataAsync()
+        private async Task LoadCriticalDataAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Starting LoadCriticalDataAsync - fast path for dashboard");
 
@@ -690,24 +827,67 @@ namespace BusBuddy.WPF.ViewModels
                 var metricsStopwatch = Stopwatch.StartNew();
 
                 // OPTIMIZATION: Skip caching mechanisms during startup, go directly to metrics service
-                var metrics = await _dashboardMetricsService.GetDashboardMetricsAsync();
+                // Wrap in Task.Run with timeout to prevent blocking
+                var metricsTask = Task.Run(async () =>
+                {
+                    return await _dashboardMetricsService.GetDashboardMetricsAsync();
+                });
+
+                // Add timeout protection within the method as well
+                if (await Task.WhenAny(metricsTask, Task.Delay(1500, cancellationToken)) != metricsTask)
+                {
+                    _logger.LogWarning("Dashboard metrics query taking too long, using default values");
+                    // Use default values rather than waiting
+                    TotalBuses = 0;
+                    TotalDrivers = 0;
+                    TotalActiveRoutes = 0;
+                    return;
+                }
+
+                var metrics = await metricsTask;
+                cancellationToken.ThrowIfCancellationRequested();
 
                 // Store metrics for future cache use - we'll let the background process handle this
                 metricsStopwatch.Stop();
 
-                // Update metrics properties
-                if (metrics.TryGetValue("BusCount", out int busCount))
+                // Update metrics properties - check for cancellation between operations
+                if (!cancellationToken.IsCancellationRequested && metrics.TryGetValue("BusCount", out int busCount))
                     TotalBuses = busCount;
 
-                if (metrics.TryGetValue("DriverCount", out int driverCount))
+                if (!cancellationToken.IsCancellationRequested && metrics.TryGetValue("DriverCount", out int driverCount))
                     TotalDrivers = driverCount;
 
-                if (metrics.TryGetValue("RouteCount", out int routeCount))
+                if (!cancellationToken.IsCancellationRequested && metrics.TryGetValue("RouteCount", out int routeCount))
                     TotalActiveRoutes = routeCount;
 
                 _logger.LogInformation("Critical dashboard metrics loaded in {ElapsedMs}ms - " +
                     "Buses: {TotalBuses}, Drivers: {TotalDrivers}, Routes: {TotalActiveRoutes}",
                     metricsStopwatch.ElapsedMilliseconds, TotalBuses, TotalDrivers, TotalActiveRoutes);
+
+                // Add to cache immediately to speed up future startups
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        var cacheMetrics = new Dictionary<string, int>
+                        {
+                            ["BusCount"] = TotalBuses,
+                            ["DriverCount"] = TotalDrivers,
+                            ["RouteCount"] = TotalActiveRoutes
+                        };
+                        _cachingService.SetDashboardMetricsDirectly(cacheMetrics);
+                        _logger.LogDebug("Dashboard metrics cached during critical data loading");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogDebug(ex, "Non-critical failure caching metrics");
+                    }
+                }, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("Critical dashboard data loading was canceled");
+                throw; // Propagate cancellation
             }
             catch (Exception ex)
             {
@@ -724,26 +904,14 @@ namespace BusBuddy.WPF.ViewModels
         /// <summary>
         /// Phase 2: Loads all remaining dashboard data in the background
         /// </summary>
-        private async Task LoadNonCriticalDataAsync()
+        private async Task LoadNonCriticalDataAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Starting LoadNonCriticalDataAsync - background initialization");
 
             try
             {
-                // OPTIMIZATION: Prioritize route population as it's needed for map display
-                var routeStopwatch = Stopwatch.StartNew();
-
-                // OPTIMIZATION: Only fetch route metadata instead of full route data
-                using (LogContext.PushProperty("Operation", "BackgroundRouteMetadataPopulation"))
-                {
-                    // Call a more targeted method that only loads essential route information
-                    await _routePopulationScaffold.PopulateRouteMetadataAsync();
-                }
-
-                routeStopwatch.Stop();
-                _routePopulationTime = routeStopwatch.Elapsed;
-                _logger.LogInformation("Background route metadata population completed in {ElapsedMs}ms",
-                    _routePopulationTime.TotalMilliseconds);
+                // Note: Route metadata now loaded in LoadMinimalRouteDataAsync
+                // to ensure core data loads faster
 
                 // OPTIMIZATION: Add metrics to cache for future use
                 if (TotalBuses > 0 || TotalDrivers > 0 || TotalActiveRoutes > 0)
@@ -755,8 +923,8 @@ namespace BusBuddy.WPF.ViewModels
                         ["RouteCount"] = TotalActiveRoutes
                     };
 
-                    // Cache the metrics we already have
-                    await Task.Run(() =>
+                    // Cache the metrics we already have - but don't block on it
+                    Task cacheTask = Task.Run(() =>
                     {
                         try
                         {
@@ -768,26 +936,57 @@ namespace BusBuddy.WPF.ViewModels
                         {
                             _logger.LogWarning(ex, "Failed to cache dashboard metrics");
                         }
-                    });
+                    }, cancellationToken);
+
+                    // Don't await - let it run in background
                 }
 
-                // Initialize StudentListViewModel lazily with a timeout
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Initialize StudentListViewModel lazily with a stricter timeout
                 var studentListStopwatch = Stopwatch.StartNew();
 
                 // OPTIMIZATION: Use TaskCompletionSource with timeout to limit waiting time
                 var taskCompletionSource = new TaskCompletionSource<bool>();
-                var timeoutTask = Task.Delay(3000); // 3 second timeout
+                var timeoutTask = Task.Delay(2000, cancellationToken); // Reduced to 2 second timeout
 
                 var studentInitTask = Task.Run(async () =>
                 {
                     try
                     {
-                        var studentViewModel = StudentListViewModel;
+                        // Use a separate cancellation token with shorter timeout
+                        using var localCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+                        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                            localCts.Token, cancellationToken);
+
+                        // Try to get StudentListViewModel but with timeout protection
+                        var getViewModelTask = Task.Run(() =>
+                        {
+                            return StudentListViewModel;
+                        });
+
+                        // Apply a short timeout to just getting the view model
+                        if (await Task.WhenAny(getViewModelTask, Task.Delay(1000, linkedCts.Token)) != getViewModelTask)
+                        {
+                            _logger.LogWarning("Getting StudentListViewModel timed out");
+                            taskCompletionSource.TrySetResult(false);
+                            return;
+                        }
+
+                        var studentViewModel = await getViewModelTask;
                         if (studentViewModel?.Initialized != null)
                         {
-                            await studentViewModel.Initialized;
+                            // Only wait up to 1 second for initialization
+                            if (await Task.WhenAny(studentViewModel.Initialized, Task.Delay(1000, linkedCts.Token)) != studentViewModel.Initialized)
+                            {
+                                _logger.LogWarning("StudentListViewModel.Initialized task timed out");
+                            }
                         }
                         taskCompletionSource.TrySetResult(true);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        taskCompletionSource.TrySetCanceled();
                     }
                     catch (Exception ex)
                     {
@@ -799,7 +998,7 @@ namespace BusBuddy.WPF.ViewModels
                 // Wait for either completion or timeout
                 if (await Task.WhenAny(taskCompletionSource.Task, timeoutTask) == timeoutTask)
                 {
-                    _logger.LogWarning("StudentListViewModel initialization timed out after 3 seconds, continuing startup");
+                    _logger.LogWarning("StudentListViewModel initialization timed out after 2 seconds, continuing startup");
                 }
 
                 studentListStopwatch.Stop();
@@ -808,6 +1007,14 @@ namespace BusBuddy.WPF.ViewModels
                     _studentListLoadTime.TotalMilliseconds);
 
                 _logger.LogInformation("Background initialization completed, remaining ViewModels will be initialized on-demand");
+
+                // DO NOT initialize other view models eagerly - they will be initialized on-demand
+                // when their tab is selected, which significantly improves startup time
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("Non-critical data initialization was canceled");
+                throw; // Propagate cancellation
             }
             catch (Exception ex)
             {

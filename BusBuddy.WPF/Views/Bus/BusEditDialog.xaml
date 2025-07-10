@@ -1,0 +1,274 @@
+<Window x:Class="BusBuddy.WPF.Views.Bus.BusEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BusBuddy.WPF.Views.Bus"
+        xmlns:sf="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:sfinput="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.WPF"
+        xmlns:sfTextInputLayout="clr-namespace:Syncfusion.UI.Xaml.TextInputLayout;assembly=Syncfusion.SfTextInputLayout.WPF"
+        xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+        mc:Ignorable="d"
+        Title="{Binding DialogTitle}" 
+        Height="600" 
+        Width="700"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <Window.Resources>
+        <Style x:Key="ValidationErrorStyle" TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                    <Setter Property="BorderBrush" Value="Red"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,5,5,2"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="FieldInputStyle" TargetType="Control">
+            <Setter Property="Margin" Value="0,5,0,5"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <TextBlock Grid.Row="0" 
+                   Text="{Binding DialogTitle}" 
+                   FontSize="20" 
+                   FontWeight="Bold" 
+                   Margin="0,0,0,15"/>
+        
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Left Column - Essential Fields -->
+                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    <TextBlock Text="Essential Information" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                    
+                    <!-- Bus Number -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Bus Number *"
+                        HelperText="Required. The identifying number of the bus."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <TextBox Text="{Binding Bus.BusNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                Style="{StaticResource ValidationErrorStyle}"
+                                MaxLength="20"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                    
+                    <!-- Year -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Year *"
+                        HelperText="Required. Year the bus was manufactured."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <syncfusion:DoubleTextBox 
+                            Value="{Binding Bus.Year, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                            MinValue="1900"
+                            MaxValue="2030"
+                            NumberDecimalDigits="0"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                    
+                    <!-- Make -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Make *"
+                        HelperText="Required. The manufacturer of the bus."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <TextBox Text="{Binding Bus.Make, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                 Style="{StaticResource ValidationErrorStyle}"
+                                 MaxLength="50"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                    
+                    <!-- Model -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Model *"
+                        HelperText="Required. The model of the bus."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <TextBox Text="{Binding Bus.Model, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                 Style="{StaticResource ValidationErrorStyle}"
+                                 MaxLength="50"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                    
+                    <!-- Seating Capacity -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Seating Capacity *"
+                        HelperText="Required. Maximum number of passengers."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <syncfusion:DoubleTextBox Value="{Binding Bus.SeatingCapacity, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                               MinValue="1"
+                                               MaxValue="90"
+                                               NumberDecimalDigits="0"
+                                               Height="30"
+                                               VerticalContentAlignment="Center"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                    
+                    <!-- VIN Number -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="VIN Number *"
+                        HelperText="Required. Vehicle Identification Number."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <TextBox Text="{Binding Bus.VINNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                 Style="{StaticResource ValidationErrorStyle}"
+                                 MaxLength="17"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                    
+                    <!-- License Number -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="License Number *"
+                        HelperText="Required. License plate number."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <TextBox Text="{Binding Bus.LicenseNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                 Style="{StaticResource ValidationErrorStyle}"
+                                 MaxLength="20"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                    <!-- Notes -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Notes"
+                        HelperText="Optional notes about this bus."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <TextBox Text="{Binding Bus.Notes, UpdateSourceTrigger=PropertyChanged}"
+                                 Height="100"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+                </StackPanel>
+                
+                <!-- Right Column - Additional Fields -->
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                    <TextBlock Text="Additional Information" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+
+                    <!-- Status -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Status *"
+                        HelperText="Current operational status of the bus."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <ComboBox SelectedItem="{Binding Bus.Status, UpdateSourceTrigger=PropertyChanged}">
+                            <ComboBoxItem Content="Active"/>
+                            <ComboBoxItem Content="Maintenance"/>
+                            <ComboBoxItem Content="Out of Service"/>
+                            <ComboBoxItem Content="Reserved"/>
+                            <ComboBoxItem Content="Retired"/>
+                        </ComboBox>
+                    </sfTextInputLayout:SfTextInputLayout>
+
+                    <!-- Date Last Inspection -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Date Last Inspection"
+                        HelperText="Date of the most recent safety inspection."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <DatePicker SelectedDate="{Binding Bus.DateLastInspection, UpdateSourceTrigger=PropertyChanged}"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+
+                    <!-- Current Odometer -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Current Odometer"
+                        HelperText="Current odometer reading in miles/kilometers."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <syncfusion:DoubleTextBox Value="{Binding Bus.CurrentOdometer, UpdateSourceTrigger=PropertyChanged}"
+                                               MinValue="0"
+                                               MaxValue="9999999"
+                                               NumberDecimalDigits="0"
+                                               Height="30"
+                                               VerticalContentAlignment="Center"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+
+                    <!-- Purchase Date -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Purchase Date"
+                        HelperText="Date when the bus was purchased."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <DatePicker SelectedDate="{Binding Bus.PurchaseDate, UpdateSourceTrigger=PropertyChanged}"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+
+                    <!-- Purchase Price -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Purchase Price"
+                        HelperText="Purchase price of the bus."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <syncfusion:CurrencyTextBox Value="{Binding Bus.PurchasePrice, UpdateSourceTrigger=PropertyChanged}"
+                                               MinValue="0"
+                                               CurrencySymbol="$"
+                                               Height="30"
+                                               VerticalContentAlignment="Center"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+
+                    <!-- Department -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Department"
+                        HelperText="Department responsible for this bus."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <TextBox Text="{Binding Bus.Department, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="50"/>
+                    </sfTextInputLayout:SfTextInputLayout>
+
+                    <!-- Fleet Type -->
+                    <sfTextInputLayout:SfTextInputLayout
+                        Hint="Fleet Type"
+                        HelperText="Type of fleet this bus belongs to."
+                        ContainerType="Outlined"
+                        Margin="0,5,0,10">
+                        <ComboBox Text="{Binding Bus.FleetType, UpdateSourceTrigger=PropertyChanged}"
+                                  IsEditable="True">
+                            <ComboBoxItem Content="Regular"/>
+                            <ComboBoxItem Content="Special Needs"/>
+                            <ComboBoxItem Content="Activity"/>
+                            <ComboBoxItem Content="Spare"/>
+                        </ComboBox>
+                    </sfTextInputLayout:SfTextInputLayout>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+        
+        <!-- Footer with Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <TextBlock Text="* Required fields" Foreground="Gray" VerticalAlignment="Center" Margin="0,0,20,0"/>
+            <Button Content="Cancel" Width="100" Height="30" Margin="0,0,10,0" Click="CancelButton_Click"/>
+            <Button Content="Save" Width="100" Height="30" Click="SaveButton_Click" IsDefault="True"/>
+        </StackPanel>
+        
+        <!-- Validation Message -->
+        <Border Grid.Row="2" 
+                Background="#FFEEEE" 
+                BorderBrush="#FFCCCC" 
+                BorderThickness="1" 
+                Padding="10"
+                Margin="0,15,0,5"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Visibility="{Binding HasValidationErrors, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Text="{Binding ValidationMessage}" 
+                       Foreground="Red" 
+                       TextWrapping="Wrap"
+                       MaxWidth="350"/>
+        </Border>
+    </Grid>
+</Window>

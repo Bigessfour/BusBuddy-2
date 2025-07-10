@@ -150,5 +150,14 @@ namespace BusBuddy.WPF.ViewModels
             await LoadStudentsAsync();
             await LoadDataAsync();
         }
+
+        // Stub for XAML binding: DeleteCommand
+        public System.Windows.Input.ICommand DeleteCommand => DeleteStudentCommand;
+
+        // Stub for XAML binding: AvailableBuses
+        public System.Collections.IEnumerable AvailableBuses => Buses;
+
+        // Stub for XAML binding: AvailableRoutes
+        public System.Collections.IEnumerable AvailableRoutes => Routes;
     }
 }

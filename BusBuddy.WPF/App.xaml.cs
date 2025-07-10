@@ -544,6 +544,12 @@ public partial class App : Application
         services.AddScoped<BusBuddy.Core.Services.GoogleEarthEngineService>();
         services.AddScoped<BusBuddy.Core.Services.RoutePopulationScaffold>();
 
+        // Register Dashboard Metrics Service
+        services.AddScoped<BusBuddy.Core.Services.IDashboardMetricsService, BusBuddy.Core.Services.DashboardMetricsService>();
+
+        // Register Enhanced Caching Service
+        services.AddSingleton<BusBuddy.Core.Services.IEnhancedCachingService, BusBuddy.Core.Services.EnhancedCachingService>();
+
         // Register WPF Services
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
