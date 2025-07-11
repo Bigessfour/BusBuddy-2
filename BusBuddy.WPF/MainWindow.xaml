@@ -61,86 +61,181 @@
         <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
             <views:StudentListView />
         </DataTemplate>
-
     </Window.Resources>
 
-    <syncfusion:SfNavigationDrawer x:Name="navigationDrawer" DisplayMode="Expanded" DrawerWidth="240" DrawerHeight="400" AnimationDuration="250" IsOpen="True">
-        <syncfusion:SfNavigationDrawer.ContentView>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Border Background="#005A9E" Height="50">
-                    <StackPanel Orientation="Horizontal">
-                        <Button HorizontalAlignment="Left" Margin="10" Content="☰" Command="{Binding ElementName=navigationDrawer, Path=ToggleDrawer}" Background="Transparent" Foreground="White" BorderThickness="0" />
-                        <TextBlock Text="Bus Buddy" VerticalAlignment="Center" Foreground="White" FontSize="18" FontWeight="SemiBold" />
-                        <!-- Debug info -->
-                        <TextBlock Text="{Binding CurrentViewModel, Converter={StaticResource DebugConverter}, StringFormat='Current View: {0}'}" 
-                                   Foreground="White" Margin="20,0,0,0" VerticalAlignment="Center" />
-                        <!-- Direct navigation buttons for debugging -->
-                        <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                            <Button Content="Dashboard" Command="{Binding NavigateToCommand}" CommandParameter="Dashboard" 
-                                    Margin="5,0" Padding="5,2" Background="#003366" Foreground="White" BorderThickness="0" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-                <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}" />
-            </Grid>
-        </syncfusion:SfNavigationDrawer.ContentView>
-        <syncfusion:SfNavigationDrawer.DrawerContentView>
-            <Grid Background="#f0f0f0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Border Background="#005A9E" Height="60">
-                    <TextBlock Text="Menu" Foreground="White" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center" Margin="15,0,0,0"/>
-                </Border>
-                <ListView Grid.Row="1" ItemsSource="{Binding NavigationItems}" BorderThickness="0" Background="Transparent">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Padding" Value="10,8"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Button Content="{Binding Name}" 
-                                    Command="{Binding Path=DataContext.NavigateToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
-                                    CommandParameter="{Binding ViewModelName}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    HorizontalContentAlignment="Left"
-                                    Width="200"
-                                    Height="40"
-                                    FontSize="14"
-                                    Foreground="{Binding IsDeprecated, Converter={StaticResource BooleanToDeprecatedForegroundConverter}, FallbackValue=Black}"
-                                    ToolTip="{Binding Tooltip}">
-                                    <Button.Resources>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsDeprecated}" Value="True">
-                                                    <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Resources>
-                                </Button>
-                                <TextBlock Text="(Deprecated)" 
-                                           HorizontalAlignment="Right" 
-                                           VerticalAlignment="Center"
-                                           Margin="0,0,5,0"
-                                           FontSize="10"
-                                           Foreground="Red"
-                                           Visibility="{Binding IsDeprecated, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
-        </syncfusion:SfNavigationDrawer.DrawerContentView>
-    </syncfusion:SfNavigationDrawer>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header with Navigation -->
+        <Border Grid.Row="0" Background="#005A9E" Height="50">
+            <DockPanel>
+                <!-- Navigation Drawer Toggle -->
+                <Button DockPanel.Dock="Left" 
+                        x:Name="MenuToggleButton"
+                        Content="☰" 
+                        Background="Transparent" 
+                        Foreground="White" 
+                        BorderThickness="0" 
+                        Margin="10" 
+                        FontSize="16"
+                        Width="30" Height="30"
+                        Click="MenuToggleButton_Click"/>
+                
+                <!-- Title and Navigation Buttons -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,20,0">
+                    <!-- Dashboard Navigation Buttons -->
+                    <Button Content="Dashboard" 
+                            Command="{Binding NavigateToCommand}" 
+                            CommandParameter="Dashboard" 
+                            Margin="5,0" Padding="10,5" 
+                            Background="#003366" 
+                            Foreground="White" 
+                            BorderThickness="0"/>
+                    <Button Content="Buses" 
+                            Command="{Binding NavigateToCommand}" 
+                            CommandParameter="BusManagement" 
+                            Margin="5,0" Padding="10,5" 
+                            Background="#003366" 
+                            Foreground="White" 
+                            BorderThickness="0"/>
+                    <Button Content="Drivers" 
+                            Command="{Binding NavigateToCommand}" 
+                            CommandParameter="DriverManagement" 
+                            Margin="5,0" Padding="10,5" 
+                            Background="#003366" 
+                            Foreground="White" 
+                            BorderThickness="0"/>
+                    <Button Content="Routes" 
+                            Command="{Binding NavigateToCommand}" 
+                            CommandParameter="RouteManagement" 
+                            Margin="5,0" Padding="10,5" 
+                            Background="#003366" 
+                            Foreground="White" 
+                            BorderThickness="0"/>
+                    <Button Content="Settings" 
+                            Command="{Binding NavigateToCommand}" 
+                            CommandParameter="Settings" 
+                            Margin="5,0" Padding="10,5" 
+                            Background="#003366" 
+                            Foreground="White" 
+                            BorderThickness="0"/>
+                </StackPanel>
+                
+                <!-- Title and Debug Info -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Bus Buddy" 
+                               VerticalAlignment="Center" 
+                               Foreground="White" 
+                               FontSize="18" 
+                               FontWeight="SemiBold" 
+                               Margin="10,0"/>
+                    <!-- Debug info -->
+                    <TextBlock Text="{Binding CurrentViewModel, Converter={StaticResource DebugConverter}, StringFormat='Current View: {0}'}" 
+                               Foreground="White" 
+                               Margin="20,0,0,0" 
+                               VerticalAlignment="Center" 
+                               FontSize="12"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+        
+        <!-- Main Content Area with Navigation Drawer -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Navigation Drawer Panel -->
+            <Border x:Name="NavigationPanel" 
+                    Grid.Column="0" 
+                    Width="240" 
+                    Background="#f0f0f0" 
+                    BorderBrush="#E0E0E0" 
+                    BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#005A9E" Height="50">
+                        <TextBlock Text="Navigation" 
+                                   Foreground="White" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   VerticalAlignment="Center" 
+                                   Margin="15,0,0,0"/>
+                    </Border>
+                    
+                    <ListView Grid.Row="1" 
+                              ItemsSource="{Binding NavigationItems}" 
+                              BorderThickness="0" 
+                              Background="Transparent"
+                              Margin="0,10,0,0">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="15,12"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#E3F2FD"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#BBDEFB"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Button Content="{Binding Name}" 
+                                            Command="{Binding Path=DataContext.NavigateToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
+                                            CommandParameter="{Binding ViewModelName}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            HorizontalContentAlignment="Left"
+                                            HorizontalAlignment="Stretch"
+                                            FontSize="14"
+                                            Foreground="{Binding IsDeprecated, Converter={StaticResource BooleanToDeprecatedForegroundConverter}, FallbackValue=Black}"
+                                            ToolTip="{Binding Tooltip}">
+                                        <Button.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDeprecated}" Value="True">
+                                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Resources>
+                                    </Button>
+                                    <TextBlock Text="(Deprecated)" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,10,0"
+                                               FontSize="10"
+                                               Foreground="Red"
+                                               Visibility="{Binding IsDeprecated, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+            
+            <!-- Main Content Area with Stretch Alignment -->
+            <ContentControl x:Name="MainContentControl"
+                            Grid.Column="1" 
+                            Content="{Binding CurrentViewModel}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Margin="0"/>
+        </Grid>
+    </Grid>
 </Window>
