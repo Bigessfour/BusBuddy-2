@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using BusBuddy.WPF.Services;
 using BusBuddy.WPF.ViewModels;
+using BusBuddy.WPF.ViewModels.Schedule;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
@@ -8,6 +9,10 @@ using Microsoft.Extensions.Logging;
 using BusBuddy.WPF.Utilities;
 using Serilog.Context;
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
+
+// Disable obsolete warnings for the entire file
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -73,21 +78,13 @@ namespace BusBuddy.WPF.ViewModels
         {
             get
             {
-                try
+                if (_busManagementViewModel == null)
                 {
-                    if (_busManagementViewModel == null)
-                    {
-                        _logger.LogInformation("Resolving BusManagementViewModel from service provider");
-                        _busManagementViewModel = _serviceProvider.GetRequiredService<BusManagementViewModel>();
-                        _logger.LogInformation("Successfully resolved BusManagementViewModel");
-                    }
-                    return _busManagementViewModel;
+                    Debug.WriteLine("[DEBUG] Resolving BusManagementViewModel from service provider");
+                    _busManagementViewModel = _serviceProvider.GetRequiredService<BusManagementViewModel>();
+                    Debug.WriteLine("[DEBUG] Successfully resolved BusManagementViewModel");
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to resolve BusManagementViewModel: {0}", ex.Message);
-                    throw;
-                }
+                return _busManagementViewModel;
             }
         }
 
@@ -95,21 +92,13 @@ namespace BusBuddy.WPF.ViewModels
         {
             get
             {
-                try
+                if (_driverManagementViewModel == null)
                 {
-                    if (_driverManagementViewModel == null)
-                    {
-                        _logger.LogInformation("Resolving DriverManagementViewModel from service provider");
-                        _driverManagementViewModel = _serviceProvider.GetRequiredService<DriverManagementViewModel>();
-                        _logger.LogInformation("Successfully resolved DriverManagementViewModel");
-                    }
-                    return _driverManagementViewModel;
+                    Debug.WriteLine("[DEBUG] Resolving DriverManagementViewModel from service provider");
+                    _driverManagementViewModel = _serviceProvider.GetRequiredService<DriverManagementViewModel>();
+                    Debug.WriteLine("[DEBUG] Successfully resolved DriverManagementViewModel");
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to resolve DriverManagementViewModel: {0}", ex.Message);
-                    throw;
-                }
+                return _driverManagementViewModel;
             }
         }
 
@@ -117,25 +106,16 @@ namespace BusBuddy.WPF.ViewModels
         {
             get
             {
-                try
+                if (_routeManagementViewModel == null)
                 {
-                    if (_routeManagementViewModel == null)
-                    {
-                        _logger.LogInformation("Resolving RouteManagementViewModel from service provider");
-                        _routeManagementViewModel = _serviceProvider.GetRequiredService<RouteManagementViewModel>();
-                        _logger.LogInformation("Successfully resolved RouteManagementViewModel");
-                    }
-                    return _routeManagementViewModel;
+                    Debug.WriteLine("[DEBUG] Resolving RouteManagementViewModel from service provider");
+                    _routeManagementViewModel = _serviceProvider.GetRequiredService<RouteManagementViewModel>();
+                    Debug.WriteLine("[DEBUG] Successfully resolved RouteManagementViewModel");
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to resolve RouteManagementViewModel: {0}", ex.Message);
-                    throw;
-                }
+                return _routeManagementViewModel;
             }
         }
 
-        // Properties for in-development modules
         public ScheduleManagementViewModel ScheduleManagementViewModel
         {
             get
@@ -144,14 +124,15 @@ namespace BusBuddy.WPF.ViewModels
                 {
                     if (_scheduleManagementViewModel == null)
                     {
-                        _logger.LogInformation("Resolving ScheduleManagementViewModel from service provider");
+                        Debug.WriteLine("[DEBUG] Resolving ScheduleManagementViewModel from service provider");
                         _scheduleManagementViewModel = _serviceProvider.GetRequiredService<ScheduleManagementViewModel>();
-                        _logger.LogInformation("Successfully resolved ScheduleManagementViewModel");
+                        Debug.WriteLine("[DEBUG] Successfully resolved ScheduleManagementViewModel");
                     }
                     return _scheduleManagementViewModel;
                 }
                 catch (Exception ex)
                 {
+                    Debug.WriteLine($"[DEBUG] Failed to resolve ScheduleManagementViewModel: {ex.Message}");
                     _logger.LogError(ex, "Failed to resolve ScheduleManagementViewModel: {0}", ex.Message);
                     throw;
                 }
@@ -279,6 +260,7 @@ namespace BusBuddy.WPF.ViewModels
             IDashboardMetricsService dashboardMetricsService,
             IEnhancedCachingService cachingService)
         {
+            System.Diagnostics.Debug.WriteLine("[DEBUG] DashboardViewModel constructor called");
             _routePopulationScaffold = routePopulationScaffold ?? throw new ArgumentNullException(nameof(routePopulationScaffold));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -295,6 +277,34 @@ namespace BusBuddy.WPF.ViewModels
         public string InitializationTimeFormatted => FormatUtils.FormatDuration((int)_initializationTime.TotalMilliseconds / 1000);
         public string RoutePopulationTimeFormatted => FormatUtils.FormatDuration((int)_routePopulationTime.TotalMilliseconds / 1000);
         public string StudentListLoadTimeFormatted => FormatUtils.FormatDuration((int)_studentListLoadTime.TotalMilliseconds / 1000);
+        
+        /// <summary>
+        /// Refresh dashboard data - called by UI refresh actions
+        /// Implements lightweight refresh for tile updates
+        /// </summary>
+        public async Task RefreshDashboardDataAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Starting dashboard data refresh");
+                
+                // Quick metrics refresh without full initialization
+                await LoadCriticalDataAsync();
+                
+                // Trigger property change notifications for UI updates
+                OnPropertyChanged(nameof(TotalBuses));
+                OnPropertyChanged(nameof(TotalDrivers));
+                OnPropertyChanged(nameof(TotalActiveRoutes));
+                OnPropertyChanged(nameof(InitializationTimeFormatted));
+                
+                _logger.LogInformation("Dashboard data refresh completed");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during dashboard refresh: {ErrorMessage}", ex.Message);
+                throw;
+            }
+        }
 
         // Dashboard metrics properties
         public int TotalBuses
@@ -305,6 +315,7 @@ namespace BusBuddy.WPF.ViewModels
                 if (_totalBuses != value)
                 {
                     _totalBuses = value;
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] TotalBuses set to: {_totalBuses}");
                     OnPropertyChanged();
                 }
             }
@@ -318,6 +329,7 @@ namespace BusBuddy.WPF.ViewModels
                 if (_totalDrivers != value)
                 {
                     _totalDrivers = value;
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] TotalDrivers set to: {_totalDrivers}");
                     OnPropertyChanged();
                 }
             }
@@ -331,6 +343,7 @@ namespace BusBuddy.WPF.ViewModels
                 if (_totalActiveRoutes != value)
                 {
                     _totalActiveRoutes = value;
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] TotalActiveRoutes set to: {_totalActiveRoutes}");
                     OnPropertyChanged();
                 }
             }
@@ -348,6 +361,7 @@ namespace BusBuddy.WPF.ViewModels
                 if (_isCriticalDataLoaded != value)
                 {
                     _isCriticalDataLoaded = value;
+                    Debug.WriteLine($"[DEBUG] IsCriticalDataLoaded set to: {_isCriticalDataLoaded}");
                     OnPropertyChanged();
                 }
             }
@@ -361,6 +375,7 @@ namespace BusBuddy.WPF.ViewModels
                 if (_isFullyInitialized != value)
                 {
                     _isFullyInitialized = value;
+                    Debug.WriteLine($"[DEBUG] IsFullyInitialized set to: {_isFullyInitialized}");
                     OnPropertyChanged();
                 }
             }
@@ -373,10 +388,11 @@ namespace BusBuddy.WPF.ViewModels
             var ct = cts.Token;
 
             _logger.LogInformation("DashboardViewModel.InitializeAsync called");
-            Debug.WriteLine("DashboardViewModel.InitializeAsync called");
+            Debug.WriteLine("[DEBUG] DashboardViewModel.InitializeAsync START");
 
             try
             {
+                Debug.WriteLine("[DEBUG] DashboardViewModel.InitializeAsync: Entered try block");
                 // Use LogContext to add structured properties to all log entries within this scope
                 using (LogContext.PushProperty("StartupStep", "DashboardInitialization"))
                 {
@@ -390,8 +406,10 @@ namespace BusBuddy.WPF.ViewModels
                         _logger.LogInformation("Loaded dashboard data from cache in {DurationMs}ms",
                             totalStopwatch.ElapsedMilliseconds);
 
+                        Debug.WriteLine("[DEBUG] DashboardViewModel.InitializeAsync: Loaded from cache, launching background load");
                         // Still load remaining data, but don't block UI on it
                         _ = LoadRemainingDataInBackgroundAsync(totalStopwatch);
+                        Debug.WriteLine("[DEBUG] DashboardViewModel.InitializeAsync END (cache path)");
                         return;
                     }
 
@@ -426,6 +444,7 @@ namespace BusBuddy.WPF.ViewModels
                 _logger.LogWarning("Dashboard initialization was canceled due to timeout after {ElapsedMs}ms",
                     totalStopwatch.ElapsedMilliseconds);
 
+                Debug.WriteLine("[DEBUG] DashboardViewModel.InitializeAsync: Canceled due to timeout");
                 // Still mark as loaded so UI is visible
                 IsCriticalDataLoaded = true;
             }
@@ -436,6 +455,7 @@ namespace BusBuddy.WPF.ViewModels
                 _logger.LogError(ex, "DashboardViewModel.InitializeAsync failed with exception after {ElapsedMs}ms: {ErrorMessage}",
                     totalStopwatch.ElapsedMilliseconds, ex.Message);
 
+                Debug.WriteLine($"[DEBUG] DashboardViewModel.InitializeAsync: Exception: {ex.Message}");
                 // Still mark as loaded so UI is visible with error state
                 IsCriticalDataLoaded = true;
 
@@ -444,17 +464,20 @@ namespace BusBuddy.WPF.ViewModels
                     _logger.LogError(ex.InnerException, "Inner exception: {ErrorMessage}", ex.InnerException.Message);
                 }
             }
+            Debug.WriteLine("[DEBUG] DashboardViewModel.InitializeAsync END");
         }
 
         // Extracted background loading into a separate method for clarity
         private async Task LoadRemainingDataInBackgroundAsync(Stopwatch totalStopwatch)
         {
+            Debug.WriteLine("[DEBUG] LoadRemainingDataInBackgroundAsync START");
             // Use a background CancellationTokenSource with a much longer timeout
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var ct = cts.Token;
 
             try
             {
+                Debug.WriteLine("[DEBUG] LoadRemainingDataInBackgroundAsync: Entered try block");
                 // Lower thread priority to avoid impacting UI responsiveness
                 Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
 
@@ -527,6 +550,7 @@ namespace BusBuddy.WPF.ViewModels
                 _performanceMonitor.RecordMetric("DashboardViewModel.Initialize", _initializationTime);
                 _performanceMonitor.RecordMetric("DashboardViewModel.RoutePopulation", _routePopulationTime);
                 _performanceMonitor.RecordMetric("DashboardViewModel.StudentListLoad", _studentListLoadTime);
+                Debug.WriteLine("[DEBUG] LoadRemainingDataInBackgroundAsync END");
             }
             catch (OperationCanceledException)
             {
@@ -546,35 +570,45 @@ namespace BusBuddy.WPF.ViewModels
         // Helper method to wait for a task with a timeout
         private async Task<bool> WaitForTaskWithTimeout(Task task, int timeoutMs, string operationName)
         {
+            Debug.WriteLine($"[DEBUG] WaitForTaskWithTimeout: Starting wait for '{operationName}' with {timeoutMs}ms timeout");
             if (await Task.WhenAny(task, Task.Delay(timeoutMs)) == task)
             {
+                Debug.WriteLine($"[DEBUG] WaitForTaskWithTimeout: Operation '{operationName}' completed successfully");
                 return true;
             }
             _logger.LogWarning("Operation '{Operation}' timed out after {Timeout}ms", operationName, timeoutMs);
+            Debug.WriteLine($"[DEBUG] WaitForTaskWithTimeout: Operation '{operationName}' timed out after {timeoutMs}ms");
             return false;
         }
 
         // Load minimal route data for initial display
         private async Task LoadMinimalRouteDataAsync(CancellationToken cancellationToken)
         {
+            Debug.WriteLine("[DEBUG] LoadMinimalRouteDataAsync START");
             try
             {
+                Debug.WriteLine("[DEBUG] LoadMinimalRouteDataAsync: Calling PopulateRouteMetadataAsync");
                 // OPTIMIZATION: Only load essential route data needed for dashboard display
                 // This avoids loading full route details during startup
                 await _routePopulationScaffold.PopulateRouteMetadataAsync();
+                Debug.WriteLine("[DEBUG] LoadMinimalRouteDataAsync: Successfully populated route metadata");
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Error loading minimal route data");
+                Debug.WriteLine($"[DEBUG] LoadMinimalRouteDataAsync: Exception: {ex.Message}");
                 // Don't rethrow - allow other initialization to continue
             }
+            Debug.WriteLine("[DEBUG] LoadMinimalRouteDataAsync END");
         }
 
         // Try to load dashboard data from cache to avoid DB hits
         private async Task<bool> TryLoadFromCacheAsync()
         {
+            Debug.WriteLine("[DEBUG] TryLoadFromCacheAsync START");
             try
             {
+                Debug.WriteLine("[DEBUG] TryLoadFromCacheAsync: Entered try block");
                 // OPTIMIZATION: Use a timeout to avoid blocking on cache access
                 var cacheTask = Task.Run(async () =>
                 {
@@ -601,29 +635,34 @@ namespace BusBuddy.WPF.ViewModels
                     {
                         TotalBuses = busCount;
                         hasValidData = true;
+                        Debug.WriteLine($"[DEBUG] TryLoadFromCacheAsync: BusCount={busCount}");
                     }
 
                     if (metrics.TryGetValue("DriverCount", out int driverCount))
                     {
                         TotalDrivers = driverCount;
                         hasValidData = true;
+                        Debug.WriteLine($"[DEBUG] TryLoadFromCacheAsync: DriverCount={driverCount}");
                     }
 
                     if (metrics.TryGetValue("RouteCount", out int routeCount))
                     {
                         TotalActiveRoutes = routeCount;
                         hasValidData = true;
+                        Debug.WriteLine($"[DEBUG] TryLoadFromCacheAsync: RouteCount={routeCount}");
                     }
 
                     if (hasValidData)
                     {
                         _logger.LogInformation("Successfully loaded dashboard metrics from cache: Buses={Buses}, Drivers={Drivers}, Routes={Routes}",
                             TotalBuses, TotalDrivers, TotalActiveRoutes);
+                        Debug.WriteLine("[DEBUG] TryLoadFromCacheAsync END (cache hit)");
                         return true;
                     }
                 }
 
                 _logger.LogDebug("No usable cache data found, falling back to database");
+                Debug.WriteLine("[DEBUG] TryLoadFromCacheAsync END (no cache)");
                 return false;
             }
             catch (Exception ex)
@@ -636,7 +675,7 @@ namespace BusBuddy.WPF.ViewModels
         private async Task LoadDashboardDataAsync()
         {
             _logger.LogInformation("Starting LoadDashboardDataAsync");
-            Debug.WriteLine("Starting LoadDashboardDataAsync");
+            Debug.WriteLine("[DEBUG] LoadDashboardDataAsync START");
 
             await LoadDataAsync(async () =>
             {
@@ -807,11 +846,12 @@ namespace BusBuddy.WPF.ViewModels
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error loading dashboard data: {ErrorMessage}", ex.Message);
-                    Debug.WriteLine($"LoadDashboardDataAsync ERROR: {ex.Message}");
-                    Debug.WriteLine($"STACK TRACE: {ex.StackTrace}");
+                    Debug.WriteLine($"[DEBUG] LoadDashboardDataAsync ERROR: {ex.Message}");
+                    Debug.WriteLine($"[DEBUG] STACK TRACE: {ex.StackTrace}");
                     throw; // Re-throw to be caught by LoadDataAsync
                 }
             });
+            Debug.WriteLine("[DEBUG] LoadDashboardDataAsync END");
         }
 
         /// <summary>
@@ -819,10 +859,12 @@ namespace BusBuddy.WPF.ViewModels
         /// </summary>
         private async Task LoadCriticalDataAsync(CancellationToken cancellationToken = default)
         {
+            Debug.WriteLine("[DEBUG] LoadCriticalDataAsync START");
             _logger.LogInformation("Starting LoadCriticalDataAsync - fast path for dashboard");
 
             try
             {
+                Debug.WriteLine("[DEBUG] LoadCriticalDataAsync: Entered try block");
                 // Use the optimized metrics service to get all counts in one query
                 var metricsStopwatch = Stopwatch.StartNew();
 
@@ -841,6 +883,7 @@ namespace BusBuddy.WPF.ViewModels
                     TotalBuses = 0;
                     TotalDrivers = 0;
                     TotalActiveRoutes = 0;
+                    Debug.WriteLine("[DEBUG] LoadCriticalDataAsync: Timeout, set all metrics to 0");
                     return;
                 }
 
@@ -852,17 +895,27 @@ namespace BusBuddy.WPF.ViewModels
 
                 // Update metrics properties - check for cancellation between operations
                 if (!cancellationToken.IsCancellationRequested && metrics.TryGetValue("BusCount", out int busCount))
+                {
                     TotalBuses = busCount;
+                    Debug.WriteLine($"[DEBUG] LoadCriticalDataAsync: BusCount={busCount}");
+                }
 
                 if (!cancellationToken.IsCancellationRequested && metrics.TryGetValue("DriverCount", out int driverCount))
+                {
                     TotalDrivers = driverCount;
+                    Debug.WriteLine($"[DEBUG] LoadCriticalDataAsync: DriverCount={driverCount}");
+                }
 
                 if (!cancellationToken.IsCancellationRequested && metrics.TryGetValue("RouteCount", out int routeCount))
+                {
                     TotalActiveRoutes = routeCount;
+                    Debug.WriteLine($"[DEBUG] LoadCriticalDataAsync: RouteCount={routeCount}");
+                }
 
                 _logger.LogInformation("Critical dashboard metrics loaded in {ElapsedMs}ms - " +
                     "Buses: {TotalBuses}, Drivers: {TotalDrivers}, Routes: {TotalActiveRoutes}",
                     metricsStopwatch.ElapsedMilliseconds, TotalBuses, TotalDrivers, TotalActiveRoutes);
+                Debug.WriteLine("[DEBUG] LoadCriticalDataAsync END");
 
                 // Add to cache immediately to speed up future startups
                 await Task.Run(() =>
@@ -896,6 +949,7 @@ namespace BusBuddy.WPF.ViewModels
                 TotalBuses = 0;
                 TotalDrivers = 0;
                 TotalActiveRoutes = 0;
+                Debug.WriteLine($"[DEBUG] LoadCriticalDataAsync: Exception: {ex.Message}");
 
                 // We don't rethrow here to ensure the dashboard can still load
             }
@@ -906,10 +960,12 @@ namespace BusBuddy.WPF.ViewModels
         /// </summary>
         private async Task LoadNonCriticalDataAsync(CancellationToken cancellationToken = default)
         {
+            Debug.WriteLine("[DEBUG] LoadNonCriticalDataAsync START");
             _logger.LogInformation("Starting LoadNonCriticalDataAsync - background initialization");
 
             try
             {
+                Debug.WriteLine("[DEBUG] LoadNonCriticalDataAsync: Entered try block");
                 // Note: Route metadata now loaded in LoadMinimalRouteDataAsync
                 // to ensure core data loads faster
 
@@ -1010,6 +1066,7 @@ namespace BusBuddy.WPF.ViewModels
 
                 // DO NOT initialize other view models eagerly - they will be initialized on-demand
                 // when their tab is selected, which significantly improves startup time
+                Debug.WriteLine("[DEBUG] LoadNonCriticalDataAsync END");
             }
             catch (OperationCanceledException)
             {
@@ -1025,15 +1082,17 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task LoadDashboardMetricsAsync()
         {
+            Debug.WriteLine("[DEBUG] LoadDashboardMetricsAsync START");
             try
             {
+                Debug.WriteLine("[DEBUG] LoadDashboardMetricsAsync: Entered try block");
                 _logger.LogInformation("Loading dashboard metrics");
 
                 // Start stopwatch to measure metric loading time
                 var metricsStopwatch = Stopwatch.StartNew();
 
                 // Load metrics in parallel for better performance
-                var busTask = _busService.GetAllBusEntitiesAsync();
+                var busTask = _busService.GetAllBusesAsync();
                 var driverTask = _driverService.GetAllDriversAsync();
                 var routeTask = _routeService.GetAllActiveRoutesAsync();
 
@@ -1041,9 +1100,12 @@ namespace BusBuddy.WPF.ViewModels
                 await Task.WhenAll(busTask, driverTask, routeTask);
 
                 // Update properties with the results
-                TotalBuses = busTask.Result.Count;
-                TotalDrivers = driverTask.Result.Count;
-                TotalActiveRoutes = (await routeTask).Count();
+                TotalBuses = busTask.Result.ToList().Count;
+                Debug.WriteLine($"[DEBUG] LoadDashboardMetricsAsync: BusCount={TotalBuses}");
+                TotalDrivers = driverTask.Result.ToList().Count;
+                Debug.WriteLine($"[DEBUG] LoadDashboardMetricsAsync: DriverCount={TotalDrivers}");
+                TotalActiveRoutes = (await routeTask).ToList().Count;
+                Debug.WriteLine($"[DEBUG] LoadDashboardMetricsAsync: RouteCount={TotalActiveRoutes}");
 
                 metricsStopwatch.Stop();
 
@@ -1051,6 +1113,7 @@ namespace BusBuddy.WPF.ViewModels
                     metricsStopwatch.Elapsed.TotalMilliseconds);
                 _logger.LogInformation("Metrics - Buses: {TotalBuses}, Drivers: {TotalDrivers}, Active Routes: {TotalActiveRoutes}",
                     TotalBuses, TotalDrivers, TotalActiveRoutes);
+                Debug.WriteLine("[DEBUG] LoadDashboardMetricsAsync END");
             }
             catch (Exception ex)
             {
@@ -1059,6 +1122,7 @@ namespace BusBuddy.WPF.ViewModels
                 TotalBuses = 0;
                 TotalDrivers = 0;
                 TotalActiveRoutes = 0;
+                Debug.WriteLine($"[DEBUG] LoadDashboardMetricsAsync: Exception: {ex.Message}");
             }
         }
     }

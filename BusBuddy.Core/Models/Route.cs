@@ -26,9 +26,6 @@ public class Route
     [Display(Name = "Description")]
     public string? Description { get; set; }
 
-    [Display(Name = "Is Active")]
-    public bool IsActive { get; set; } = true;
-
     // AM Route Information
     [ForeignKey("AMVehicle")]
     [Display(Name = "AM Vehicle")]
@@ -98,6 +95,10 @@ public class Route
     [StringLength(20)]
     [Display(Name = "Bus Number")]
     public string? BusNumber { get; set; }
+
+    // Added IsActive property to support existing code
+    [Display(Name = "Is Active")]
+    public bool IsActive { get; set; } = true;
 
     // Navigation properties
     public virtual Bus? AMVehicle { get; set; }

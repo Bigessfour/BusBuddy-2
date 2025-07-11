@@ -1,20 +1,21 @@
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 
 namespace BusBuddy.WPF.Services
 {
     public class DriverAvailabilityService : IDriverAvailabilityService
     {
-        private readonly IBusService _busService;
+        private readonly IDriverService _driverService;
 
-        public DriverAvailabilityService(IBusService busService)
+        public DriverAvailabilityService(IDriverService driverService)
         {
-            _busService = busService;
+            _driverService = driverService;
         }
 
         public async Task<List<DriverAvailabilityInfo>> GetDriverAvailabilitiesAsync()
         {
             // For demo: Simulate availability for each driver for the next 7 days
-            var drivers = await _busService.GetAllDriversAsync();
+            var drivers = await _driverService.GetAllDriversAsync();
             var today = DateTime.Today;
             var result = new List<DriverAvailabilityInfo>();
             foreach (var driver in drivers)

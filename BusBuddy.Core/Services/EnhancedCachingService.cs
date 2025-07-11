@@ -60,37 +60,48 @@ namespace BusBuddy.Core.Services
         public Task<Dictionary<string, int>> GetCachedDashboardMetricsAsync()
         {
             const string cacheKey = "DashboardMetrics";
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService.GetCachedDashboardMetricsAsync: Checking cache for key '{cacheKey}'");
+
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, int>? cachedResult) && cachedResult != null)
             {
                 _logger.LogDebug("Cache hit for {Key}, returning cached dashboard metrics", cacheKey);
+                Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache HIT for '{cacheKey}' with {cachedResult.Count} metrics");
                 return Task.FromResult(cachedResult);
             }
 
             _logger.LogDebug("No cached dashboard metrics found");
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache MISS for '{cacheKey}'");
             return Task.FromResult(new Dictionary<string, int>());
         }
 
         public async Task<IReadOnlyDictionary<string, int>> GetDashboardMetricsAsync(Func<Task<Dictionary<string, int>>> fetchFunc)
         {
             const string cacheKey = "DashboardMetrics";
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService.GetDashboardMetricsAsync: Checking cache for key '{cacheKey}'");
+
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, int>? cachedResult) && cachedResult != null)
             {
                 _logger.LogDebug("Cache hit for {Key}, returned dashboard metrics", cacheKey);
+                Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache HIT for '{cacheKey}' with {cachedResult.Count} metrics");
                 return cachedResult;
             }
 
             _logger.LogInformation("Cache miss for {Key}, fetching dashboard metrics", cacheKey);
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache MISS for '{cacheKey}', fetching data");
+
             var stopwatch = Stopwatch.StartNew();
             var result = await fetchFunc();
             stopwatch.Stop();
 
             _logger.LogInformation("Fetched dashboard metrics in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService: Fetched dashboard metrics in {stopwatch.ElapsedMilliseconds}ms");
 
             // Add to cache with a shorter expiration for metrics
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
 
             _cache.Set(cacheKey, result, cacheEntryOptions);
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService: Added {result.Count} metrics to cache with 5min expiration");
 
             // Track this key
             lock (_cacheLock)
@@ -103,20 +114,25 @@ namespace BusBuddy.Core.Services
 
         public void SetDashboardMetricsDirectly(Dictionary<string, int> metrics)
         {
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService.SetDashboardMetricsDirectly: Called with {metrics?.Count ?? 0} metrics");
+
             if (metrics == null || !metrics.Any())
             {
                 _logger.LogWarning("Attempted to cache empty dashboard metrics");
+                Debug.WriteLine($"[DEBUG] EnhancedCachingService: Attempted to cache empty metrics, skipping");
                 return;
             }
 
             const string cacheKey = "DashboardMetrics";
             _logger.LogInformation("Directly setting dashboard metrics cache with {Count} values", metrics.Count);
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService: Setting cache for key '{cacheKey}' with {metrics.Count} values");
 
             // Add to cache with a shorter expiration for metrics
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                 .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
 
             _cache.Set(cacheKey, metrics, cacheEntryOptions);
+            Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache set successfully for key '{cacheKey}'");
 
             // Track this key
             lock (_cacheLock)
@@ -163,24 +179,58 @@ namespace BusBuddy.Core.Services
 
             _logger.LogInformation("Cache miss for {Key}, fetching data", key);
             var stopwatch = Stopwatch.StartNew();
-            var result = (await fetchFunc()).ToList();
-            stopwatch.Stop();
 
-            _logger.LogInformation("Fetched {Count} items for {Key} in {ElapsedMs}ms",
-                result.Count, key, stopwatch.ElapsedMilliseconds);
-
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(DefaultCacheTime);
-
-            _cache.Set(key, result, cacheEntryOptions);
-
-            // Track this key
-            lock (_cacheLock)
+            try
             {
-                _allCacheKeys.Add(key);
-            }
+                var result = (await fetchFunc()).ToList();
+                stopwatch.Stop();
 
-            return result;
+                _logger.LogInformation("Fetched {Count} items for {Key} in {ElapsedMs}ms",
+                    result.Count, key, stopwatch.ElapsedMilliseconds);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(DefaultCacheTime);
+
+                _cache.Set(key, result, cacheEntryOptions);
+
+                // Track this key
+                lock (_cacheLock)
+                {
+                    _allCacheKeys.Add(key);
+                }
+
+                return result;
+            }
+            catch (System.Data.SqlTypes.SqlNullValueException ex)
+            {
+                stopwatch.Stop();
+                _logger.LogWarning(ex, "SQL NULL value error when fetching data for {Key} after {ElapsedMs}ms. Returning empty list to prevent application failure.",
+                    key, stopwatch.ElapsedMilliseconds);
+
+                // Return empty list instead of throwing to prevent application failures
+                var emptyList = new List<T>();
+
+                // Still cache the empty result with shorter expiration to prevent constant retries
+                var shortCacheOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
+
+                _cache.Set(key, emptyList, shortCacheOptions);
+
+                // Track this key
+                lock (_cacheLock)
+                {
+                    _allCacheKeys.Add(key);
+                }
+
+                return emptyList;
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _logger.LogError(ex, "Error fetching data for {Key} after {ElapsedMs}ms",
+                    key, stopwatch.ElapsedMilliseconds);
+                throw;
+            }
         }
     }
 }

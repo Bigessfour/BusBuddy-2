@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using BusBuddy.WPF.ViewModels.Schedule;
 
 namespace BusBuddy.WPF.Views.Schedule
 {
@@ -11,7 +12,7 @@ namespace BusBuddy.WPF.Views.Schedule
             var app = (App)System.Windows.Application.Current;
             if (app.Services != null)
             {
-                DataContext = app.Services.GetService<ViewModels.ScheduleManagementViewModel>();
+                DataContext = app.Services.GetService<ScheduleManagementViewModel>();
             }
         }
     }

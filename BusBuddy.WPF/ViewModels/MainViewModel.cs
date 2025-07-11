@@ -2,7 +2,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using BusBuddy.WPF.ViewModels;
+using BusBuddy.WPF.ViewModels.Schedule;
 using Microsoft.Extensions.Logging;
+
+// Disable obsolete warnings for the entire file
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -10,6 +14,16 @@ namespace BusBuddy.WPF.ViewModels
     {
         public required string Name { get; set; }
         public required string ViewModelName { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this navigation item is for a deprecated module.
+        /// </summary>
+        public bool IsDeprecated { get; set; }
+
+        /// <summary>
+        /// Gets or sets a tooltip to display for this navigation item.
+        /// </summary>
+        public string? Tooltip { get; set; }
     }
 
     public partial class MainViewModel : BaseViewModel
@@ -29,7 +43,6 @@ namespace BusBuddy.WPF.ViewModels
         private readonly ActivityLogViewModel _activityLogViewModel;
         private readonly SettingsViewModel _settingsViewModel;
         private readonly StudentListViewModel _studentListViewModel;
-        private readonly TicketManagementViewModel _ticketManagementViewModel;
         private readonly LoadingViewModel _loadingViewModel;
 
         public ObservableCollection<NavigationItem> NavigationItems { get; }
@@ -46,7 +59,6 @@ namespace BusBuddy.WPF.ViewModels
             ActivityLogViewModel activityLogViewModel,
             SettingsViewModel settingsViewModel,
             StudentListViewModel studentListViewModel,
-            TicketManagementViewModel ticketManagementViewModel,
             LoadingViewModel loadingViewModel,
             ILogger<MainViewModel>? logger = null)
         {
@@ -61,7 +73,6 @@ namespace BusBuddy.WPF.ViewModels
             _activityLogViewModel = activityLogViewModel;
             _settingsViewModel = settingsViewModel;
             _studentListViewModel = studentListViewModel;
-            _ticketManagementViewModel = ticketManagementViewModel;
             _loadingViewModel = loadingViewModel;
             _logger = logger;
 
@@ -77,7 +88,6 @@ namespace BusBuddy.WPF.ViewModels
                 new NavigationItem { Name = "Fuel", ViewModelName = "Fuel" },
                 new NavigationItem { Name = "Activity", ViewModelName = "Activity" },
                 new NavigationItem { Name = "Student List", ViewModelName = "StudentList" },
-                new NavigationItem { Name = "Tickets", ViewModelName = "Tickets" },
                 new NavigationItem { Name = "Settings", ViewModelName = "Settings" }
             };
 
@@ -88,7 +98,7 @@ namespace BusBuddy.WPF.ViewModels
             System.Diagnostics.Debug.WriteLine($"MainViewModel initialized with current view: {CurrentViewModel?.GetType().Name}");
             System.Diagnostics.Debug.WriteLine($"Navigation items count: {NavigationItems.Count}");
             _logger?.LogInformation("MainViewModel initialized with {Count} navigation items", NavigationItems.Count);
-            _logger?.LogInformation("In-Development Modules added to navigation: Schedule, Students, Maintenance, Fuel, Activity, Tickets");
+            _logger?.LogInformation("Navigation items: Dashboard, Buses, Drivers, Routes, Schedule, Students, Maintenance, Fuel, Activity, Student List, Settings");
         }
 
         partial void OnCurrentViewModelChanged(object? value)
@@ -118,7 +128,6 @@ namespace BusBuddy.WPF.ViewModels
                 "Activity" => _activityLogViewModel,
                 "Settings" => _settingsViewModel,
                 "StudentList" => _studentListViewModel,
-                "Tickets" => _ticketManagementViewModel,
                 "Loading" => _loadingViewModel,
                 "Error" => _loadingViewModel, // Use loading view for errors too
                 _ => _dashboardViewModel

@@ -117,4 +117,61 @@ public interface IStudentService
     /// </summary>
     /// <returns>CSV string containing student data</returns>
     Task<string> ExportStudentsToCsvAsync();
+
+    /// <summary>
+    /// Assigns a student to a specific bus stop
+    /// </summary>
+    /// <param name="studentId">Student ID</param>
+    /// <param name="busStop">Bus stop name</param>
+    /// <returns>True if successful</returns>
+    Task<bool> AssignStudentToBusStopAsync(int studentId, string? busStop);
+
+    /// <summary>
+    /// Updates a student's address information
+    /// </summary>
+    /// <param name="studentId">Student ID</param>
+    /// <param name="homeAddress">Home address</param>
+    /// <param name="city">City</param>
+    /// <param name="state">State (2-letter abbreviation)</param>
+    /// <param name="zip">ZIP code</param>
+    /// <returns>True if successful</returns>
+    Task<bool> UpdateStudentAddressAsync(int studentId, string homeAddress, string city, string state, string zip);
+
+    /// <summary>
+    /// Updates a student's primary contact information
+    /// </summary>
+    /// <param name="studentId">Student ID</param>
+    /// <param name="parentGuardian">Parent or guardian name</param>
+    /// <param name="homePhone">Home phone number</param>
+    /// <param name="emergencyPhone">Emergency phone number</param>
+    /// <returns>True if successful</returns>
+    Task<bool> UpdateStudentContactInfoAsync(int studentId, string parentGuardian, string homePhone, string emergencyPhone);
+
+    /// <summary>
+    /// Updates a student's emergency contact information
+    /// </summary>
+    /// <param name="studentId">Student ID</param>
+    /// <param name="alternativeContact">Alternative contact name</param>
+    /// <param name="alternativePhone">Alternative contact phone</param>
+    /// <param name="doctorName">Doctor name</param>
+    /// <param name="doctorPhone">Doctor phone</param>
+    /// <returns>True if successful</returns>
+    Task<bool> UpdateEmergencyContactAsync(int studentId, string alternativeContact, string alternativePhone, string doctorName, string doctorPhone);
+
+#if DEBUG
+    /// <summary>
+    /// Provides detailed diagnostic information about a student record
+    /// Only available in DEBUG builds
+    /// </summary>
+    /// <param name="studentId">Student ID</param>
+    /// <returns>Dictionary with diagnostic information</returns>
+    Task<Dictionary<string, object>> GetStudentDiagnosticsAsync(int studentId);
+
+    /// <summary>
+    /// Provides student data operation metrics for system diagnostics
+    /// Only available in DEBUG builds
+    /// </summary>
+    /// <returns>Dictionary with operation metrics</returns>
+    Task<Dictionary<string, object>> GetStudentOperationMetricsAsync();
+#endif
 }

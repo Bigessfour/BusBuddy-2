@@ -1,5 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -66,7 +67,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task LoadBusesAsync()
         {
-            var buses = await _busService.GetAllBusEntitiesAsync();
+            var buses = await _busService.GetAllBusesAsync();
             Buses.Clear();
             foreach (var bus in buses)
             {

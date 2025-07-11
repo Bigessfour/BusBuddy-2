@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="ViewModels.MSTest\**" />
+    <EmbeddedResource Remove="ViewModels.MSTest\**" />
+    <None Remove="ViewModels.MSTest\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
     <ProjectReference Include="..\BusBuddy.WPF\BusBuddy.WPF.csproj" />
   </ItemGroup>

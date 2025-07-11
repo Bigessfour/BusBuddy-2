@@ -8,7 +8,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
-namespace BusBuddy.WPF.ViewModels
+namespace BusBuddy.WPF.ViewModels.Schedule
 {
     public partial class ScheduleManagementViewModel : BaseInDevelopmentViewModel
     {
@@ -17,7 +17,7 @@ namespace BusBuddy.WPF.ViewModels
         private readonly IDriverService _driverService;
 
         [ObservableProperty]
-        private ObservableCollection<Schedule> _schedules;
+        private ObservableCollection<BusBuddy.Core.Models.Schedule> _schedules;
 
         [ObservableProperty]
         private ObservableCollection<Bus> _buses;
@@ -26,7 +26,7 @@ namespace BusBuddy.WPF.ViewModels
         private ObservableCollection<Driver> _drivers;
 
         [ObservableProperty]
-        private Schedule _selectedSchedule;
+        private BusBuddy.Core.Models.Schedule _selectedSchedule;
 
         public IAsyncRelayCommand LoadSchedulesCommand { get; }
         public IAsyncRelayCommand AddScheduleCommand { get; }
@@ -44,10 +44,10 @@ namespace BusBuddy.WPF.ViewModels
             _busService = busService;
             _driverService = driverService;
 
-            Schedules = new ObservableCollection<Schedule>();
+            Schedules = new ObservableCollection<BusBuddy.Core.Models.Schedule>();
             Buses = new ObservableCollection<Bus>();
             Drivers = new ObservableCollection<Driver>();
-            SelectedSchedule = new Schedule();
+            SelectedSchedule = new BusBuddy.Core.Models.Schedule();
 
             LoadSchedulesCommand = new AsyncRelayCommand(LoadDataAsync);
             AddScheduleCommand = new AsyncRelayCommand(AddScheduleAsync);
@@ -98,7 +98,7 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                var buses = await _busService.GetAllBusEntitiesAsync();
+                var buses = await _busService.GetAllBusesAsync();
                 Buses.Clear();
                 foreach (var bus in buses)
                 {
@@ -188,7 +188,7 @@ namespace BusBuddy.WPF.ViewModels
             return SelectedSchedule != null && SelectedSchedule.ScheduleId != 0;
         }
 
-        partial void OnSelectedScheduleChanged(Schedule value)
+        partial void OnSelectedScheduleChanged(BusBuddy.Core.Models.Schedule value)
         {
             (UpdateScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();
             (DeleteScheduleCommand as IRelayCommand)?.NotifyCanExecuteChanged();

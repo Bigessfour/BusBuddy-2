@@ -17,7 +17,7 @@ namespace BusBuddy.WPF.ViewModels
         private readonly ILogger<StudentListViewModel>? _logger;
         private readonly SemaphoreSlim _loadSemaphore = new SemaphoreSlim(1, 1);
         private bool _disposed = false;
-        public ObservableCollection<Student> Students { get; } = new();
+        public ObservableCollection<Core.Models.Student> Students { get; } = new();
         public ICommand OpenStudentDetailCommand { get; }
 
         // Property to track initialization completion
@@ -89,7 +89,7 @@ namespace BusBuddy.WPF.ViewModels
             try
             {
                 _logger?.LogInformation("OpenStudentDetail called");
-                if (parameter is Student student)
+                if (parameter is Core.Models.Student student)
                 {
                     _logger?.LogInformation("Opening detail view for student ID: {0}", student.StudentId);
                     var viewModel = new StudentDetailViewModel(student, _unitOfWork);

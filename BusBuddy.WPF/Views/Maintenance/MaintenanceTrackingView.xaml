@@ -6,15 +6,23 @@
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
-    <Grid>
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="Add" Command="{Binding AddCommand}" Margin="0,0,10,0"/>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Command Buttons -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Add Maintenance" Command="{Binding AddCommand}" Margin="0,0,10,0"/>
             <Button Content="Edit" Command="{Binding EditCommand}" Margin="0,0,10,0"/>
-            <Button Content="Delete" Command="{Binding DeleteCommand}"/>
+            <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="0,0,10,0"/>
+            <Button Content="Alerts &amp; Notifications" Command="{Binding AlertsCommand}" Margin="0,0,10,0"/>
+            <Button Content="Reports" Command="{Binding ReportCommand}" Margin="0,0,10,0"/>
         </StackPanel>
         
         <!-- Placeholder message overlay -->
-        <Border Background="#80FFFFFF" Margin="-10" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+        <Border Grid.RowSpan="2" Background="#80FFFFFF" Margin="-16" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
             <TextBlock Text="Maintenance Tracking - In Development"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
@@ -23,10 +31,10 @@
         </Border>
         
         <syncfusion:SfDataGrid x:Name="MaintenanceGrid"
+                               Grid.Row="1"
                                ItemsSource="{Binding MaintenanceRecords}"
                                SelectedItem="{Binding SelectedRecord, Mode=TwoWay}"
                                AutoGenerateColumns="False"
-                               Margin="0,40,0,0"
                                IsEnabled="{Binding IsInDevelopment, Converter={StaticResource InverseBooleanConverter}, FallbackValue=False}">
             <syncfusion:SfDataGrid.Columns>
                 <!-- Bus selection by BusNumber -->
@@ -35,14 +43,14 @@
                                               ItemsSource="{Binding DataContext.AvailableBuses, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                               DisplayMemberPath="BusNumber"
                                               SelectedValuePath="VehicleId" />
-                <syncfusion:GridDateTimeColumn MappingName="Date" HeaderText="Date"/>
+                <syncfusion:GridDateTimeColumn MappingName="Date" HeaderText="Date" DisplayBinding="{Binding Date, StringFormat=d}"/>
                 <syncfusion:GridTextColumn MappingName="OdometerReading" HeaderText="Odometer"/>
                 <syncfusion:GridTextColumn MappingName="MaintenanceCompleted" HeaderText="Maintenance Completed"/>
                 <syncfusion:GridTextColumn MappingName="Vendor" HeaderText="Vendor"/>
-                <syncfusion:GridTextColumn MappingName="RepairCost" HeaderText="Repair Cost"/>
+                <syncfusion:GridTextColumn MappingName="RepairCost" HeaderText="Repair Cost" DisplayBinding="{Binding RepairCost, StringFormat=C}"/>
                 <syncfusion:GridTextColumn MappingName="Status" HeaderText="Status"/>
                 <syncfusion:GridTextColumn MappingName="Priority" HeaderText="Priority"/>
-                <syncfusion:GridTextColumn MappingName="Notes" HeaderText="Notes"/>
+                <syncfusion:GridTextColumn MappingName="Notes" HeaderText="Notes" Width="200"/>
             </syncfusion:SfDataGrid.Columns>
         </syncfusion:SfDataGrid>
     </Grid>

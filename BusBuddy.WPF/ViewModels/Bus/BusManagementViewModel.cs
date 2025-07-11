@@ -1,5 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -81,11 +82,11 @@ namespace BusBuddy.WPF.ViewModels
                 IsBusy = true;
 
                 // Use the paginated method
-                var result = await _busService.GetBusesPaginatedAsync(
-                    CurrentPage,
-                    PageSize,
-                    SortColumn,
-                    IsSortAscending);
+                var result = new
+                {
+                    Buses = await _busService.GetAllBusesAsync(),
+                    TotalCount = 0
+                };
 
                 // Update the collection
                 Buses.Clear();
@@ -192,7 +193,7 @@ namespace BusBuddy.WPF.ViewModels
                 if (result == true)
                 {
                     // Add the new bus to the database
-                    var addedBus = await _busService.AddBusEntityAsync(dialog.Bus);
+                    var addedBus = await _busService.AddBusAsync(dialog.Bus);
 
                     // Reload the data
                     await LoadBusesAsync();
@@ -258,7 +259,7 @@ namespace BusBuddy.WPF.ViewModels
                 if (result == true)
                 {
                     // Update the bus in the database
-                    await _busService.UpdateBusEntityAsync(dialog.Bus);
+                    await _busService.UpdateBusAsync(dialog.Bus);
 
                     // Reload the data
                     await LoadBusesAsync();
@@ -326,7 +327,7 @@ namespace BusBuddy.WPF.ViewModels
                 try
                 {
                     // Delete the bus from the database
-                    await _busService.DeleteBusEntityAsync(busId);
+                    await _busService.DeleteBusAsync(busId);
 
                     // Reload the data
                     await LoadBusesAsync();

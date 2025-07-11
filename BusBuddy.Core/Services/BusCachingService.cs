@@ -49,15 +49,43 @@ namespace BusBuddy.Core.Services
                     return buses;
                 }
 
-                // Cache miss - get from database
-                buses = await factory();
+                try
+                {
+                    // Cache miss - get from database
+                    buses = await factory();
 
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(_cacheDuration)
-                    .SetPriority(CacheItemPriority.High);
+                    // Ensure no null collections exist
+                    buses ??= new List<Bus>();
 
-                _cache.Set(ALL_BUSES_KEY, buses, cacheOptions);
-                _logger.LogInformation("Added all buses to cache");
+                    // Validate the data before caching
+                    foreach (var bus in buses)
+                    {
+                        // Ensure string properties are not null
+                        bus.BusNumber ??= string.Empty;
+                        bus.Make ??= string.Empty;
+                        bus.Model ??= string.Empty;
+                        bus.VINNumber ??= string.Empty;
+                        bus.LicenseNumber ??= string.Empty;
+                        bus.Status ??= "Active";
+                    }
+
+                    var cacheOptions = new MemoryCacheEntryOptions()
+                        .SetAbsoluteExpiration(_cacheDuration)
+                        .SetPriority(CacheItemPriority.High);
+
+                    _cache.Set(ALL_BUSES_KEY, buses, cacheOptions);
+                    _logger.LogInformation("Added all buses to cache");
+                }
+                catch (System.Data.SqlTypes.SqlNullValueException ex)
+                {
+                    _logger.LogWarning(ex, "SQL NULL value error when retrieving buses. Returning empty list to avoid application failure.");
+                    buses = new List<Bus>();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error retrieving buses for caching");
+                    throw;
+                }
 
                 return buses ?? new List<Bus>();
             }

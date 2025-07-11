@@ -4,6 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using BusBuddy.WPF.ViewModels;
 
+// Disable obsolete warnings for the entire file
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace BusBuddy.WPF.Views.Ticket
 {
     public partial class TicketManagementView : UserControl

@@ -1,0 +1,180 @@
+<UserControl x:Class="BusBuddy.WPF.Views.Dashboard.SimpleDashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:BusBuddy.WPF.Views.Dashboard"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             xmlns:busView="clr-namespace:BusBuddy.WPF.Views.Bus"
+             xmlns:driverView="clr-namespace:BusBuddy.WPF.Views.Driver"
+             xmlns:routeView="clr-namespace:BusBuddy.WPF.Views.Route"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
+    
+    <UserControl.Resources>
+        <!-- Simple Tile Style for Fallback -->
+        <Style x:Key="SimpleTileStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Padding" Value="12"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F0F0F0"/>
+                    <Setter Property="BorderBrush" Value="#007ACC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#007ACC" Padding="12,8">
+            <TextBlock Text="Bus Buddy Dashboard (Simple Mode)" FontSize="20" FontWeight="SemiBold" Foreground="White"/>
+        </Border>
+        
+        <!-- Main Content with TabControl (Fallback) -->
+        <TabControl Grid.Row="1" TabStripPlacement="Top" Background="White" Margin="8">
+            
+            <!-- Dashboard Overview Tab -->
+            <TabItem Header="📊 Dashboard Overview" IsSelected="True">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Quick Stats Row -->
+                        <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,16">
+                            <Border Style="{StaticResource SimpleTileStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="🚌 Total Buses" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding TotalBuses}" FontSize="24" FontWeight="Bold" Foreground="#007ACC"/>
+                                    <TextBlock Text="Active Fleet" FontSize="12" Foreground="#666"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border Style="{StaticResource SimpleTileStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="👨‍💼 Total Drivers" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding TotalDrivers}" FontSize="24" FontWeight="Bold" Foreground="#007ACC"/>
+                                    <TextBlock Text="Available Staff" FontSize="12" Foreground="#666"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border Style="{StaticResource SimpleTileStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="🗺️ Active Routes" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding TotalActiveRoutes}" FontSize="24" FontWeight="Bold" Foreground="#007ACC"/>
+                                    <TextBlock Text="Service Routes" FontSize="12" Foreground="#666"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border Style="{StaticResource SimpleTileStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="⚡ Performance" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding InitializationTimeFormatted}" FontSize="16" FontWeight="Bold" Foreground="#007ACC"/>
+                                    <TextBlock Text="System Response" FontSize="12" Foreground="#666"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        
+                        <!-- Status Information Row -->
+                        <Border Grid.Row="1" Style="{StaticResource SimpleTileStyle}" Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="📊 System Status" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="Database: Connected" Foreground="Green"/>
+                                    <TextBlock Text="Services: Online" Foreground="Green"/>
+                                    <TextBlock Text="Last Update: 2 mins ago" Foreground="#666"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="📈 Performance Metrics" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding RoutePopulationTimeFormatted, StringFormat='Route Load: {0}'}" Foreground="#666"/>
+                                    <TextBlock Text="{Binding StudentListLoadTimeFormatted, StringFormat='Student Load: {0}'}" Foreground="#666"/>
+                                    <TextBlock Text="Memory Usage: Normal" Foreground="Green"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- Information Message -->
+                        <Border Grid.Row="2" Background="#E3F2FD" BorderBrush="#2196F3" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="ℹ️ Simple Dashboard Mode" FontWeight="SemiBold" Foreground="#1976D2"/>
+                                <TextBlock Text="This is the lightweight fallback dashboard. For the full professional interface with docking panels, use the Enhanced Dashboard View." 
+                                          TextWrapping="Wrap" Foreground="#1976D2" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            
+            <!-- Bus Management Tab -->
+            <TabItem Header="🚌 Bus Management">
+                <busView:BusManagementView DataContext="{Binding BusManagementViewModel}" Margin="10"/>
+            </TabItem>
+            
+            <!-- Driver Management Tab -->
+            <TabItem Header="👨‍💼 Driver Management">
+                <driverView:DriverManagementView DataContext="{Binding DriverManagementViewModel}" Margin="10"/>
+            </TabItem>
+            
+            <!-- Route Management Tab -->
+            <TabItem Header="🗺️ Route Management">
+                <routeView:RouteManagementView DataContext="{Binding RouteManagementViewModel}" Margin="10"/>
+            </TabItem>
+            
+            <!-- Schedule Management Tab -->
+            <TabItem Header="📅 Schedule Management">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding ScheduleManagementViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <!-- Student Management Tab -->
+            <TabItem Header="🎓 Student Management">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding StudentManagementViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <!-- Maintenance Tracking Tab -->
+            <TabItem Header="🔧 Maintenance Tracking">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding MaintenanceTrackingViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <!-- Fuel Management Tab -->
+            <TabItem Header="⛽ Fuel Management">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding FuelManagementViewModel}" />
+                </Grid>
+            </TabItem>
+            
+            <!-- Activity Logging Tab -->
+            <TabItem Header="📝 Activity Logging">
+                <Grid Margin="10">
+                    <ContentControl Content="{Binding ActivityLogViewModel}" />
+                </Grid>
+            </TabItem>
+            
+        </TabControl>
+    </Grid>
+</UserControl>

@@ -4,37 +4,243 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             xmlns:controls="clr-namespace:BusBuddy.WPF.Controls"
+             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="400" d:DesignWidth="600">
-    <Grid>
-        <!-- Placeholder message overlay -->
-        <Border Background="#80FFFFFF" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+             d:DesignHeight="700" d:DesignWidth="1200"
+             d:DataContext="{d:DesignInstance Type=viewModels:StudentManagementViewModel}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="15,5"/>
+            <Setter Property="MinWidth" Value="100"/>
+        </Style>
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" 
+                   Text="Student Management" 
+                   Style="{StaticResource HeaderStyle}"/>
+
+        <!-- Search and Filter Controls -->
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Search Box -->
+            <syncfusion:SfTextBoxExt Grid.Column="0" 
+                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     Watermark="Search students..." 
+                                     ShowClearButton="True"
+                                     Margin="0,0,10,0"/>
+            
+            <!-- Filter Dropdown -->
+            <ComboBox Grid.Column="1" 
+                      Width="150" 
+                      Margin="0,0,10,0"
+                      SelectedValue="{Binding SelectedStatusFilter}"
+                      SelectedIndex="0">
+                <ComboBoxItem Content="All Students"/>
+                <ComboBoxItem Content="Active Students"/>
+                <ComboBoxItem Content="Inactive Students"/>
+            </ComboBox>
+            
+            <!-- Grade Filter Dropdown -->
+            <ComboBox Grid.Column="2"
+                      Width="120"
+                      Margin="0,0,10,0"
+                      ItemsSource="{Binding AvailableGrades}"
+                      SelectedValue="{Binding SelectedGradeFilter}"
+                      DisplayMemberPath="."
+                      SelectedValuePath="."
+                      SelectedIndex="0">
+            </ComboBox>
+            
+            <!-- School Filter Dropdown -->
+            <ComboBox Grid.Column="3"
+                      Width="150"
+                      Margin="0,0,10,0"
+                      ItemsSource="{Binding AvailableSchools}"
+                      SelectedValue="{Binding SelectedSchoolFilter}"
+                      DisplayMemberPath="."
+                      SelectedValuePath="."
+                      SelectedIndex="0">
+            </ComboBox>
+            
+            <!-- Statistics Toggle Button -->
+            <ToggleButton Grid.Column="4"
+                          IsChecked="{Binding ShowStatistics}"
+                          Command="{Binding ToggleStatisticsCommand}"
+                          Margin="0,0,10,0"
+                          Padding="8,4"
+                          ToolTip="Show/Hide Statistics">
+                <TextBlock Text="📊 Statistics"/>
+            </ToggleButton>
+            
+            <!-- Advanced Search Button -->
+            <Button Grid.Column="5"
+                    Command="{Binding AdvancedSearchCommand}"
+                    Margin="0,0,10,0"
+                    Padding="8,4"
+                    ToolTip="Advanced Search Options">
+                <TextBlock Text="🔍 Advanced"/>
+            </Button>
+            
+            <!-- Clear Advanced Search Button -->
+            <Button Grid.Column="6"
+                    Command="{Binding ClearAdvancedSearchCommand}"
+                    Margin="0,0,10,0"
+                    Padding="8,4"
+                    Visibility="{Binding AdvancedSearchCriteria, Converter={StaticResource ObjectToVisibilityConverter}}"
+                    ToolTip="Clear Advanced Search">
+                <TextBlock Text="❌ Clear Advanced"/>
+            </Button>
+            
+            <!-- Refresh Button -->
+            <Button Grid.Column="7" 
+                    Command="{Binding RefreshCommand}"
+                    ToolTip="Refresh student list">
+                <TextBlock Text="⟳ Refresh"/>
+            </Button>
+        </Grid>
+        
+        <!-- Statistics Panel (Collapsible) -->
+        <controls:StudentStatisticsPanel 
+            Grid.Row="2"
+            Visibility="{Binding ShowStatistics, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Margin="0,0,0,15"
+            TotalStudents="{Binding TotalStudents}"
+            ActiveStudents="{Binding ActiveStudents}"
+            InactiveStudents="{Binding InactiveStudents}"
+            StudentsWithRoutes="{Binding StudentsWithRoutes}"
+            StudentsWithoutRoutes="{Binding StudentsWithoutRoutes}"
+            GradeDistribution="{Binding GradeDistribution}"
+            StatusDistribution="{Binding StatusDistribution}"/>
+
+        <!-- Main Student Grid -->
+        <syncfusion:SfDataGrid Grid.Row="3"
+                              ItemsSource="{Binding FilteredStudents}"
+                              SelectedItem="{Binding SelectedStudent, Mode=TwoWay}"
+                              AutoGenerateColumns="False"
+                              AllowResizingColumns="True"
+                              AllowSorting="True"
+                              AllowFiltering="True"
+                              ColumnSizer="Star"
+                              SelectionMode="Single"
+                              SelectionUnit="Row"
+                              NavigationMode="Row"
+                              AllowEditing="False"
+                              ShowRowHeader="True"
+                              EnableDataVirtualization="True"
+                              BorderThickness="1"
+                              BorderBrush="#DDDDDD"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              RowSelectionBrush="#E0F0FF"
+                              CurrentCellBorderBrush="#0078D7"
+                              CurrentCellBorderThickness="1">
+            <syncfusion:SfDataGrid.Columns>
+                <syncfusion:GridTextColumn MappingName="StudentName" HeaderText="Student Name" Width="150"/>
+                <syncfusion:GridTextColumn MappingName="StudentNumber" HeaderText="Student Number" Width="120"/>
+                <syncfusion:GridTextColumn MappingName="Grade" HeaderText="Grade" Width="80"/>
+                <syncfusion:GridTextColumn MappingName="School" HeaderText="School" Width="120"/>
+                <syncfusion:GridTextColumn MappingName="AMRoute" HeaderText="AM Route" Width="100"/>
+                <syncfusion:GridTextColumn MappingName="PMRoute" HeaderText="PM Route" Width="100"/>
+                <syncfusion:GridTextColumn MappingName="BusStop" HeaderText="Bus Stop" Width="120"/>
+                <syncfusion:GridTextColumn MappingName="ParentGuardian" HeaderText="Parent/Guardian" Width="150"/>
+                <syncfusion:GridTextColumn MappingName="HomePhone" HeaderText="Phone" Width="120"/>
+                <syncfusion:GridCheckBoxColumn MappingName="Active" HeaderText="Active" Width="80"/>
+                <syncfusion:GridCheckBoxColumn MappingName="SpecialNeeds" HeaderText="Special Needs" Width="100"/>
+                <syncfusion:GridTextColumn MappingName="City" HeaderText="City" Width="100"/>
+                <syncfusion:GridTextColumn MappingName="State" HeaderText="State" Width="80"/>
+            </syncfusion:SfDataGrid.Columns>
+            <syncfusion:SfDataGrid.Style>
+                <Style TargetType="syncfusion:SfDataGrid">
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="GridLinesVisibility" Value="Both"/>
+                </Style>
+            </syncfusion:SfDataGrid.Style>
+        </syncfusion:SfDataGrid>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="4" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="0,15,0,0">
+            <Button Content="Add New Student" 
+                    Command="{Binding AddStudentCommand}" 
+                    Style="{StaticResource ActionButton}"
+                    ToolTip="Add a new student"/>
+            
+            <Button Content="Edit Student" 
+                    Command="{Binding EditStudentCommand}" 
+                    Style="{StaticResource ActionButton}"
+                    ToolTip="Edit the selected student"/>
+            
+            <Button Content="Assign Route" 
+                    Command="{Binding AssignRouteCommand}" 
+                    Style="{StaticResource ActionButton}"
+                    ToolTip="Assign a route to the selected student"/>
+            
+            <Button Content="Delete" 
+                    Command="{Binding DeleteStudentCommand}" 
+                    Style="{StaticResource ActionButton}"
+                    Background="#FFDDDD"
+                    ToolTip="Delete the selected student"/>
+        </StackPanel>
+        
+        <!-- Loading Indicator -->
+        <Border Grid.Row="0" Grid.RowSpan="5" 
+                Background="#80000000" 
+                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <syncfusion:SfBusyIndicator IsBusy="True" 
+                                           AnimationType="SingleCircle" 
+                                           Foreground="White"
+                                           ViewboxHeight="50" 
+                                           ViewboxWidth="50"/>
+                <TextBlock Text="Loading..." 
+                           Foreground="White" 
+                           FontSize="16" 
+                           Margin="0,10,0,0" 
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- In Development Overlay - Hidden when fully implemented -->
+        <Border Grid.Row="0" Grid.RowSpan="5" 
+                Background="#80FFFFFF" 
+                Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}">
             <TextBlock Text="Student Management - In Development"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       FontSize="16"
+                       FontSize="20"
                        Foreground="Gray"/>
         </Border>
-        
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="Add" Command="{Binding AddCommand}" Margin="0,0,10,0"/>
-            <Button Content="Edit" Command="{Binding EditCommand}" Margin="0,0,10,0"/>
-            <Button Content="Delete" Command="{Binding DeleteCommand}"/>
-        </StackPanel>
-        <syncfusion:SfDataGrid x:Name="StudentGrid"
-                               ItemsSource="{Binding Students}"
-                               SelectedItem="{Binding SelectedStudent, Mode=TwoWay}"
-                               AutoGenerateColumns="False"
-                               Margin="0,40,0,0">
-            <syncfusion:SfDataGrid.Columns>
-                <syncfusion:GridTextColumn MappingName="Name" HeaderText="Name"/>
-                <syncfusion:GridTextColumn MappingName="Grade" HeaderText="Grade"/>
-                <syncfusion:GridComboBoxColumn MappingName="AssignedBus" HeaderText="Bus"
-                                              ItemsSource="{Binding DataContext.AvailableBuses, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                <syncfusion:GridComboBoxColumn MappingName="AssignedRoute" HeaderText="Route"
-                                              ItemsSource="{Binding DataContext.AvailableRoutes, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                <syncfusion:GridTextColumn MappingName="Status" HeaderText="Status"/>
-            </syncfusion:SfDataGrid.Columns>
-        </syncfusion:SfDataGrid>
     </Grid>
 </UserControl>

@@ -3,16 +3,17 @@ using BusBuddy.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace BusBuddy.WPF.ViewModels
+namespace BusBuddy.WPF.ViewModels.ScheduleManagement
 {
     public class ScheduleViewModel : ObservableObject
     {
         private readonly IScheduleService _scheduleService;
-        public ObservableCollection<Schedule> Schedules { get; } = new();
-        private Schedule? _selectedSchedule;
-        public Schedule? SelectedSchedule
+        public ObservableCollection<BusBuddy.Core.Models.Schedule> Schedules { get; } = new();
+        private BusBuddy.Core.Models.Schedule? _selectedSchedule;
+        public BusBuddy.Core.Models.Schedule? SelectedSchedule
         {
             get => _selectedSchedule;
             set => SetProperty(ref _selectedSchedule, value);

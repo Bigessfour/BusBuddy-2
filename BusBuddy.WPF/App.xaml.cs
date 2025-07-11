@@ -1,4 +1,4 @@
-﻿using BusBuddy.Core.Data;
+using BusBuddy.Core.Data;
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.WPF.Logging;
 using BusBuddy.WPF.Utilities;
@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Context;
 using Syncfusion.SfSkinManager;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -271,6 +273,37 @@ public partial class App : Application
                 // Wait a short delay to allow the application to fully initialize
                 await Task.Delay(2000);
 
+                // Run database validation to detect and fix potential issues
+                using (var scope = this.Services.CreateScope())
+                {
+                    var dbValidator = scope.ServiceProvider.GetService<BusBuddy.Core.Utilities.DatabaseValidator>();
+                    if (dbValidator != null)
+                    {
+                        Log.Information("[STARTUP] Running database validation...");
+                        // Enable breaking into the debugger when issues are found if we're in debug mode
+                        bool isDebugMode = System.Diagnostics.Debugger.IsAttached || Environment.GetEnvironmentVariable("ENABLE_DB_VALIDATION") == "true";
+                        var issues = await dbValidator.ValidateDatabaseDataAsync(breakOnIssue: isDebugMode);
+
+                        if (issues.Any())
+                        {
+                            Log.Warning("[STARTUP] Database validation found {Count} issues", issues.Count);
+                            foreach (var issue in issues)
+                            {
+                                Log.Warning("[STARTUP] Database issue: {Issue}", issue);
+                            }
+
+                            // Attempt to fix common issues automatically
+                            Log.Information("[STARTUP] Attempting to fix database issues automatically...");
+                            var fixCount = await dbValidator.RunAutomaticFixesAsync(breakOnFix: isDebugMode);
+                            Log.Information("[STARTUP] Fixed {Count} database issues automatically", fixCount);
+                        }
+                        else
+                        {
+                            Log.Information("[STARTUP] Database validation completed successfully with no issues found");
+                        }
+                    }
+                }
+
                 // Get the caching service (which should be a singleton)
                 var busCacheService = this.Services.GetService<BusBuddy.Core.Services.IBusCachingService>();
                 if (busCacheService != null)
@@ -282,8 +315,8 @@ public partial class App : Application
                         using var freshScope = this.Services.CreateScope();
                         try
                         {
-                            var busService = freshScope.ServiceProvider.GetRequiredService<BusBuddy.Core.Services.IBusService>();
-                            var result = await busService.GetAllBusEntitiesAsync();
+                            var busService = freshScope.ServiceProvider.GetRequiredService<BusBuddy.Core.Services.Interfaces.IBusService>();
+                            var result = await busService.GetAllBusesAsync();
                             return result.ToList();
                         }
                         catch (Exception ex)
@@ -530,7 +563,7 @@ public partial class App : Application
         services.AddSingleton<BusBuddy.Core.Services.IBusCachingService, BusBuddy.Core.Services.BusCachingService>();
 
         // Register Core Services
-        services.AddScoped<BusBuddy.Core.Services.IBusService, BusBuddy.Core.Services.BusService>();
+        services.AddScoped<BusBuddy.Core.Services.Interfaces.IBusService, BusBuddy.Core.Services.BusService>();
         services.AddScoped<BusBuddy.Core.Services.IRouteService, BusBuddy.Core.Services.RouteService>();
         services.AddScoped<BusBuddy.Core.Services.IDriverService, BusBuddy.Core.Services.DriverService>();
         services.AddScoped<BusBuddy.Core.Services.ITicketService, BusBuddy.Core.Services.TicketService>();
@@ -558,9 +591,14 @@ public partial class App : Application
         // Register performance utilities
         services.AddSingleton<BusBuddy.WPF.Utilities.BackgroundTaskManager>();
 
+        // Register database validation utilities
+        services.AddScoped<BusBuddy.Core.Utilities.DatabaseValidator>();
+
         // Register Main Window
-        services.AddTransient<MainWindow>();            // Register ViewModels with consistent lifetimes
-                                                        // Main/Dashboard/Navigation ViewModels
+        services.AddTransient<MainWindow>();
+
+        // Register ViewModels with consistent lifetimes
+        // Main/Dashboard/Navigation ViewModels
         services.AddSingleton<BusBuddy.WPF.ViewModels.MainViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.ActivityLogViewModel>();
@@ -571,11 +609,11 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.BusManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.DriverManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.RouteManagementViewModel>();
-        services.AddScoped<BusBuddy.WPF.ViewModels.ScheduleManagementViewModel>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.Schedule.ScheduleManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.StudentManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();
-        services.AddScoped<BusBuddy.WPF.ViewModels.TicketManagementViewModel>();
+        // services.AddScoped<BusBuddy.WPF.ViewModels.TicketManagementViewModel>(); // Removed because TicketManagementViewModel is obsolete
         services.AddScoped<BusBuddy.WPF.ViewModels.RoutePlanningViewModel>();
 
         // List ViewModels
@@ -804,7 +842,7 @@ public partial class App : Application
 
                 // Get caching and data services
                 var cacheService = serviceProvider.GetService<BusBuddy.Core.Services.IEnhancedCachingService>();
-                var busService = serviceProvider.GetService<BusBuddy.Core.Services.IBusService>();
+                var busService = serviceProvider.GetService<BusBuddy.Core.Services.Interfaces.IBusService>();
                 var driverService = serviceProvider.GetService<BusBuddy.Core.Services.IDriverService>();
                 var routeService = serviceProvider.GetService<BusBuddy.Core.Services.IRouteService>();
                 var dashboardMetricsService = serviceProvider.GetService<BusBuddy.Core.Services.IDashboardMetricsService>();
@@ -829,7 +867,7 @@ public partial class App : Application
                 if (busService != null)
                 {
                     tasks.Add(cacheService.GetAllBusesAsync(async () =>
-                        await busService.GetAllBusEntitiesAsync()));
+                        await busService.GetAllBusesAsync()));
                 }
 
                 // Pre-warm driver data cache
@@ -850,6 +888,15 @@ public partial class App : Application
                 await Task.WhenAll(tasks);
                 Log.Information("[STARTUP] Cache pre-warming completed successfully");
             }
+            catch (System.Data.SqlTypes.SqlNullValueException ex)
+            {
+                // Specific handling for SQL NULL value errors
+                Log.Warning(ex, "[STARTUP] SQL NULL value detected during cache pre-warming. This may indicate a data integrity issue: {ErrorMessage}", ex.Message);
+                // Continue application execution as this is non-critical
+
+                // Log a more user-friendly message for troubleshooting
+                Log.Information("[STARTUP] Cache pre-warming encountered non-critical errors but application will continue to function normally");
+            }
             catch (Exception ex)
             {
                 Log.Error(ex, "[STARTUP] Error during cache pre-warming: {ErrorMessage}", ex.Message);
@@ -857,5 +904,3 @@ public partial class App : Application
         }, "CachePreWarming", 500);
     }
 }
-
-

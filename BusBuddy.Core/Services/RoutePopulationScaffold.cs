@@ -1,3 +1,5 @@
+using BusBuddy.Core.Services.Interfaces;
+
 namespace BusBuddy.Core.Services
 {
     public class RoutePopulationScaffold

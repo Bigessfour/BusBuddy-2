@@ -131,12 +131,6 @@
                     <ContentControl Content="{Binding ActivityLogViewModel}" />
                 </Grid>
             </TabItem>
-            
-            <TabItem Header="Ticket Management">
-                <Grid Margin="10">
-                    <ContentControl Content="{Binding TicketManagementViewModel}" />
-                </Grid>
-            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

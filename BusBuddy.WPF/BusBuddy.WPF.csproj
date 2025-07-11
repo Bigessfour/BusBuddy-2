@@ -34,6 +34,12 @@
     <Compile Update="Views\Student\StudentManagementView.xaml.cs">
       <DependentUpon>StudentManagementView.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\Student\StudentEditView.xaml.cs">
+      <DependentUpon>StudentEditView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Student\StudentEditDialog.xaml.cs">
+      <DependentUpon>StudentEditDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Maintenance\MaintenanceTrackingView.xaml.cs">
       <DependentUpon>MaintenanceTrackingView.xaml</DependentUpon>
     </Compile>
@@ -55,6 +61,9 @@
     <Compile Update="Views\StudentListView.xaml.cs">
       <DependentUpon>StudentListView.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\Student\AssignRouteDialog.xaml.cs">
+      <DependentUpon>AssignRouteDialog.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -74,6 +83,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Student\StudentManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Student\StudentEditView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Student\StudentEditDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Student\AssignRouteDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Maintenance\MaintenanceTrackingView.xaml">
@@ -126,11 +144,14 @@
     <PackageReference Include="Syncfusion.SfInput.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfNavigationDrawer.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfRichTextBoxAdv.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.SfSchedule.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.SfScheduler.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.SfTextInputLayout.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="30.1.38" />
     <PackageReference Include="Syncfusion.Tools.WPF" Version="30.1.38" />
+    <PackageReference Include="Syncfusion.UI.WPF.NET" Version="30.1.39" />
     <PackageReference Include="System.Net.Http.Json" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />

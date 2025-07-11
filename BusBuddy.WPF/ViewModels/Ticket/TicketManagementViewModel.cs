@@ -1,5 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using BusBuddy.WPF.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,10 @@ namespace BusBuddy.WPF.ViewModels
     /// <summary>
     /// ViewModel for managing tickets in the Ticket Management module
     /// </summary>
+    [Obsolete("The Ticket Management module is deprecated and will be removed in a future version.")]
+    [DeprecatedModule("This module is deprecated and will not receive further development.",
+                     "Please contact your administrator for alternative options.",
+                     "2025-12-31")]
     public partial class TicketManagementViewModel : BaseInDevelopmentViewModel
     {
         private readonly ITicketService _ticketService;
@@ -24,7 +29,7 @@ namespace BusBuddy.WPF.ViewModels
 
         // Observable collections
         public ObservableCollection<Ticket> Tickets { get; } = new();
-        public ObservableCollection<Student> Students { get; } = new();
+        public ObservableCollection<BusBuddy.Core.Models.Student> Students { get; } = new();
         public ObservableCollection<Route> Routes { get; } = new();
 
         // Collection views for filtering
@@ -36,7 +41,7 @@ namespace BusBuddy.WPF.ViewModels
         private Ticket? _selectedTicket;
 
         [ObservableProperty]
-        private Student? _selectedStudent;
+        private BusBuddy.Core.Models.Student? _selectedStudent;
 
         [ObservableProperty]
         private Route? _selectedRoute;

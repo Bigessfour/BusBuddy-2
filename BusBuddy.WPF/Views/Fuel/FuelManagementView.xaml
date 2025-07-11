@@ -9,12 +9,13 @@
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid Margin="16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
         <!-- Placeholder message overlay -->
-        <Border Grid.RowSpan="2" Background="#80FFFFFF" Margin="-16" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
+        <Border Grid.RowSpan="3" Background="#80FFFFFF" Margin="-16" Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Visible}">
             <TextBlock Text="Fuel Management - In Development"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
@@ -22,14 +23,37 @@
                        Foreground="Gray"/>
         </Border>
         
+        <!-- Command Buttons -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Add Fuel Record" Command="{Binding AddCommand}" Margin="0,0,10,0"/>
+            <Button Content="Edit" Command="{Binding EditCommand}" Margin="0,0,10,0"/>
+            <Button Content="Delete" Command="{Binding DeleteCommand}" Margin="0,0,10,0"/>
+            <Button Content="Export" Command="{Binding ExportCommand}" Margin="0,0,10,0"/>
+            <Button Content="Reports" Command="{Binding ReportCommand}" Margin="0,0,10,0"/>
+            <Button Content="Reconciliation" Command="{Binding ReconciliationCommand}" ToolTip="Compare bulk station meter readings with vehicle fuel usage"/>
+        </StackPanel>
+        
         <syncfusionGrid:SfDataGrid x:Name="FuelDataGrid"
-                                   Grid.Row="0"
+                                   Grid.Row="1"
                                    ItemsSource="{Binding FuelRecords}"
-                                   AutoGenerateColumns="True"
+                                   SelectedItem="{Binding SelectedFuelRecord, Mode=TwoWay}"
+                                   AutoGenerateColumns="False"
                                    SelectionMode="Single"
                                    IsEnabled="{Binding IsInDevelopment, Converter={StaticResource InverseBooleanConverter}, FallbackValue=False}"
-                                   Margin="0,0,0,12"/>
-        <syncfusionChart:SfChart x:Name="FuelTrendChart" Grid.Row="1" Margin="0">
+                                   Margin="0,0,0,12">
+            <syncfusionGrid:SfDataGrid.Columns>
+                <syncfusionGrid:GridDateTimeColumn MappingName="FuelDate" HeaderText="Fuel Date" DisplayBinding="{Binding FuelDate, StringFormat=d}"/>
+                <syncfusionGrid:GridTextColumn MappingName="FuelLocation" HeaderText="Location"/>
+                <syncfusionGrid:GridTextColumn MappingName="VehicleFueledId" HeaderText="Bus ID"/>
+                <syncfusionGrid:GridTextColumn MappingName="VehicleOdometerReading" HeaderText="Odometer"/>
+                <syncfusionGrid:GridTextColumn MappingName="FuelType" HeaderText="Fuel Type"/>
+                <syncfusionGrid:GridTextColumn MappingName="Gallons" HeaderText="Gallons" DisplayBinding="{Binding Gallons, StringFormat=N3}"/>
+                <syncfusionGrid:GridTextColumn MappingName="PricePerGallon" HeaderText="Price/Gallon" DisplayBinding="{Binding PricePerGallon, StringFormat=C3}"/>
+                <syncfusionGrid:GridTextColumn MappingName="TotalCost" HeaderText="Total Cost" DisplayBinding="{Binding TotalCost, StringFormat=C2}"/>
+            </syncfusionGrid:SfDataGrid.Columns>
+        </syncfusionGrid:SfDataGrid>
+        
+        <syncfusionChart:SfChart x:Name="FuelTrendChart" Grid.Row="2" Margin="0">
             <syncfusionChart:LineSeries ItemsSource="{Binding FuelTrends}" XBindingPath="Period" YBindingPath="AvgMPG" Label="Avg MPG"/>
             <syncfusionChart:SfChart.PrimaryAxis>
                 <syncfusionChart:DateTimeAxis IntervalType="Months" LabelFormat="MMM yyyy"/>

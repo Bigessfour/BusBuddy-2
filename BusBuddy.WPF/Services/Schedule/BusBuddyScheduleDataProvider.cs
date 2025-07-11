@@ -1,9 +1,8 @@
 using BusBuddy.Core.Models;
+using BusBuddy.Core.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
-
-using CoreServices = BusBuddy.Core.Services;
 
 namespace BusBuddy.WPF.Services;
 
@@ -13,12 +12,12 @@ namespace BusBuddy.WPF.Services;
 /// </summary>
 public class BusBuddyScheduleDataProvider
 {
-    private readonly CoreServices.IActivityService _activityService;
+    private readonly IActivityService _activityService;
     private readonly ILogger<BusBuddyScheduleDataProvider> _logger;
     private ObservableCollection<BusBuddyScheduleAppointment> _masterList;
     private bool _isDirty;
 
-    public BusBuddyScheduleDataProvider(CoreServices.IActivityService activityService, ILogger<BusBuddyScheduleDataProvider> logger)
+    public BusBuddyScheduleDataProvider(IActivityService activityService, ILogger<BusBuddyScheduleDataProvider> logger)
     {
         _activityService = activityService;
         _logger = logger;

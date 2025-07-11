@@ -1049,7 +1049,7 @@ public class ActivityService : IActivityService
 
             // Average passengers
             metrics["Avg_Passengers"] = activities.Count > 0 && activities.Any(a => a.ExpectedPassengers.HasValue && a.ExpectedPassengers > 0)
-                ? activities.Where(a => a.ExpectedPassengers.HasValue && a.ExpectedPassengers > 0).Average(a => a.ExpectedPassengers.Value)
+                ? activities.Where(a => a.ExpectedPassengers.HasValue && a.ExpectedPassengers.Value > 0).Average(a => a.ExpectedPassengers.Value)
                 : 0;
 
             // Activities per day
@@ -1252,7 +1252,7 @@ public class ActivityService : IActivityService
                 ["VehicleTotalActivities"] = vehicleActivityCount,
                 ["IsValidTimeRange"] = activity.LeaveTime < activity.ReturnTime,
                 ["Notes"] = activity.Notes ?? "No notes",
-                ["ExpectedPassengers"] = activity.ExpectedPassengers,
+                ["ExpectedPassengers"] = activity.ExpectedPassengers ?? 0,
                 ["HasRecurringSeries"] = activity.RecurringSeriesId.HasValue,
                 ["RecurringSeriesId"] = activity.RecurringSeriesId ?? 0
             };

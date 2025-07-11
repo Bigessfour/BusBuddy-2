@@ -11,6 +11,7 @@ using ActivityType = BusBuddy.Core.Models.Activity;
 
 namespace BusBuddy.Core.Services
 {
+    [DebuggerDisplay("BusService - Cache: {_cacheService != null}")]
     public class BusService : IBusService
     {
         private readonly ILogger<BusService> _logger;
@@ -54,10 +55,41 @@ namespace BusBuddy.Core.Services
                             var context = _contextFactory.CreateDbContext();
                             try
                             {
+                                // Use projection to handle NULL values safely
+                                // Debug.Assert to help find issues during debugging
+                                Debug.Assert(context != null, "DbContext is null");
+                                Debug.Assert(context.Vehicles != null, "Vehicles DbSet is null");
+
                                 return await context.Vehicles
                                     .AsNoTracking() // Use AsNoTracking for better performance in read operations
-                                    .Include(v => v.AMRoutes)
-                                    .Include(v => v.PMRoutes)
+                                    .Select(v => new Bus
+                                    {
+                                        VehicleId = v.VehicleId,
+                                        BusNumber = v.BusNumber ?? string.Empty,
+                                        Year = v.Year,
+                                        Make = v.Make ?? string.Empty,
+                                        Model = v.Model ?? string.Empty,
+                                        SeatingCapacity = v.SeatingCapacity,
+                                        VINNumber = v.VINNumber ?? string.Empty,
+                                        LicenseNumber = v.LicenseNumber ?? string.Empty,
+                                        DateLastInspection = v.DateLastInspection,
+                                        CurrentOdometer = v.CurrentOdometer,
+                                        Status = v.Status ?? "Active",
+                                        Department = v.Department,
+                                        FleetType = v.FleetType,
+                                        FuelCapacity = v.FuelCapacity,
+                                        FuelType = v.FuelType,
+                                        MilesPerGallon = v.MilesPerGallon,
+                                        NextMaintenanceDue = v.NextMaintenanceDue,
+                                        NextMaintenanceMileage = v.NextMaintenanceMileage,
+                                        LastServiceDate = v.LastServiceDate,
+                                        SpecialEquipment = v.SpecialEquipment,
+                                        GPSTracking = v.GPSTracking,
+                                        GPSDeviceId = v.GPSDeviceId,
+                                        Notes = v.Notes,
+                                        AMRoutes = v.AMRoutes,
+                                        PMRoutes = v.PMRoutes
+                                    })
                                     .ToListAsync();
                             }
                             finally
@@ -78,6 +110,14 @@ namespace BusBuddy.Core.Services
                         stopwatch.Stop();
                         _logger.LogError(ex, "Error retrieving all bus entities after {Duration}ms",
                             stopwatch.ElapsedMilliseconds);
+
+                        // If we're debugging, break into the debugger for SqlNullValueException
+                        if (Debugger.IsAttached && ex.ToString().Contains("SqlNullValueException"))
+                        {
+                            _logger.LogDebug("Breaking into debugger due to SqlNullValueException");
+                            Debugger.Break();
+                        }
+
                         throw; // Propagate exception to caller - no fallback to sample data
                     }
                 }
@@ -485,6 +525,7 @@ namespace BusBuddy.Core.Services
 
         #region IBusService Implementation
 
+        [DebuggerStepThrough]
         public async Task<IEnumerable<Bus>> GetAllBusesAsync()
         {
             using (LogContext.PushProperty("QueryType", "GetAllBuses"))
@@ -504,6 +545,7 @@ namespace BusBuddy.Core.Services
             }
         }
 
+        [DebuggerStepThrough]
         public async Task<Bus?> GetBusByIdAsync(int busId)
         {
             using (LogContext.PushProperty("QueryType", "GetBusById"))

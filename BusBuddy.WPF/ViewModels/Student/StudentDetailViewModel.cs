@@ -9,19 +9,19 @@ namespace BusBuddy.WPF.ViewModels
     public class StudentDetailViewModel : INotifyPropertyChanged
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly Student _originalStudent;
+        private readonly BusBuddy.Core.Models.Student _originalStudent;
 
-        public Student Student { get; }
+        public BusBuddy.Core.Models.Student Student { get; }
         public ICommand SaveCommand { get; set; }
         public ICommand CancelCommand { get; set; }
         public Action? CloseAction { get; set; }
 
-        public StudentDetailViewModel(Student student, IUnitOfWork unitOfWork)
+        public StudentDetailViewModel(BusBuddy.Core.Models.Student student, IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             Student = student;
             // Create a copy for cancellation
-            _originalStudent = new Student
+            _originalStudent = new BusBuddy.Core.Models.Student
             {
                 StudentId = student.StudentId,
                 StudentName = student.StudentName,

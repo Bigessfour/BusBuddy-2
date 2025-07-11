@@ -518,6 +518,39 @@ public class StudentService : IStudentService
         }
     }
 
+    public async Task<bool> AssignStudentToBusStopAsync(int studentId, string? busStop)
+    {
+        try
+        {
+            _logger.LogInformation("Assigning student {StudentId} to bus stop: {BusStop}", studentId, busStop);
+
+            using var context = _contextFactory.CreateWriteDbContext();
+            var student = await context.Students.FindAsync(studentId);
+            if (student == null)
+            {
+                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                return false;
+            }
+
+            student.BusStop = busStop;
+
+            var result = await context.SaveChangesAsync();
+            var success = result > 0;
+
+            if (success)
+            {
+                _logger.LogInformation("Successfully assigned bus stop for student: {StudentName}", student.StudentName);
+            }
+
+            return success;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error assigning bus stop for student {StudentId}", studentId);
+            throw;
+        }
+    }
+
     public async Task<bool> UpdateStudentActiveStatusAsync(int studentId, bool isActive)
     {
         try
@@ -548,6 +581,177 @@ public class StudentService : IStudentService
             _logger.LogError(ex, "Error updating active status for student {StudentId}", studentId);
             throw;
         }
+    }
+
+    #endregion
+
+    #region Address and Contact Management
+
+    public async Task<bool> UpdateStudentAddressAsync(int studentId, string homeAddress, string city, string state, string zip)
+    {
+        try
+        {
+            _logger.LogInformation("Updating address information for student {StudentId}", studentId);
+
+            // Validate address format
+            var addressValidation = ValidateAddress(homeAddress, city, state, zip);
+            if (!addressValidation.IsValid)
+            {
+                throw new ArgumentException($"Address validation failed: {addressValidation.ErrorMessage}");
+            }
+
+            using var context = _contextFactory.CreateWriteDbContext();
+            var student = await context.Students.FindAsync(studentId);
+            if (student == null)
+            {
+                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                return false;
+            }
+
+            student.HomeAddress = homeAddress;
+            student.City = city;
+            student.State = state;
+            student.Zip = zip;
+
+            var result = await context.SaveChangesAsync();
+            var success = result > 0;
+
+            if (success)
+            {
+                _logger.LogInformation("Successfully updated address for student: {StudentName}", student.StudentName);
+            }
+
+            return success;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating address for student {StudentId}", studentId);
+            throw;
+        }
+    }
+
+    public async Task<bool> UpdateStudentContactInfoAsync(int studentId, string parentGuardian, string homePhone, string emergencyPhone)
+    {
+        try
+        {
+            _logger.LogInformation("Updating contact information for student {StudentId}", studentId);
+
+            // Validate phone number formats
+            var phonePattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";
+            if (!string.IsNullOrWhiteSpace(homePhone) && !System.Text.RegularExpressions.Regex.IsMatch(homePhone, phonePattern))
+            {
+                throw new ArgumentException("Invalid home phone number format");
+            }
+
+            if (!string.IsNullOrWhiteSpace(emergencyPhone) && !System.Text.RegularExpressions.Regex.IsMatch(emergencyPhone, phonePattern))
+            {
+                throw new ArgumentException("Invalid emergency phone number format");
+            }
+
+            using var context = _contextFactory.CreateWriteDbContext();
+            var student = await context.Students.FindAsync(studentId);
+            if (student == null)
+            {
+                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                return false;
+            }
+
+            student.ParentGuardian = parentGuardian;
+            student.HomePhone = homePhone;
+            student.EmergencyPhone = emergencyPhone;
+
+            var result = await context.SaveChangesAsync();
+            var success = result > 0;
+
+            if (success)
+            {
+                _logger.LogInformation("Successfully updated contact information for student: {StudentName}", student.StudentName);
+            }
+
+            return success;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating contact information for student {StudentId}", studentId);
+            throw;
+        }
+    }
+
+    public async Task<bool> UpdateEmergencyContactAsync(int studentId, string alternativeContact, string alternativePhone, string doctorName, string doctorPhone)
+    {
+        try
+        {
+            _logger.LogInformation("Updating emergency contact information for student {StudentId}", studentId);
+
+            // Validate phone number formats
+            var phonePattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";
+            if (!string.IsNullOrWhiteSpace(alternativePhone) && !System.Text.RegularExpressions.Regex.IsMatch(alternativePhone, phonePattern))
+            {
+                throw new ArgumentException("Invalid alternative contact phone number format");
+            }
+
+            if (!string.IsNullOrWhiteSpace(doctorPhone) && !System.Text.RegularExpressions.Regex.IsMatch(doctorPhone, phonePattern))
+            {
+                throw new ArgumentException("Invalid doctor phone number format");
+            }
+
+            using var context = _contextFactory.CreateWriteDbContext();
+            var student = await context.Students.FindAsync(studentId);
+            if (student == null)
+            {
+                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                return false;
+            }
+
+            student.AlternativeContact = alternativeContact;
+            student.AlternativePhone = alternativePhone;
+            student.DoctorName = doctorName;
+            student.DoctorPhone = doctorPhone;
+
+            var result = await context.SaveChangesAsync();
+            var success = result > 0;
+
+            if (success)
+            {
+                _logger.LogInformation("Successfully updated emergency contact information for student: {StudentName}", student.StudentName);
+            }
+
+            return success;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating emergency contact information for student {StudentId}", studentId);
+            throw;
+        }
+    }
+
+    public (bool IsValid, string? ErrorMessage) ValidateAddress(string address, string city, string state, string zip)
+    {
+        // Implement basic address validation
+        if (string.IsNullOrWhiteSpace(address))
+        {
+            return (false, "Address cannot be empty");
+        }
+
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            return (false, "City cannot be empty");
+        }
+
+        if (string.IsNullOrWhiteSpace(state) || state.Length != 2)
+        {
+            return (false, "State must be a 2-letter abbreviation");
+        }
+
+        var zipPattern = @"^\d{5}(-\d{4})?$";
+        if (string.IsNullOrWhiteSpace(zip) || !System.Text.RegularExpressions.Regex.IsMatch(zip, zipPattern))
+        {
+            return (false, "Invalid ZIP code format");
+        }
+
+        // In a real implementation, you might also validate against an address verification service
+        // For now, we'll just return valid if basic checks pass
+        return (true, null);
     }
 
     #endregion
@@ -601,6 +805,276 @@ public class StudentService : IStudentService
             throw;
         }
     }
+
+    #endregion
+
+    #region DEBUG Instrumentation
+
+#if DEBUG
+    /// <summary>
+    /// Provides detailed diagnostic information about a student record
+    /// Only available in DEBUG builds
+    /// </summary>
+    public async Task<Dictionary<string, object>> GetStudentDiagnosticsAsync(int studentId)
+    {
+        try
+        {
+            _logger.LogDebug("Retrieving diagnostic information for student {StudentId}", studentId);
+
+            using var context = _contextFactory.CreateDbContext();
+            var student = await context.Students
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+            if (student == null)
+            {
+                _logger.LogWarning("Student with ID {StudentId} not found for diagnostics", studentId);
+                return new Dictionary<string, object> { { "Error", "Student not found" } };
+            }
+
+            // Create a comprehensive diagnostic report
+            var diagnostics = new Dictionary<string, object>
+            {
+                { "StudentId", student.StudentId },
+                { "StudentName", student.StudentName },
+                { "RecordCreationTime", student.CreatedDate },
+                { "LastUpdateTime", student.UpdatedDate ?? DateTime.MinValue },
+                { "RecordAgeInDays", (DateTime.UtcNow - student.CreatedDate).TotalDays },
+                { "RecordCompleteness", CalculateRecordCompleteness(student) },
+                { "HasRequiredFields", !string.IsNullOrEmpty(student.ParentGuardian) &&
+                                      !string.IsNullOrEmpty(student.EmergencyPhone) &&
+                                      !string.IsNullOrEmpty(student.HomeAddress) &&
+                                      !string.IsNullOrEmpty(student.Grade) },
+                { "HasRouteAssignment", !string.IsNullOrEmpty(student.AMRoute) || !string.IsNullOrEmpty(student.PMRoute) },
+                { "HasBusStopAssignment", !string.IsNullOrEmpty(student.BusStop) },
+                { "HasMedicalNotes", !string.IsNullOrEmpty(student.MedicalNotes) },
+                { "HasSpecialNeeds", student.HasSpecialNeeds },
+                { "HasTransportationNotes", !string.IsNullOrEmpty(student.TransportationNotes) },
+                { "IsActive", student.Active },
+                { "ModelState", SerializeStudentForDiagnostics(student) }
+            };
+
+            // Add related data counts
+            try
+            {
+                // Just check if there are any related entries in other tables
+                // This would need to be adjusted based on your actual data model
+                diagnostics.Add("HasRelatedRecords", false);
+            }
+            catch (Exception ex)
+            {
+                diagnostics.Add("RelatedDataCountError", ex.Message);
+            }
+
+            return diagnostics;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating diagnostics for student {StudentId}", studentId);
+            return new Dictionary<string, object> { { "Error", ex.Message } };
+        }
+    }
+
+    /// <summary>
+    /// Calculates the completeness percentage of a student record
+    /// Only available in DEBUG builds
+    /// </summary>
+    private double CalculateRecordCompleteness(Student student)
+    {
+        var requiredFields = new[]
+        {
+            student.StudentName,
+            student.Grade,
+            student.School,
+            student.HomeAddress,
+            student.City,
+            student.State,
+            student.Zip,
+            student.HomePhone,
+            student.ParentGuardian,
+            student.EmergencyPhone
+        };
+
+        var optionalFields = new[]
+        {
+            student.StudentNumber,
+            student.AMRoute,
+            student.PMRoute,
+            student.BusStop,
+            student.MedicalNotes,
+            student.TransportationNotes,
+            student.DateOfBirth.HasValue ? "HasValue" : null,
+            student.Gender,
+            student.PickupAddress,
+            student.DropoffAddress,
+            student.SpecialAccommodations,
+            student.Allergies,
+            student.Medications,
+            student.DoctorName,
+            student.DoctorPhone,
+            student.AlternativeContact,
+            student.AlternativePhone
+        };
+
+        // Calculate completeness (required fields have more weight)
+        var requiredFieldsCount = requiredFields.Length;
+        var filledRequiredFieldsCount = requiredFields.Count(f => !string.IsNullOrWhiteSpace(f));
+
+        var optionalFieldsCount = optionalFields.Length;
+        var filledOptionalFieldsCount = optionalFields.Count(f => !string.IsNullOrWhiteSpace(f));
+
+        var requiredCompleteness = filledRequiredFieldsCount / (double)requiredFieldsCount;
+        var optionalCompleteness = filledOptionalFieldsCount / (double)optionalFieldsCount;
+
+        // Weight required fields as 70% of total score, optional as 30%
+        return (requiredCompleteness * 0.7) + (optionalCompleteness * 0.3);
+    }
+
+    /// <summary>
+    /// Serializes a student object for diagnostic viewing
+    /// Only available in DEBUG builds
+    /// </summary>
+    private object SerializeStudentForDiagnostics(Student student)
+    {
+        return new
+        {
+            // Basic Info
+            student.StudentId,
+            student.StudentName,
+            student.StudentNumber,
+            student.Grade,
+            student.School,
+
+            // Contact Info
+            Address = new
+            {
+                student.HomeAddress,
+                student.City,
+                student.State,
+                student.Zip
+            },
+            Contact = new
+            {
+                student.HomePhone,
+                student.ParentGuardian,
+                student.EmergencyPhone
+            },
+            EmergencyContacts = new
+            {
+                student.AlternativeContact,
+                student.AlternativePhone,
+                student.DoctorName,
+                student.DoctorPhone
+            },
+
+            // Transportation Info
+            TransportationDetails = new
+            {
+                student.AMRoute,
+                student.PMRoute,
+                student.BusStop,
+                student.PickupAddress,
+                student.DropoffAddress,
+                student.TransportationNotes
+            },
+
+            // Medical Info
+            MedicalDetails = new
+            {
+                student.MedicalNotes,
+                student.SpecialNeeds,
+                student.SpecialAccommodations,
+                student.Allergies,
+                student.Medications
+            },
+
+            // Status Info
+            StatusInfo = new
+            {
+                student.Active,
+                student.EnrollmentDate,
+                student.CreatedDate,
+                student.UpdatedDate,
+                student.CreatedBy,
+                student.UpdatedBy
+            }
+        };
+    }
+
+    /// <summary>
+    /// Provides student data operation metrics for system diagnostics
+    /// Only available in DEBUG builds
+    /// </summary>
+    public async Task<Dictionary<string, object>> GetStudentOperationMetricsAsync()
+    {
+        try
+        {
+            _logger.LogDebug("Retrieving student operation metrics");
+
+            var metrics = new Dictionary<string, object>();
+            using var context = _contextFactory.CreateDbContext();
+
+            // Student Record Metrics
+            metrics["TotalStudentCount"] = await context.Students.CountAsync();
+            metrics["ActiveStudentCount"] = await context.Students.CountAsync(s => s.Active);
+            metrics["InactiveStudentCount"] = await context.Students.CountAsync(s => !s.Active);
+            metrics["StudentsWithRoutes"] = await context.Students.CountAsync(s => !string.IsNullOrEmpty(s.AMRoute) || !string.IsNullOrEmpty(s.PMRoute));
+            metrics["StudentsWithoutRoutes"] = await context.Students.CountAsync(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute));
+            metrics["StudentsWithBusStops"] = await context.Students.CountAsync(s => !string.IsNullOrEmpty(s.BusStop));
+            metrics["StudentsWithoutBusStops"] = await context.Students.CountAsync(s => string.IsNullOrEmpty(s.BusStop));
+            metrics["StudentsWithSpecialNeeds"] = await context.Students.CountAsync(s => s.SpecialNeeds);
+
+            // Database Performance Metrics
+            var sw = new System.Diagnostics.Stopwatch();
+
+            sw.Start();
+            await context.Students.AsNoTracking().ToListAsync();
+            sw.Stop();
+            metrics["AllStudentsQueryTimeMs"] = sw.ElapsedMilliseconds;
+
+            sw.Restart();
+            await context.Students.AsNoTracking().Where(s => s.Active).ToListAsync();
+            sw.Stop();
+            metrics["ActiveStudentsQueryTimeMs"] = sw.ElapsedMilliseconds;
+
+            sw.Restart();
+            await context.Students.AsNoTracking().Where(s => !string.IsNullOrEmpty(s.AMRoute)).ToListAsync();
+            sw.Stop();
+            metrics["StudentsWithAMRouteQueryTimeMs"] = sw.ElapsedMilliseconds;
+
+            // Record Completeness Distribution
+            var students = await context.Students.AsNoTracking().ToListAsync();
+            var completenessScores = new List<double>();
+
+            foreach (var student in students)
+            {
+                completenessScores.Add(CalculateRecordCompleteness(student));
+            }
+
+            metrics["AverageRecordCompleteness"] = completenessScores.Count > 0 ? completenessScores.Average() : 0;
+            metrics["MaxRecordCompleteness"] = completenessScores.Count > 0 ? completenessScores.Max() : 0;
+            metrics["MinRecordCompleteness"] = completenessScores.Count > 0 ? completenessScores.Min() : 0;
+
+            // Group completeness into ranges
+            var completenessDistribution = new Dictionary<string, int>
+            {
+                { "0-25%", completenessScores.Count(s => s >= 0 && s < 0.25) },
+                { "25-50%", completenessScores.Count(s => s >= 0.25 && s < 0.5) },
+                { "50-75%", completenessScores.Count(s => s >= 0.5 && s < 0.75) },
+                { "75-100%", completenessScores.Count(s => s >= 0.75 && s <= 1.0) }
+            };
+
+            metrics["CompletenessDistribution"] = completenessDistribution;
+
+            return metrics;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating student operation metrics");
+            return new Dictionary<string, object> { { "Error", ex.Message } };
+        }
+    }
+#endif
 
     #endregion
 }

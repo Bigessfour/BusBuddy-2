@@ -1,0 +1,272 @@
+<UserControl x:Class="BusBuddy.WPF.Views.Dashboard.EnhancedDashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:BusBuddy.WPF.Views.Dashboard"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:busView="clr-namespace:BusBuddy.WPF.Views.Bus"
+             xmlns:driverView="clr-namespace:BusBuddy.WPF.Views.Driver"
+             xmlns:routeView="clr-namespace:BusBuddy.WPF.Views.Route"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
+    
+    <UserControl.Resources>
+        <!-- Tile Style for Modern Appearance -->
+        <Style x:Key="DashboardTileStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="8" Direction="270" ShadowDepth="2" Opacity="0.1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F8F9FA"/>
+                    <Setter Property="BorderBrush" Value="#007ACC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Tile Header Style -->
+        <Style x:Key="TileHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <!-- Tile Content Style -->
+        <Style x:Key="TileContentStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <!-- Tile Value Style -->
+        <Style x:Key="TileValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#007ACC"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#007ACC" Padding="16,12">
+            <TextBlock Text="Bus Buddy Dashboard" FontSize="24" FontWeight="SemiBold" Foreground="White"/>
+        </Border>
+        
+        <!-- Main Content with DockingManager -->
+        <syncfusion:DockingManager x:Name="MainDockingManager" 
+                                   Grid.Row="1"
+                                   UseDocumentContainer="True" 
+                                   PersistState="True"
+                                   ContainerMode="TDI">
+            
+            <!-- Dashboard Overview Panel (Document) -->
+            <ContentControl x:Name="DashboardOverview" 
+                          syncfusion:DockingManager.Header="Dashboard Overview"
+                          syncfusion:DockingManager.State="Document"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
+                    <!-- Custom Tile Dashboard Implementation -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Quick Stats Tiles Row 1 -->
+                        <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,16">
+                            <!-- Fleet Summary Tile -->
+                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                                <StackPanel>
+                                    <TextBlock Text="🚌 Fleet Status" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Total Buses:" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="{Binding TotalBuses}" Style="{StaticResource TileValueStyle}"/>
+                                    <TextBlock Text="Active: 95%" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Driver Summary Tile -->
+                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                                <StackPanel>
+                                    <TextBlock Text="👨‍💼 Drivers" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Total Drivers:" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="{Binding TotalDrivers}" Style="{StaticResource TileValueStyle}"/>
+                                    <TextBlock Text="Available: 87%" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Routes Summary Tile -->
+                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                                <StackPanel>
+                                    <TextBlock Text="🗺️ Routes" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Active Routes:" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="{Binding TotalActiveRoutes}" Style="{StaticResource TileValueStyle}"/>
+                                    <TextBlock Text="Coverage: 98%" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Performance Tile -->
+                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                                <StackPanel>
+                                    <TextBlock Text="⚡ Performance" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Avg Response:" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="{Binding InitializationTimeFormatted}" Style="{StaticResource TileValueStyle}"/>
+                                    <TextBlock Text="System: Optimal" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        
+                        <!-- Operations Tiles Row 2 -->
+                        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,16">
+                            <!-- Maintenance Tile -->
+                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                                <StackPanel>
+                                    <TextBlock Text="🔧 Maintenance" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Pending Items: 3" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Next Service: Bus #12" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Due: Tomorrow" Style="{StaticResource TileValueStyle}"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Fuel Management Tile -->
+                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                                <StackPanel>
+                                    <TextBlock Text="⛽ Fuel Status" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Avg Consumption: 8.2L/100km" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Monthly Budget: 85% used" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Efficiency: Good" Style="{StaticResource TileValueStyle}"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Student Management Tile -->
+                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                                <StackPanel>
+                                    <TextBlock Text="🎓 Students" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Total Enrolled: 1,247" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Active Today: 1,195" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Attendance: 95.8%" Style="{StaticResource TileValueStyle}"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        
+                        <!-- System Status Tile Row 3 -->
+                        <Border Grid.Row="2" Style="{StaticResource DashboardTileStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="📊 System Health" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Database: Connected" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Services: Online" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Last Sync: 2 mins ago" Style="{StaticResource TileContentStyle}"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="🔄 Real-time Updates" Style="{StaticResource TileHeaderStyle}"/>
+                                    <TextBlock Text="Auto-refresh: Enabled" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Update Interval: 5 seconds" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Next Update: {Binding NextUpdateTime}" Style="{StaticResource TileContentStyle}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </ContentControl>
+            
+            <!-- Bus Management Panel (Docked Right) -->
+            <ContentControl x:Name="BusManagement" 
+                          syncfusion:DockingManager.Header="Bus Management"
+                          syncfusion:DockingManager.State="Dock"
+                          syncfusion:DockingManager.SideInDockedMode="Right"
+                          syncfusion:DockingManager.DesiredWidthInDockedMode="350"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <busView:BusManagementView DataContext="{Binding BusManagementViewModel}"/>
+            </ContentControl>
+            
+            <!-- Driver Management Panel (Docked Left) -->
+            <ContentControl x:Name="DriverManagement" 
+                          syncfusion:DockingManager.Header="Driver Management"
+                          syncfusion:DockingManager.State="Dock"
+                          syncfusion:DockingManager.SideInDockedMode="Left"
+                          syncfusion:DockingManager.DesiredWidthInDockedMode="300"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <driverView:DriverManagementView DataContext="{Binding DriverManagementViewModel}"/>
+            </ContentControl>
+            
+            <!-- Route Management Panel (Document Tab) -->
+            <ContentControl x:Name="RouteManagement" 
+                          syncfusion:DockingManager.Header="Route Management"
+                          syncfusion:DockingManager.State="Document"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <routeView:RouteManagementView DataContext="{Binding RouteManagementViewModel}"/>
+            </ContentControl>
+            
+            <!-- Schedule Management Panel (Auto Hidden) -->
+            <ContentControl x:Name="ScheduleManagement" 
+                          syncfusion:DockingManager.Header="Schedule Management"
+                          syncfusion:DockingManager.State="AutoHidden"
+                          syncfusion:DockingManager.SideInDockedMode="Bottom"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <ContentControl Content="{Binding ScheduleManagementViewModel}" Margin="10"/>
+            </ContentControl>
+            
+            <!-- Student Management Panel (Docked Bottom) -->
+            <ContentControl x:Name="StudentManagement" 
+                          syncfusion:DockingManager.Header="Student Management"
+                          syncfusion:DockingManager.State="Dock"
+                          syncfusion:DockingManager.SideInDockedMode="Bottom"
+                          syncfusion:DockingManager.DesiredHeightInDockedMode="200"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <ContentControl Content="{Binding StudentManagementViewModel}" Margin="10"/>
+            </ContentControl>
+            
+            <!-- Maintenance Tracking Panel (Tabbed with Student Management) -->
+            <ContentControl x:Name="MaintenanceTracking" 
+                          syncfusion:DockingManager.Header="Maintenance Tracking"
+                          syncfusion:DockingManager.State="Dock"
+                          syncfusion:DockingManager.SideInDockedMode="Tabbed"
+                          syncfusion:DockingManager.TargetNameInDockedMode="StudentManagement"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <ContentControl Content="{Binding MaintenanceTrackingViewModel}" Margin="10"/>
+            </ContentControl>
+            
+            <!-- Fuel Management Panel (Float) -->
+            <ContentControl x:Name="FuelManagement" 
+                          syncfusion:DockingManager.Header="Fuel Management"
+                          syncfusion:DockingManager.State="Float"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <ContentControl Content="{Binding FuelManagementViewModel}" Margin="10"/>
+            </ContentControl>
+            
+            <!-- Activity Logging Panel (Auto Hidden) -->
+            <ContentControl x:Name="ActivityLogging" 
+                          syncfusion:DockingManager.Header="Activity Logging"
+                          syncfusion:DockingManager.State="AutoHidden"
+                          syncfusion:DockingManager.SideInDockedMode="Right"
+                          syncfusion:DockingManager.CanSerialize="True">
+                <ContentControl Content="{Binding ActivityLogViewModel}" Margin="10"/>
+            </ContentControl>
+            
+        </syncfusion:DockingManager>
+    </Grid>
+</UserControl>

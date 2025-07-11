@@ -20,15 +20,15 @@ namespace BusBuddy.WPF.Views.Activity
                 _logger = app.Services.GetService<ILogger<ActivityLoggingView>>();
                 _logger?.LogInformation("ActivityLoggingView loaded");
 
-                var vm = app.Services.GetService<ViewModels.ActivityLogViewModel>();
+                var vm = app.Services.GetService<ViewModels.ActivityLoggingViewModel>();
                 if (vm != null)
                 {
                     DataContext = vm;
-                    _logger?.LogInformation("ActivityLogViewModel successfully set as DataContext");
+                    _logger?.LogInformation("ActivityLoggingViewModel successfully set as DataContext");
                 }
                 else
                 {
-                    _logger?.LogWarning("ActivityLogViewModel could not be resolved from DI container");
+                    _logger?.LogWarning("ActivityLoggingViewModel could not be resolved from DI container");
                 }
             }
         }

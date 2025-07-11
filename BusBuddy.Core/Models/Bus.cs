@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 
 namespace BusBuddy.Core.Models;
 
@@ -11,6 +12,7 @@ namespace BusBuddy.Core.Models;
 /// Enhanced for Syncfusion data binding with INotifyPropertyChanged support
 /// </summary>
 [Table("Vehicles")]
+[DebuggerDisplay("Bus {BusNumber} - {Year} {Make} {Model} - ID:{VehicleId}")]
 public class Bus : INotifyPropertyChanged
 {
     private string _busNumber = string.Empty;
