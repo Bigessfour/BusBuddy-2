@@ -5,6 +5,9 @@
              xmlns:converters="clr-namespace:BusBuddy.WPF.Converters">
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/TileStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>

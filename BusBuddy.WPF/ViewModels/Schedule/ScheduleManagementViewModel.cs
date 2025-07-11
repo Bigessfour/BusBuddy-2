@@ -54,8 +54,8 @@ namespace BusBuddy.WPF.ViewModels.Schedule
             UpdateScheduleCommand = new AsyncRelayCommand(UpdateScheduleAsync, CanUpdateOrDelete);
             DeleteScheduleCommand = new AsyncRelayCommand(DeleteScheduleAsync, CanUpdateOrDelete);
 
-            // Set as in-development
-            IsInDevelopment = true;
+            // Schedule Management is now production-ready!
+            IsInDevelopment = false;
 
             _ = LoadDataAsync();
         }

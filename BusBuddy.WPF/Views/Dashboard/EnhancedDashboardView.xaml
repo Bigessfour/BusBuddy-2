@@ -14,47 +14,84 @@
              d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
     
     <UserControl.Resources>
-        <!-- Tile Style for Modern Appearance -->
+        <!-- Enhanced Tile Style for Modern Appearance -->
         <Style x:Key="DashboardTileStyle" TargetType="Border">
             <Setter Property="Background" Value="#FFFFFF"/>
             <Setter Property="BorderBrush" Value="#E0E0E0"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Margin" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="8" Direction="270" ShadowDepth="2" Opacity="0.1"/>
+                    <DropShadowEffect BlurRadius="12" Direction="270" ShadowDepth="3" Opacity="0.15"/>
                 </Setter.Value>
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#F8F9FA"/>
                     <Setter Property="BorderBrush" Value="#007ACC"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect BlurRadius="16" Direction="270" ShadowDepth="4" Opacity="0.25"/>
+                        </Setter.Value>
+                    </Setter>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Tile Header Style -->
+        <!-- Enhanced Tile Header Style -->
         <Style x:Key="TileHeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="#333333"/>
-            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
         </Style>
 
-        <!-- Tile Content Style -->
+        <!-- Enhanced Tile Content Style -->
         <Style x:Key="TileContentStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#666666"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="Foreground" Value="#5D6D7E"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
         </Style>
 
-        <!-- Tile Value Style -->
+        <!-- Enhanced Tile Value Style -->
         <Style x:Key="TileValueStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontSize" Value="24"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Foreground" Value="#007ACC"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <!-- Status Indicator Style -->
+        <Style x:Key="StatusIndicatorStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="Height" Value="12"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Performance Tile Style for Metrics -->
+        <Style x:Key="PerformanceTileStyle" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#E8F4FD" Offset="0"/>
+                        <GradientStop Color="#D1E7F7" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#007ACC"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="12" Direction="270" ShadowDepth="3" Opacity="0.2"/>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
 
@@ -74,13 +111,17 @@
                                    Grid.Row="1"
                                    UseDocumentContainer="True" 
                                    PersistState="True"
-                                   ContainerMode="TDI">
+                                   ContainerMode="TDI"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch">
             
             <!-- Dashboard Overview Panel (Document) -->
             <ContentControl x:Name="DashboardOverview" 
                           syncfusion:DockingManager.Header="Dashboard Overview"
                           syncfusion:DockingManager.State="Document"
-                          syncfusion:DockingManager.CanSerialize="True">
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
                     <!-- Custom Tile Dashboard Implementation -->
                     <Grid>
@@ -90,102 +131,480 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         
-                        <!-- Quick Stats Tiles Row 1 -->
-                        <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,16">
-                            <!-- Fleet Summary Tile -->
+                        <!-- Enhanced Quick Stats Tiles Row 1 -->
+                        <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,20">
+                            <!-- Enhanced Fleet Summary Tile -->
                             <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
                                 <StackPanel>
-                                    <TextBlock Text="🚌 Fleet Status" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Total Buses:" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="{Binding TotalBuses}" Style="{StaticResource TileValueStyle}"/>
-                                    <TextBlock Text="{Binding FleetActivePercentageFormatted, StringFormat='Active: {0}'}" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                    <DockPanel>
+                                        <TextBlock Text="🚌 Fleet Status" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#2ECC71" DockPanel.Dock="Right" ToolTip="System Online"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Total Buses:" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="{Binding TotalBuses}" Style="{StaticResource TileValueStyle}"/>
+                                            <TextBlock Text="{Binding FleetActivePercentageFormatted, StringFormat='Active: {0}'}" 
+                                                      Style="{StaticResource TileContentStyle}" Margin="0,8,0,0" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding ActiveBusCount}" FontSize="20" FontWeight="Bold" 
+                                                      Foreground="#27AE60" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Active" FontSize="12" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                             
-                            <!-- Driver Summary Tile -->
+                            <!-- Enhanced Driver Summary Tile -->
                             <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
                                 <StackPanel>
-                                    <TextBlock Text="👨‍💼 Drivers" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Total Drivers:" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="{Binding TotalDrivers}" Style="{StaticResource TileValueStyle}"/>
-                                    <TextBlock Text="{Binding DriverAvailabilityPercentageFormatted, StringFormat='Available: {0}'}" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                    <DockPanel>
+                                        <TextBlock Text="👨‍💼 Driver Management" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#3498DB" DockPanel.Dock="Right" ToolTip="Fully Staffed"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Total Drivers:" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="{Binding TotalDrivers}" Style="{StaticResource TileValueStyle}"/>
+                                            <TextBlock Text="{Binding DriverAvailabilityPercentageFormatted, StringFormat='Available: {0}'}" 
+                                                      Style="{StaticResource TileContentStyle}" Margin="0,8,0,0" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding AvailableDriverCount}" FontSize="20" FontWeight="Bold" 
+                                                      Foreground="#3498DB" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Available" FontSize="12" Foreground="#3498DB" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                             
-                            <!-- Routes Summary Tile -->
+                            <!-- Enhanced Routes Summary Tile -->
                             <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
                                 <StackPanel>
-                                    <TextBlock Text="🗺️ Routes" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Active Routes:" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="{Binding TotalActiveRoutes}" Style="{StaticResource TileValueStyle}"/>
-                                    <TextBlock Text="{Binding RouteCoveragePercentageFormatted, StringFormat='Coverage: {0}'}" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                    <DockPanel>
+                                        <TextBlock Text="🗺️ Route Network" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#E67E22" DockPanel.Dock="Right" ToolTip="Optimized Coverage"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Active Routes:" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="{Binding TotalActiveRoutes}" Style="{StaticResource TileValueStyle}"/>
+                                            <TextBlock Text="{Binding RouteCoveragePercentageFormatted, StringFormat='Coverage: {0}'}" 
+                                                      Style="{StaticResource TileContentStyle}" Margin="0,8,0,0" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <!-- Simple progress bar instead of CircularProgressBar -->
+                                            <Border Width="45" Height="45" 
+                                                   Background="#ECF0F1" 
+                                                   CornerRadius="22.5"
+                                                   HorizontalAlignment="Center">
+                                                <Grid>
+                                                    <Ellipse Width="37" Height="37" 
+                                                            Stroke="#E67E22" 
+                                                            StrokeThickness="4"
+                                                            StrokeDashArray="2.3,1"/>
+                                                    <TextBlock Text="{Binding RouteCoveragePercentage, StringFormat='{}{0:F0}%'}" 
+                                                              FontSize="10" 
+                                                              FontWeight="Bold" 
+                                                              Foreground="#E67E22"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                             
-                            <!-- Performance Tile -->
-                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                            <!-- Enhanced Performance Tile -->
+                            <Border Style="{StaticResource PerformanceTileStyle}" Cursor="Hand">
                                 <StackPanel>
-                                    <TextBlock Text="⚡ Performance" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Avg Response:" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="{Binding InitializationTimeFormatted}" Style="{StaticResource TileValueStyle}"/>
-                                    <TextBlock Text="System: Optimal" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                    <DockPanel>
+                                        <TextBlock Text="⚡ System Performance" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#2ECC71" DockPanel.Dock="Right" ToolTip="Excellent Performance"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Grid.Row="0">
+                                            <TextBlock Text="Response Time:" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="{Binding InitializationTimeFormatted}" Style="{StaticResource TileValueStyle}" FontSize="20"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                                            <TextBlock Text="Next Update:" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="{Binding NextUpdateTime}" FontSize="14" FontWeight="SemiBold" Foreground="#007ACC"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="2" Margin="0,8,0,0">
+                                            <TextBlock Text="Status: Optimal" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#2ECC71"/>
+                                        </StackPanel>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
                         
-                        <!-- Operations Tiles Row 2 -->
-                        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,16">
-                            <!-- Maintenance Tile -->
+                        <!-- Enhanced Operations Tiles Row 2 -->
+                        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
+                            <!-- Enhanced Maintenance Tile with Chart -->
                             <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
                                 <StackPanel>
-                                    <TextBlock Text="🔧 Maintenance" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Pending Items: 3" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Next Service: Bus #12" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Due: Tomorrow" Style="{StaticResource TileValueStyle}"/>
+                                    <DockPanel>
+                                        <TextBlock Text="🔧 Maintenance Hub" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#F39C12" DockPanel.Dock="Right" ToolTip="Maintenance Scheduled"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="60"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <StackPanel Grid.Row="0">
+                                            <TextBlock Text="Pending Items: 3" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Next Service: Bus #12" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Due: Tomorrow" Style="{StaticResource TileValueStyle}" FontSize="16" Foreground="#E74C3C"/>
+                                        </StackPanel>
+                                        
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
+                                            <Border Background="#2ECC71" CornerRadius="3" Padding="8,4" Margin="0,0,8,0">
+                                                <TextBlock Text="2 Complete" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                            </Border>
+                                            <Border Background="#E74C3C" CornerRadius="3" Padding="8,4">
+                                                <TextBlock Text="3 Pending" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </StackPanel>
+                                        
+                                        <!-- Mini maintenance progress chart -->
+                                        <Border Grid.Row="2" 
+                                               Background="#ECF0F1" 
+                                               CornerRadius="27.5"
+                                               Width="55" Height="55"
+                                               HorizontalAlignment="Center">
+                                            <Grid>
+                                                <Ellipse Width="47" Height="47" 
+                                                        Stroke="#F39C12" 
+                                                        StrokeThickness="4"
+                                                        StrokeDashArray="2.1,1" 
+                                                        StrokeDashOffset="0"/>
+                                                <TextBlock Text="67%" 
+                                                          FontSize="11" 
+                                                          FontWeight="Bold" 
+                                                          Foreground="#F39C12"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                             
-                            <!-- Fuel Management Tile -->
+                            <!-- Enhanced Fuel Management Tile with Gauge -->
                             <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
                                 <StackPanel>
-                                    <TextBlock Text="⛽ Fuel Status" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Avg Consumption: 8.2L/100km" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Monthly Budget: 85% used" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Efficiency: Good" Style="{StaticResource TileValueStyle}"/>
+                                    <DockPanel>
+                                        <TextBlock Text="⛽ Fuel Analytics" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#27AE60" DockPanel.Dock="Right" ToolTip="Fuel Efficiency Good"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="60"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <StackPanel Grid.Row="0">
+                                            <TextBlock Text="Avg Consumption: 8.2L/100km" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Monthly Budget: 85% used" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Efficiency: Good" Style="{StaticResource TileValueStyle}" FontSize="16" Foreground="#27AE60"/>
+                                        </StackPanel>
+                                        
+                                        <!-- Fuel efficiency gauge -->
+                                        <Border Grid.Row="1" 
+                                               Background="#ECF0F1" 
+                                               CornerRadius="6"
+                                               Height="12"
+                                               Margin="0,10,0,0">
+                                            <Grid>
+                                                <Border Background="#27AE60" 
+                                                       CornerRadius="6"
+                                                       Width="200"
+                                                       HorizontalAlignment="Left"/>
+                                                <TextBlock Text="85% Budget Used" 
+                                                          FontSize="10" 
+                                                          FontWeight="SemiBold" 
+                                                          Foreground="White"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                             
-                            <!-- Student Management Tile -->
+                            <!-- Enhanced Student Management Tile with Data -->
                             <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
                                 <StackPanel>
-                                    <TextBlock Text="🎓 Students" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Total Enrolled: Calculating..." Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Active Today: Calculating..." Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Attendance: Calculating..." Style="{StaticResource TileValueStyle}"/>
+                                    <DockPanel>
+                                        <TextBlock Text="🎓 Student Transport" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#9B59B6" DockPanel.Dock="Right" ToolTip="All Students Accounted"/>
+                                    </DockPanel>
+                                    <Grid Margin="0,10,0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <StackPanel Grid.Row="0">
+                                            <TextBlock Text="Total Enrolled: Calculating..." Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Active Today: Calculating..." Style="{StaticResource TileContentStyle}"/>
+                                        </StackPanel>
+                                        
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
+                                            <!-- Simple radial progress indicator -->
+                                            <Border Background="#ECF0F1" 
+                                                   CornerRadius="20"
+                                                   Width="40" Height="40"
+                                                   Margin="0,0,10,0">
+                                                <Grid>
+                                                    <Ellipse Width="32" Height="32" 
+                                                            Stroke="#9B59B6" 
+                                                            StrokeThickness="3"
+                                                            StrokeDashArray="3,1"/>
+                                                    <TextBlock Text="95%" 
+                                                              FontSize="10" 
+                                                              FontWeight="Bold" 
+                                                              Foreground="#9B59B6"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Attendance Rate" FontSize="12" Style="{StaticResource TileContentStyle}"/>
+                                                <TextBlock Text="Excellent" FontSize="14" FontWeight="SemiBold" Foreground="#9B59B6"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        
+                                        <TextBlock Grid.Row="2" Text="All routes covered" Style="{StaticResource TileContentStyle}" 
+                                                  FontWeight="SemiBold" Foreground="#27AE60" Margin="0,10,0,0"/>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
                         
-                        <!-- System Status Tile Row 3 -->
+                        <!-- Enhanced System Status & Real-time Monitoring Row 3 -->
                         <Border Grid.Row="2" Style="{StaticResource DashboardTileStyle}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="📊 System Health" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Database: Connected" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Services: Online" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Last Sync: 2 mins ago" Style="{StaticResource TileContentStyle}"/>
+                                <!-- System Health Column -->
+                                <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                                    <DockPanel Margin="0,0,0,15">
+                                        <TextBlock Text="📊 System Health" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#2ECC71" DockPanel.Dock="Right" ToolTip="All Systems Operational"/>
+                                    </DockPanel>
+                                    
+                                    <StackPanel>
+                                        <DockPanel Margin="0,0,0,8">
+                                            <TextBlock Text="Database:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
+                                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                                <Ellipse Width="8" Height="8" Fill="#2ECC71" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Connected" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#2ECC71"/>
+                                            </StackPanel>
+                                        </DockPanel>
+                                        
+                                        <DockPanel Margin="0,0,0,8">
+                                            <TextBlock Text="Services:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
+                                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                                <Ellipse Width="8" Height="8" Fill="#2ECC71" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                                <TextBlock Text="Online" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#2ECC71"/>
+                                            </StackPanel>
+                                        </DockPanel>
+                                        
+                                        <DockPanel Margin="0,0,0,8">
+                                            <TextBlock Text="Last Sync:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
+                                            <TextBlock Text="2 mins ago" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#3498DB" DockPanel.Dock="Right"/>
+                                        </DockPanel>
+                                        
+                                        <!-- System Performance Gauge -->
+                                        <DockPanel Margin="0,15,0,0">
+                                            <TextBlock Text="Performance:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Top" Margin="0,0,0,10"/>
+                                            <Border Background="#ECF0F1" 
+                                                   CornerRadius="4"
+                                                   Height="8">
+                                                <Grid>
+                                                    <Border Background="#2ECC71" 
+                                                           CornerRadius="4"
+                                                           Width="180"
+                                                           HorizontalAlignment="Left"/>
+                                                    <TextBlock Text="92% Optimal" 
+                                                              FontSize="10" 
+                                                              FontWeight="SemiBold" 
+                                                              Foreground="White"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DockPanel>
+                                    </StackPanel>
                                 </StackPanel>
                                 
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="🔄 Real-time Updates" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Auto-refresh: Enabled" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Update Interval: 5 seconds" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="{Binding NextUpdateTime, StringFormat='Next Update: {0}'}" Style="{StaticResource TileContentStyle}"/>
+                                <!-- Real-time Updates Column -->
+                                <StackPanel Grid.Column="1" Margin="20,0">
+                                    <DockPanel Margin="0,0,0,15">
+                                        <TextBlock Text="🔄 Live Dashboard" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
+                                        <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#3498DB" DockPanel.Dock="Right" ToolTip="Auto-refresh Active">
+                                            <Ellipse.RenderTransform>
+                                                <RotateTransform x:Name="RefreshRotate" CenterX="6" CenterY="6"/>
+                                            </Ellipse.RenderTransform>
+                                            <Ellipse.Triggers>
+                                                <EventTrigger RoutedEvent="Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetName="RefreshRotate" 
+                                                                           Storyboard.TargetProperty="Angle"
+                                                                           From="0" To="360" Duration="0:0:3"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Ellipse.Triggers>
+                                        </Ellipse>
+                                    </DockPanel>
+                                    
+                                    <StackPanel>
+                                        <DockPanel Margin="0,0,0,8">
+                                            <TextBlock Text="Auto-refresh:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
+                                            <TextBlock Text="Enabled" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#2ECC71" DockPanel.Dock="Right"/>
+                                        </DockPanel>
+                                        
+                                        <DockPanel Margin="0,0,0,8">
+                                            <TextBlock Text="Update Interval:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
+                                            <TextBlock Text="5 seconds" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#3498DB" DockPanel.Dock="Right"/>
+                                        </DockPanel>
+                                        
+                                        <DockPanel Margin="0,0,0,8">
+                                            <TextBlock Text="Next Update:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
+                                            <TextBlock Text="{Binding NextUpdateTime}" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#E67E22" DockPanel.Dock="Right"/>
+                                        </DockPanel>
+                                        
+                                        <!-- Refresh countdown indicator -->
+                                        <DockPanel Margin="0,15,0,0">
+                                            <TextBlock Text="Refresh Status:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Top" Margin="0,0,0,10"/>
+                                            <!-- Simple circular indicator -->
+                                            <Border Background="#ECF0F1" 
+                                                   CornerRadius="20"
+                                                   Width="40" Height="40"
+                                                   HorizontalAlignment="Center">
+                                                <Grid>
+                                                    <Ellipse Width="32" Height="32" 
+                                                            Stroke="#3498DB" 
+                                                            StrokeThickness="3"
+                                                            StrokeDashArray="2.5,1">
+                                                        <Ellipse.RenderTransform>
+                                                            <RotateTransform x:Name="LiveIndicator" CenterX="16" CenterY="16"/>
+                                                        </Ellipse.RenderTransform>
+                                                        <Ellipse.Triggers>
+                                                            <EventTrigger RoutedEvent="Loaded">
+                                                                <BeginStoryboard>
+                                                                    <Storyboard RepeatBehavior="Forever">
+                                                                        <DoubleAnimation Storyboard.TargetName="LiveIndicator" 
+                                                                                       Storyboard.TargetProperty="Angle"
+                                                                                       From="0" To="360" Duration="0:0:2"/>
+                                                                    </Storyboard>
+                                                                </BeginStoryboard>
+                                                            </EventTrigger>
+                                                        </Ellipse.Triggers>
+                                                    </Ellipse>
+                                                    <TextBlock Text="LIVE" 
+                                                              FontSize="10" 
+                                                              FontWeight="Bold" 
+                                                              Foreground="#3498DB" 
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <!-- Quick Actions Column -->
+                                <StackPanel Grid.Column="2" Margin="20,0,0,0">
+                                    <TextBlock Text="⚡ Quick Actions" Style="{StaticResource TileHeaderStyle}" Margin="0,0,0,15"/>
+                                    
+                                    <StackPanel>
+                                        <Border Background="#3498DB" 
+                                               CornerRadius="6" 
+                                               Margin="0,0,0,10">
+                                            <Button Content="🔄 Refresh Data" 
+                                                   Background="Transparent" 
+                                                   Foreground="White" 
+                                                   BorderThickness="0" 
+                                                   Padding="12,8" 
+                                                   FontWeight="SemiBold"
+                                                   Cursor="Hand"/>
+                                        </Border>
+                                        
+                                        <Border Background="#9B59B6" 
+                                               CornerRadius="6" 
+                                               Margin="0,0,0,10">
+                                            <Button Content="📊 View Reports" 
+                                                   Background="Transparent" 
+                                                   Foreground="White" 
+                                                   BorderThickness="0" 
+                                                   Padding="12,8" 
+                                                   FontWeight="SemiBold"
+                                                   Cursor="Hand"/>
+                                        </Border>
+                                        
+                                        <Border Background="#34495E" 
+                                               CornerRadius="6" 
+                                               Margin="0,0,0,10">
+                                            <Button Content="⚙️ Settings" 
+                                                   Background="Transparent" 
+                                                   Foreground="White" 
+                                                   BorderThickness="0" 
+                                                   Padding="12,8" 
+                                                   FontWeight="SemiBold"
+                                                   Cursor="Hand"/>
+                                        </Border>
+                                        
+                                        <!-- System uptime indicator -->
+                                        <Border CornerRadius="6" 
+                                               BorderBrush="#27AE60" 
+                                               BorderThickness="1" 
+                                               Padding="10" 
+                                               Margin="0,15,0,0">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                    <GradientStop Color="#E8F6F3" Offset="0"/>
+                                                    <GradientStop Color="#D5F4E6" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <StackPanel>
+                                                <TextBlock Text="System Uptime" FontSize="12" FontWeight="SemiBold" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="99.8%" FontSize="18" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Excellent" FontSize="10" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -199,8 +618,10 @@
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Right"
                           syncfusion:DockingManager.DesiredWidthInDockedMode="350"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <busView:BusManagementView DataContext="{Binding BusManagementViewModel}"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <busView:BusManagementView DataContext="{Binding BusManagementViewModel, FallbackValue={x:Null}}"/>
             </ContentControl>
             
             <!-- Driver Management Panel (Docked Left) -->
@@ -209,16 +630,20 @@
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Left"
                           syncfusion:DockingManager.DesiredWidthInDockedMode="300"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <driverView:DriverManagementView DataContext="{Binding DriverManagementViewModel}"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <driverView:DriverManagementView DataContext="{Binding DriverManagementViewModel, FallbackValue={x:Null}}"/>
             </ContentControl>
             
             <!-- Route Management Panel (Document Tab) -->
             <ContentControl x:Name="RouteManagement" 
                           syncfusion:DockingManager.Header="Route Management"
                           syncfusion:DockingManager.State="Document"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <routeView:RouteManagementView DataContext="{Binding RouteManagementViewModel}"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <routeView:RouteManagementView DataContext="{Binding RouteManagementViewModel, FallbackValue={x:Null}}"/>
             </ContentControl>
             
             <!-- Schedule Management Panel (Auto Hidden) -->
@@ -226,8 +651,13 @@
                           syncfusion:DockingManager.Header="Schedule Management"
                           syncfusion:DockingManager.State="AutoHidden"
                           syncfusion:DockingManager.SideInDockedMode="Bottom"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <ContentControl Content="{Binding ScheduleManagementViewModel}" Margin="10"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <ContentControl Content="{Binding ScheduleManagementViewModel, FallbackValue={x:Null}}" 
+                               Margin="10"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
             </ContentControl>
             
             <!-- Student Management Panel (Docked Bottom) -->
@@ -236,8 +666,13 @@
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Bottom"
                           syncfusion:DockingManager.DesiredHeightInDockedMode="200"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <ContentControl Content="{Binding StudentManagementViewModel}" Margin="10"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <ContentControl Content="{Binding StudentManagementViewModel, FallbackValue={x:Null}}" 
+                               Margin="10"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
             </ContentControl>
             
             <!-- Maintenance Tracking Panel (Tabbed with Student Management) -->
@@ -246,16 +681,26 @@
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Tabbed"
                           syncfusion:DockingManager.TargetNameInDockedMode="StudentManagement"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <ContentControl Content="{Binding MaintenanceTrackingViewModel}" Margin="10"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <ContentControl Content="{Binding MaintenanceTrackingViewModel, FallbackValue={x:Null}}" 
+                               Margin="10"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
             </ContentControl>
             
             <!-- Fuel Management Panel (Float) -->
             <ContentControl x:Name="FuelManagement" 
                           syncfusion:DockingManager.Header="Fuel Management"
                           syncfusion:DockingManager.State="Float"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <ContentControl Content="{Binding FuelManagementViewModel}" Margin="10"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <ContentControl Content="{Binding FuelManagementViewModel, FallbackValue={x:Null}}" 
+                               Margin="10"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
             </ContentControl>
             
             <!-- Activity Logging Panel (Auto Hidden) -->
@@ -263,8 +708,13 @@
                           syncfusion:DockingManager.Header="Activity Logging"
                           syncfusion:DockingManager.State="AutoHidden"
                           syncfusion:DockingManager.SideInDockedMode="Right"
-                          syncfusion:DockingManager.CanSerialize="True">
-                <ContentControl Content="{Binding ActivityLogViewModel}" Margin="10"/>
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch">
+                <ContentControl Content="{Binding ActivityLogViewModel, FallbackValue={x:Null}}" 
+                               Margin="10"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"/>
             </ContentControl>
             
         </syncfusion:DockingManager>

@@ -58,6 +58,7 @@ namespace BusBuddy.WPF.ViewModels
         private double _routeCoveragePercentage;
         private string _nextUpdateTime = "Calculating...";
         private System.Threading.Timer? _refreshTimer;
+        private volatile bool _isRefreshing = false; // State guard to prevent concurrent refreshes
 
         protected override ILogger? GetLogger() => _logger;
 
@@ -327,10 +328,16 @@ namespace BusBuddy.WPF.ViewModels
 
             // Create timer that fires every 5 seconds
             _refreshTimer = new System.Threading.Timer(
-                callback: async _ => await PerformTimedRefreshAsync(),
+                callback: TimerCallback,
                 state: null,
                 dueTime: TimeSpan.FromSeconds(5),
                 period: TimeSpan.FromSeconds(5));
+        }
+
+        private void TimerCallback(object? state)
+        {
+            // Use fire-and-forget pattern to avoid blocking timer thread
+            _ = Task.Run(async () => await PerformTimedRefreshAsync());
         }
 
         private void UpdateNextUpdateTime()
@@ -340,8 +347,16 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task PerformTimedRefreshAsync()
         {
+            // Prevent concurrent refreshes
+            if (_isRefreshing)
+            {
+                _logger.LogDebug("Skipping timed refresh - already in progress");
+                return;
+            }
+
             try
             {
+                _isRefreshing = true;
                 _logger.LogDebug("Performing timed dashboard refresh");
 
                 // Update next refresh time
@@ -356,6 +371,10 @@ namespace BusBuddy.WPF.ViewModels
             {
                 _logger.LogWarning(ex, "Error during timed dashboard refresh: {ErrorMessage}", ex.Message);
                 // Continue running timer even if refresh fails
+            }
+            finally
+            {
+                _isRefreshing = false;
             }
         }
 
@@ -384,7 +403,7 @@ namespace BusBuddy.WPF.ViewModels
                 await LoadCriticalDataAsync();
 
                 // Calculate additional real-time metrics
-                CalculateRealTimeMetrics();
+                await CalculateRealTimeMetricsAsync();
 
                 // Trigger property change notifications for UI updates
                 OnPropertyChanged(nameof(TotalBuses));
@@ -406,7 +425,7 @@ namespace BusBuddy.WPF.ViewModels
             }
         }
 
-        private async void CalculateRealTimeMetrics()
+        private async Task CalculateRealTimeMetricsAsync()
         {
             try
             {
@@ -1355,83 +1374,43 @@ namespace BusBuddy.WPF.ViewModels
 #if DEBUG
 #endif
                 // OPTIMIZATION: Skip caching mechanisms during startup, go directly to metrics service
-                // Wrap in Task.Run with timeout to prevent blocking
-                var metricsTask = Task.Run(async () =>
-                {
-                    Debug.WriteLine("[DEBUG] LoadCriticalDataAsync: Inside metricsTask - calling _dashboardMetricsService.GetDashboardMetricsAsync()");
-                    var result = await _dashboardMetricsService.GetDashboardMetricsAsync();
-#if DEBUG
-#endif
-                    return result;
-                });
+                // Create cancellation token for timeout
+                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(1.5));
+                using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
-#if DEBUG
-#endif
-                // Add timeout protection within the method as well
-                if (await Task.WhenAny(metricsTask, Task.Delay(1500, cancellationToken)) != metricsTask)
+                try
                 {
-                    _logger.LogWarning("Dashboard metrics query taking too long, using default values");
-#if DEBUG
-#endif
-                    // Use default values rather than waiting
+                    Debug.WriteLine("[DEBUG] LoadCriticalDataAsync: Calling _dashboardMetricsService.GetDashboardMetricsAsync()");
+                    var metrics = await _dashboardMetricsService.GetDashboardMetricsAsync();
+
+                    // Only update values if not cancelled
+                    if (!combinedCts.Token.IsCancellationRequested && metrics != null)
+                    {
+                        if (metrics.TryGetValue("BusCount", out int busCount))
+                        {
+                            TotalBuses = busCount;
+                        }
+                        if (metrics.TryGetValue("DriverCount", out int driverCount))
+                        {
+                            TotalDrivers = driverCount;
+                        }
+                        if (metrics.TryGetValue("RouteCount", out int routeCount))
+                        {
+                            TotalActiveRoutes = routeCount;
+                        }
+                    }
+                }
+                catch (OperationCanceledException) when (timeoutCts.Token.IsCancellationRequested)
+                {
+                    _logger.LogWarning("Dashboard metrics query timed out after 1.5 seconds, using default values");
+                    // Use default values on timeout
                     TotalBuses = 0;
                     TotalDrivers = 0;
                     TotalActiveRoutes = 0;
-#if DEBUG
-#endif
-                    return;
                 }
 
-#if DEBUG
-#endif
-                var metrics = await metricsTask;
-                cancellationToken.ThrowIfCancellationRequested();
-#if DEBUG
-#endif
-
-                // Store metrics for future cache use - we'll let the background process handle this
+                // Stop the stopwatch for metrics
                 metricsStopwatch.Stop();
-#if DEBUG
-#endif
-
-#if DEBUG
-#endif
-                // Update metrics properties - check for cancellation between operations
-                if (metrics != null && !cancellationToken.IsCancellationRequested && metrics.TryGetValue("BusCount", out int busCount))
-                {
-                    TotalBuses = busCount;
-#if DEBUG
-#endif
-                }
-                else
-                {
-#if DEBUG
-#endif
-                }
-
-                if (metrics != null && !cancellationToken.IsCancellationRequested && metrics.TryGetValue("DriverCount", out int driverCount))
-                {
-                    TotalDrivers = driverCount;
-#if DEBUG
-#endif
-                }
-                else
-                {
-#if DEBUG
-#endif
-                }
-
-                if (metrics != null && !cancellationToken.IsCancellationRequested && metrics.TryGetValue("RouteCount", out int routeCount))
-                {
-                    TotalActiveRoutes = routeCount;
-#if DEBUG
-#endif
-                }
-                else
-                {
-#if DEBUG
-#endif
-                }
 
                 _logger.LogInformation("Critical dashboard metrics loaded in {ElapsedMs}ms - " +
                     "Buses: {TotalBuses}, Drivers: {TotalDrivers}, Routes: {TotalActiveRoutes}",

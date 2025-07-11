@@ -686,29 +686,53 @@ public partial class App : Application
 
         try
         {
+            // Enhanced logging with detailed exception information
+            string errorMessage = e.Exception?.Message ?? "Unknown error";
+            string stackTrace = e.Exception?.StackTrace ?? "No stack trace available";
+            string innerExceptionDetails = e.Exception?.InnerException?.ToString() ?? "No inner exception";
+
             // Categorize the exception for better user messaging
-            var isDbException = IsDbContextException(e.Exception);
-            var isCriticalException = IsCriticalException(e.Exception);
+            var isDbException = e.Exception != null && IsDbContextException(e.Exception);
+            var isCriticalException = e.Exception != null && IsCriticalException(e.Exception);
+            var isSyncfusionException = IsSyncfusionException(e.Exception);
+
+            // Log detailed exception information for debugging
+            Log.Error(e.Exception, "[ERROR] Dispatcher unhandled exception - Message: {ErrorMessage}, StackTrace: {StackTrace}, InnerException: {InnerException}",
+                errorMessage, stackTrace, innerExceptionDetails);
 
             if (isCriticalException)
             {
-                Log.Fatal(e.Exception, "[FATAL] Critical dispatcher unhandled exception");
+                Log.Fatal(e.Exception, "[FATAL] Critical dispatcher unhandled exception - Message: {ErrorMessage}", errorMessage);
                 e.Handled = true;
 
                 MessageBox.Show(
-                    "A critical error has occurred. The application will attempt to continue, but some features may not work correctly.\n\n" +
+                    $"A critical error has occurred:\n\n{errorMessage}\n\nThe application will attempt to continue, but some features may not work correctly.\n\n" +
                     "Please save your work and restart the application.",
                     "Critical Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
-            else if (isDbException)
+            else if (isSyncfusionException)
             {
-                Log.Error(e.Exception, "[ERROR] Database-related dispatcher exception");
+                Log.Error(e.Exception, "[ERROR] Syncfusion-related dispatcher exception - Message: {ErrorMessage}, StackTrace: {StackTrace}", errorMessage, stackTrace);
                 e.Handled = true;
 
                 MessageBox.Show(
-                    "A database error occurred. Please check your connection and try again.\n\n" +
+                    $"A Syncfusion UI component error occurred:\n\n{errorMessage}\n\n" +
+                    "The application will continue, but some UI features may not display correctly.\n\n" +
+                    "Please check the Dashboard layout and try refreshing the view.",
+                    "UI Component Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            else if (isDbException)
+            {
+                Log.Error(e.Exception, "[ERROR] Database-related dispatcher exception - Message: {ErrorMessage}, StackTrace: {StackTrace}", errorMessage, stackTrace);
+                e.Handled = true;
+
+                MessageBox.Show(
+                    $"A database error occurred:\n\n{errorMessage}\n\n" +
+                    "Please check your connection and try again.\n\n" +
                     "If the problem persists, contact your system administrator.",
                     "Database Error",
                     MessageBoxButton.OK,
@@ -716,13 +740,14 @@ public partial class App : Application
             }
             else
             {
-                Log.Error(e.Exception, "[ERROR] Dispatcher unhandled exception");
+                Log.Error(e.Exception, "[ERROR] General dispatcher unhandled exception - Message: {ErrorMessage}, StackTrace: {StackTrace}", errorMessage, stackTrace);
                 e.Handled = true;
 
                 MessageBox.Show(
-                    "An unexpected error occurred. Please try again.\n\n" +
-                    "If the problem persists, please contact support.",
-                    "Error",
+                    $"An unexpected error occurred:\n\n{errorMessage}\n\n" +
+                    "Please try again. If the problem persists, please contact support.\n\n" +
+                    "Stack trace details have been logged for troubleshooting.",
+                    "Unexpected Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -733,14 +758,20 @@ public partial class App : Application
         {
             try
             {
-                // Ensure fallback logging
-                File.AppendAllText(fallbackLogPath,
-                    $"[ERROR] [{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] Dispatcher unhandled exception: {e.Exception}\n" +
-                    $"[LOGGING ERROR]: {logEx}\n");
+                // Enhanced fallback logging with more details
+                string fallbackDetails = $"[ERROR] [{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] Dispatcher unhandled exception:\n" +
+                                       $"Exception Message: {e.Exception?.Message ?? "Unknown"}\n" +
+                                       $"Exception Type: {e.Exception?.GetType().FullName ?? "Unknown"}\n" +
+                                       $"Stack Trace: {e.Exception?.StackTrace ?? "No stack trace"}\n" +
+                                       $"Inner Exception: {e.Exception?.InnerException?.ToString() ?? "None"}\n" +
+                                       $"[LOGGING ERROR]: {logEx}\n\n";
+
+                File.AppendAllText(fallbackLogPath, fallbackDetails);
 
                 e.Handled = true;
                 MessageBox.Show(
-                    "A fatal error occurred. Please contact support.",
+                    $"A fatal error occurred:\n\n{e.Exception?.Message ?? "Unknown error"}\n\n" +
+                    "Please contact support. Error details have been logged.",
                     "Fatal Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -815,6 +846,20 @@ public partial class App : Application
                exception is BadImageFormatException ||
                exception is CannotUnloadAppDomainException ||
                exception is InvalidProgramException;
+    }
+
+    /// <summary>
+    /// Determines if an exception is related to Syncfusion components
+    /// </summary>
+    private static bool IsSyncfusionException(Exception? exception)
+    {
+        if (exception == null) return false;
+
+        return exception.GetType().FullName?.Contains("Syncfusion") == true ||
+               exception.Message.Contains("Syncfusion") ||
+               exception.Message.Contains("DockingManager") ||
+               exception.Message.Contains("AutoHidden") ||
+               exception.StackTrace?.Contains("Syncfusion") == true;
     }
 
     /// <summary>
