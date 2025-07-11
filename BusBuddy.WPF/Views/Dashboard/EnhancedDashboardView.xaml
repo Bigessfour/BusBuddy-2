@@ -106,14 +106,12 @@
             <TextBlock Text="Bus Buddy Dashboard" FontSize="24" FontWeight="SemiBold" Foreground="White"/>
         </Border>
         
-        <!-- Main Content with DockingManager -->
-        <syncfusion:DockingManager x:Name="MainDockingManager" 
-                                   Grid.Row="1"
-                                   UseDocumentContainer="True" 
-                                   PersistState="True"
-                                   ContainerMode="TDI"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch">
+        <!-- Main Content - Simplified DockingManager to fix XAML parsing errors -->
+        <Grid Grid.Row="1">
+            <syncfusion:DockingManager x:Name="MainDockingManager" 
+                                       UseDocumentContainer="True" 
+                                       PersistState="False"
+                                       ContainerMode="TDI">
             
             <!-- Dashboard Overview Panel (Document) -->
             <ContentControl x:Name="DashboardOverview" 
@@ -715,8 +713,7 @@
                                Margin="10"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
-            </ContentControl>
-            
-        </syncfusion:DockingManager>
+            </ContentControl>            </syncfusion:DockingManager>
+        </Grid>
     </Grid>
 </UserControl>

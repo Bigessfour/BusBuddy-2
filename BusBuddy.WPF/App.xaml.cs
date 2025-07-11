@@ -54,9 +54,15 @@ public partial class App : Application
             })
             .Build();
     }
-
     protected override void OnStartup(StartupEventArgs e)
     {
+        // CRITICAL FIX: Set culture to prevent XAML parsing issues with * character
+        // This fixes the "* is not a valid value for Double" error in Syncfusion templates
+        System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+        System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
+        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
+
         // Start performance monitoring
         var stopwatch = Stopwatch.StartNew();
 
@@ -427,26 +433,87 @@ public partial class App : Application
             {
                 try
                 {
-                    // Initialize the dashboard asynchronously
+                    // Add small delay to ensure UI thread is ready
+                    await Task.Delay(100);
+
+                    // Initialize the dashboard asynchronously with enhanced error handling
+                    Log.Information("[STARTUP] Starting dashboard initialization");
                     await dashboardViewModel.InitializeAsync();
+                    Log.Information("[STARTUP] Dashboard initialization completed successfully");
 
                     // Switch to dashboard when it's ready
                     System.Windows.Application.Current.Dispatcher.Invoke(() =>
                     {
-                        mainViewModel.NavigateToCommand.Execute("Dashboard");
-                        _startupMonitor.EndStep();
+                        try
+                        {
+                            mainViewModel.NavigateToCommand.Execute("Dashboard");
+                            _startupMonitor.EndStep();
+                            Log.Information("[STARTUP] Successfully navigated to Dashboard view");
+                        }
+                        catch (Exception navEx)
+                        {
+                            Log.Error(navEx, "[STARTUP] Error during dashboard navigation: {ErrorMessage}", navEx.Message);
+                            // Fallback to a safe view
+                            try
+                            {
+                                mainViewModel.NavigateToCommand.Execute("Loading");
+                            }
+                            catch (Exception fallbackEx)
+                            {
+                                Log.Fatal(fallbackEx, "[STARTUP] Fatal error: Cannot navigate to any view");
+                            }
+                            _startupMonitor.EndStep();
+                        }
+                    });
+                }
+                catch (System.Windows.Markup.XamlParseException xamlEx)
+                {
+                    Log.Error(xamlEx, "[STARTUP] XAML parsing error during dashboard initialization. This may be related to Syncfusion template loading: {ErrorMessage}", xamlEx.Message);
+
+                    // Handle dashboard initialization error on UI thread with fallback
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        try
+                        {
+                            // Show a simplified error view instead of dashboard
+                            mainViewModel.NavigateToCommand.Execute("Error");
+                            _startupMonitor.EndStep();
+
+                            // Show user-friendly error message
+                            MessageBox.Show(
+                                "The dashboard view could not be loaded due to a template error.\n\n" +
+                                "This is often caused by display scaling or regional settings conflicts.\n\n" +
+                                "The application will continue to function, but some dashboard features may not display correctly.\n\n" +
+                                "Please try restarting the application or contact support if the problem persists.",
+                                "Dashboard Loading Issue",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                        }
+                        catch (Exception uiEx)
+                        {
+                            Log.Fatal(uiEx, "[STARTUP] Fatal error handling XAML exception");
+                            _startupMonitor.EndStep();
+                        }
                     });
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Error initializing dashboard");
+                    Log.Error(ex, "[STARTUP] General error during dashboard initialization: {ErrorMessage}", ex.Message);
 
                     // Handle initialization error on UI thread
                     System.Windows.Application.Current.Dispatcher.Invoke(() =>
                     {
-                        // Show error view or dashboard with error state
-                        mainViewModel.NavigateToCommand.Execute("Error");
-                        _startupMonitor.EndStep();
+                        try
+                        {
+                            // Show error view or dashboard with error state
+                            mainViewModel.NavigateToCommand.Execute("Error");
+                            _startupMonitor.EndStep();
+                        }
+                        catch (Exception errorEx)
+                        {
+                            Log.Fatal(errorEx, "[STARTUP] Fatal error during error handling");
+                            _startupMonitor.EndStep();
+                        }
                     });
                 }
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default)
@@ -855,11 +922,19 @@ public partial class App : Application
     {
         if (exception == null) return false;
 
+        // Check for XAML parsing errors specifically related to * character parsing
+        var isXamlStarParsingError = exception is System.Windows.Markup.XamlParseException xamlEx &&
+                                    (xamlEx.Message.Contains("is not a valid value for Double") ||
+                                     xamlEx.Message.Contains("TypeConverterMarkupExtension"));
+
         return exception.GetType().FullName?.Contains("Syncfusion") == true ||
                exception.Message.Contains("Syncfusion") ||
                exception.Message.Contains("DockingManager") ||
                exception.Message.Contains("AutoHidden") ||
-               exception.StackTrace?.Contains("Syncfusion") == true;
+               exception.Message.Contains("TabControlExt") ||
+               exception.Message.Contains("TDILayoutPanel") ||
+               exception.StackTrace?.Contains("Syncfusion") == true ||
+               isXamlStarParsingError;
     }
 
     /// <summary>
