@@ -22,7 +22,7 @@
             <sf:SfDataGrid.Columns>
                 <sf:GridTextColumn MappingName="RouteName" HeaderText="Route Name" />
                 <sf:GridTextColumn MappingName="Description" HeaderText="Description" />
-                <sf:GridDateTimeColumn MappingName="Date" HeaderText="Date" />
+                <sf:GridDateTimeColumn MappingName="Date" HeaderText="Date" Pattern="ShortDate" />
                 <sf:GridCheckBoxColumn MappingName="IsActive" HeaderText="Active" />
                 <sf:GridComboBoxColumn MappingName="AMVehicleId" HeaderText="AM Bus"
                                        ItemsSource="{Binding DataContext.Buses, RelativeSource={RelativeSource AncestorType=UserControl}}"

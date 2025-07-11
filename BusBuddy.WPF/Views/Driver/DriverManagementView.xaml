@@ -22,8 +22,8 @@
                 <sf:GridTextColumn MappingName="LastName" HeaderText="Last Name" />
                 <sf:GridTextColumn MappingName="ContactPhone" HeaderText="Phone" />
                 <sf:GridTextColumn MappingName="ContactEmail" HeaderText="Email" />
-                <sf:GridDateTimeColumn MappingName="HireDate" HeaderText="Hire Date" />
-                <sf:GridDateTimeColumn MappingName="LicenseExpiryDate" HeaderText="License Expiry" />
+                <sf:GridDateTimeColumn MappingName="HireDate" HeaderText="Hire Date" Pattern="ShortDate" />
+                <sf:GridDateTimeColumn MappingName="LicenseExpiryDate" HeaderText="License Expiry" Pattern="ShortDate" />
             </sf:SfDataGrid.Columns>
         </sf:SfDataGrid>
 
@@ -40,7 +40,7 @@
                     <sf:SfDataGrid.Columns>
                         <sf:GridTextColumn MappingName="DriverName" HeaderText="Driver Name"/>
                         <sf:GridTextColumn MappingName="LicenseStatus" HeaderText="Status"/>
-                        <sf:GridDateTimeColumn MappingName="LicenseExpiry" HeaderText="Expiry Date"/>
+                        <sf:GridDateTimeColumn MappingName="LicenseExpiry" HeaderText="Expiry Date" Pattern="ShortDate"/>
                     </sf:SfDataGrid.Columns>
                 </sf:SfDataGrid>
             </StackPanel>

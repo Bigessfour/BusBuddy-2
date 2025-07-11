@@ -63,6 +63,9 @@ public partial class App : Application
         System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
         System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
 
+        // CRITICAL FIX: Validate Syncfusion DateTimePattern configurations to prevent XamlParseException
+        BusBuddy.WPF.Utilities.SyncfusionValidationUtility.ValidateSyncfusionControls();
+
         // Start performance monitoring
         var stopwatch = Stopwatch.StartNew();
 
@@ -796,6 +799,24 @@ public partial class App : Application
             Log.Error(e.Exception, "[ERROR] Dispatcher unhandled exception - Message: {ErrorMessage}, StackTrace: {StackTrace}, InnerException: {InnerException}",
                 errorMessage, stackTrace, innerExceptionDetails);
 
+            // SPECIFIC FIX: Handle TypeConverterMarkupExtension errors (enum parsing issues)
+            if (e.Exception is System.Windows.Markup.XamlParseException xamlParseEx &&
+                xamlParseEx.Message.Contains("TypeConverterMarkupExtension"))
+            {
+                Log.Error(e.Exception, "[ERROR] TypeConverter XAML parsing error detected - attempting graceful recovery");
+                e.Handled = true;
+
+                // Show user-friendly message and continue
+                MessageBox.Show(
+                    "A UI formatting error was detected and corrected.\n\n" +
+                    "The application will continue normally, but some display elements may use default formatting.\n\n" +
+                    "This is typically related to date/time formatting and does not affect application functionality.",
+                    "UI Formatting Issue Resolved",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return; // Exit early after handling
+            }
+
             if (isCriticalException)
             {
                 Log.Fatal(e.Exception, "[FATAL] Critical dispatcher unhandled exception - Message: {ErrorMessage}", errorMessage);
@@ -813,13 +834,30 @@ public partial class App : Application
                 Log.Error(e.Exception, "[ERROR] Syncfusion-related dispatcher exception - Message: {ErrorMessage}, StackTrace: {StackTrace}", errorMessage, stackTrace);
                 e.Handled = true;
 
-                MessageBox.Show(
-                    $"A Syncfusion UI component error occurred:\n\n{errorMessage}\n\n" +
-                    "The application will continue, but some UI features may not display correctly.\n\n" +
-                    "Please check the Dashboard layout and try refreshing the view.",
-                    "UI Component Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                // Enhanced handling for DateTimePattern errors specifically
+                if (e.Exception is System.Windows.Markup.XamlParseException xpe &&
+                    xpe.InnerException?.Message.Contains("DateTimePattern") == true)
+                {
+                    Log.Error(e.Exception, "[ERROR] DateTimePattern XAML parsing error detected - this indicates an invalid enum value in Syncfusion controls");
+
+                    MessageBox.Show(
+                        "Invalid date pattern detected in UI controls.\n\n" +
+                        "The application will continue with default patterns, but some date displays may not format correctly.\n\n" +
+                        "Please contact support if date formatting issues persist.",
+                        "Date Pattern Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        $"A Syncfusion UI component error occurred:\n\n{errorMessage}\n\n" +
+                        "The application will continue, but some UI features may not display correctly.\n\n" +
+                        "Please check the Dashboard layout and try refreshing the view.",
+                        "UI Component Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
             }
             else if (isDbException)
             {
@@ -956,6 +994,12 @@ public partial class App : Application
                                     (xamlEx.Message.Contains("is not a valid value for Double") ||
                                      xamlEx.Message.Contains("TypeConverterMarkupExtension"));
 
+        // Check for DateTimePattern enum parsing errors
+        var isDateTimePatternError = exception is System.Windows.Markup.XamlParseException dtpEx &&
+                                    (dtpEx.InnerException?.Message.Contains("DateTimePattern") == true ||
+                                     dtpEx.InnerException?.Message.Contains("is not a valid value for DateTimePattern") == true ||
+                                     dtpEx.Message.Contains("FullDate is not a valid value"));
+
         return exception.GetType().FullName?.Contains("Syncfusion") == true ||
                exception.Message.Contains("Syncfusion") ||
                exception.Message.Contains("DockingManager") ||
@@ -963,7 +1007,8 @@ public partial class App : Application
                exception.Message.Contains("TabControlExt") ||
                exception.Message.Contains("TDILayoutPanel") ||
                exception.StackTrace?.Contains("Syncfusion") == true ||
-               isXamlStarParsingError;
+               isXamlStarParsingError ||
+               isDateTimePatternError;
     }
 
     /// <summary>

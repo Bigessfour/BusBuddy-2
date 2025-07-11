@@ -21,8 +21,8 @@
                 <syncfusion:GridTextColumn MappingName="Route.RouteName" HeaderText="Route" Width="120"/>
                 <syncfusion:GridTextColumn MappingName="Bus.BusNumber" HeaderText="Bus" Width="80"/>
                 <syncfusion:GridTextColumn MappingName="Driver.DriverName" HeaderText="Driver" Width="120"/>
-                <syncfusion:GridDateTimeColumn MappingName="DepartureTime" HeaderText="Departure" Width="120"/>
-                <syncfusion:GridDateTimeColumn MappingName="ArrivalTime" HeaderText="Arrival" Width="120"/>
+                <syncfusion:GridDateTimeColumn MappingName="DepartureTime" HeaderText="Departure" Width="120" Pattern="LongTime"/>
+                <syncfusion:GridDateTimeColumn MappingName="ArrivalTime" HeaderText="Arrival" Width="120" Pattern="LongTime"/>
                 <syncfusion:GridTextColumn MappingName="ScheduleDate" HeaderText="Date" Width="100"/>
             </syncfusion:SfDataGrid.Columns>
         </syncfusion:SfDataGrid>

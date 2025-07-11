@@ -63,7 +63,7 @@
                 <sf:GridDateTimeColumn MappingName="ScheduleDate" 
                                       HeaderText="Schedule Date"
                                       Width="130"
-                                      Pattern="FullDate"/>
+                                      Pattern="LongDate"/>
                 <sf:GridTimeSpanColumn MappingName="LeaveTime" 
                                       HeaderText="Departure"
                                       Width="100"/>
