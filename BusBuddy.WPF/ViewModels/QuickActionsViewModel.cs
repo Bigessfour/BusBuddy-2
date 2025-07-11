@@ -32,6 +32,7 @@ namespace BusBuddy.WPF.ViewModels
     {
         private bool _isEnabled = true;
         private ObservableCollection<QuickActionItem> _quickActions = new();
+        private readonly Action<string>? _navigationAction;
 
         public bool IsEnabled
         {
@@ -68,8 +69,9 @@ namespace BusBuddy.WPF.ViewModels
         public ICommand QuickReportCommand { get; set; } = null!;
         public ICommand QuickExportCommand { get; set; } = null!;
 
-        public QuickActionsViewModel()
+        public QuickActionsViewModel(Action<string>? navigationAction = null)
         {
+            _navigationAction = navigationAction;
             InitializeCommands();
             InitializeQuickActions();
         }
@@ -103,8 +105,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ExecuteQuickAddStudent()
         {
-            // TODO: Navigate to student creation dialog
-            // This will be implemented when integrating with existing navigation system
+            _navigationAction?.Invoke("Students");
         }
 
         private bool CanExecuteQuickAddStudent()
@@ -114,7 +115,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ExecuteQuickAddBus()
         {
-            // TODO: Navigate to bus creation dialog
+            _navigationAction?.Invoke("Buses");
         }
 
         private bool CanExecuteQuickAddBus()
@@ -124,7 +125,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ExecuteQuickScheduleTrip()
         {
-            // TODO: Navigate to trip scheduling dialog
+            _navigationAction?.Invoke("Schedule");
         }
 
         private bool CanExecuteQuickScheduleTrip()
@@ -134,7 +135,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ExecuteQuickMaintenance()
         {
-            // TODO: Navigate to maintenance logging dialog
+            _navigationAction?.Invoke("Maintenance");
         }
 
         private bool CanExecuteQuickMaintenance()
@@ -144,7 +145,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ExecuteQuickFuelEntry()
         {
-            // TODO: Navigate to fuel entry dialog
+            _navigationAction?.Invoke("Fuel");
         }
 
         private bool CanExecuteQuickFuelEntry()
@@ -154,7 +155,7 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ExecuteQuickReport()
         {
-            // TODO: Navigate to report generation
+            _navigationAction?.Invoke("Activity");
         }
 
         private bool CanExecuteQuickReport()
@@ -164,7 +165,9 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ExecuteQuickExport()
         {
-            // TODO: Navigate to data export dialog
+            // TODO: Implement data export functionality
+            // This could be a separate dialog or navigate to a reporting section
+            _navigationAction?.Invoke("Activity");
         }
 
         private bool CanExecuteQuickExport()

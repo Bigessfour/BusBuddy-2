@@ -11,7 +11,6 @@
         xmlns:driver="clr-namespace:BusBuddy.WPF.Views.Driver"
         xmlns:schedule="clr-namespace:BusBuddy.WPF.Views.Schedule"
         xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
-        xmlns:ticket="clr-namespace:BusBuddy.WPF.Views.Ticket"
         xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
         xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
         xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"

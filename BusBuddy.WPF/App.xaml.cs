@@ -574,20 +574,27 @@ public partial class App : Application
 
     private void ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services, IConfiguration configuration)
     {
+        ConfigureLoggingAndDiagnostics(services);
+        ConfigureDatabase(services, configuration);
+        ConfigureDataAccess(services);
+        ConfigureCoreServices(services);
+        ConfigureWpfServices(services);
+        ConfigureUtilities(services);
+        ConfigureViewModels(services);
+    }
+
+    private void ConfigureLoggingAndDiagnostics(IServiceCollection services)
+    {
         // Register logging so ILogger<T> can be injected into services
         services.AddLogging();
-
-        // Register memory caching services - CRITICAL for BusCachingService
-        services.AddMemoryCache();
-
-        // Register AutoMapper services
-        services.AddAutoMapper(typeof(BusBuddy.WPF.Mapping.MappingProfile));
-        services.AddSingleton<BusBuddy.WPF.Services.IMappingService, BusBuddy.WPF.Services.MappingService>();
 
         // Register performance monitoring utilities
         services.AddSingleton<BusBuddy.WPF.Utilities.PerformanceMonitor>();
         services.AddSingleton<BusBuddy.WPF.Utilities.StartupPerformanceMonitor>();
+    }
 
+    private void ConfigureDatabase(IServiceCollection services, IConfiguration configuration)
+    {
         // Register DbContext using SQL Server and connection string from appsettings.json with scoped lifetime
         string? connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<BusBuddyDbContext>(options =>
@@ -623,7 +630,10 @@ public partial class App : Application
                 options.EnableDetailedErrors();
             }
         }, ServiceLifetime.Scoped); // Explicitly specify scoped lifetime
+    }
 
+    private void ConfigureDataAccess(IServiceCollection services)
+    {
         // Register DbContextFactory - CRITICAL - must be scoped, not singleton
         services.AddScoped<IBusBuddyDbContextFactory, BusBuddyDbContextFactory>();
 
@@ -632,40 +642,54 @@ public partial class App : Application
 
         // Register specialized repositories for thread-safe data access
         services.AddScoped<BusBuddy.Core.Data.Repositories.IVehicleRepository, BusBuddy.Core.Data.Repositories.VehicleRepository>();
+    }
+
+    private void ConfigureCoreServices(IServiceCollection services)
+    {
+        // Register memory caching services - CRITICAL for BusCachingService
+        services.AddMemoryCache();
 
         // Register caching service - depends on IMemoryCache
         services.AddSingleton<BusBuddy.Core.Services.IBusCachingService, BusBuddy.Core.Services.BusCachingService>();
+        services.AddSingleton<BusBuddy.Core.Services.IEnhancedCachingService, BusBuddy.Core.Services.EnhancedCachingService>();
 
-        // Register Core Services
+        // Register Core Business Services
         services.AddScoped<BusBuddy.Core.Services.Interfaces.IBusService, BusBuddy.Core.Services.BusService>();
         services.AddScoped<BusBuddy.Core.Services.IRouteService, BusBuddy.Core.Services.RouteService>();
         services.AddScoped<BusBuddy.Core.Services.IDriverService, BusBuddy.Core.Services.DriverService>();
-        services.AddScoped<BusBuddy.Core.Services.ITicketService, BusBuddy.Core.Services.TicketService>();
         services.AddScoped<BusBuddy.Core.Services.IFuelService, BusBuddy.Core.Services.FuelService>();
         services.AddScoped<BusBuddy.Core.Services.IMaintenanceService, BusBuddy.Core.Services.MaintenanceService>();
-        services.AddScoped<BusBuddy.Core.Services.IUserContextService, BusBuddy.Core.Services.UserContextService>();
         services.AddScoped<BusBuddy.Core.Services.IActivityLogService, BusBuddy.Core.Services.ActivityLogService>();
         services.AddScoped<BusBuddy.Core.Services.IStudentService, BusBuddy.Core.Services.StudentService>();
         services.AddScoped<BusBuddy.Core.Services.Interfaces.IScheduleService, BusBuddy.Core.Services.ScheduleService>();
+
+        // Configuration and User Services
+        services.AddScoped<BusBuddy.Core.Services.IUserContextService, BusBuddy.Core.Services.UserContextService>();
         services.AddScoped<BusBuddy.Core.Services.IUserSettingsService, BusBuddy.Core.Services.UserSettingsService>();
         services.AddScoped<BusBuddy.Core.Services.IConfigurationService, BusBuddy.Core.Services.ConfigurationService>();
+
+        // Specialized Services
         services.AddScoped<BusBuddy.Core.Services.GoogleEarthEngineService>();
-        services.AddScoped<BusBuddy.Core.Services.RoutePopulationScaffold>();
-
-        // Register Dashboard Metrics Service
         services.AddScoped<BusBuddy.Core.Services.IDashboardMetricsService, BusBuddy.Core.Services.DashboardMetricsService>();
+    }
 
-        // Register Enhanced Caching Service
-        services.AddSingleton<BusBuddy.Core.Services.IEnhancedCachingService, BusBuddy.Core.Services.EnhancedCachingService>();
+    private void ConfigureWpfServices(IServiceCollection services)
+    {
+        // Register AutoMapper services
+        services.AddAutoMapper(typeof(BusBuddy.WPF.Mapping.MappingProfile));
+        services.AddSingleton<BusBuddy.WPF.Services.IMappingService, BusBuddy.WPF.Services.MappingService>();
 
-        // Register WPF Services
+        // Register WPF-specific Services
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
         services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
 
         // Register Theme Service for dark/light mode switching
         services.AddSingleton<BusBuddy.WPF.Services.IThemeService, BusBuddy.WPF.Services.ThemeService>();
+    }
 
+    private void ConfigureUtilities(IServiceCollection services)
+    {
         // Register performance utilities
         services.AddSingleton<BusBuddy.WPF.Utilities.BackgroundTaskManager>();
 
@@ -674,14 +698,22 @@ public partial class App : Application
 
         // Register Main Window
         services.AddTransient<MainWindow>();
+    }
 
-        // Register ViewModels with consistent lifetimes
+    private void ConfigureViewModels(IServiceCollection services)
+    {
         // Main/Dashboard/Navigation ViewModels
         services.AddSingleton<BusBuddy.WPF.ViewModels.MainViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.ActivityLogViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.LoadingViewModel>();
+
+        // Dashboard Tile ViewModels  
+        services.AddScoped<BusBuddy.WPF.ViewModels.FleetStatusTileViewModel>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.MaintenanceAlertsTileViewModel>();
+        services.AddScoped<Func<Action<string>?, BusBuddy.WPF.ViewModels.QuickActionsTileViewModel>>(provider =>
+            (navigationAction) => new BusBuddy.WPF.ViewModels.QuickActionsTileViewModel(navigationAction));
 
         // Management ViewModels
         services.AddScoped<BusBuddy.WPF.ViewModels.BusManagementViewModel>();
@@ -691,9 +723,6 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.StudentManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();
-#pragma warning disable CS0618 // Type or member is obsolete
-        services.AddScoped<BusBuddy.WPF.ViewModels.TicketManagementViewModel>(); // Temporarily re-enabled for startup fix
-#pragma warning restore CS0618
         services.AddScoped<BusBuddy.WPF.ViewModels.RoutePlanningViewModel>();
 
         // List ViewModels

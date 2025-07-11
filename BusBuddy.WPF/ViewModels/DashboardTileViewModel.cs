@@ -3,6 +3,7 @@ using System.Windows.Input;
 using BusBuddy.WPF.ViewModels.Panels;
 using Syncfusion.Windows.Tools.Controls;
 using System.Runtime.CompilerServices;
+using BusBuddy.Core.Data.UnitOfWork;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -90,6 +91,7 @@ namespace BusBuddy.WPF.ViewModels
     /// </summary>
     public class FleetStatusTileViewModel : DashboardTileViewModel
     {
+        private readonly IUnitOfWork _unitOfWork;
         private int _activeBusCount;
         private int _maintenanceBusCount;
         private int _outOfServiceCount;
@@ -114,8 +116,9 @@ namespace BusBuddy.WPF.ViewModels
 
         public int TotalBusCount => ActiveBusCount + MaintenanceBusCount + OutOfServiceCount;
 
-        public FleetStatusTileViewModel()
+        public FleetStatusTileViewModel(IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             Title = "Fleet Status";
             Priority = 1;
         }
@@ -125,15 +128,27 @@ namespace BusBuddy.WPF.ViewModels
             IsRefreshing = true;
             try
             {
-                // TODO: Replace with actual service calls
-                await Task.Delay(500);
+                // Get real fleet data from repository
+                var vehicleCountByStatus = await _unitOfWork.Buses.GetVehicleCountByStatusAsync();
 
-                // Simulate data refresh
-                ActiveBusCount = 25;
-                MaintenanceBusCount = 3;
-                OutOfServiceCount = 1;
+                // Map status values to our display properties
+                ActiveBusCount = vehicleCountByStatus.GetValueOrDefault("Active", 0);
+                MaintenanceBusCount = vehicleCountByStatus.GetValueOrDefault("Maintenance", 0) +
+                                     vehicleCountByStatus.GetValueOrDefault("In Maintenance", 0);
+                OutOfServiceCount = vehicleCountByStatus.GetValueOrDefault("Out of Service", 0) +
+                                   vehicleCountByStatus.GetValueOrDefault("Inactive", 0);
 
                 LastUpdated = DateTime.Now;
+            }
+            catch (Exception ex)
+            {
+                // Log error and fallback to default values
+                System.Diagnostics.Debug.WriteLine($"Error refreshing fleet status: {ex.Message}");
+
+                // Fallback values if database is unavailable
+                ActiveBusCount = 0;
+                MaintenanceBusCount = 0;
+                OutOfServiceCount = 0;
             }
             finally
             {
@@ -147,6 +162,7 @@ namespace BusBuddy.WPF.ViewModels
     /// </summary>
     public class MaintenanceAlertsTileViewModel : DashboardTileViewModel
     {
+        private readonly IUnitOfWork _unitOfWork;
         private int _criticalMaintenanceCount;
         private int _upcomingMaintenanceCount;
         private int _overdueMaintenanceCount;
@@ -169,8 +185,9 @@ namespace BusBuddy.WPF.ViewModels
             set { _overdueMaintenanceCount = value; OnPropertyChanged(); }
         }
 
-        public MaintenanceAlertsTileViewModel()
+        public MaintenanceAlertsTileViewModel(IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             Title = "Maintenance Alerts";
             Priority = 2;
         }
@@ -180,15 +197,27 @@ namespace BusBuddy.WPF.ViewModels
             IsRefreshing = true;
             try
             {
-                // TODO: Replace with actual service calls
-                await Task.Delay(500);
+                // Get real maintenance data from repository
+                var upcomingMaintenance = await _unitOfWork.MaintenanceRecords.GetUpcomingMaintenanceAsync(30);
+                var overdueMaintenance = await _unitOfWork.MaintenanceRecords.GetOverdueMaintenanceAsync();
+                var vehiclesDueForInspection = await _unitOfWork.Buses.GetVehiclesWithExpiredInspectionAsync();
 
-                // Simulate data refresh
-                CriticalMaintenanceCount = 2;
-                UpcomingMaintenanceCount = 5;
-                OverdueMaintenanceCount = 1;
+                // Calculate counts based on real data
+                UpcomingMaintenanceCount = upcomingMaintenance.Count();
+                OverdueMaintenanceCount = overdueMaintenance.Count();
+                CriticalMaintenanceCount = vehiclesDueForInspection.Count();
 
                 LastUpdated = DateTime.Now;
+            }
+            catch (Exception ex)
+            {
+                // Log error and fallback to default values
+                System.Diagnostics.Debug.WriteLine($"Error refreshing maintenance alerts: {ex.Message}");
+
+                // Fallback values if database is unavailable
+                CriticalMaintenanceCount = 0;
+                UpcomingMaintenanceCount = 0;
+                OverdueMaintenanceCount = 0;
             }
             finally
             {
@@ -202,6 +231,8 @@ namespace BusBuddy.WPF.ViewModels
     /// </summary>
     public class QuickActionsTileViewModel : DashboardTileViewModel
     {
+        private readonly Action<string>? _navigationAction;
+
         public ICommand QuickAddStudentCommand { get; set; }
         public ICommand QuickAddBusCommand { get; set; }
         public ICommand QuickScheduleTripCommand { get; set; }
@@ -209,19 +240,20 @@ namespace BusBuddy.WPF.ViewModels
         public ICommand QuickFuelEntryCommand { get; set; }
         public ICommand QuickReportCommand { get; set; }
 
-        public QuickActionsTileViewModel()
+        public QuickActionsTileViewModel(Action<string>? navigationAction = null)
         {
+            _navigationAction = navigationAction;
             Title = "Quick Actions";
             Priority = 5;
             State = "Minimized";
 
-            // Initialize commands - these will be wired to actual implementations
-            QuickAddStudentCommand = new RelayCommand(_ => { /* TODO: Implement */ });
-            QuickAddBusCommand = new RelayCommand(_ => { /* TODO: Implement */ });
-            QuickScheduleTripCommand = new RelayCommand(_ => { /* TODO: Implement */ });
-            QuickMaintenanceCommand = new RelayCommand(_ => { /* TODO: Implement */ });
-            QuickFuelEntryCommand = new RelayCommand(_ => { /* TODO: Implement */ });
-            QuickReportCommand = new RelayCommand(_ => { /* TODO: Implement */ });
+            // Initialize commands with actual navigation
+            QuickAddStudentCommand = new RelayCommand(_ => _navigationAction?.Invoke("Students"));
+            QuickAddBusCommand = new RelayCommand(_ => _navigationAction?.Invoke("Buses"));
+            QuickScheduleTripCommand = new RelayCommand(_ => _navigationAction?.Invoke("Schedule"));
+            QuickMaintenanceCommand = new RelayCommand(_ => _navigationAction?.Invoke("Maintenance"));
+            QuickFuelEntryCommand = new RelayCommand(_ => _navigationAction?.Invoke("Fuel"));
+            QuickReportCommand = new RelayCommand(_ => _navigationAction?.Invoke("Activity"));
         }
     }
 }

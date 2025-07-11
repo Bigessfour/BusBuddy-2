@@ -38,7 +38,7 @@ namespace BusBuddy.WPF.ViewModels
         private MaintenanceTrackingViewModel? _maintenanceTrackingViewModel;
         private FuelManagementViewModel? _fuelManagementViewModel;
         private ActivityLogViewModel? _activityLogViewModel;
-        private TicketManagementViewModel? _ticketManagementViewModel;
+        // REMOVED: _ticketManagementViewModel - deprecated module
 
         // Performance tracking metrics
         private TimeSpan _initializationTime;
@@ -259,35 +259,7 @@ namespace BusBuddy.WPF.ViewModels
             }
         }
 
-        public TicketManagementViewModel? TicketManagementViewModel
-        {
-            get
-            {
-                try
-                {
-                    if (_ticketManagementViewModel == null)
-                    {
-                        _logger.LogInformation("Attempting to resolve TicketManagementViewModel from service provider (deprecated module)");
-                        // Use GetService instead of GetRequiredService to handle missing service gracefully
-                        _ticketManagementViewModel = _serviceProvider.GetService<TicketManagementViewModel>();
-                        if (_ticketManagementViewModel != null)
-                        {
-                            _logger.LogInformation("Successfully resolved TicketManagementViewModel");
-                        }
-                        else
-                        {
-                            _logger.LogInformation("TicketManagementViewModel service not registered (expected for deprecated module)");
-                        }
-                    }
-                    return _ticketManagementViewModel;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "TicketManagementViewModel is not available (deprecated module): {0}", ex.Message);
-                    return null; // Return null instead of throwing to handle graceful degradation
-                }
-            }
-        }
+        // REMOVED: TicketManagementViewModel property - deprecated module completely removed
 
         public DashboardViewModel(
             IRoutePopulationScaffold routePopulationScaffold,
@@ -1315,19 +1287,7 @@ namespace BusBuddy.WPF.ViewModels
                         }
                     }
 
-                    // Initialize TicketManagementViewModel
-                    using (LogContext.PushProperty("Operation", "TicketManagementLoading"))
-                    {
-                        try
-                        {
-                            var ticketViewModel = TicketManagementViewModel;
-                            _logger.LogInformation("Successfully initialized TicketManagementViewModel");
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning(ex, "Could not initialize TicketManagementViewModel: {Message}", ex.Message);
-                        }
-                    }
+                    // REMOVED: TicketManagementViewModel initialization - deprecated module
 
                     // Wait for all initialization tasks to complete
                     await Task.WhenAll(initializationTasks);
@@ -1358,12 +1318,20 @@ namespace BusBuddy.WPF.ViewModels
         /// </summary>
         private async Task LoadCriticalDataAsync(CancellationToken cancellationToken = default)
         {
-#if DEBUG
-#endif
-            _logger.LogInformation("Starting LoadCriticalDataAsync - fast path for dashboard");
+            // Prevent concurrent calls to avoid DbContext threading issues
+            if (_isRefreshing)
+            {
+                _logger.LogDebug("Skipping LoadCriticalDataAsync - already in progress");
+                return;
+            }
 
             try
             {
+                _isRefreshing = true;
+#if DEBUG
+#endif
+                _logger.LogInformation("Starting LoadCriticalDataAsync - fast path for dashboard");
+
 #if DEBUG
 #endif
 #if DEBUG
@@ -1472,6 +1440,10 @@ namespace BusBuddy.WPF.ViewModels
 #endif
 
                 // We don't rethrow here to ensure the dashboard can still load
+            }
+            finally
+            {
+                _isRefreshing = false;
             }
         }
 

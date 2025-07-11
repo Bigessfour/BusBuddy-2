@@ -5,72 +5,124 @@ using System.Collections.Generic;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace BusBuddy.WPF.Services
 {
     public class RoutePopulationScaffold : IRoutePopulationScaffold
     {
         private readonly BusBuddy.Core.Services.IRouteService _routeService;
+        private readonly ILogger<RoutePopulationScaffold>? _logger;
+        private static readonly object _cacheLock = new object();
+        private static List<BusBuddy.Core.Models.Route>? _cachedRoutes;
+        private static DateTime _lastCacheUpdate = DateTime.MinValue;
+        private static readonly TimeSpan _cacheExpiry = TimeSpan.FromMinutes(5); // Cache for 5 minutes
 
-        public RoutePopulationScaffold(BusBuddy.Core.Services.IRouteService routeService)
+        public RoutePopulationScaffold(BusBuddy.Core.Services.IRouteService routeService, ILogger<RoutePopulationScaffold>? logger = null)
         {
             _routeService = routeService;
+            _logger = logger;
         }
 
         public async Task<System.Collections.Generic.List<BusBuddy.Core.Models.Route>> GetOptimizedRoutesAsync()
         {
-            System.Diagnostics.Debug.WriteLine("[DEBUG] RoutePopulationScaffold.GetOptimizedRoutesAsync START");
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            _logger?.LogDebug("RoutePopulationScaffold.GetOptimizedRoutesAsync START");
 
-            var routes = await _routeService.GetAllActiveRoutesAsync();
-            // TODO: Process routes as needed for dashboard or caching
+            try
+            {
+                // Check cache first for performance optimization
+                lock (_cacheLock)
+                {
+                    if (_cachedRoutes != null && DateTime.Now - _lastCacheUpdate < _cacheExpiry)
+                    {
+                        _logger?.LogDebug("Returning cached routes ({Count} routes) in {ElapsedMs}ms",
+                            _cachedRoutes.Count, stopwatch.ElapsedMilliseconds);
+                        return new List<BusBuddy.Core.Models.Route>(_cachedRoutes);
+                    }
+                }
 
-            stopwatch.Stop();
-            System.Diagnostics.Debug.WriteLine($"[DEBUG] RoutePopulationScaffold.GetOptimizedRoutesAsync END - Retrieved {routes.Count()} routes in {stopwatch.ElapsedMilliseconds}ms");
-            return routes.ToList();
+                // Cache miss or expired - fetch from service
+                var routes = await _routeService.GetAllActiveRoutesAsync();
+                var routeList = routes.ToList();
+
+                // Update cache
+                lock (_cacheLock)
+                {
+                    _cachedRoutes = new List<BusBuddy.Core.Models.Route>(routeList);
+                    _lastCacheUpdate = DateTime.Now;
+                }
+
+                stopwatch.Stop();
+                _logger?.LogInformation("Retrieved {Count} routes from service in {ElapsedMs}ms",
+                    routeList.Count, stopwatch.ElapsedMilliseconds);
+
+                return routeList;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error in GetOptimizedRoutesAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                return new List<BusBuddy.Core.Models.Route>();
+            }
         }
 
         public async Task PopulateRoutesAsync()
         {
-            System.Diagnostics.Debug.WriteLine("[DEBUG] RoutePopulationScaffold.PopulateRoutesAsync START");
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            _logger?.LogDebug("RoutePopulationScaffold.PopulateRoutesAsync START");
 
-            // In a real application, this would involve more complex logic
-            // such as fetching from a remote source, calculating routes, etc.
-            // For now, we just ensure the service is working.
-            var routes = await GetOptimizedRoutesAsync();
+            try
+            {
+                // Use the optimized route retrieval with caching
+                var routes = await GetOptimizedRoutesAsync();
 
-            stopwatch.Stop();
-            System.Diagnostics.Debug.WriteLine($"[DEBUG] RoutePopulationScaffold.PopulateRoutesAsync END - Completed in {stopwatch.ElapsedMilliseconds}ms");
+                stopwatch.Stop();
+                _logger?.LogInformation("PopulateRoutesAsync completed with {Count} routes in {ElapsedMs}ms",
+                    routes.Count, stopwatch.ElapsedMilliseconds);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _logger?.LogError(ex, "Error in PopulateRoutesAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+            }
         }
 
         public async Task PopulateRouteMetadataAsync()
         {
-            System.Diagnostics.Debug.WriteLine("[DEBUG] RoutePopulationScaffold.PopulateRouteMetadataAsync START");
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            _logger?.LogDebug("RoutePopulationScaffold.PopulateRouteMetadataAsync START");
 
-            // OPTIMIZATION: This is a lightweight version that only retrieves
-            // minimal route data needed for the dashboard
             try
             {
-                // Direct database access could be used here for a more targeted query
-                // that only fetches the exact fields needed for the dashboard
-                System.Diagnostics.Debug.WriteLine("[DEBUG] RoutePopulationScaffold: Calling GetAllActiveRoutesAsync");
-                var routes = await _routeService.GetAllActiveRoutesAsync();
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] RoutePopulationScaffold: Retrieved {routes.Count()} active routes");
+                // OPTIMIZATION: For startup performance, just ensure cache is warmed up
+                // without doing heavy processing. The actual route data will be loaded
+                // on-demand when needed by the UI components.
 
-                // Here we could perform any necessary processing or caching
-                // but we're keeping it minimal for faster startup
+                // Check if we have cached data, if not, do a lightweight load
+                bool needsRefresh;
+                lock (_cacheLock)
+                {
+                    needsRefresh = _cachedRoutes == null || DateTime.Now - _lastCacheUpdate >= _cacheExpiry;
+                }
+
+                if (needsRefresh)
+                {
+                    _logger?.LogDebug("Cache miss - warming up route cache");
+                    await GetOptimizedRoutesAsync();
+                }
+                else
+                {
+                    _logger?.LogDebug("Using existing cached route data");
+                }
 
                 stopwatch.Stop();
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] RoutePopulationScaffold.PopulateRouteMetadataAsync END - Completed in {stopwatch.ElapsedMilliseconds}ms");
+                _logger?.LogInformation("PopulateRouteMetadataAsync completed in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 stopwatch.Stop();
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Error in PopulateRouteMetadataAsync: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Failed after {stopwatch.ElapsedMilliseconds}ms");
-                // Log but don't throw to avoid startup failures
+                _logger?.LogError(ex, "Error in PopulateRouteMetadataAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                // Don't throw to avoid startup failures
             }
         }
     }
