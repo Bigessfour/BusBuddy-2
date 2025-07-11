@@ -252,14 +252,10 @@
         <!-- Content Area - Dashboard Views -->
         <Grid Grid.Row="1" x:Name="ContentArea">
             <!-- Default content will be the Enhanced Dashboard View -->
+            <!-- Primary Enhanced Dashboard View -->
             <dashboard:EnhancedDashboardView x:Name="EnhancedDashboard" 
                                            DataContext="{Binding}" 
                                            Visibility="Visible"/>
-            
-            <!-- Simple Dashboard View (Hidden by default) -->
-            <dashboard:SimpleDashboardView x:Name="SimpleDashboard" 
-                                         DataContext="{Binding}" 
-                                         Visibility="Collapsed"/>
         </Grid>
 
     </Grid>

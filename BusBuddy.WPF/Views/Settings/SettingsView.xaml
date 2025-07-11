@@ -4,28 +4,72 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="400" d:DesignWidth="600">
+             d:DesignHeight="500" d:DesignWidth="600">
+    
+    <UserControl.Resources>
+        <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
+    </UserControl.Resources>
+    
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="Theme" FontWeight="Bold"/>
+        
+        <!-- Theme Toggle Section -->
+        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Theme Mode" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="ThemeToggle"
+                         IsChecked="{Binding IsDarkTheme, Mode=TwoWay}"
+                         Content="{Binding IsDarkTheme, Converter={StaticResource ThemeTextConverter}}"
+                         VerticalAlignment="Center" 
+                         FontSize="12"/>
+            </StackPanel>
+        </StackPanel>
+        
+        <!-- Advanced Theme Selection -->
+        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,16">
+            <TextBlock Text="Advanced Theme Selection" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
             <syncfusion:ComboBoxAdv x:Name="ThemeComboBox"
                                    ItemsSource="{Binding ThemeOptions}"
                                    SelectedItem="{Binding Theme, Mode=TwoWay}"
-                                   Width="200"/>
+                                   Width="250" HorizontalAlignment="Left"/>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,16">
-            <TextBlock Text="Notification Preference" FontWeight="Bold"/>
+        
+        <!-- Notification Settings -->
+        <StackPanel Orientation="Vertical" Grid.Row="2" Margin="0,0,0,16">
+            <TextBlock Text="Notification Preference" FontWeight="Bold" FontSize="14" Margin="0,0,0,8"/>
             <syncfusion:ComboBoxAdv x:Name="NotificationComboBox"
                                    ItemsSource="{Binding NotificationOptions}"
                                    SelectedItem="{Binding NotificationPreference, Mode=TwoWay}"
-                                   Width="200"/>
+                                   Width="250" HorizontalAlignment="Left"/>
         </StackPanel>
-        <Button Content="Save Settings" Grid.Row="2" Width="120" Height="32" HorizontalAlignment="Left" Command="{Binding SaveSettingsCommand}"/>
+        
+        <!-- Action Buttons -->
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="0,20,0,0">
+            <Button Content="Quick Theme Toggle" 
+                    Command="{Binding ToggleThemeCommand}" 
+                    Width="150" Height="35" 
+                    Margin="0,0,12,0"
+                    Background="#2196F3" 
+                    Foreground="White"/>
+            <Button Content="Save Settings" 
+                    Command="{Binding SaveSettingsCommand}" 
+                    Width="120" Height="35" 
+                    Margin="0,0,12,0"
+                    Background="#4CAF50" 
+                    Foreground="White"/>
+            <Button Content="Reset Settings" 
+                    Command="{Binding ResetSettingsCommand}" 
+                    Width="120" Height="35" 
+                    Background="#FF5722" 
+                    Foreground="White"/>
+        </StackPanel>
     </Grid>
 </UserControl>

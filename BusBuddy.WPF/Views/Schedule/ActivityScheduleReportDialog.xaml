@@ -60,7 +60,7 @@
                                          ExplodeIndex="0">
                         <syncfusion:PieSeries.AdornmentsInfo>
                             <syncfusion:ChartAdornmentInfo ShowLabel="True" 
-                                                        SegmentLabelContent="LabelAndPercent"/>
+                                                        SegmentLabelContent="Percentage"/>
                         </syncfusion:PieSeries.AdornmentsInfo>
                     </syncfusion:PieSeries>
                 </syncfusion:SfChart>
@@ -113,7 +113,7 @@
                                              ShowTooltip="True">
                         <syncfusion:DoughnutSeries.AdornmentsInfo>
                             <syncfusion:ChartAdornmentInfo ShowLabel="True" 
-                                                        SegmentLabelContent="LabelAndPercent"/>
+                                                        SegmentLabelContent="Percentage"/>
                         </syncfusion:DoughnutSeries.AdornmentsInfo>
                     </syncfusion:DoughnutSeries>
                 </syncfusion:SfChart>

@@ -13,9 +13,9 @@
         xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
         xmlns:ticket="clr-namespace:BusBuddy.WPF.Views.Ticket"
         xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
-        xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
         xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
         xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
+        xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
         xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
@@ -29,7 +29,7 @@
         <local:DebugConverter x:Key="DebugConverter" />
         
         <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
-            <dashboard:DashboardView />
+            <dashboard:EnhancedDashboardView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
             <bus:BusManagementView />
@@ -61,9 +61,7 @@
         <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
             <views:StudentListView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:TicketManagementViewModel}">
-            <ticket:TicketManagementView />
-        </DataTemplate>
+
     </Window.Resources>
 
     <syncfusion:SfNavigationDrawer x:Name="navigationDrawer" DisplayMode="Expanded" DrawerWidth="240" DrawerHeight="400" AnimationDuration="250" IsOpen="True">
@@ -83,8 +81,6 @@
                         <!-- Direct navigation buttons for debugging -->
                         <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
                             <Button Content="Dashboard" Command="{Binding NavigateToCommand}" CommandParameter="Dashboard" 
-                                    Margin="5,0" Padding="5,2" Background="#003366" Foreground="White" BorderThickness="0" />
-                            <Button Content="Tickets" Command="{Binding NavigateToCommand}" CommandParameter="Tickets" 
                                     Margin="5,0" Padding="5,2" Background="#003366" Foreground="White" BorderThickness="0" />
                         </StackPanel>
                     </StackPanel>

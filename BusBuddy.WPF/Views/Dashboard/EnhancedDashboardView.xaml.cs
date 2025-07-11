@@ -5,43 +5,44 @@ using System.Windows.Threading;
 using Syncfusion.Windows.Tools.Controls;
 using BusBuddy.WPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BusBuddy.WPF.Views.Dashboard
 {
     /// <summary>
-    /// Enhanced Dashboard View with DockingManager and Tile-based interface
-    /// Implements Development Plan Phase 6A requirements
+    /// 🚀 PRIMARY DASHBOARD VIEW - Enhanced Dashboard with DockingManager and Tile-based interface
+    /// This is the main dashboard implementation as of Phase 6A completion
+    /// Implements Development Plan Phase 6A requirements with modern UI and real-time updates
     /// </summary>
     public partial class EnhancedDashboardView : UserControl
     {
         private DispatcherTimer? _dataRefreshTimer;
         private const int REFRESH_INTERVAL_SECONDS = 5;
+        private readonly ILogger<EnhancedDashboardView>? _logger;
 
         public EnhancedDashboardView()
         {
-            InitializeComponent();
-            InitializeDataRefreshTimer();
-            InitializeDataContext();
-            Loaded += UserControl_Loaded;
-            Unloaded += UserControl_Unloaded;
-        }
-
-        /// <summary>
-        /// Initialize data context with DashboardViewModel from DI
-        /// </summary>
-        private void InitializeDataContext()
-        {
             try
             {
+                // Get logger first for error tracking
                 if (Application.Current is App app && app.Services != null)
                 {
-                    this.DataContext = app.Services.GetService<DashboardViewModel>();
-                    System.Diagnostics.Debug.WriteLine("EnhancedDashboardView: Successfully set DashboardViewModel from DI");
+                    _logger = app.Services.GetService<ILogger<EnhancedDashboardView>>();
                 }
+
+                InitializeComponent();
+                _logger?.LogInformation("🚀 EnhancedDashboardView: PRIMARY dashboard view initialized");
+
+                InitializeDataRefreshTimer();
+                // DataContext is set by DataTemplate - no manual initialization needed
+                Loaded += UserControl_Loaded;
+                Unloaded += UserControl_Unloaded;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"EnhancedDashboardView: Error setting DataContext - {ex.Message}");
+                _logger?.LogError(ex, "Failed to initialize EnhancedDashboardView: {ErrorMessage}", ex.Message);
+                System.Diagnostics.Debug.WriteLine($"❌ EnhancedDashboardView initialization failed: {ex.Message}");
+                throw; // Re-throw to trigger fallback mechanisms
             }
         }
 

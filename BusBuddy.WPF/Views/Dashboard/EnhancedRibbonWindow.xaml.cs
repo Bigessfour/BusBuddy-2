@@ -71,11 +71,12 @@ namespace BusBuddy.WPF.Views.Dashboard
         }
 
         /// <summary>
-        /// Switch to Simple Dashboard with TabControl
+        /// <summary>
+        /// Switch to Enhanced Dashboard (SimpleDashboard no longer available)
         /// </summary>
         private void SimpleViewButton_Click(object sender, RoutedEventArgs e)
         {
-            ShowSimpleDashboard();
+            ShowEnhancedDashboard();
         }
 
         #endregion
@@ -94,7 +95,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 {
                     // Trigger data refresh asynchronously
                     await viewModel.InitializeAsync();
-                    
+
                     MessageBox.Show("Data refresh completed successfully!",
                                   "Refresh", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -200,12 +201,9 @@ namespace BusBuddy.WPF.Views.Dashboard
             try
             {
                 var enhancedDashboard = FindName("EnhancedDashboard") as EnhancedDashboardView;
-                var simpleDashboard = FindName("SimpleDashboard") as SimpleDashboardView;
 
                 if (enhancedDashboard != null)
                     enhancedDashboard.Visibility = Visibility.Visible;
-                if (simpleDashboard != null)
-                    simpleDashboard.Visibility = Visibility.Collapsed;
 
                 // Update window title
                 this.Title = "Bus Buddy - Enhanced Interface";
@@ -218,26 +216,30 @@ namespace BusBuddy.WPF.Views.Dashboard
         }
 
         /// <summary>
-        /// Show the Simple Dashboard with TabControl
+        /// Refresh the current dashboard view
         /// </summary>
-        private void ShowSimpleDashboard()
+        private void RefreshDashboard()
         {
             try
             {
                 var enhancedDashboard = FindName("EnhancedDashboard") as EnhancedDashboardView;
-                var simpleDashboard = FindName("SimpleDashboard") as SimpleDashboardView;
-
                 if (enhancedDashboard != null)
-                    enhancedDashboard.Visibility = Visibility.Collapsed;
-                if (simpleDashboard != null)
-                    simpleDashboard.Visibility = Visibility.Visible;
+                {
+                    // Trigger a refresh of the dashboard data
+                    var viewModel = enhancedDashboard.DataContext as DashboardViewModel;
+                    if (viewModel != null)
+                    {
+                        // Async refresh without blocking UI
+                        _ = Task.Run(async () => await viewModel.RefreshDashboardDataAsync());
+                    }
+                }
 
-                // Update window title
-                this.Title = "Bus Buddy - Simple Interface";
+                // Update window title to show last refresh time
+                this.Title = $"Bus Buddy - Enhanced Interface (Refreshed: {DateTime.Now:HH:mm:ss})";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error showing Simple Dashboard: {ex.Message}",
+                MessageBox.Show($"Error refreshing Dashboard: {ex.Message}",
                               "Display Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -324,7 +326,7 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
             else
             {
-                ShowSimpleDashboard();
+                ShowEnhancedDashboard(); // Only Enhanced Dashboard available now
             }
         }
 

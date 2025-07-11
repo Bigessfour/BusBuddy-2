@@ -357,6 +357,13 @@ public partial class App : Application
             var mainViewModel = serviceProvider.GetRequiredService<MainViewModel>();
             _startupMonitor.EndStep();
 
+            // Initialize theme service before creating UI
+            _startupMonitor.BeginStep("InitializeTheme");
+            var themeService = serviceProvider.GetRequiredService<BusBuddy.WPF.Services.IThemeService>();
+            themeService.InitializeTheme();
+            Log.Information("[STARTUP] Theme service initialized with theme: {Theme}", themeService.CurrentTheme);
+            _startupMonitor.EndStep();
+
             // Begin tracking MainWindow creation
             _startupMonitor.BeginStep("CreateMainWindow");
             var mainWindowStopwatch = Stopwatch.StartNew();
@@ -573,6 +580,7 @@ public partial class App : Application
         services.AddScoped<BusBuddy.Core.Services.IActivityLogService, BusBuddy.Core.Services.ActivityLogService>();
         services.AddScoped<BusBuddy.Core.Services.IStudentService, BusBuddy.Core.Services.StudentService>();
         services.AddScoped<BusBuddy.Core.Services.Interfaces.IScheduleService, BusBuddy.Core.Services.ScheduleService>();
+        services.AddScoped<BusBuddy.Core.Services.IUserSettingsService, BusBuddy.Core.Services.UserSettingsService>();
         services.AddScoped<BusBuddy.Core.Services.IConfigurationService, BusBuddy.Core.Services.ConfigurationService>();
         services.AddScoped<BusBuddy.Core.Services.GoogleEarthEngineService>();
         services.AddScoped<BusBuddy.Core.Services.RoutePopulationScaffold>();
@@ -587,6 +595,9 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
         services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
+
+        // Register Theme Service for dark/light mode switching
+        services.AddSingleton<BusBuddy.WPF.Services.IThemeService, BusBuddy.WPF.Services.ThemeService>();
 
         // Register performance utilities
         services.AddSingleton<BusBuddy.WPF.Utilities.BackgroundTaskManager>();
@@ -613,7 +624,9 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.StudentManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();
-        // services.AddScoped<BusBuddy.WPF.ViewModels.TicketManagementViewModel>(); // Removed because TicketManagementViewModel is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddScoped<BusBuddy.WPF.ViewModels.TicketManagementViewModel>(); // Temporarily re-enabled for startup fix
+#pragma warning restore CS0618
         services.AddScoped<BusBuddy.WPF.ViewModels.RoutePlanningViewModel>();
 
         // List ViewModels

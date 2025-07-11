@@ -95,15 +95,19 @@ namespace BusBuddy.WPF.ViewModels
             CurrentViewModel = _dashboardViewModel;
 
             // Log initialization for debugging
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"MainViewModel initialized with current view: {CurrentViewModel?.GetType().Name}");
             System.Diagnostics.Debug.WriteLine($"Navigation items count: {NavigationItems.Count}");
+#endif
             _logger?.LogInformation("MainViewModel initialized with {Count} navigation items", NavigationItems.Count);
             _logger?.LogInformation("Navigation items: Dashboard, Buses, Drivers, Routes, Schedule, Students, Maintenance, Fuel, Activity, Student List, Settings");
         }
 
         partial void OnCurrentViewModelChanged(object? value)
         {
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"CurrentViewModel changed to: {value?.GetType().Name ?? "null"}");
+#endif
             _logger?.LogInformation("CurrentViewModel changed to: {ViewModelType}", value?.GetType().Name ?? "null");
         }
 
@@ -111,7 +115,9 @@ namespace BusBuddy.WPF.ViewModels
         private void NavigateTo(string viewModelName)
         {
             _logger?.LogInformation("Navigating to {ViewModelName}", viewModelName);
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"NavigateTo called with parameter: {viewModelName}");
+#endif
 
             object? previousViewModel = CurrentViewModel;
 
@@ -136,7 +142,9 @@ namespace BusBuddy.WPF.ViewModels
             _logger?.LogInformation("Successfully navigated to {ViewModel} from {PreviousViewModel}",
                 CurrentViewModel?.GetType().Name,
                 previousViewModel?.GetType().Name ?? "null");
+#if DEBUG
             System.Diagnostics.Debug.WriteLine($"Navigation completed: {previousViewModel?.GetType().Name ?? "null"} → {CurrentViewModel?.GetType().Name}");
+#endif
         }
     }
 }

@@ -98,7 +98,7 @@
                                     <TextBlock Text="🚌 Fleet Status" Style="{StaticResource TileHeaderStyle}"/>
                                     <TextBlock Text="Total Buses:" Style="{StaticResource TileContentStyle}"/>
                                     <TextBlock Text="{Binding TotalBuses}" Style="{StaticResource TileValueStyle}"/>
-                                    <TextBlock Text="Active: 95%" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                    <TextBlock Text="{Binding FleetActivePercentageFormatted, StringFormat='Active: {0}'}" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
                                 </StackPanel>
                             </Border>
                             
@@ -108,7 +108,7 @@
                                     <TextBlock Text="👨‍💼 Drivers" Style="{StaticResource TileHeaderStyle}"/>
                                     <TextBlock Text="Total Drivers:" Style="{StaticResource TileContentStyle}"/>
                                     <TextBlock Text="{Binding TotalDrivers}" Style="{StaticResource TileValueStyle}"/>
-                                    <TextBlock Text="Available: 87%" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                    <TextBlock Text="{Binding DriverAvailabilityPercentageFormatted, StringFormat='Available: {0}'}" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
                                 </StackPanel>
                             </Border>
                             
@@ -118,7 +118,7 @@
                                     <TextBlock Text="🗺️ Routes" Style="{StaticResource TileHeaderStyle}"/>
                                     <TextBlock Text="Active Routes:" Style="{StaticResource TileContentStyle}"/>
                                     <TextBlock Text="{Binding TotalActiveRoutes}" Style="{StaticResource TileValueStyle}"/>
-                                    <TextBlock Text="Coverage: 98%" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
+                                    <TextBlock Text="{Binding RouteCoveragePercentageFormatted, StringFormat='Coverage: {0}'}" Style="{StaticResource TileContentStyle}" Margin="0,8,0,0"/>
                                 </StackPanel>
                             </Border>
                             
@@ -159,9 +159,9 @@
                             <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
                                 <StackPanel>
                                     <TextBlock Text="🎓 Students" Style="{StaticResource TileHeaderStyle}"/>
-                                    <TextBlock Text="Total Enrolled: 1,247" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Active Today: 1,195" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Attendance: 95.8%" Style="{StaticResource TileValueStyle}"/>
+                                    <TextBlock Text="Total Enrolled: Calculating..." Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Active Today: Calculating..." Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="Attendance: Calculating..." Style="{StaticResource TileValueStyle}"/>
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
@@ -185,7 +185,7 @@
                                     <TextBlock Text="🔄 Real-time Updates" Style="{StaticResource TileHeaderStyle}"/>
                                     <TextBlock Text="Auto-refresh: Enabled" Style="{StaticResource TileContentStyle}"/>
                                     <TextBlock Text="Update Interval: 5 seconds" Style="{StaticResource TileContentStyle}"/>
-                                    <TextBlock Text="Next Update: {Binding NextUpdateTime}" Style="{StaticResource TileContentStyle}"/>
+                                    <TextBlock Text="{Binding NextUpdateTime, StringFormat='Next Update: {0}'}" Style="{StaticResource TileContentStyle}"/>
                                 </StackPanel>
                             </Grid>
                         </Border>

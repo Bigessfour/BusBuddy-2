@@ -183,7 +183,7 @@
                                 <syncfusion:ChartAdornmentInfo ShowLabel="True" 
                                                               ShowConnectorLine="True"
                                                               ConnectorHeight="20"
-                                                              SegmentLabelContent="LabelAndPercent"/>
+                                                              SegmentLabelContent="Percentage"/>
                             </syncfusion:PieSeries.AdornmentsInfo>
                         </syncfusion:PieSeries>
                     </syncfusion:SfChart>
