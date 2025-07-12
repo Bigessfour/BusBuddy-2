@@ -370,11 +370,11 @@ namespace BusBuddy.WPF.ViewModels
 
             _logger.LogInformation("DashboardViewModel constructor completed successfully");
 
-            // Initialize auto-refresh timer (5-second intervals as per development plan)
-            InitializeRefreshTimer();
-
-            // Initialize dashboard tiles for SfHubTile support
+            // Initialize dashboard tiles for SfHubTile support (lightweight operation)
             _dashboardTiles = InitializeDashboardTiles();
+
+            // Defer auto-refresh timer and data loading until explicit initialization
+            // This prevents blocking the UI thread during startup
         }
 
         private ObservableCollection<DashboardTileModel> InitializeDashboardTiles()
@@ -497,6 +497,13 @@ namespace BusBuddy.WPF.ViewModels
             try
             {
                 _logger.LogInformation("Starting dashboard data refresh");
+
+                // Initialize refresh timer on first data load if not already initialized
+                if (_refreshTimer == null)
+                {
+                    _logger.LogInformation("Initializing dashboard auto-refresh timer during first data load");
+                    InitializeRefreshTimer();
+                }
 
                 // Quick metrics refresh without full initialization
                 await LoadCriticalDataAsync();

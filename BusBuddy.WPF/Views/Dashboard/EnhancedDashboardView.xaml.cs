@@ -6,6 +6,8 @@
 // - Added logging for active window changes as per reference.md recommendations.
 // - No changes to persistence, as Save/LoadDockState are already implemented (assume PersistState="True" in XAML).
 // - Minor cleanup and added try-catch in event handler for robustness.
+// - Added event handlers for chart interactions and tile clicks to capture user interactions for debugging
+// - Enhanced logging for ComboBox selection changes and module navigation clicks
 
 using System;
 using System.Windows;
@@ -280,6 +282,265 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
 
             return "Statistics unavailable";
+        }
+
+        // Dashboard Control Event Handlers for Debugging and Analytics
+
+        /// <summary>
+        /// Handle Refresh Data button click event
+        /// </summary>
+        private async void RefreshDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _logger?.LogInformation("UI Dashboard control clicked: Refresh Data button - triggering data refresh");
+
+                var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
+                if (viewModel != null)
+                {
+                    await viewModel.RefreshDashboardDataAsync();
+                    _logger?.LogInformation("UI Dashboard data refresh completed successfully");
+                }
+                else
+                {
+                    _logger?.LogWarning("UI Dashboard Refresh Data button clicked but ViewModel is null - potential binding issue");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard Refresh Data button failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Handle View Reports button click event
+        /// </summary>
+        private void ViewReportsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _logger?.LogInformation("UI Dashboard control clicked: View Reports button - navigating to reports");
+
+                var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
+                if (viewModel != null)
+                {
+                    // Navigate to reports view
+                    _logger?.LogInformation("UI Dashboard navigating to reports view");
+                    // TODO: Implement reports navigation when available
+                }
+                else
+                {
+                    _logger?.LogWarning("UI Dashboard View Reports button clicked but ViewModel is null - potential binding issue");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard View Reports button failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Handle Settings button click event
+        /// </summary>
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _logger?.LogInformation("UI Dashboard control clicked: Settings button - navigating to settings");
+
+                var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
+                if (viewModel != null)
+                {
+                    // Navigate to settings view
+                    _logger?.LogInformation("UI Dashboard navigating to settings view");
+                    // TODO: Implement settings navigation when available
+                }
+                else
+                {
+                    _logger?.LogWarning("UI Dashboard Settings button clicked but ViewModel is null - potential binding issue");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard Settings button failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Handle Refresh Analytics button click event
+        /// </summary>
+        private async void RefreshAnalyticsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _logger?.LogInformation("UI Dashboard Syncfusion control clicked: RefreshAnalytics ButtonAdv - refreshing analytics data");
+
+                var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
+                if (viewModel != null)
+                {
+                    await viewModel.RefreshDashboardDataAsync();
+                    _logger?.LogInformation("UI Dashboard analytics refresh completed successfully");
+                }
+                else
+                {
+                    _logger?.LogWarning("UI Dashboard RefreshAnalytics ButtonAdv clicked but ViewModel is null - potential Syncfusion binding issue");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard RefreshAnalytics ButtonAdv failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Generic control interaction handler for any unhandled events
+        /// </summary>
+        private void DashboardControl_InteractionFailed(object sender, string controlName, string interactionType, Exception exception)
+        {
+            _logger?.LogError(exception, "UI Dashboard control interaction failed - Control: {ControlName}, Interaction: {InteractionType}, Error: {ErrorMessage}",
+                controlName, interactionType, exception.Message);
+        }
+
+        /// <summary>
+        /// Handle any ComboBox selection changed events for analytics filters
+        /// </summary>
+        private void AnalyticsFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (sender is Syncfusion.Windows.Tools.Controls.ComboBoxAdv comboBox)
+                {
+                    var selectedItem = comboBox.SelectedItem?.ToString() ?? "Unknown";
+                    _logger?.LogInformation("🚌 UI Dashboard analytics filter changed: {FilterValue} - triggering data refresh", selectedItem);
+
+                    // Trigger analytics refresh if needed
+                    var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
+                    if (viewModel != null)
+                    {
+                        // Could trigger specific analytics refresh based on filter
+                        _logger?.LogDebug("🚌 UI Dashboard analytics filter applied successfully for {FilterValue}", selectedItem);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "🚌 UI Dashboard analytics filter selection failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Enhanced logging for module navigation clicks
+        /// </summary>
+        private void ModuleNavigation_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is FrameworkElement button)
+                {
+                    var moduleName = button.Name ?? button.GetType().Name;
+                    _logger?.LogInformation("🚌 UI Dashboard module navigation: {ModuleName} clicked - initiating module switch", moduleName);
+
+                    var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
+                    if (viewModel != null)
+                    {
+                        // Could trigger module switching logic
+                        _logger?.LogInformation("🚌 UI Dashboard module navigation processed for {ModuleName}", moduleName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "🚌 UI Dashboard module navigation failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Handle chart interaction events (mouse clicks on charts)
+        /// </summary>
+        private void Chart_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (sender is Syncfusion.UI.Xaml.Charts.SfChart chart)
+                {
+                    var chartName = chart.Name ?? "UnnamedChart";
+                    _logger?.LogInformation("UI Dashboard chart interaction: {ChartName} clicked at position ({X}, {Y})",
+                        chartName, e.GetPosition(chart).X, e.GetPosition(chart).Y);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard chart interaction failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Handle dashboard tile clicks for navigation or detailed views
+        /// </summary>
+        private void DashboardTile_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (sender is FrameworkElement tile)
+                {
+                    var tileName = tile.Name ?? "UnnamedTile";
+                    _logger?.LogInformation("UI Dashboard tile clicked: {TileName} - potential navigation trigger", tileName);
+
+                    // Could trigger navigation based on tile clicked
+                    var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
+                    if (viewModel != null)
+                    {
+                        _logger?.LogDebug("UI Dashboard tile interaction processed for {TileName}", tileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard tile interaction failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Handle any control that fails to respond to commands or events
+        /// </summary>
+        private void Control_InteractionFailed(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is FrameworkElement control)
+                {
+                    var controlName = control.Name ?? control.GetType().Name;
+                    _logger?.LogWarning("UI Dashboard control interaction failed to respond: {ControlName} - {ControlType}",
+                        controlName, control.GetType().Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard control failure logging failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Override to capture any unhandled UI exceptions in the dashboard
+        /// </summary>
+        protected override void OnPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                // Log any clicks for debugging purposes
+                if (e.Source is FrameworkElement element)
+                {
+                    var elementName = element.Name ?? element.GetType().Name;
+                    _logger?.LogDebug("UI Dashboard preview click on: {ElementName} ({ElementType})",
+                        elementName, element.GetType().Name);
+                }
+
+                base.OnPreviewMouseLeftButtonDown(e);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "UI Dashboard preview click handling failed: {ErrorMessage}", ex.Message);
+            }
         }
     }
 }

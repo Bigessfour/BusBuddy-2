@@ -39,6 +39,11 @@ public partial class MainWindow : Window
 
         // Subscribe to DataContext changes for proper ViewModel binding
         this.DataContextChanged += MainWindow_DataContextChanged;
+
+        // CRITICAL FIX: Add proper window closing behavior
+        this.Closing += MainWindow_Closing;
+        this.Closed += MainWindow_Closed;
+        this.Loaded += MainWindow_Loaded;
     }
 
     /// <summary>
@@ -138,9 +143,78 @@ public partial class MainWindow : Window
     /// <summary>
     /// Handle window closing to cleanup resources
     /// </summary>
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        _logger?.LogInformation("MainWindow closing requested");
+
+        // Allow the window to close normally
+        // If you need confirmation, you can add it here:
+        // var result = MessageBox.Show("Are you sure you want to exit?", "Confirm Exit", MessageBoxButton.YesNo);
+        // if (result == MessageBoxResult.No)
+        // {
+        //     e.Cancel = true;
+        //     return;
+        // }
+
+        base.OnClosing(e);
+    }
+
+    /// <summary>
+    /// Handle window closed to cleanup resources
+    /// </summary>
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
-        _logger?.LogInformation("MainWindow closed");
+        _logger?.LogInformation("MainWindow closed - shutting down application");
+
+        // Ensure application shuts down when main window closes
+        Application.Current.Shutdown();
+    }
+
+    /// <summary>
+    /// Handle window loaded event for theme application
+    /// </summary>
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Apply initial theme via SfSkinManager (not hardcoded in XAML)
+        try
+        {
+            var app = (App)Application.Current;
+            var themeService = app.Services?.GetService(typeof(BusBuddy.WPF.Services.IThemeService)) as BusBuddy.WPF.Services.IThemeService;
+            if (themeService != null)
+            {
+                // Apply the current theme to this window
+                SfSkinManager.SetTheme(this, new Theme(themeService.CurrentTheme));
+                _logger?.LogInformation("[THEME] Applied theme {Theme} to MainWindow on load", themeService.CurrentTheme);
+            }
+            else
+            {
+                // Fallback to default theme
+                SfSkinManager.SetTheme(this, new Theme("Office2019Colorful"));
+                _logger?.LogWarning("[THEME] ThemeService not found, using default theme");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "[THEME] Error applying theme on window load: {Error}", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Handle window closing event
+    /// </summary>
+    private void MainWindow_Closing(object? sender, CancelEventArgs e)
+    {
+        _logger?.LogInformation("[WINDOW] MainWindow closing initiated by user (X button)");
+        // Let the existing OnClosing method handle the logic
+    }
+
+    /// <summary>
+    /// Handle window closed event
+    /// </summary>
+    private void MainWindow_Closed(object? sender, EventArgs e)
+    {
+        _logger?.LogInformation("[WINDOW] MainWindow closed event fired");
+        // Let the existing OnClosed method handle the logic
     }
 }

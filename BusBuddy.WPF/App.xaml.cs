@@ -232,28 +232,53 @@ public partial class App : Application
             loggingBuilder.AddSerilog();
         });
 
-        // Initialize Serilog for robust logging, with fallback
+        // Initialize Serilog for robust logging, with enrichers
         try
         {
-            // Use the new consolidated UI logging configuration
-            // Use basic Serilog configuration instead of missing extension
+            // Create custom enrichers
+            var contextEnricher = new BusBuddyContextEnricher();
+            var dbEnricher = new DatabaseOperationEnricher();
+            var uiEnricher = new UIOperationEnricher();
+            var aggregationEnricher = new LogAggregationEnricher();
+
+            // Create custom formatters
+            var condensedFormatter = new CondensedLogFormatter(includeProperties: true, showAggregatedOnly: false);
+            var consoleFormatter = new CondensedLogFormatter(includeProperties: false, showAggregatedOnly: true);
+
+            // Use consolidated Serilog configuration with aggressive aggregation
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.File(Path.Combine(logsDirectory, "busbuddy-.log"),
+                .MinimumLevel.Information() // Reduce noise by starting at Information level
+                                            // Built-in enrichers (essential ones only)
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithThreadId()
+                .Enrich.WithProcessId()
+                .Enrich.WithProcessName()
+                .Enrich.WithEnvironmentName()
+                // Custom BusBuddy enrichers (order matters - aggregation should be last)
+                .Enrich.With(contextEnricher)
+                .Enrich.With(dbEnricher)
+                .Enrich.With(uiEnricher)
+                .Enrich.With(aggregationEnricher)
+                // CONSOLIDATED: Only 2 log files with smart filtering
+                .WriteTo.File(condensedFormatter, Path.Combine(logsDirectory, "busbuddy-consolidated-.log"),
                     rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 30)
-                .WriteTo.File(Path.Combine(logsDirectory, "errors-.log"),
-                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error,
+                    retainedFileCountLimit: 30,
+                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+                .WriteTo.File(Path.Combine(logsDirectory, "busbuddy-errors-.log"),
+                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
                     rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 30)
-                .WriteTo.Console()
+                    retainedFileCountLimit: 30,
+                    outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] [{LogCategory}] {Message:lj}{NewLine}    📊 {EventSignature} (Count: {EventOccurrenceCount}){NewLine}    🔍 {Properties:j}{NewLine}{Exception}")
+                // Simplified console output with aggregation info
+                .WriteTo.Console(consoleFormatter)
                 .CreateLogger();
 
-            Log.Information("[STARTUP] BusBuddy WPF application is starting with consolidated logging. Build completed at {BuildTime}", DateTime.Now);
-            Log.Information("[STARTUP] Logs directory: {LogsDirectory}", logsDirectory);
-            Log.Information("[STARTUP] Main application log: {MainLog}", Path.Combine(logsDirectory, "busbuddy-.log"));
-            Log.Information("[STARTUP] Consolidated error log: {ErrorLog}", Path.Combine(logsDirectory, "errors-.log"));
-            Log.Information("[STARTUP] Performance issues log: {PerformanceLog}", Path.Combine(logsDirectory, "performance-.log"));
-            Log.Information("[STARTUP] Total log files: 3 (reduced from 5+ for better manageability)");
+            Log.Information("BusBuddy WPF application starting with consolidated Serilog enrichers. Build: {BuildTime}", DateTime.Now);
+            Log.Information("Enrichers enabled: Context, Database, UI, Aggregation, Machine, Thread, Process, Environment");
+            Log.Information("Consolidated logging: 2 files (main + errors) with smart aggregation");
+            Log.Information("Logs directory: {LogsDirectory}", logsDirectory);
+            Log.Information("Enhanced structured logging with {EnricherCount} enrichers active", 8);
         }
         catch (Exception serilogEx)
         {
@@ -500,6 +525,15 @@ public partial class App : Application
     {
         // Register logging so ILogger<T> can be injected into services
         services.AddLogging();
+
+        // Register Serilog enrichers as singletons (as recommended in the article)
+        services.AddSingleton<BusBuddyContextEnricher>();
+        services.AddSingleton<DatabaseOperationEnricher>();
+        services.AddSingleton<UIOperationEnricher>();
+        services.AddSingleton<LogAggregationEnricher>();
+
+        // Register custom formatters
+        services.AddSingleton<CondensedLogFormatter>();
 
         // Register UI-specific logging services - DISABLED due to missing utilities
         // services.AddUILogging();

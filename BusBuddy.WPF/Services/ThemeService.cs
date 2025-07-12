@@ -41,28 +41,76 @@ namespace BusBuddy.WPF.Services
             {
                 _logger.LogDebug("[DEBUG] ThemeService.ApplyTheme: Switching to theme: {ThemeName}", themeName);
 
-                // Set global theme for all Syncfusion controls
+                // CRITICAL: Set global theme FIRST before applying to individual windows
                 SfSkinManager.ApplyThemeAsDefaultStyle = true;
                 SfSkinManager.ApplicationTheme = new Theme(themeName);
 
                 // Update current theme
                 _currentTheme = themeName;
 
-                // Apply theme to main window if it exists
-                if (Application.Current.MainWindow != null)
+                // Apply theme to ALL windows in the application
+                if (Application.Current != null)
                 {
-                    SfSkinManager.SetTheme(Application.Current.MainWindow, new Theme(themeName));
-                    _logger.LogDebug("[DEBUG] ThemeService.ApplyTheme: Applied theme to MainWindow");
+                    // Apply to main window EXPLICITLY
+                    if (Application.Current.MainWindow != null)
+                    {
+                        SfSkinManager.SetTheme(Application.Current.MainWindow, new Theme(themeName));
+                        _logger.LogDebug("[DEBUG] ThemeService.ApplyTheme: Applied theme to MainWindow");
+                    }
+
+                    // Apply to ALL other windows (including popups, dialogs, etc.)
+                    foreach (Window window in Application.Current.Windows)
+                    {
+                        SfSkinManager.SetTheme(window, new Theme(themeName));
+                        _logger.LogDebug("[DEBUG] ThemeService.ApplyTheme: Applied theme to window: {WindowType}", window.GetType().Name);
+                    }
+
+                    // ENHANCED: Force immediate visual refresh
+                    Application.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        foreach (Window window in Application.Current.Windows)
+                        {
+                            // Force complete visual refresh
+                            window.InvalidateVisual();
+                            window.UpdateLayout();
+
+                            // Refresh all child elements recursively
+                            RefreshVisualTree(window);
+                        }
+                    }, System.Windows.Threading.DispatcherPriority.Render);
                 }
 
                 // Notify subscribers
                 ThemeChanged?.Invoke(this, themeName);
-                _logger.LogInformation("Theme successfully changed to: {ThemeName}", themeName);
+                _logger.LogInformation("[THEME] Theme successfully changed to: {ThemeName} and applied universally", themeName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error applying theme {ThemeName}: {Error}", themeName, ex.Message);
+                _logger.LogError(ex, "[THEME] Error applying theme {ThemeName}: {Error}", themeName, ex.Message);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Recursively refresh the visual tree to ensure theme is applied to all controls
+        /// </summary>
+        private void RefreshVisualTree(DependencyObject parent)
+        {
+            if (parent == null) return;
+
+            // Refresh the current element
+            if (parent is FrameworkElement element)
+            {
+                element.InvalidateVisual();
+                element.UpdateLayout();
+            }
+
+            // Recursively refresh all children
+            int childCount = System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
+                RefreshVisualTree(child);
             }
         }
 

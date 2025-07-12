@@ -27,7 +27,52 @@
         <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
             <routeView:RouteManagementView/>
         </DataTemplate>
-        <!-- Add other DataTemplates for Schedule, Student, Maintenance, Fuel, and ActivityLog ViewModels as needed -->
+        <!-- Enhanced DataTemplates for additional ViewModels -->
+        <DataTemplate DataType="{x:Type viewModels:ScheduleManagementViewModel}">
+            <Grid>
+                <TextBlock Text="📅 Schedule Management Module" 
+                          FontSize="16" FontWeight="Bold" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Foreground="#666666"/>
+                <!-- Schedule management view will be implemented here -->
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
+            <Grid>
+                <TextBlock Text="🎓 Student Management Module" 
+                          FontSize="16" FontWeight="Bold" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Foreground="#666666"/>
+                <!-- Student management view will be implemented here -->
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
+            <Grid>
+                <TextBlock Text="🔧 Maintenance Tracking Module" 
+                          FontSize="16" FontWeight="Bold" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Foreground="#666666"/>
+                <!-- Maintenance tracking view will be implemented here -->
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
+            <Grid>
+                <TextBlock Text="⛽ Fuel Management Module" 
+                          FontSize="16" FontWeight="Bold" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Foreground="#666666"/>
+                <!-- Fuel management view will be implemented here -->
+            </Grid>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
+            <Grid>
+                <TextBlock Text="📝 Activity Logging Module" 
+                          FontSize="16" FontWeight="Bold" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Foreground="#666666"/>
+                <!-- Activity logging view will be implemented here -->
+            </Grid>
+        </DataTemplate>
         
         <!-- Enhanced Tile Style for Modern Appearance -->
         <Style x:Key="DashboardTileStyle" TargetType="Border">
@@ -202,7 +247,10 @@
                         <!-- Enhanced Quick Stats Tiles Row 1 -->
                         <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,20">
                             <!-- Enhanced Fleet Summary Tile -->
-                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                            <Border x:Name="FleetStatusTile" 
+                                   Style="{StaticResource DashboardTileStyle}" 
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
                                     <DockPanel>
                                         <TextBlock Text="🚌 Fleet Status" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
@@ -235,7 +283,10 @@
                             </Border>
                             
                             <!-- Enhanced Driver Summary Tile -->
-                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                            <Border x:Name="DriverManagementTile" 
+                                   Style="{StaticResource DashboardTileStyle}" 
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
                                     <DockPanel>
                                         <TextBlock Text="👨‍💼 Driver Management" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
@@ -262,7 +313,10 @@
                             </Border>
                             
                             <!-- Enhanced Routes Summary Tile with Syncfusion Radial Gauge -->
-                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                            <Border x:Name="RouteNetworkTile" 
+                                   Style="{StaticResource DashboardTileStyle}" 
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
                                     <DockPanel>
                                         <TextBlock Text="🗺️ Route Network" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
@@ -318,7 +372,10 @@
                             </Border>
                             
         <!-- Enhanced Performance Tile with Syncfusion Gauge -->
-                            <Border Style="{StaticResource PerformanceTileStyle}" Cursor="Hand">
+                            <Border x:Name="SystemPerformanceTile" 
+                                   Style="{StaticResource PerformanceTileStyle}" 
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
                                     <DockPanel>
                                         <TextBlock Text="⚡ System Performance" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
@@ -371,7 +428,10 @@
                         <!-- Enhanced Operations Tiles Row 2 -->
                         <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
                             <!-- Enhanced Maintenance Tile with Syncfusion Progress -->
-                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                            <Border x:Name="MaintenanceHubTile" 
+                                   Style="{StaticResource DashboardTileStyle}" 
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
                                     <DockPanel>
                                         <TextBlock Text="🔧 Maintenance Hub" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
@@ -410,7 +470,10 @@
                             </Border>
                             
                             <!-- Enhanced Fuel Management Tile with Syncfusion ProgressBar -->
-                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                            <Border x:Name="FuelManagementTile" 
+                                   Style="{StaticResource DashboardTileStyle}" 
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
                                     <DockPanel>
                                         <TextBlock Text="⛽ Fuel Analytics" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
@@ -468,7 +531,10 @@
                             </Border>
                             
                             <!-- Enhanced Student Management Tile with Syncfusion Gauge -->
-                            <Border Style="{StaticResource DashboardTileStyle}" Cursor="Hand">
+                            <Border x:Name="StudentTransportTile" 
+                                   Style="{StaticResource DashboardTileStyle}" 
+                                   Cursor="Hand"
+                                   MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
                                     <DockPanel>
                                         <TextBlock Text="🎓 Student Transport" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
@@ -533,7 +599,8 @@
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
                                         <syncfusion:ComboBoxAdv x:Name="AnalyticsTimeRange" 
                                                               Width="150" Height="30"
-                                                              SelectedIndex="0">
+                                                              SelectedIndex="0"
+                                                              SelectionChanged="AnalyticsFilterComboBox_SelectionChanged">
                                             <syncfusion:ComboBoxItemAdv Content="Last 7 Days"/>
                                             <syncfusion:ComboBoxItemAdv Content="Last 30 Days"/>
                                             <syncfusion:ComboBoxItemAdv Content="Last 3 Months"/>
@@ -543,7 +610,8 @@
                                                             Content="🔄 Refresh" 
                                                             Width="80" Height="30" 
                                                             Margin="10,0,0,0"
-                                                            SizeMode="Small"/>
+                                                            SizeMode="Small"
+                                                            Click="RefreshAnalyticsButton_Click"/>
                                     </StackPanel>
                                 </DockPanel>
                                 
@@ -558,7 +626,9 @@
                                     <Border Grid.Column="0" Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,10,0">
                                         <StackPanel>
                                             <TextBlock Text="Fleet Performance Trend" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10" Foreground="#2C3E50"/>
-                                            <chart:SfChart Height="180">
+                                            <chart:SfChart x:Name="FleetPerformanceChart" 
+                                                          Height="180"
+                                                          MouseLeftButtonDown="Chart_MouseLeftButtonDown">
                                                 <chart:SfChart.PrimaryAxis>
                                                     <chart:CategoryAxis ShowGridLines="False"/>
                                                 </chart:SfChart.PrimaryAxis>
@@ -588,7 +658,9 @@
                                     <Border Grid.Column="1" Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="5,0">
                                         <StackPanel>
                                             <TextBlock Text="Route Efficiency Analysis" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10" Foreground="#2C3E50"/>
-                                            <chart:SfChart Height="180">
+                                            <chart:SfChart x:Name="RouteEfficiencyChart" 
+                                                          Height="180"
+                                                          MouseLeftButtonDown="Chart_MouseLeftButtonDown">
                                                 <chart:SfChart.PrimaryAxis>
                                                     <chart:CategoryAxis ShowGridLines="False"/>
                                                 </chart:SfChart.PrimaryAxis>
@@ -832,37 +904,43 @@
                                         <Border Background="#3498DB" 
                                                CornerRadius="6" 
                                                Margin="0,0,0,10">
-                                            <Button Content="🔄 Refresh Data" 
+                                            <Button x:Name="RefreshDataButton"
+                                                   Content="🔄 Refresh Data" 
                                                    Background="Transparent" 
                                                    Foreground="White" 
                                                    BorderThickness="0" 
                                                    Padding="12,8" 
                                                    FontWeight="SemiBold"
-                                                   Cursor="Hand"/>
+                                                   Cursor="Hand"
+                                                   Click="RefreshDataButton_Click"/>
                                         </Border>
                                         
                                         <Border Background="#9B59B6" 
                                                CornerRadius="6" 
                                                Margin="0,0,0,10">
-                                            <Button Content="📊 View Reports" 
+                                            <Button x:Name="ViewReportsButton"
+                                                   Content="📊 View Reports" 
                                                    Background="Transparent" 
                                                    Foreground="White" 
                                                    BorderThickness="0" 
                                                    Padding="12,8" 
                                                    FontWeight="SemiBold"
-                                                   Cursor="Hand"/>
+                                                   Cursor="Hand"
+                                                   Click="ViewReportsButton_Click"/>
                                         </Border>
                                         
                                         <Border Background="#34495E" 
                                                CornerRadius="6" 
                                                Margin="0,0,0,10">
-                                            <Button Content="⚙️ Settings" 
+                                            <Button x:Name="DashboardSettingsButton"
+                                                   Content="⚙️ Settings" 
                                                    Background="Transparent" 
                                                    Foreground="White" 
                                                    BorderThickness="0" 
                                                    Padding="12,8" 
                                                    FontWeight="SemiBold"
-                                                   Cursor="Hand"/>
+                                                   Cursor="Hand"
+                                                   Click="SettingsButton_Click"/>
                                         </Border>
                                         
                                         <!-- System uptime indicator -->

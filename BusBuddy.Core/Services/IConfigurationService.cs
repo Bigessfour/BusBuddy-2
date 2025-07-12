@@ -73,7 +73,9 @@ namespace BusBuddy.Core.Services
 
         public string GetSyncfusionLicenseKey()
         {
-            return _configuration["SyncfusionLicenseKey"] ?? "Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhec3RSRGRYU0R2WUBWYEk=";
+            return _configuration["SyncfusionLicenseKey"] ??
+                   Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY") ??
+                   throw new InvalidOperationException("Syncfusion license key not found in configuration or environment variables");
         }
     }
 }

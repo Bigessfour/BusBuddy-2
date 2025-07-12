@@ -23,8 +23,7 @@
         mc:Ignorable="d"
         Title="Bus Buddy - Transportation Management System" 
         Height="900" Width="1600" 
-        WindowStartupLocation="CenterScreen"
-        syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful">
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <!-- Enhanced Navigation Styles -->

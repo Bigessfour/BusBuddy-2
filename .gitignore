@@ -400,6 +400,28 @@ TestResults/
 .env
 .env.local
 
+# API Keys and Secrets (NEVER commit these!)
+*.key
+*.secret
+*apikey*
+*api-key*
+*api_key*
+.env
+.env.*
+secrets.json
+appsettings.Production.json
+appsettings.Staging.json
+
+# Specific API key patterns
+*xai*key*
+*syncfusion*key*
+*license*key*
+
+# Configuration files with secrets
+config.json
+local.settings.json
+user-secrets.json
+
 # Google Earth Engine Security
 keys/
 *.json
