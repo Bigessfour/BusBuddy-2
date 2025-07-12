@@ -78,7 +78,7 @@
                 <syncfusion:GridDateTimeColumn HeaderText="Date" MappingName="ScheduledDate" Width="110" 
                                               DisplayBinding="{Binding ScheduledDate, StringFormat=\{0:MM/dd/yyyy\}}"/>
                 <syncfusion:GridTextColumn HeaderText="Trip Type" MappingName="TripType" Width="120"/>
-                <syncfusion:GridTextColumn HeaderText="Destination" MappingName="ScheduledDestination" Width="*"/>
+                <syncfusion:GridTextColumn HeaderText="Destination" MappingName="ScheduledDestination" Width="200"/>
                 <syncfusion:GridTextColumn HeaderText="Leave Time" MappingName="ScheduledLeaveTime" Width="100" 
                                           DisplayBinding="{Binding ScheduledLeaveTime, StringFormat=\{0:hh\\:mm\}}"/>
                 <syncfusion:GridTextColumn HeaderText="Event Time" MappingName="ScheduledEventTime" Width="100" 

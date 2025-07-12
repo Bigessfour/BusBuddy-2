@@ -37,6 +37,9 @@ public partial class App : Application
 
     public App()
     {
+        // CRITICAL FIX: Apply Syncfusion culture fixes IMMEDIATELY to prevent XAML parsing issues
+        BusBuddy.WPF.Utilities.SyncfusionCultureFix.ApplyCultureFixes();
+
         // CRITICAL: Initialize error handling before anything else
         try
         {
@@ -76,12 +79,8 @@ public partial class App : Application
     }
     protected override void OnStartup(StartupEventArgs e)
     {
-        // CRITICAL FIX: Set culture to prevent XAML parsing issues with * character
-        // This fixes the "* is not a valid value for Double" error in Syncfusion templates
-        System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-        System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
-        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
+        // CRITICAL FIX: Apply culture fixes again to ensure they're active during XAML loading
+        BusBuddy.WPF.Utilities.SyncfusionCultureFix.ApplyCultureFixes();
 
         // CRITICAL FIX: Initialize XAML error handling to gracefully handle parsing errors
         // XamlErrorHandler.Initialize(); // Commented out due to build issues
@@ -397,9 +396,10 @@ public partial class App : Application
             // Log that we're about to initialize the UI
             Log.Information("[STARTUP] Creating and showing MainWindow");
 
-            // Get the MainViewModel - this is now a singleton
+            // Get the MainViewModel - this is now scoped, so create scope first
             _startupMonitor.BeginStep("ResolveMainViewModel");
-            var mainViewModel = serviceProvider.GetRequiredService<MainViewModel>();
+            var scope = serviceProvider.CreateScope();
+            var mainViewModel = scope.ServiceProvider.GetRequiredService<MainViewModel>();
             _startupMonitor.EndStep();
 
             // Initialize theme service before creating UI
@@ -413,7 +413,7 @@ public partial class App : Application
             _startupMonitor.BeginStep("CreateMainWindow");
             var mainWindowStopwatch = Stopwatch.StartNew();
 
-            // Create the main window with MainViewModel
+            // Create the main window with MainViewModel - RESTORED DASHBOARD
             var mainWindow = new MainWindow
             {
                 DataContext = mainViewModel
@@ -429,145 +429,19 @@ public partial class App : Application
             _startupMonitor.BeginStep("ShowMainWindow");
             var showWindowStopwatch = Stopwatch.StartNew();
 
-            // Set initial view to a lightweight loading screen
-            mainViewModel.NavigateToCommand.Execute("Loading");
+            // Set main window DataContext to show dashboard immediately
+            mainWindow.DataContext = mainViewModel;
 
-            // Show the main window
+            // Show the main window immediately with dashboard - RESTORED
             mainWindow.Show();
 
-            // Log window display with timing
+            // Show window immediately without complex initialization
             showWindowStopwatch.Stop();
             Log.Information("[STARTUP] MainWindow.Show() called and completed in {ElapsedMs}ms",
                 showWindowStopwatch.ElapsedMilliseconds);
             _startupMonitor.EndStep();
 
-            // Create another marker file
-            File.WriteAllText(Path.Combine(logsDirectory, "pre_initialize_async.marker"), DateTime.Now.ToString("o"));
-
-            // Begin tracking DashboardViewModel resolution and initialization
-            _startupMonitor.BeginStep("ResolveDashboardViewModel");
-
-            // Log that we're about to resolve the DashboardViewModel
-            Log.Information("[STARTUP] Resolving DashboardViewModel from service provider");
-
-            // Get dashboard view model but don't initialize it yet
-            var dashboardViewModel = serviceProvider.GetRequiredService<DashboardViewModel>();
-
-            // Log successful resolution
-            Log.Information("[STARTUP] Successfully resolved DashboardViewModel");
-            _startupMonitor.EndStep();
-
-            // Create background task manager
-            var backgroundTaskManager = new BackgroundTaskManager(loggerFactory.CreateLogger<BackgroundTaskManager>());
-
-            // OPTIMIZATION: Show the main window immediately with default or loading UI
-            // Start background pre-warming of caches
-            PreWarmCaches(backgroundTaskManager, serviceProvider);
-
-            // Initialize dashboard in a higher priority background task to ensure UI responsiveness
-            _startupMonitor.BeginStep("InitializeDashboardViewModel");
-
-            // OPTIMIZATION: Use a higher thread priority for dashboard initialization
-            var dashboardInitTask = Task.Factory.StartNew(async () =>
-            {
-                try
-                {
-                    // Add small delay to ensure UI thread is ready
-                    await Task.Delay(100);
-
-                    // Initialize the dashboard asynchronously with enhanced error handling
-                    Log.Information("[STARTUP] Starting dashboard initialization");
-                    await dashboardViewModel.InitializeAsync();
-                    Log.Information("[STARTUP] Dashboard initialization completed successfully");
-
-                    // Switch to dashboard when it's ready
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        try
-                        {
-                            mainViewModel.NavigateToCommand.Execute("Dashboard");
-                            _startupMonitor.EndStep();
-                            Log.Information("[STARTUP] Successfully navigated to Dashboard view");
-                        }
-                        catch (Exception navEx)
-                        {
-                            Log.Error(navEx, "[STARTUP] Error during dashboard navigation: {ErrorMessage}", navEx.Message);
-                            // Fallback to a safe view
-                            try
-                            {
-                                mainViewModel.NavigateToCommand.Execute("Loading");
-                            }
-                            catch (Exception fallbackEx)
-                            {
-                                Log.Fatal(fallbackEx, "[STARTUP] Fatal error: Cannot navigate to any view");
-                            }
-                            _startupMonitor.EndStep();
-                        }
-                    });
-                }
-                catch (System.Windows.Markup.XamlParseException xamlEx)
-                {
-                    Log.Error(xamlEx, "[STARTUP] XAML parsing error during dashboard initialization. This may be related to Syncfusion template loading: {ErrorMessage}", xamlEx.Message);
-
-                    // Handle dashboard initialization error on UI thread with fallback
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        try
-                        {
-                            // Show a simplified error view instead of dashboard
-                            mainViewModel.NavigateToCommand.Execute("Error");
-                            _startupMonitor.EndStep();
-
-                            // Show user-friendly error message
-                            MessageBox.Show(
-                                "The dashboard view could not be loaded due to a template error.\n\n" +
-                                "This is often caused by display scaling or regional settings conflicts.\n\n" +
-                                "The application will continue to function, but some dashboard features may not display correctly.\n\n" +
-                                "Please try restarting the application or contact support if the problem persists.",
-                                "Dashboard Loading Issue",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Warning);
-                        }
-                        catch (Exception uiEx)
-                        {
-                            Log.Fatal(uiEx, "[STARTUP] Fatal error handling XAML exception");
-                            _startupMonitor.EndStep();
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "[STARTUP] General error during dashboard initialization: {ErrorMessage}", ex.Message);
-
-                    // Handle initialization error on UI thread
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        try
-                        {
-                            // Show error view or dashboard with error state
-                            mainViewModel.NavigateToCommand.Execute("Error");
-                            _startupMonitor.EndStep();
-                        }
-                        catch (Exception errorEx)
-                        {
-                            Log.Fatal(errorEx, "[STARTUP] Fatal error during error handling");
-                            _startupMonitor.EndStep();
-                        }
-                    });
-                }
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default)
-            .Unwrap();
-
-            // Observe the task in case of exceptions
-            dashboardInitTask.ContinueWith(t =>
-            {
-                if (t.IsFaulted)
-                {
-                    Log.Error(t.Exception, "Unhandled exception in dashboard initialization task");
-                }
-            }, TaskContinuationOptions.OnlyOnFaulted);
-
-            // Complete startup performance monitoring after window is shown
+            // Complete startup performance monitoring immediately
             _startupMonitor.Complete();
 
             // Log total time from the original stopwatch
@@ -724,9 +598,9 @@ public partial class App : Application
         services.AddAutoMapper(typeof(BusBuddy.WPF.Mapping.MappingProfile));
         services.AddSingleton<BusBuddy.WPF.Services.IMappingService, BusBuddy.WPF.Services.MappingService>();
 
-        // Register WPF-specific Services
+        // Register WPF-specific Services - Changed RoutePopulationScaffold to Singleton
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
-        services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
+        services.AddSingleton<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
         services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
 
         // Register Theme Service for dark/light mode switching
@@ -759,8 +633,8 @@ public partial class App : Application
 
     private void ConfigureViewModels(IServiceCollection services)
     {
-        // Main/Dashboard/Navigation ViewModels
-        services.AddSingleton<BusBuddy.WPF.ViewModels.MainViewModel>();
+        // Main/Dashboard/Navigation ViewModels - Changed MainViewModel to Scoped
+        services.AddScoped<BusBuddy.WPF.ViewModels.MainViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.ActivityLogViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();

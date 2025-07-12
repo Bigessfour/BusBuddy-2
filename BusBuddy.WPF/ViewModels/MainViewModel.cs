@@ -91,7 +91,7 @@ namespace BusBuddy.WPF.ViewModels
                 new NavigationItem { Name = "Settings", ViewModelName = "Settings" }
             };
 
-            // Set the default view
+            // Set the default view - skip loading and go directly to dashboard
             CurrentViewModel = _dashboardViewModel;
 
             // Log initialization for debugging

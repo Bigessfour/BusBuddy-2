@@ -29,6 +29,9 @@
         <!-- Add a converter to debug binding issues -->
         <local:DebugConverter x:Key="DebugConverter" />
         
+        <DataTemplate DataType="{x:Type viewModels:LoadingViewModel}">
+            <views:LoadingView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
             <dashboard:EnhancedDashboardView />
         </DataTemplate>

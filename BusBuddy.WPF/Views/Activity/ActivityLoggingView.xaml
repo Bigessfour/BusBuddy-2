@@ -79,7 +79,7 @@
                 <syncfusionGrid:GridDateTimeColumn MappingName="Timestamp" HeaderText="Timestamp" DisplayBinding="{Binding Timestamp, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="150"/>
                 <syncfusionGrid:GridTextColumn MappingName="Action" HeaderText="Action" Width="200"/>
                 <syncfusionGrid:GridTextColumn MappingName="User" HeaderText="User" Width="120"/>
-                <syncfusionGrid:GridTextColumn MappingName="Details" HeaderText="Details" Width="*" 
+                <syncfusionGrid:GridTextColumn MappingName="Details" HeaderText="Details" Width="300" 
                                               TextTrimming="CharacterEllipsis" MaximumWidth="400"/>
             </syncfusionGrid:SfDataGrid.Columns>
         </syncfusionGrid:SfDataGrid>

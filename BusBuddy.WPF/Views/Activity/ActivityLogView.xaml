@@ -16,7 +16,7 @@
                 <syncfusion:GridTextColumn MappingName="Timestamp" HeaderText="Timestamp" Width="180"/>
                 <syncfusion:GridTextColumn MappingName="User" HeaderText="User" Width="120"/>
                 <syncfusion:GridTextColumn MappingName="Action" HeaderText="Action" Width="200"/>
-                <syncfusion:GridTextColumn MappingName="Details" HeaderText="Details" Width="*"/>
+                <syncfusion:GridTextColumn MappingName="Details" HeaderText="Details" Width="300"/>
             </syncfusion:SfDataGrid.Columns>
         </syncfusion:SfDataGrid>
     </Grid>

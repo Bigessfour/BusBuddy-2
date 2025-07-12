@@ -11,9 +11,9 @@ namespace BusBuddy.WPF.Utilities
     /// </summary>
     public class BackgroundTaskManager
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<BackgroundTaskManager> _logger;
 
-        public BackgroundTaskManager(ILogger logger)
+        public BackgroundTaskManager(ILogger<BackgroundTaskManager> logger)
         {
             _logger = logger;
         }
