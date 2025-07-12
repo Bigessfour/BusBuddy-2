@@ -4,5 +4,11 @@
     <!-- Ensure WPF Temporary Project references the core assembly and includes all relevant namespaces -->
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <MarkupCompilePass1UsesDependencyPaths>true</MarkupCompilePass1UsesDependencyPaths>
+    
+    <!-- Build Logging Configuration -->
+    <BuildLoggerEnabled>true</BuildLoggerEnabled>
+    <LogFileDirectory>$(MSBuildThisFileDirectory)logs</LogFileDirectory>
+    <MSBuildLogFile>$(LogFileDirectory)\msbuild-$(MSBuildProjectName)-$(Configuration).log</MSBuildLogFile>
+    <MSBuildVerbosity>normal</MSBuildVerbosity>
   </PropertyGroup>
 </Project>

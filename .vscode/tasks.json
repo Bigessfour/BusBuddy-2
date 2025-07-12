@@ -9,7 +9,8 @@
                 "clean",
                 "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary",
+                "/flp:logfile=${workspaceFolder}/logs/clean-build.log;verbosity=normal"
             ],
             "group": "build",
             "presentation": {
@@ -28,7 +29,8 @@
             "type": "process",
             "args": [
                 "restore",
-                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj"
+                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "/flp:logfile=${workspaceFolder}/logs/restore-build.log;verbosity=normal"
             ],
             "group": "build",
             "presentation": {
@@ -49,7 +51,9 @@
                 "build",
                 "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary",
+                "/flp:logfile=${workspaceFolder}/logs/build.log;verbosity=detailed",
+                "/flp1:logfile=${workspaceFolder}/logs/build-errors.log;errorsonly"
             ],
             "group": {
                 "kind": "build",
@@ -74,7 +78,8 @@
                 "publish",
                 "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary",
+                "/flp:logfile=${workspaceFolder}/logs/publish.log;verbosity=detailed"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -102,7 +107,7 @@
         {
             "label": "Run Tests and Log Output",
             "type": "shell",
-            "command": "dotnet test --logger 'console;verbosity=detailed' *>&1 | Tee-Object -FilePath '${workspaceFolder}/BusBuddy.Tests/test-output.log'",
+            "command": "dotnet test --logger 'console;verbosity=detailed' --logger 'trx;LogFileName=${workspaceFolder}/logs/test-results.trx' *>&1 | Tee-Object -FilePath '${workspaceFolder}/logs/test-output.log'",
             "group": {
                 "kind": "test",
                 "isDefault": true
@@ -114,6 +119,52 @@
                 "panel": "shared",
                 "showReuseMessage": true,
                 "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Full Solution Build with Logging",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/BusBuddy.sln",
+                "/property:GenerateFullPaths=true",
+                "/verbosity:detailed",
+                "/flp:logfile=${workspaceFolder}/logs/solution-build.log;verbosity=detailed",
+                "/flp1:logfile=${workspaceFolder}/logs/solution-errors.log;errorsonly",
+                "/flp2:logfile=${workspaceFolder}/logs/solution-warnings.log;warningsonly"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean All with Logging",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/BusBuddy.sln",
+                "/property:GenerateFullPaths=true",
+                "/verbosity:detailed",
+                "/flp:logfile=${workspaceFolder}/logs/clean-all.log;verbosity=detailed"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
             },
             "problemMatcher": "$msCompile"
         }
