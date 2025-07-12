@@ -80,18 +80,41 @@ public class BusBuddyDbContext : DbContext
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.azure.json", optional: true, reloadOnChange: true)
                 .Build();
 
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), options =>
-            {
-                // Enhanced connection resilience
-                options.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
+            // Support switching between local and Azure databases
+            var databaseProvider = configuration["DatabaseProvider"] ?? "Local";
+            var connectionStringKey = databaseProvider == "Azure" ? "DefaultConnection" : "DefaultConnection";
 
-                // Set command timeout to prevent hanging
-                options.CommandTimeout(60);
+            var connectionString = configuration.GetConnectionString(connectionStringKey);
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                // Fallback to local connection
+                connectionString = configuration.GetConnectionString("LocalConnection")
+                    ?? "Server=localhost\\SQLEXPRESS;Database=BusBuddyDB;Trusted_Connection=True;TrustServerCertificate=True;";
+            }
+
+            optionsBuilder.UseSqlServer(connectionString, options =>
+            {
+                // Enhanced connection resilience with different settings for Azure vs Local
+                if (databaseProvider == "Azure")
+                {
+                    options.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(60),
+                        errorNumbersToAdd: null);
+                    options.CommandTimeout(120); // Longer timeout for cloud
+                }
+                else
+                {
+                    options.EnableRetryOnFailure(
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                    options.CommandTimeout(60); // Standard timeout for local
+                }
             });
 
             // Add detailed logging for SQL exceptions

@@ -231,7 +231,7 @@ public class DatabaseValidationService
                     var tableExists = await context.Database
                         .SqlQuery<int>($"SELECT CASE WHEN EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = {check.Key}) THEN 1 ELSE 0 END AS Value")
                         .FirstOrDefaultAsync();
-                    
+
                     if (tableExists == 0)
                     {
                         result.AddIssue($"Missing table: {check.Key} - {check.Value}");

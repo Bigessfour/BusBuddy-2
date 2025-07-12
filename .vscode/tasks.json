@@ -2,171 +2,67 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "clean",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "clean",
-                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "/flp:logfile=${workspaceFolder}/logs/clean-build.log;verbosity=normal"
-            ],
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "restore",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "restore",
-                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "/flp:logfile=${workspaceFolder}/logs/restore-build.log;verbosity=normal"
-            ],
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
             "label": "build",
             "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "/flp:logfile=${workspaceFolder}/logs/build.log;verbosity=detailed",
-                "/flp1:logfile=${workspaceFolder}/logs/build-errors.log;errorsonly"
-            ],
+            "type": "shell",
+            "args": ["build", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "presentation": {
-                "echo": true,
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
+                "panel": "shared"
             },
-            "problemMatcher": "$msCompile",
-            "dependsOn": "restore"
-        },
-        {
-            "label": "publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary",
-                "/flp:logfile=${workspaceFolder}/logs/publish.log;verbosity=detailed"
-            ],
             "problemMatcher": "$msCompile"
         },
         {
             "label": "run",
             "command": "dotnet",
-            "type": "process",
-            "args": [
-                "run",
-                "--project",
-                "${workspaceFolder}/BusBuddy.WPF/BusBuddy.WPF.csproj"
-            ],
+            "type": "shell",
+            "args": ["run", "--project", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
             "group": "build",
             "presentation": {
-                "echo": true,
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
+                "panel": "dedicated"
             },
-            "problemMatcher": "$msCompile",
             "dependsOn": "build"
         },
         {
-            "label": "Run Tests and Log Output",
+            "label": "clean",
+            "command": "dotnet",
             "type": "shell",
-            "command": "dotnet test --logger 'console;verbosity=detailed' --logger 'trx;LogFileName=${workspaceFolder}/logs/test-results.trx' *>&1 | Tee-Object -FilePath '${workspaceFolder}/logs/test-output.log'",
+            "args": ["clean", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "shell",
+            "args": ["restore", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "shell",
+            "args": ["test", "BusBuddy.Tests/BusBuddy.Tests.csproj"],
             "group": {
                 "kind": "test",
                 "isDefault": true
             },
             "presentation": {
-                "echo": true,
                 "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Full Solution Build with Logging",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/BusBuddy.sln",
-                "/property:GenerateFullPaths=true",
-                "/verbosity:detailed",
-                "/flp:logfile=${workspaceFolder}/logs/solution-build.log;verbosity=detailed",
-                "/flp1:logfile=${workspaceFolder}/logs/solution-errors.log;errorsonly",
-                "/flp2:logfile=${workspaceFolder}/logs/solution-warnings.log;warningsonly"
-            ],
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Clean All with Logging",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "clean",
-                "${workspaceFolder}/BusBuddy.sln",
-                "/property:GenerateFullPaths=true",
-                "/verbosity:detailed",
-                "/flp:logfile=${workspaceFolder}/logs/clean-all.log;verbosity=detailed"
-            ],
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            },
-            "problemMatcher": "$msCompile"
+                "panel": "shared"
+            }
         }
     ]
 }

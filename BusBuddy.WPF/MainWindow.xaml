@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusBuddy.WPF"
+        xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
         xmlns:views="clr-namespace:BusBuddy.WPF.Views"
         xmlns:bus="clr-namespace:BusBuddy.WPF.Views.Bus"
         xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
@@ -13,10 +14,10 @@
         xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
         xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
         xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
         xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
         xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
-        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
         mc:Ignorable="d"
@@ -26,9 +27,89 @@
         syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful">
 
     <Window.Resources>
-        <!-- Add a converter to debug binding issues -->
+        <!-- Enhanced Navigation Styles -->
+        <Style x:Key="NavigationButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="Margin" Value="5,2"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder" 
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#E3F2FD"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#BBDEFB"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Icon and Text Style for Navigation -->
+        <Style x:Key="NavigationTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+        </Style>
+
+        <!-- Enhanced Status Bar Style -->
+        <Style x:Key="StatusBarStyle" TargetType="Border">
+            <Setter Property="Background" Value="#F8F9FA"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="0,1,0,0"/>
+            <Setter Property="Height" Value="28"/>
+        </Style>
+
+        <!-- Dashboard Container Style -->
+        <Style x:Key="DashboardContainerStyle" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#F8F9FA" Offset="0"/>
+                        <GradientStop Color="#E9ECEF" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderBrush" Value="#DEE2E6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000" Opacity="0.1" BlurRadius="8" ShadowDepth="2"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Enhanced Dashboard Converters -->
+        <converters:ViewModelToHeaderBackgroundConverter x:Key="ViewModelToHeaderBackgroundConverter"/>
+        <converters:ViewModelToHeaderHeightConverter x:Key="ViewModelToHeaderHeightConverter"/>
+        <converters:ViewModelToHeaderVisibilityConverter x:Key="ViewModelToHeaderVisibilityConverter"/>
+        <converters:IsDashboardViewConverter x:Key="IsDashboardViewConverter"/>
+        <converters:ViewModelToTitleConverter x:Key="ViewModelToTitleConverter"/>
+        <converters:ViewModelToSubtitleConverter x:Key="ViewModelToSubtitleConverter"/>
+
+        <!-- Debug converter -->
         <local:DebugConverter x:Key="DebugConverter" />
-        
+
+        <!-- DataTemplates for ViewModels -->
         <DataTemplate DataType="{x:Type viewModels:LoadingViewModel}">
             <views:LoadingView />
         </DataTemplate>
@@ -71,6 +152,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <!-- Header with Navigation -->
@@ -88,45 +170,85 @@
                         Width="30" Height="30"
                         Click="MenuToggleButton_Click"/>
                 
-                <!-- Title and Navigation Buttons -->
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,20,0">
-                    <!-- Dashboard Navigation Buttons -->
-                    <Button Content="Dashboard" 
-                            Command="{Binding NavigateToCommand}" 
-                            CommandParameter="Dashboard" 
-                            Margin="5,0" Padding="10,5" 
-                            Background="#003366" 
-                            Foreground="White" 
-                            BorderThickness="0"/>
-                    <Button Content="Buses" 
-                            Command="{Binding NavigateToCommand}" 
-                            CommandParameter="BusManagement" 
-                            Margin="5,0" Padding="10,5" 
-                            Background="#003366" 
-                            Foreground="White" 
-                            BorderThickness="0"/>
-                    <Button Content="Drivers" 
-                            Command="{Binding NavigateToCommand}" 
-                            CommandParameter="DriverManagement" 
-                            Margin="5,0" Padding="10,5" 
-                            Background="#003366" 
-                            Foreground="White" 
-                            BorderThickness="0"/>
-                    <Button Content="Routes" 
-                            Command="{Binding NavigateToCommand}" 
-                            CommandParameter="RouteManagement" 
-                            Margin="5,0" Padding="10,5" 
-                            Background="#003366" 
-                            Foreground="White" 
-                            BorderThickness="0"/>
-                    <Button Content="Settings" 
-                            Command="{Binding NavigateToCommand}" 
-                            CommandParameter="Settings" 
-                            Margin="5,0" Padding="10,5" 
-                            Background="#003366" 
-                            Foreground="White" 
-                            BorderThickness="0"/>
+        <!-- Enhanced Quick Navigation and Controls -->
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,20,0">
+            <!-- Enhanced Dashboard Button with Icon -->
+            <syncfusion:ButtonAdv Command="{Binding NavigateToCommand}" 
+                    CommandParameter="Dashboard" 
+                    Margin="5,0" Padding="12,8" 
+                    Background="#003366" 
+                    Foreground="White" 
+                    BorderThickness="0"
+                    CornerRadius="4"
+                    ToolTip="Enhanced Dashboard - Real-time Fleet Overview">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🏠" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Dashboard" FontWeight="SemiBold"/>
                 </StackPanel>
+            </syncfusion:ButtonAdv>
+            
+            <!-- Quick Access Buttons -->
+            <syncfusion:ButtonAdv Command="{Binding NavigateToCommand}" 
+                    CommandParameter="BusManagement" 
+                    Margin="5,0" Padding="12,8" 
+                    Background="#003366" 
+                    Foreground="White" 
+                    BorderThickness="0"
+                    CornerRadius="4"
+                    ToolTip="Fleet Management">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="🚌" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Fleet" FontWeight="SemiBold"/>
+                </StackPanel>
+            </syncfusion:ButtonAdv>
+            
+            <syncfusion:ButtonAdv Command="{Binding NavigateToCommand}" 
+                    CommandParameter="DriverManagement" 
+                    Margin="5,0" Padding="12,8" 
+                    Background="#003366" 
+                    Foreground="White" 
+                    BorderThickness="0"
+                    CornerRadius="4"
+                    ToolTip="Driver Management">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="👤" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Drivers" FontWeight="SemiBold"/>
+                </StackPanel>
+            </syncfusion:ButtonAdv>
+            
+            <syncfusion:ButtonAdv Command="{Binding NavigateToCommand}" 
+                    CommandParameter="RouteManagement" 
+                    Margin="5,0" Padding="12,8" 
+                    Background="#003366" 
+                    Foreground="White" 
+                    BorderThickness="0"
+                    CornerRadius="4"
+                    ToolTip="Route Planning &amp; Management">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="�" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Routes" FontWeight="SemiBold"/>
+                </StackPanel>
+            </syncfusion:ButtonAdv>
+            
+            <!-- Settings with Dropdown Menu -->
+            <syncfusion:DropDownButtonAdv Label="⚙️" 
+                                         Background="#003366" 
+                                         Foreground="White" 
+                                         BorderThickness="0"
+                                         Margin="5,0" 
+                                         Padding="12,8"
+                                         ToolTip="Application Settings">
+                <syncfusion:DropDownMenuGroup>
+                    <syncfusion:DropDownMenuItem Header="Application Settings" 
+                                                Command="{Binding NavigateToCommand}" 
+                                                CommandParameter="Settings"/>
+                    <syncfusion:DropDownMenuItem Header="Database Settings"/>
+                    <syncfusion:DropDownMenuItem Header="User Preferences"/>
+                    <Separator/>
+                    <syncfusion:DropDownMenuItem Header="About Bus Buddy"/>
+                </syncfusion:DropDownMenuGroup>
+            </syncfusion:DropDownButtonAdv>
+        </StackPanel>
                 
                 <!-- Title and Debug Info -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -202,6 +324,7 @@
                                     <Button Content="{Binding Name}" 
                                             Command="{Binding Path=DataContext.NavigateToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
                                             CommandParameter="{Binding ViewModelName}"
+                                            Style="{StaticResource NavigationButtonStyle}"
                                             Background="Transparent"
                                             BorderThickness="0"
                                             HorizontalContentAlignment="Left"
@@ -233,13 +356,154 @@
                 </Grid>
             </Border>
             
-            <!-- Main Content Area with Stretch Alignment -->
-            <ContentControl x:Name="MainContentControl"
-                            Grid.Column="1" 
-                            Content="{Binding CurrentViewModel}"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Margin="0"/>
+            <!-- Main Content Area with Enhanced Dashboard Focus -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Enhanced Dashboard Header (only visible when Dashboard is active) -->
+                <Border Grid.Row="0" 
+                        Background="{Binding CurrentViewModel, Converter={StaticResource ViewModelToHeaderBackgroundConverter}, FallbackValue=Transparent}"
+                        Height="{Binding CurrentViewModel, Converter={StaticResource ViewModelToHeaderHeightConverter}, FallbackValue=0}"
+                        Visibility="{Binding CurrentViewModel, Converter={StaticResource ViewModelToHeaderVisibilityConverter}, FallbackValue=Collapsed}">
+                    <DockPanel Margin="20,10">
+                        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                            <TextBlock Text="🚌" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <StackPanel>
+                                <TextBlock Text="Enhanced Dashboard" 
+                                          FontSize="20" 
+                                          FontWeight="Bold" 
+                                          Foreground="White"/>
+                                <TextBlock Text="Real-time Fleet Management &amp; Analytics" 
+                                          FontSize="14" 
+                                          Foreground="#E0E0E0"
+                                          Opacity="0.9"/>
+                            </StackPanel>
+                        </StackPanel>
+                        
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- Quick Action Buttons for Dashboard -->
+                            <Button Content="📊" FontSize="16" Margin="0,0,8,0" 
+                                    ToolTip="Analytics View"
+                                    Style="{StaticResource NavigationButtonStyle}"
+                                    Background="White" 
+                                    Foreground="#007ACC"
+                                    Padding="8"
+                                    Width="36" Height="36"/>
+                            <Button Content="🔄" FontSize="16" Margin="0,0,8,0" 
+                                    ToolTip="Refresh Dashboard"
+                                    Style="{StaticResource NavigationButtonStyle}"
+                                    Background="White" 
+                                    Foreground="#007ACC"
+                                    Padding="8"
+                                    Width="36" Height="36"/>
+                            <Button Content="⚙️" FontSize="16" Margin="0,0,12,0" 
+                                    ToolTip="Dashboard Settings"
+                                    Style="{StaticResource NavigationButtonStyle}"
+                                    Background="White" 
+                                    Foreground="#007ACC"
+                                    Padding="8"
+                                    Width="36" Height="36"/>
+                            
+                            <!-- Live indicator for Dashboard -->
+                            <Border Background="White" CornerRadius="12" Padding="8,4" Opacity="0.9">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Fill="#2ECC71" VerticalAlignment="Center">
+                                        <Ellipse.RenderTransform>
+                                            <ScaleTransform x:Name="DashboardPulse" ScaleX="1" ScaleY="1" CenterX="4" CenterY="4"/>
+                                        </Ellipse.RenderTransform>
+                                        <Ellipse.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard RepeatBehavior="Forever">
+                                                        <DoubleAnimation Storyboard.TargetName="DashboardPulse" 
+                                                                        Storyboard.TargetProperty="ScaleX"
+                                                                        From="1" To="1.3" 
+                                                                        Duration="0:0:1" 
+                                                                        AutoReverse="True"/>
+                                                        <DoubleAnimation Storyboard.TargetName="DashboardPulse" 
+                                                                        Storyboard.TargetProperty="ScaleY"
+                                                                        From="1" To="1.3" 
+                                                                        Duration="0:0:1" 
+                                                                        AutoReverse="True"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Ellipse.Triggers>
+                                    </Ellipse>
+                                    <TextBlock Text="LIVE DATA" 
+                                              FontSize="12" 
+                                              FontWeight="Bold" 
+                                              Foreground="#007ACC" 
+                                              Margin="6,0,0,0"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+                
+                <!-- Main Content with Enhanced Styling -->
+                <ContentControl x:Name="MainContentControl"
+                                Grid.Row="1" 
+                                Content="{Binding CurrentViewModel}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Margin="0">
+                    <!-- Enhanced content presentation based on current view -->
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="Background" Value="#F8F9FA"/>
+                            <Style.Triggers>
+                                <!-- Enhanced Dashboard Presentation -->
+                                <DataTrigger Binding="{Binding CurrentViewModel, Converter={StaticResource IsDashboardViewConverter}}" Value="True">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ContentControl">
+                                                <Border Style="{StaticResource DashboardContainerStyle}" Margin="10">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </Grid>
         </Grid>
+        
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Style="{StaticResource StatusBarStyle}">
+            <DockPanel>
+                <!-- Connection Status -->
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="10,0">
+                    <Ellipse Width="8" Height="8" Fill="#2ECC71" VerticalAlignment="Center"/>
+                    <TextBlock Text="Database Connected" Margin="5,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="#666666"/>
+                </StackPanel>
+                
+                <!-- Quick Stats -->
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="20,0">
+                    <TextBlock Text="🚌" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ActiveBusCount, StringFormat='Active Buses: {0}'}" 
+                               Margin="5,0,15,0" VerticalAlignment="Center" FontSize="12" Foreground="#666666"/>
+                    <TextBlock Text="👤" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ActiveDriverCount, StringFormat='Active Drivers: {0}'}" 
+                               Margin="5,0,15,0" VerticalAlignment="Center" FontSize="12" Foreground="#666666"/>
+                    <TextBlock Text="🗺️" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ActiveRouteCount, StringFormat='Active Routes: {0}'}" 
+                               Margin="5,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="#666666"/>
+                </StackPanel>
+                
+                <!-- Right Side Status -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="10,0">
+                    <TextBlock Text="{Binding CurrentTime, StringFormat='Last Updated: {0:HH:mm:ss}'}" 
+                               VerticalAlignment="Center" FontSize="12" Foreground="#666666"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
     </Grid>
 </Window>
