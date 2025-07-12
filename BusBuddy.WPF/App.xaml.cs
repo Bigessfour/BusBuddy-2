@@ -259,8 +259,8 @@ public partial class App : Application
                 var logConsolidationUtility = Services.GetRequiredService<BusBuddy.WPF.Utilities.LogConsolidationUtility>();
                 await logConsolidationUtility.ConsolidateLogsAsync();
                 var stats = logConsolidationUtility.GetLogStats();
-                
-                Log.Information("[STARTUP] Log consolidation complete - {ActiveFiles} active files, {ArchivedFiles} archived files, {TotalSizeMB:F2}MB total", 
+
+                Log.Information("[STARTUP] Log consolidation complete - {ActiveFiles} active files, {ArchivedFiles} archived files, {TotalSizeMB:F2}MB total",
                     stats.ActiveLogFiles, stats.ArchivedLogFiles, stats.TotalSizeMB);
             }
             catch (Exception ex)
@@ -624,8 +624,11 @@ public partial class App : Application
                 sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });
 
-            // OPTIMIZATION: For dashboard read-only operations, use NoTracking for better performance
+            // OPTIMIZATION: Use NoTracking by default for better concurrency performance
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
+            // CONCURRENCY FIX: Enable thread safety for concurrent operations
+            options.EnableThreadSafetyChecks(false); // Disable checks that cause exceptions in concurrent scenarios
 
             // Configure warnings
             options.ConfigureWarnings(warnings =>

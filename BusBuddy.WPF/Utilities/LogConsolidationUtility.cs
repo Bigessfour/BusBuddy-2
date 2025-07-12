@@ -104,7 +104,7 @@ namespace BusBuddy.WPF.Utilities
                     foreach (var file in files)
                     {
                         var fileInfo = new FileInfo(file);
-                        
+
                         // Only delete files older than 1 day to avoid losing recent data
                         if (fileInfo.LastWriteTime < DateTime.Now.AddDays(-1))
                         {

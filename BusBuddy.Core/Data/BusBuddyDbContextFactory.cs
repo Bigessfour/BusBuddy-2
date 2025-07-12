@@ -11,7 +11,13 @@ namespace BusBuddy.Core.Data;
 /// </summary>
 public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory, IDesignTimeDbContextFactory<BusBuddyDbContext>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceProvider? _serviceProvider;
+
+    // Parameterless constructor for design-time services
+    public BusBuddyDbContextFactory()
+    {
+        _serviceProvider = null;
+    }
 
     public BusBuddyDbContextFactory(IServiceProvider serviceProvider)
     {
@@ -25,6 +31,12 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory, IDesignTimeDb
     /// <returns>A new instance of BusBuddyDbContext</returns>
     public BusBuddyDbContext CreateDbContext()
     {
+        if (_serviceProvider == null)
+        {
+            // Fallback for design-time scenarios
+            return CreateDbContext(Array.Empty<string>());
+        }
+
         // Create a scope to ensure proper dependency resolution
         var scope = _serviceProvider.CreateScope();
 
@@ -43,16 +55,24 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory, IDesignTimeDb
     /// <returns>A new instance of BusBuddyDbContext configured for tracking changes</returns>
     public BusBuddyDbContext CreateWriteDbContext()
     {
+        if (_serviceProvider == null)
+        {
+            // Fallback for design-time scenarios
+            var context = CreateDbContext(Array.Empty<string>());
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+            return context;
+        }
+
         // Create a scope to ensure proper dependency resolution
         var scope = _serviceProvider.CreateScope();
 
         // Get a fresh DbContext instance from the DI container
-        var context = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();
 
         // Configure for tracking entities when we need to make changes
-        context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+        dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
 
-        return context;
+        return dbContext;
     }
 
     /// <summary>
