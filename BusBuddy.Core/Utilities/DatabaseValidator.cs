@@ -58,8 +58,8 @@ namespace BusBuddy.Core.Utilities
                     // Break into the debugger if requested and in debug mode
                     if (breakOnIssue && Debugger.IsAttached)
                     {
-                        _logger.LogDebug("Breaking into debugger due to NULL values in vehicles");
-                        Debugger.Break();
+                        _logger.LogDebug("NULL values found in vehicles");
+                        // Debugger.Break(); // Commented out to prevent unwanted breaks
                     }
                 }
 
@@ -79,8 +79,8 @@ namespace BusBuddy.Core.Utilities
                     // Break into the debugger if requested and in debug mode
                     if (breakOnIssue && Debugger.IsAttached)
                     {
-                        _logger.LogDebug("Breaking into debugger due to routes with invalid vehicle references");
-                        Debugger.Break();
+                        _logger.LogDebug("Routes with invalid vehicle references found");
+                        // Debugger.Break(); // Commented out to prevent unwanted breaks
                     }
                 }
 
@@ -100,8 +100,8 @@ namespace BusBuddy.Core.Utilities
                     // Break into the debugger if requested and in debug mode
                     if (breakOnIssue && Debugger.IsAttached)
                     {
-                        _logger.LogDebug("Breaking into debugger due to routes with invalid driver references");
-                        Debugger.Break();
+                        _logger.LogDebug("Routes with invalid driver references found");
+                        // Debugger.Break(); // Commented out to prevent unwanted breaks
                     }
                 }
             }
@@ -113,8 +113,8 @@ namespace BusBuddy.Core.Utilities
                 // Break into the debugger on exception if requested and in debug mode
                 if (breakOnIssue && Debugger.IsAttached)
                 {
-                    _logger.LogDebug("Breaking into debugger due to exception in database validation: {ExceptionType}", ex.GetType().Name);
-                    Debugger.Break();
+                    _logger.LogDebug("Exception in database validation: {ExceptionType}", ex.GetType().Name);
+                    // Debugger.Break(); // Commented out to prevent unwanted breaks
                 }
             }
 
@@ -191,8 +191,8 @@ namespace BusBuddy.Core.Utilities
                         // Break into the debugger for the first fix if requested and in debug mode
                         if (breakOnFix && Debugger.IsAttached && fixCount == 1)
                         {
-                            _logger.LogDebug("Breaking into debugger during database fix for Vehicle ID {VehicleId}", vehicle.VehicleId);
-                            Debugger.Break();
+                            _logger.LogDebug("Database fix applied for Vehicle ID {VehicleId}", vehicle.VehicleId);
+                            // Debugger.Break(); // Commented out to prevent unwanted breaks
                         }
                     }
                 }
@@ -211,8 +211,8 @@ namespace BusBuddy.Core.Utilities
                 // Break into the debugger on exception if in debug mode
                 if (Debugger.IsAttached)
                 {
-                    _logger.LogDebug("Breaking into debugger due to exception in database fixes: {ExceptionType}", ex.GetType().Name);
-                    Debugger.Break();
+                    _logger.LogDebug("Exception in database fixes: {ExceptionType}", ex.GetType().Name);
+                    // Debugger.Break(); // Commented out to prevent unwanted breaks
                 }
             }
 

@@ -32,14 +32,34 @@ namespace BusBuddy.Core.Services
             {
                 _logger.LogInformation("Retrieving all drivers from database");
                 using var context = _contextFactory.CreateDbContext();
+
+                // Fix any NULL values before attempting to read drivers
+                await FixNullDriverValuesIfNeeded(context);
+
                 return await context.Drivers
                     .AsNoTracking()
                     .ToListAsync();
             }
             catch (System.Data.SqlTypes.SqlNullValueException ex)
             {
-                _logger.LogWarning(ex, "SQL NULL value error when retrieving drivers. Returning empty list to avoid application failure.");
-                return new List<Driver>();
+                _logger.LogWarning(ex, "SQL NULL value error when retrieving drivers. Attempting to fix NULL values and retry.");
+
+                // Try to fix NULL values and retry once
+                try
+                {
+                    using var fixContext = _contextFactory.CreateWriteDbContext();
+                    await FixNullDriverValuesIfNeeded(fixContext);
+
+                    using var retryContext = _contextFactory.CreateDbContext();
+                    return await retryContext.Drivers
+                        .AsNoTracking()
+                        .ToListAsync();
+                }
+                catch (Exception retryEx)
+                {
+                    _logger.LogError(retryEx, "Failed to fix NULL values and retry. Returning empty list to avoid application failure.");
+                    return new List<Driver>();
+                }
             }
             catch (Exception ex)
             {
@@ -225,10 +245,35 @@ namespace BusBuddy.Core.Services
             {
                 _logger.LogInformation("Retrieving active drivers");
                 using var context = _contextFactory.CreateDbContext();
+
+                // Fix any NULL values before attempting to read drivers
+                await FixNullDriverValuesIfNeeded(context);
+
                 return await context.Drivers
                     .AsNoTracking()
                     .Where(d => d.Status == "Active")
                     .ToListAsync();
+            }
+            catch (System.Data.SqlTypes.SqlNullValueException ex)
+            {
+                _logger.LogWarning(ex, "SQL NULL value error when retrieving active drivers. Attempting to fix and retry.");
+
+                try
+                {
+                    using var fixContext = _contextFactory.CreateWriteDbContext();
+                    await FixNullDriverValuesIfNeeded(fixContext);
+
+                    using var retryContext = _contextFactory.CreateDbContext();
+                    return await retryContext.Drivers
+                        .AsNoTracking()
+                        .Where(d => d.Status == "Active")
+                        .ToListAsync();
+                }
+                catch (Exception retryEx)
+                {
+                    _logger.LogError(retryEx, "Failed to fix NULL values and retry. Returning empty list.");
+                    return new List<Driver>();
+                }
             }
             catch (Exception ex)
             {
@@ -990,6 +1035,86 @@ namespace BusBuddy.Core.Services
             {
                 _logger.LogError(ex, "Error exporting drivers to CSV");
                 throw;
+            }
+        }
+
+        #endregion
+
+        #region NULL Value Handling
+
+        /// <summary>
+        /// Fix NULL values in the Drivers table to prevent SqlNullValueException
+        /// </summary>
+        private async Task FixNullDriverValuesIfNeeded(BusBuddyDbContext context)
+        {
+            try
+            {
+                // Check if there are any NULL values in required columns
+                var hasNullValues = await context.Database.ExecuteSqlRawAsync(@"
+                    SELECT CASE WHEN EXISTS (
+                        SELECT 1 FROM Drivers 
+                        WHERE DriverName IS NULL OR DriversLicenceType IS NULL OR Status IS NULL
+                    ) THEN 1 ELSE 0 END
+                ");
+
+                if (hasNullValues > 0)
+                {
+                    _logger.LogWarning("Found NULL values in required Driver columns. Fixing automatically.");
+
+                    // Fix NULL values
+                    await context.Database.ExecuteSqlRawAsync(@"
+                        UPDATE Drivers 
+                        SET DriverName = COALESCE(NULLIF(LTRIM(RTRIM(DriverName)), ''), 'Driver-' + CAST(DriverId AS VARCHAR(10)))
+                        WHERE DriverName IS NULL OR LTRIM(RTRIM(DriverName)) = '';
+
+                        UPDATE Drivers 
+                        SET DriversLicenceType = COALESCE(NULLIF(LTRIM(RTRIM(DriversLicenceType)), ''), 'Standard')
+                        WHERE DriversLicenceType IS NULL OR LTRIM(RTRIM(DriversLicenceType)) = '';
+
+                        UPDATE Drivers 
+                        SET Status = COALESCE(NULLIF(LTRIM(RTRIM(Status)), ''), 'Active')
+                        WHERE Status IS NULL OR LTRIM(RTRIM(Status)) = '';
+
+                        UPDATE Drivers 
+                        SET FirstName = NULL
+                        WHERE FirstName = '';
+
+                        UPDATE Drivers 
+                        SET LastName = NULL
+                        WHERE LastName = '';
+
+                        UPDATE Drivers 
+                        SET DriverPhone = NULL
+                        WHERE DriverPhone = '';
+
+                        UPDATE Drivers 
+                        SET DriverEmail = NULL
+                        WHERE DriverEmail = '';
+
+                        UPDATE Drivers 
+                        SET Address = NULL
+                        WHERE Address = '';
+
+                        UPDATE Drivers 
+                        SET City = NULL
+                        WHERE City = '';
+
+                        UPDATE Drivers 
+                        SET State = NULL
+                        WHERE State = '';
+
+                        UPDATE Drivers 
+                        SET Zip = NULL
+                        WHERE Zip = '';
+                    ");
+
+                    _logger.LogInformation("Successfully fixed NULL values in Drivers table.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while attempting to fix NULL values in Drivers table");
+                // Don't throw - let the calling method handle the original exception
             }
         }
 

@@ -72,6 +72,9 @@ namespace BusBuddy.Core.Extensions
             // Register Activity Log Service
             services.AddScoped<IActivityLogService, ActivityLogService>();
 
+            // Register Database NULL Fix Service
+            services.AddScoped<BusBuddy.Core.Services.DatabaseNullFixService>();
+
             return services;
         }
     }

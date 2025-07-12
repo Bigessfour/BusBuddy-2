@@ -112,12 +112,13 @@ public class BusBuddyDbContext : DbContext
         // Configure Bus (Vehicle) entity with enhanced audit and indexing
         modelBuilder.Entity<Bus>(entity =>
         {
-            entity.ToTable("Vehicles");
+            entity.ToTable("Buses");
             entity.HasKey(e => e.VehicleId);
+            entity.Property(e => e.VehicleId).HasColumnName("BusId");
 
             // Properties with validation and constraints
             entity.Property(e => e.BusNumber).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.VINNumber).IsRequired().HasMaxLength(17);
+            entity.Property(e => e.VINNumber).IsRequired().HasMaxLength(17).HasColumnName("VIN");
             entity.Property(e => e.LicenseNumber).IsRequired().HasMaxLength(20);
             entity.Property(e => e.Make).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Model).IsRequired().HasMaxLength(50);
@@ -160,12 +161,13 @@ public class BusBuddyDbContext : DbContext
         {
             entity.ToTable("Drivers");
             entity.HasKey(e => e.DriverId);
+            entity.Property(e => e.DriverId).HasColumnName("DriverID");
 
             // Properties
             entity.Property(e => e.DriverName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.DriverPhone).HasMaxLength(20);
             entity.Property(e => e.DriverEmail).HasMaxLength(100);
-            entity.Property(e => e.DriversLicenceType).HasMaxLength(20);
+            entity.Property(e => e.DriversLicenceType).HasMaxLength(20).HasColumnName("DriversLicenseType");
             entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.City).HasMaxLength(50);
             entity.Property(e => e.State).HasMaxLength(20);
@@ -192,10 +194,17 @@ public class BusBuddyDbContext : DbContext
         {
             entity.ToTable("Routes");
             entity.HasKey(e => e.RouteId);
+            entity.Property(e => e.RouteId).HasColumnName("RouteID");
 
             // Properties
             entity.Property(e => e.RouteName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Description).HasMaxLength(500);
+
+            // Foreign key column mappings
+            entity.Property(e => e.AMVehicleId).HasColumnName("AMVehicleID");
+            entity.Property(e => e.AMDriverId).HasColumnName("AMDriverID");
+            entity.Property(e => e.PMVehicleId).HasColumnName("PMVehicleID");
+            entity.Property(e => e.PMDriverId).HasColumnName("PMDriverID");
 
             // Decimal properties
             entity.Property(e => e.AMBeginMiles).HasColumnType("decimal(10,2)");
