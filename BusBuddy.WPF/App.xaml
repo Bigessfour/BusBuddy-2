@@ -6,14 +6,33 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- Primary unified styles - loaded first for inheritance -->
+                <ResourceDictionary Source="Resources/UnifiedStyles.xaml"/>
+                <!-- Standard data view templates -->
+                <ResourceDictionary Source="Controls/StandardDataViewTemplate.xaml"/>
+                <!-- Specific component styles -->
                 <ResourceDictionary Source="Resources/TileStyles.xaml"/>
                 <ResourceDictionary Source="Resources/SyncfusionDateTimeFix.xaml"/>
                 <ResourceDictionary Source="Resources/SyncfusionButtonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Global Converters - Syncfusion Compatible -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
+            
+            <!-- Status and Data Converters -->
+            <converters:ActiveStatusToColorConverter x:Key="ActiveStatusToColorConverter"/>
+            <converters:ActiveStatusToTextConverter x:Key="ActiveStatusToTextConverter"/>
+            <converters:EfficiencyToColorConverter x:Key="EfficiencyToColorConverter"/>
+            <converters:LicenseStatusToColorConverter x:Key="LicenseStatusToColorConverter"/>
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            <converters:AvailabilityToColorConverter x:Key="AvailabilityToColorConverter"/>
+            <converters:LicenseExpiredConverter x:Key="LicenseExpiredConverter"/>
+            <converters:LicenseExpiringSoonConverter x:Key="LicenseExpiringSoonConverter"/>
+            <converters:DaysRemainingToColorConverter x:Key="DaysRemainingToColorConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

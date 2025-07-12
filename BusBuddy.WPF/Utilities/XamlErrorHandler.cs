@@ -135,7 +135,11 @@ namespace BusBuddy.WPF.Utilities
                 }
 
                 // Return the default value for the type
-                return targetType.IsValueType ? Activator.CreateInstance(targetType) : (object)string.Empty;
+                if (targetType.IsValueType)
+                {
+                    return Activator.CreateInstance(targetType) ?? (object)0;
+                }
+                return string.Empty;
             }
             catch (Exception ex)
             {

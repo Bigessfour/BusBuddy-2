@@ -93,7 +93,7 @@ public class DatabasePerformanceOptimizer
     /// <summary>
     /// Apply recommended performance optimizations
     /// </summary>
-    public async Task<int> ApplyOptimizationsAsync()
+    public Task<int> ApplyOptimizationsAsync()
     {
         var optimizationsApplied = 0;
 
@@ -115,7 +115,7 @@ public class DatabasePerformanceOptimizer
             _logger.LogError(ex, "Failed to apply database optimizations");
         }
 
-        return optimizationsApplied;
+        return Task.FromResult(optimizationsApplied);
     }
 
     private async Task MeasureQueryPerformance<T>(PerformanceAnalysisResult result, string queryName, Func<Task<T>> query)
