@@ -14,6 +14,18 @@
              d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
     
     <UserControl.Resources>
+        <!-- DataTemplates to map ViewModels to Views -->
+        <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
+            <busView:BusManagementView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:DriverManagementViewModel}">
+            <driverView:DriverManagementView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
+            <routeView:RouteManagementView/>
+        </DataTemplate>
+        <!-- Add other DataTemplates for Schedule, Student, Maintenance, Fuel, and ActivityLog ViewModels as needed -->
+        
         <!-- Enhanced Tile Style for Modern Appearance -->
         <Style x:Key="DashboardTileStyle" TargetType="Border">
             <Setter Property="Background" Value="#FFFFFF"/>
@@ -618,9 +630,8 @@
                           syncfusion:DockingManager.DesiredWidthInDockedMode="350"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch">
-                <busView:BusManagementView DataContext="{Binding BusManagementViewModel, FallbackValue={x:Null}}"/>
-            </ContentControl>
+                          VerticalAlignment="Stretch"
+                          Content="{Binding BusManagementViewModel, FallbackValue={x:Null}}"/>
             
             <!-- Driver Management Panel (Docked Left) -->
             <ContentControl x:Name="DriverManagement" 
@@ -630,9 +641,8 @@
                           syncfusion:DockingManager.DesiredWidthInDockedMode="300"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch">
-                <driverView:DriverManagementView DataContext="{Binding DriverManagementViewModel, FallbackValue={x:Null}}"/>
-            </ContentControl>
+                          VerticalAlignment="Stretch"
+                          Content="{Binding DriverManagementViewModel, FallbackValue={x:Null}}"/>
             
             <!-- Route Management Panel (Document Tab) -->
             <ContentControl x:Name="RouteManagement" 
@@ -640,9 +650,8 @@
                           syncfusion:DockingManager.State="Document"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch">
-                <routeView:RouteManagementView DataContext="{Binding RouteManagementViewModel, FallbackValue={x:Null}}"/>
-            </ContentControl>
+                          VerticalAlignment="Stretch"
+                          Content="{Binding RouteManagementViewModel, FallbackValue={x:Null}}"/>
             
             <!-- Schedule Management Panel (Auto Hidden) -->
             <ContentControl x:Name="ScheduleManagement" 

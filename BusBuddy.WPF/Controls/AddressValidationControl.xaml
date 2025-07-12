@@ -96,8 +96,8 @@
                                     AnimationType="SingleCircle"
                                     Visibility="{Binding IsValidating, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     HorizontalAlignment="Center"
-                                    ViewboxHeight="24"
-                                    ViewboxWidth="24"
+                                    Height="24"
+                                    Width="24"
                                     Margin="0,10,0,0" />
         
         <!-- Normalized Address Display -->

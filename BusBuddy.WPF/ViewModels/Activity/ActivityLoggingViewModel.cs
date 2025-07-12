@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using Microsoft.Win32;
 using System.IO;
 using System.Collections.Generic;
@@ -70,20 +71,20 @@ namespace BusBuddy.WPF.ViewModels
             set => SetProperty(ref _selectedLog, value);
         }
 
-        public RelayCommand RefreshCommand { get; }
-        public RelayCommand ExportCommand { get; }
-        public RelayCommand ClearFiltersCommand { get; }
-        public RelayCommand ViewDetailsCommand { get; }
+        public ICommand RefreshCommand { get; }
+        public ICommand ExportCommand { get; }
+        public ICommand ClearFiltersCommand { get; }
+        public ICommand ViewDetailsCommand { get; }
 
         public ActivityLoggingViewModel(IActivityLogService logService, ILogger<ActivityLoggingViewModel>? logger = null)
             : base(logger)
         {
             _logService = logService;
 
-            RefreshCommand = new RelayCommand(_ => { _ = RefreshLogsAsync(); });
-            ExportCommand = new RelayCommand(_ => { _ = ExportLogsAsync(); });
-            ClearFiltersCommand = new RelayCommand(_ => { ClearFilters(); });
-            ViewDetailsCommand = new RelayCommand(_ => { ViewLogDetails(); }, _ => SelectedLog != null);
+            RefreshCommand = new BusBuddy.WPF.RelayCommand(async _ => await RefreshLogsAsync());
+            ExportCommand = new BusBuddy.WPF.RelayCommand(async _ => await ExportLogsAsync());
+            ClearFiltersCommand = new BusBuddy.WPF.RelayCommand(_ => ClearFilters());
+            ViewDetailsCommand = new BusBuddy.WPF.RelayCommand(_ => ViewLogDetails(), _ => SelectedLog != null);
 
             // Set development status to false to make the view fully functional
             IsInDevelopment = false;

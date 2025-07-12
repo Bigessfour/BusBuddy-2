@@ -1,5 +1,6 @@
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Models;
+using BusBuddy.WPF;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -58,8 +59,8 @@ namespace BusBuddy.WPF.ViewModels
                 FieldTripPermission = student.FieldTripPermission,
             };
 
-            SaveCommand = new RelayCommand(SaveChanges);
-            CancelCommand = new RelayCommand(CancelChanges);
+            SaveCommand = new BusBuddy.WPF.RelayCommand(o => SaveChanges(o));
+            CancelCommand = new BusBuddy.WPF.RelayCommand(o => CancelChanges(o));
         }
 
         private void CancelChanges(object? obj)

@@ -1,5 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using BusBuddy.WPF;
 using CoreInterfaces = BusBuddy.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -104,7 +105,7 @@ namespace BusBuddy.WPF.ViewModels.ScheduleManagement
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             FilterCommand = new AsyncRelayCommand(ApplyFiltersAsync);
             ExportToCsvCommand = new AsyncRelayCommand(ExportToCsvAsync);
-            ShowReportsCommand = new RelayCommand(ExecuteShowReportsDialog);
+            ShowReportsCommand = new BusBuddy.WPF.RelayCommand(o => ExecuteShowReportsDialog(o));
 
             // Load schedules when view model is created
             _ = LoadActivitySchedulesAsync();

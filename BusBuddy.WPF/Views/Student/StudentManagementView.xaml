@@ -222,8 +222,8 @@
                 <syncfusion:SfBusyIndicator IsBusy="True" 
                                            AnimationType="SingleCircle" 
                                            Foreground="White"
-                                           ViewboxHeight="50" 
-                                           ViewboxWidth="50"/>
+                                           Height="50" 
+                                           Width="50"/>
                 <TextBlock Text="Loading..." 
                            Foreground="White" 
                            FontSize="16" 

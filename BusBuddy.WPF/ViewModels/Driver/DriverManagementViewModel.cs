@@ -49,7 +49,7 @@ namespace BusBuddy.WPF.ViewModels
             AddDriverCommand = new AsyncRelayCommand(AddDriverAsync);
             UpdateDriverCommand = new AsyncRelayCommand(UpdateDriverAsync, CanUpdateOrDelete);
             DeleteDriverCommand = new AsyncRelayCommand(DeleteDriverAsync, CanUpdateOrDelete);
-            GenerateLicenseStatusReportCommand = new RelayCommand(_ => GenerateLicenseStatusReport());
+            GenerateLicenseStatusReportCommand = new BusBuddy.WPF.RelayCommand(_ => GenerateLicenseStatusReport());
 
             // Trigger initialization but don't wait for it to complete directly in the constructor
             Initialized = InitializeAsync();

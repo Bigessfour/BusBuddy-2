@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BusBuddy.Core.Models.Trips;
 
 namespace BusBuddy.Core.Models;
 
@@ -112,4 +113,10 @@ public class ActivitySchedule
     // Navigation properties
     public virtual Bus ScheduledVehicle { get; set; } = null!;
     public virtual Driver ScheduledDriver { get; set; } = null!;
+
+    // Link to detailed trip information
+    [ForeignKey("TripEvent")]
+    [Display(Name = "Trip Event")]
+    public int? TripEventId { get; set; }
+    public virtual TripEvent? TripEvent { get; set; }
 }

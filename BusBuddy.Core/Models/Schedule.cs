@@ -4,7 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BusBuddy.Core.Models;
 
 /// <summary>
-/// Represents a scheduled bus operation
+/// Represents a scheduled bus operation for daily routes
+/// This is for regular bus routes, NOT for sports/activity trips (use ActivitySchedule for those)
 /// Extended model for enhanced scheduling functionality with Syncfusion components
 /// </summary>
 [Table("Schedules")]

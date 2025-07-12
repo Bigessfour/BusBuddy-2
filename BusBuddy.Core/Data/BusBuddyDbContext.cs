@@ -1,5 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Models.Base;
+using BusBuddy.Core.Models.Trips;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Linq.Expressions;
@@ -66,6 +67,7 @@ public class BusBuddyDbContext : DbContext
     public virtual DbSet<Maintenance> MaintenanceRecords { get; set; }
     public virtual DbSet<Student> Students { get; set; }
     public virtual DbSet<Schedule> Schedules { get; set; }
+    public virtual DbSet<TripEvent> TripEvents { get; set; }
     public virtual DbSet<RouteStop> RouteStops { get; set; }
     public virtual DbSet<SchoolCalendar> SchoolCalendar { get; set; }
     public virtual DbSet<ActivitySchedule> ActivitySchedule { get; set; }
@@ -419,6 +421,58 @@ public class BusBuddyDbContext : DbContext
             entity.HasIndex(e => e.BusId).HasDatabaseName("IX_Schedules_BusId");
             entity.HasIndex(e => e.DriverId).HasDatabaseName("IX_Schedules_DriverId");
             entity.HasIndex(e => e.RouteId).HasDatabaseName("IX_Schedules_RouteId");
+        });
+
+        // Configure TripEvent entity
+        modelBuilder.Entity<TripEvent>(entity =>
+        {
+            entity.ToTable("TripEvents");
+            entity.HasKey(e => e.TripEventId);
+
+            // Properties
+            entity.Property(e => e.Type).IsRequired();
+            entity.Property(e => e.CustomType).HasMaxLength(100);
+            entity.Property(e => e.POCName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.POCPhone).HasMaxLength(20);
+            entity.Property(e => e.POCEmail).HasMaxLength(100);
+            entity.Property(e => e.Destination).HasMaxLength(200);
+            entity.Property(e => e.SpecialRequirements).HasMaxLength(500);
+            entity.Property(e => e.TripNotes).HasMaxLength(1000);
+            entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Scheduled");
+            entity.Property(e => e.ApprovedBy).HasMaxLength(100);
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            entity.Property(e => e.UpdatedBy).HasMaxLength(100);
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("GETUTCDATE()");
+
+            // Relationships - TripEvents are now only related through ActivitySchedule
+            entity.HasOne(te => te.Vehicle)
+                  .WithMany()  // No back-reference from Vehicle to TripEvents
+                  .HasForeignKey(te => te.VehicleId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_TripEvents_Vehicle");
+
+            entity.HasOne(te => te.Driver)
+                  .WithMany()  // No back-reference from Driver to TripEvents
+                  .HasForeignKey(te => te.DriverId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_TripEvents_Driver");
+
+            entity.HasOne(te => te.Route)
+                  .WithMany()  // No back-reference from Route to TripEvents
+                  .HasForeignKey(te => te.RouteId)
+                  .OnDelete(DeleteBehavior.SetNull)
+                  .HasConstraintName("FK_TripEvents_Route");
+
+            // Indexes
+            entity.HasIndex(e => e.LeaveTime).HasDatabaseName("IX_TripEvents_LeaveTime");
+            entity.HasIndex(e => e.Type).HasDatabaseName("IX_TripEvents_Type");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_TripEvents_Status");
+            entity.HasIndex(e => e.VehicleId).HasDatabaseName("IX_TripEvents_VehicleId");
+            entity.HasIndex(e => e.DriverId).HasDatabaseName("IX_TripEvents_DriverId");
+            entity.HasIndex(e => e.RouteId).HasDatabaseName("IX_TripEvents_RouteId");
+            entity.HasIndex(e => new { e.VehicleId, e.LeaveTime }).HasDatabaseName("IX_TripEvents_VehicleSchedule");
+            entity.HasIndex(e => new { e.DriverId, e.LeaveTime }).HasDatabaseName("IX_TripEvents_DriverSchedule");
+            entity.HasIndex(e => e.ApprovalRequired).HasDatabaseName("IX_TripEvents_ApprovalRequired");
         });
 
         // Configure RouteStop entity

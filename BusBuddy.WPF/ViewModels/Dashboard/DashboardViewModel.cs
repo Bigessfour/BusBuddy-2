@@ -1,4 +1,16 @@
+// Artifact: Updated DashboardViewModel.cs
+// Changes:
+// - Added support for SfHubTile integration as per reference.md recommendations.
+// - Introduced DashboardTileModel class (implements INotifyPropertyChanged) for tile data.
+// - Added DashboardTiles collection and initialization.
+// - Added UpdateDashboardTiles() method called during RefreshDashboardDataAsync() to keep tiles in sync with metrics.
+// - Included a simple RelayCommand class for NavigateCommand (assuming no existing command infrastructure; can be replaced if a more robust one exists).
+// - Updated RefreshDashboardDataAsync() to call UpdateDashboardTiles().
+// - No changes to docking events as they belong in the view code-behind.
+// - Ensured compatibility with existing performance optimizations and auto-refresh.
+
 using System.Threading.Tasks;
+using System.Windows.Input;
 using BusBuddy.WPF.Services;
 using BusBuddy.WPF.ViewModels;
 using BusBuddy.WPF.ViewModels.Schedule;
@@ -11,12 +23,80 @@ using Serilog.Context;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
 using System.Threading;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 
 // Disable obsolete warnings for the entire file
 #pragma warning disable CS0618 // Type or member is obsolete
 
 namespace BusBuddy.WPF.ViewModels
 {
+    public class DashboardTileModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private string _header = string.Empty;
+        public string Header
+        {
+            get => _header;
+            set { _header = value; OnPropertyChanged(nameof(Header)); }
+        }
+
+        private string _title = string.Empty;
+        public string Title
+        {
+            get => _title;
+            set { _title = value; OnPropertyChanged(nameof(Title)); }
+        }
+
+        private string _imageSource = string.Empty;
+        public string ImageSource
+        {
+            get => _imageSource;
+            set { _imageSource = value; OnPropertyChanged(nameof(ImageSource)); }
+        }
+
+        private int _notificationCount;
+        public int NotificationCount
+        {
+            get => _notificationCount;
+            set { _notificationCount = value; OnPropertyChanged(nameof(NotificationCount)); }
+        }
+
+        private string _tileType = string.Empty;
+        public string TileType
+        {
+            get => _tileType;
+            set { _tileType = value; OnPropertyChanged(nameof(TileType)); }
+        }
+
+        public ICommand? NavigateCommand { get; set; }
+    }
+
+    // Syncfusion-style RelayCommand implementation with proper nullable reference types
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object?> _execute;
+        private readonly Func<object?, bool>? _canExecute;
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public bool CanExecute(object? parameter) => _canExecute?.Invoke(parameter) ?? true;
+        public void Execute(object? parameter) => _execute(parameter);
+    }
+
     public class DashboardViewModel : BaseViewModel
     {
         private readonly IRoutePopulationScaffold _routePopulationScaffold;
@@ -59,6 +139,9 @@ namespace BusBuddy.WPF.ViewModels
         private string _nextUpdateTime = "Calculating...";
         private System.Threading.Timer? _refreshTimer;
         private volatile bool _isRefreshing = false; // State guard to prevent concurrent refreshes
+
+        // Hub Tile support
+        private ObservableCollection<DashboardTileModel> _dashboardTiles;
 
         protected override ILogger? GetLogger() => _logger;
 
@@ -289,6 +372,50 @@ namespace BusBuddy.WPF.ViewModels
 
             // Initialize auto-refresh timer (5-second intervals as per development plan)
             InitializeRefreshTimer();
+
+            // Initialize dashboard tiles for SfHubTile support
+            _dashboardTiles = InitializeDashboardTiles();
+        }
+
+        private ObservableCollection<DashboardTileModel> InitializeDashboardTiles()
+        {
+            var tiles = new ObservableCollection<DashboardTileModel>
+            {
+                new DashboardTileModel { Header = "Bus Fleet", Title = $"{ActiveBusCount} Active", ImageSource = "/Assets/Icons/bus_icon.png", NotificationCount = 0, TileType = "Flip", NavigateCommand = new RelayCommand(o => NavigateToBusManagement()) },
+                new DashboardTileModel { Header = "Drivers", Title = $"{AvailableDriverCount} Available", ImageSource = "/Assets/Icons/driver_icon.png", NotificationCount = 0, TileType = "Flip", NavigateCommand = new RelayCommand(o => NavigateToDriverManagement()) },
+                new DashboardTileModel { Header = "Active Routes", Title = $"{TotalActiveRoutes} Routes", ImageSource = "/Assets/Icons/route_icon.png", NotificationCount = 0, TileType = "Flip", NavigateCommand = new RelayCommand(o => NavigateToRouteManagement()) }
+            };
+            return tiles;
+        }
+
+        public ObservableCollection<DashboardTileModel> DashboardTiles => _dashboardTiles;
+
+        private void UpdateDashboardTiles()
+        {
+            var fleetTile = _dashboardTiles.FirstOrDefault(t => t.Header == "Bus Fleet");
+            if (fleetTile != null) fleetTile.Title = $"{ActiveBusCount} Active";
+
+            var driverTile = _dashboardTiles.FirstOrDefault(t => t.Header == "Drivers");
+            if (driverTile != null) driverTile.Title = $"{AvailableDriverCount} Available";
+
+            var routeTile = _dashboardTiles.FirstOrDefault(t => t.Header == "Active Routes");
+            if (routeTile != null) routeTile.Title = $"{TotalActiveRoutes} Routes";
+        }
+
+        private void NavigateToBusManagement()
+        {
+            // Implement navigation logic, e.g., switch to BusManagement panel
+            _logger.LogInformation("Navigating to Bus Management");
+        }
+
+        private void NavigateToDriverManagement()
+        {
+            _logger.LogInformation("Navigating to Driver Management");
+        }
+
+        private void NavigateToRouteManagement()
+        {
+            _logger.LogInformation("Navigating to Route Management");
         }
 
         private void InitializeRefreshTimer()
@@ -377,6 +504,9 @@ namespace BusBuddy.WPF.ViewModels
                 // Calculate additional real-time metrics
                 await CalculateRealTimeMetricsAsync();
 
+                // Update hub tiles
+                UpdateDashboardTiles();
+
                 // Trigger property change notifications for UI updates
                 OnPropertyChanged(nameof(TotalBuses));
                 OnPropertyChanged(nameof(TotalDrivers));
@@ -387,6 +517,7 @@ namespace BusBuddy.WPF.ViewModels
                 OnPropertyChanged(nameof(FleetActivePercentageFormatted));
                 OnPropertyChanged(nameof(DriverAvailabilityPercentageFormatted));
                 OnPropertyChanged(nameof(RouteCoveragePercentageFormatted));
+                OnPropertyChanged(nameof(DashboardTiles));  // Ensure tiles update
 
                 _logger.LogInformation("Dashboard data refresh completed");
             }

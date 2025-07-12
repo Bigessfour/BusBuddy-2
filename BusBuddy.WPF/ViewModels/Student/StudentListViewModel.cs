@@ -1,5 +1,6 @@
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Models;
+using BusBuddy.WPF;
 using BusBuddy.WPF.Views;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
@@ -32,7 +33,7 @@ namespace BusBuddy.WPF.ViewModels
 
             _logger?.LogInformation("StudentListViewModel constructor starting");
 
-            OpenStudentDetailCommand = new RelayCommand(OpenStudentDetail);
+            OpenStudentDetailCommand = new BusBuddy.WPF.RelayCommand(o => OpenStudentDetail(o));
 
             _logger?.LogInformation("StudentListViewModel constructor completed, initiating LoadStudentsAsync");
             Initialized = LoadStudentsAsync();

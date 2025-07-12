@@ -4,175 +4,445 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sf="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:tools="http://schemas.syncfusion.com/wpf"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
+             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="1000">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+             d:DesignHeight="600" d:DesignWidth="1000"
+             d:DataContext="{d:DesignInstance viewModels:ScheduleManagementViewModel}">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:ScheduleStatusToColorConverter x:Key="ScheduleStatusToColorConverter"/>
         
-        <!-- Header -->
-        <Border Grid.Row="0" Background="#007ACC" Padding="16,12" Margin="-20,-20,-20,10" CornerRadius="0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="🚌 Schedule Management" 
-                          FontSize="20" 
-                          FontWeight="SemiBold" 
-                          Foreground="White"/>
-                <TextBlock Text="{Binding Schedules.Count, StringFormat=' ({0} schedules)'}" 
-                          FontSize="14" 
+        <!-- Schedule Status Templates -->
+        <DataTemplate x:Key="ScheduleStatusTemplate">
+            <Border Background="{Binding Status, Converter={StaticResource ScheduleStatusToColorConverter}}" 
+                    CornerRadius="12" Padding="6,3" Margin="2">
+                <TextBlock Text="{Binding Status}" 
                           Foreground="White" 
-                          Margin="10,0,0,0" 
-                          VerticalAlignment="Center"/>
+                          FontSize="10" 
+                          FontWeight="SemiBold" 
+                          HorizontalAlignment="Center"/>
+            </Border>
+        </DataTemplate>
+        
+        <!-- Appointment Template for Custom Display -->
+        <DataTemplate x:Key="CustomAppointmentTemplate">
+            <Border Background="{Binding AppointmentBackground}" 
+                    CornerRadius="4" 
+                    Padding="4,2"
+                    BorderBrush="White" 
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="{Binding Subject}" 
+                              FontWeight="Bold" 
+                              FontSize="11" 
+                              Foreground="White" 
+                              TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding StartTime, StringFormat='{}{0:HH:mm}'}" 
+                              FontSize="9" 
+                              Foreground="White" 
+                              Opacity="0.8"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!-- Enhanced Schedule Management with Syncfusion DockingManager -->
+    <sf:DockingManager UseDocumentContainer="True" PersistState="False" ContainerMode="TDI">
+        
+        <!-- Calendar View (Document) -->
+        <ContentControl sf:DockingManager.Header="Schedule Calendar" 
+                       sf:DockingManager.State="Document"
+                       sf:DockingManager.CanSerialize="True">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Enhanced Header with Calendar Controls -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Schedule Management" FontSize="22" FontWeight="Bold" Margin="0,0,0,10"/>
+                        
+                        <!-- Calendar Navigation and Filters -->
+                        <StackPanel Orientation="Horizontal">
+                            <tools:ButtonAdv Label="◀" 
+                                       Command="{Binding PreviousPeriodCommand}" 
+                                       Width="32" Height="32" 
+                                       Margin="0,0,5,0"/>
+                            <tools:ButtonAdv Label="▶" 
+                                       Command="{Binding NextPeriodCommand}" 
+                                       Width="32" Height="32" 
+                                       Margin="0,0,10,0"/>
+                            <tools:ButtonAdv Label="📅 Today" 
+                                       Command="{Binding GoToTodayCommand}" 
+                                       Width="70" Height="32" 
+                                       Margin="0,0,15,0"/>
+                            
+                            <!-- View Type Selector -->
+                            <syncfusion:ComboBoxAdv ItemsSource="{Binding ViewTypes}" 
+                                            SelectedItem="{Binding SelectedViewType}"
+                                            DisplayMemberPath="Name"
+                                            DefaultText="Select view..."
+                                            Width="120" Height="32" 
+                                            Margin="0,0,10,0"/>
+                            
+                            <!-- Schedule Filters -->
+                            <tools:ComboBoxAdv ItemsSource="{Binding ScheduleFilters}" 
+                                            SelectedItem="{Binding SelectedScheduleFilter}"
+                                            DisplayMemberPath="Name"
+                                            DefaultText="Filter schedules..."
+                                            Width="150" Height="32"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Schedule Statistics -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Border Background="#E8F5E8" CornerRadius="8" Padding="12,8" Margin="5,0">
+                            <StackPanel>
+                                <TextBlock Text="Today's Schedules" FontSize="12" Foreground="#2E7D32"/>
+                                <TextBlock Text="{Binding TodayScheduleCount}" FontSize="20" FontWeight="Bold" Foreground="#2E7D32"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#FFF3E0" CornerRadius="8" Padding="12,8" Margin="5,0">
+                            <StackPanel>
+                                <TextBlock Text="This Week" FontSize="12" Foreground="#F57C00"/>
+                                <TextBlock Text="{Binding WeekScheduleCount}" FontSize="20" FontWeight="Bold" Foreground="#F57C00"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#FFEBEE" CornerRadius="8" Padding="12,8" Margin="5,0">
+                            <StackPanel>
+                                <TextBlock Text="Conflicts" FontSize="12" Foreground="#C62828"/>
+                                <TextBlock Text="{Binding ConflictCount}" FontSize="20" FontWeight="Bold" Foreground="#C62828"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Enhanced SfScheduler for Visual Schedule Management -->
+                <sf:SfScheduler Grid.Row="1"
+               ItemsSource="{Binding ScheduleAppointments}"
+               ViewType="{Binding SelectedSchedulerViewType}"
+               SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+               ResourceCollection="{Binding BusResources}"
+               ResourceGroupType="Resource"
+               BorderThickness="1"
+               BorderBrush="#E0E0E0"
+               Background="White">
+                    
+                    <!-- Appointment Mapping for Custom Schedule Model -->
+                    <sf:SfScheduler.AppointmentMapping>
+                        <sf:AppointmentMapping StartTime="StartTime"
+                                              EndTime="EndTime"
+                                              Subject="Subject"
+                                              Id="Id"
+                                              AppointmentBackground="AppointmentBackground"
+                                              Notes="Notes"
+                                              IsAllDay="IsAllDay" />
+                    </sf:SfScheduler.AppointmentMapping>
+                    
+                    <!-- Resource Mapping Configuration -->
+                    <sf:SfScheduler.ResourceMapping>
+                        <sf:ResourceMapping Name="Name" 
+                                           Id="Id" 
+                                           Background="Background" 
+                                           Foreground="Foreground" />
+                    </sf:SfScheduler.ResourceMapping>
+
+                    <!-- Resource Header Template -->
+                    <sf:SfScheduler.ResourceHeaderTemplate>
+                        <DataTemplate>
+                            <Border Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1" Padding="8,4">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12"/>
+                                    <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" FontSize="10" Foreground="#666"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </sf:SfScheduler.ResourceHeaderTemplate>
+                    
+                    <!-- Context Menu for Appointments -->
+                    <sf:SfScheduler.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="View Details" Command="{Binding ViewScheduleDetailsCommand}"/>
+                            <MenuItem Header="Edit Schedule" Command="{Binding EditScheduleCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Duplicate Schedule" Command="{Binding DuplicateScheduleCommand}"/>
+                            <MenuItem Header="Reschedule" Command="{Binding RescheduleCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Mark as Complete" Command="{Binding MarkCompleteCommand}"/>
+                            <MenuItem Header="Cancel Schedule" Command="{Binding CancelScheduleCommand}" Foreground="Red"/>
+                            <Separator/>
+                            <MenuItem Header="Add to Route" Command="{Binding AddToRouteCommand}"/>
+                        </ContextMenu>
+                    </sf:SfScheduler.ContextMenu>
+                </sf:SfScheduler>
+            </Grid>
+        </ContentControl>
+
+        <!-- Schedule List View (Docked Right) -->
+        <ContentControl sf:DockingManager.Header="Schedule List" 
+                       sf:DockingManager.State="Dock"
+                       sf:DockingManager.SideInDockedMode="Right"
+                       sf:DockingManager.DesiredWidthInDockedMode="400"
+                       sf:DockingManager.CanSerialize="True">
+            <Grid Margin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- List Header -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                    <TextBlock Text="Schedule Management" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                    
+                    <!-- Quick Actions -->
+                    <StackPanel Orientation="Horizontal">
+                        <tools:ButtonAdv Label="➕ New" 
+                                   Command="{Binding AddScheduleCommand}" 
+                                   Style="{StaticResource PrimaryButtonStyle}"
+                                   Width="60" Height="32" 
+                                   Margin="0,0,8,0"/>
+                        <syncfusion:DropDownButtonAdv Width="80" Height="32">
+                            <syncfusion:DropDownMenuGroup>
+                                <syncfusion:DropDownMenuItem Header="Daily Schedule Report" 
+                                                            Command="{Binding GenerateDailyReportCommand}"/>
+                                <syncfusion:DropDownMenuItem Header="Weekly Summary" 
+                                                            Command="{Binding GenerateWeeklyReportCommand}"/>
+                                <syncfusion:DropDownMenuItem Header="Resource Utilization" 
+                                                            Command="{Binding GenerateUtilizationReportCommand}"/>
+                                <Separator/>
+                                <syncfusion:DropDownMenuItem Header="Export to Excel" 
+                                                            Command="{Binding ExportScheduleCommand}"/>
+                            </syncfusion:DropDownMenuGroup>
+                        </syncfusion:DropDownButtonAdv>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Enhanced Schedule Data Grid -->
+                <sf:SfDataGrid Grid.Row="1"
+                               ItemsSource="{Binding Schedules}"
+                               SelectedItem="{Binding SelectedSchedule, Mode=TwoWay}"
+                               AutoGenerateColumns="False"
+                               AllowResizingColumns="True"
+                               AllowSorting="True"
+                               AllowFiltering="True"
+                               AllowGrouping="True"
+                               ShowGroupDropArea="False"
+                               ColumnSizer="Star"
+                               SelectionMode="Single"
+                               NavigationMode="Row"
+                               AllowEditing="True"
+                               ShowRowHeader="False"
+                               BorderThickness="1"
+                               BorderBrush="#E0E0E0"
+                               GridLinesVisibility="Both">
+                    
+                    <sf:SfDataGrid.Columns>
+                        <!-- Schedule ID (Hidden/Collapsed) -->
+                        <sf:GridTextColumn MappingName="ScheduleId" HeaderText="ID" Width="0" IsHidden="True"/>
+                        
+                        <!-- Destination -->
+                        <sf:GridTextColumn MappingName="Destination" HeaderText="Destination" Width="140"/>
+                        
+                        <!-- Schedule Date and Time -->
+                        <sf:GridDateTimeColumn MappingName="ScheduleDate" HeaderText="Date" Width="100" Pattern="ShortDate"/>
+                        <sf:GridTimeSpanColumn MappingName="LeaveTime" HeaderText="Departure" Width="80"/>
+                        <sf:GridTimeSpanColumn MappingName="EventTime" HeaderText="Arrival" Width="80"/>
+                        
+                        <!-- Bus Assignment with Enhanced Display -->
+                        <sf:GridTemplateColumn MappingName="BusAssignment" HeaderText="Bus" Width="100">
+                            <sf:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="#E3F2FD" CornerRadius="4" Padding="4,2" Margin="1">
+                                        <TextBlock Text="{Binding BusNumber, StringFormat='Bus {0}'}" 
+                                                  FontSize="10" FontWeight="SemiBold" 
+                                                  Foreground="#1976D2" 
+                                                  HorizontalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </sf:GridTemplateColumn.CellTemplate>
+                        </sf:GridTemplateColumn>
+                        
+                        <!-- Driver Assignment -->
+                        <sf:GridTemplateColumn MappingName="DriverAssignment" HeaderText="Driver" Width="120">
+                            <sf:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="#F3E5F5" CornerRadius="4" Padding="4,2" Margin="1">
+                                        <TextBlock Text="{Binding DriverName}" 
+                                                  FontSize="10" FontWeight="SemiBold" 
+                                                  Foreground="#7B1FA2" 
+                                                  HorizontalAlignment="Center"
+                                                  TextTrimming="CharacterEllipsis"/>
+                                    </Border>
+                                </DataTemplate>
+                            </sf:GridTemplateColumn.CellTemplate>
+                        </sf:GridTemplateColumn>
+                        
+                        <!-- Status with Visual Indicator -->
+                        <sf:GridTemplateColumn MappingName="Status" HeaderText="Status" Width="80">
+                            <sf:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource ScheduleStatusTemplate}"/>
+                                </DataTemplate>
+                            </sf:GridTemplateColumn.CellTemplate>
+                        </sf:GridTemplateColumn>
+                    </sf:SfDataGrid.Columns>
+
+                    <!-- Row Styling -->
+                    <!-- Removed invalid DataRowControl style. If row styling is needed, use a valid Syncfusion type such as GridRow. -->
+                    
+                    <!-- Context Menu -->
+                    <sf:SfDataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="View Details" Command="{Binding ViewScheduleDetailsCommand}"/>
+                            <MenuItem Header="Edit Schedule" Command="{Binding EditScheduleCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Duplicate" Command="{Binding DuplicateScheduleCommand}"/>
+                            <MenuItem Header="Reschedule" Command="{Binding RescheduleCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Mark as Complete" Command="{Binding MarkCompleteCommand}"/>
+                            <MenuItem Header="Cancel Schedule" Command="{Binding CancelScheduleCommand}" Foreground="Red"/>
+                            <Separator/>
+                            <MenuItem Header="Generate Report" Command="{Binding GenerateScheduleReportCommand}"/>
+                        </ContextMenu>
+                    </sf:SfDataGrid.ContextMenu>
+                </sf:SfDataGrid>
+                
+                <!-- Action Panel -->
+                <Grid Grid.Row="2" Margin="0,15,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Schedule Summary -->
+                    <TextBlock Grid.Row="0" Margin="0,0,0,10">
+                        <Run Text="Showing"/>
+                        <Run Text="{Binding Schedules.Count, Mode=OneWay}" FontWeight="Bold"/>
+                        <Run Text="of"/>
+                        <Run Text="{Binding TotalSchedules, Mode=OneWay}" FontWeight="Bold"/>
+                        <Run Text="schedules"/>
+                    </TextBlock>
+                    
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                        <tools:ButtonAdv Label="✏️ Edit Selected" 
+                                   Command="{Binding UpdateScheduleCommand}" 
+                                   CommandParameter="{Binding SelectedSchedule}"
+                                   Style="{StaticResource SecondaryButtonStyle}"
+                                   Height="32" Margin="0,0,0,5"/>
+                        <tools:ButtonAdv Label="🗑️ Delete Selected" 
+                                   Command="{Binding DeleteScheduleCommand}" 
+                                   CommandParameter="{Binding SelectedSchedule}"
+                                   Style="{StaticResource DangerButtonStyle}"
+                                   Height="32" Margin="0,0,0,5"/>
+                        <tools:ButtonAdv Label="🔄 Refresh Data" 
+                                   Command="{Binding LoadSchedulesCommand}" 
+                                   Style="{StaticResource PrimaryButtonStyle}"
+                                   Height="32"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </ContentControl>
+
+        <!-- Schedule Analytics (Document Tab) -->
+        <ContentControl sf:DockingManager.Header="Schedule Analytics" 
+                       sf:DockingManager.State="Document"
+                       sf:DockingManager.CanSerialize="True">
+            <Grid Margin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="300"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Analytics Header -->
+                <TextBlock Grid.Row="0" Text="Schedule Performance Analytics" 
+                          FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                
+                <!-- Analytics Charts -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Schedule Volume Chart -->
+                    <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" 
+                           CornerRadius="6" Margin="0,0,10,0">
+                        <sf:SfChart Header="Daily Schedule Volume" Margin="15">
+                            <sf:SfChart.PrimaryAxis>
+                                <sf:DateTimeAxis Header="Date"/>
+                            </sf:SfChart.PrimaryAxis>
+                            <sf:SfChart.SecondaryAxis>
+                                <sf:NumericalAxis Header="Schedule Count"/>
+                            </sf:SfChart.SecondaryAxis>
+                            <sf:LineSeries ItemsSource="{Binding ScheduleVolumeData}" 
+                                         XBindingPath="Date" 
+                                         YBindingPath="Count"
+                                         Interior="#2196F3"/>
+                        </sf:SfChart>
+                    </Border>
+                    
+                    <!-- Resource Utilization Chart -->
+                    <Border Grid.Column="1" BorderBrush="#E0E0E0" BorderThickness="1" 
+                           CornerRadius="6" Margin="10,0,0,0">
+                        <sf:SfChart Header="Resource Utilization" Margin="15">
+                            <sf:PieSeries ItemsSource="{Binding ResourceUtilizationData}" 
+                                        XBindingPath="ResourceType" 
+                                        YBindingPath="UtilizationPercentage"
+                                        ExplodeIndex="0"
+                                        ExplodeRadius="10"/>
+                        </sf:SfChart>
+                    </Border>
+                </Grid>
+                
+                <!-- Detailed Analytics Grid -->
+                <sf:SfDataGrid Grid.Row="2" Margin="0,15,0,0"
+                               ItemsSource="{Binding ScheduleAnalyticsData}"
+                               AutoGenerateColumns="False"
+                               AllowSorting="True"
+                               AllowFiltering="True"
+                               ShowRowHeader="False">
+                    <sf:SfDataGrid.Columns>
+                        <sf:GridDateTimeColumn MappingName="Date" HeaderText="Date" Width="100" Pattern="ShortDate"/>
+                        <sf:GridNumericColumn MappingName="TotalSchedules" HeaderText="Total Schedules" Width="120"/>
+                        <sf:GridNumericColumn MappingName="CompletedSchedules" HeaderText="Completed" Width="100"/>
+                        <sf:GridNumericColumn MappingName="CancelledSchedules" HeaderText="Cancelled" Width="100"/>
+                        <sf:GridNumericColumn MappingName="BusUtilization" HeaderText="Bus Utilization %" Width="130"/>
+                        <sf:GridNumericColumn MappingName="DriverUtilization" HeaderText="Driver Utilization %" Width="140"/>
+                        <sf:GridNumericColumn MappingName="EfficiencyScore" HeaderText="Efficiency %" Width="100"/>
+                    </sf:SfDataGrid.Columns>
+                </sf:SfDataGrid>
+            </Grid>
+        </ContentControl>
+
+        <!-- Loading Indicator -->
+        <Border sf:DockingManager.CanSerialize="False"
+                Background="#80000000" 
+                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" 
+                           Width="60" 
+                           Height="10"
+                           Foreground="White"/>
+                <TextBlock Text="Loading schedule data..." 
+                           Foreground="White" 
+                           FontSize="16" 
+                           Margin="0,15,0,0" 
+                           HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
-
-        <!-- Data Grid -->
-        <sf:SfDataGrid Grid.Row="1"
-                       ItemsSource="{Binding Schedules}"
-                       SelectedItem="{Binding SelectedSchedule, Mode=TwoWay}"
-                       AutoGenerateColumns="False"
-                       AllowSorting="True"
-                       AllowFiltering="True"
-                       AllowGrouping="True"
-                       ShowGroupDropArea="True"
-                       GridLinesVisibility="Both"
-                       HeaderLinesVisibility="Both"
-                       Margin="0,10">
-            <sf:SfDataGrid.Columns>
-                <sf:GridTextColumn MappingName="ScheduleId" 
-                                  HeaderText="ID" 
-                                  Width="80"
-                                  IsReadOnly="True"/>
-                <sf:GridTextColumn MappingName="Destination" 
-                                  HeaderText="Destination"
-                                  Width="200"/>
-                <sf:GridComboBoxColumn MappingName="BusId" 
-                                      HeaderText="Bus"
-                                      Width="120"
-                                      ItemsSource="{Binding DataContext.Buses, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                      DisplayMemberPath="BusNumber"
-                                      SelectedValuePath="BusId" />
-                <sf:GridComboBoxColumn MappingName="DriverId" 
-                                      HeaderText="Driver"
-                                      Width="150"
-                                      ItemsSource="{Binding DataContext.Drivers, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                      DisplayMemberPath="FullName"
-                                      SelectedValuePath="DriverId" />
-                <sf:GridDateTimeColumn MappingName="ScheduleDate" 
-                                      HeaderText="Schedule Date"
-                                      Width="130"
-                                      Pattern="LongDate"/>
-                <sf:GridTimeSpanColumn MappingName="LeaveTime" 
-                                      HeaderText="Departure"
-                                      Width="100"/>
-                <sf:GridTimeSpanColumn MappingName="EventTime" 
-                                      HeaderText="Arrival"
-                                      Width="100"/>
-                <sf:GridTextColumn MappingName="Status" 
-                                  HeaderText="Status"
-                                  Width="100"/>
-                <sf:GridTextColumn MappingName="Description" 
-                                  HeaderText="Description"
-                                  Width="*"/>
-            </sf:SfDataGrid.Columns>
-            
-            <!-- Simplified styling without problematic properties -->
-        </sf:SfDataGrid>
-
-        <!-- Command Buttons -->
-        <StackPanel Grid.Row="2" 
-                   Orientation="Horizontal" 
-                   HorizontalAlignment="Right" 
-                   Margin="0,15,0,0">
-            <Button Content="➕ Add Schedule" 
-                   Command="{Binding AddScheduleCommand}" 
-                   Margin="5"
-                   Padding="12,8"
-                   Background="#4CAF50"
-                   Foreground="White"
-                   BorderThickness="0"
-                   FontWeight="SemiBold"
-                   Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#45A049"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            
-            <Button Content="✏️ Update" 
-                   Command="{Binding UpdateScheduleCommand}" 
-                   Margin="5"
-                   Padding="12,8"
-                   Background="#FF9800"
-                   Foreground="White"
-                   BorderThickness="0"
-                   FontWeight="SemiBold"
-                   Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#F57C00"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#CCCCCC"/>
-                                <Setter Property="Cursor" Value="Arrow"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            
-            <Button Content="🗑️ Delete" 
-                   Command="{Binding DeleteScheduleCommand}" 
-                   Margin="5"
-                   Padding="12,8"
-                   Background="#F44336"
-                   Foreground="White"
-                   BorderThickness="0"
-                   FontWeight="SemiBold"
-                   Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#D32F2F"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#CCCCCC"/>
-                                <Setter Property="Cursor" Value="Arrow"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            
-            <Button Content="🔄 Refresh" 
-                   Command="{Binding LoadSchedulesCommand}" 
-                   Margin="5"
-                   Padding="12,8"
-                   Background="#2196F3"
-                   Foreground="White"
-                   BorderThickness="0"
-                   FontWeight="SemiBold"
-                   Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1976D2"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-        </StackPanel>
-    </Grid>
+    </sf:DockingManager>
 </UserControl>

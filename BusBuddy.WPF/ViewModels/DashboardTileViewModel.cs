@@ -65,9 +65,9 @@ namespace BusBuddy.WPF.ViewModels
 
         public DashboardTileViewModel()
         {
-            RefreshCommand = new RelayCommand(async _ => await RefreshTileAsync());
-            MaximizeCommand = new RelayCommand(_ => State = "Maximized");
-            MinimizeCommand = new RelayCommand(_ => State = "Minimized");
+            RefreshCommand = new BusBuddy.WPF.RelayCommand(async _ => await RefreshTileAsync());
+            MaximizeCommand = new BusBuddy.WPF.RelayCommand(_ => State = "Maximized");
+            MinimizeCommand = new BusBuddy.WPF.RelayCommand(_ => State = "Minimized");
         }
 
         public virtual async Task RefreshTileAsync()
@@ -248,12 +248,12 @@ namespace BusBuddy.WPF.ViewModels
             State = "Minimized";
 
             // Initialize commands with actual navigation
-            QuickAddStudentCommand = new RelayCommand(_ => _navigationAction?.Invoke("Students"));
-            QuickAddBusCommand = new RelayCommand(_ => _navigationAction?.Invoke("Buses"));
-            QuickScheduleTripCommand = new RelayCommand(_ => _navigationAction?.Invoke("Schedule"));
-            QuickMaintenanceCommand = new RelayCommand(_ => _navigationAction?.Invoke("Maintenance"));
-            QuickFuelEntryCommand = new RelayCommand(_ => _navigationAction?.Invoke("Fuel"));
-            QuickReportCommand = new RelayCommand(_ => _navigationAction?.Invoke("Activity"));
+            QuickAddStudentCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Students"));
+            QuickAddBusCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Buses"));
+            QuickScheduleTripCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Schedule"));
+            QuickMaintenanceCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Maintenance"));
+            QuickFuelEntryCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Fuel"));
+            QuickReportCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Activity"));
         }
     }
 }

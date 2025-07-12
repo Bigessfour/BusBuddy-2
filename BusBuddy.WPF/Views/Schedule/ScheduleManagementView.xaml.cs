@@ -1,3 +1,4 @@
+using BusBuddy.WPF;
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using BusBuddy.WPF.ViewModels.Schedule;
@@ -9,10 +10,9 @@ namespace BusBuddy.WPF.Views.Schedule
         public ScheduleManagementView()
         {
             InitializeComponent();
-            var app = (App)System.Windows.Application.Current;
-            if (app.Services != null)
+            if (System.Windows.Application.Current is App app && app.Services != null)
             {
-                DataContext = app.Services.GetService<ScheduleManagementViewModel>();
+                DataContext = app.Services.GetRequiredService<ScheduleManagementViewModel>();
             }
         }
     }

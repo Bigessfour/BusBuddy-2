@@ -1,3 +1,4 @@
+using BusBuddy.WPF;
 using BusBuddy.WPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
@@ -11,7 +12,7 @@ namespace BusBuddy.WPF.Views.Driver
             InitializeComponent();
             if (System.Windows.Application.Current is App app && app.Services != null)
             {
-                DataContext = app.Services.GetService<DriverManagementViewModel>();
+                DataContext = app.Services.GetRequiredService<DriverManagementViewModel>();
             }
         }
     }

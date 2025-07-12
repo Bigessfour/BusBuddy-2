@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace BusBuddy.WPF.ViewModels
@@ -82,7 +83,7 @@ namespace BusBuddy.WPF.ViewModels
             set => SetProperty(ref _hasNoData, value);
         }
 
-        public RelayCommand RefreshCommand { get; }
+        public ICommand RefreshCommand { get; }
 
         public ActivityTimelineViewModel(IActivityLogService logService, ILogger<ActivityTimelineViewModel>? logger = null)
             : base(logger)
@@ -90,7 +91,7 @@ namespace BusBuddy.WPF.ViewModels
             _logService = logService;
 
             // Initialize commands
-            RefreshCommand = new RelayCommand(_ => { _ = RefreshTimelineAsync(); });
+            RefreshCommand = new BusBuddy.WPF.RelayCommand(async _ => await RefreshTimelineAsync());
 
             // Set up date range options
             InitializeDateRanges();

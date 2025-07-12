@@ -54,6 +54,9 @@
         </syncfusionGrid:SfDataGrid>
         
         <syncfusionChart:SfChart x:Name="FuelTrendChart" Grid.Row="2" Margin="0">
+            <syncfusionChart:SfChart.Behaviors>
+                <syncfusionChart:ChartTooltipBehavior/>
+            </syncfusionChart:SfChart.Behaviors>
             <syncfusionChart:LineSeries ItemsSource="{Binding FuelTrends}" XBindingPath="Period" YBindingPath="AvgMPG" Label="Avg MPG"/>
             <syncfusionChart:SfChart.PrimaryAxis>
                 <syncfusionChart:DateTimeAxis IntervalType="Months" LabelFormat="MMM yyyy"/>
