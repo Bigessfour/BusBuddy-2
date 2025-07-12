@@ -106,6 +106,9 @@ public class BusBuddyDbContext : DbContext
         // Configure global query filters for soft deletes
         ConfigureGlobalQueryFilters(modelBuilder);
 
+        // Configure global NULL handling for better error resilience
+        ConfigureNullHandling(modelBuilder);
+
         // Configure Bus (Vehicle) entity with enhanced audit and indexing
         modelBuilder.Entity<Bus>(entity =>
         {
@@ -580,6 +583,46 @@ public class BusBuddyDbContext : DbContext
                 modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
             }
         }
+    }
+
+    private void ConfigureNullHandling(ModelBuilder modelBuilder)
+    {
+        // Configure specific entities with NULL-safe defaults to prevent SqlNullValueException
+        modelBuilder.Entity<Driver>(entity =>
+        {
+            entity.Property(e => e.DriverName)
+                .HasDefaultValue("Unknown Driver");
+
+            entity.Property(e => e.Status)
+                .HasDefaultValue("Active");
+
+            entity.Property(e => e.DriversLicenceType)
+                .HasDefaultValue("Standard");
+        });
+
+        modelBuilder.Entity<Route>(entity =>
+        {
+            entity.Property(e => e.RouteName)
+                .HasDefaultValue("Route");
+        });
+
+        modelBuilder.Entity<Bus>(entity =>
+        {
+            entity.Property(e => e.Make)
+                .HasDefaultValue("Unknown");
+
+            entity.Property(e => e.Model)
+                .HasDefaultValue("Unknown");
+
+            entity.Property(e => e.Status)
+                .HasDefaultValue("Active");
+        });
+
+        modelBuilder.Entity<Activity>(entity =>
+        {
+            entity.Property(e => e.Description)
+                .HasDefaultValue("Activity");
+        });
     }
 
     private void SeedData(ModelBuilder modelBuilder)

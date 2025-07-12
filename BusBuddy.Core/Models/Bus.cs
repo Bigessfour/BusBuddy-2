@@ -9,7 +9,7 @@ namespace BusBuddy.Core.Models;
 /// Represents a school bus vehicle in the fleet
 /// Based on Vehicle Table from BusBuddy Tables schema
 /// Matches requirements: Bus #, Year, Make, Model, Seating Capacity, VIN Number, License Number, Date Last Inspection
-/// Enhanced for Syncfusion data binding with INotifyPropertyChanged support
+/// Enhanced for Syncfusion data binding with INotifyPropertyChanged support and comprehensive NULL handling
 /// </summary>
 [Table("Vehicles")]
 [DebuggerDisplay("Bus {BusNumber} - {Year} {Make} {Model} - ID:{VehicleId}")]
@@ -41,27 +41,28 @@ public class Bus : INotifyPropertyChanged
         get => _busNumber;
         set
         {
-            if (_busNumber != value)
+            var newValue = string.IsNullOrWhiteSpace(value) ? $"BUS-{VehicleId:000}" : value.Trim();
+            if (_busNumber != newValue)
             {
-                _busNumber = value ?? string.Empty;
+                _busNumber = newValue;
                 OnPropertyChanged(nameof(BusNumber));
             }
         }
     }
 
     [Required]
-    [Range(1900, 2030)]
+    [Range(1990, 2030)]
     [Display(Name = "Year")]
     public int Year
     {
         get => _year;
         set
         {
-            if (_year != value)
+            var newValue = value <= 0 ? DateTime.Now.Year : value;
+            if (_year != newValue)
             {
-                _year = value;
+                _year = newValue;
                 OnPropertyChanged(nameof(Year));
-                OnPropertyChanged(nameof(Age));
             }
         }
     }
@@ -74,11 +75,11 @@ public class Bus : INotifyPropertyChanged
         get => _make;
         set
         {
-            if (_make != value)
+            var newValue = string.IsNullOrWhiteSpace(value) ? "Unknown Make" : value.Trim();
+            if (_make != newValue)
             {
-                _make = value ?? string.Empty;
+                _make = newValue;
                 OnPropertyChanged(nameof(Make));
-                OnPropertyChanged(nameof(FullDescription));
             }
         }
     }
@@ -91,26 +92,27 @@ public class Bus : INotifyPropertyChanged
         get => _model;
         set
         {
-            if (_model != value)
+            var newValue = string.IsNullOrWhiteSpace(value) ? "Unknown Model" : value.Trim();
+            if (_model != newValue)
             {
-                _model = value ?? string.Empty;
+                _model = newValue;
                 OnPropertyChanged(nameof(Model));
-                OnPropertyChanged(nameof(FullDescription));
             }
         }
     }
 
     [Required]
-    [Range(1, 90)]
+    [Range(1, 100)]
     [Display(Name = "Seating Capacity")]
     public int SeatingCapacity
     {
         get => _seatingCapacity;
         set
         {
-            if (_seatingCapacity != value)
+            var newValue = value <= 0 ? 30 : value; // Default to 30 seats
+            if (_seatingCapacity != newValue)
             {
-                _seatingCapacity = value;
+                _seatingCapacity = newValue;
                 OnPropertyChanged(nameof(SeatingCapacity));
             }
         }
@@ -124,9 +126,10 @@ public class Bus : INotifyPropertyChanged
         get => _vinNumber;
         set
         {
-            if (_vinNumber != value)
+            var newValue = string.IsNullOrWhiteSpace(value) ? $"TEMP-VIN-{VehicleId:00000}" : value.Trim();
+            if (_vinNumber != newValue)
             {
-                _vinNumber = value ?? string.Empty;
+                _vinNumber = newValue;
                 OnPropertyChanged(nameof(VINNumber));
             }
         }
@@ -140,10 +143,27 @@ public class Bus : INotifyPropertyChanged
         get => _licenseNumber;
         set
         {
-            if (_licenseNumber != value)
+            var newValue = string.IsNullOrWhiteSpace(value) ? $"TEMP-LIC-{VehicleId:000}" : value.Trim();
+            if (_licenseNumber != newValue)
             {
-                _licenseNumber = value ?? string.Empty;
+                _licenseNumber = newValue;
                 OnPropertyChanged(nameof(LicenseNumber));
+            }
+        }
+    }
+
+    [StringLength(20)]
+    [Display(Name = "Status")]
+    public string Status
+    {
+        get => _status;
+        set
+        {
+            var newValue = string.IsNullOrWhiteSpace(value) ? "Active" : value.Trim();
+            if (_status != newValue)
+            {
+                _status = newValue;
+                OnPropertyChanged(nameof(Status));
             }
         }
     }
@@ -177,20 +197,7 @@ public class Bus : INotifyPropertyChanged
         }
     }
 
-    [StringLength(20)]
-    [Display(Name = "Current Status")]
-    public string Status
-    {
-        get => _status;
-        set
-        {
-            if (_status != value)
-            {
-                _status = value ?? "Active";
-                OnPropertyChanged(nameof(Status));
-            }
-        }
-    }
+
 
     [Display(Name = "Purchase Date")]
     public DateTime? PurchaseDate

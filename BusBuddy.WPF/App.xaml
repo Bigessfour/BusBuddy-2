@@ -8,6 +8,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/TileStyles.xaml"/>
                 <ResourceDictionary Source="Resources/SyncfusionDateTimeFix.xaml"/>
+                <ResourceDictionary Source="Resources/SyncfusionButtonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

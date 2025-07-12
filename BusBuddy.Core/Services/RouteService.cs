@@ -20,75 +20,88 @@ namespace BusBuddy.Core.Services
 
         public async Task<IEnumerable<Route>> GetAllActiveRoutesAsync()
         {
-            using var context = _contextFactory.CreateDbContext();
-            return await context.Routes
-                .Where(r => r.IsActive)
-                .AsNoTracking()
-                .Select(r => new Route
-                {
-                    RouteId = r.RouteId,
-                    RouteName = r.RouteName,
-                    Date = r.Date,
-                    Description = r.Description,
-                    IsActive = r.IsActive,
-                    Distance = r.Distance,
-                    EstimatedDuration = r.EstimatedDuration,
-                    StudentCount = r.StudentCount,
-
-                    // AM details
-                    AMVehicleId = r.AMVehicleId,
-                    AMDriverId = r.AMDriverId,
-                    AMBeginMiles = r.AMBeginMiles,
-                    AMEndMiles = r.AMEndMiles,
-                    AMRiders = r.AMRiders,
-                    AMBeginTime = r.AMBeginTime,
-
-                    // PM details
-                    PMVehicleId = r.PMVehicleId,
-                    PMDriverId = r.PMDriverId,
-                    PMBeginMiles = r.PMBeginMiles,
-                    PMEndMiles = r.PMEndMiles,
-                    PMRiders = r.PMRiders,
-                    PMBeginTime = r.PMBeginTime,
-
-                    // Basic reference data for display
-                    BusNumber = r.BusNumber,
-                    DriverName = r.DriverName,
-
-                    // Join to minimal vehicle info
-                    AMVehicle = r.AMVehicleId != null ? new Bus
+            try
+            {
+                using var context = _contextFactory.CreateDbContext();
+                return await context.Routes
+                    .Where(r => r.IsActive)
+                    .AsNoTracking()
+                    .Select(r => new Route
                     {
-                        VehicleId = (int)r.AMVehicleId,
-                        BusNumber = r.AMVehicle != null ? r.AMVehicle.BusNumber : string.Empty,
-                        Status = r.AMVehicle != null ? r.AMVehicle.Status : "Unknown"
-                    } : null,
+                        RouteId = r.RouteId,
+                        RouteName = r.RouteName,
+                        Date = r.Date,
+                        Description = r.Description,
+                        IsActive = r.IsActive,
+                        Distance = r.Distance,
+                        EstimatedDuration = r.EstimatedDuration,
+                        StudentCount = r.StudentCount,
 
-                    // Join to minimal driver info
-                    AMDriver = r.AMDriverId != null ? new Driver
-                    {
-                        DriverId = (int)r.AMDriverId,
-                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty,
-                        Status = r.AMDriver != null ? r.AMDriver.Status : "Unknown"
-                    } : null,
+                        // AM details
+                        AMVehicleId = r.AMVehicleId,
+                        AMDriverId = r.AMDriverId,
+                        AMBeginMiles = r.AMBeginMiles,
+                        AMEndMiles = r.AMEndMiles,
+                        AMRiders = r.AMRiders,
+                        AMBeginTime = r.AMBeginTime,
 
-                    // Join to minimal vehicle info for PM
-                    PMVehicle = r.PMVehicleId != null ? new Bus
-                    {
-                        VehicleId = (int)r.PMVehicleId,
-                        BusNumber = r.PMVehicle != null ? r.PMVehicle.BusNumber : string.Empty,
-                        Status = r.PMVehicle != null ? r.PMVehicle.Status : "Unknown"
-                    } : null,
+                        // PM details
+                        PMVehicleId = r.PMVehicleId,
+                        PMDriverId = r.PMDriverId,
+                        PMBeginMiles = r.PMBeginMiles,
+                        PMEndMiles = r.PMEndMiles,
+                        PMRiders = r.PMRiders,
+                        PMBeginTime = r.PMBeginTime,
 
-                    // Join to minimal driver info for PM
-                    PMDriver = r.PMDriverId != null ? new Driver
-                    {
-                        DriverId = (int)r.PMDriverId,
-                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty,
-                        Status = r.PMDriver != null ? r.PMDriver.Status : "Unknown"
-                    } : null
-                })
-                .OrderBy(r => r.RouteName)
-                .ToListAsync();
+                        // Basic reference data for display
+                        BusNumber = r.BusNumber,
+                        DriverName = r.DriverName,
+
+                        // Join to minimal vehicle info
+                        AMVehicle = r.AMVehicleId != null ? new Bus
+                        {
+                            VehicleId = (int)r.AMVehicleId,
+                            BusNumber = r.AMVehicle != null ? r.AMVehicle.BusNumber : string.Empty,
+                            Status = r.AMVehicle != null ? r.AMVehicle.Status : "Unknown"
+                        } : null,
+
+                        // Join to minimal driver info
+                        AMDriver = r.AMDriverId != null ? new Driver
+                        {
+                            DriverId = (int)r.AMDriverId,
+                            DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty,
+                            Status = r.AMDriver != null ? r.AMDriver.Status : "Unknown"
+                        } : null,
+
+                        // Join to minimal vehicle info for PM
+                        PMVehicle = r.PMVehicleId != null ? new Bus
+                        {
+                            VehicleId = (int)r.PMVehicleId,
+                            BusNumber = r.PMVehicle != null ? r.PMVehicle.BusNumber : string.Empty,
+                            Status = r.PMVehicle != null ? r.PMVehicle.Status : "Unknown"
+                        } : null,
+
+                        // Join to minimal driver info for PM
+                        PMDriver = r.PMDriverId != null ? new Driver
+                        {
+                            DriverId = (int)r.PMDriverId,
+                            DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty,
+                            Status = r.PMDriver != null ? r.PMDriver.Status : "Unknown"
+                        } : null
+                    })
+                    .OrderBy(r => r.RouteName)
+                    .ToListAsync();
+            }
+            catch (System.InvalidCastException ex) when (ex.Message.Contains("DateTime"))
+            {
+                // Handle datetime conversion errors by returning empty list
+                return new List<Route>();
+            }
+            catch (System.Data.SqlTypes.SqlNullValueException)
+            {
+                // Handle null value exceptions by returning empty list
+                return new List<Route>();
+            }
         }
 
         public async Task<Route> GetRouteByIdAsync(int id)

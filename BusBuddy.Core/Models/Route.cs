@@ -1,30 +1,89 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace BusBuddy.Core.Models;
 
 /// <summary>
 /// Represents a daily route record
 /// Based on Routes Table from BusBuddy Tables schema
+/// Enhanced with proper DateTime handling and NULL safety
 /// </summary>
 [Table("Routes")]
-public class Route
+public class Route : INotifyPropertyChanged
 {
+    private DateTime _date = DateTime.Today;
+    private string _routeName = string.Empty;
+    private string? _description;
+    private bool _isActive = true;
+
     [Key]
     public int RouteId { get; set; }
 
     [Required]
     [Display(Name = "Date")]
-    public DateTime Date { get; set; }
+    public DateTime Date
+    {
+        get => _date;
+        set
+        {
+            // Ensure date is always valid and not in the far future
+            var newValue = value == default(DateTime) ? DateTime.Today :
+                          value > DateTime.Today.AddYears(1) ? DateTime.Today : value.Date;
+            if (_date != newValue)
+            {
+                _date = newValue;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     [Required]
     [StringLength(50)]
     [Display(Name = "Route Name")]
-    public string RouteName { get; set; } = string.Empty; // Truck Plaza, East Route, West Route, SPED
+    public string RouteName
+    {
+        get => _routeName;
+        set
+        {
+            var newValue = string.IsNullOrWhiteSpace(value) ? $"Route-{RouteId}" : value.Trim();
+            if (_routeName != newValue)
+            {
+                _routeName = newValue;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     [StringLength(500)]
     [Display(Name = "Description")]
-    public string? Description { get; set; }
+    public string? Description
+    {
+        get => _description;
+        set
+        {
+            if (_description != value)
+            {
+                _description = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    [Display(Name = "Is Active")]
+    public bool IsActive
+    {
+        get => _isActive;
+        set
+        {
+            if (_isActive != value)
+            {
+                _isActive = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     // AM Route Information
     [ForeignKey("AMVehicle")]
@@ -96,14 +155,25 @@ public class Route
     [Display(Name = "Bus Number")]
     public string? BusNumber { get; set; }
 
-    // Added IsActive property to support existing code
-    [Display(Name = "Is Active")]
-    public bool IsActive { get; set; } = true;
-
     // Navigation properties
     public virtual Bus? AMVehicle { get; set; }
     public virtual Bus? PMVehicle { get; set; }
     public virtual Driver? AMDriver { get; set; }
     public virtual Driver? PMDriver { get; set; }
     public virtual ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+
+    // Computed properties with null safety
+    public string SafeRouteName => string.IsNullOrWhiteSpace(RouteName) ? $"Route-{RouteId}" : RouteName;
+    public string DateFormatted => Date.ToString("yyyy-MM-dd");
+    public bool HasAMAssignment => AMVehicleId.HasValue && AMDriverId.HasValue;
+    public bool HasPMAssignment => PMVehicleId.HasValue && PMDriverId.HasValue;
+    public decimal TotalMiles => (AMEndMiles - AMBeginMiles ?? 0) + (PMEndMiles - PMBeginMiles ?? 0);
+
+    // INotifyPropertyChanged implementation
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }

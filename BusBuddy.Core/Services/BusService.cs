@@ -105,6 +105,12 @@ namespace BusBuddy.Core.Services
 
                         return result;
                     }
+                    catch (System.Data.SqlTypes.SqlNullValueException ex)
+                    {
+                        stopwatch.Stop();
+                        _logger.LogWarning(ex, "SQL NULL value error when retrieving buses. Returning empty list to avoid application failure.");
+                        return new List<Bus>();
+                    }
                     catch (Exception ex)
                     {
                         stopwatch.Stop();

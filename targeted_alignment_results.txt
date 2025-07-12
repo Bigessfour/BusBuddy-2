@@ -1,0 +1,3 @@
+Changed database context to 'BusBuddyDB'.
+Msg 207, Level 16, State 1, Server ST-LPTP9-23\SQLEXPRESS, Line 16
+Invalid column name 'Date_New'.

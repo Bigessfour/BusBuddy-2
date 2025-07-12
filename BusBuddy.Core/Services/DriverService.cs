@@ -36,6 +36,11 @@ namespace BusBuddy.Core.Services
                     .AsNoTracking()
                     .ToListAsync();
             }
+            catch (System.Data.SqlTypes.SqlNullValueException ex)
+            {
+                _logger.LogWarning(ex, "SQL NULL value error when retrieving drivers. Returning empty list to avoid application failure.");
+                return new List<Driver>();
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all drivers");

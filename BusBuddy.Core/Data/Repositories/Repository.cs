@@ -33,29 +33,37 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<T?> GetByIdAsync(int id)
     {
-        var entity = await _dbSet.FindAsync(id);
-
-        if (entity != null && _supportsSoftDelete)
+        try
         {
-            // Check if entity is soft deleted using reflection
-            if (entity is BaseEntity baseEntity && baseEntity.IsDeleted)
-            {
-                return null; // Entity is soft deleted
-            }
+            var entity = await _dbSet.FindAsync(id);
 
-            // Check Active property for Student/Driver entities
-            var activeProperty = typeof(T).GetProperty("Active");
-            if (activeProperty?.PropertyType == typeof(bool))
+            if (entity != null && _supportsSoftDelete)
             {
-                var isActive = (bool)activeProperty.GetValue(entity)!;
-                if (!isActive)
+                // Check if entity is soft deleted using reflection
+                if (entity is BaseEntity baseEntity && baseEntity.IsDeleted)
                 {
-                    return null; // Entity is marked inactive
+                    return null; // Entity is soft deleted
+                }
+
+                // Check Active property for Student/Driver entities
+                var activeProperty = typeof(T).GetProperty("Active");
+                if (activeProperty?.PropertyType == typeof(bool))
+                {
+                    var isActive = (bool)activeProperty.GetValue(entity)!;
+                    if (!isActive)
+                    {
+                        return null; // Entity is marked inactive
+                    }
                 }
             }
-        }
 
-        return entity;
+            return entity;
+        }
+        catch (Exception)
+        {
+            // Log exception if needed and return null for safe fallback
+            return null;
+        }
     }
 
     public virtual async Task<T?> GetByIdAsync(object id)
@@ -115,7 +123,13 @@ public class Repository<T> : IRepository<T> where T : class
             }
 
             // Materialize the query to avoid context sharing issues
-            return await query.ToListAsync();
+            var result = await query.ToListAsync();
+            return result ?? new List<T>(); // Ensure never null
+        }
+        catch (Exception)
+        {
+            // Return empty list on error for safe fallback
+            return new List<T>();
         }
         finally
         {

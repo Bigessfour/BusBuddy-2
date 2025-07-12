@@ -35,9 +35,10 @@ public class Driver : INotifyPropertyChanged
         get => _driverName;
         set
         {
-            if (_driverName != value)
+            var newValue = string.IsNullOrWhiteSpace(value) ? $"Driver-{DriverId}" : value.Trim();
+            if (_driverName != newValue)
             {
-                _driverName = value ?? string.Empty;
+                _driverName = newValue;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(FullName));
             }
