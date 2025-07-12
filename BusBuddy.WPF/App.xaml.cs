@@ -19,6 +19,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using static BusBuddy.WPF.Logging.UILoggingConfiguration;
 
 namespace BusBuddy.WPF;
 
@@ -213,32 +214,17 @@ public partial class App : Application
         // Initialize Serilog for robust logging, with fallback
         try
         {
-            // Use the Serilog configuration from appsettings.json
-            // but override the file paths to ensure they're in the logs directory
+            // Use the new consolidated UI logging configuration
             Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .Enrich.FromLogContext()
-                .Enrich.WithProperty("ApplicationVersion", typeof(App).Assembly.GetName().Version?.ToString() ?? "Unknown")
-                .Enrich.WithProperty("BuildTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                .Enrich.WithMachineName()
-                .Enrich.WithThreadId()
-                .Enrich.With(new PerformanceEnricher())  // Add our custom performance enricher
-                .WriteTo.File(buildLogPath,
-                    rollingInterval: RollingInterval.Infinite,
-                    shared: true,
-                    outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{MachineName}] [{ThreadId}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.File(runtimeLogPath,
-                    rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 7,
-                    shared: true,
-                    outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{MachineName}] [{ThreadId}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss}] [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .ConfigureUILogging(logsDirectory)
                 .CreateLogger();
 
-            Log.Information("[STARTUP] BusBuddy WPF application is starting. Build completed at {BuildTime}", DateTime.Now);
+            Log.Information("[STARTUP] BusBuddy WPF application is starting with consolidated logging. Build completed at {BuildTime}", DateTime.Now);
             Log.Information("[STARTUP] Logs directory: {LogsDirectory}", logsDirectory);
-            Log.Information("[STARTUP] Build log: {BuildLogPath}", buildLogPath);
-            Log.Information("[STARTUP] Runtime log: {RuntimeLogPath}", runtimeLogPath);
+            Log.Information("[STARTUP] Main application log: {MainLog}", Path.Combine(logsDirectory, "busbuddy-.log"));
+            Log.Information("[STARTUP] Consolidated error log: {ErrorLog}", Path.Combine(logsDirectory, "errors-.log"));
+            Log.Information("[STARTUP] Performance issues log: {PerformanceLog}", Path.Combine(logsDirectory, "performance-.log"));
+            Log.Information("[STARTUP] Total log files: 3 (reduced from 5+ for better manageability)");
         }
         catch (Exception serilogEx)
         {
@@ -264,6 +250,24 @@ public partial class App : Application
 
         // Set the Services property to the host's service provider for backward compatibility
         Services = _host.Services;
+
+        // Run log consolidation after DI is set up (asynchronously)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var logConsolidationUtility = Services.GetRequiredService<BusBuddy.WPF.Utilities.LogConsolidationUtility>();
+                await logConsolidationUtility.ConsolidateLogsAsync();
+                var stats = logConsolidationUtility.GetLogStats();
+                
+                Log.Information("[STARTUP] Log consolidation complete - {ActiveFiles} active files, {ArchivedFiles} archived files, {TotalSizeMB:F2}MB total", 
+                    stats.ActiveLogFiles, stats.ArchivedLogFiles, stats.TotalSizeMB);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "[STARTUP] Log consolidation had issues but continuing: {ErrorMessage}", ex.Message);
+            }
+        });
 
         // Create and initialize startup performance monitor
         var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
@@ -591,6 +595,9 @@ public partial class App : Application
         // Register logging so ILogger<T> can be injected into services
         services.AddLogging();
 
+        // Register UI-specific logging services
+        services.AddUILogging();
+
         // Register performance monitoring utilities
         services.AddSingleton<BusBuddy.WPF.Utilities.PerformanceMonitor>();
         services.AddSingleton<BusBuddy.WPF.Utilities.StartupPerformanceMonitor>();
@@ -698,6 +705,16 @@ public partial class App : Application
 
         // Register database validation utilities
         services.AddScoped<BusBuddy.Core.Utilities.DatabaseValidator>();
+
+        // Register log consolidation utility
+        services.AddScoped<BusBuddy.WPF.Utilities.LogConsolidationUtility>(provider =>
+        {
+            var logger = provider.GetRequiredService<ILogger<BusBuddy.WPF.Utilities.LogConsolidationUtility>>();
+            string solutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
+                               ?? Directory.GetCurrentDirectory();
+            string logsDirectory = Path.Combine(solutionRoot, "logs");
+            return new BusBuddy.WPF.Utilities.LogConsolidationUtility(logger, logsDirectory);
+        });
 
         // Register Main Window
         services.AddTransient<MainWindow>();

@@ -1,4 +1,5 @@
 ﻿using BusBuddy.WPF.ViewModels;
+using BusBuddy.WPF.Logging;
 using Microsoft.Extensions.Logging;
 using Syncfusion.SfSkinManager;
 using System;
@@ -20,10 +21,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         var stopwatch = Stopwatch.StartNew();
-
-        // Configure Syncfusion theme before InitializeComponent
-        SfSkinManager.ApplyThemeAsDefaultStyle = true;
-        SfSkinManager.SetTheme(this, new Theme("Office2019Colorful"));
 
         InitializeComponent();
 
