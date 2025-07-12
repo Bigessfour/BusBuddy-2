@@ -2,6 +2,33 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "shell",
+            "args": ["clean", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            }
+        },
+        {
+            "label": "restore",
+            "command": "dotnet",
+            "type": "shell",
+            "args": ["restore", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "dependsOn": ["clean"]
+        },
+        {
             "label": "build",
             "command": "dotnet",
             "type": "shell",
@@ -12,9 +39,12 @@
             },
             "presentation": {
                 "reveal": "always",
-                "panel": "shared"
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
             },
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "dependsOn": ["restore"]
         },
         {
             "label": "run",
@@ -24,45 +54,11 @@
             "group": "build",
             "presentation": {
                 "reveal": "always",
-                "panel": "dedicated"
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
             },
-            "dependsOn": "build"
-        },
-        {
-            "label": "clean",
-            "command": "dotnet",
-            "type": "shell",
-            "args": ["clean", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
-            "group": "build",
-            "presentation": {
-                "reveal": "silent",
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "restore",
-            "command": "dotnet",
-            "type": "shell",
-            "args": ["restore", "BusBuddy.WPF/BusBuddy.WPF.csproj"],
-            "group": "build",
-            "presentation": {
-                "reveal": "silent",
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "test",
-            "command": "dotnet",
-            "type": "shell",
-            "args": ["test", "BusBuddy.Tests/BusBuddy.Tests.csproj"],
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
+            "dependsOn": ["build"]
         }
     ]
 }

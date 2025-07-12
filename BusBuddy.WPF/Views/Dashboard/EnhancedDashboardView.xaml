@@ -15,7 +15,7 @@
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
-    
+
     <UserControl.Resources>
         <!-- DataTemplates to map ViewModels to Views -->
         <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
@@ -29,51 +29,41 @@
         </DataTemplate>
         <!-- Enhanced DataTemplates for additional ViewModels -->
         <DataTemplate DataType="{x:Type viewModels:ScheduleManagementViewModel}">
-            <Grid>
-                <TextBlock Text="📅 Schedule Management Module" 
-                          FontSize="16" FontWeight="Bold" 
-                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Foreground="#666666"/>
-                <!-- Schedule management view will be implemented here -->
-            </Grid>
+            <ContentControl>
+                <ContentControl.Content>
+                    <local:../Schedule/ScheduleManagementView />
+                </ContentControl.Content>
+            </ContentControl>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
-            <Grid>
-                <TextBlock Text="🎓 Student Management Module" 
-                          FontSize="16" FontWeight="Bold" 
-                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Foreground="#666666"/>
-                <!-- Student management view will be implemented here -->
-            </Grid>
+            <ContentControl>
+                <ContentControl.Content>
+                    <local:../Student/StudentManagementView />
+                </ContentControl.Content>
+            </ContentControl>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
-            <Grid>
-                <TextBlock Text="🔧 Maintenance Tracking Module" 
-                          FontSize="16" FontWeight="Bold" 
-                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Foreground="#666666"/>
-                <!-- Maintenance tracking view will be implemented here -->
-            </Grid>
+            <ContentControl>
+                <ContentControl.Content>
+                    <local:../Maintenance/MaintenanceTrackingView />
+                </ContentControl.Content>
+            </ContentControl>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
-            <Grid>
-                <TextBlock Text="⛽ Fuel Management Module" 
-                          FontSize="16" FontWeight="Bold" 
-                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Foreground="#666666"/>
-                <!-- Fuel management view will be implemented here -->
-            </Grid>
+            <ContentControl>
+                <ContentControl.Content>
+                    <local:../Fuel/FuelManagementView />
+                </ContentControl.Content>
+            </ContentControl>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
-            <Grid>
-                <TextBlock Text="📝 Activity Logging Module" 
-                          FontSize="16" FontWeight="Bold" 
-                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Foreground="#666666"/>
-                <!-- Activity logging view will be implemented here -->
-            </Grid>
+            <ContentControl>
+                <ContentControl.Content>
+                    <local:../Activity/ActivityLogView />
+                </ContentControl.Content>
+            </ContentControl>
         </DataTemplate>
-        
+
         <!-- Enhanced Tile Style for Modern Appearance -->
         <Style x:Key="DashboardTileStyle" TargetType="Border">
             <Setter Property="Background" Value="#FFFFFF"/>
@@ -160,7 +150,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Enhanced Header with Live Status -->
         <Border Grid.Row="0" Background="#007ACC" Padding="16,12">
             <Grid>
@@ -168,7 +158,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <TextBlock Text="🚌 Bus Buddy Dashboard" FontSize="28" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                     <Border Background="#2ECC71" CornerRadius="12" Padding="8,4" Margin="16,0,0,0" VerticalAlignment="Center">
@@ -200,35 +190,35 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
-                
+
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <Border Background="White" CornerRadius="8" Padding="12,6" Margin="0,0,12,0" Opacity="0.9">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🕒" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='HH:mm:ss'}" 
+                            <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='HH:mm:ss'}"
                                       FontSize="14" FontWeight="SemiBold" Foreground="#007ACC" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                     <Border Background="White" CornerRadius="8" Padding="12,6" Opacity="0.9">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📅" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='MMM dd, yyyy'}" 
+                            <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='MMM dd, yyyy'}"
                                       FontSize="14" FontWeight="SemiBold" Foreground="#007ACC" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </Grid>
         </Border>
-        
+
         <!-- Main Content - Simplified DockingManager to fix XAML parsing errors -->
         <Grid Grid.Row="1">
-            <syncfusion:DockingManager x:Name="MainDockingManager" 
-                                       UseDocumentContainer="True" 
+            <syncfusion:DockingManager x:Name="MainDockingManager"
+                                       UseDocumentContainer="True"
                                        PersistState="False"
                                        ContainerMode="TDI">
-            
+
             <!-- Dashboard Overview Panel (Document) -->
-            <ContentControl x:Name="DashboardOverview" 
+            <ContentControl x:Name="DashboardOverview"
                           syncfusion:DockingManager.Header="Dashboard Overview"
                           syncfusion:DockingManager.State="Document"
                           syncfusion:DockingManager.CanSerialize="True"
@@ -243,12 +233,12 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        
+
                         <!-- Enhanced Quick Stats Tiles Row 1 -->
                         <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,20">
                             <!-- Enhanced Fleet Summary Tile -->
-                            <Border x:Name="FleetStatusTile" 
-                                   Style="{StaticResource DashboardTileStyle}" 
+                            <Border x:Name="FleetStatusTile"
+                                   Style="{StaticResource DashboardTileStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
@@ -264,27 +254,27 @@
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="Total Buses:" Style="{StaticResource TileContentStyle}"/>
                                             <TextBlock Text="{Binding TotalBuses}" Style="{StaticResource TileValueStyle}"/>
-                                            <TextBlock Text="{Binding FleetActivePercentageFormatted, StringFormat='Active: {0}'}" 
+                                            <TextBlock Text="{Binding FleetActivePercentageFormatted, StringFormat='Active: {0}'}"
                                                       Style="{StaticResource TileContentStyle}" Margin="0,8,0,0" FontWeight="SemiBold"/>
                                         </StackPanel>
-                                        
+
                                         <!-- Syncfusion Circular Progress for Fleet Status -->
-                                        <syncfusion:SfCircularProgressBar Grid.Column="1" 
-                                                                        Width="70" Height="70" 
-                                                                        Progress="85"
+                                        <syncfusion:SfCircularProgressBar Grid.Column="1"
+                                                                        Width="70" Height="70"
+                                                                        Progress="{Binding FleetActivePercentage}"
                                                                         Margin="5">
                                             <syncfusion:SfCircularProgressBar.Content>
-                                                <TextBlock Text="85%" FontSize="12" FontWeight="Bold" 
+                                                <TextBlock Text="{Binding FleetActivePercentage, StringFormat='{}{0:F0}%'}" FontSize="12" FontWeight="Bold"
                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </syncfusion:SfCircularProgressBar.Content>
                                         </syncfusion:SfCircularProgressBar>
                                     </Grid>
                                 </StackPanel>
                             </Border>
-                            
+
                             <!-- Enhanced Driver Summary Tile -->
-                            <Border x:Name="DriverManagementTile" 
-                                   Style="{StaticResource DashboardTileStyle}" 
+                            <Border x:Name="DriverManagementTile"
+                                   Style="{StaticResource DashboardTileStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
@@ -300,21 +290,21 @@
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="Total Drivers:" Style="{StaticResource TileContentStyle}"/>
                                             <TextBlock Text="{Binding TotalDrivers}" Style="{StaticResource TileValueStyle}"/>
-                                            <TextBlock Text="{Binding DriverAvailabilityPercentageFormatted, StringFormat='Available: {0}'}" 
+                                            <TextBlock Text="{Binding DriverAvailabilityPercentageFormatted, StringFormat='Available: {0}'}"
                                                       Style="{StaticResource TileContentStyle}" Margin="0,8,0,0" FontWeight="SemiBold"/>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding AvailableDriverCount}" FontSize="20" FontWeight="Bold" 
+                                            <TextBlock Text="{Binding AvailableDriverCount}" FontSize="20" FontWeight="Bold"
                                                       Foreground="#3498DB" HorizontalAlignment="Center"/>
                                             <TextBlock Text="Available" FontSize="12" Foreground="#3498DB" HorizontalAlignment="Center"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
                             </Border>
-                            
+
                             <!-- Enhanced Routes Summary Tile with Syncfusion Radial Gauge -->
-                            <Border x:Name="RouteNetworkTile" 
-                                   Style="{StaticResource DashboardTileStyle}" 
+                            <Border x:Name="RouteNetworkTile"
+                                   Style="{StaticResource DashboardTileStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
@@ -330,26 +320,26 @@
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="Active Routes:" Style="{StaticResource TileContentStyle}"/>
                                             <TextBlock Text="{Binding TotalActiveRoutes}" Style="{StaticResource TileValueStyle}"/>
-                                            <TextBlock Text="{Binding RouteCoveragePercentageFormatted, StringFormat='Coverage: {0}'}" 
+                                            <TextBlock Text="{Binding RouteCoveragePercentageFormatted, StringFormat='Coverage: {0}'}"
                                                       Style="{StaticResource TileContentStyle}" Margin="0,8,0,0" FontWeight="SemiBold"/>
                                         </StackPanel>
-                                        
+
                                         <!-- Syncfusion Radial Gauge for Route Coverage -->
                                         <gauge:SfCircularGauge Grid.Column="1" Width="60" Height="60" Margin="10,0,0,0">
                                             <gauge:SfCircularGauge.Scales>
-                                                <gauge:CircularScale StartAngle="135" SweepAngle="270" 
+                                                <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
                                                                    Interval="25" ShowTicks="False"
                                                                    ShowLabels="False"
                                                                    RimStroke="#ECF0F1" RimStrokeThickness="6">
                                                     <gauge:CircularScale.Pointers>
-                                                        <gauge:CircularPointer NeedlePointerType="Triangle" 
+                                                        <gauge:CircularPointer NeedlePointerType="Triangle"
                                                                              PointerCapStroke="#E67E22"
                                                                              NeedlePointerStroke="#E67E22"
                                                                              Value="{Binding RouteCoveragePercentage}"/>
                                                     </gauge:CircularScale.Pointers>
                                                     <gauge:CircularScale.Ranges>
-                                                        <gauge:CircularRange StartValue="0" EndValue="100" 
+                                                        <gauge:CircularRange StartValue="0" EndValue="100"
                                                                            Stroke="#E67E22" StrokeThickness="6"/>
                                                     </gauge:CircularScale.Ranges>
                                                 </gauge:CircularScale>
@@ -357,9 +347,9 @@
                                             <gauge:SfCircularGauge.Annotations>
                                                 <gauge:GaugeAnnotation>
                                                     <gauge:GaugeAnnotation.Content>
-                                                        <TextBlock Text="{Binding RouteCoveragePercentage, StringFormat='{}{0:F0}%'}" 
-                                                                  FontSize="12" 
-                                                                  FontWeight="Bold" 
+                                                        <TextBlock Text="{Binding RouteCoveragePercentage, StringFormat='{}{0:F0}%'}"
+                                                                  FontSize="12"
+                                                                  FontWeight="Bold"
                                                                   Foreground="#E67E22"
                                                                   HorizontalAlignment="Center"
                                                                   VerticalAlignment="Center"/>
@@ -370,10 +360,10 @@
                                     </Grid>
                                 </StackPanel>
                             </Border>
-                            
+
         <!-- Enhanced Performance Tile with Syncfusion Gauge -->
-                            <Border x:Name="SystemPerformanceTile" 
-                                   Style="{StaticResource PerformanceTileStyle}" 
+                            <Border x:Name="SystemPerformanceTile"
+                                   Style="{StaticResource PerformanceTileStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
@@ -386,35 +376,35 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        
+
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="Response Time:" Style="{StaticResource TileContentStyle}"/>
                                             <TextBlock Text="{Binding InitializationTimeFormatted}" Style="{StaticResource TileValueStyle}" FontSize="20"/>
                                             <TextBlock Text="Next Update:" Style="{StaticResource TileContentStyle}" Margin="0,5,0,0"/>
                                             <TextBlock Text="{Binding NextUpdateTime}" FontSize="12" FontWeight="SemiBold" Foreground="#007ACC"/>
                                         </StackPanel>
-                                        
+
                                         <!-- Syncfusion Circular Gauge for Performance -->
                                         <gauge:SfCircularGauge Grid.Column="1" Width="80" Height="80" Margin="10,0,0,0">
                                             <gauge:SfCircularGauge.Scales>
-                                                <gauge:CircularScale StartAngle="135" SweepAngle="270" 
+                                                <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
                                                                    Interval="20" MinorTicksPerInterval="1"
                                                                    RimStroke="#E0E0E0" RimStrokeThickness="8"
                                                                    TickStroke="#666666" TickStrokeThickness="1"
                                                                    LabelStroke="Transparent">
                                                     <gauge:CircularScale.Pointers>
-                                                        <gauge:CircularPointer NeedlePointerType="Triangle" 
+                                                        <gauge:CircularPointer NeedlePointerType="Triangle"
                                                                              PointerCapStroke="#007ACC"
                                                                              NeedlePointerStroke="#007ACC"
-                                                                             Value="92"/>
+                                                                             Value="{Binding SystemPerformanceScore}"/>
                                                     </gauge:CircularScale.Pointers>
                                                     <gauge:CircularScale.Ranges>
-                                                        <gauge:CircularRange StartValue="0" EndValue="50" 
+                                                        <gauge:CircularRange StartValue="0" EndValue="50"
                                                                            Stroke="#E74C3C" StrokeThickness="8"/>
-                                                        <gauge:CircularRange StartValue="50" EndValue="75" 
+                                                        <gauge:CircularRange StartValue="50" EndValue="75"
                                                                            Stroke="#F39C12" StrokeThickness="8"/>
-                                                        <gauge:CircularRange StartValue="75" EndValue="100" 
+                                                        <gauge:CircularRange StartValue="75" EndValue="100"
                                                                            Stroke="#2ECC71" StrokeThickness="8"/>
                                                     </gauge:CircularScale.Ranges>
                                                 </gauge:CircularScale>
@@ -424,12 +414,12 @@
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
-                        
+
                         <!-- Enhanced Operations Tiles Row 2 -->
                         <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,20">
                             <!-- Enhanced Maintenance Tile with Syncfusion Progress -->
-                            <Border x:Name="MaintenanceHubTile" 
-                                   Style="{StaticResource DashboardTileStyle}" 
+                            <Border x:Name="MaintenanceHubTile"
+                                   Style="{StaticResource DashboardTileStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
@@ -443,13 +433,13 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="60"/>
                                         </Grid.RowDefinitions>
-                                        
+
                                         <StackPanel Grid.Row="0">
                                             <TextBlock Text="Pending Items: 3" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="Next Service: Bus #12" Style="{StaticResource TileContentStyle}"/>
-                                            <TextBlock Text="Due: Tomorrow" Style="{StaticResource TileValueStyle}" FontSize="16" Foreground="#E74C3C"/>
+                                            <TextBlock Text="Next Service: {Binding NextServiceBus}" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Due: {Binding NextServiceDue}" Style="{StaticResource TileValueStyle}" FontSize="16" Foreground="#E74C3C"/>
                                         </StackPanel>
-                                        
+
                                         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,10">
                                             <Border Background="#2ECC71" CornerRadius="3" Padding="8,4" Margin="0,0,8,0">
                                                 <TextBlock Text="2 Complete" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
@@ -458,20 +448,20 @@
                                                 <TextBlock Text="3 Pending" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
                                             </Border>
                                         </StackPanel>
-                                        
+
                                         <!-- Syncfusion Circular ProgressBar for Maintenance -->
-                                        <syncfusion:SfCircularProgressBar Grid.Row="2" 
+                                        <syncfusion:SfCircularProgressBar Grid.Row="2"
                                                                         Width="55" Height="55"
                                                                         HorizontalAlignment="Center"
-                                                                        Progress="67"
+                                                                        Progress="{Binding MaintenanceCompletionPercentage}"
                                                                         FontSize="11"/>
                                     </Grid>
                                 </StackPanel>
                             </Border>
-                            
+
                             <!-- Enhanced Fuel Management Tile with Syncfusion ProgressBar -->
-                            <Border x:Name="FuelManagementTile" 
-                                   Style="{StaticResource DashboardTileStyle}" 
+                            <Border x:Name="FuelManagementTile"
+                                   Style="{StaticResource DashboardTileStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
@@ -485,37 +475,38 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="50"/>
                                         </Grid.RowDefinitions>
-                                        
+
                                         <StackPanel Grid.Row="0">
                                             <TextBlock Text="Avg Consumption: 8.2L/100km" Style="{StaticResource TileContentStyle}"/>
-                                            <TextBlock Text="Monthly Budget: 85% used" Style="{StaticResource TileContentStyle}"/>
-                                            <TextBlock Text="Efficiency: Good" Style="{StaticResource TileValueStyle}" FontSize="16" Foreground="#27AE60"/>
+                                            <TextBlock Text="Avg Consumption: {Binding AverageFuelConsumption}" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Monthly Budget: {Binding FuelBudgetUsedPercentage, StringFormat='{}{0}% used'}" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Efficiency: {Binding FuelEfficiencyStatus}" Style="{StaticResource TileValueStyle}" FontSize="16" Foreground="#27AE60"/>
                                         </StackPanel>
-                                        
+
                                         <!-- Fuel efficiency indicator -->
                                         <StackPanel Grid.Row="1" Margin="0,10,0,0">
                                             <TextBlock Text="Budget Utilization" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,5"/>
                                             <!-- Syncfusion Linear ProgressBar -->
-                                            <syncfusion:SfLinearProgressBar Height="12" 
-                                                                           Progress="85"/>
+                                            <syncfusion:SfLinearProgressBar Height="12"
+                                                                           Progress="{Binding FuelBudgetUsedPercentage}"/>
                                         </StackPanel>
-                                        
+
                                         <!-- Efficiency Meter -->
                                         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
                                             <gauge:SfCircularGauge Width="40" Height="40" Margin="0,0,10,0">
                                                 <gauge:SfCircularGauge.Scales>
-                                                    <gauge:CircularScale StartAngle="135" SweepAngle="270" 
+                                                    <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                                        StartValue="0" EndValue="10"
                                                                        ShowLabels="False" ShowTicks="False"
                                                                        RimStroke="#ECF0F1" RimStrokeThickness="4">
                                                         <gauge:CircularScale.Pointers>
-                                                            <gauge:CircularPointer NeedlePointerType="Triangle" 
+                                                            <gauge:CircularPointer NeedlePointerType="Triangle"
                                                                                  PointerCapStroke="#27AE60"
                                                                                  NeedlePointerStroke="#27AE60"
-                                                                                 Value="8.2"/>
+                                                                                 Value="{Binding AverageFuelConsumption}"/>
                                                         </gauge:CircularScale.Pointers>
                                                         <gauge:CircularScale.Ranges>
-                                                            <gauge:CircularRange StartValue="0" EndValue="10" 
+                                                            <gauge:CircularRange StartValue="0" EndValue="10"
                                                                                Stroke="#27AE60" StrokeThickness="4"/>
                                                         </gauge:CircularScale.Ranges>
                                                     </gauge:CircularScale>
@@ -523,16 +514,17 @@
                                             </gauge:SfCircularGauge>
                                             <StackPanel VerticalAlignment="Center">
                                                 <TextBlock Text="8.2 L/100km" FontSize="12" FontWeight="SemiBold" Foreground="#27AE60"/>
+                                                <TextBlock Text="{Binding AverageFuelConsumption, StringFormat='{}{0} L/100km'}" FontSize="12" FontWeight="SemiBold" Foreground="#27AE60"/>
                                                 <TextBlock Text="Efficiency" FontSize="10" Foreground="#666666"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
                             </Border>
-                            
+
                             <!-- Enhanced Student Management Tile with Syncfusion Gauge -->
-                            <Border x:Name="StudentTransportTile" 
-                                   Style="{StaticResource DashboardTileStyle}" 
+                            <Border x:Name="StudentTransportTile"
+                                   Style="{StaticResource DashboardTileStyle}"
                                    Cursor="Hand"
                                    MouseLeftButtonDown="DashboardTile_MouseLeftButtonDown">
                                 <StackPanel>
@@ -545,30 +537,30 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        
+
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="Total Enrolled: Calculating..." Style="{StaticResource TileContentStyle}"/>
-                                            <TextBlock Text="Active Today: Calculating..." Style="{StaticResource TileContentStyle}"/>
-                                            <TextBlock Text="All routes covered" Style="{StaticResource TileContentStyle}" 
+                                            <TextBlock Text="Total Enrolled: {Binding TotalEnrolledStudents}" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="Active Today: {Binding ActiveStudentsToday}" Style="{StaticResource TileContentStyle}"/>
+                                            <TextBlock Text="{Binding StudentCoverageStatus}" Style="{StaticResource TileContentStyle}"
                                                       FontWeight="SemiBold" Foreground="#27AE60" Margin="0,8,0,0"/>
                                         </StackPanel>
-                                        
+
                                         <!-- Syncfusion Circular Gauge for Attendance -->
                                         <gauge:SfCircularGauge Grid.Column="1" Width="70" Height="70" Margin="10,0,0,0">
                                             <gauge:SfCircularGauge.Scales>
-                                                <gauge:CircularScale StartAngle="135" SweepAngle="270" 
+                                                <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
                                                                    Interval="25" ShowTicks="False"
                                                                    ShowLabels="False"
                                                                    RimStroke="#ECF0F1" RimStrokeThickness="6">
                                                     <gauge:CircularScale.Pointers>
-                                                        <gauge:CircularPointer NeedlePointerType="Triangle" 
+                                                        <gauge:CircularPointer NeedlePointerType="Triangle"
                                                                              PointerCapStroke="#9B59B6"
                                                                              NeedlePointerStroke="#9B59B6"
-                                                                             Value="95"/>
+                                                                             Value="{Binding StudentAttendancePercentage}"/>
                                                     </gauge:CircularScale.Pointers>
                                                     <gauge:CircularScale.Ranges>
-                                                        <gauge:CircularRange StartValue="0" EndValue="100" 
+                                                        <gauge:CircularRange StartValue="0" EndValue="100"
                                                                            Stroke="#9B59B6" StrokeThickness="6"/>
                                                     </gauge:CircularScale.Ranges>
                                                 </gauge:CircularScale>
@@ -577,9 +569,9 @@
                                                 <gauge:GaugeAnnotation>
                                                     <gauge:GaugeAnnotation.Content>
                                                         <StackPanel HorizontalAlignment="Center">
-                                                            <TextBlock Text="95%" FontSize="14" FontWeight="Bold" 
+                                                            <TextBlock Text="95%" FontSize="14" FontWeight="Bold"
                                                                       Foreground="#9B59B6" HorizontalAlignment="Center"/>
-                                                            <TextBlock Text="Attendance" FontSize="9" 
+                                                            <TextBlock Text="{Binding StudentAttendancePercentage, StringFormat='{}{0:F0}%'}" FontSize="9"
                                                                       Foreground="#666666" HorizontalAlignment="Center"/>
                                                         </StackPanel>
                                                     </gauge:GaugeAnnotation.Content>
@@ -590,14 +582,14 @@
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
-                        
+
                         <!-- Enhanced Analytics Dashboard Row 3 -->
                         <Border Grid.Row="2" Style="{StaticResource DashboardTileStyle}" Margin="0,0,0,20">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,20">
                                     <TextBlock Text="📈 Analytics Dashboard" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
                                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                                        <syncfusion:ComboBoxAdv x:Name="AnalyticsTimeRange" 
+                                        <syncfusion:ComboBoxAdv x:Name="AnalyticsTimeRange"
                                                               Width="150" Height="30"
                                                               SelectedIndex="0"
                                                               SelectionChanged="AnalyticsFilterComboBox_SelectionChanged">
@@ -606,27 +598,27 @@
                                             <syncfusion:ComboBoxItemAdv Content="Last 3 Months"/>
                                             <syncfusion:ComboBoxItemAdv Content="This Year"/>
                                         </syncfusion:ComboBoxAdv>
-                                        <syncfusion:ButtonAdv x:Name="RefreshAnalyticsButton" 
-                                                            Content="🔄 Refresh" 
-                                                            Width="80" Height="30" 
+                                        <syncfusion:ButtonAdv x:Name="RefreshAnalyticsButton"
+                                                            Content="🔄 Refresh"
+                                                            Width="80" Height="30"
                                                             Margin="10,0,0,0"
                                                             SizeMode="Small"
                                                             Click="RefreshAnalyticsButton_Click"/>
                                     </StackPanel>
                                 </DockPanel>
-                                
+
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    
+
                                     <!-- Fleet Performance Trend Chart -->
                                     <Border Grid.Column="0" Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,10,0">
                                         <StackPanel>
                                             <TextBlock Text="Fleet Performance Trend" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10" Foreground="#2C3E50"/>
-                                            <chart:SfChart x:Name="FleetPerformanceChart" 
+                                            <chart:SfChart x:Name="FleetPerformanceChart"
                                                           Height="180"
                                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown">
                                                 <chart:SfChart.PrimaryAxis>
@@ -636,8 +628,8 @@
                                                     <chart:NumericalAxis ShowGridLines="True"/>
                                                 </chart:SfChart.SecondaryAxis>
                                                 <chart:SfChart.Series>
-                                                    <chart:SplineAreaSeries ItemsSource="{Binding FleetPerformanceData}" 
-                                                                          XBindingPath="Period" 
+                                                    <chart:SplineAreaSeries ItemsSource="{Binding FleetPerformanceData}"
+                                                                          XBindingPath="Period"
                                                                           YBindingPath="Performance"
                                                                           StrokeThickness="2"
                                                                           Stroke="#2980B9">
@@ -653,12 +645,12 @@
                                             </chart:SfChart>
                                         </StackPanel>
                                     </Border>
-                                    
+
                                     <!-- Route Efficiency Chart -->
                                     <Border Grid.Column="1" Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="5,0">
                                         <StackPanel>
                                             <TextBlock Text="Route Efficiency Analysis" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10" Foreground="#2C3E50"/>
-                                            <chart:SfChart x:Name="RouteEfficiencyChart" 
+                                            <chart:SfChart x:Name="RouteEfficiencyChart"
                                                           Height="180"
                                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown">
                                                 <chart:SfChart.PrimaryAxis>
@@ -668,8 +660,8 @@
                                                     <chart:NumericalAxis ShowGridLines="True"/>
                                                 </chart:SfChart.SecondaryAxis>
                                                 <chart:SfChart.Series>
-                                                    <chart:ColumnSeries ItemsSource="{Binding RouteEfficiencyData}" 
-                                                                      XBindingPath="Route" 
+                                                    <chart:ColumnSeries ItemsSource="{Binding RouteEfficiencyData}"
+                                                                      XBindingPath="Route"
                                                                       YBindingPath="Efficiency">
                                                         <chart:ColumnSeries.Interior>
                                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -682,7 +674,7 @@
                                             </chart:SfChart>
                                         </StackPanel>
                                     </Border>
-                                    
+
                                     <!-- Resource Utilization Gauge -->
                                     <Border Grid.Column="2" Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="10,0,0,0">
                                         <StackPanel>
@@ -692,28 +684,28 @@
                                                     <RowDefinition Height="*"/>
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
-                                                
+
                                                 <!-- Advanced Syncfusion Circular Gauge -->
                                                 <gauge:SfCircularGauge Grid.Row="0" Width="150" Height="150">
                                                     <gauge:SfCircularGauge.Scales>
-                                                        <gauge:CircularScale StartAngle="135" SweepAngle="270" 
+                                                        <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                                            StartValue="0" EndValue="100"
                                                                            Interval="10" MinorTicksPerInterval="1"
                                                                            RimStroke="#E0E0E0" RimStrokeThickness="10"
                                                                            TickStroke="#666666" TickStrokeThickness="1"
                                                                            LabelStroke="#333333">
                                                             <gauge:CircularScale.Pointers>
-                                                                <gauge:CircularPointer NeedlePointerType="Triangle" 
+                                                                <gauge:CircularPointer NeedlePointerType="Triangle"
                                                                                      PointerCapStroke="#9B59B6"
                                                                                      NeedlePointerStroke="#9B59B6"
-                                                                                     Value="78"/>
+                                                                                     Value="{Binding ResourceUtilizationPercentage}"/>
                                                             </gauge:CircularScale.Pointers>
                                                             <gauge:CircularScale.Ranges>
-                                                                <gauge:CircularRange StartValue="0" EndValue="40" 
+                                                                <gauge:CircularRange StartValue="0" EndValue="40"
                                                                                    Stroke="#E74C3C" StrokeThickness="10"/>
-                                                                <gauge:CircularRange StartValue="40" EndValue="70" 
+                                                                <gauge:CircularRange StartValue="40" EndValue="70"
                                                                                    Stroke="#F39C12" StrokeThickness="10"/>
-                                                                <gauge:CircularRange StartValue="70" EndValue="100" 
+                                                                <gauge:CircularRange StartValue="70" EndValue="100"
                                                                                    Stroke="#2ECC71" StrokeThickness="10"/>
                                                             </gauge:CircularScale.Ranges>
                                                         </gauge:CircularScale>
@@ -722,31 +714,31 @@
                                                         <gauge:GaugeAnnotation>
                                                             <gauge:GaugeAnnotation.Content>
                                                                 <StackPanel HorizontalAlignment="Center">
-                                                                    <TextBlock Text="78%" FontSize="20" FontWeight="Bold" 
+                                                                    <TextBlock Text="78%" FontSize="20" FontWeight="Bold"
                                                                               Foreground="#9B59B6" HorizontalAlignment="Center"/>
-                                                                    <TextBlock Text="Utilization" FontSize="12" 
+                                                                    <TextBlock Text="{Binding ResourceUtilizationPercentage, StringFormat='{}{0:F0}%'}" FontSize="12"
                                                                               Foreground="#666666" HorizontalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </gauge:GaugeAnnotation.Content>
                                                         </gauge:GaugeAnnotation>
                                                     </gauge:SfCircularGauge.Annotations>
                                                 </gauge:SfCircularGauge>
-                                                
+
                                                 <!-- Utilization Breakdown -->
                                                 <StackPanel Grid.Row="1" Margin="0,10,0,0">
                                                     <DockPanel Margin="0,2">
                                                         <Ellipse Width="8" Height="8" Fill="#2ECC71" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-                                                        <TextBlock Text="Optimal: 45%" Style="{StaticResource TileContentStyle}" 
+                                                        <TextBlock Text="Optimal: 45%" Style="{StaticResource TileContentStyle}"
                                                                   FontSize="11" Margin="8,0,0,0" DockPanel.Dock="Left"/>
                                                     </DockPanel>
                                                     <DockPanel Margin="0,2">
                                                         <Ellipse Width="8" Height="8" Fill="#F39C12" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-                                                        <TextBlock Text="Moderate: 33%" Style="{StaticResource TileContentStyle}" 
+                                                        <TextBlock Text="Moderate: 33%" Style="{StaticResource TileContentStyle}"
                                                                   FontSize="11" Margin="8,0,0,0" DockPanel.Dock="Left"/>
                                                     </DockPanel>
                                                     <DockPanel Margin="0,2">
                                                         <Ellipse Width="8" Height="8" Fill="#E74C3C" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-                                                        <TextBlock Text="Critical: 22%" Style="{StaticResource TileContentStyle}" 
+                                                        <TextBlock Text="Critical: 22%" Style="{StaticResource TileContentStyle}"
                                                                   FontSize="11" Margin="8,0,0,0" DockPanel.Dock="Left"/>
                                                     </DockPanel>
                                                 </StackPanel>
@@ -756,7 +748,7 @@
                                 </Grid>
                             </StackPanel>
                         </Border>
-                        
+
                         <!-- Enhanced System Status & Real-time Monitoring Row 4 -->
                         <Border Grid.Row="3" Style="{StaticResource DashboardTileStyle}">
                             <Grid>
@@ -765,14 +757,14 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <!-- System Health Column -->
                                 <StackPanel Grid.Column="0" Margin="0,0,20,0">
                                     <DockPanel Margin="0,0,0,15">
                                         <TextBlock Text="📊 System Health" Style="{StaticResource TileHeaderStyle}" DockPanel.Dock="Left"/>
                                         <Ellipse Style="{StaticResource StatusIndicatorStyle}" Fill="#2ECC71" DockPanel.Dock="Right" ToolTip="All Systems Operational"/>
                                     </DockPanel>
-                                    
+
                                     <StackPanel>
                                         <DockPanel Margin="0,0,0,8">
                                             <TextBlock Text="Database:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
@@ -781,7 +773,7 @@
                                                 <TextBlock Text="Connected" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#2ECC71"/>
                                             </StackPanel>
                                         </DockPanel>
-                                        
+
                                         <DockPanel Margin="0,0,0,8">
                                             <TextBlock Text="Services:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
                                             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
@@ -789,26 +781,26 @@
                                                 <TextBlock Text="Online" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#2ECC71"/>
                                             </StackPanel>
                                         </DockPanel>
-                                        
+
                                         <DockPanel Margin="0,0,0,8">
                                             <TextBlock Text="Last Sync:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
                                             <TextBlock Text="2 mins ago" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#3498DB" DockPanel.Dock="Right"/>
                                         </DockPanel>
-                                        
+
                                         <!-- System Performance Gauge -->
                                         <DockPanel Margin="0,15,0,0">
                                             <TextBlock Text="Performance:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Top" Margin="0,0,0,10"/>
-                                            <Border Background="#ECF0F1" 
+                                            <Border Background="#ECF0F1"
                                                    CornerRadius="4"
                                                    Height="8">
                                                 <Grid>
-                                                    <Border Background="#2ECC71" 
+                                                    <Border Background="#2ECC71"
                                                            CornerRadius="4"
                                                            Width="180"
                                                            HorizontalAlignment="Left"/>
-                                                    <TextBlock Text="92% Optimal" 
-                                                              FontSize="10" 
-                                                              FontWeight="SemiBold" 
+                                                    <TextBlock Text="92% Optimal"
+                                                              FontSize="10"
+                                                              FontWeight="SemiBold"
                                                               Foreground="White"
                                                               HorizontalAlignment="Center"
                                                               VerticalAlignment="Center"/>
@@ -817,7 +809,7 @@
                                         </DockPanel>
                                     </StackPanel>
                                 </StackPanel>
-                                
+
                                 <!-- Real-time Updates Column -->
                                 <StackPanel Grid.Column="1" Margin="20,0">
                                     <DockPanel Margin="0,0,0,15">
@@ -830,7 +822,7 @@
                                                 <EventTrigger RoutedEvent="Loaded">
                                                     <BeginStoryboard>
                                                         <Storyboard RepeatBehavior="Forever">
-                                                            <DoubleAnimation Storyboard.TargetName="RefreshRotate" 
+                                                            <DoubleAnimation Storyboard.TargetName="RefreshRotate"
                                                                            Storyboard.TargetProperty="Angle"
                                                                            From="0" To="360" Duration="0:0:3"/>
                                                         </Storyboard>
@@ -839,34 +831,34 @@
                                             </Ellipse.Triggers>
                                         </Ellipse>
                                     </DockPanel>
-                                    
+
                                     <StackPanel>
                                         <DockPanel Margin="0,0,0,8">
                                             <TextBlock Text="Auto-refresh:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
                                             <TextBlock Text="Enabled" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#2ECC71" DockPanel.Dock="Right"/>
                                         </DockPanel>
-                                        
+
                                         <DockPanel Margin="0,0,0,8">
                                             <TextBlock Text="Update Interval:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
                                             <TextBlock Text="5 seconds" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#3498DB" DockPanel.Dock="Right"/>
                                         </DockPanel>
-                                        
+
                                         <DockPanel Margin="0,0,0,8">
                                             <TextBlock Text="Next Update:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Left"/>
                                             <TextBlock Text="{Binding NextUpdateTime}" Style="{StaticResource TileContentStyle}" FontWeight="SemiBold" Foreground="#E67E22" DockPanel.Dock="Right"/>
                                         </DockPanel>
-                                        
+
                                         <!-- Refresh countdown indicator -->
                                         <DockPanel Margin="0,15,0,0">
                                             <TextBlock Text="Refresh Status:" Style="{StaticResource TileContentStyle}" DockPanel.Dock="Top" Margin="0,0,0,10"/>
                                             <!-- Simple circular indicator -->
-                                            <Border Background="#ECF0F1" 
+                                            <Border Background="#ECF0F1"
                                                    CornerRadius="20"
                                                    Width="40" Height="40"
                                                    HorizontalAlignment="Center">
                                                 <Grid>
-                                                    <Ellipse Width="32" Height="32" 
-                                                            Stroke="#3498DB" 
+                                                    <Ellipse Width="32" Height="32"
+                                                            Stroke="#3498DB"
                                                             StrokeThickness="3"
                                                             StrokeDashArray="2.5,1">
                                                         <Ellipse.RenderTransform>
@@ -876,7 +868,7 @@
                                                             <EventTrigger RoutedEvent="Loaded">
                                                                 <BeginStoryboard>
                                                                     <Storyboard RepeatBehavior="Forever">
-                                                                        <DoubleAnimation Storyboard.TargetName="LiveIndicator" 
+                                                                        <DoubleAnimation Storyboard.TargetName="LiveIndicator"
                                                                                        Storyboard.TargetProperty="Angle"
                                                                                        From="0" To="360" Duration="0:0:2"/>
                                                                     </Storyboard>
@@ -884,10 +876,10 @@
                                                             </EventTrigger>
                                                         </Ellipse.Triggers>
                                                     </Ellipse>
-                                                    <TextBlock Text="LIVE" 
-                                                              FontSize="10" 
-                                                              FontWeight="Bold" 
-                                                              Foreground="#3498DB" 
+                                                    <TextBlock Text="LIVE"
+                                                              FontSize="10"
+                                                              FontWeight="Bold"
+                                                              Foreground="#3498DB"
                                                               HorizontalAlignment="Center"
                                                               VerticalAlignment="Center"/>
                                                 </Grid>
@@ -895,59 +887,59 @@
                                         </DockPanel>
                                     </StackPanel>
                                 </StackPanel>
-                                
+
                                 <!-- Quick Actions Column -->
                                 <StackPanel Grid.Column="2" Margin="20,0,0,0">
                                     <TextBlock Text="⚡ Quick Actions" Style="{StaticResource TileHeaderStyle}" Margin="0,0,0,15"/>
-                                    
+
                                     <StackPanel>
-                                        <Border Background="#3498DB" 
-                                               CornerRadius="6" 
+                                        <Border Background="#3498DB"
+                                               CornerRadius="6"
                                                Margin="0,0,0,10">
                                             <Button x:Name="RefreshDataButton"
-                                                   Content="🔄 Refresh Data" 
-                                                   Background="Transparent" 
-                                                   Foreground="White" 
-                                                   BorderThickness="0" 
-                                                   Padding="12,8" 
+                                                   Content="🔄 Refresh Data"
+                                                   Background="Transparent"
+                                                   Foreground="White"
+                                                   BorderThickness="0"
+                                                   Padding="12,8"
                                                    FontWeight="SemiBold"
                                                    Cursor="Hand"
                                                    Click="RefreshDataButton_Click"/>
                                         </Border>
-                                        
-                                        <Border Background="#9B59B6" 
-                                               CornerRadius="6" 
+
+                                        <Border Background="#9B59B6"
+                                               CornerRadius="6"
                                                Margin="0,0,0,10">
                                             <Button x:Name="ViewReportsButton"
-                                                   Content="📊 View Reports" 
-                                                   Background="Transparent" 
-                                                   Foreground="White" 
-                                                   BorderThickness="0" 
-                                                   Padding="12,8" 
+                                                   Content="📊 View Reports"
+                                                   Background="Transparent"
+                                                   Foreground="White"
+                                                   BorderThickness="0"
+                                                   Padding="12,8"
                                                    FontWeight="SemiBold"
                                                    Cursor="Hand"
                                                    Click="ViewReportsButton_Click"/>
                                         </Border>
-                                        
-                                        <Border Background="#34495E" 
-                                               CornerRadius="6" 
+
+                                        <Border Background="#34495E"
+                                               CornerRadius="6"
                                                Margin="0,0,0,10">
                                             <Button x:Name="DashboardSettingsButton"
-                                                   Content="⚙️ Settings" 
-                                                   Background="Transparent" 
-                                                   Foreground="White" 
-                                                   BorderThickness="0" 
-                                                   Padding="12,8" 
+                                                   Content="⚙️ Settings"
+                                                   Background="Transparent"
+                                                   Foreground="White"
+                                                   BorderThickness="0"
+                                                   Padding="12,8"
                                                    FontWeight="SemiBold"
                                                    Cursor="Hand"
                                                    Click="SettingsButton_Click"/>
                                         </Border>
-                                        
+
                                         <!-- System uptime indicator -->
-                                        <Border CornerRadius="6" 
-                                               BorderBrush="#27AE60" 
-                                               BorderThickness="1" 
-                                               Padding="10" 
+                                        <Border CornerRadius="6"
+                                               BorderBrush="#27AE60"
+                                               BorderThickness="1"
+                                               Padding="10"
                                                Margin="0,15,0,0">
                                             <Border.Background>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -968,9 +960,9 @@
                     </Grid>
                 </ScrollViewer>
             </ContentControl>
-            
+
             <!-- Bus Management Panel (Docked Right) -->
-            <ContentControl x:Name="BusManagement" 
+            <ContentControl x:Name="BusManagement"
                           syncfusion:DockingManager.Header="Bus Management"
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Right"
@@ -979,9 +971,9 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Content="{Binding BusManagementViewModel, FallbackValue={x:Null}}"/>
-            
+
             <!-- Driver Management Panel (Docked Left) -->
-            <ContentControl x:Name="DriverManagement" 
+            <ContentControl x:Name="DriverManagement"
                           syncfusion:DockingManager.Header="Driver Management"
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Left"
@@ -990,32 +982,32 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Content="{Binding DriverManagementViewModel, FallbackValue={x:Null}}"/>
-            
+
             <!-- Route Management Panel (Document Tab) -->
-            <ContentControl x:Name="RouteManagement" 
+            <ContentControl x:Name="RouteManagement"
                           syncfusion:DockingManager.Header="Route Management"
                           syncfusion:DockingManager.State="Document"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           Content="{Binding RouteManagementViewModel, FallbackValue={x:Null}}"/>
-            
+
             <!-- Schedule Management Panel (Auto Hidden) -->
-            <ContentControl x:Name="ScheduleManagement" 
+            <ContentControl x:Name="ScheduleManagement"
                           syncfusion:DockingManager.Header="Schedule Management"
                           syncfusion:DockingManager.State="AutoHidden"
                           syncfusion:DockingManager.SideInDockedMode="Bottom"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch">
-                <ContentControl Content="{Binding ScheduleManagementViewModel, FallbackValue={x:Null}}" 
+                <ContentControl Content="{Binding ScheduleManagementViewModel, FallbackValue={x:Null}}"
                                Margin="10"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
             </ContentControl>
-            
+
             <!-- Student Management Panel (Docked Bottom) -->
-            <ContentControl x:Name="StudentManagement" 
+            <ContentControl x:Name="StudentManagement"
                           syncfusion:DockingManager.Header="Student Management"
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Bottom"
@@ -1023,14 +1015,14 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch">
-                <ContentControl Content="{Binding StudentManagementViewModel, FallbackValue={x:Null}}" 
+                <ContentControl Content="{Binding StudentManagementViewModel, FallbackValue={x:Null}}"
                                Margin="10"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
             </ContentControl>
-            
+
             <!-- Maintenance Tracking Panel (Tabbed with Student Management) -->
-            <ContentControl x:Name="MaintenanceTracking" 
+            <ContentControl x:Name="MaintenanceTracking"
                           syncfusion:DockingManager.Header="Maintenance Tracking"
                           syncfusion:DockingManager.State="Dock"
                           syncfusion:DockingManager.SideInDockedMode="Tabbed"
@@ -1038,34 +1030,34 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch">
-                <ContentControl Content="{Binding MaintenanceTrackingViewModel, FallbackValue={x:Null}}" 
+                <ContentControl Content="{Binding MaintenanceTrackingViewModel, FallbackValue={x:Null}}"
                                Margin="10"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
             </ContentControl>
-            
+
             <!-- Fuel Management Panel (Float) -->
-            <ContentControl x:Name="FuelManagement" 
+            <ContentControl x:Name="FuelManagement"
                           syncfusion:DockingManager.Header="Fuel Management"
                           syncfusion:DockingManager.State="Float"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch">
-                <ContentControl Content="{Binding FuelManagementViewModel, FallbackValue={x:Null}}" 
+                <ContentControl Content="{Binding FuelManagementViewModel, FallbackValue={x:Null}}"
                                Margin="10"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
             </ContentControl>
-            
+
             <!-- Activity Logging Panel (Auto Hidden) -->
-            <ContentControl x:Name="ActivityLogging" 
+            <ContentControl x:Name="ActivityLogging"
                           syncfusion:DockingManager.Header="Activity Logging"
                           syncfusion:DockingManager.State="AutoHidden"
                           syncfusion:DockingManager.SideInDockedMode="Right"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch">
-                <ContentControl Content="{Binding ActivityLogViewModel, FallbackValue={x:Null}}" 
+                <ContentControl Content="{Binding ActivityLogViewModel, FallbackValue={x:Null}}"
                                Margin="10"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
