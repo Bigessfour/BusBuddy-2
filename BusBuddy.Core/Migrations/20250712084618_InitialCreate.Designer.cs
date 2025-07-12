@@ -9,23 +9,23 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Bus_Buddy.Migrations
+namespace BusBuddy.Core.Migrations
 {
     [DbContext(typeof(BusBuddyDbContext))]
-    [Migration("20250705222938_MakeDriverIdOptional")]
-    partial class MakeDriverIdOptional
+    [Migration("20250712084618_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Bus_Buddy.Models.Activity", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Activity", b =>
                 {
                     b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd()
@@ -39,8 +39,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("ActivityType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
 
                     b.Property<decimal?>("ActualCost")
                         .HasColumnType("decimal(10,2)");
@@ -73,10 +75,18 @@ namespace Bus_Buddy.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasDefaultValue("Activity");
+
                     b.Property<string>("Destination")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(200)")
+                        .HasDefaultValue("");
 
                     b.Property<decimal?>("DestinationLatitude")
                         .HasColumnType("decimal(10,8)");
@@ -103,6 +113,9 @@ namespace Bus_Buddy.Migrations
                     b.Property<TimeSpan>("EventTime")
                         .HasColumnType("time");
 
+                    b.Property<int?>("ExpectedPassengers")
+                        .HasColumnType("int");
+
                     b.Property<TimeSpan>("LeaveTime")
                         .HasColumnType("time");
 
@@ -120,10 +133,18 @@ namespace Bus_Buddy.Migrations
                     b.Property<decimal?>("PickupLongitude")
                         .HasColumnType("decimal(11,8)");
 
+                    b.Property<int?>("RecurringSeriesId")
+                        .HasColumnType("int");
+
                     b.Property<string>("RequestedBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
+
+                    b.Property<TimeSpan>("ReturnTime")
+                        .HasColumnType("time");
 
                     b.Property<int?>("RouteId")
                         .HasColumnType("int");
@@ -180,7 +201,41 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Activities", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.ActivitySchedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("Details")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("User")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ActivityLogs", (string)null);
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.ActivitySchedule", b =>
                 {
                     b.Property<int>("ActivityScheduleId")
                         .ValueGeneratedOnAdd()
@@ -201,16 +256,20 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("RequestedBy")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime>("ScheduledDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ScheduledDestination")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(200)")
+                        .HasDefaultValue("");
 
                     b.Property<int>("ScheduledDriverId")
                         .HasColumnType("int");
@@ -229,13 +288,20 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
+
+                    b.Property<int?>("TripEventId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TripType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
@@ -255,13 +321,15 @@ namespace Bus_Buddy.Migrations
                     b.HasIndex("ScheduledVehicleId")
                         .HasDatabaseName("IX_ActivitySchedule_VehicleId");
 
+                    b.HasIndex("TripEventId");
+
                     b.HasIndex("TripType")
                         .HasDatabaseName("IX_ActivitySchedule_TripType");
 
                     b.ToTable("ActivitySchedule", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Bus", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Bus", b =>
                 {
                     b.Property<int>("VehicleId")
                         .ValueGeneratedOnAdd()
@@ -271,8 +339,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("BusNumber")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(100)
@@ -323,21 +393,27 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("LicenseNumber")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("Make")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
 
                     b.Property<decimal?>("MilesPerGallon")
                         .HasColumnType("decimal(6,2)");
 
                     b.Property<string>("Model")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime?>("NextMaintenanceDue")
                         .HasColumnType("datetime2");
@@ -378,8 +454,11 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("VINNumber")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(17)
-                        .HasColumnType("nvarchar(17)");
+                        .HasColumnType("nvarchar(17)")
+                        .HasDefaultValue("")
+                        .HasColumnName("VIN");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -420,7 +499,7 @@ namespace Bus_Buddy.Migrations
                         {
                             VehicleId = 1,
                             BusNumber = "001",
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7792),
+                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5084),
                             GPSTracking = false,
                             LicenseNumber = "TX123456",
                             Make = "Blue Bird",
@@ -436,7 +515,7 @@ namespace Bus_Buddy.Migrations
                         {
                             VehicleId = 2,
                             BusNumber = "002",
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7835),
+                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5131),
                             GPSTracking = false,
                             LicenseNumber = "TX654321",
                             Make = "Thomas Built",
@@ -450,11 +529,12 @@ namespace Bus_Buddy.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Driver", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Driver", b =>
                 {
                     b.Property<int>("DriverId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("DriverID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DriverId"));
 
@@ -487,8 +567,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("DriverName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("DriverPhone")
                         .HasMaxLength(20)
@@ -496,8 +578,11 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("DriversLicenceType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("")
+                        .HasColumnName("DriversLicenseType");
 
                     b.Property<DateTime?>("DrugTestDate")
                         .HasColumnType("datetime2");
@@ -562,8 +647,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
 
                     b.Property<bool>("TrainingComplete")
                         .HasColumnType("bit");
@@ -602,7 +689,7 @@ namespace Bus_Buddy.Migrations
                         new
                         {
                             DriverId = 1,
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7895),
+                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5335),
                             DriverEmail = "john.smith@school.edu",
                             DriverName = "John Smith",
                             DriverPhone = "555-0123",
@@ -613,7 +700,7 @@ namespace Bus_Buddy.Migrations
                         new
                         {
                             DriverId = 2,
-                            CreatedDate = new DateTime(2025, 7, 5, 22, 29, 38, 103, DateTimeKind.Utc).AddTicks(7907),
+                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5347),
                             DriverEmail = "mary.johnson@school.edu",
                             DriverName = "Mary Johnson",
                             DriverPhone = "555-0456",
@@ -623,7 +710,7 @@ namespace Bus_Buddy.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Fuel", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Fuel", b =>
                 {
                     b.Property<int>("FuelId")
                         .ValueGeneratedOnAdd()
@@ -636,8 +723,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("FuelLocation")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("FuelType")
                         .IsRequired()
@@ -685,7 +774,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Fuel", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Maintenance", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Maintenance", b =>
                 {
                     b.Property<int>("MaintenanceId")
                         .ValueGeneratedOnAdd()
@@ -717,8 +806,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("MaintenanceCompleted")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime?>("NextServiceDue")
                         .HasColumnType("datetime2");
@@ -756,8 +847,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
@@ -771,8 +864,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("Vendor")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<bool>("Warranty")
                         .HasColumnType("bit");
@@ -804,11 +899,12 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Maintenance", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Route", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Route", b =>
                 {
                     b.Property<int>("RouteId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("RouteID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RouteId"));
 
@@ -819,7 +915,8 @@ namespace Bus_Buddy.Migrations
                         .HasColumnType("time");
 
                     b.Property<int?>("AMDriverId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("AMDriverID");
 
                     b.Property<decimal?>("AMEndMiles")
                         .HasColumnType("decimal(10,2)");
@@ -828,7 +925,8 @@ namespace Bus_Buddy.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("AMVehicleId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("AMVehicleID");
 
                     b.Property<string>("BusNumber")
                         .HasMaxLength(20)
@@ -861,7 +959,8 @@ namespace Bus_Buddy.Migrations
                         .HasColumnType("time");
 
                     b.Property<int?>("PMDriverId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("PMDriverID");
 
                     b.Property<decimal?>("PMEndMiles")
                         .HasColumnType("decimal(10,2)");
@@ -870,12 +969,15 @@ namespace Bus_Buddy.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("PMVehicleId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("PMVehicleID");
 
                     b.Property<string>("RouteName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
 
                     b.Property<int?>("StopCount")
                         .HasColumnType("int");
@@ -910,7 +1012,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Routes", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.RouteStop", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.RouteStop", b =>
                 {
                     b.Property<int>("RouteStopId")
                         .ValueGeneratedOnAdd()
@@ -942,8 +1044,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("StopAddress")
                         .HasMaxLength(200)
@@ -954,8 +1058,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("StopName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<int>("StopOrder")
                         .HasColumnType("int");
@@ -974,7 +1080,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("RouteStops", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Schedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Schedule", b =>
                 {
                     b.Property<int>("ScheduleId")
                         .ValueGeneratedOnAdd()
@@ -986,10 +1092,13 @@ namespace Bus_Buddy.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("BusId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("VehicleId");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<DateTime>("DepartureTime")
                         .HasColumnType("datetime2");
@@ -1009,8 +1118,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
@@ -1029,10 +1140,14 @@ namespace Bus_Buddy.Migrations
                     b.HasIndex("ScheduleDate")
                         .HasDatabaseName("IX_Schedules_Date");
 
+                    b.HasIndex("RouteId", "BusId", "DepartureTime")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Schedules_RouteBusDeparture");
+
                     b.ToTable("Schedules", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.SchoolCalendar", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.SchoolCalendar", b =>
                 {
                     b.Property<int>("CalendarId")
                         .ValueGeneratedOnAdd()
@@ -1055,13 +1170,17 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("EventName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("EventType")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1075,8 +1194,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("SchoolYear")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
@@ -1101,7 +1222,7 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("SchoolCalendar", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Student", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Student", b =>
                 {
                     b.Property<int>("StudentId")
                         .ValueGeneratedOnAdd()
@@ -1226,8 +1347,10 @@ namespace Bus_Buddy.Migrations
 
                     b.Property<string>("StudentName")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("StudentNumber")
                         .HasMaxLength(20)
@@ -1265,13 +1388,26 @@ namespace Bus_Buddy.Migrations
                     b.ToTable("Students", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Ticket", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Trips.TripEvent", b =>
                 {
-                    b.Property<int>("TicketId")
+                    b.Property<int>("TripEventId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TripEventId"));
+
+                    b.Property<int>("AdultSupervisorCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("ApprovalRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(100)
@@ -1282,68 +1418,64 @@ namespace Bus_Buddy.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<string>("CustomFields")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("CustomType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Id")
+                    b.Property<string>("Destination")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("DriverId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
+                    b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsRefundable")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("LeaveTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("IssuedDate")
+                    b.Property<string>("POCEmail")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("POCName")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("");
 
-                    b.Property<string>("Notes")
+                    b.Property<string>("POCPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("ReturnTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RouteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SpecialRequirements")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<string>("QRCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal?>("RefundAmount")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<int>("RouteId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Valid");
+                        .HasDefaultValue("Scheduled");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int>("StudentCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("TicketType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<string>("TripNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTime>("TravelDate")
-                        .HasColumnType("date");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
@@ -1352,68 +1484,57 @@ namespace Bus_Buddy.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UsedByDriver")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int?>("VehicleId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("UsedDate")
-                        .HasColumnType("datetime2");
+                    b.HasKey("TripEventId");
 
-                    b.Property<DateTime?>("ValidFrom")
-                        .HasColumnType("datetime2");
+                    b.HasIndex("ApprovalRequired")
+                        .HasDatabaseName("IX_TripEvents_ApprovalRequired");
 
-                    b.Property<DateTime?>("ValidUntil")
-                        .HasColumnType("datetime2");
+                    b.HasIndex("DriverId")
+                        .HasDatabaseName("IX_TripEvents_DriverId");
 
-                    b.HasKey("TicketId");
-
-                    b.HasIndex("IssuedDate")
-                        .HasDatabaseName("IX_Tickets_IssuedDate");
-
-                    b.HasIndex("QRCode")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Tickets_QRCode");
+                    b.HasIndex("LeaveTime")
+                        .HasDatabaseName("IX_TripEvents_LeaveTime");
 
                     b.HasIndex("RouteId")
-                        .HasDatabaseName("IX_Tickets_RouteId");
+                        .HasDatabaseName("IX_TripEvents_RouteId");
 
                     b.HasIndex("Status")
-                        .HasDatabaseName("IX_Tickets_Status");
+                        .HasDatabaseName("IX_TripEvents_Status");
 
-                    b.HasIndex("StudentId")
-                        .HasDatabaseName("IX_Tickets_StudentId");
+                    b.HasIndex("Type")
+                        .HasDatabaseName("IX_TripEvents_Type");
 
-                    b.HasIndex("TicketType")
-                        .HasDatabaseName("IX_Tickets_TicketType");
+                    b.HasIndex("VehicleId")
+                        .HasDatabaseName("IX_TripEvents_VehicleId");
 
-                    b.HasIndex("TravelDate")
-                        .HasDatabaseName("IX_Tickets_TravelDate");
+                    b.HasIndex("DriverId", "LeaveTime")
+                        .HasDatabaseName("IX_TripEvents_DriverSchedule");
 
-                    b.HasIndex("TravelDate", "Status")
-                        .HasDatabaseName("IX_Tickets_TravelDateStatus");
+                    b.HasIndex("VehicleId", "LeaveTime")
+                        .HasDatabaseName("IX_TripEvents_VehicleSchedule");
 
-                    b.HasIndex("StudentId", "RouteId", "TravelDate")
-                        .HasDatabaseName("IX_Tickets_StudentRouteDate");
-
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("TripEvents", (string)null);
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Activity", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Activity", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "AssignedVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "AssignedVehicle")
                         .WithMany("Activities")
                         .HasForeignKey("AssignedVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Activities_Vehicle");
 
-                    b.HasOne("Bus_Buddy.Models.Driver", "Driver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "Driver")
                         .WithMany("Activities")
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Activities_Driver");
 
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
                         .WithMany()
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -1426,30 +1547,36 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.ActivitySchedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.ActivitySchedule", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Driver", "ScheduledDriver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "ScheduledDriver")
                         .WithMany("ScheduledActivities")
                         .HasForeignKey("ScheduledDriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ActivitySchedule_Driver");
 
-                    b.HasOne("Bus_Buddy.Models.Bus", "ScheduledVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "ScheduledVehicle")
                         .WithMany("ScheduledActivities")
                         .HasForeignKey("ScheduledVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ActivitySchedule_Vehicle");
 
+                    b.HasOne("BusBuddy.Core.Models.Trips.TripEvent", "TripEvent")
+                        .WithMany()
+                        .HasForeignKey("TripEventId");
+
                     b.Navigation("ScheduledDriver");
 
                     b.Navigation("ScheduledVehicle");
+
+                    b.Navigation("TripEvent");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Fuel", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Fuel", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "Vehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "Vehicle")
                         .WithMany("FuelRecords")
                         .HasForeignKey("VehicleFueledId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1459,9 +1586,9 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Maintenance", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Maintenance", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "Vehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "Vehicle")
                         .WithMany("MaintenanceRecords")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1471,27 +1598,27 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Route", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Route", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Driver", "AMDriver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "AMDriver")
                         .WithMany("AMRoutes")
                         .HasForeignKey("AMDriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Routes_AMDriver");
 
-                    b.HasOne("Bus_Buddy.Models.Bus", "AMVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "AMVehicle")
                         .WithMany("AMRoutes")
                         .HasForeignKey("AMVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Routes_AMVehicle");
 
-                    b.HasOne("Bus_Buddy.Models.Driver", "PMDriver")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "PMDriver")
                         .WithMany("PMRoutes")
                         .HasForeignKey("PMDriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_Routes_PMDriver");
 
-                    b.HasOne("Bus_Buddy.Models.Bus", "PMVehicle")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "PMVehicle")
                         .WithMany("PMRoutes")
                         .HasForeignKey("PMVehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1506,9 +1633,9 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("PMVehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.RouteStop", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.RouteStop", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
                         .WithMany()
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1518,24 +1645,24 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Schedule", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Schedule", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Bus", "Bus")
-                        .WithMany()
+                    b.HasOne("BusBuddy.Core.Models.Bus", "Bus")
+                        .WithMany("Schedules")
                         .HasForeignKey("BusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Schedules_Bus");
 
-                    b.HasOne("Bus_Buddy.Models.Driver", "Driver")
-                        .WithMany()
+                    b.HasOne("BusBuddy.Core.Models.Driver", "Driver")
+                        .WithMany("Schedules")
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Schedules_Driver");
 
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
-                        .WithMany()
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
+                        .WithMany("Schedules")
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
@@ -1548,28 +1675,34 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Ticket", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Trips.TripEvent", b =>
                 {
-                    b.HasOne("Bus_Buddy.Models.Route", "Route")
+                    b.HasOne("BusBuddy.Core.Models.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_TripEvents_Driver");
+
+                    b.HasOne("BusBuddy.Core.Models.Route", "Route")
                         .WithMany()
                         .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_Tickets_Route");
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_TripEvents_Route");
 
-                    b.HasOne("Bus_Buddy.Models.Student", "Student")
+                    b.HasOne("BusBuddy.Core.Models.Bus", "Vehicle")
                         .WithMany()
-                        .HasForeignKey("StudentId")
+                        .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_Tickets_Student");
+                        .HasConstraintName("FK_TripEvents_Vehicle");
+
+                    b.Navigation("Driver");
 
                     b.Navigation("Route");
 
-                    b.Navigation("Student");
+                    b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Bus", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Bus", b =>
                 {
                     b.Navigation("AMRoutes");
 
@@ -1582,9 +1715,11 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("PMRoutes");
 
                     b.Navigation("ScheduledActivities");
+
+                    b.Navigation("Schedules");
                 });
 
-            modelBuilder.Entity("Bus_Buddy.Models.Driver", b =>
+            modelBuilder.Entity("BusBuddy.Core.Models.Driver", b =>
                 {
                     b.Navigation("AMRoutes");
 
@@ -1593,6 +1728,13 @@ namespace Bus_Buddy.Migrations
                     b.Navigation("PMRoutes");
 
                     b.Navigation("ScheduledActivities");
+
+                    b.Navigation("Schedules");
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.Route", b =>
+                {
+                    b.Navigation("Schedules");
                 });
 #pragma warning restore 612, 618
         }

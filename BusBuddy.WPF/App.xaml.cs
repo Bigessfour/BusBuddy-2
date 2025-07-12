@@ -598,9 +598,9 @@ public partial class App : Application
         services.AddAutoMapper(typeof(BusBuddy.WPF.Mapping.MappingProfile));
         services.AddSingleton<BusBuddy.WPF.Services.IMappingService, BusBuddy.WPF.Services.MappingService>();
 
-        // Register WPF-specific Services - Changed RoutePopulationScaffold to Singleton
+        // Register WPF-specific Services - Changed RoutePopulationScaffold to Scoped
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
-        services.AddSingleton<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
+        services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
         services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
 
         // Register Theme Service for dark/light mode switching

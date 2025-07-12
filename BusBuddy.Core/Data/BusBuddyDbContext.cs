@@ -82,7 +82,27 @@ public class BusBuddyDbContext : DbContext
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), options =>
+            {
+                // Enhanced connection resilience
+                options.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+
+                // Set command timeout to prevent hanging
+                options.CommandTimeout(60);
+            });
+
+            // Add detailed logging for SQL exceptions
+            optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Warning);
+
+            // Enable sensitive data logging in debug mode only
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                optionsBuilder.EnableSensitiveDataLogging();
+                optionsBuilder.EnableDetailedErrors();
+            }
         }
     }
 
@@ -112,9 +132,9 @@ public class BusBuddyDbContext : DbContext
         // Configure Bus (Vehicle) entity with enhanced audit and indexing
         modelBuilder.Entity<Bus>(entity =>
         {
-            entity.ToTable("Buses");
+            entity.ToTable("Vehicles");
             entity.HasKey(e => e.VehicleId);
-            entity.Property(e => e.VehicleId).HasColumnName("BusId");
+            // Remove the HasColumnName mapping since VehicleId should map to VehicleId column
 
             // Properties with validation and constraints
             entity.Property(e => e.BusNumber).IsRequired().HasMaxLength(20);
@@ -408,6 +428,9 @@ public class BusBuddyDbContext : DbContext
             entity.ToTable("Schedules");
             entity.HasKey(e => e.ScheduleId);
 
+            // Explicitly map BusId to VehicleId column to fix schema mismatch
+            entity.Property(e => e.BusId).HasColumnName("VehicleId");
+
             // Relationships
             entity.HasOne(s => s.Bus)
                   .WithMany(b => b.Schedules)
@@ -632,6 +655,41 @@ public class BusBuddyDbContext : DbContext
             entity.Property(e => e.Description)
                 .HasDefaultValue("Activity");
         });
+
+        // Add NULL handling for Schedule entity to prevent InvalidCastException
+        modelBuilder.Entity<Schedule>(entity =>
+        {
+            entity.Property(e => e.Status)
+                .HasDefaultValue("Scheduled");
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("GETUTCDATE()");
+        });
+
+        // Configure all string properties to handle NULL values gracefully
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(string))
+                {
+                    // Convert NULL values to empty string for required string properties
+                    if (!property.IsNullable)
+                    {
+                        property.SetDefaultValue("");
+                    }
+                }
+
+                // Handle DateTime properties that might be NULL
+                if (property.ClrType == typeof(DateTime) && property.IsNullable)
+                {
+                    // Add a value converter to handle invalid dates
+                    property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime?, DateTime?>(
+                        v => v.HasValue && v.Value != DateTime.MinValue ? v : null,
+                        v => v ?? DateTime.MinValue));
+                }
+            }
+        }
     }
 
     private void SeedData(ModelBuilder modelBuilder)

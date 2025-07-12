@@ -17,6 +17,7 @@ public class Schedule
     [Required]
     [ForeignKey("Bus")]
     [Display(Name = "Bus")]
+    [Column("VehicleId")] // Map to the actual VehicleId column in database
     public int BusId { get; set; }
 
     [Required]
