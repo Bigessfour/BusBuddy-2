@@ -53,7 +53,7 @@ public void TestWithSTAThread()
 public class SyncfusionControlTests
 {
     private Application _application;
-    
+
     [OneTimeSetUp]
     public void TestFixtureSetUp()
     {
@@ -63,11 +63,11 @@ public class SyncfusionControlTests
             _application = new Application();
             _application.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         }
-        
+
         // Register Syncfusion license
         SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");
     }
-    
+
     [OneTimeTearDown]
     public void TestFixtureTearDown()
     {
@@ -93,7 +93,7 @@ public void TestWithTimeout()
 public async Task TestAsyncSyncfusionOperation()
 {
     var tcs = new TaskCompletionSource<bool>();
-    
+
     Application.Current.Dispatcher.BeginInvoke(new Action(async () =>
     {
         try
@@ -107,7 +107,7 @@ public async Task TestAsyncSyncfusionOperation()
             tcs.SetException(ex);
         }
     }));
-    
+
     var result = await tcs.Task;
     Assert.IsTrue(result);
 }
@@ -122,15 +122,15 @@ public async Task TestAsyncSyncfusionOperation()
 public void TestSfDataGrid()
 {
     var dataGrid = new SfDataGrid();
-    
+
     // Set up data source
     var testData = new ObservableCollection<TestModel>();
     dataGrid.ItemsSource = testData;
-    
+
     // Force layout update
     dataGrid.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
     dataGrid.Arrange(new Rect(dataGrid.DesiredSize));
-    
+
     // Perform tests
     Assert.AreEqual(testData.Count, dataGrid.View.Records.Count);
 }
@@ -143,11 +143,11 @@ public void TestSfDataGrid()
 public void TestDockingManager()
 {
     var dockingManager = new DockingManager();
-    
+
     // Add test window
     var window = new Window();
     window.Content = dockingManager;
-    
+
     // Use dispatcher for UI operations
     Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
     {
@@ -155,7 +155,7 @@ public void TestDockingManager()
         // Test docking operations
         window.Close();
     }));
-    
+
     // Process pending dispatcher operations
     Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => { }));
 }
@@ -168,14 +168,14 @@ public void TestDockingManager()
 public void TestSfChart()
 {
     var chart = new SfChart();
-    
+
     // Configure chart
     var series = new LineSeries();
     chart.Series.Add(series);
-    
+
     // Force rendering
     chart.UpdateLayout();
-    
+
     // Test chart properties
     Assert.AreEqual(1, chart.Series.Count);
 }
@@ -206,7 +206,7 @@ public void TestWithMocking()
 {
     var mockService = new Mock<IDataService>();
     mockService.Setup(x => x.GetDataAsync()).ReturnsAsync(testData);
-    
+
     // Use mock instead of real service
 }
 ```
