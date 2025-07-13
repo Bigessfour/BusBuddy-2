@@ -53,7 +53,7 @@
         <Setter Property="SelectionUnit" Value="Row"/>
         <Setter Property="NavigationMode" Value="Row"/>
         <Setter Property="ShowRowHeader" Value="True"/>
-        <!-- Note: ShowCheckBox removed - use CheckBoxColumn in columns instead -->
+        <!-- Note: ShowCheckBox removed — use CheckBoxColumn in columns instead -->
 
         <!-- Performance optimizations -->
         <Setter Property="EnableDataVirtualization" Value="True"/>

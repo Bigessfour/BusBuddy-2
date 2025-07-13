@@ -234,7 +234,7 @@
             </Grid>
         </Border>
 
-        <!-- Main Content - DockingManager with baseline theme -->
+        <!-- Main Content — DockingManager with baseline theme -->
         <Grid Grid.Row="1">
             <syncfusion:DockingManager x:Name="MainDockingManager"
                                        Style="{StaticResource BusBuddyDockingManagerStyle}"
@@ -1108,7 +1108,7 @@
                                VerticalAlignment="Stretch"/>
             </ContentControl>
 
-            <!-- 🤖 XAI Chat Panel (Right Docked) - NEW ENHANCEMENT -->
+            <!-- 🤖 XAI Chat Panel (Right Docked) — NEW ENHANCEMENT -->
             <ContentControl x:Name="XAIChatPanel"
                           syncfusion:DockingManager.Header="🤖 XAI Assistant"
                           syncfusion:DockingManager.State="Dock"
@@ -1136,7 +1136,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Chat Control - Using RichTextBox instead of non-existent SfChat -->
+                    <!-- Chat Control — Using RichTextBox instead of non-existent SfChat -->
                     <Border Grid.Row="1" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="0,0,8,8">
                         <Grid Margin="5">
                             <Grid.RowDefinitions>
@@ -1214,7 +1214,7 @@
                 </Grid>
             </ContentControl>
 
-            <!-- 🌍 Google Earth Engine Panel (Floating) - NEW ENHANCEMENT -->
+            <!-- 🌍 Google Earth Engine Panel (Floating) — NEW ENHANCEMENT -->
             <ContentControl x:Name="EarthEnginePanel"
                           syncfusion:DockingManager.Header="🌍 Earth Engine Maps"
                           syncfusion:DockingManager.State="Float"

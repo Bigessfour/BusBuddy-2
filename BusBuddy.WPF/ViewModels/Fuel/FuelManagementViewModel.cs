@@ -48,12 +48,12 @@ namespace BusBuddy.WPF.ViewModels
         public bool CanEdit => SelectedFuelRecord != null;
         public bool CanDelete => SelectedFuelRecord != null;
 
-        public BusBuddy.WPF.RelayCommand AddCommand { get; }
-        public BusBuddy.WPF.RelayCommand EditCommand { get; }
-        public BusBuddy.WPF.RelayCommand DeleteCommand { get; }
-        public BusBuddy.WPF.RelayCommand ExportCommand { get; }
-        public BusBuddy.WPF.RelayCommand ReportCommand { get; }
-        public BusBuddy.WPF.RelayCommand ReconciliationCommand { get; }
+        public RelayCommand AddCommand { get; }
+        public RelayCommand EditCommand { get; }
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand ExportCommand { get; }
+        public RelayCommand ReportCommand { get; }
+        public RelayCommand ReconciliationCommand { get; }
 
         public FuelManagementViewModel(IFuelService fuelService, IBusService busService, ILogger<FuelManagementViewModel>? logger = null)
             : base(logger)
@@ -61,12 +61,12 @@ namespace BusBuddy.WPF.ViewModels
             _fuelService = fuelService;
             _busService = busService;
 
-            AddCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = AddFuelRecordAsync(); });
-            EditCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = EditFuelRecordAsync(); }, _ => CanEdit);
-            DeleteCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = DeleteFuelRecordAsync(); }, _ => CanDelete);
-            ExportCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = ExportFuelDataAsync(); });
-            ReportCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = ShowFuelReportAsync(); });
-            ReconciliationCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = ShowFuelReconciliationAsync(); });
+            AddCommand = new RelayCommand(_ => { _ = AddFuelRecordAsync(); });
+            EditCommand = new RelayCommand(_ => { _ = EditFuelRecordAsync(); }, _ => CanEdit);
+            DeleteCommand = new RelayCommand(_ => { _ = DeleteFuelRecordAsync(); }, _ => CanDelete);
+            ExportCommand = new RelayCommand(_ => { _ = ExportFuelDataAsync(); });
+            ReportCommand = new RelayCommand(_ => { _ = ShowFuelReportAsync(); });
+            ReconciliationCommand = new RelayCommand(_ => { _ = ShowFuelReconciliationAsync(); });
 
             // Set as ready for development
             IsInDevelopment = false;

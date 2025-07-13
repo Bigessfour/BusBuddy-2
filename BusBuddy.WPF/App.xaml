@@ -6,7 +6,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- 🚀 SYNCFUSION FLUENT DARK THEME - BASELINE FRAMEWORK -->
+                <!-- 🚀 SYNCFUSION FLUENT DARK THEME — BASELINE FRAMEWORK -->
                 <!-- Unified theme system for seamless UI experience across all child forms -->
                 <ResourceDictionary Source="Resources/SyncfusionFluentDarkTheme.xaml"/>
 
@@ -29,7 +29,7 @@
                     </Style>
                 </ResourceDictionary>
 
-                <!-- Primary unified styles - custom application styles -->
+                <!-- Primary unified styles — custom application styles -->
                 <ResourceDictionary>
                     <!-- Global converters -->
                     <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -52,7 +52,7 @@
                 <ResourceDictionary Source="Resources/SyncfusionButtonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Global Converters - Syncfusion Compatible -->
+            <!-- Global Converters — Syncfusion Compatible -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>

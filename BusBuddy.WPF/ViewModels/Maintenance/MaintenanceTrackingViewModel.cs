@@ -21,11 +21,11 @@ namespace BusBuddy.WPF.ViewModels
         public ObservableCollection<Maintenance> MaintenanceRecords { get; } = new();
         public ObservableCollection<Bus> AvailableBuses { get; } = new();
 
-        public BusBuddy.WPF.RelayCommand AddCommand { get; }
-        public BusBuddy.WPF.RelayCommand EditCommand { get; }
-        public BusBuddy.WPF.RelayCommand DeleteCommand { get; }
-        public BusBuddy.WPF.RelayCommand AlertsCommand { get; }
-        public BusBuddy.WPF.RelayCommand ReportCommand { get; }
+        public RelayCommand AddCommand { get; }
+        public RelayCommand EditCommand { get; }
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand AlertsCommand { get; }
+        public RelayCommand ReportCommand { get; }
 
         private Maintenance? _selectedRecord;
         public Maintenance? SelectedRecord
@@ -40,11 +40,11 @@ namespace BusBuddy.WPF.ViewModels
             _maintenanceService = maintenanceService;
             _busService = busService;
 
-            AddCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = AddRecordAsync(); });
-            EditCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = EditRecordAsync(); }, _ => SelectedRecord != null);
-            DeleteCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = DeleteRecordAsync(); }, _ => SelectedRecord != null);
-            AlertsCommand = new BusBuddy.WPF.RelayCommand(_ => { _ = ShowMaintenanceAlertsAsync(); });
-            ReportCommand = new BusBuddy.WPF.RelayCommand(_ => MessageBox.Show("Maintenance reports will be implemented in the next sprint.",
+            AddCommand = new RelayCommand(_ => { _ = AddRecordAsync(); });
+            EditCommand = new RelayCommand(_ => { _ = EditRecordAsync(); }, _ => SelectedRecord != null);
+            DeleteCommand = new RelayCommand(_ => { _ = DeleteRecordAsync(); }, _ => SelectedRecord != null);
+            AlertsCommand = new RelayCommand(_ => { _ = ShowMaintenanceAlertsAsync(); });
+            ReportCommand = new RelayCommand(_ => MessageBox.Show("Maintenance reports will be implemented in the next sprint.",
                 "Coming Soon", MessageBoxButton.OK, MessageBoxImage.Information));
 
             // Set as ready for development

@@ -272,7 +272,7 @@
             </syncfusion:SfBusyIndicator.Content>
         </syncfusion:SfBusyIndicator>
 
-        <!-- In Development Overlay - Hidden when fully implemented -->
+        <!-- In Development Overlay — Hidden when fully implemented -->
         <Border Grid.Row="0" Grid.RowSpan="5"
                 Background="#80000000"
                 Visibility="{Binding IsInDevelopment, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}">

@@ -80,7 +80,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Left Column - Essential Fields -->
+                <!-- Left Column — Essential Fields -->
                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
                     <TextBlock Text="Essential Information" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
@@ -178,7 +178,7 @@
                     </sfTextInputLayout:SfTextInputLayout>
                 </StackPanel>
 
-                <!-- Right Column - Additional Fields -->
+                <!-- Right Column — Additional Fields -->
                 <StackPanel Grid.Column="1" Margin="10,0,0,0">
                     <TextBlock Text="Additional Information" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 

@@ -14,7 +14,7 @@
     ===============================================================================
     -->
 
-    <!-- GLOBAL COLOR PALETTE - Material Design with Syncfusion compatibility -->
+    <!-- GLOBAL COLOR PALETTE — Material Design with Syncfusion compatibility -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="#2196F3"/>           <!-- Material Blue -->
     <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#1976D2"/>       <!-- Dark Blue -->
     <SolidColorBrush x:Key="PrimaryLightBrush" Color="#BBDEFB"/>      <!-- Light Blue -->
