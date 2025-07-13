@@ -2,11 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sf="http://schemas.syncfusion.com/wpf"
                     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-                    xmlns:tools="http://schemas.syncfusion.com/wpf"
                     xmlns:chart="http://schemas.syncfusion.com/wpf"
                     xmlns:gauge="http://schemas.syncfusion.com/wpf">
 
-    <!-- 
+    <!--
     ===============================================================================
     BUS BUDDY UNIFIED STYLE SYSTEM - SYNCFUSION EDITION
     ===============================================================================
@@ -51,10 +50,10 @@
     <Thickness x:Key="LargeMargin">16</Thickness>
     <Thickness x:Key="XLargeMargin">24</Thickness>
 
-    <!-- 
+    <!--
     ===============================================================================
     SYNCFUSION CONTROL STYLES
-    =============================================================================== 
+    ===============================================================================
     -->
 
     <!-- BASE SYNCFUSION DATAGRID STYLE -->
@@ -124,7 +123,7 @@
     </Style>
 
     <!-- SYNCFUSION BUTTON STYLES -->
-    <Style x:Key="PrimaryButtonStyle" TargetType="tools:ButtonAdv">
+    <Style x:Key="PrimaryButtonStyle" TargetType="syncfusion:ButtonAdv">
         <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -150,7 +149,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="SecondaryButtonStyle" TargetType="tools:ButtonAdv">
+    <Style x:Key="SecondaryButtonStyle" TargetType="syncfusion:ButtonAdv">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
@@ -174,7 +173,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="DangerButtonStyle" TargetType="tools:ButtonAdv">
+    <Style x:Key="DangerButtonStyle" TargetType="syncfusion:ButtonAdv">
         <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -196,7 +195,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="AccentButtonStyle" TargetType="tools:ButtonAdv">
+    <Style x:Key="AccentButtonStyle" TargetType="syncfusion:ButtonAdv">
         <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -267,10 +266,10 @@
         <Setter Property="Background" Value="Transparent"/>
     </Style>
 
-    <!-- 
+    <!--
     ===============================================================================
     LAYOUT AND CONTAINER STYLES
-    =============================================================================== 
+    ===============================================================================
     -->
 
     <!-- Standard Page Container -->
@@ -294,10 +293,10 @@
         </Setter>
     </Style>
 
-    <!-- 
+    <!--
     ===============================================================================
     TYPOGRAPHY STYLES
-    =============================================================================== 
+    ===============================================================================
     -->
 
     <!-- Page Title Style -->
@@ -335,10 +334,10 @@
         <Setter Property="LineHeight" Value="16"/>
     </Style>
 
-    <!-- 
+    <!--
     ===============================================================================
     STATUS AND INDICATOR STYLES
-    =============================================================================== 
+    ===============================================================================
     -->
 
     <!-- Success Status Style -->

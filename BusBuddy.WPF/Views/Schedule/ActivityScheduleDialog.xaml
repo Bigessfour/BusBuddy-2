@@ -98,7 +98,7 @@
                     <ComboBox Grid.Column="0" Name="DriverComboBox" 
                               DisplayMemberPath="DriverName" 
                               SelectedValuePath="DriverId"/>
-                    <Button Grid.Column="1" Content="Check Availability" Name="CheckDriverButton" 
+                    <syncfusion:ButtonAdv Grid.Column="1" Content="Check Availability" Name="CheckDriverButton" 
                             Margin="5,0,0,0" Padding="5,2"/>
                 </Grid>
 
@@ -112,7 +112,7 @@
                     <ComboBox Grid.Column="0" Name="VehicleComboBox" 
                               DisplayMemberPath="BusNumber" 
                               SelectedValuePath="VehicleId"/>
-                    <Button Grid.Column="1" Content="Check Availability" Name="CheckVehicleButton" 
+                    <syncfusion:ButtonAdv Grid.Column="1" Content="Check Availability" Name="CheckVehicleButton" 
                             Margin="5,0,0,0" Padding="5,2"/>
                 </Grid>
 
@@ -158,7 +158,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
-                <Button Grid.Row="0" Content="Check for Conflicts" Name="CheckConflictsButton" 
+                <syncfusion:ButtonAdv Grid.Row="0" Content="Check for Conflicts" Name="CheckConflictsButton" 
                         HorizontalAlignment="Left" Padding="10,5"/>
                 
                 <ItemsControl Grid.Row="1" Name="ConflictsItemsControl" Margin="0,10,0,0" 
@@ -192,8 +192,10 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Save" Name="SaveButton" IsDefault="True" Style="{StaticResource DialogButton}"/>
-            <Button Content="Cancel" Name="CancelButton" IsCancel="True" Style="{StaticResource DialogButton}"/>
+            <syncfusion:ButtonAdv Content="Save" Name="SaveButton" IsDefault="True" Style="{StaticResource DialogButton}"/>
+            <syncfusion:ButtonAdv Content="Cancel" Name="CancelButton" IsCancel="True" Style="{StaticResource DialogButton}"/>
         </StackPanel>
     </Grid>
 </Window>
+
+

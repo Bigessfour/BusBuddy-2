@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusBuddy.WPF.Views"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         mc:Ignorable="d"
         Title="Student Details" Height="450" Width="800">
     <Grid>
@@ -22,8 +23,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="Save" Command="{Binding SaveCommand}" Width="75" Margin="5" />
-            <Button Content="Cancel" Command="{Binding CancelCommand}" Width="75" Margin="5" />
+            <syncfusion:ButtonAdv Content="Save" Command="{Binding SaveCommand}" Width="75" Margin="5" />
+            <syncfusion:ButtonAdv Content="Cancel" Command="{Binding CancelCommand}" Width="75" Margin="5" />
         </StackPanel>
     </Grid>
 </Window>

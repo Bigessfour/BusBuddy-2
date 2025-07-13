@@ -1,3 +1,14 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                            🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                      ║
+║                                                          [SUPPORTING DIALOG VIEW]                                                                                      ║
+║  📋 REQUIRED STANDARDS: This supporting dialog MUST follow the universal standards defined in:                                                                         ║
+║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
+║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
+║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
 <Window x:Class="BusBuddy.WPF.Views.Student.StudentEditDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -30,13 +41,13 @@
             <Setter Property="MinWidth" Value="100"/>
         </Style>
     </Window.Resources>
-    
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Content -->
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
@@ -55,30 +66,30 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
+
                     <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabelStyle}">
                         <TextBlock.Inlines>
                             <Run Text="Student Name:" />
                             <Run Text=" *" Foreground="Red" FontWeight="Bold"/>
                         </TextBlock.Inlines>
                     </TextBlock>
-                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1" 
-                                           Text="{Binding StudentName}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding StudentName}"
                                            Margin="0,5,15,5"/>
-                    
+
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="Student Number:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3" 
-                                           Text="{Binding StudentNumber}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3"
+                                           Text="{Binding StudentNumber}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabelStyle}">
                         <TextBlock.Inlines>
                             <Run Text="Grade:" />
                             <Run Text=" *" Foreground="Red" FontWeight="Bold"/>
                         </TextBlock.Inlines>
                     </TextBlock>
-                    <ComboBox Grid.Row="1" Grid.Column="1" 
-                              SelectedValue="{Binding Grade}" 
+                    <ComboBox Grid.Row="1" Grid.Column="1"
+                              SelectedValue="{Binding Grade}"
                               Margin="0,5,15,5"
                               IsEditable="True">
                         <ComboBoxItem Content="Pre-K"/>
@@ -96,40 +107,40 @@
                         <ComboBoxItem Content="11"/>
                         <ComboBoxItem Content="12"/>
                     </ComboBox>
-                    
+
                     <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource FieldLabelStyle}">
                         <TextBlock.Inlines>
                             <Run Text="School:" />
                             <Run Text=" *" Foreground="Red" FontWeight="Bold"/>
                         </TextBlock.Inlines>
                     </TextBlock>
-                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="3" 
-                                           Text="{Binding School}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="3"
+                                           Text="{Binding School}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Date of Birth:" Style="{StaticResource FieldLabelStyle}"/>
-                    <DatePicker Grid.Row="2" Grid.Column="1" 
-                                SelectedDate="{Binding DateOfBirth}" 
+                    <DatePicker Grid.Row="2" Grid.Column="1"
+                                SelectedDate="{Binding DateOfBirth}"
                                 Margin="0,5,15,5"/>
-                    
+
                     <TextBlock Grid.Row="2" Grid.Column="2" Text="Gender:" Style="{StaticResource FieldLabelStyle}"/>
-                    <ComboBox Grid.Row="2" Grid.Column="3" 
-                              SelectedValue="{Binding Gender}" 
+                    <ComboBox Grid.Row="2" Grid.Column="3"
+                              SelectedValue="{Binding Gender}"
                               Margin="0,5">
                         <ComboBoxItem Content="Male"/>
                         <ComboBoxItem Content="Female"/>
                         <ComboBoxItem Content="Other"/>
                     </ComboBox>
-                    
+
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Active:" Style="{StaticResource FieldLabelStyle}"/>
-                    <CheckBox Grid.Row="3" Grid.Column="1" 
-                              IsChecked="{Binding Active}" 
+                    <CheckBox Grid.Row="3" Grid.Column="1"
+                              IsChecked="{Binding Active}"
                               VerticalAlignment="Center"
                               Margin="0,5,15,5"/>
-                    
+
                     <TextBlock Grid.Row="3" Grid.Column="2" Text="Special Needs:" Style="{StaticResource FieldLabelStyle}"/>
-                    <CheckBox Grid.Row="3" Grid.Column="3" 
-                              IsChecked="{Binding SpecialNeeds}" 
+                    <CheckBox Grid.Row="3" Grid.Column="3"
+                              IsChecked="{Binding SpecialNeeds}"
                               VerticalAlignment="Center"
                               Margin="0,5"/>
                 </Grid>
@@ -147,12 +158,12 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
+
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Home Address:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1" 
-                                           Text="{Binding HomeAddress}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding HomeAddress}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="City:" Style="{StaticResource FieldLabelStyle}"/>
                     <Grid Grid.Row="1" Grid.Column="1" Margin="0,5">
                         <Grid.ColumnDefinitions>
@@ -162,14 +173,14 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="100"/>
                         </Grid.ColumnDefinitions>
-                        
+
                         <syncfusion:SfTextBoxExt Grid.Column="0" Text="{Binding City}" Margin="0,0,10,0"/>
                         <TextBlock Grid.Column="1" Text="State:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                         <syncfusion:SfTextBoxExt Grid.Column="2" Text="{Binding State}" Width="50" Margin="0,0,10,0"/>
                         <TextBlock Grid.Column="3" Text="Zip:" VerticalAlignment="Center" Margin="0,0,5,0"/>
                         <syncfusion:SfTextBoxExt Grid.Column="4" Text="{Binding Zip}"/>
                     </Grid>
-                    
+
                     <!-- Address Validation Control -->
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Address Validation:" Style="{StaticResource FieldLabelStyle}"/>
                     <local:AddressValidationControl Grid.Row="2" Grid.Column="1"
@@ -180,10 +191,10 @@
                                                    ZipDep="{Binding Zip, Mode=TwoWay}"
                                                    SelectedBusStopDep="{Binding BusStop, Mode=TwoWay}"
                                                    Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Bus Stop:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="3" Grid.Column="1" 
-                                           Text="{Binding BusStop}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="3" Grid.Column="1"
+                                           Text="{Binding BusStop}"
                                            Margin="0,5"/>
                 </Grid>
 
@@ -201,30 +212,30 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
+
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Parent/Guardian:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1" 
-                                           Text="{Binding ParentGuardian}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding ParentGuardian}"
                                            Margin="0,5,15,5"/>
-                    
+
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="Home Phone:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3" 
-                                           Text="{Binding HomePhone}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3"
+                                           Text="{Binding HomePhone}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Emergency Phone:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="1" 
-                                           Text="{Binding EmergencyPhone}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="1"
+                                           Text="{Binding EmergencyPhone}"
                                            Margin="0,5,15,5"/>
-                    
+
                     <TextBlock Grid.Row="1" Grid.Column="2" Text="Alt. Contact:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="3" 
-                                           Text="{Binding AlternativeContact}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="3"
+                                           Text="{Binding AlternativeContact}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Alt. Phone:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="2" Grid.Column="1" 
-                                           Text="{Binding AlternativePhone}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="2" Grid.Column="1"
+                                           Text="{Binding AlternativePhone}"
                                            Margin="0,5,15,5"/>
                 </Grid>
 
@@ -241,20 +252,20 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
+
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="AM Route:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1" 
-                                           Text="{Binding AmRoute}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding AmRoute}"
                                            Margin="0,5,15,5"/>
-                    
+
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="PM Route:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3" 
-                                           Text="{Binding PmRoute}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3"
+                                           Text="{Binding PmRoute}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Transportation Notes:" Style="{StaticResource FieldLabelStyle}"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
-                             Text="{Binding TransportationNotes}" 
+                             Text="{Binding TransportationNotes}"
                              Height="60"
                              TextWrapping="Wrap"
                              AcceptsReturn="True"
@@ -276,53 +287,53 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
-                    <TextBox Grid.Row="0" Grid.Column="1" 
-                             Text="{Binding MedicalNotes}" 
+
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             Text="{Binding MedicalNotes}"
                              Height="60"
                              TextWrapping="Wrap"
                              AcceptsReturn="True"
                              VerticalScrollBarVisibility="Auto"
                              Margin="0,5"/>
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Medical Notes:" Style="{StaticResource FieldLabelStyle}"/>
-                    
+
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Allergies:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="1" 
-                                           Text="{Binding Allergies}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="1"
+                                           Text="{Binding Allergies}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Medications:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="2" Grid.Column="1" 
-                                           Text="{Binding Medications}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="2" Grid.Column="1"
+                                           Text="{Binding Medications}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Doctor Name:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="3" Grid.Column="1" 
-                                           Text="{Binding DoctorName}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="3" Grid.Column="1"
+                                           Text="{Binding DoctorName}"
                                            Margin="0,5"/>
-                    
+
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Doctor Phone:" Style="{StaticResource FieldLabelStyle}"/>
-                    <syncfusion:SfTextBoxExt Grid.Row="4" Grid.Column="1" 
-                                           Text="{Binding DoctorPhone}" 
+                    <syncfusion:SfTextBoxExt Grid.Row="4" Grid.Column="1"
+                                           Text="{Binding DoctorPhone}"
                                            Margin="0,5"/>
                 </Grid>
             </StackPanel>
         </ScrollViewer>
-        
+
         <!-- Dialog Buttons -->
-        <StackPanel Grid.Row="1" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
                     Margin="0,15,0,0">
-            <Button Content="Save" 
-                    Command="{Binding SaveCommand}" 
+            <syncfusion:ButtonAdv Content="Save"
+                    Command="{Binding SaveCommand}"
                     Style="{StaticResource DialogButton}"
                     IsDefault="True"
                     Background="#0078D7"
                     Foreground="White"/>
-            
-            <Button Content="Cancel" 
-                    Command="{Binding CancelCommand}" 
+
+            <syncfusion:ButtonAdv Content="Cancel"
+                    Command="{Binding CancelCommand}"
                     Style="{StaticResource DialogButton}"
                     IsCancel="True"/>
         </StackPanel>

@@ -6,8 +6,44 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Primary unified styles - loaded first for inheritance -->
+                <!-- 🚀 SYNCFUSION FLUENT DARK THEME - BASELINE FRAMEWORK -->
+                <!-- Unified theme system for seamless UI experience across all child forms -->
+                <ResourceDictionary Source="Resources/SyncfusionFluentDarkTheme.xaml"/>
+
+                <!-- Syncfusion FluentDark theme is DLL-based, not XAML file based -->
+                <!-- Theme applied via SfSkinManager.VisualStyle="FluentDark" on controls -->
+
+                <!-- Register Syncfusion FluentDark Theme Resources -->
+                <ResourceDictionary>
+                    <!-- Import Syncfusion FluentDark Theme namespace -->
+                    <ResourceDictionary.MergedDictionaries>
+                        <!-- Syncfusion FluentDark theme registration will be handled in code-behind -->
+                        <!-- This ensures proper theme initialization for all Syncfusion controls -->
+                    </ResourceDictionary.MergedDictionaries>
+
+                    <!-- Syncfusion Control Style Overrides for FluentDark Theme Compatibility -->
+                    <Style TargetType="{x:Type Control}" x:Key="SyncfusionFluentDarkStyle">
+                        <Setter Property="Background" Value="#2D2D30"/>
+                        <Setter Property="Foreground" Value="#F1F1F1"/>
+                        <Setter Property="BorderBrush" Value="#3F3F46"/>
+                    </Style>
+                </ResourceDictionary>
+
+                <!-- Primary unified styles - custom application styles -->
+                <ResourceDictionary>
+                    <!-- Global converters -->
+                    <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                    <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
+
+                    <!-- Global application styles that work with FluentDark theme -->
+                    <Style TargetType="Window">
+                        <Setter Property="Background" Value="#2D2D30"/>
+                        <Setter Property="Foreground" Value="#F1F1F1"/>
+                    </Style>
+                </ResourceDictionary>
                 <ResourceDictionary Source="Resources/UnifiedStyles.xaml"/>
+                <!-- Unified Progress Bar styles -->
+                <ResourceDictionary Source="Resources/UnifiedProgressBarStyles.xaml"/>
                 <!-- Standard data view templates -->
                 <ResourceDictionary Source="Controls/StandardDataViewTemplate.xaml"/>
                 <!-- Specific component styles -->
@@ -15,13 +51,13 @@
                 <ResourceDictionary Source="Resources/SyncfusionDateTimeFix.xaml"/>
                 <ResourceDictionary Source="Resources/SyncfusionButtonStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+
             <!-- Global Converters - Syncfusion Compatible -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
-            
+
             <!-- Status and Data Converters -->
             <converters:ActiveStatusToColorConverter x:Key="ActiveStatusToColorConverter"/>
             <converters:ActiveStatusToTextConverter x:Key="ActiveStatusToTextConverter"/>

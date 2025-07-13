@@ -164,6 +164,11 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
+    <!-- Modern Theme Support -->
+    <PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="30.1.39" />
+    <PackageReference Include="Syncfusion.Themes.FluentDark.WPF" Version="30.1.39" />
+    <PackageReference Include="Syncfusion.Themes.MaterialLight.WPF" Version="30.1.39" />
+    <PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="30.1.39" />
   </ItemGroup>
 
   <ItemGroup>

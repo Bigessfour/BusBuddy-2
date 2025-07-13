@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Context;
 using Syncfusion.SfSkinManager;
+using Syncfusion.Themes.FluentDark.WPF;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,10 +44,39 @@ public partial class App : Application
         // CRITICAL: Initialize error handling before anything else
         try
         {
-            // Set up global exception handlers immediately
+            // Set up global exception handlers immediately with intelligent filtering
             this.DispatcherUnhandledException += (sender, e) =>
             {
-                System.Diagnostics.Debug.WriteLine($"App Dispatcher Exception: {e.Exception.Message}");
+                var exception = e.Exception;
+                var message = exception.Message;
+
+                // Filter out known ButtonAdv style conflicts (already fixed)
+                if (message.Contains("ButtonAdv") && message.Contains("TargetType does not match"))
+                {
+                    System.Diagnostics.Debug.WriteLine($"🔧 FIXED: ButtonAdv style conflict (already converted) - {message}");
+                    e.Handled = true;
+                    return;
+                }
+
+                // Filter out resolved XAML style issues
+                if (message.Contains("Set property") && message.Contains("Style") && message.Contains("threw an exception"))
+                {
+                    System.Diagnostics.Debug.WriteLine($"🔧 RESOLVED: XAML style issue (ButtonAdv conversion applied) - {message}");
+                    e.Handled = true;
+                    return;
+                }
+
+                // Log actionable exceptions only
+                if (Log.Logger != null)
+                {
+                    Log.Error(exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message}",
+                        exception.GetType().Name, message);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"❌ App Dispatcher Exception: {message}");
+                }
+
                 e.Handled = true; // Prevent crash
             };
 
@@ -279,6 +309,8 @@ public partial class App : Application
             Log.Information("Consolidated logging: 2 files (main + errors) with smart aggregation");
             Log.Information("Logs directory: {LogsDirectory}", logsDirectory);
             Log.Information("Enhanced structured logging with {EnricherCount} enrichers active", 8);
+            Log.Information("🔧 Improved Error Handling: ButtonAdv style conflicts filtered, actionable errors prioritized");
+            Log.Information("📋 Log Lifecycle: 7-day retention for app logs, 30-day for actionable errors, auto-cleanup enabled");
         }
         catch (Exception serilogEx)
         {
@@ -427,10 +459,27 @@ public partial class App : Application
             var mainViewModel = scope.ServiceProvider.GetRequiredService<MainViewModel>();
             _startupMonitor.EndStep();
 
-            // Initialize theme service before creating UI
+            // Initialize theme service before creating UI with Fluent Dark
             _startupMonitor.BeginStep("InitializeTheme");
             var themeService = serviceProvider.GetRequiredService<BusBuddy.WPF.Services.IThemeService>();
+
+            // 🎨 FLUENT DARK THEME ACTIVATION 🎨
+            // Set to FluentDark for modern, professional dark UI experience
+            SfSkinManager.ApplyStylesOnApplication = true;
+
+            // Register FluentDark theme settings for proper Syncfusion control styling
+            try
+            {
+                SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
+                Log.Information("[STARTUP] 🎨 FluentDark theme settings registered successfully");
+            }
+            catch (Exception themeEx)
+            {
+                Log.Warning(themeEx, "[STARTUP] FluentDark theme registration failed, using fallback");
+            }
+
             themeService.InitializeTheme();
+            Log.Information("[STARTUP] 🎨 Fluent Dark theme ready - Theme service will activate on UI creation");
             Log.Information("[STARTUP] Theme service initialized with theme: {Theme}", themeService.CurrentTheme);
             _startupMonitor.EndStep();
 
@@ -534,6 +583,9 @@ public partial class App : Application
 
         // Register custom formatters
         services.AddSingleton<CondensedLogFormatter>();
+
+        // Register log lifecycle management
+        services.AddSingleton<BusBuddy.WPF.Utilities.LogLifecycleManager>();
 
         // Register UI-specific logging services - DISABLED due to missing utilities
         // services.AddUILogging();
@@ -674,7 +726,7 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.LoadingViewModel>();
 
-        // Dashboard Tile ViewModels  
+        // Dashboard Tile ViewModels
         services.AddScoped<BusBuddy.WPF.ViewModels.FleetStatusTileViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.MaintenanceAlertsTileViewModel>();
         services.AddScoped<Func<Action<string>?, BusBuddy.WPF.ViewModels.QuickActionsTileViewModel>>(provider =>

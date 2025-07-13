@@ -1,40 +1,72 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                                                                                                          ║
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+║                                                                                                                                                                          ║
+║  📋 REQUIRED STANDARDS: This child form MUST follow the universal standards defined in:                                                                                ║
+║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
+║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
+║                                                                                                                                                                          ║
+║  🔧 MANDATORY IMPLEMENTATIONS:                                                                                                                                          ║
+║     ✅ UserControl Style: BusBuddyUserControlStyle                                                                                                                     ║
+║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
+║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
+║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
+║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
+║                                                                                                                                                                          ║
+║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
+║     • NEVER use standard WPF Button - use syncfusion:ButtonAdv                                                                                                        ║
+║     • NEVER use Content property on ButtonAdv - use Label property                                                                                                    ║
+║     • NEVER use "sf:" namespace prefix - use "syncfusion:" prefix                                                                                                     ║
+║     • ALWAYS apply FluentDark theme to maintain visual consistency                                                                                                     ║
+║     • ALWAYS reference baseline styles for consistent appearance                                                                                                       ║
+║                                                                                                                                                                          ║
+║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+║                                                                                                                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
 <UserControl x:Class="BusBuddy.WPF.Views.Driver.DriverManagementView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:sf="http://schemas.syncfusion.com/wpf"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:tools="http://schemas.syncfusion.com/wpf"
-             xmlns:gauge="http://schemas.syncfusion.com/wpf"
-             xmlns:chart="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance viewModels:DriverManagementViewModel}">
-    
+             d:DataContext="{d:DesignInstance viewModels:DriverManagementViewModel}"
+             Style="{StaticResource BusBuddyUserControlStyle}">
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        
+
         <!-- License Status Color Converter for highlighting expiring licenses -->
         <DataTemplate x:Key="LicenseStatusTemplate">
-            <Border Background="{Binding LicenseStatus, Converter={StaticResource LicenseStatusToColorConverter}}" 
+            <Border Background="{Binding LicenseStatus, Converter={StaticResource LicenseStatusToColorConverter}}"
                     CornerRadius="4" Padding="8,4">
-                <TextBlock Text="{Binding LicenseStatus}" 
-                          Foreground="White" 
-                          FontWeight="SemiBold" 
+                <TextBlock Text="{Binding LicenseStatus}"
+                          Foreground="White"
+                          FontWeight="SemiBold"
                           HorizontalAlignment="Center"/>
             </Border>
         </DataTemplate>
     </UserControl.Resources>
 
     <!-- Enhanced Driver Management with Syncfusion DockingManager -->
-    <sf:DockingManager UseDocumentContainer="True" PersistState="False" ContainerMode="TDI">
-        
+    <syncfusion:DockingManager UseDocumentContainer="True"
+                               PersistState="False"
+                               ContainerMode="TDI"
+                               Style="{StaticResource BusBuddyDockingManagerStyle}"
+                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                               Background="{StaticResource FluentDarkBackgroundBrush}">
+
         <!-- Main Driver List Panel (Document) -->
-        <ContentControl sf:DockingManager.Header="Driver Directory" 
-                       sf:DockingManager.State="Document"
-                       sf:DockingManager.CanSerialize="True">
+        <ContentControl syncfusion:DockingManager.Header="Driver Directory"
+                       syncfusion:DockingManager.State="Document"
+                       syncfusion:DockingManager.CanSerialize="True">
             <Grid Margin="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -48,50 +80,78 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="Driver Management" FontSize="22" FontWeight="Bold" Margin="0,0,0,10"/>
-                        
+                        <TextBlock Text="🚗 Driver Management"
+                                   Style="{StaticResource BusBuddyTileHeaderStyle}"
+                                   Margin="0,0,0,10"/>
+
                         <!-- Search and Filter Panel -->
-                        <StackPanel Orientation="Horizontal">
-                            <sf:SfTextBoxExt x:Name="SearchBox" 
-                                           Watermark="Search drivers..." 
-                                           Width="250" 
-                                           Height="32"
-                                           Margin="0,0,10,0"/>
-                            <tools:ButtonAdv Content="🔍 Search" 
-                                       Command="{Binding SearchDriversCommand}" 
-                                       CommandParameter="{Binding Text, ElementName=SearchBox}"
-                                       Width="80" Height="32" Margin="0,0,10,0"/>
-                            <syncfusion:ComboBoxAdv ItemsSource="{Binding AvailableStatuses}" 
-                                            SelectedItem="{Binding SelectedStatusFilter}"
-                                            DisplayMemberPath="Name"
-                                            DefaultText="Filter by status..."
-                                            Width="150" Height="32"/>
-                        </StackPanel>
-                    </StackPanel>
-                    
-                    <!-- Quick Stats Panel -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Border Background="#E8F4FD" CornerRadius="8" Padding="12,8" Margin="5,0">
-                            <StackPanel>
-                                <TextBlock Text="Total Drivers" FontSize="12" Foreground="#666"/>
-                                <TextBlock Text="{Binding TotalDrivers}" FontSize="20" FontWeight="Bold" Foreground="#007ACC"/>
+                        <Border Background="{StaticResource FluentDarkSurfaceBrush}"
+                                BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12">
+                            <StackPanel Orientation="Horizontal">
+                                <syncfusion:SfTextBoxExt x:Name="SearchBox"
+                                                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                      Background="{StaticResource FluentDarkSurfaceBrush}"
+                                                      Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                                      BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                                      Width="250"
+                                                      Height="32"
+                                                      Margin="0,0,10,0"/>
+                                <syncfusion:ButtonAdv Label="🔍 Search"
+                                                     Command="{Binding SearchDriversCommand}"
+                                                     CommandParameter="{Binding Text, ElementName=SearchBox}"
+                                                     Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                     Margin="0,0,10,0"/>
+                                <syncfusion:ComboBoxAdv ItemsSource="{Binding AvailableStatuses}"
+                                                       SelectedItem="{Binding SelectedStatusFilter}"
+                                                       DisplayMemberPath="Name"
+                                                       Style="{StaticResource BusBuddyComboBoxAdvStyle}"
+                                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                       Background="{StaticResource FluentDarkSurfaceBrush}"
+                                                       Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                                       BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                                       Width="150" Height="32"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="#FFF2E8" CornerRadius="8" Padding="12,8" Margin="5,0">
+                    </StackPanel>
+
+                    <!-- Quick Stats Panel -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
                             <StackPanel>
-                                <TextBlock Text="License Expiring" FontSize="12" Foreground="#666"/>
-                                <TextBlock Text="{Binding LicenseExpiringCount}" FontSize="20" FontWeight="Bold" Foreground="#E67E22"/>
+                                <TextBlock Text="Total Drivers"
+                                           Style="{StaticResource BusBuddyTileContentStyle}"/>
+                                <TextBlock Text="{Binding TotalDrivers}"
+                                           Style="{StaticResource BusBuddyTileValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
+                            <StackPanel>
+                                <TextBlock Text="License Expiring"
+                                           Style="{StaticResource BusBuddyTileContentStyle}"/>
+                                <TextBlock Text="{Binding LicenseExpiringCount}"
+                                           Style="{StaticResource BusBuddyTileValueStyle}"
+                                           Foreground="{StaticResource FluentDarkWarningBrush}"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
                 </Grid>
 
                 <!-- Enhanced Data Grid with Conditional Formatting -->
-                <sf:SfDataGrid x:Name="driversGrid" Grid.Row="1"
+                <syncfusion:SfDataGrid x:Name="driversGrid" Grid.Row="1"
                                ItemsSource="{Binding Drivers}"
                                SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
+                               Style="{StaticResource BusBuddySfDataGridStyle}"
+                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                               Background="{StaticResource FluentDarkBackgroundBrush}"
+                               Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                               BorderBrush="{StaticResource FluentDarkBorderBrush}"
                                AutoGenerateColumns="False"
                                AllowResizingColumns="True"
                                AllowSorting="True"
@@ -103,93 +163,24 @@
                                AllowEditing="False"
                                ShowRowHeader="True"
                                EnableDataVirtualization="True"
-                               BorderThickness="1"
-                               BorderBrush="#DDDDDD"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
-                               RowSelectionBrush="#E0F0FF"
-                               CurrentCellBorderBrush="#0078D7"
-                               CurrentCellBorderThickness="1">
-                    
-                    <sf:SfDataGrid.Columns>
-                        <sf:GridTextColumn MappingName="FirstName" HeaderText="First Name" Width="120"/>
-                        <sf:GridTextColumn MappingName="LastName" HeaderText="Last Name" Width="120"/>
-                        <sf:GridTextColumn MappingName="ContactPhone" HeaderText="Phone" Width="130"/>
-                        <sf:GridTextColumn MappingName="ContactEmail" HeaderText="Email" Width="200"/>
-                        <sf:GridDateTimeColumn MappingName="HireDate" HeaderText="Hire Date" Width="120" Pattern="ShortDate"/>
-                        
-                        <!-- Enhanced License Expiry Column with Color Coding -->
-                        <sf:GridDateTimeColumn MappingName="LicenseExpiryDate" HeaderText="License Expiry" Width="140" Pattern="ShortDate">
-                            <sf:GridDateTimeColumn.CellStyle>
-                                <Style TargetType="sf:GridCell">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Style.Triggers>
-                                        <!-- Expired licenses - Red background -->
-                                        <DataTrigger Binding="{Binding LicenseExpiryDate, Converter={StaticResource LicenseExpiredConverter}}" Value="True">
-                                            <Setter Property="Background" Value="#FFEBEE"/>
-                                            <Setter Property="Foreground" Value="#C62828"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                        </DataTrigger>
-                                        <!-- Expiring soon - Yellow background -->
-                                        <DataTrigger Binding="{Binding LicenseExpiryDate, Converter={StaticResource LicenseExpiringSoonConverter}}" Value="True">
-                                            <Setter Property="Background" Value="#FFF8E1"/>
-                                            <Setter Property="Foreground" Value="#F57C00"/>
-                                            <Setter Property="FontWeight" Value="SemiBold"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </sf:GridDateTimeColumn.CellStyle>
-                        </sf:GridDateTimeColumn>
-                        
-                        <!-- Driver Status Column -->
-                        <sf:GridTextColumn MappingName="Status" HeaderText="Status" Width="100">
-                            <sf:GridTextColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border Background="{Binding Status, Converter={StaticResource StatusToColorConverter}}" 
-                                           CornerRadius="12" Padding="8,4" Margin="2">
-                                        <TextBlock Text="{Binding Status}" 
-                                                  Foreground="White" 
-                                                  FontSize="11" 
-                                                  FontWeight="SemiBold" 
-                                                  HorizontalAlignment="Center"/>
-                                    </Border>
-                                </DataTemplate>
-                            </sf:GridTextColumn.CellTemplate>
-                        </sf:GridTextColumn>
-                        
-                        <!-- Available Hours Column with Progress Bar -->
-                        <sf:GridTemplateColumn MappingName="AvailableHours" HeaderText="Available Hours" Width="120">
-                            <sf:GridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <ProgressBar Value="{Binding AvailableHours}" 
-                                                    Minimum="0"
-                                                    Maximum="40" 
-                                                    Width="60" 
-                                                    Height="8" 
-                                                    Foreground="#4CAF50"
-                                                    Background="#E0E0E0"
-                                                    Margin="0,0,8,0"/>
-                                        <TextBlock Text="{Binding AvailableHours, StringFormat='{}{0}h'}" 
-                                                  FontSize="11" 
-                                                  VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </sf:GridTemplateColumn.CellTemplate>
-                        </sf:GridTemplateColumn>
-                    </sf:SfDataGrid.Columns>
+                               RowHeight="40"
+                               HeaderRowHeight="45">
 
-                    <!-- Enhanced Row Styling -->
-                    <sf:SfDataGrid.Style>
-                        <Style TargetType="sf:SfDataGrid">
-                            <Setter Property="Background" Value="White"/>
-                            <Setter Property="GridLinesVisibility" Value="Both"/>
-                            <Setter Property="HeaderLinesVisibility" Value="Both"/>
-                        </Style>
-                    </sf:SfDataGrid.Style>
-                    
+                    <syncfusion:SfDataGrid.Columns>
+                        <syncfusion:GridTextColumn MappingName="FirstName" HeaderText="First Name" Width="120"/>
+                        <syncfusion:GridTextColumn MappingName="LastName" HeaderText="Last Name" Width="120"/>
+                        <syncfusion:GridTextColumn MappingName="ContactPhone" HeaderText="Phone" Width="130"/>
+                        <syncfusion:GridTextColumn MappingName="ContactEmail" HeaderText="Email" Width="200"/>
+                        <syncfusion:GridDateTimeColumn MappingName="HireDate" HeaderText="Hire Date" Width="120" Pattern="ShortDate"/>
+                        <syncfusion:GridDateTimeColumn MappingName="LicenseExpiryDate" HeaderText="License Expiry" Width="140" Pattern="ShortDate"/>
+                        <syncfusion:GridTextColumn MappingName="Status" HeaderText="Status" Width="100"/>
+                        <syncfusion:GridTextColumn MappingName="AvailableHours" HeaderText="Available Hours" Width="120"/>
+                    </syncfusion:SfDataGrid.Columns>
+
                     <!-- Context Menu for Right-Click Actions -->
-                    <sf:SfDataGrid.ContextMenu>
+                    <syncfusion:SfDataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="View Details" Command="{Binding ViewDriverDetailsCommand}"/>
                             <MenuItem Header="Edit Driver" Command="{Binding EditDriverCommand}"/>
@@ -197,11 +188,11 @@
                             <MenuItem Header="Schedule Assignment" Command="{Binding ScheduleAssignmentCommand}"/>
                             <MenuItem Header="Generate Report" Command="{Binding GenerateDriverReportCommand}"/>
                             <Separator/>
-                            <MenuItem Header="Delete Driver" Command="{Binding DeleteDriverCommand}" 
-                                     Foreground="Red"/>
+                            <MenuItem Header="Delete Driver" Command="{Binding DeleteDriverCommand}"
+                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
                         </ContextMenu>
-                    </sf:SfDataGrid.ContextMenu>
-                </sf:SfDataGrid>
+                    </syncfusion:SfDataGrid.ContextMenu>
+                </syncfusion:SfDataGrid>
 
                 <!-- Enhanced Action Panel with Syncfusion Buttons -->
                 <Grid Grid.Row="2" Margin="0,15,0,0">
@@ -209,265 +200,83 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <!-- Driver Status Summary -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Showing" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBlock Text="{Binding Drivers.Count, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <TextBlock Text="of" VerticalAlignment="Center" Margin="5,0"/>
-                        <TextBlock Text="{Binding TotalDrivers, Mode=OneWay}" FontWeight="Bold" VerticalAlignment="Center"/>
-                        <TextBlock Text="drivers" VerticalAlignment="Center" Margin="5,0,15,0"/>
-                        
+                        <TextBlock Text="Showing"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,5,0"
+                                   Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                        <TextBlock Text="{Binding Drivers.Count, Mode=OneWay}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                        <TextBlock Text="of"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0"
+                                   Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                        <TextBlock Text="{Binding TotalDrivers, Mode=OneWay}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                        <TextBlock Text="drivers"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0,15,0"
+                                   Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+
                         <!-- License Alert Indicator -->
-                        <Border Background="#FFEBEE" CornerRadius="4" Padding="8,4" 
-                               Visibility="{Binding HasExpiringLicenses, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Border Background="{StaticResource FluentDarkWarningBrush}"
+                                CornerRadius="4"
+                                Padding="8,4"
+                                Visibility="{Binding HasExpiringLicenses, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="⚠️" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <TextBlock Text="{Binding LicenseExpiringCount, StringFormat='{}{0} licenses expiring soon'}" 
-                                          Foreground="#C62828" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding LicenseExpiringCount, StringFormat='{}{0} licenses expiring soon'}"
+                                          Foreground="White"
+                                          FontWeight="SemiBold"
+                                          VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
-                    
+
                     <!-- Action Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <tools:ButtonAdv Content="➕ Add Driver" 
-                                   Command="{Binding AddDriverCommand}" 
-                                   Style="{StaticResource PrimaryButtonStyle}"
-                                   Width="120" Height="36" 
-                                   Margin="5,0"/>
-                        <tools:ButtonAdv Content="✏️ Edit" 
-                                   Command="{Binding UpdateDriverCommand}" 
-                                   CommandParameter="{Binding SelectedDriver}"
-                                   Style="{StaticResource SecondaryButtonStyle}"
-                                   Width="80" Height="36" 
-                                   Margin="5,0"/>
-                        <tools:ButtonAdv Content="🗑️ Delete" 
-                                   Command="{Binding DeleteDriverCommand}" 
-                                   CommandParameter="{Binding SelectedDriver}"
-                                   Style="{StaticResource DangerButtonStyle}"
-                                   Width="80" Height="36" 
-                                   Margin="5,0"/>
-                        <syncfusion:DropDownButtonAdv Width="100" Height="36" Margin="5,0">
-                            <syncfusion:DropDownMenuGroup>
-                                <syncfusion:DropDownMenuItem Header="License Status Report" 
-                                                            Command="{Binding GenerateLicenseReportCommand}"/>
-                                <syncfusion:DropDownMenuItem Header="Driver Performance" 
-                                                            Command="{Binding GeneratePerformanceReportCommand}"/>
-                                <syncfusion:DropDownMenuItem Header="Hours Summary" 
-                                                            Command="{Binding GenerateHoursReportCommand}"/>
-                                <Separator/>
-                                <syncfusion:DropDownMenuItem Header="Export to Excel" 
-                                                            Command="{Binding ExportToExcelCommand}"/>
-                            </syncfusion:DropDownMenuGroup>
-                        </syncfusion:DropDownButtonAdv>
+                        <syncfusion:ButtonAdv Label="➕ Add Driver"
+                                             Command="{Binding AddDriverCommand}"
+                                             Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             Margin="5"/>
+                        <syncfusion:ButtonAdv Label="✏️ Edit"
+                                             Command="{Binding UpdateDriverCommand}"
+                                             CommandParameter="{Binding SelectedDriver}"
+                                             Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             Margin="5"/>
+                        <syncfusion:ButtonAdv Label="🗑️ Delete"
+                                             Command="{Binding DeleteDriverCommand}"
+                                             CommandParameter="{Binding SelectedDriver}"
+                                             Style="{StaticResource BusBuddyDeleteButtonStyle}"
+                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             Margin="5"/>
+                        <syncfusion:ButtonAdv Label="📊 Reports"
+                                             Command="{Binding GenerateReportsCommand}"
+                                             Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             Margin="5"/>
                     </StackPanel>
                 </Grid>
             </Grid>
         </ContentControl>
 
-        <!-- License Tracking Panel (Docked Right) -->
-        <ContentControl sf:DockingManager.Header="License Tracker" 
-                       sf:DockingManager.State="Dock"
-                       sf:DockingManager.SideInDockedMode="Right"
-                       sf:DockingManager.DesiredWidthInDockedMode="350"
-                       sf:DockingManager.CanSerialize="True">
-            <Grid Margin="15">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                
-                <!-- License Status Header -->
-                <StackPanel Grid.Row="0" Margin="0,0,0,15">
-                    <TextBlock Text="License Status Monitor" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <Border Background="#FFF3E0" CornerRadius="6" Padding="10">
-                        <TextBlock Text="Track and monitor driver license expiration dates to ensure compliance." 
-                                  FontSize="12" Foreground="#E65100" TextWrapping="Wrap"/>
-                    </Border>
-                </StackPanel>
-                
-                <!-- License Statistics -->
-                <Grid Grid.Row="1" Margin="0,0,0,15">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    
-                    <!-- Valid Licenses -->
-                    <Border Grid.Row="0" Background="#E8F5E8" CornerRadius="6" Padding="12,8" Margin="0,0,0,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="Valid Licenses" FontSize="12" Foreground="#2E7D32"/>
-                                <TextBlock Text="{Binding ValidLicenseCount}" FontSize="20" FontWeight="Bold" Foreground="#2E7D32"/>
-                            </StackPanel>
-                            <TextBlock Grid.Column="1" Text="✅" FontSize="24" VerticalAlignment="Center" Foreground="#2E7D32"/>
-                        </Grid>
-                    </Border>
-                    
-                    <!-- Expiring Soon -->
-                    <Border Grid.Row="1" Background="#FFF8E1" CornerRadius="6" Padding="12,8" Margin="0,0,0,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="Expiring Soon (30 days)" FontSize="12" Foreground="#F57C00"/>
-                                <TextBlock Text="{Binding ExpiringSoonCount}" FontSize="20" FontWeight="Bold" Foreground="#F57C00"/>
-                            </StackPanel>
-                            <TextBlock Grid.Column="1" Text="⚠️" FontSize="24" VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-                    
-                    <!-- Expired -->
-                    <Border Grid.Row="2" Background="#FFEBEE" CornerRadius="6" Padding="12,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="Expired" FontSize="12" Foreground="#C62828"/>
-                                <TextBlock Text="{Binding ExpiredLicenseCount}" FontSize="20" FontWeight="Bold" Foreground="#C62828"/>
-                            </StackPanel>
-                            <TextBlock Grid.Column="1" Text="❌" FontSize="24" VerticalAlignment="Center" Foreground="#C62828"/>
-                        </Grid>
-                    </Border>
-                </Grid>
-                
-                <!-- License Status Details -->
-                <sf:SfDataGrid Grid.Row="2"
-                               ItemsSource="{Binding LicenseStatusReport}"
-                               AutoGenerateColumns="False"
-                               AllowSorting="True"
-                               SelectionMode="Single"
-                               ShowRowHeader="False"
-                               BorderThickness="1"
-                               BorderBrush="#E0E0E0"
-                               GridLinesVisibility="Both">
-                    <sf:SfDataGrid.Columns>
-                        <sf:GridTextColumn MappingName="DriverName" HeaderText="Driver" Width="140"/>
-                        <sf:GridDateTimeColumn MappingName="ExpiryDate" HeaderText="Expires" Width="100" Pattern="ShortDate"/>
-                        <sf:GridTemplateColumn MappingName="DaysRemaining" HeaderText="Days" Width="70">
-                            <sf:GridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding DaysRemaining}" 
-                                              HorizontalAlignment="Center"
-                                              FontWeight="Bold">
-                                        <TextBlock.Foreground>
-                                            <MultiBinding Converter="{StaticResource DaysRemainingToColorConverter}">
-                                                <Binding Path="DaysRemaining"/>
-                                            </MultiBinding>
-                                        </TextBlock.Foreground>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </sf:GridTemplateColumn.CellTemplate>
-                        </sf:GridTemplateColumn>
-                    </sf:SfDataGrid.Columns>
-                </sf:SfDataGrid>
-                
-                <!-- License Actions -->
-                <StackPanel Grid.Row="3" Margin="0,15,0,0">
-                    <tools:ButtonAdv Content="🔄 Refresh License Data" 
-                               Command="{Binding RefreshLicenseDataCommand}"
-                               Style="{StaticResource SecondaryButtonStyle}"
-                               Width="200" Height="32" 
-                               HorizontalAlignment="Center" 
-                               Margin="0,0,0,8"/>
-                    <tools:ButtonAdv Content="📧 Send Expiry Notifications" 
-                               Command="{Binding SendExpiryNotificationsCommand}"
-                               Style="{StaticResource PrimaryButtonStyle}"
-                               Width="200" Height="32" 
-                               HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Grid>
-        </ContentControl>
+        <!-- Loading Indicator -->
+        <syncfusion:SfBusyIndicator Grid.RowSpan="3"
+                                    IsBusy="{Binding IsLoading}"
+                                    Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
+                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    AnimationType="DoubleCircle"
+                                    Foreground="{StaticResource FluentDarkAccentBrush}"
+                                    Background="Transparent"/>
 
-        <!-- Driver Performance Analytics (Document Tab) -->
-        <ContentControl sf:DockingManager.Header="Performance Analytics" 
-                       sf:DockingManager.State="Document"
-                       sf:DockingManager.CanSerialize="True">
-            <Grid Margin="15">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="300"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                
-                <!-- Analytics Header -->
-                <TextBlock Grid.Row="0" Text="Driver Performance Analytics" 
-                          FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                
-                <!-- Performance Charts -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <!-- Hours Distribution Chart -->
-                    <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" 
-                           CornerRadius="6" Margin="0,0,10,0">
-                        <sf:SfChart Header="Weekly Hours Distribution" Margin="15">
-                            <sf:SfChart.PrimaryAxis>
-                                <sf:CategoryAxis Header="Drivers"/>
-                            </sf:SfChart.PrimaryAxis>
-                            <sf:SfChart.SecondaryAxis>
-                                <sf:NumericalAxis Header="Hours"/>
-                            </sf:SfChart.SecondaryAxis>
-                            <sf:ColumnSeries ItemsSource="{Binding DriverHoursData}" 
-                                           XBindingPath="DriverName" 
-                                           YBindingPath="WeeklyHours"
-                                           Interior="#4CAF50"/>
-                        </sf:SfChart>
-                    </Border>
-                    
-                    <!-- Performance Rating Gauge -->
-                    <Border Grid.Column="1" BorderBrush="#E0E0E0" BorderThickness="1" 
-                           CornerRadius="6" Margin="10,0,0,0">
-                        <StackPanel Margin="15">
-                            <TextBlock Text="Overall Fleet Performance" FontWeight="Bold" 
-                                      HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                            <gauge:SfCircularGauge Height="200">
-                                <gauge:SfCircularGauge.Scales>
-                                    <gauge:CircularScale>
-                                        <gauge:CircularScale.Pointers>
-                                            <gauge:CircularPointer Value="{Binding OverallPerformanceScore}"/>
-                                        </gauge:CircularScale.Pointers>
-                                    </gauge:CircularScale>
-                                </gauge:SfCircularGauge.Scales>
-                            </gauge:SfCircularGauge>
-                        </StackPanel>
-                    </Border>
-                </Grid>
-                
-                <!-- Detailed Performance Metrics -->
-                <sf:SfDataGrid Grid.Row="2" Margin="0,15,0,0"
-                               ItemsSource="{Binding PerformanceMetrics}"
-                               AutoGenerateColumns="False"
-                               AllowSorting="True"
-                               SelectionMode="Single"
-                               ShowRowHeader="False"
-                               BorderThickness="1"
-                               BorderBrush="#E0E0E0"
-                               GridLinesVisibility="Both">
-                    <sf:SfDataGrid.Columns>
-                        <sf:GridTextColumn MappingName="DriverName" HeaderText="Driver" Width="150"/>
-                        <sf:GridTextColumn MappingName="OnTimePercentage" HeaderText="On-Time %" Width="100"/>
-                        <sf:GridTextColumn MappingName="SafetyScore" HeaderText="Safety Score" Width="120"/>
-                        <sf:GridTextColumn MappingName="CustomerRating" HeaderText="Customer Rating" Width="130"/>
-                        <sf:GridTextColumn MappingName="WeeklyHours" HeaderText="Weekly Hours" Width="120"/>
-                    </sf:SfDataGrid.Columns>
-                </sf:SfDataGrid>
-            </Grid>
-        </ContentControl>
-    </sf:DockingManager>
+    </syncfusion:DockingManager>
 </UserControl>
+

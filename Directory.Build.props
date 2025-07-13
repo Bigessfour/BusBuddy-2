@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
-    <SyncfusionVersion>30.1.37</SyncfusionVersion>
+    <SyncfusionVersion>30.1.39</SyncfusionVersion>
     <!-- Ensure WPF Temporary Project references the core assembly and includes all relevant namespaces -->
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <MarkupCompilePass1UsesDependencyPaths>true</MarkupCompilePass1UsesDependencyPaths>
-    
+
     <!-- Build Logging Configuration -->
     <BuildLoggerEnabled>true</BuildLoggerEnabled>
     <LogFileDirectory>$(MSBuildThisFileDirectory)logs</LogFileDirectory>

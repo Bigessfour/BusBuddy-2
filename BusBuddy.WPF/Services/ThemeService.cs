@@ -22,7 +22,7 @@ namespace BusBuddy.WPF.Services
     public class ThemeService : IThemeService
     {
         private readonly ILogger<ThemeService> _logger;
-        private string _currentTheme = "Office2019Colorful"; // Default light theme
+        private string _currentTheme = "FluentDark"; // 🎨 FLUENT DARK as default theme
 
         public event EventHandler<string>? ThemeChanged;
 
@@ -32,7 +32,7 @@ namespace BusBuddy.WPF.Services
         public ThemeService(ILogger<ThemeService> logger)
         {
             _logger = logger;
-            _logger.LogDebug("[DEBUG] ThemeService initialized with default theme: {Theme}", _currentTheme);
+            _logger.LogDebug("[DEBUG] 🎨 ThemeService initialized with Fluent Dark theme: {Theme}", _currentTheme);
         }
 
         public void ApplyTheme(string themeName)
@@ -116,8 +116,9 @@ namespace BusBuddy.WPF.Services
 
         public void ToggleTheme()
         {
-            string newTheme = IsDarkTheme ? "Office2019Colorful" : "Office2019DarkGray";
-            _logger.LogDebug("[DEBUG] ThemeService.ToggleTheme: Current={Current}, New={New}", _currentTheme, newTheme);
+            // 🎨 Enhanced theme toggle: FluentDark ⟷ FluentLight
+            string newTheme = IsDarkTheme ? "FluentLight" : "FluentDark";
+            _logger.LogDebug("[DEBUG] 🎨 ThemeService.ToggleTheme: Current={Current}, New={New}", _currentTheme, newTheme);
             ApplyTheme(newTheme);
         }
 

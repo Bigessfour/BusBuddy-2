@@ -168,20 +168,20 @@
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right" 
                     Margin="0,20,0,0">
-            <Button Content="Search" 
+            <syncfusion:ButtonAdv Content="Search" 
                     Command="{Binding SearchCommand}"
                     Width="100" 
                     Padding="0,5" 
                     Margin="0,0,10,0"
                     IsDefault="True"/>
             
-            <Button Content="Clear All" 
+            <syncfusion:ButtonAdv Content="Clear All" 
                     Command="{Binding ClearCommand}"
                     Width="100" 
                     Padding="0,5" 
                     Margin="0,0,10,0"/>
             
-            <Button Content="Cancel" 
+            <syncfusion:ButtonAdv Content="Cancel" 
                     Command="{Binding CancelCommand}"
                     Width="100" 
                     Padding="0,5"
@@ -189,3 +189,5 @@
         </StackPanel>
     </Grid>
 </Window>
+
+

@@ -1,49 +1,78 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                                                                                                          ║
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+║                                                                                                                                                                          ║
+║  📋 REQUIRED STANDARDS: This child form MUST follow the universal standards defined in:                                                                                ║
+║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
+║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
+║                                                                                                                                                                          ║
+║  🔧 MANDATORY IMPLEMENTATIONS:                                                                                                                                          ║
+║     ✅ UserControl Style: BusBuddyUserControlStyle                                                                                                                     ║
+║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
+║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
+║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
+║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
+║                                                                                                                                                                          ║
+║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
+║     • NEVER use standard WPF Button - use syncfusion:ButtonAdv                                                                                                        ║
+║     • NEVER use Content property on ButtonAdv - use Label property                                                                                                    ║
+║     • NEVER use "sf:" namespace prefix - use "syncfusion:" prefix                                                                                                     ║
+║     • ALWAYS apply FluentDark theme to maintain visual consistency                                                                                                     ║
+║     • ALWAYS reference baseline styles for consistent appearance                                                                                                       ║
+║                                                                                                                                                                          ║
+║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+║                                                                                                                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
 <UserControl x:Class="BusBuddy.WPF.Views.Schedule.ScheduleManagementView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:sf="http://schemas.syncfusion.com/wpf"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:tools="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
              xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000"
-             d:DataContext="{d:DesignInstance viewModels:ScheduleManagementViewModel}">
-    
+             d:DataContext="{d:DesignInstance viewModels:ScheduleManagementViewModel}"
+             Style="{StaticResource BusBuddyUserControlStyle}">
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:ScheduleStatusToColorConverter x:Key="ScheduleStatusToColorConverter"/>
-        
+
         <!-- Schedule Status Templates -->
         <DataTemplate x:Key="ScheduleStatusTemplate">
-            <Border Background="{Binding Status, Converter={StaticResource ScheduleStatusToColorConverter}}" 
+            <Border Background="{Binding Status, Converter={StaticResource ScheduleStatusToColorConverter}}"
                     CornerRadius="12" Padding="6,3" Margin="2">
-                <TextBlock Text="{Binding Status}" 
-                          Foreground="White" 
-                          FontSize="10" 
-                          FontWeight="SemiBold" 
+                <TextBlock Text="{Binding Status}"
+                          Foreground="White"
+                          FontSize="10"
+                          FontWeight="SemiBold"
                           HorizontalAlignment="Center"/>
             </Border>
         </DataTemplate>
-        
+
         <!-- Appointment Template for Custom Display -->
         <DataTemplate x:Key="CustomAppointmentTemplate">
-            <Border Background="{Binding AppointmentBackground}" 
-                    CornerRadius="4" 
+            <Border Background="{Binding AppointmentBackground}"
+                    CornerRadius="4"
                     Padding="4,2"
-                    BorderBrush="White" 
+                    BorderBrush="White"
                     BorderThickness="1">
                 <StackPanel>
-                    <TextBlock Text="{Binding Subject}" 
-                              FontWeight="Bold" 
-                              FontSize="11" 
-                              Foreground="White" 
+                    <TextBlock Text="{Binding Subject}"
+                              FontWeight="Bold"
+                              FontSize="11"
+                              Foreground="White"
                               TextWrapping="Wrap"/>
-                    <TextBlock Text="{Binding StartTime, StringFormat='{}{0:HH:mm}'}" 
-                              FontSize="9" 
-                              Foreground="White" 
+                    <TextBlock Text="{Binding StartTime, StringFormat='{}{0:HH:mm}'}"
+                              FontSize="9"
+                              Foreground="White"
                               Opacity="0.8"/>
                 </StackPanel>
             </Border>
@@ -51,12 +80,17 @@
     </UserControl.Resources>
 
     <!-- Enhanced Schedule Management with Syncfusion DockingManager -->
-    <sf:DockingManager UseDocumentContainer="True" PersistState="False" ContainerMode="TDI">
-        
+    <syncfusion:DockingManager UseDocumentContainer="True"
+                           PersistState="False"
+                           ContainerMode="TDI"
+                           Style="{StaticResource BusBuddyDockingManagerStyle}"
+                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                           Background="{StaticResource FluentDarkBackgroundBrush}">
+
         <!-- Calendar View (Document) -->
-        <ContentControl sf:DockingManager.Header="Schedule Calendar" 
-                       sf:DockingManager.State="Document"
-                       sf:DockingManager.CanSerialize="True">
+        <ContentControl syncfusion:DockingManager.Header="Schedule Calendar"
+                       syncfusion:DockingManager.State="Document"
+                       syncfusion:DockingManager.CanSerialize="True">
             <Grid Margin="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -69,110 +103,145 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="Schedule Management" FontSize="22" FontWeight="Bold" Margin="0,0,0,10"/>
-                        
+
                         <!-- Calendar Navigation and Filters -->
                         <StackPanel Orientation="Horizontal">
-                            <tools:ButtonAdv Label="◀" 
-                                       Command="{Binding PreviousPeriodCommand}" 
-                                       Width="32" Height="32" 
+                            <syncfusion:ButtonAdv Label="◀"
+                                       Command="{Binding PreviousPeriodCommand}"
+                                       Style="{StaticResource BusBuddyIconButtonStyle}"
+                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                       Width="32" Height="32"
                                        Margin="0,0,5,0"/>
-                            <tools:ButtonAdv Label="▶" 
-                                       Command="{Binding NextPeriodCommand}" 
-                                       Width="32" Height="32" 
+                            <syncfusion:ButtonAdv Label="▶"
+                                       Command="{Binding NextPeriodCommand}"
+                                       Style="{StaticResource BusBuddyIconButtonStyle}"
+                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                       Width="32" Height="32"
                                        Margin="0,0,10,0"/>
-                            <tools:ButtonAdv Label="📅 Today" 
-                                       Command="{Binding GoToTodayCommand}" 
-                                       Width="70" Height="32" 
+                            <syncfusion:ButtonAdv Label="📅 Today"
+                                       Command="{Binding GoToTodayCommand}"
+                                       Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                       Width="70" Height="32"
                                        Margin="0,0,15,0"/>
-                            
+
                             <!-- View Type Selector -->
-                            <syncfusion:ComboBoxAdv ItemsSource="{Binding ViewTypes}" 
+                            <syncfusion:ComboBoxAdv ItemsSource="{Binding ViewTypes}"
                                             SelectedItem="{Binding SelectedViewType}"
                                             DisplayMemberPath="Name"
                                             DefaultText="Select view..."
-                                            Width="120" Height="32" 
+                                            Style="{StaticResource BusBuddyComboBoxAdvStyle}"
+                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                            Background="{StaticResource FluentDarkSurfaceBrush}"
+                                            Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                            BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                            Width="120" Height="32"
                                             Margin="0,0,10,0"/>
-                            
+
                             <!-- Schedule Filters -->
-                            <tools:ComboBoxAdv ItemsSource="{Binding ScheduleFilters}" 
+                            <syncfusion:ComboBoxAdv ItemsSource="{Binding ScheduleFilters}"
                                             SelectedItem="{Binding SelectedScheduleFilter}"
                                             DisplayMemberPath="Name"
                                             DefaultText="Filter schedules..."
+                                            Style="{StaticResource BusBuddyComboBoxAdvStyle}"
+                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                            Background="{StaticResource FluentDarkSurfaceBrush}"
+                                            Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                            BorderBrush="{StaticResource FluentDarkBorderBrush}"
                                             Width="150" Height="32"/>
                         </StackPanel>
                     </StackPanel>
-                    
+
                     <!-- Schedule Statistics -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Border Background="#E8F5E8" CornerRadius="8" Padding="12,8" Margin="5,0">
+                        <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
                             <StackPanel>
-                                <TextBlock Text="Today's Schedules" FontSize="12" Foreground="#2E7D32"/>
-                                <TextBlock Text="{Binding TodayScheduleCount}" FontSize="20" FontWeight="Bold" Foreground="#2E7D32"/>
+                                <TextBlock Text="Today's Schedules"
+                                          Style="{StaticResource BusBuddyTileContentStyle}"/>
+                                <TextBlock Text="{Binding TodayScheduleCount}"
+                                          Style="{StaticResource BusBuddyTileValueStyle}"
+                                          Foreground="{StaticResource FluentDarkSuccessBrush}"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="#FFF3E0" CornerRadius="8" Padding="12,8" Margin="5,0">
+                        <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
                             <StackPanel>
-                                <TextBlock Text="This Week" FontSize="12" Foreground="#F57C00"/>
-                                <TextBlock Text="{Binding WeekScheduleCount}" FontSize="20" FontWeight="Bold" Foreground="#F57C00"/>
+                                <TextBlock Text="This Week"
+                                          Style="{StaticResource BusBuddyTileContentStyle}"/>
+                                <TextBlock Text="{Binding WeekScheduleCount}"
+                                          Style="{StaticResource BusBuddyTileValueStyle}"
+                                          Foreground="{StaticResource FluentDarkWarningBrush}"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="#FFEBEE" CornerRadius="8" Padding="12,8" Margin="5,0">
+                        <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
                             <StackPanel>
-                                <TextBlock Text="Conflicts" FontSize="12" Foreground="#C62828"/>
-                                <TextBlock Text="{Binding ConflictCount}" FontSize="20" FontWeight="Bold" Foreground="#C62828"/>
+                                <TextBlock Text="Conflicts"
+                                          Style="{StaticResource BusBuddyTileContentStyle}"/>
+                                <TextBlock Text="{Binding ConflictCount}"
+                                          Style="{StaticResource BusBuddyTileValueStyle}"
+                                          Foreground="{StaticResource FluentDarkErrorBrush}"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
                 </Grid>
 
                 <!-- Enhanced SfScheduler for Visual Schedule Management -->
-                <sf:SfScheduler Grid.Row="1"
-               ItemsSource="{Binding ScheduleAppointments}"
-               ViewType="{Binding SelectedSchedulerViewType}"
-               SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
-               ResourceCollection="{Binding BusResources}"
-               ResourceGroupType="Resource"
-               BorderThickness="1"
-               BorderBrush="#E0E0E0"
-               Background="White">
-                    
+                <syncfusion:SfScheduler Grid.Row="1"
+                                      ItemsSource="{Binding ScheduleAppointments}"
+                                      ViewType="{Binding SelectedSchedulerViewType}"
+                                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                      ResourceCollection="{Binding BusResources}"
+                                      ResourceGroupType="Resource"
+                                      BorderThickness="1"
+                                      BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                      Background="{StaticResource FluentDarkBackgroundBrush}"
+                                      Style="{StaticResource BusBuddySfSchedulerStyle}"
+                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+
                     <!-- Appointment Mapping for Custom Schedule Model -->
-                    <sf:SfScheduler.AppointmentMapping>
-                        <sf:AppointmentMapping StartTime="StartTime"
-                                              EndTime="EndTime"
-                                              Subject="Subject"
-                                              Id="Id"
-                                              AppointmentBackground="AppointmentBackground"
-                                              Notes="Notes"
-                                              IsAllDay="IsAllDay" />
-                    </sf:SfScheduler.AppointmentMapping>
-                    
+                    <syncfusion:SfScheduler.AppointmentMapping>
+                        <syncfusion:AppointmentMapping StartTime="StartTime"
+                                                      EndTime="EndTime"
+                                                      Subject="Subject"
+                                                      Id="Id"
+                                                      AppointmentBackground="AppointmentBackground"
+                                                      Notes="Notes"
+                                                      IsAllDay="IsAllDay" />
+                    </syncfusion:SfScheduler.AppointmentMapping>
+
                     <!-- Resource Mapping Configuration -->
-                    <sf:SfScheduler.ResourceMapping>
-                        <sf:ResourceMapping Name="Name" 
-                                           Id="Id" 
-                                           Background="Background" 
-                                           Foreground="Foreground" />
-                    </sf:SfScheduler.ResourceMapping>
+                    <syncfusion:SfScheduler.ResourceMapping>
+                        <syncfusion:ResourceMapping Name="Name"
+                                                   Id="Id"
+                                                   Background="Background"
+                                                   Foreground="Foreground" />
+                    </syncfusion:SfScheduler.ResourceMapping>
 
                     <!-- Resource Header Template -->
-                    <sf:SfScheduler.ResourceHeaderTemplate>
+                    <syncfusion:SfScheduler.ResourceHeaderTemplate>
                         <DataTemplate>
-                            <Border Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="0,0,1,1" Padding="8,4">
+                            <Border Background="{StaticResource FluentDarkSurfaceBrush}"
+                                  BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                  BorderThickness="0,0,1,1"
+                                  Padding="8,4">
                                 <StackPanel>
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12"/>
-                                    <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}" FontSize="10" Foreground="#666"/>
+                                    <TextBlock Text="{Binding Name}"
+                                             FontWeight="Bold"
+                                             FontSize="12"
+                                             Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                    <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}"
+                                             FontSize="10"
+                                             Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
-                    </sf:SfScheduler.ResourceHeaderTemplate>
-                    
+                    </syncfusion:SfScheduler.ResourceHeaderTemplate>
+
                     <!-- Context Menu for Appointments -->
-                    <sf:SfScheduler.ContextMenu>
-                        <ContextMenu>
+                    <syncfusion:SfScheduler.ContextMenu>
+                        <ContextMenu Style="{StaticResource BusBuddyContextMenuStyle}">
                             <MenuItem Header="View Details" Command="{Binding ViewScheduleDetailsCommand}"/>
                             <MenuItem Header="Edit Schedule" Command="{Binding EditScheduleCommand}"/>
                             <Separator/>
@@ -180,49 +249,58 @@
                             <MenuItem Header="Reschedule" Command="{Binding RescheduleCommand}"/>
                             <Separator/>
                             <MenuItem Header="Mark as Complete" Command="{Binding MarkCompleteCommand}"/>
-                            <MenuItem Header="Cancel Schedule" Command="{Binding CancelScheduleCommand}" Foreground="Red"/>
+                            <MenuItem Header="Cancel Schedule" Command="{Binding CancelScheduleCommand}"
+                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
                             <Separator/>
                             <MenuItem Header="Add to Route" Command="{Binding AddToRouteCommand}"/>
                         </ContextMenu>
-                    </sf:SfScheduler.ContextMenu>
-                </sf:SfScheduler>
+                    </syncfusion:SfScheduler.ContextMenu>
+                </syncfusion:SfScheduler>
             </Grid>
         </ContentControl>
 
         <!-- Schedule List View (Docked Right) -->
-        <ContentControl sf:DockingManager.Header="Schedule List" 
-                       sf:DockingManager.State="Dock"
-                       sf:DockingManager.SideInDockedMode="Right"
-                       sf:DockingManager.DesiredWidthInDockedMode="400"
-                       sf:DockingManager.CanSerialize="True">
+        <ContentControl syncfusion:DockingManager.Header="Schedule List"
+                       syncfusion:DockingManager.State="Dock"
+                       syncfusion:DockingManager.SideInDockedMode="Right"
+                       syncfusion:DockingManager.DesiredWidthInDockedMode="400"
+                       syncfusion:DockingManager.CanSerialize="True">
             <Grid Margin="15">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                
+
                 <!-- List Header -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,15">
-                    <TextBlock Text="Schedule Management" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                    
+                    <TextBlock Text="Schedule Management"
+                             FontSize="16"
+                             FontWeight="Bold"
+                             Margin="0,0,0,10"
+                             Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+
                     <!-- Quick Actions -->
                     <StackPanel Orientation="Horizontal">
-                        <tools:ButtonAdv Label="➕ New" 
-                                   Command="{Binding AddScheduleCommand}" 
-                                   Style="{StaticResource PrimaryButtonStyle}"
-                                   Width="60" Height="32" 
+                        <syncfusion:ButtonAdv Label="➕ New"
+                                   Command="{Binding AddScheduleCommand}"
+                                   Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   Width="60" Height="32"
                                    Margin="0,0,8,0"/>
-                        <syncfusion:DropDownButtonAdv Width="80" Height="32">
+                        <syncfusion:DropDownButtonAdv Width="80"
+                                              Height="32"
+                                              Style="{StaticResource BusBuddyDropDownButtonStyle}"
+                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
                             <syncfusion:DropDownMenuGroup>
-                                <syncfusion:DropDownMenuItem Header="Daily Schedule Report" 
+                                <syncfusion:DropDownMenuItem Header="Daily Schedule Report"
                                                             Command="{Binding GenerateDailyReportCommand}"/>
-                                <syncfusion:DropDownMenuItem Header="Weekly Summary" 
+                                <syncfusion:DropDownMenuItem Header="Weekly Summary"
                                                             Command="{Binding GenerateWeeklyReportCommand}"/>
-                                <syncfusion:DropDownMenuItem Header="Resource Utilization" 
+                                <syncfusion:DropDownMenuItem Header="Resource Utilization"
                                                             Command="{Binding GenerateUtilizationReportCommand}"/>
                                 <Separator/>
-                                <syncfusion:DropDownMenuItem Header="Export to Excel" 
+                                <syncfusion:DropDownMenuItem Header="Export to Excel"
                                                             Command="{Binding ExportScheduleCommand}"/>
                             </syncfusion:DropDownMenuGroup>
                         </syncfusion:DropDownButtonAdv>
@@ -230,7 +308,7 @@
                 </StackPanel>
 
                 <!-- Enhanced Schedule Data Grid -->
-                <sf:SfDataGrid Grid.Row="1"
+                <syncfusion:SfDataGrid Grid.Row="1"
                                ItemsSource="{Binding Schedules}"
                                SelectedItem="{Binding SelectedSchedule, Mode=TwoWay}"
                                AutoGenerateColumns="False"
@@ -245,66 +323,75 @@
                                AllowEditing="True"
                                ShowRowHeader="False"
                                BorderThickness="1"
-                               BorderBrush="#E0E0E0"
+                               BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                               Style="{StaticResource BusBuddySfDataGridStyle}"
+                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                               Background="{StaticResource FluentDarkBackgroundBrush}"
+                               Foreground="{StaticResource FluentDarkForegroundBrush}"
                                GridLinesVisibility="Both">
-                    
-                    <sf:SfDataGrid.Columns>
+
+                    <syncfusion:SfDataGrid.Columns>
                         <!-- Schedule ID (Hidden/Collapsed) -->
-                        <sf:GridTextColumn MappingName="ScheduleId" HeaderText="ID" Width="0" IsHidden="True"/>
-                        
+                        <syncfusion:GridTextColumn MappingName="ScheduleId" HeaderText="ID" Width="0" IsHidden="True"/>
+
                         <!-- Destination -->
-                        <sf:GridTextColumn MappingName="Destination" HeaderText="Destination" Width="140"/>
-                        
+                        <syncfusion:GridTextColumn MappingName="Destination" HeaderText="Destination" Width="140"/>
+
                         <!-- Schedule Date and Time -->
-                        <sf:GridDateTimeColumn MappingName="ScheduleDate" HeaderText="Date" Width="100" Pattern="ShortDate"/>
-                        <sf:GridTimeSpanColumn MappingName="LeaveTime" HeaderText="Departure" Width="80"/>
-                        <sf:GridTimeSpanColumn MappingName="EventTime" HeaderText="Arrival" Width="80"/>
-                        
+                        <syncfusion:GridDateTimeColumn MappingName="ScheduleDate" HeaderText="Date" Width="100" Pattern="ShortDate"/>
+                        <syncfusion:GridTimeSpanColumn MappingName="LeaveTime" HeaderText="Departure" Width="80"/>
+                        <syncfusion:GridTimeSpanColumn MappingName="EventTime" HeaderText="Arrival" Width="80"/>
+
                         <!-- Bus Assignment with Enhanced Display -->
-                        <sf:GridTemplateColumn MappingName="BusAssignment" HeaderText="Bus" Width="100">
-                            <sf:GridTemplateColumn.CellTemplate>
+                        <syncfusion:GridTemplateColumn MappingName="BusAssignment" HeaderText="Bus" Width="100">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="#E3F2FD" CornerRadius="4" Padding="4,2" Margin="1">
-                                        <TextBlock Text="{Binding BusNumber, StringFormat='Bus {0}'}" 
-                                                  FontSize="10" FontWeight="SemiBold" 
-                                                  Foreground="#1976D2" 
+                                    <Border Background="{StaticResource FluentDarkAccentBrush}"
+                                          CornerRadius="4"
+                                          Padding="4,2"
+                                          Margin="1">
+                                        <TextBlock Text="{Binding BusNumber, StringFormat='Bus {0}'}"
+                                                  FontSize="10"
+                                                  FontWeight="SemiBold"
+                                                  Foreground="{StaticResource FluentDarkBackgroundBrush}"
                                                   HorizontalAlignment="Center"/>
                                     </Border>
                                 </DataTemplate>
-                            </sf:GridTemplateColumn.CellTemplate>
-                        </sf:GridTemplateColumn>
-                        
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
                         <!-- Driver Assignment -->
-                        <sf:GridTemplateColumn MappingName="DriverAssignment" HeaderText="Driver" Width="120">
-                            <sf:GridTemplateColumn.CellTemplate>
+                        <syncfusion:GridTemplateColumn MappingName="DriverAssignment" HeaderText="Driver" Width="120">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="#F3E5F5" CornerRadius="4" Padding="4,2" Margin="1">
-                                        <TextBlock Text="{Binding DriverName}" 
-                                                  FontSize="10" FontWeight="SemiBold" 
-                                                  Foreground="#7B1FA2" 
+                                    <Border Background="{StaticResource FluentDarkSecondaryBrush}"
+                                          CornerRadius="4"
+                                          Padding="4,2"
+                                          Margin="1">
+                                        <TextBlock Text="{Binding DriverName}"
+                                                  FontSize="10"
+                                                  FontWeight="SemiBold"
+                                                  Foreground="{StaticResource FluentDarkBackgroundBrush}"
                                                   HorizontalAlignment="Center"
                                                   TextTrimming="CharacterEllipsis"/>
                                     </Border>
                                 </DataTemplate>
-                            </sf:GridTemplateColumn.CellTemplate>
-                        </sf:GridTemplateColumn>
-                        
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
                         <!-- Status with Visual Indicator -->
-                        <sf:GridTemplateColumn MappingName="Status" HeaderText="Status" Width="80">
-                            <sf:GridTemplateColumn.CellTemplate>
+                        <syncfusion:GridTemplateColumn MappingName="Status" HeaderText="Status" Width="80">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource ScheduleStatusTemplate}"/>
                                 </DataTemplate>
-                            </sf:GridTemplateColumn.CellTemplate>
-                        </sf:GridTemplateColumn>
-                    </sf:SfDataGrid.Columns>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+                    </syncfusion:SfDataGrid.Columns>
 
-                    <!-- Row Styling -->
-                    <!-- Removed invalid DataRowControl style. If row styling is needed, use a valid Syncfusion type such as GridRow. -->
-                    
                     <!-- Context Menu -->
-                    <sf:SfDataGrid.ContextMenu>
-                        <ContextMenu>
+                    <syncfusion:SfDataGrid.ContextMenu>
+                        <ContextMenu Style="{StaticResource BusBuddyContextMenuStyle}">
                             <MenuItem Header="View Details" Command="{Binding ViewScheduleDetailsCommand}"/>
                             <MenuItem Header="Edit Schedule" Command="{Binding EditScheduleCommand}"/>
                             <Separator/>
@@ -312,44 +399,51 @@
                             <MenuItem Header="Reschedule" Command="{Binding RescheduleCommand}"/>
                             <Separator/>
                             <MenuItem Header="Mark as Complete" Command="{Binding MarkCompleteCommand}"/>
-                            <MenuItem Header="Cancel Schedule" Command="{Binding CancelScheduleCommand}" Foreground="Red"/>
+                            <MenuItem Header="Cancel Schedule"
+                                     Command="{Binding CancelScheduleCommand}"
+                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
                             <Separator/>
                             <MenuItem Header="Generate Report" Command="{Binding GenerateScheduleReportCommand}"/>
                         </ContextMenu>
-                    </sf:SfDataGrid.ContextMenu>
-                </sf:SfDataGrid>
-                
+                    </syncfusion:SfDataGrid.ContextMenu>
+                </syncfusion:SfDataGrid>
+
                 <!-- Action Panel -->
                 <Grid Grid.Row="2" Margin="0,15,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
+
                     <!-- Schedule Summary -->
-                    <TextBlock Grid.Row="0" Margin="0,0,0,10">
+                    <TextBlock Grid.Row="0"
+                             Margin="0,0,0,10"
+                             Foreground="{StaticResource FluentDarkPrimaryTextBrush}">
                         <Run Text="Showing"/>
                         <Run Text="{Binding Schedules.Count, Mode=OneWay}" FontWeight="Bold"/>
                         <Run Text="of"/>
                         <Run Text="{Binding TotalSchedules, Mode=OneWay}" FontWeight="Bold"/>
                         <Run Text="schedules"/>
                     </TextBlock>
-                    
+
                     <!-- Action Buttons -->
                     <StackPanel Grid.Row="1" Orientation="Vertical">
-                        <tools:ButtonAdv Label="✏️ Edit Selected" 
-                                   Command="{Binding UpdateScheduleCommand}" 
+                        <syncfusion:ButtonAdv Label="✏️ Edit Selected"
+                                   Command="{Binding UpdateScheduleCommand}"
                                    CommandParameter="{Binding SelectedSchedule}"
-                                   Style="{StaticResource SecondaryButtonStyle}"
+                                   Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                    Height="32" Margin="0,0,0,5"/>
-                        <tools:ButtonAdv Label="🗑️ Delete Selected" 
-                                   Command="{Binding DeleteScheduleCommand}" 
+                        <syncfusion:ButtonAdv Label="🗑️ Delete Selected"
+                                   Command="{Binding DeleteScheduleCommand}"
                                    CommandParameter="{Binding SelectedSchedule}"
-                                   Style="{StaticResource DangerButtonStyle}"
+                                   Style="{StaticResource BusBuddyDangerButtonStyle}"
+                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                    Height="32" Margin="0,0,0,5"/>
-                        <tools:ButtonAdv Label="🔄 Refresh Data" 
-                                   Command="{Binding LoadSchedulesCommand}" 
-                                   Style="{StaticResource PrimaryButtonStyle}"
+                        <syncfusion:ButtonAdv Label="🔄 Refresh Data"
+                                   Command="{Binding LoadSchedulesCommand}"
+                                   Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                    Height="32"/>
                     </StackPanel>
                 </Grid>
@@ -357,92 +451,117 @@
         </ContentControl>
 
         <!-- Schedule Analytics (Document Tab) -->
-        <ContentControl sf:DockingManager.Header="Schedule Analytics" 
-                       sf:DockingManager.State="Document"
-                       sf:DockingManager.CanSerialize="True">
+        <ContentControl syncfusion:DockingManager.Header="Schedule Analytics"
+                       syncfusion:DockingManager.State="Document"
+                       syncfusion:DockingManager.CanSerialize="True">
             <Grid Margin="15">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="300"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
+
                 <!-- Analytics Header -->
-                <TextBlock Grid.Row="0" Text="Schedule Performance Analytics" 
-                          FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
-                
+                <TextBlock Grid.Row="0"
+                          Text="Schedule Performance Analytics"
+                          FontSize="18"
+                          FontWeight="Bold"
+                          Margin="0,0,0,15"
+                          Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+
                 <!-- Analytics Charts -->
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <!-- Schedule Volume Chart -->
-                    <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" 
-                           CornerRadius="6" Margin="0,0,10,0">
-                        <sf:SfChart Header="Daily Schedule Volume" Margin="15">
-                            <sf:SfChart.PrimaryAxis>
-                                <sf:DateTimeAxis Header="Date"/>
-                            </sf:SfChart.PrimaryAxis>
-                            <sf:SfChart.SecondaryAxis>
-                                <sf:NumericalAxis Header="Schedule Count"/>
-                            </sf:SfChart.SecondaryAxis>
-                            <sf:LineSeries ItemsSource="{Binding ScheduleVolumeData}" 
-                                         XBindingPath="Date" 
-                                         YBindingPath="Count"
-                                         Interior="#2196F3"/>
-                        </sf:SfChart>
+                    <Border Grid.Column="0"
+                           BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                           BorderThickness="1"
+                           CornerRadius="6"
+                           Margin="0,0,10,0">
+                        <syncfusion:SfChart Header="Daily Schedule Volume"
+                                         Margin="15"
+                                         Style="{StaticResource BusBuddySfChartStyle}"
+                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                         Background="{StaticResource FluentDarkSurfaceBrush}">
+                            <syncfusion:SfChart.PrimaryAxis>
+                                <syncfusion:DateTimeAxis Header="Date"/>
+                            </syncfusion:SfChart.PrimaryAxis>
+                            <syncfusion:SfChart.SecondaryAxis>
+                                <syncfusion:NumericalAxis Header="Schedule Count"/>
+                            </syncfusion:SfChart.SecondaryAxis>
+                            <syncfusion:LineSeries ItemsSource="{Binding ScheduleVolumeData}"
+                                                 XBindingPath="Date"
+                                                 YBindingPath="Count"
+                                                 Interior="{StaticResource FluentDarkAccentBrush}"/>
+                        </syncfusion:SfChart>
                     </Border>
-                    
+
                     <!-- Resource Utilization Chart -->
-                    <Border Grid.Column="1" BorderBrush="#E0E0E0" BorderThickness="1" 
-                           CornerRadius="6" Margin="10,0,0,0">
-                        <sf:SfChart Header="Resource Utilization" Margin="15">
-                            <sf:PieSeries ItemsSource="{Binding ResourceUtilizationData}" 
-                                        XBindingPath="ResourceType" 
-                                        YBindingPath="UtilizationPercentage"
-                                        ExplodeIndex="0"
-                                        ExplodeRadius="10"/>
-                        </sf:SfChart>
+                    <Border Grid.Column="1"
+                           BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                           BorderThickness="1"
+                           CornerRadius="6"
+                           Margin="10,0,0,0">
+                        <syncfusion:SfChart Header="Resource Utilization"
+                                         Margin="15"
+                                         Style="{StaticResource BusBuddySfChartStyle}"
+                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                         Background="{StaticResource FluentDarkSurfaceBrush}">
+                            <syncfusion:PieSeries ItemsSource="{Binding ResourceUtilizationData}"
+                                                XBindingPath="ResourceType"
+                                                YBindingPath="UtilizationPercentage"
+                                                ExplodeIndex="0"
+                                                ExplodeRadius="10"/>
+                        </syncfusion:SfChart>
                     </Border>
                 </Grid>
-                
+
                 <!-- Detailed Analytics Grid -->
-                <sf:SfDataGrid Grid.Row="2" Margin="0,15,0,0"
-                               ItemsSource="{Binding ScheduleAnalyticsData}"
-                               AutoGenerateColumns="False"
-                               AllowSorting="True"
-                               AllowFiltering="True"
-                               ShowRowHeader="False">
-                    <sf:SfDataGrid.Columns>
-                        <sf:GridDateTimeColumn MappingName="Date" HeaderText="Date" Width="100" Pattern="ShortDate"/>
-                        <sf:GridNumericColumn MappingName="TotalSchedules" HeaderText="Total Schedules" Width="120"/>
-                        <sf:GridNumericColumn MappingName="CompletedSchedules" HeaderText="Completed" Width="100"/>
-                        <sf:GridNumericColumn MappingName="CancelledSchedules" HeaderText="Cancelled" Width="100"/>
-                        <sf:GridNumericColumn MappingName="BusUtilization" HeaderText="Bus Utilization %" Width="130"/>
-                        <sf:GridNumericColumn MappingName="DriverUtilization" HeaderText="Driver Utilization %" Width="140"/>
-                        <sf:GridNumericColumn MappingName="EfficiencyScore" HeaderText="Efficiency %" Width="100"/>
-                    </sf:SfDataGrid.Columns>
-                </sf:SfDataGrid>
+                <syncfusion:SfDataGrid Grid.Row="2"
+                                    Margin="0,15,0,0"
+                                    ItemsSource="{Binding ScheduleAnalyticsData}"
+                                    AutoGenerateColumns="False"
+                                    AllowSorting="True"
+                                    AllowFiltering="True"
+                                    ShowRowHeader="False"
+                                    Style="{StaticResource BusBuddySfDataGridStyle}"
+                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    Background="{StaticResource FluentDarkBackgroundBrush}"
+                                    Foreground="{StaticResource FluentDarkForegroundBrush}"
+                                    BorderBrush="{StaticResource FluentDarkBorderBrush}">
+                    <syncfusion:SfDataGrid.Columns>
+                        <syncfusion:GridDateTimeColumn MappingName="Date" HeaderText="Date" Width="100" Pattern="ShortDate"/>
+                        <syncfusion:GridNumericColumn MappingName="TotalSchedules" HeaderText="Total Schedules" Width="120"/>
+                        <syncfusion:GridNumericColumn MappingName="CompletedSchedules" HeaderText="Completed" Width="100"/>
+                        <syncfusion:GridNumericColumn MappingName="CancelledSchedules" HeaderText="Cancelled" Width="100"/>
+                        <syncfusion:GridNumericColumn MappingName="BusUtilization" HeaderText="Bus Utilization %" Width="130"/>
+                        <syncfusion:GridNumericColumn MappingName="DriverUtilization" HeaderText="Driver Utilization %" Width="140"/>
+                        <syncfusion:GridNumericColumn MappingName="EfficiencyScore" HeaderText="Efficiency %" Width="100"/>
+                    </syncfusion:SfDataGrid.Columns>
+                </syncfusion:SfDataGrid>
             </Grid>
         </ContentControl>
 
         <!-- Loading Indicator -->
-        <Border sf:DockingManager.CanSerialize="False"
-                Background="#80000000" 
+        <Border syncfusion:DockingManager.CanSerialize="False"
+                Background="#80000000"
                 Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <ProgressBar IsIndeterminate="True" 
-                           Width="60" 
-                           Height="10"
-                           Foreground="White"/>
-                <TextBlock Text="Loading schedule data..." 
-                           Foreground="White" 
-                           FontSize="16" 
-                           Margin="0,15,0,0" 
+                <syncfusion:SfBusyIndicator IsBusy="True"
+                                         Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
+                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                         Width="60"
+                                         Height="60"/>
+                <TextBlock Text="Loading schedule data..."
+                           Foreground="White"
+                           FontSize="16"
+                           Margin="0,15,0,0"
                            HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
-    </sf:DockingManager>
+    </syncfusion:DockingManager>
 </UserControl>

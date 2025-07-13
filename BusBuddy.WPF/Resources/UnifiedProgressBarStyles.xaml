@@ -1,0 +1,75 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sf="http://schemas.syncfusion.com/wpf">
+
+    <!-- Unified SfLinearProgressBar Styles -->
+
+    <!-- Small Progress Bar (6px height) -->
+    <Style x:Key="SmallProgressBarStyle" TargetType="sf:SfLinearProgressBar">
+        <Setter Property="Height" Value="6"/>
+        <Setter Property="Background" Value="#E0E0E0"/>
+        <Setter Property="Foreground" Value="#0078D4"/>
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="100"/>
+    </Style>
+
+    <!-- Standard Progress Bar (8px height) -->
+    <Style x:Key="StandardProgressBarStyle" TargetType="sf:SfLinearProgressBar">
+        <Setter Property="Height" Value="8"/>
+        <Setter Property="Background" Value="#E0E0E0"/>
+        <Setter Property="Foreground" Value="#0078D4"/>
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="100"/>
+    </Style>
+
+    <!-- Large Progress Bar (12px height) -->
+    <Style x:Key="LargeProgressBarStyle" TargetType="sf:SfLinearProgressBar">
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="Background" Value="#E0E0E0"/>
+        <Setter Property="Foreground" Value="#0078D4"/>
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="100"/>
+    </Style>
+
+    <!-- Success Progress Bar -->
+    <Style x:Key="SuccessProgressBarStyle" TargetType="sf:SfLinearProgressBar" BasedOn="{StaticResource StandardProgressBarStyle}">
+        <Setter Property="Foreground" Value="#4CAF50"/>
+    </Style>
+
+    <!-- Warning Progress Bar -->
+    <Style x:Key="WarningProgressBarStyle" TargetType="sf:SfLinearProgressBar" BasedOn="{StaticResource StandardProgressBarStyle}">
+        <Setter Property="Foreground" Value="#FF9800"/>
+    </Style>
+
+    <!-- Error Progress Bar -->
+    <Style x:Key="ErrorProgressBarStyle" TargetType="sf:SfLinearProgressBar" BasedOn="{StaticResource StandardProgressBarStyle}">
+        <Setter Property="Foreground" Value="#F44336"/>
+    </Style>
+
+    <!-- Indeterminate Progress Bar -->
+    <Style x:Key="IndeterminateProgressBarStyle" TargetType="sf:SfLinearProgressBar" BasedOn="{StaticResource LargeProgressBarStyle}">
+        <Setter Property="IsIndeterminate" Value="True"/>
+    </Style>
+
+    <!-- Dark Theme Progress Bars -->
+    <Style x:Key="DarkProgressBarStyle" TargetType="sf:SfLinearProgressBar" BasedOn="{StaticResource StandardProgressBarStyle}">
+        <Setter Property="Background" Value="#484848"/>
+        <Setter Property="Foreground" Value="#0078D4"/>
+    </Style>
+
+    <!-- Unified Progress Bar Template -->
+    <DataTemplate x:Key="UnifiedProgressBarTemplate">
+        <Grid>
+            <sf:SfLinearProgressBar Progress="{Binding Value, FallbackValue=0}"
+                                   Style="{StaticResource StandardProgressBarStyle}"
+                                   Width="{Binding Width, FallbackValue=80}"
+                                   Margin="0,0,8,0"/>
+            <TextBlock Text="{Binding Value, StringFormat='{}{0:F0}%', FallbackValue='0%'}"
+                      FontSize="10"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>
