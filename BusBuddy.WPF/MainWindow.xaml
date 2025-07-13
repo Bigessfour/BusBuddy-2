@@ -34,6 +34,88 @@
         <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
+        <!-- CRITICAL FIX: Add missing navigation styles to prevent StaticResource errors -->
+        <!-- Navigation Panel Style — Ensures proper theme integration -->
+        <Style x:Key="BusBuddyNavigationPanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="#3F3F46"/>  <!-- FluentDark surface -->
+            <Setter Property="BorderBrush" Value="#3F3F46"/>  <!-- FluentDark border -->
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <!-- Navigation ListView Style -->
+        <Style x:Key="BusBuddyNavigationListViewStyle" TargetType="ListView">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        </Style>
+
+        <!-- Navigation ListView Item Style -->
+        <Style x:Key="BusBuddyNavigationListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Foreground" Value="#F1F1F1"/>  <!-- FluentDark text -->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A4A51"/>  <!-- FluentDark hover -->
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#007ACC"/>  <!-- FluentDark accent -->
+                    <Setter Property="Foreground" Value="#F1F1F1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Navigation Button Style -->
+        <Style x:Key="BusBuddyNavigationButtonStyle" TargetType="syncfusion:ButtonAdv">
+            <Setter Property="Background" Value="#003366"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="SizeMode" Value="Normal"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#004080"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Icon Button Style -->
+        <Style x:Key="BusBuddyIconButtonStyle" TargetType="syncfusion:ButtonAdv">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#F1F1F1"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="SizeMode" Value="Small"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A4A51"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Window Style -->
+        <Style x:Key="BusBuddyWindowStyle" TargetType="Window">
+            <Setter Property="Background" Value="#2D2D30"/>  <!-- FluentDark background -->
+            <Setter Property="Foreground" Value="#F1F1F1"/>  <!-- FluentDark text -->
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="WindowStyle" Value="SingleBorderWindow"/>
+            <Setter Property="ResizeMode" Value="CanResize"/>
+            <Setter Property="UseLayoutRounding" Value="True"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
+        </Style>
+
         <DataTemplate DataType="{x:Type viewModels:LoadingViewModel}">
             <views:LoadingView />
         </DataTemplate>
