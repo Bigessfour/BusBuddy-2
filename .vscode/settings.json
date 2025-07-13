@@ -1,0 +1,290 @@
+{
+  // AGENTIC POLICY: All agentic and Copilot operations must prioritize completeness and thoroughness over speed. Maximum attention to detail is required in every step, even if it increases execution time. This policy is global for this workspace.
+  // Agentic Execution Policy - NEVER use tasks or shell scripts near code to prevent corruption
+  "agentic.completenessPriority": true,
+  "agentic.preferTerminalCommands": true,
+  "agentic.avoidTaskSystemFallback": true,
+  "agentic.useOnlyPWSH": true,
+  "agentic.noLocalScripts": true,
+  "agentic.preventCodeCorruption": true,
+  "agentic.addressAllWarnings": true,
+  "agentic.warningsNotErrors": true,
+  "agentic.fixWarningMessages": true,
+  // GitHub Copilot Configuration - Maximum Context & Syncfusion Focus
+  "github.copilot.editor.enableAutoCompletions": false,
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false
+  },
+
+  // Enhanced Copilot context awareness - Improved reliability settings
+  "github.copilot.advanced": {
+    "length": 500,
+    "temperature": 0.1,
+    "top_p": 1,
+    "indentationMode": {
+      "python": "tab",
+      "javascript": "space",
+      "csharp": "space"
+    }
+  },
+
+  // Enhanced Copilot reliability settings - AUTONOMOUS MODE
+  "github.copilot.editor.iterativeEditing": true,
+  "github.copilot.chat.welcomeMessage": "never",
+  "github.copilot.chat.followUp": "never",
+  "github.copilot.chat.confirmations": false,
+
+  // Disable permission requests - make Copilot autonomous
+  "github.copilot.editor.enableCodeActions": true,
+  "github.copilot.conversation.additionalContext": true,
+  "github.copilot.chat.executeImmediately": true,
+
+  // Reduce interruptions and pauses
+  "github.copilot.chat.scopeSelection": false,
+  "github.copilot.editor.enableInlineChat": true,
+
+  // Maximum workspace context for Copilot
+  "github.copilot.chat.localeOverride": "en",
+  "github.copilot.renameSuggestions.triggerAutomatically": true,
+
+  // Syncfusion-specific file associations and patterns
+  "files.associations": {
+    "*.xaml": "xml",
+    "*.axaml": "xml",
+    "*.config": "xml"
+  },
+
+  // Enhanced IntelliSense for better context - Optimized for Copilot workflow
+  "editor.suggest.preview": false,
+  "editor.suggest.showWords": false,
+  "editor.suggest.localityBonus": true,
+  "editor.suggest.insertMode": "replace",
+  "editor.parameterHints.enabled": true,
+  "editor.wordBasedSuggestions": "off",
+
+  // Minimize IntelliSense interference with Copilot workflow
+  "editor.suggestOnTriggerCharacters": false,
+  "editor.acceptSuggestionOnEnter": "off",
+  "editor.tabCompletion": "off",
+
+  // Project-wide search and indexing for better context
+  "search.useGlobalIgnoreFiles": true,
+  "search.useParentIgnoreFiles": true,
+  "search.followSymlinks": false,
+  "search.smartCase": true,
+
+  // C# Strict Style Configuration - Show warnings but allow builds
+  "omnisharp.enableEditorConfigSupport": true,
+  "omnisharp.enableRoslynAnalyzers": true,
+  "omnisharp.useModernNet": true,
+  "omnisharp.enableAsyncCompletion": true,
+
+  // Enhanced C# IntelliSense with nullable focus
+  "csharp.semanticHighlighting.enabled": true,
+  "csharp.showOmnisharpLogOnError": true,
+  "csharp.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
+  "csharp.inlayHints.enableInlayHintsForImplicitVariableTypes": true,
+  "csharp.inlayHints.enableInlayHintsForLambdaParameterTypes": true,
+  "csharp.inlayHints.enableInlayHintsForTypes": true,
+
+  // Code formatting - strict C# style
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit",
+    "source.addMissingImports": "explicit"
+  },
+
+  // Enhanced error and problem detection - Balanced IDE Assistance
+  "problems.decorations.enabled": true,
+  "problems.showNearbySymbols": true,
+  "problems.sortOrder": "severity",
+  "editor.rulers": [120],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+
+  // Balanced error handling - show errors on save, warnings in problems panel
+  "editor.renderWhitespace": "boundary",
+  "editor.renderControlCharacters": false,
+  "editor.showUnused": true,
+  "editor.showDeprecated": true,
+
+  // Quick fixes and suggestions on demand (Ctrl+.) - Optimized for Copilot workflow
+  "editor.lightbulb.enabled": "onCode",
+  "editor.codeActionsOnSaveTimeout": 3000,
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  },
+  "editor.quickSuggestionsDelay": 300,
+
+  // Hover information for learning
+  "editor.hover.enabled": true,
+  "editor.hover.delay": 300,
+  "editor.hover.sticky": true,
+
+  // C# specific editor settings
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.trimAutoWhitespace": true,
+    "editor.suggest.snippetsPreventQuickSuggestions": false
+  },
+
+  // XAML specific settings with Syncfusion awareness
+  "[xml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.autoClosingBrackets": "always",
+    "editor.autoClosingQuotes": "always",
+    "editor.suggest.insertMode": "replace"
+  },
+
+  // Enhanced workspace indexing for better Copilot context
+  "typescript.suggest.includeAutomaticOptionalChainCompletions": true,
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+
+  // Visual indicators for file changes and verification
+  "workbench.editor.highlightModifiedTabs": true,
+  "workbench.editor.decorations.badges": true,
+  "workbench.editor.decorations.colors": true,
+  "explorer.decorations.badges": true,
+  "explorer.decorations.colors": true,
+
+  // Auto-save to ensure Copilot changes are preserved
+  "files.autoSave": "onFocusChange",
+  "files.autoSaveDelay": 1000,
+
+  // File explorer settings for better project visibility
+  "explorer.compactFolders": false,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.csproj": "*.user",
+    "*.xaml": "*.xaml.cs",
+    "appsettings.json": "appsettings.*.json"
+  },
+
+  // Terminal integration - PowerShell Core 7.5.2 ONLY, no local scripts to prevent corruption
+  "terminal.integrated.defaultProfile.windows": "PowerShell Core 7.5.2",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell Core 7.5.2": {
+      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "icon": "terminal-powershell",
+      "args": [
+        "-NoProfile",
+        "-NoExit",
+        "-Command",
+        "$PSVersionTable | Format-Table; Write-Host 'PowerShell Core 7.5.2 Enhanced Features Enabled' -ForegroundColor Green"
+      ],
+      "overrideName": true
+    },
+    "PowerShell Legacy (Disabled)": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell",
+      "args": ["-Command", "Write-Host 'Legacy PowerShell Disabled - Use PowerShell Core 7.5.2' -ForegroundColor Red; exit"],
+      "overrideName": true
+    }
+  },
+
+  // PowerShell Core 7.5.2 specific settings
+  "powershell.powerShellDefaultVersion": "PowerShell (x64)",
+  "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+  "powershell.enableProfileLoading": false,
+  "powershell.integratedConsole.forceClearScrollbackBuffer": true,
+
+  // PowerShell Core 7.5.2 Enhanced Features
+  "powershell.powerShellAdditionalExePaths": {
+    "PowerShell Core 7.5.2": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
+  },
+  "powershell.enableReferencesCodeLens": true,
+  "powershell.analyzeOpenDocumentsOnly": true,
+  "powershell.integratedConsole.suppressStartupBanner": true,
+
+  // Enhanced PowerShell IntelliSense for Core 7.5.2
+  "powershell.completion.completeInlinePlaceholders": true,
+  "powershell.codeFormatting.autoCorrectAliases": true,
+  "powershell.codeFormatting.useConstantStrings": true,
+  "powershell.codeFormatting.useCorrectCasing": true,
+
+  // PowerShell Core Performance Optimizations
+  "powershell.integratedConsole.useLegacyReadLine": false,
+  "powershell.helpCompletion": "BlockComment",
+
+  // Enhanced error highlighting with Syncfusion context
+  "workbench.colorCustomizations": {
+    "editorError.foreground": "#ff0000",
+    "editorWarning.foreground": "#ff8800",
+    "editorInfo.foreground": "#00ff00",
+    "editorHint.foreground": "#0066cc",
+    "problemsErrorIcon.foreground": "#ff0000",
+    "problemsWarningIcon.foreground": "#ff8800",
+
+    // 🆕 ENHANCED PROBLEMS PANEL STYLING
+    "problemsInfoIcon.foreground": "#0066cc",
+    "list.errorForeground": "#ff0000",
+    "list.warningForeground": "#ff8800",
+    "notificationsErrorIcon.foreground": "#ff0000",
+    "notificationsWarningIcon.foreground": "#ff8800",
+
+    // 🆕 SYNCFUSION-SPECIFIC PROBLEM HIGHLIGHTING
+    "editor.wordHighlightBackground": "#07365580",
+    "editor.wordHighlightStrongBackground": "#0e4b6980",
+    "editorSuggestWidget.highlightForeground": "#0066cc"
+  },
+
+  // 🆕 ENHANCED PROBLEMS PANEL CONFIGURATION
+  "problems.defaultViewMode": "tree",              // Tree view for better organization
+  "problems.showCurrentInStatus": true,            // Show current file problems in status
+  "problems.autoReveal": true,                     // Auto-reveal problems when opening files
+
+  // 🆕 SYNCFUSION XAML SPECIFIC PROBLEM HANDLING
+  "xml.validation.noGrammar": "hint",              // XAML without schema = hint not error
+  "xml.validation.enabled": true,                 // Enable XAML validation
+  "xml.format.enforceQuoteStyle": "preferred",    // Consistent XAML quotes
+
+  // 🆕 C# PROBLEM FILTERING FOR SYNCFUSION
+  "csharp.maxProjectFileCountForDiagnosticAnalysis": 1000, // Handle large projects
+
+  // Extension-specific settings for Syncfusion development
+  "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+  "dotnet.inlayHints.enableInlayHintsForIndexerParameters": true,
+  "dotnet.inlayHints.enableInlayHintsForLiteralParameters": true,
+  "dotnet.inlayHints.enableInlayHintsForObjectCreationParameters": true,
+  "dotnet.inlayHints.enableInlayHintsForOtherParameters": true,
+  "dotnet.inlayHints.enableInlayHintsForParameters": true,
+
+  // DISABLE ALL TASK AUTOMATION AND SCRIPTS TO PREVENT CODE CORRUPTION
+  "task.autoDetect": "off",
+  "task.showDecorations": false,
+  "task.problemMatchers.neverPrompt": true,
+  "task.quickOpen.skip": true,
+  "powershell.scriptAnalysis.enable": false,
+  "powershell.integratedConsole.showOnStartup": false,
+
+  // CONTROLLED COPILOT COMMAND POLICY - ESSENTIAL DOTNET COMMANDS ALLOWED
+  "terminal.integrated.allowWorkspaceConfiguration": true,
+  "terminal.integrated.automationProfile.windows": null,
+  "workbench.commandPalette.experimental.suggestCommands": false,
+  "github.copilot.advanced.shellCommands": true,
+  "github.copilot.terminal.executeCommands": true,
+
+  // BLOCK ALL SCRIPT FILES TO PREVENT EXECUTION
+  "files.exclude": {
+    "**/*.ps1": true,
+    "**/*.bat": true,
+    "**/*.cmd": true,
+    "**/*.sh": true
+  },
+
+  // Warning handling policy - Address all warnings but don't treat as errors
+  "csharp.suppressDotnetInstallWarnings": false,
+  "csharp.suppressDotnetRestoreNotification": false,
+  "omnisharp.enableMsBuildLoadProjectsOnDemand": false
+}
