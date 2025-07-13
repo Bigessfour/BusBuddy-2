@@ -382,8 +382,8 @@ codecov.exe
 *.msix
 *.msm
 *.msp
-# Keep specific installer files that are part of the project
-!AzureCLI.msi
+# Exclude installer files
+AzureCLI.msi
 
 # JetBrains Rider
 *.sln.iml
@@ -428,6 +428,11 @@ TestResults/
 secrets.json
 appsettings.Production.json
 appsettings.Staging.json
+*-connection-string.txt
+EMERGENCY_*.ps1
+IMMEDIATE_*.ps1
+BusBuddy.Core/lib/Syncfusion*.dll
+azure-connection-string.txt
 
 # Specific API key patterns
 *xai*key*
