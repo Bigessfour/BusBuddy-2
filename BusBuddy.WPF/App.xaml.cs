@@ -38,6 +38,42 @@ public partial class App : Application
 
     public App()
     {
+        // CRITICAL: Register Syncfusion license FIRST according to official documentation
+        // This must be done in App constructor before any Syncfusion controls are initialized
+        string? envLicenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
+        if (!string.IsNullOrWhiteSpace(envLicenseKey))
+        {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(envLicenseKey);
+        }
+        else
+        {
+            // Fallback: try to load from appsettings.json if environment variable not found
+            try
+            {
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+                string? licenseKey = configuration["Syncfusion:LicenseKey"] ??
+                                   configuration["SyncfusionLicenseKey"];
+
+                if (!string.IsNullOrWhiteSpace(licenseKey))
+                {
+                    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("WARNING: Syncfusion license key not found in environment variables or appsettings.json");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ERROR: Failed to load Syncfusion license from appsettings.json: {ex.Message}");
+            }
+        }
+
         // CRITICAL FIX: Apply Syncfusion culture fixes IMMEDIATELY to prevent XAML parsing issues
         BusBuddy.WPF.Utilities.SyncfusionCultureFix.ApplyCultureFixes();
 
@@ -192,46 +228,20 @@ public partial class App : Application
         }
         // --- END: Enhanced Build log diagnostics ---
 
-        string? envLicenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
         string appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
 
         // Check for appsettings.json before loading configuration
-        if (!File.Exists(appSettingsPath) && string.IsNullOrWhiteSpace(envLicenseKey))
+        if (!File.Exists(appSettingsPath))
         {
             MessageBox.Show(
                 $"The configuration file 'appsettings.json' was not found at '{appSettingsPath}'.\n\n" +
-                "Please ensure the file exists and is set to 'Copy if newer' in the project, or set the SYNCFUSION_LICENSE_KEY environment variable.",
+                "Please ensure the file exists and is set to 'Copy if newer' in the project.",
                 "Configuration File Missing",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             Shutdown();
             return;
         }
-
-        string? licenseKey = !string.IsNullOrWhiteSpace(envLicenseKey)
-            ? envLicenseKey
-            : new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build()["Syncfusion:LicenseKey"]
-                ?? new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .Build()["SyncfusionLicenseKey"];
-
-        if (string.IsNullOrWhiteSpace(licenseKey))
-        {
-            MessageBox.Show(
-                "Syncfusion license key is missing. Please set the SYNCFUSION_LICENSE_KEY environment variable or add it to appsettings.json.",
-                "License Key Missing",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            Shutdown();
-            return;
-        }
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
 
         // Build configuration for Serilog and DI
         var configuration = new ConfigurationBuilder()
@@ -336,6 +346,85 @@ public partial class App : Application
 
         // Set the Services property to the host's service provider for backward compatibility
         Services = _host.Services;
+
+        // 🔧 DEPLOYMENT READINESS: Comprehensive startup validation
+        Log.Information("[STARTUP] Running comprehensive startup validation for deployment readiness");
+        var validationStopwatch = Stopwatch.StartNew();
+
+        // Run validation in background task to avoid blocking UI thread
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                using var validationScope = Services.CreateScope();
+                var startupValidationService = validationScope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.StartupValidationService>();
+                var validationResult = await startupValidationService.ValidateStartupAsync();
+
+                validationStopwatch.Stop();
+
+                // Log detailed validation results
+                Log.Information("[STARTUP] Startup validation completed in {ValidationTimeMs}ms", validationResult.TotalValidationTimeMs);
+                Log.Information("[STARTUP] Validation Summary:\n{ValidationSummary}", validationResult.GetDeploymentSummary());
+
+                // Write validation results to a deployment-ready file
+                try
+                {
+                    string validationSolutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
+                                       ?? Directory.GetCurrentDirectory();
+                    string validationLogsDirectory = Path.Combine(validationSolutionRoot, "logs");
+                    string validationLogPath = Path.Combine(validationLogsDirectory, $"startup_validation_{DateTime.Now:yyyyMMdd_HHmmss}.log");
+
+                    await File.WriteAllTextAsync(validationLogPath, validationResult.GetDeploymentSummary());
+                    Log.Information("[STARTUP] Validation results written to: {ValidationLogPath}", validationLogPath);
+                }
+                catch (Exception logEx)
+                {
+                    Log.Warning(logEx, "[STARTUP] Could not write validation results to file");
+                }
+
+                // If validation failed, log the results
+                if (!validationResult.IsValid)
+                {
+                    var failedValidations = string.Join("\n", validationResult.ValidationResults
+                        .Where(r => !r.IsValid)
+                        .Select(r => $"• {r.ValidationName}: {r.ErrorMessage}"));
+
+                    var isDevelopment = BusBuddy.Core.Utilities.EnvironmentHelper.IsDevelopment();
+
+                    if (isDevelopment)
+                    {
+                        // In development, show warning but continue
+                        Log.Warning("[STARTUP] Validation failures detected in development environment - continuing startup");
+                        Log.Warning("[STARTUP] Failed validations:\n{FailedValidations}", failedValidations);
+                    }
+                    else
+                    {
+                        // In production, this is more serious
+                        Log.Error("[STARTUP] Validation failures detected in production environment");
+                        Log.Error("[STARTUP] Failed validations:\n{FailedValidations}", failedValidations);
+
+                        // Show warning on UI thread
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            MessageBox.Show(
+                                $"The application failed startup validation and may not function correctly:\n\n{failedValidations}\n\n" +
+                                "Please check the logs and contact technical support if this problem persists.",
+                                "Startup Validation Failed",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                        });
+                    }
+                }
+                else
+                {
+                    Log.Information("[STARTUP] ✅ All startup validations passed - application is ready for deployment");
+                }
+            }
+            catch (Exception validationEx)
+            {
+                Log.Error(validationEx, "[STARTUP] Error during startup validation");
+            }
+        });
 
         // Run log consolidation after DI is set up (asynchronously) - DISABLED due to missing utility
         /*
@@ -564,7 +653,7 @@ public partial class App : Application
         ConfigureLoggingAndDiagnostics(services);
         ConfigureDatabase(services, configuration);
         ConfigureDataAccess(services);
-        ConfigureCoreServices(services);
+        ConfigureCoreServices(services, configuration);
         ConfigureWpfServices(services);
         ConfigureUtilities(services);
         ConfigureViewModels(services);
@@ -649,7 +738,7 @@ public partial class App : Application
         services.AddScoped<BusBuddy.Core.Data.Repositories.IVehicleRepository, BusBuddy.Core.Data.Repositories.VehicleRepository>();
     }
 
-    private void ConfigureCoreServices(IServiceCollection services)
+    private void ConfigureCoreServices(IServiceCollection services, IConfiguration configuration)
     {
         // Register memory caching services - CRITICAL for BusCachingService
         services.AddMemoryCache();
@@ -676,6 +765,13 @@ public partial class App : Application
         // Specialized Services
         services.AddScoped<BusBuddy.Core.Services.GoogleEarthEngineService>();
         services.AddScoped<BusBuddy.Core.Services.IDashboardMetricsService, BusBuddy.Core.Services.DashboardMetricsService>();
+
+        // AI Services
+        services.AddHttpClient<BusBuddy.Core.Services.XAIService>();
+        services.AddScoped<BusBuddy.Core.Services.XAIService>();
+
+        // Register XAI configuration settings
+        services.Configure<BusBuddy.Configuration.XAIDocumentationSettings>(configuration.GetSection("XAI"));
     }
 
     private void ConfigureWpfServices(IServiceCollection services)
@@ -688,6 +784,9 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
         services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
+
+        // Register startup validation service for deployment readiness
+        services.AddScoped<BusBuddy.WPF.Services.StartupValidationService>();
 
         // Register Theme Service for dark/light mode switching
         services.AddSingleton<BusBuddy.WPF.Services.IThemeService, BusBuddy.WPF.Services.ThemeService>();
@@ -744,6 +843,9 @@ public partial class App : Application
 
         // List ViewModels
         services.AddScoped<BusBuddy.WPF.ViewModels.StudentListViewModel>();
+
+        // Settings and AI ViewModels
+        services.AddScoped<BusBuddy.WPF.ViewModels.XaiChatViewModel>();
     }
 
     #region Global Exception Handling

@@ -23,9 +23,9 @@
 
                     <!-- Syncfusion Control Style Overrides for FluentDark Theme Compatibility -->
                     <Style TargetType="{x:Type Control}" x:Key="SyncfusionFluentDarkStyle">
-                        <Setter Property="Background" Value="#2D2D30"/>
-                        <Setter Property="Foreground" Value="#F1F1F1"/>
-                        <Setter Property="BorderBrush" Value="#3F3F46"/>
+                        <Setter Property="Background" Value="{StaticResource FluentDarkBackgroundBrush}"/>
+                        <Setter Property="Foreground" Value="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource FluentDarkBorderBrush}"/>
                     </Style>
                 </ResourceDictionary>
 
@@ -37,8 +37,8 @@
 
                     <!-- Global application styles that work with FluentDark theme -->
                     <Style TargetType="Window">
-                        <Setter Property="Background" Value="#2D2D30"/>
-                        <Setter Property="Foreground" Value="#F1F1F1"/>
+                        <Setter Property="Background" Value="{StaticResource FluentDarkBackgroundBrush}"/>
+                        <Setter Property="Foreground" Value="{StaticResource FluentDarkPrimaryTextBrush}"/>
                     </Style>
                 </ResourceDictionary>
                 <ResourceDictionary Source="Resources/UnifiedStyles.xaml"/>

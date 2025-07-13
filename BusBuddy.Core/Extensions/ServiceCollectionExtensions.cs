@@ -56,8 +56,13 @@ namespace BusBuddy.Core.Extensions
             // Register User Context Service
             services.AddScoped<IUserContextService, UserContextService>();
 
+            // Register memory caching services - CRITICAL for BusCachingService
+            services.AddMemoryCache();
+            services.AddSingleton<IBusCachingService, BusCachingService>();
+
             // Register Business Services
             services.AddScoped<IBusService, BusService>();
+            services.AddScoped<IDriverService, DriverService>();
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IRouteService, RouteService>();
             services.AddScoped<IStudentService, StudentService>();
@@ -71,6 +76,9 @@ namespace BusBuddy.Core.Extensions
 
             // Register Activity Log Service
             services.AddScoped<IActivityLogService, ActivityLogService>();
+
+            // Register Dashboard Metrics Service
+            services.AddScoped<IDashboardMetricsService, DashboardMetricsService>();
 
             // Register Database NULL Fix Service
             services.AddScoped<BusBuddy.Core.Services.DatabaseNullFixService>();

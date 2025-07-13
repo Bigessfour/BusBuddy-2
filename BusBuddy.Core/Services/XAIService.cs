@@ -204,6 +204,48 @@ namespace BusBuddy.Core.Services
             }
         }
 
+        /// <summary>
+        /// Sends a general chat message to xAI Grok for AI AssistView integration
+        /// </summary>
+        public async Task<string> SendChatMessageAsync(string message, string? context = null)
+        {
+            try
+            {
+                _logger.LogInformation("Sending chat message to xAI: {Message}", message);
+
+                if (!_isConfigured)
+                {
+                    await Task.Delay(1000); // Simulate processing time
+                    return GenerateMockChatResponse(message);
+                }
+
+                var systemPrompt = string.IsNullOrEmpty(context)
+                    ? GetGeneralChatSystemPrompt()
+                    : $"{GetGeneralChatSystemPrompt()}\n\nAdditional Context: {context}";
+
+                var xaiRequest = new XAIRequest
+                {
+                    Model = _configuration["XAI:DefaultModel"] ?? "grok-3-latest",
+                    Messages = new[]
+                    {
+                        new XAIMessage { Role = "system", Content = systemPrompt },
+                        new XAIMessage { Role = "user", Content = message }
+                    },
+                    Temperature = _configuration.GetValue<double>("XAI:Temperature", 0.7),
+                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 2000)
+                };
+
+                var response = await CallXAIAPI(CHAT_COMPLETIONS_ENDPOINT, xaiRequest);
+                return response.Choices.FirstOrDefault()?.Message.Content ?? "I'm sorry, I couldn't process your request at the moment.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in xAI chat message: {Message}", message);
+                await Task.Delay(500); // Brief delay for mock response
+                return GenerateMockChatResponse(message);
+            }
+        }
+
         #region Prompt Building Methods
 
         private string BuildRouteOptimizationPrompt(RouteAnalysisRequest request)
@@ -382,6 +424,19 @@ Always prioritize student and driver safety. Provide comprehensive risk assessme
 Provide mathematically sound optimization recommendations with clear implementation steps.";
         }
 
+        private string GetGeneralChatSystemPrompt()
+        {
+            return @"You are BusBuddy AI, an intelligent assistant for school transportation management. You help with:
+- Transportation planning and optimization
+- Student and route management
+- Safety protocols and compliance
+- Maintenance scheduling and tracking
+- Fuel management and cost optimization
+- General school transportation questions
+
+Be helpful, informative, and always prioritize student safety. Provide practical, actionable advice for school transportation challenges.";
+        }
+
         #endregion
 
         #region API Communication (Future Implementation)
@@ -551,6 +606,22 @@ Provide mathematically sound optimization recommendations with clear implementat
                 ConfidenceLevel = 0.91,
                 Reasoning = "Optimization based on geographic clustering, capacity constraints, and time window requirements."
             };
+        }
+
+        private string GenerateMockChatResponse(string message)
+        {
+            // Simulate realistic chat responses based on the input message
+            var responses = new[]
+            {
+                $"Thank you for your question about '{message}'. Based on my transportation expertise, I recommend checking our safety protocols and route optimization features.",
+                $"I understand you're asking about '{message}'. For school transportation management, this typically involves reviewing current policies and consulting with our routing algorithms.",
+                $"That's a great question about '{message}'. In my experience with school transportation systems, the best approach is to prioritize student safety while optimizing efficiency.",
+                $"Regarding '{message}', I'd suggest checking your current transportation data and considering factors like route efficiency, safety compliance, and student capacity.",
+                $"I can help with '{message}'. For optimal school transportation management, consider reviewing your maintenance schedules, route planning, and safety protocols."
+            };
+
+            var random = new Random();
+            return responses[random.Next(responses.Length)];
         }
 
         #endregion

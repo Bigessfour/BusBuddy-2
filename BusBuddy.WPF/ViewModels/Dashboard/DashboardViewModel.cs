@@ -134,24 +134,21 @@ namespace BusBuddy.WPF.ViewModels
         private int _availableDriverCount;
         private double _fleetActivePercentage;
         private double _driverAvailabilityPercentage;
-        private double _routeCoveragePercentage;
-        private string _nextUpdateTime = "Calculating...";
-        private System.Threading.Timer? _refreshTimer;
         private volatile bool _isRefreshing = false; // State guard to prevent concurrent refreshes
 
-        // Additional properties for EnhancedDashboardView
-        private double _systemPerformanceScore = 92.5;
-        private string _nextServiceBus = "Bus #1042";
-        private string _nextServiceDue = "July 18, 2025";
-        private double _maintenanceCompletionPercentage = 40.0;
-        private double _averageFuelConsumption = 7.2;
-        private double _fuelBudgetUsedPercentage = 65.0;
-        private string _fuelEfficiencyStatus = "Good";
-        private int _totalEnrolledStudents = 1250;
-        private int _activeStudentsToday = 1180;
-        private string _studentCoverageStatus = "Excellent";
-        private double _studentAttendancePercentage = 94.4;
-        private double _resourceUtilizationPercentage = 87.5;
+        // Dashboard metrics properties with public accessors
+        public double SystemPerformanceScore { get; private set; } = 92.5;
+        public string NextServiceBus { get; private set; } = "Bus #1042";
+        public string NextServiceDue { get; private set; } = "July 18, 2025";
+        public double MaintenanceCompletionPercentage { get; private set; } = 40.0;
+        public double AverageFuelConsumption { get; private set; } = 7.2;
+        public double FuelBudgetUsedPercentage { get; private set; } = 65.0;
+        public string FuelEfficiencyStatus { get; private set; } = "Good";
+        public int TotalEnrolledStudents { get; private set; } = 1250;
+        public int ActiveStudentsToday { get; private set; } = 1180;
+        public string StudentCoverageStatus { get; private set; } = "Excellent";
+        public double StudentAttendancePercentage { get; private set; } = 94.4;
+        public double ResourceUtilizationPercentage { get; private set; } = 87.5;
         private ObservableCollection<DataPoint>? _fleetPerformanceData;
         private ObservableCollection<DataPoint>? _routeEfficiencyData;
 
