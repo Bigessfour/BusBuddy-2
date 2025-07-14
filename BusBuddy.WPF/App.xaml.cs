@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -50,14 +51,14 @@ public partial class App : Application
             // Fallback: try to load from appsettings.json if environment variable not found
             try
             {
-                var configuration = new ConfigurationBuilder()
+                var licenseConfig = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
                     .AddEnvironmentVariables()
                     .Build();
 
-                string? licenseKey = configuration["Syncfusion:LicenseKey"] ??
-                                   configuration["SyncfusionLicenseKey"];
+                string? licenseKey = licenseConfig["Syncfusion:LicenseKey"] ??
+                                   licenseConfig["SyncfusionLicenseKey"];
 
                 if (!string.IsNullOrWhiteSpace(licenseKey))
                 {
@@ -74,8 +75,8 @@ public partial class App : Application
             }
         }
 
-        // CRITICAL FIX: Apply Syncfusion culture fixes IMMEDIATELY to prevent XAML parsing issues
-        BusBuddy.WPF.Utilities.SyncfusionCultureFix.ApplyCultureFixes();
+        // Enable Syncfusion to apply merged theme resources globally
+        SfSkinManager.ApplyStylesOnApplication = true;
 
         // CRITICAL: Initialize error handling before anything else
         try
@@ -126,33 +127,66 @@ public partial class App : Application
             System.Diagnostics.Debug.WriteLine($"Error setting up exception handlers: {ex.Message}");
         }
 
-        _host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((context, config) =>
-            {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            })
-            .ConfigureServices((context, services) =>
-            {
-                // Use the application's ConfigureServices method for all registrations
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .Build();
-                ConfigureServices(services, configuration);
-            })
-            .Build();
+        // Initialize Serilog directly first (before host)
+        try
+        {
+            var startupConfig = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(startupConfig)
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithThreadId()
+                .Enrich.WithProcessId()
+                .WriteTo.Console()
+                .WriteTo.File("logs/application-.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            Log.Information("Serilog initialized successfully");
+        }
+        catch (Exception logEx)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to initialize Serilog: {logEx.Message}");
+        }
+
+        // Build the generic host with Serilog already initialized
+        try
+        {
+            _host = Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    config.SetBasePath(Directory.GetCurrentDirectory());
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                })
+                .UseSerilog()
+                .ConfigureServices((context, services) =>
+                {
+                    // Use the application's ConfigureServices method for all registrations
+                    ConfigureServices(services, context.Configuration);
+                })
+                .Build();
+            Services = _host.Services;
+
+            Log.Information("Host built successfully");
+        }
+        catch (Exception hostEx)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to build host: {hostEx.Message}");
+            throw;
+        }
     }
     protected override void OnStartup(StartupEventArgs e)
     {
-        // CRITICAL FIX: Apply culture fixes again to ensure they're active during XAML loading
-        BusBuddy.WPF.Utilities.SyncfusionCultureFix.ApplyCultureFixes();
+        // Start the generic host to initialize DI and logging before UI
+        _host.StartAsync().GetAwaiter().GetResult();
+        base.OnStartup(e);
 
-        // CRITICAL FIX: Initialize XAML error handling to gracefully handle parsing errors
-        // XamlErrorHandler.Initialize(); // Commented out due to build issues
-
-        // CRITICAL FIX: Validate Syncfusion DateTimePattern configurations to prevent XamlParseException
-        BusBuddy.WPF.Utilities.SyncfusionValidationUtility.ValidateSyncfusionControls();
+        // Now that the host is started, Serilog should be initialized
+        // Ensure Syncfusion applies merged theme resources globally
+        SfSkinManager.ApplyStylesOnApplication = true;
 
         // Start performance monitoring
         var stopwatch = Stopwatch.StartNew();

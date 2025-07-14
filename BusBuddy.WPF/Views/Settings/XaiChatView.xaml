@@ -9,10 +9,10 @@
              d:DesignHeight="600" d:DesignWidth="400">
 
     <UserControl.Resources>
-        <!-- Import FluentLight theme resources -->
+        <!-- Import FluentDark theme resources from NuGet package -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Resources/SyncfusionFluentLightTheme.xaml"/>
+                <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/FluentDark.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
