@@ -40,7 +40,7 @@
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance viewModels:FuelManagementViewModel}"
-             Style="{StaticResource BusBuddyUserControlStyle}"
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded">
     <UserControl.Resources>

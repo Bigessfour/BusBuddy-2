@@ -4,6 +4,7 @@
 // - Ensured the file compiles with basic functionality
 // - Restored original implementation after namespace fixes
 // - Added missing methods and properties in DashboardViewModel
+// - Integrated LoadingViewModel property for dashboard layout access
 
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -124,6 +125,9 @@ namespace BusBuddy.WPF.ViewModels
         private readonly IDashboardMetricsService _dashboardMetricsService;
         private readonly IEnhancedCachingService _cachingService;
 
+        // LoadingViewModel for dashboard integration
+        public LoadingViewModel? LoadingViewModel { get; }
+
         // Dashboard metrics
         private int _totalBuses;
         private int _totalDrivers;
@@ -163,7 +167,8 @@ namespace BusBuddy.WPF.ViewModels
             IDriverService driverService,
             IRouteService routeService,
             IDashboardMetricsService dashboardMetricsService,
-            IEnhancedCachingService cachingService)
+            IEnhancedCachingService cachingService,
+            LoadingViewModel? loadingViewModel = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
@@ -173,6 +178,7 @@ namespace BusBuddy.WPF.ViewModels
             _routeService = routeService ?? throw new ArgumentNullException(nameof(routeService));
             _dashboardMetricsService = dashboardMetricsService ?? throw new ArgumentNullException(nameof(dashboardMetricsService));
             _cachingService = cachingService ?? throw new ArgumentNullException(nameof(cachingService));
+            LoadingViewModel = loadingViewModel;
 
             // Initialize dashboard tiles and chart data
             _dashboardTiles = InitializeDashboardTiles();

@@ -15,6 +15,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         xmlns:local="clr-namespace:BusBuddy.WPF.Controls"
         mc:Ignorable="d"
         Title="{Binding DialogTitle, FallbackValue='Edit Student'}"
@@ -75,12 +76,14 @@
                     </TextBlock>
                     <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
                                            Text="{Binding StudentName}"
-                                           Margin="0,5,15,5"/>
+                                           Margin="0,5,15,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="Student Number:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3"
                                            Text="{Binding StudentNumber}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabelStyle}">
                         <TextBlock.Inlines>
@@ -116,7 +119,8 @@
                     </TextBlock>
                     <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="3"
                                            Text="{Binding School}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Date of Birth:" Style="{StaticResource FieldLabelStyle}"/>
                     <DatePicker Grid.Row="2" Grid.Column="1"
@@ -162,7 +166,8 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Home Address:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
                                            Text="{Binding HomeAddress}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="City:" Style="{StaticResource FieldLabelStyle}"/>
                     <Grid Grid.Row="1" Grid.Column="1" Margin="0,5">
@@ -174,11 +179,11 @@
                             <ColumnDefinition Width="100"/>
                         </Grid.ColumnDefinitions>
 
-                        <syncfusion:SfTextBoxExt Grid.Column="0" Text="{Binding City}" Margin="0,0,10,0"/>
+                        <syncfusion:SfTextBoxExt Grid.Column="0" Text="{Binding City}" Margin="0,0,10,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                         <TextBlock Grid.Column="1" Text="State:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <syncfusion:SfTextBoxExt Grid.Column="2" Text="{Binding State}" Width="50" Margin="0,0,10,0"/>
+                        <syncfusion:SfTextBoxExt Grid.Column="2" Text="{Binding State}" Width="50" Margin="0,0,10,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                         <TextBlock Grid.Column="3" Text="Zip:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <syncfusion:SfTextBoxExt Grid.Column="4" Text="{Binding Zip}"/>
+                        <syncfusion:SfTextBoxExt Grid.Column="4" Text="{Binding Zip}" syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                     </Grid>
 
                     <!-- Address Validation Control -->
@@ -195,7 +200,8 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Bus Stop:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="3" Grid.Column="1"
                                            Text="{Binding BusStop}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                 </Grid>
 
                 <!-- Contact Information Section -->
@@ -216,27 +222,32 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Parent/Guardian:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
                                            Text="{Binding ParentGuardian}"
-                                           Margin="0,5,15,5"/>
+                                           Margin="0,5,15,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="Home Phone:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3"
                                            Text="{Binding HomePhone}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Emergency Phone:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="1"
                                            Text="{Binding EmergencyPhone}"
-                                           Margin="0,5,15,5"/>
+                                           Margin="0,5,15,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="2" Text="Alt. Contact:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="3"
                                            Text="{Binding AlternativeContact}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Alt. Phone:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="2" Grid.Column="1"
                                            Text="{Binding AlternativePhone}"
-                                           Margin="0,5,15,5"/>
+                                           Margin="0,5,15,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                 </Grid>
 
                 <!-- Transportation Section -->
@@ -256,12 +267,14 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="AM Route:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="1"
                                            Text="{Binding AmRoute}"
-                                           Margin="0,5,15,5"/>
+                                           Margin="0,5,15,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="PM Route:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="0" Grid.Column="3"
                                            Text="{Binding PmRoute}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Transportation Notes:" Style="{StaticResource FieldLabelStyle}"/>
                     <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
@@ -300,22 +313,26 @@
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Allergies:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="1" Grid.Column="1"
                                            Text="{Binding Allergies}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Medications:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="2" Grid.Column="1"
                                            Text="{Binding Medications}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Doctor Name:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="3" Grid.Column="1"
                                            Text="{Binding DoctorName}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Doctor Phone:" Style="{StaticResource FieldLabelStyle}"/>
                     <syncfusion:SfTextBoxExt Grid.Row="4" Grid.Column="1"
                                            Text="{Binding DoctorPhone}"
-                                           Margin="0,5"/>
+                                           Margin="0,5"
+                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                 </Grid>
             </StackPanel>
         </ScrollViewer>
@@ -330,12 +347,14 @@
                     Style="{StaticResource DialogButton}"
                     IsDefault="True"
                     Background="#0078D7"
-                    Foreground="White"/>
+                    Foreground="White"
+                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <syncfusion:ButtonAdv Content="Cancel"
                     Command="{Binding CancelCommand}"
                     Style="{StaticResource DialogButton}"
-                    IsCancel="True"/>
+                    IsCancel="True"
+                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
         </StackPanel>
     </Grid>
 </Window>

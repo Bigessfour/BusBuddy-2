@@ -20,10 +20,10 @@
              xmlns:maintenanceView="clr-namespace:BusBuddy.WPF.Views.Maintenance"
              xmlns:fuelView="clr-namespace:BusBuddy.WPF.Views.Fuel"
              xmlns:activityView="clr-namespace:BusBuddy.WPF.Views.Activity"
+             xmlns:views="clr-namespace:BusBuddy.WPF.Views"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}"
-             Style="{StaticResource BusBuddyUserControlStyle}"
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <UserControl.Resources>
@@ -1106,6 +1106,21 @@
                                Margin="10"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"/>
+            </ContentControl>
+
+            <!-- System Loading Panel (Auto Hidden) — NEWLY INTEGRATED -->
+            <ContentControl x:Name="SystemLoadingPanel"
+                          syncfusion:DockingManager.Header="⚡ System Loading"
+                          syncfusion:DockingManager.State="AutoHidden"
+                          syncfusion:DockingManager.SideInDockedMode="Bottom"
+                          syncfusion:DockingManager.CanSerialize="True"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                <views:LoadingView DataContext="{Binding LoadingViewModel, FallbackValue={x:Null}}"
+                                  Margin="10"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"/>
             </ContentControl>
 
             <!-- 🤖 XAI Chat Panel (Right Docked) — NEW ENHANCEMENT -->

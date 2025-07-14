@@ -38,7 +38,7 @@
              xmlns:editors="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="800"
-             Style="{StaticResource BusBuddyUserControlStyle}">
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
     <Grid Margin="16" Background="{StaticResource FluentDarkBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

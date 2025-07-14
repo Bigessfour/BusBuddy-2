@@ -9,8 +9,8 @@
              xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Style="{StaticResource BusBuddyUserControlStyle}">
-    <Grid Background="{StaticResource FluentDarkBackgroundBrush}">
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+    <Grid>
         <syncfusion:SfDataGrid x:Name="StudentsGrid"
                                ItemsSource="{Binding Students}"
                                AutoGenerateColumns="False"

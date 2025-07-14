@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusBuddy.WPF.Views"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
         Title="Student Details" Height="450" Width="800">
     <Grid>
@@ -23,8 +24,10 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <syncfusion:ButtonAdv Content="Save" Command="{Binding SaveCommand}" Width="75" Margin="5" />
-            <syncfusion:ButtonAdv Content="Cancel" Command="{Binding CancelCommand}" Width="75" Margin="5" />
+            <syncfusion:ButtonAdv Content="Save" Command="{Binding SaveCommand}" Width="75" Margin="5"
+                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark" />
+            <syncfusion:ButtonAdv Content="Cancel" Command="{Binding CancelCommand}" Width="75" Margin="5"
+                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark" />
         </StackPanel>
     </Grid>
 </Window>

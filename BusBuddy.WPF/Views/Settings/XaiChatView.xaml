@@ -8,14 +8,7 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="400">
 
-    <UserControl.Resources>
-        <!-- Import FluentDark theme resources from NuGet package -->
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/FluentDark.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
+    <!-- No UserControl.Resources needed — SfSkinManager handles theme automatically -->
 
     <Grid Background="#FFFFFF">
         <Grid.RowDefinitions>
@@ -47,7 +40,7 @@
                             Messages="{Binding Messages}"
                             Suggestions="{Binding Suggestions}"
                             ShowTypingIndicator="{Binding IsTyping}"
-                            syncfusionskin:SfSkinManager.VisualStyle="FluentLight"
+                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                             Background="#FFFFFF"
                             Foreground="#000000"
                             Margin="0"/>

@@ -38,7 +38,7 @@
              xmlns:buttons="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="600"
-             Style="{StaticResource BusBuddyUserControlStyle}">
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <UserControl.Resources>
         <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>

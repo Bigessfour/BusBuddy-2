@@ -15,6 +15,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1200">
     <UserControl.Resources>
@@ -237,11 +238,13 @@
             <syncfusion:ButtonAdv Content="Save"
                     Command="{Binding SaveCommand}"
                     Style="{StaticResource ActionButton}"
-                    Background="#E0F0E0"/>
+                    Background="#E0F0E0"
+                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <syncfusion:ButtonAdv Content="Cancel"
                     Command="{Binding CancelCommand}"
-                    Style="{StaticResource ActionButton}"/>
+                    Style="{StaticResource ActionButton}"
+                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -28,20 +28,20 @@ namespace BusBuddy.WPF.Utilities
             dataGrid.ColumnSizer = GridLengthUnitType.Auto;
 
             // Apply theme using SfSkinManager
-            ApplyOffice2019Styling(dataGrid);
+            ApplyFluentDarkStyling(dataGrid);
         }
 
         /// <summary>
-        /// Apply Office2019Colorful theme to SfDataGrid
+        /// Apply FluentDark theme to SfDataGrid
         /// Per Syncfusion documentation: https://help.syncfusion.com/wpf/themes/skin-manager#set-theme
         /// </summary>
-        public static void ApplyOffice2019Styling(SfDataGrid dataGrid)
+        public static void ApplyFluentDarkStyling(SfDataGrid dataGrid)
         {
             // CRITICAL: Set ApplyThemeAsDefaultStyle before theme application
             SfSkinManager.ApplyThemeAsDefaultStyle = true;
 
             // Apply theme using official Syncfusion method
-            SfSkinManager.SetTheme(dataGrid, new Theme("Office2019Colorful"));
+            SfSkinManager.SetTheme(dataGrid, new Theme("FluentDark"));
         }
 
         /// <summary>

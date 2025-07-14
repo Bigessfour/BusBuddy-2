@@ -41,7 +41,7 @@
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance Type=viewModels:StudentManagementViewModel}"
-             Style="{StaticResource BusBuddyUserControlStyle}">
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>

@@ -1,11 +1,11 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║                                            🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                      ║
-║                                                          [UTILITY VIEW]                                                                                               ║
-║  📋 REQUIRED STANDARDS: This utility view MUST follow the universal standards defined in:                                                                             ║
-║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
-║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
-║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+║                                            🚀 BUSBUDDY PREMIUM LOADING EXPERIENCE 🚀                                                                                ║
+║                                                [ENHANCED LOADING VIEW]                                                                                                ║
+║  ✨ PREMIUM SYNCFUSION DESIGN: Advanced Syncfusion controls with FluentDark theme                                                                                     ║
+║  🎯 DIRECT THEME BRUSHES: Uses explicit FluentDark colors to prevent white screen                                                                                    ║
+║  🎭 MODERN ANIMATIONS: Storyboard animations with Syncfusion premium controls                                                                                        ║
+║  🏗️ DEPTH & SHADOWS: Layered design with modern visual depth effects                                                                                                 ║
 ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 -->
 
@@ -13,37 +13,161 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:progressbar="clr-namespace:Syncfusion.UI.Xaml.ProgressBar;assembly=Syncfusion.SfProgressBar.WPF"
              xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
-             Style="{StaticResource BusBuddyUserControlStyle}">
-    <Grid Background="{StaticResource FluentDarkBackgroundBrush}">
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Bus Buddy"
-                       FontSize="32"
-                       FontWeight="Bold"
-                       Foreground="{StaticResource FluentDarkForegroundBrush}"
-                       Margin="0,0,0,20"/>
+             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
-            <!-- Using SfBusyIndicator for better visual appearance -->
-            <syncfusion:SfBusyIndicator IsBusy="True"
-                                       AnimationType="DoubleCircle"
-                                       Height="70"
-                                       Width="70"
-                                       Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
-                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                       Margin="0,0,0,20"/>
+    <UserControl.Resources>
+        <!-- CONVERTERS -->
+        <converters:BooleanToVisibilityInverseConverter x:Key="BooleanToVisibilityInverseConverter"/>
 
-            <!-- Progress bar for additional visual feedback -->
-            <syncfusion:SfLinearProgressBar IsIndeterminate="True"
-                                          Width="300"
-                                          Height="6"
-                                          Margin="0,0,0,10"
-                                          Background="{StaticResource FluentDarkSurfaceBrush}"
-                                          Foreground="{StaticResource FluentDarkPrimaryBrush}"
-                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+        <!-- FLUENT DARK THEME COLORS — Direct brush definitions to prevent white screen -->
+        <SolidColorBrush x:Key="FluentDarkPrimary" Color="#0078D4"/>
+        <SolidColorBrush x:Key="FluentDarkBackground" Color="#1F1F1F"/>
+        <SolidColorBrush x:Key="FluentDarkSurface" Color="#2D2D30"/>
+        <SolidColorBrush x:Key="FluentDarkText" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="FluentDarkTextSecondary" Color="#B3B3B3"/>
+        <SolidColorBrush x:Key="FluentDarkAccent" Color="#00BCF2"/>
 
-            <TextBlock Text="Loading application..."
-                       HorizontalAlignment="Center"
-                       Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
-        </StackPanel>
+        <!-- PREMIUM GRADIENT BACKGROUNDS -->
+        <LinearGradientBrush x:Key="FluentDarkGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#1F1F1F" Offset="0"/>
+            <GradientStop Color="#2D2D30" Offset="0.5"/>
+            <GradientStop Color="#1F1F1F" Offset="1"/>
+        </LinearGradientBrush>
+
+        <RadialGradientBrush x:Key="FluentDarkRadialGlow" Center="0.5,0.5" RadiusX="0.8" RadiusY="0.8">
+            <GradientStop Color="#330078D4" Offset="0"/>
+            <GradientStop Color="#1F1F1F" Offset="1"/>
+        </RadialGradientBrush>
+
+        <!-- PREMIUM LOADING ANIMATIONS -->
+        <Storyboard x:Key="FadeInAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="LoadingContainer"
+                           Storyboard.TargetProperty="Opacity"
+                           From="0.7" To="1.0" Duration="0:0:2"
+                           AutoReverse="True"/>
+        </Storyboard>
+
+        <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="GlowEllipse"
+                           Storyboard.TargetProperty="Opacity"
+                           From="0.2" To="0.8" Duration="0:0:1.5"
+                           AutoReverse="True"/>
+        </Storyboard>
+    </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
+            <BeginStoryboard Storyboard="{StaticResource PulseAnimation}"/>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <!-- MAIN LOADING EXPERIENCE -->
+    <Grid Background="{StaticResource FluentDarkGradient}">
+        <!-- BACKGROUND GLOW EFFECT -->
+        <Ellipse x:Name="GlowEllipse"
+                 Width="800" Height="800"
+                 Fill="{StaticResource FluentDarkRadialGlow}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Opacity="0.3"/>
+
+        <!-- PREMIUM LOADING CONTAINER -->
+        <Border x:Name="LoadingContainer"
+                Background="{StaticResource FluentDarkSurface}"
+                CornerRadius="20"
+                Padding="60,50"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" Direction="270" ShadowDepth="10"
+                                BlurRadius="30" Opacity="0.5"/>
+            </Border.Effect>
+
+            <StackPanel>
+                <!-- PREMIUM APP BRANDING -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,40">
+                    <!-- ICON PLACEHOLDER — Could add custom icon here -->
+                    <Border Background="{StaticResource FluentDarkPrimary}"
+                            CornerRadius="8" Width="48" Height="48" Margin="0,0,15,0">
+                        <TextBlock Text="🚌" FontSize="24" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+
+                    <!-- APP TITLE WITH PREMIUM TYPOGRAPHY -->
+                    <StackPanel>
+                        <TextBlock Text="BUS BUDDY"
+                                   FontSize="42" FontWeight="Bold"
+                                   Foreground="{StaticResource FluentDarkText}"
+                                   FontFamily="Segoe UI Light"/>
+                        <TextBlock Text="School Transportation Management"
+                                   FontSize="14" FontWeight="Normal"
+                                   Foreground="{StaticResource FluentDarkTextSecondary}"
+                                   FontFamily="Segoe UI"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,5,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- SYNCFUSION PREMIUM LOADING INDICATORS -->
+
+                <!-- PRIMARY LOADING ANIMATION -->
+                <syncfusion:SfBusyIndicator IsBusy="True"
+                                           AnimationType="Gear"
+                                           Height="100" Width="100"
+                                           Foreground="{StaticResource FluentDarkPrimary}"
+                                           Margin="0,0,0,30"/>
+
+                <!-- ADVANCED PROGRESS BAR -->
+                <StackPanel Margin="0,0,0,25">
+                    <TextBlock Text="{Binding Status}"
+                               FontSize="16" FontWeight="Medium"
+                               Foreground="{StaticResource FluentDarkText}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,15"/>
+
+                    <progressbar:SfLinearProgressBar Width="400" Height="8"
+                                             Progress="{Binding ProgressPercentage}"
+                                             Foreground="{StaticResource FluentDarkPrimary}"
+                                             Background="{StaticResource FluentDarkBackground}"
+                                             IsIndeterminate="{Binding IsIndeterminate}"/>
+
+                    <!-- Progress Percentage Display -->
+                    <TextBlock Text="{Binding ProgressPercentage, StringFormat='{}{0}%'}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource FluentDarkAccent}"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"
+                               Visibility="{Binding IsIndeterminate, Converter={StaticResource BooleanToVisibilityInverseConverter}}"/>
+                </StackPanel>
+
+                <!-- SECONDARY PROGRESS INDICATOR -->
+                <syncfusion:SfLinearProgressBar IsIndeterminate="True"
+                                               Width="320" Height="3"
+                                               Foreground="{StaticResource FluentDarkAccent}"
+                                               Background="{StaticResource FluentDarkBackground}"
+                                               Margin="0,0,0,25"/>
+
+                <!-- STATUS INFORMATION -->
+                <StackPanel>
+                    <TextBlock Text="Loading Dashboard..."
+                               FontSize="14"
+                               Foreground="{StaticResource FluentDarkTextSecondary}"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               Margin="0,0,0,8"/>
+
+                    <TextBlock Text="Please wait while we prepare your experience"
+                               FontSize="12"
+                               Foreground="{StaticResource FluentDarkTextSecondary}"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               Opacity="0.7"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

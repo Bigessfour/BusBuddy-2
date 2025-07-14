@@ -25,7 +25,6 @@
         Height="900" Width="1600"
         WindowStartupLocation="CenterScreen"
         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-        Style="{StaticResource BusBuddyWindowStyle}"
         Loaded="Window_Loaded">
 
     <Window.Resources>
@@ -34,11 +33,10 @@
         <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <!-- CRITICAL FIX: Add missing navigation styles to prevent StaticResource errors -->
-        <!-- Navigation Panel Style — Ensures proper theme integration -->
+        <!-- Navigation Panel Style — Uses FluentDark theme colors -->
         <Style x:Key="BusBuddyNavigationPanelStyle" TargetType="Border">
-            <Setter Property="Background" Value="#3F3F46"/>  <!-- FluentDark surface -->
-            <Setter Property="BorderBrush" Value="#3F3F46"/>  <!-- FluentDark border -->
+            <Setter Property="Background" Value="#3F3F46"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
             <Setter Property="BorderThickness" Value="0,0,1,0"/>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Margin" Value="0"/>
@@ -60,13 +58,13 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="Foreground" Value="#F1F1F1"/>  <!-- FluentDark text -->
+            <Setter Property="Foreground" Value="#F1F1F1"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#4A4A51"/>  <!-- FluentDark hover -->
+                    <Setter Property="Background" Value="#4A4A51"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#007ACC"/>  <!-- FluentDark accent -->
+                    <Setter Property="Background" Value="#007ACC"/>
                     <Setter Property="Foreground" Value="#F1F1F1"/>
                 </Trigger>
             </Style.Triggers>
@@ -103,18 +101,8 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Window Style -->
-        <Style x:Key="BusBuddyWindowStyle" TargetType="Window">
-            <Setter Property="Background" Value="#2D2D30"/>  <!-- FluentDark background -->
-            <Setter Property="Foreground" Value="#F1F1F1"/>  <!-- FluentDark text -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="WindowStyle" Value="SingleBorderWindow"/>
-            <Setter Property="ResizeMode" Value="CanResize"/>
-            <Setter Property="UseLayoutRounding" Value="True"/>
-            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
-            <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
-        </Style>
+        <!-- FluentDark theme will automatically style the window -->
+        <!-- Removed custom BusBuddyWindowStyle as it conflicts with SfSkinManager.VisualStyle="FluentDark" -->
 
         <DataTemplate DataType="{x:Type viewModels:LoadingViewModel}">
             <views:LoadingView />

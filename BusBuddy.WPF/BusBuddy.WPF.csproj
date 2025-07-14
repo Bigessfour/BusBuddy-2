@@ -156,7 +156,6 @@
     <PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="30.1.39" />
     <PackageReference Include="Syncfusion.SfTextInputLayout.WPF" Version="30.1.39" />
     <PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.39" />
-    <PackageReference Include="Syncfusion.Themes.Office2019Colorful.WPF" Version="30.1.39" />
     <PackageReference Include="Syncfusion.Tools.WPF" Version="30.1.39" />
     <PackageReference Include="Syncfusion.UI.WPF.NET" Version="30.1.39" />
     <!-- Additional Syncfusion controls for enhanced functionality -->
@@ -170,11 +169,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
-    <!-- Modern Theme Support -->
-    <PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="30.1.39" />
+    <!-- Syncfusion Theme Support - FluentDark Only -->
     <PackageReference Include="Syncfusion.Themes.FluentDark.WPF" Version="30.1.39" />
-    <PackageReference Include="Syncfusion.Themes.MaterialLight.WPF" Version="30.1.39" />
-    <PackageReference Include="Syncfusion.Themes.MaterialDark.WPF" Version="30.1.39" />
     <!-- AI AssistView for modern chat interface -->
     <PackageReference Include="Syncfusion.SfChat.WPF" Version="30.1.39" />
   </ItemGroup>

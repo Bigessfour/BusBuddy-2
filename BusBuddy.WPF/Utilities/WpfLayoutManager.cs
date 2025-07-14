@@ -23,7 +23,7 @@ namespace BusBuddy.WPF.Utilities
             dockingManager.ContainerMode = DocumentContainerMode.TDI;
 
             // Apply theme using SfSkinManager
-            SfSkinManager.SetTheme(dockingManager, new Theme("Office2019Colorful"));
+            SfSkinManager.SetTheme(dockingManager, new Theme("FluentDark"));
         }
 
         /// <summary>

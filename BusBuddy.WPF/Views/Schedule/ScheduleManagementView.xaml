@@ -39,7 +39,7 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000"
              d:DataContext="{d:DesignInstance viewModels:ScheduleManagementViewModel}"
-             Style="{StaticResource BusBuddyUserControlStyle}">
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

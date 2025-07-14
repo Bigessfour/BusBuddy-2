@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              xmlns:vm="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="700">
@@ -15,7 +16,8 @@
                                ItemsSource="{Binding Schedules}"
                                AutoGenerateColumns="False"
                                SelectionMode="Single"
-                               SelectedItem="{Binding SelectedSchedule, Mode=TwoWay}">
+                               SelectedItem="{Binding SelectedSchedule, Mode=TwoWay}"
+                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn MappingName="ScheduleId" HeaderText="ID" Width="60"/>
                 <syncfusion:GridTextColumn MappingName="Route.RouteName" HeaderText="Route" Width="120"/>

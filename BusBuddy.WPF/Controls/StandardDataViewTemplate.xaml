@@ -244,6 +244,7 @@
 
     <!-- Premium Syncfusion Button Style with Ripple Effect -->
     <Style x:Key="StandardButtonStyle" TargetType="syncfusion:ButtonAdv">
+        <Setter Property="skin:SfSkinManager.VisualStyle" Value="FluentDark"/>
         <Setter Property="Height" Value="48"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
@@ -530,7 +531,8 @@
                                      Margin="8,0,0,0"
                                      Background="Transparent"
                                      BorderThickness="0"
-                                     ToolTip="Remove Filter">
+                                     ToolTip="Remove Filter"
+                                     skin:SfSkinManager.VisualStyle="FluentDark">
                     <TextBlock Text="✕" FontSize="10" Foreground="{StaticResource OnSurfaceVariantBrush}"/>
                 </syncfusion:ButtonAdv>
             </StackPanel>

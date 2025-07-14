@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sf="http://schemas.syncfusion.com/wpf"
                     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+                    xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
                     xmlns:chart="http://schemas.syncfusion.com/wpf"
                     xmlns:gauge="http://schemas.syncfusion.com/wpf">
 
@@ -124,6 +125,7 @@
 
     <!-- SYNCFUSION BUTTON STYLES -->
     <Style x:Key="PrimaryButtonStyle" TargetType="syncfusion:ButtonAdv">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
         <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -150,6 +152,7 @@
     </Style>
 
     <Style x:Key="SecondaryButtonStyle" TargetType="syncfusion:ButtonAdv">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
@@ -174,6 +177,7 @@
     </Style>
 
     <Style x:Key="DangerButtonStyle" TargetType="syncfusion:ButtonAdv">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
         <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -196,6 +200,7 @@
     </Style>
 
     <Style x:Key="AccentButtonStyle" TargetType="syncfusion:ButtonAdv">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
         <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -230,6 +235,7 @@
     </Style>
 
     <Style x:Key="StandardComboBoxStyle" TargetType="syncfusion:ComboBoxAdv">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
         <Setter Property="Height" Value="36"/>
         <Setter Property="FontFamily" Value="{StaticResource PrimaryFontFamily}"/>
         <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>

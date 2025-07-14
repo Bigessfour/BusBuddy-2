@@ -1,5 +1,5 @@
 using Syncfusion.SfSkinManager;
-using Syncfusion.Themes.Office2019Colorful.WPF;
+using Syncfusion.Themes.FluentDark.WPF;
 using System.Windows;
 
 namespace BusBuddy.WPF.Utilities
@@ -11,18 +11,18 @@ namespace BusBuddy.WPF.Utilities
     public static class WpfThemeManager
     {
         /// <summary>
-        /// Apply Office2019Colorful theme to a specific element using official Syncfusion SetTheme method
+        /// Apply FluentDark theme to a specific element using official Syncfusion SetTheme method
         /// API Reference: https://help.syncfusion.com/cr/wpf/Syncfusion.SfSkinManager.SfSkinManager.html#Syncfusion_SfSkinManager_SfSkinManager_SetTheme_System_Windows_DependencyObject_Syncfusion_SfSkinManager_Theme_
         /// </summary>
         /// <param name="element">The DependencyObject to apply the theme to</param>
-        public static void ApplyOffice2019ColorfulTheme(DependencyObject element)
+        public static void ApplyFluentDarkTheme(DependencyObject element)
         {
             // CRITICAL: Set ApplyThemeAsDefaultStyle before any theme application
             // API Reference: https://help.syncfusion.com/cr/wpf/Syncfusion.SfSkinManager.SfSkinManager.html#Syncfusion_SfSkinManager_SfSkinManager_ApplyThemeAsDefaultStyle
             SfSkinManager.ApplyThemeAsDefaultStyle = true;
 
             // Apply theme using official Syncfusion SetTheme method
-            SfSkinManager.SetTheme(element, new Theme("Office2019Colorful"));
+            SfSkinManager.SetTheme(element, new Theme("FluentDark"));
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace BusBuddy.WPF.Utilities
             SfSkinManager.ApplyThemeAsDefaultStyle = true;
 
             // Apply theme globally using ApplicationTheme property
-            SfSkinManager.ApplicationTheme = new Theme("Office2019Colorful");
+            SfSkinManager.ApplicationTheme = new Theme("FluentDark");
         }
 
         /// <summary>
@@ -43,10 +43,10 @@ namespace BusBuddy.WPF.Utilities
         /// API Reference: https://help.syncfusion.com/cr/wpf/Syncfusion.SfSkinManager.SfSkinManager.html#Syncfusion_SfSkinManager_SfSkinManager_RegisterThemeSettings_System_String_Syncfusion_SfSkinManager_IThemeSetting_
         /// </summary>
         /// <param name="element">The DependencyObject to apply the theme to</param>
-        public static void ApplyCustomOffice2019Theme(DependencyObject element)
+        public static void ApplyCustomFluentDarkTheme(DependencyObject element)
         {
-            // Create custom theme settings using official Office2019ColorfulThemeSettings class
-            var themeSettings = new Office2019ColorfulThemeSettings();
+            // Create custom theme settings using official FluentDarkThemeSettings class
+            var themeSettings = new FluentDarkThemeSettings();
 
             // Customize colors as needed using documented properties
             // themeSettings.PrimaryBackground = new SolidColorBrush(Colors.CustomColor);
@@ -55,10 +55,10 @@ namespace BusBuddy.WPF.Utilities
             // themeSettings.BodyFontSize = 12;
 
             // Register custom theme settings using official RegisterThemeSettings method
-            SfSkinManager.RegisterThemeSettings("Office2019Colorful", themeSettings);
+            SfSkinManager.RegisterThemeSettings("FluentDark", themeSettings);
 
             // Apply theme using official SetTheme method
-            SfSkinManager.SetTheme(element, new Theme("Office2019Colorful"));
+            SfSkinManager.SetTheme(element, new Theme("FluentDark"));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace BusBuddy.WPF.Utilities
             SfSkinManager.ApplyThemeAsDefaultStyle = true;
 
             // Apply theme using official SetTheme method
-            SfSkinManager.SetTheme(element, new Theme("Office2019Colorful"));
+            SfSkinManager.SetTheme(element, new Theme("FluentDark"));
 
             // Set touch mode using official SetSizeMode method
             if (enableTouchMode)
@@ -103,7 +103,7 @@ namespace BusBuddy.WPF.Utilities
             // NOTE: Based on API documentation review, there is no Dispose method available
             // in the current SfSkinManager API. This method is kept for compatibility
             // but currently performs no operation.
-            // 
+            //
             // If cleanup is needed, consider setting the Theme to null or default:
             // SfSkinManager.SetTheme(element, new Theme("Default"));
         }

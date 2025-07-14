@@ -381,69 +381,72 @@ public partial class App : Application
         // Set the Services property to the host's service provider for backward compatibility
         Services = _host.Services;
 
-        // 🔧 DEPLOYMENT READINESS: Comprehensive startup validation
-        Log.Information("[STARTUP] Running comprehensive startup validation for deployment readiness");
-        var validationStopwatch = Stopwatch.StartNew();
+        // 🔧 PROGRESS-AWARE STARTUP: Replace background validation with orchestrated startup sequence
+        Log.Information("[STARTUP] Running orchestrated startup sequence with LoadingView progress indication");
+        var orchestrationStopwatch = Stopwatch.StartNew();
 
-        // Run validation in background task to avoid blocking UI thread
+        // Run orchestrated startup in background task to avoid blocking UI thread
         _ = Task.Run(async () =>
         {
             try
             {
-                using var validationScope = Services.CreateScope();
-                var startupValidationService = validationScope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.StartupValidationService>();
-                var validationResult = await startupValidationService.ValidateStartupAsync();
+                using var orchestrationScope = Services.CreateScope();
+                var orchestrationService = orchestrationScope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.StartupOrchestrationService>();
+                var loadingViewModel = orchestrationScope.ServiceProvider.GetRequiredService<BusBuddy.WPF.ViewModels.LoadingViewModel>();
 
-                validationStopwatch.Stop();
+                // Connect orchestration service to LoadingView
+                var startupResult = await orchestrationService.ExecuteStartupSequenceAsync(loadingViewModel);
 
-                // Log detailed validation results
-                Log.Information("[STARTUP] Startup validation completed in {ValidationTimeMs}ms", validationResult.TotalValidationTimeMs);
-                Log.Information("[STARTUP] Validation Summary:\n{ValidationSummary}", validationResult.GetDeploymentSummary());
+                orchestrationStopwatch.Stop();
 
-                // Write validation results to a deployment-ready file
+                // Log detailed orchestration results
+                Log.Information("[STARTUP] Orchestrated startup completed in {OrchestrationTimeMs}ms", startupResult.TotalExecutionTimeMs);
+                Log.Information("[STARTUP] Startup Phases Summary:\n{StartupSummary}", startupResult.GetExecutionSummary());
+
+                // Write orchestration results to deployment-ready file
                 try
                 {
-                    string validationSolutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
+                    string orchestrationSolutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
                                        ?? Directory.GetCurrentDirectory();
-                    string validationLogsDirectory = Path.Combine(validationSolutionRoot, "logs");
-                    string validationLogPath = Path.Combine(validationLogsDirectory, $"startup_validation_{DateTime.Now:yyyyMMdd_HHmmss}.log");
+                    string orchestrationLogsDirectory = Path.Combine(orchestrationSolutionRoot, "logs");
+                    string orchestrationLogPath = Path.Combine(orchestrationLogsDirectory, $"startup_orchestration_{DateTime.Now:yyyyMMdd_HHmmss}.log");
 
-                    await File.WriteAllTextAsync(validationLogPath, validationResult.GetDeploymentSummary());
-                    Log.Information("[STARTUP] Validation results written to: {ValidationLogPath}", validationLogPath);
+                    await File.WriteAllTextAsync(orchestrationLogPath, startupResult.GetExecutionSummary());
+                    Log.Information("[STARTUP] Orchestration results written to: {OrchestrationLogPath}", orchestrationLogPath);
                 }
                 catch (Exception logEx)
                 {
-                    Log.Warning(logEx, "[STARTUP] Could not write validation results to file");
+                    Log.Warning(logEx, "[STARTUP] Could not write orchestration results to file");
                 }
 
-                // If validation failed, log the results
-                if (!validationResult.IsValid)
+                // If orchestration failed, log the results
+                if (!startupResult.IsSuccessful)
                 {
-                    var failedValidations = string.Join("\n", validationResult.ValidationResults
-                        .Where(r => !r.IsValid)
-                        .Select(r => $"• {r.ValidationName}: {r.ErrorMessage}"));
+                    var failedPhases = string.Join("\n", startupResult.PhaseResults
+                        .Where(r => !r.IsSuccessful)
+                        .Select(r => $"• {r.PhaseName}: {r.ErrorMessage}"));
 
                     var isDevelopment = BusBuddy.Core.Utilities.EnvironmentHelper.IsDevelopment();
 
                     if (isDevelopment)
                     {
                         // In development, show warning but continue
-                        Log.Warning("[STARTUP] Validation failures detected in development environment - continuing startup");
-                        Log.Warning("[STARTUP] Failed validations:\n{FailedValidations}", failedValidations);
+                        Log.Warning("[STARTUP] Orchestration phase failures detected in development environment - continuing startup");
+                        Log.Warning("[STARTUP] Failed phases:\n{FailedPhases}", failedPhases);
                     }
                     else
                     {
                         // In production, this is more serious
-                        Log.Error("[STARTUP] Validation failures detected in production environment");
-                        Log.Error("[STARTUP] Failed validations:\n{FailedValidations}", failedValidations);
+                        Log.Error("[STARTUP] Orchestration phase failures detected in production environment");
+                        Log.Error("[STARTUP] Failed phases:\n{FailedPhases}", failedPhases);
 
                         // Show warning on UI thread
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             MessageBox.Show(
-                                $"The application failed startup validation and may not function correctly:\n\n{failedValidations}\n\n" +
+                                $"The application failed during startup orchestration and may not function correctly:\n\n{failedPhases}\n\n" +
                                 "Please check the logs and contact technical support if this problem persists.",
-                                "Startup Validation Failed",
+                                "Startup Orchestration Failed",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Warning);
                         });
@@ -451,12 +454,12 @@ public partial class App : Application
                 }
                 else
                 {
-                    Log.Information("[STARTUP] ✅ All startup validations passed - application is ready for deployment");
+                    Log.Information("[STARTUP] ✅ All startup orchestration phases completed successfully - LoadingView progress indication functional");
                 }
             }
-            catch (Exception validationEx)
+            catch (Exception orchestrationEx)
             {
-                Log.Error(validationEx, "[STARTUP] Error during startup validation");
+                Log.Error(orchestrationEx, "[STARTUP] Error during startup orchestration");
             }
         });
 
@@ -821,6 +824,9 @@ public partial class App : Application
 
         // Register startup validation service for deployment readiness
         services.AddScoped<BusBuddy.WPF.Services.StartupValidationService>();
+
+        // Register startup orchestration service with enhanced Serilog logging
+        services.AddScoped<BusBuddy.WPF.Services.StartupOrchestrationService>();
 
         // Register Theme Service for dark/light mode switching
         services.AddSingleton<BusBuddy.WPF.Services.IThemeService, BusBuddy.WPF.Services.ThemeService>();

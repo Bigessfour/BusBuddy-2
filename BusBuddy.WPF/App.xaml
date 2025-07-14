@@ -5,11 +5,6 @@
              xmlns:converters="clr-namespace:BusBuddy.WPF.Converters">
     <Application.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!-- Syncfusion FluentDark theme from NuGet Package — verified pack URI -->
-                <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/Syncfusion.Themes.FluentDark.WPF.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <!-- Global Converters — Syncfusion Compatible -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
