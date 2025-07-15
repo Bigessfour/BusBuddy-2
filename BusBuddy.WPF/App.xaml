@@ -7,16 +7,15 @@
         <ResourceDictionary>
             <!--
             ===============================================================================
-            SYNCFUSION FLUENTDARK THEME — PROPER IMPLEMENTATION
+            SYNCFUSION FLUENTDARK THEME — OFFICIAL SKINMANAGER IMPLEMENTATION
             ===============================================================================
-            Using SkinManager approach (recommended by Syncfusion) instead of manual merging.
-            This prevents StaticResource conflicts and "Resource not available" errors.
-            All theme resources are loaded from NuGet packages at runtime.
+            Theme is applied via SfSkinManager.ApplicationTheme in App.xaml.cs
+            This loads the official Syncfusion FluentDark theme resources automatically
+            Only custom styles and compatibility mappings are included here
             ===============================================================================
-            -->
-
-            <!-- Merged dictionaries for custom styles -->
+            -->            <!-- Load custom application styles with official theme resource alignment -->
             <ResourceDictionary.MergedDictionaries>
+                <!-- Custom styles that use official Syncfusion FluentDark resource names -->
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 

@@ -8,9 +8,6 @@
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
              xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:chart="clr-namespace:Syncfusion.UI.Xaml.Charts;assembly=Syncfusion.SfChart.WPF"
-             xmlns:gauge="clr-namespace:Syncfusion.UI.Xaml.Gauges;assembly=Syncfusion.SfGauge.WPF"
-             xmlns:progressbar="clr-namespace:Syncfusion.UI.Xaml.ProgressBar;assembly=Syncfusion.SfProgressBar.WPF"
              xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              xmlns:busView="clr-namespace:BusBuddy.WPF.Views.Bus"
              xmlns:driverView="clr-namespace:BusBuddy.WPF.Views.Driver"
@@ -76,8 +73,8 @@
 
         <!-- Enhanced Tile Style for Modern Appearance with Theme Support -->
         <Style x:Key="DashboardTileStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource FluentDarkBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource FluentDarkBorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ContentBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="Margin" Value="10"/>
@@ -89,8 +86,8 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource FluentDarkHoverBrush}"/>
-                    <Setter Property="BorderBrush" Value="{DynamicResource FluentDarkPrimaryBrush}"/>
+                    <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBackground}"/>
                     <Setter Property="BorderThickness" Value="2"/>
                     <Setter Property="Effect">
                         <Setter.Value>
@@ -110,14 +107,14 @@
         <Style x:Key="TileHeaderStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{DynamicResource FluentDarkForegroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ContentForeground}"/>
             <Setter Property="Margin" Value="0,0,0,15"/>
         </Style>
 
         <!-- Enhanced Tile Content Style with Theme Support -->
         <Style x:Key="TileContentStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="{DynamicResource FluentDarkSecondaryTextBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryForeground}"/>
             <Setter Property="Margin" Value="0,0,0,6"/>
         </Style>
 
@@ -125,7 +122,7 @@
         <Style x:Key="TileValueStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="24"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{DynamicResource FluentDarkPrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryBackground}"/>
             <Setter Property="Margin" Value="0,0,0,10"/>
         </Style>
 
@@ -142,12 +139,12 @@
             <Setter Property="Background">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="{StaticResource FluentDarkPrimaryColor}" Offset="0"/>
-                        <GradientStop Color="{StaticResource FluentDarkAccentColor}" Offset="1"/>
+                        <GradientStop Color="{DynamicResource PrimaryColor}" Offset="0"/>
+                        <GradientStop Color="{DynamicResource AccentColor}" Offset="1"/>
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
-            <Setter Property="BorderBrush" Value="{StaticResource FluentDarkPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBackground}"/>
             <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="Margin" Value="10"/>
@@ -176,7 +173,7 @@
         </Grid.RowDefinitions>
 
         <!-- Enhanced Header with Live Status -->
-        <Border Grid.Row="0" Background="{DynamicResource FluentDarkPrimaryBrush}" Padding="16,12">
+        <Border Grid.Row="0" Background="{DynamicResource PrimaryBackground}" Padding="16,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -184,10 +181,10 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="🚌 Bus Buddy Dashboard" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource FluentDarkForegroundBrush}" VerticalAlignment="Center"/>
-                    <Border Background="{StaticResource FluentDarkSuccessBrush}" CornerRadius="12" Padding="8,4" Margin="16,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="🚌 Bus Buddy Dashboard" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource ContentForeground}" VerticalAlignment="Center"/>
+                    <Border Background="{DynamicResource SuccessBackground}" CornerRadius="12" Padding="8,4" Margin="16,0,0,0" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Fill="{StaticResource FluentDarkForegroundBrush}" VerticalAlignment="Center" Margin="0,0,6,0">
+                            <Ellipse Width="8" Height="8" Fill="{DynamicResource ContentForeground}" VerticalAlignment="Center" Margin="0,0,6,0">
                                 <Ellipse.RenderTransform>
                                     <ScaleTransform x:Name="PulseTransform" ScaleX="1" ScaleY="1" CenterX="4" CenterY="4"/>
                                 </Ellipse.RenderTransform>
@@ -210,7 +207,7 @@
                                     </EventTrigger>
                                 </Ellipse.Triggers>
                             </Ellipse>
-                            <TextBlock Text="LIVE" FontSize="12" FontWeight="Bold" Foreground="{StaticResource FluentDarkForegroundBrush}" VerticalAlignment="Center"/>
+                            <TextBlock Text="LIVE" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource ContentForeground}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -282,16 +279,17 @@
                                         </StackPanel>
 
                                         <!-- Syncfusion Circular Progress for Fleet Status -->
-                                        <progressbar:SfCircularProgressBar Grid.Column="1"
+                                        <syncfusion:SfCircularProgressBar Grid.Column="1"
                                                                         Width="70" Height="70"
                                                                         Progress="{Binding FleetActivePercentage}"
                                                                         Margin="5"
+                                                                        Style="{StaticResource BusBuddySfCircularProgressBarStyle}"
                                                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                            <progressbar:SfCircularProgressBar.Content>
+                                            <syncfusion:SfCircularProgressBar.Content>
                                                 <TextBlock Text="{Binding FleetActivePercentage, StringFormat='{}{0:F0}%'}" FontSize="12" FontWeight="Bold"
                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </progressbar:SfCircularProgressBar.Content>
-                                        </progressbar:SfCircularProgressBar>
+                                            </syncfusion:SfCircularProgressBar.Content>
+                                        </syncfusion:SfCircularProgressBar>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -349,38 +347,38 @@
                                         </StackPanel>
 
                                         <!-- Syncfusion Radial Gauge for Route Coverage -->
-                                        <gauge:SfCircularGauge Grid.Column="1" Width="60" Height="60" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                            <gauge:SfCircularGauge.Scales>
-                                                <gauge:CircularScale StartAngle="135" SweepAngle="270"
+                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="60" Height="60" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                            <syncfusion:SfCircularGauge.Scales>
+                                                <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
                                                                    Interval="25" ShowTicks="False"
                                                                    ShowLabels="False"
                                                                    RimStroke="{StaticResource FluentDarkBorderBrush}" RimStrokeThickness="6">
-                                                    <gauge:CircularScale.Pointers>
-                                                        <gauge:CircularPointer NeedlePointerType="Triangle"
+                                                    <syncfusion:CircularScale.Pointers>
+                                                        <syncfusion:CircularPointer NeedlePointerType="Triangle"
                                                                              PointerCapStroke="{StaticResource FluentDarkWarningBrush}"
                                                                              NeedlePointerStroke="{StaticResource FluentDarkWarningBrush}"
                                                                              Value="{Binding RouteCoveragePercentage}"/>
-                                                    </gauge:CircularScale.Pointers>
-                                                    <gauge:CircularScale.Ranges>
-                                                        <gauge:CircularRange StartValue="0" EndValue="100"
+                                                    </syncfusion:CircularScale.Pointers>
+                                                    <syncfusion:CircularScale.Ranges>
+                                                        <syncfusion:CircularRange StartValue="0" EndValue="100"
                                                                            Stroke="{StaticResource FluentDarkWarningBrush}" StrokeThickness="6"/>
-                                                    </gauge:CircularScale.Ranges>
-                                                </gauge:CircularScale>
-                                            </gauge:SfCircularGauge.Scales>
-                                            <gauge:SfCircularGauge.Annotations>
-                                                <gauge:GaugeAnnotation>
-                                                    <gauge:GaugeAnnotation.Content>
+                                                    </syncfusion:CircularScale.Ranges>
+                                                </syncfusion:CircularScale>
+                                            </syncfusion:SfCircularGauge.Scales>
+                                            <syncfusion:SfCircularGauge.Annotations>
+                                                <syncfusion:GaugeAnnotation>
+                                                    <syncfusion:GaugeAnnotation.Content>
                                                         <TextBlock Text="{Binding RouteCoveragePercentage, StringFormat='{}{0:F0}%'}"
                                                                   FontSize="12"
                                                                   FontWeight="Bold"
                                                                   Foreground="{StaticResource FluentDarkWarningBrush}"
                                                                   HorizontalAlignment="Center"
                                                                   VerticalAlignment="Center"/>
-                                                    </gauge:GaugeAnnotation.Content>
-                                                </gauge:GaugeAnnotation>
-                                            </gauge:SfCircularGauge.Annotations>
-                                        </gauge:SfCircularGauge>
+                                                    </syncfusion:GaugeAnnotation.Content>
+                                                </syncfusion:GaugeAnnotation>
+                                            </syncfusion:SfCircularGauge.Annotations>
+                                        </syncfusion:SfCircularGauge>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -409,31 +407,31 @@
                                         </StackPanel>
 
                                         <!-- Syncfusion Circular Gauge for Performance -->
-                                        <gauge:SfCircularGauge Grid.Column="1" Width="80" Height="80" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                            <gauge:SfCircularGauge.Scales>
-                                                <gauge:CircularScale StartAngle="135" SweepAngle="270"
+                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="80" Height="80" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                            <syncfusion:SfCircularGauge.Scales>
+                                                <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
                                                                    Interval="20" MinorTicksPerInterval="1"
                                                                    RimStroke="{StaticResource FluentDarkBorderBrush}" RimStrokeThickness="8"
                                                                    TickStroke="{StaticResource FluentDarkSecondaryTextBrush}" TickStrokeThickness="1"
                                                                    LabelStroke="Transparent">
-                                                    <gauge:CircularScale.Pointers>
-                                                        <gauge:CircularPointer NeedlePointerType="Triangle"
+                                                    <syncfusion:CircularScale.Pointers>
+                                                        <syncfusion:CircularPointer NeedlePointerType="Triangle"
                                                                              PointerCapStroke="{StaticResource FluentDarkPrimaryBrush}"
                                                                              NeedlePointerStroke="{StaticResource FluentDarkPrimaryBrush}"
                                                                              Value="{Binding SystemPerformanceScore}"/>
-                                                    </gauge:CircularScale.Pointers>
-                                                    <gauge:CircularScale.Ranges>
-                                                        <gauge:CircularRange StartValue="0" EndValue="50"
+                                                    </syncfusion:CircularScale.Pointers>
+                                                    <syncfusion:CircularScale.Ranges>
+                                                        <syncfusion:CircularRange StartValue="0" EndValue="50"
                                                                            Stroke="{StaticResource FluentDarkErrorBrush}" StrokeThickness="8"/>
-                                                        <gauge:CircularRange StartValue="50" EndValue="75"
+                                                        <syncfusion:CircularRange StartValue="50" EndValue="75"
                                                                            Stroke="{StaticResource FluentDarkWarningBrush}" StrokeThickness="8"/>
-                                                        <gauge:CircularRange StartValue="75" EndValue="100"
+                                                        <syncfusion:CircularRange StartValue="75" EndValue="100"
                                                                            Stroke="{StaticResource FluentDarkSuccessBrush}" StrokeThickness="8"/>
-                                                    </gauge:CircularScale.Ranges>
-                                                </gauge:CircularScale>
-                                            </gauge:SfCircularGauge.Scales>
-                                        </gauge:SfCircularGauge>
+                                                    </syncfusion:CircularScale.Ranges>
+                                                </syncfusion:CircularScale>
+                                            </syncfusion:SfCircularGauge.Scales>
+                                        </syncfusion:SfCircularGauge>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -520,25 +518,25 @@
 
                                         <!-- Efficiency Meter -->
                                         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                                            <gauge:SfCircularGauge Width="40" Height="40" Margin="0,0,10,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                                <gauge:SfCircularGauge.Scales>
-                                                    <gauge:CircularScale StartAngle="135" SweepAngle="270"
+                                            <syncfusion:SfCircularGauge Width="40" Height="40" Margin="0,0,10,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                <syncfusion:SfCircularGauge.Scales>
+                                                    <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                        StartValue="0" EndValue="10"
                                                                        ShowLabels="False" ShowTicks="False"
                                                                        RimStroke="{StaticResource FluentDarkBorderBrush}" RimStrokeThickness="4">
-                                                        <gauge:CircularScale.Pointers>
-                                                            <gauge:CircularPointer NeedlePointerType="Triangle"
+                                                        <syncfusion:CircularScale.Pointers>
+                                                            <syncfusion:CircularPointer NeedlePointerType="Triangle"
                                                                                  PointerCapStroke="{StaticResource FluentDarkSuccessBrush}"
                                                                                  NeedlePointerStroke="{StaticResource FluentDarkSuccessBrush}"
                                                                                  Value="{Binding AverageFuelConsumption}"/>
-                                                        </gauge:CircularScale.Pointers>
-                                                        <gauge:CircularScale.Ranges>
-                                                            <gauge:CircularRange StartValue="0" EndValue="10"
+                                                        </syncfusion:CircularScale.Pointers>
+                                                        <syncfusion:CircularScale.Ranges>
+                                                            <syncfusion:CircularRange StartValue="0" EndValue="10"
                                                                                Stroke="{StaticResource FluentDarkSuccessBrush}" StrokeThickness="4"/>
-                                                        </gauge:CircularScale.Ranges>
-                                                    </gauge:CircularScale>
-                                                </gauge:SfCircularGauge.Scales>
-                                            </gauge:SfCircularGauge>
+                                                        </syncfusion:CircularScale.Ranges>
+                                                    </syncfusion:CircularScale>
+                                                </syncfusion:SfCircularGauge.Scales>
+                                            </syncfusion:SfCircularGauge>
                                             <StackPanel VerticalAlignment="Center">
                                                 <TextBlock Text="8.2 L/100km" FontSize="12" FontWeight="SemiBold" Foreground="#27AE60"/>
                                                 <TextBlock Text="{Binding AverageFuelConsumption, StringFormat='{}{0} L/100km'}" FontSize="12" FontWeight="SemiBold" Foreground="#27AE60"/>
@@ -573,38 +571,38 @@
                                         </StackPanel>
 
                                         <!-- Syncfusion Circular Gauge for Attendance -->
-                                        <gauge:SfCircularGauge Grid.Column="1" Width="70" Height="70" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                            <gauge:SfCircularGauge.Scales>
-                                                <gauge:CircularScale StartAngle="135" SweepAngle="270"
+                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="70" Height="70" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                            <syncfusion:SfCircularGauge.Scales>
+                                                <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
                                                                    Interval="25" ShowTicks="False"
                                                                    ShowLabels="False"
                                                                    RimStroke="{StaticResource FluentDarkBorderBrush}" RimStrokeThickness="6">
-                                                    <gauge:CircularScale.Pointers>
-                                                        <gauge:CircularPointer NeedlePointerType="Triangle"
+                                                    <syncfusion:CircularScale.Pointers>
+                                                        <syncfusion:CircularPointer NeedlePointerType="Triangle"
                                                                              PointerCapStroke="{StaticResource FluentDarkPurpleBrush}"
                                                                              NeedlePointerStroke="{StaticResource FluentDarkPurpleBrush}"
                                                                              Value="{Binding StudentAttendancePercentage}"/>
-                                                    </gauge:CircularScale.Pointers>
-                                                    <gauge:CircularScale.Ranges>
-                                                        <gauge:CircularRange StartValue="0" EndValue="100"
+                                                    </syncfusion:CircularScale.Pointers>
+                                                    <syncfusion:CircularScale.Ranges>
+                                                        <syncfusion:CircularRange StartValue="0" EndValue="100"
                                                                            Stroke="{StaticResource FluentDarkPurpleBrush}" StrokeThickness="6"/>
-                                                    </gauge:CircularScale.Ranges>
-                                                </gauge:CircularScale>
-                                            </gauge:SfCircularGauge.Scales>
-                                            <gauge:SfCircularGauge.Annotations>
-                                                <gauge:GaugeAnnotation>
-                                                    <gauge:GaugeAnnotation.Content>
+                                                    </syncfusion:CircularScale.Ranges>
+                                                </syncfusion:CircularScale>
+                                            </syncfusion:SfCircularGauge.Scales>
+                                            <syncfusion:SfCircularGauge.Annotations>
+                                                <syncfusion:GaugeAnnotation>
+                                                    <syncfusion:GaugeAnnotation.Content>
                                                         <StackPanel HorizontalAlignment="Center">
                                                             <TextBlock Text="95%" FontSize="14" FontWeight="Bold"
                                                                       Foreground="{StaticResource FluentDarkPurpleBrush}" HorizontalAlignment="Center"/>
                                                             <TextBlock Text="{Binding StudentAttendancePercentage, StringFormat='{}{0:F0}%'}" FontSize="9"
                                                                       Foreground="{StaticResource FluentDarkSecondaryTextBrush}" HorizontalAlignment="Center"/>
                                                         </StackPanel>
-                                                    </gauge:GaugeAnnotation.Content>
-                                                </gauge:GaugeAnnotation>
-                                            </gauge:SfCircularGauge.Annotations>
-                                        </gauge:SfCircularGauge>
+                                                    </syncfusion:GaugeAnnotation.Content>
+                                                </syncfusion:GaugeAnnotation>
+                                            </syncfusion:SfCircularGauge.Annotations>
+                                        </syncfusion:SfCircularGauge>
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -648,31 +646,32 @@
                                     <Border Grid.Column="0" Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,10,0">
                                         <StackPanel>
                                             <TextBlock Text="Fleet Performance Trend" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10" Foreground="#2C3E50"/>
-                                            <chart:SfChart x:Name="FleetPerformanceChart"
+                                            <syncfusion:SfChart x:Name="FleetPerformanceChart"
                                                           Height="180"
                                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
+                                                          Style="{StaticResource BusBuddySfChartStyle}"
                                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                                <chart:SfChart.PrimaryAxis>
-                                                    <chart:CategoryAxis ShowGridLines="False"/>
-                                                </chart:SfChart.PrimaryAxis>
-                                                <chart:SfChart.SecondaryAxis>
-                                                    <chart:NumericalAxis ShowGridLines="True"/>
-                                                </chart:SfChart.SecondaryAxis>
-                                                <chart:SfChart.Series>
-                                                    <chart:SplineAreaSeries ItemsSource="{Binding FleetPerformanceData}"
+                                                <syncfusion:SfChart.PrimaryAxis>
+                                                    <syncfusion:CategoryAxis ShowGridLines="False"/>
+                                                </syncfusion:SfChart.PrimaryAxis>
+                                                <syncfusion:SfChart.SecondaryAxis>
+                                                    <syncfusion:NumericalAxis ShowGridLines="True"/>
+                                                </syncfusion:SfChart.SecondaryAxis>
+                                                <syncfusion:SfChart.Series>
+                                                    <syncfusion:SplineAreaSeries ItemsSource="{Binding FleetPerformanceData}"
                                                                           XBindingPath="Period"
                                                                           YBindingPath="Performance"
                                                                           StrokeThickness="2"
                                                                           Stroke="{StaticResource FluentDarkInfoBrush}">
-                                                        <chart:SplineAreaSeries.Interior>
+                                                        <syncfusion:SplineAreaSeries.Interior>
                                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                                                 <GradientStop Color="{StaticResource FluentDarkInfoColor}" Offset="0"/>
                                                                 <GradientStop Color="{StaticResource FluentDarkPrimaryColor}" Offset="1"/>
                                                             </LinearGradientBrush>
-                                                        </chart:SplineAreaSeries.Interior>
-                                                    </chart:SplineAreaSeries>
-                                                </chart:SfChart.Series>
-                                            </chart:SfChart>
+                                                        </syncfusion:SplineAreaSeries.Interior>
+                                                    </syncfusion:SplineAreaSeries>
+                                                </syncfusion:SfChart.Series>
+                                            </syncfusion:SfChart>
                                         </StackPanel>
                                     </Border>
 
@@ -680,29 +679,30 @@
                                     <Border Grid.Column="1" Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="5,0">
                                         <StackPanel>
                                             <TextBlock Text="Route Efficiency Analysis" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10" Foreground="#2C3E50"/>
-                                            <chart:SfChart x:Name="RouteEfficiencyChart"
+                                            <syncfusion:SfChart x:Name="RouteEfficiencyChart"
                                                           Height="180"
                                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
+                                                          Style="{StaticResource BusBuddySfChartStyle}"
                                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                                <chart:SfChart.PrimaryAxis>
-                                                    <chart:CategoryAxis ShowGridLines="False"/>
-                                                </chart:SfChart.PrimaryAxis>
-                                                <chart:SfChart.SecondaryAxis>
-                                                    <chart:NumericalAxis ShowGridLines="True"/>
-                                                </chart:SfChart.SecondaryAxis>
-                                                <chart:SfChart.Series>
-                                                    <chart:ColumnSeries ItemsSource="{Binding RouteEfficiencyData}"
+                                                <syncfusion:SfChart.PrimaryAxis>
+                                                    <syncfusion:CategoryAxis ShowGridLines="False"/>
+                                                </syncfusion:SfChart.PrimaryAxis>
+                                                <syncfusion:SfChart.SecondaryAxis>
+                                                    <syncfusion:NumericalAxis ShowGridLines="True"/>
+                                                </syncfusion:SfChart.SecondaryAxis>
+                                                <syncfusion:SfChart.Series>
+                                                    <syncfusion:ColumnSeries ItemsSource="{Binding RouteEfficiencyData}"
                                                                       XBindingPath="Route"
                                                                       YBindingPath="Efficiency">
-                                                        <chart:ColumnSeries.Interior>
+                                                        <syncfusion:ColumnSeries.Interior>
                                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                                                 <GradientStop Color="{StaticResource FluentDarkWarningColor}" Offset="0"/>
                                                                 <GradientStop Color="{StaticResource FluentDarkPrimaryColor}" Offset="1"/>
                                                             </LinearGradientBrush>
-                                                        </chart:ColumnSeries.Interior>
-                                                    </chart:ColumnSeries>
-                                                </chart:SfChart.Series>
-                                            </chart:SfChart>
+                                                        </syncfusion:ColumnSeries.Interior>
+                                                    </syncfusion:ColumnSeries>
+                                                </syncfusion:SfChart.Series>
+                                            </syncfusion:SfChart>
                                         </StackPanel>
                                     </Border>
 
@@ -717,43 +717,43 @@
                                                 </Grid.RowDefinitions>
 
                                                 <!-- Advanced Syncfusion Circular Gauge -->
-                                                <gauge:SfCircularGauge Grid.Row="0" Width="150" Height="150" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                                    <gauge:SfCircularGauge.Scales>
-                                                        <gauge:CircularScale StartAngle="135" SweepAngle="270"
+                                                <syncfusion:SfCircularGauge Grid.Row="0" Width="150" Height="150" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                    <syncfusion:SfCircularGauge.Scales>
+                                                        <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                            StartValue="0" EndValue="100"
                                                                            Interval="10" MinorTicksPerInterval="1"
                                                                            RimStroke="{StaticResource FluentDarkBorderBrush}" RimStrokeThickness="10"
                                                                            TickStroke="{StaticResource FluentDarkSecondaryTextBrush}" TickStrokeThickness="1"
                                                                            LabelStroke="{StaticResource FluentDarkForegroundBrush}">
-                                                            <gauge:CircularScale.Pointers>
-                                                                <gauge:CircularPointer NeedlePointerType="Triangle"
+                                                            <syncfusion:CircularScale.Pointers>
+                                                                <syncfusion:CircularPointer NeedlePointerType="Triangle"
                                                                                      PointerCapStroke="{StaticResource FluentDarkPurpleBrush}"
                                                                                      NeedlePointerStroke="{StaticResource FluentDarkPurpleBrush}"
                                                                                      Value="{Binding ResourceUtilizationPercentage}"/>
-                                                            </gauge:CircularScale.Pointers>
-                                                            <gauge:CircularScale.Ranges>
-                                                                <gauge:CircularRange StartValue="0" EndValue="40"
+                                                            </syncfusion:CircularScale.Pointers>
+                                                            <syncfusion:CircularScale.Ranges>
+                                                                <syncfusion:CircularRange StartValue="0" EndValue="40"
                                                                                    Stroke="{StaticResource FluentDarkErrorBrush}" StrokeThickness="10"/>
-                                                                <gauge:CircularRange StartValue="40" EndValue="70"
+                                                                <syncfusion:CircularRange StartValue="40" EndValue="70"
                                                                                    Stroke="{StaticResource FluentDarkWarningBrush}" StrokeThickness="10"/>
-                                                                <gauge:CircularRange StartValue="70" EndValue="100"
+                                                                <syncfusion:CircularRange StartValue="70" EndValue="100"
                                                                                    Stroke="{StaticResource FluentDarkSuccessBrush}" StrokeThickness="10"/>
-                                                            </gauge:CircularScale.Ranges>
-                                                        </gauge:CircularScale>
-                                                    </gauge:SfCircularGauge.Scales>
-                                                    <gauge:SfCircularGauge.Annotations>
-                                                        <gauge:GaugeAnnotation>
-                                                            <gauge:GaugeAnnotation.Content>
+                                                            </syncfusion:CircularScale.Ranges>
+                                                        </syncfusion:CircularScale>
+                                                    </syncfusion:SfCircularGauge.Scales>
+                                                    <syncfusion:SfCircularGauge.Annotations>
+                                                        <syncfusion:GaugeAnnotation>
+                                                            <syncfusion:GaugeAnnotation.Content>
                                                                 <StackPanel HorizontalAlignment="Center">
                                                                     <TextBlock Text="78%" FontSize="20" FontWeight="Bold"
                                                                               Foreground="{StaticResource FluentDarkPurpleBrush}" HorizontalAlignment="Center"/>
                                                                     <TextBlock Text="{Binding ResourceUtilizationPercentage, StringFormat='{}{0:F0}%'}" FontSize="12"
                                                                               Foreground="{StaticResource FluentDarkSecondaryTextBrush}" HorizontalAlignment="Center"/>
                                                                 </StackPanel>
-                                                            </gauge:GaugeAnnotation.Content>
-                                                        </gauge:GaugeAnnotation>
-                                                    </gauge:SfCircularGauge.Annotations>
-                                                </gauge:SfCircularGauge>
+                                                            </syncfusion:GaugeAnnotation.Content>
+                                                        </syncfusion:GaugeAnnotation>
+                                                    </syncfusion:SfCircularGauge.Annotations>
+                                                </syncfusion:SfCircularGauge>
 
                                                 <!-- Utilization Breakdown -->
                                                 <StackPanel Grid.Row="1" Margin="0,10,0,0">
@@ -1244,7 +1244,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Map Header with Controls -->
-                    <Border Grid.Row="0" Background="#34495E" CornerRadius="8,8,0,0" Padding="15,10" Margin="0,0,0,5">
+                    <Border Grid.Row="0" Background="{DynamicResource SecondaryBackground}" CornerRadius="8,8,0,0" Padding="15,10" Margin="0,0,0,5">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -1253,7 +1253,8 @@
 
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <TextBlock Text="🌍" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBlock Text="Route &amp; Fleet Mapping" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center"/>
+                                <TextBlock Text="Route &amp; Fleet Mapping" FontWeight="SemiBold"
+                                         Foreground="{DynamicResource SecondaryForeground}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -1266,20 +1267,20 @@
                                     <syncfusion:ComboBoxItemAdv Content="Hybrid"/>
                                 </syncfusion:ComboBoxAdv>
                                 <syncfusion:ButtonAdv Label="🔄" Width="25" Height="25" ToolTip="Refresh Map"
-                                               Style="{StaticResource BusBuddyIconButtonStyle}"
+                                               Style="{StaticResource BusBuddyIconButtonAdvStyle}"
                                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                             </StackPanel>
                         </Grid>
                     </Border>
 
                     <!-- Map Control Placeholder -->
-                    <Border Grid.Row="1" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="0,0,8,8">
-                        <Grid Background="#F8F9FA">
+                    <Border Grid.Row="1" BorderBrush="{DynamicResource ContentBorder}" BorderThickness="1" CornerRadius="0,0,8,8">
+                        <Grid Background="{DynamicResource ContentBackground}">
                             <TextBlock Text="🌍 Google Earth Engine Maps"
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center"
-                                     FontSize="16"
-                                     Foreground="#6C757D"/>
+                                     Foreground="#6C757D"
+                                     FontSize="16"/>
                             <TextBlock Text="Map integration coming soon..."
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center"

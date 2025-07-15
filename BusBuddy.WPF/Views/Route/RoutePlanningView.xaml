@@ -33,6 +33,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000">
     <Grid>
@@ -80,20 +81,18 @@
 
                 <!-- Action Buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="Optimize Routes"
+                    <syncfusion:ButtonAdv Label="Optimize Routes"
                             Command="{Binding OptimizeRoutesCommand}"
                             Padding="12,6"
                             Margin="0,0,8,0"
-                            Background="#4CAF50"
-                            Foreground="White"
-                            BorderThickness="0"
+                            Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
+                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                             Cursor="Hand"/>
-                    <Button Content="Export Assignments"
+                    <syncfusion:ButtonAdv Label="Export Assignments"
                             Command="{Binding ExportAssignmentsCommand}"
                             Padding="12,6"
-                            Background="#2196F3"
-                            Foreground="White"
-                            BorderThickness="0"
+                            Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
+                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                             Cursor="Hand"/>
                 </StackPanel>
             </Grid>

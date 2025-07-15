@@ -77,7 +77,7 @@
                            ContainerMode="TDI"
                            Style="{StaticResource BusBuddyDockingManagerStyle}"
                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                           Background="{StaticResource FluentDarkBackgroundBrush}">
+                           Background="{DynamicResource ContentBackground}">
 
         <!-- Main Route Overview (Document) -->
         <ContentControl syncfusion:DockingManager.Header="Route Network Overview"
@@ -105,9 +105,9 @@
                                                Width="250"
                                                Height="32"
                                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                               Background="{StaticResource FluentDarkSurfaceBrush}"
-                                               Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                               BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                               Background="{DynamicResource SurfaceBackground}"
+                                               Foreground="{DynamicResource PrimaryForeground}"
+                                               BorderBrush="{DynamicResource BorderBrush}"
                                                Margin="0,0,10,0"/>                                <syncfusion:ButtonAdv Label="🔍"
                                               Command="{Binding SearchRoutesCommand}"
                                               CommandParameter="{Binding Text, ElementName=RouteSearchBox}"
@@ -121,9 +121,9 @@
                                             DefaultText="Filter routes..."
                                             Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                            Background="{StaticResource FluentDarkSurfaceBrush}"
-                                            Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                            BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                            Background="{DynamicResource SurfaceBackground}"
+                                            Foreground="{DynamicResource PrimaryForeground}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
                                             Width="150" Height="32"
                                             Margin="0,0,10,0"/>
                             <CheckBox Content="Show Inactive"
@@ -169,9 +169,9 @@
                                NavigationMode="Row"
                                ShowRowHeader="True"
                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                               Background="{StaticResource FluentDarkBackgroundBrush}"
-                               Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                               BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                               Background="{DynamicResource ContentBackground}"
+                               Foreground="{DynamicResource PrimaryForeground}"
+                               BorderBrush="{DynamicResource BorderBrush}"
                                BorderThickness="1"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
@@ -199,15 +199,15 @@
                             <syncfusion:TreeGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <Border Background="{StaticResource FluentDarkSuccessBrush}" Opacity="0.2" CornerRadius="4" Padding="6,3" Margin="0,0,4,0"
+                                        <Border Background="{DynamicResource SuccessBackground}" Opacity="0.2" CornerRadius="4" Padding="6,3" Margin="0,0,4,0"
                                                Visibility="{Binding AMBusNumber, Converter={StaticResource StringToVisibilityConverter}}">
                                             <TextBlock Text="{Binding AMBusNumber, StringFormat='Bus {0}'}"
-                                                      FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource FluentDarkSuccessBrush}"/>
+                                                      FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource SuccessForeground}"/>
                                         </Border>
-                                        <Border Background="{StaticResource FluentDarkAccentBrush}" Opacity="0.2" CornerRadius="4" Padding="6,3"
+                                        <Border Background="{DynamicResource AccentBackground}" Opacity="0.2" CornerRadius="4" Padding="6,3"
                                                Visibility="{Binding AMDriverName, Converter={StaticResource StringToVisibilityConverter}}">
                                             <TextBlock Text="{Binding AMDriverName}"
-                                                      FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource FluentDarkAccentBrush}"/>
+                                                      FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource AccentForeground}"/>
                                         </Border>
                                     </StackPanel>
                                 </DataTemplate>
@@ -219,15 +219,15 @@
                             <syncfusion:TreeGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <Border Background="{StaticResource FluentDarkAccentBrush}" Opacity="0.2" CornerRadius="4" Padding="6,3" Margin="0,0,4,0"
+                                        <Border Background="{DynamicResource AccentBackground}" Opacity="0.2" CornerRadius="4" Padding="6,3" Margin="0,0,4,0"
                                                Visibility="{Binding PMBusNumber, Converter={StaticResource StringToVisibilityConverter}}">
                                             <TextBlock Text="{Binding PMBusNumber, StringFormat='Bus {0}'}"
-                                                      FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource FluentDarkAccentBrush}"/>
+                                                      FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource AccentForeground}"/>
                                         </Border>
-                                        <Border Background="{StaticResource FluentDarkWarningBrush}" Opacity="0.2" CornerRadius="4" Padding="6,3"
+                                        <Border Background="{DynamicResource WarningBackground}" Opacity="0.2" CornerRadius="4" Padding="6,3"
                                                Visibility="{Binding PMDriverName, Converter={StaticResource StringToVisibilityConverter}}">
                                             <TextBlock Text="{Binding PMDriverName}"
-                                                      FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource FluentDarkWarningBrush}"/>
+                                                      FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource WarningForeground}"/>
                                         </Border>
                                     </StackPanel>
                                 </DataTemplate>
@@ -265,7 +265,7 @@
                     <!-- Remove hardcoded style -->
                     <syncfusion:SfTreeGrid.Style>
                         <Style TargetType="syncfusion:SfTreeGrid">
-                            <Setter Property="Background" Value="{StaticResource FluentDarkBackgroundBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource ContentBackground}"/>
                             <Setter Property="GridLinesVisibility" Value="Both"/>
                             <Setter Property="HeaderLinesVisibility" Value="Both"/>
                         </Style>
@@ -408,9 +408,9 @@
                                         DefaultText="Select a route..."
                                         Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                        Background="{StaticResource FluentDarkSurfaceBrush}"
-                                        Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                        BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                        Background="{DynamicResource SurfaceBackground}"
+                                        Foreground="{DynamicResource PrimaryForeground}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
                                         Height="32"
                                         Margin="0,0,0,10"/>
 
@@ -437,9 +437,9 @@
                                             DefaultText="Select bus..."
                                             Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                            Background="{StaticResource FluentDarkSurfaceBrush}"
-                                            Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                            BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                            Background="{DynamicResource SurfaceBackground}"
+                                            Foreground="{DynamicResource PrimaryForeground}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
                                             Height="32"
                                             Margin="0,0,0,8"/>
 

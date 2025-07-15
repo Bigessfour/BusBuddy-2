@@ -85,7 +85,7 @@
                            ContainerMode="TDI"
                            Style="{StaticResource BusBuddyDockingManagerStyle}"
                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                           Background="{StaticResource FluentDarkBackgroundBrush}">
+                           Background="{DynamicResource ContentBackgroundBrush}">
 
         <!-- Calendar View (Document) -->
         <ContentControl syncfusion:DockingManager.Header="Schedule Calendar"
@@ -135,9 +135,6 @@
                                             DefaultText="Select view..."
                                             Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                            Background="{StaticResource FluentDarkSurfaceBrush}"
-                                            Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                            BorderBrush="{StaticResource FluentDarkBorderBrush}"
                                             Width="120" Height="32"
                                             Margin="0,0,10,0"/>
 
@@ -148,9 +145,6 @@
                                             DefaultText="Filter schedules..."
                                             Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                            Background="{StaticResource FluentDarkSurfaceBrush}"
-                                            Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                            BorderBrush="{StaticResource FluentDarkBorderBrush}"
                                             Width="150" Height="32"/>
                         </StackPanel>
                     </StackPanel>
@@ -163,7 +157,7 @@
                                           Style="{StaticResource BusBuddyTileContentStyle}"/>
                                 <TextBlock Text="{Binding TodayScheduleCount}"
                                           Style="{StaticResource BusBuddyTileValueStyle}"
-                                          Foreground="{StaticResource FluentDarkSuccessBrush}"/>
+                                          Foreground="{DynamicResource SuccessBrush}"/>
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
@@ -172,7 +166,7 @@
                                           Style="{StaticResource BusBuddyTileContentStyle}"/>
                                 <TextBlock Text="{Binding WeekScheduleCount}"
                                           Style="{StaticResource BusBuddyTileValueStyle}"
-                                          Foreground="{StaticResource FluentDarkWarningBrush}"/>
+                                          Foreground="{DynamicResource WarningBrush}"/>
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
@@ -181,7 +175,7 @@
                                           Style="{StaticResource BusBuddyTileContentStyle}"/>
                                 <TextBlock Text="{Binding ConflictCount}"
                                           Style="{StaticResource BusBuddyTileValueStyle}"
-                                          Foreground="{StaticResource FluentDarkErrorBrush}"/>
+                                          Foreground="{DynamicResource ErrorBrush}"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -195,8 +189,8 @@
                                       ResourceCollection="{Binding BusResources}"
                                       ResourceGroupType="Resource"
                                       BorderThickness="1"
-                                      BorderBrush="{StaticResource FluentDarkBorderBrush}"
-                                      Background="{StaticResource FluentDarkBackgroundBrush}"
+                                      BorderBrush="{DynamicResource BorderBrush}"
+                                      Background="{DynamicResource ContentBackgroundBrush}"
                                       Style="{StaticResource BusBuddySfSchedulerStyle}"
                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
@@ -222,18 +216,18 @@
                     <!-- Resource Header Template -->
                     <syncfusion:SfScheduler.ResourceHeaderTemplate>
                         <DataTemplate>
-                            <Border Background="{StaticResource FluentDarkSurfaceBrush}"
-                                  BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                            <Border Background="{DynamicResource SurfaceBackgroundBrush}"
+                                  BorderBrush="{DynamicResource BorderBrush}"
                                   BorderThickness="0,0,1,1"
                                   Padding="8,4">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}"
                                              FontWeight="Bold"
                                              FontSize="12"
-                                             Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                             Foreground="{DynamicResource PrimaryForegroundBrush}"/>
                                     <TextBlock Text="{Binding Id, StringFormat='ID: {0}'}"
                                              FontSize="10"
-                                             Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                             Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -250,7 +244,7 @@
                             <Separator/>
                             <MenuItem Header="Mark as Complete" Command="{Binding MarkCompleteCommand}"/>
                             <MenuItem Header="Cancel Schedule" Command="{Binding CancelScheduleCommand}"
-                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
+                                     Foreground="{DynamicResource ErrorBrush}"/>
                             <Separator/>
                             <MenuItem Header="Add to Route" Command="{Binding AddToRouteCommand}"/>
                         </ContextMenu>
@@ -278,7 +272,7 @@
                              FontSize="16"
                              FontWeight="Bold"
                              Margin="0,0,0,10"
-                             Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                             Foreground="{DynamicResource PrimaryForegroundBrush}"/>
 
                     <!-- Quick Actions -->
                     <StackPanel Orientation="Horizontal">

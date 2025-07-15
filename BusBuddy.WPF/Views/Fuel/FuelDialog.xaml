@@ -15,6 +15,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
         Title="{Binding DialogTitle}"
         Height="500"
@@ -72,7 +73,8 @@
             <syncfusion:DoubleTextBox Grid.Row="3" Grid.Column="1"
                                        Value="{Binding Fuel.VehicleOdometerReading}"
                                        MinValue="0"
-                                       Margin="0,5,0,5"/>
+                                       Margin="0,5,0,5"
+                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Fuel Type:" Margin="0,5,10,5" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="4" Grid.Column="1"
@@ -85,7 +87,8 @@
                                        Value="{Binding Fuel.Gallons}"
                                        NumberDecimalDigits="3"
                                        MinValue="0"
-                                       Margin="0,5,0,5"/>
+                                       Margin="0,5,0,5"
+                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Price per Gallon ($):" Margin="0,5,10,5" VerticalAlignment="Center"/>
             <syncfusion:DoubleTextBox Grid.Row="6" Grid.Column="1"
@@ -93,7 +96,8 @@
                                        NumberDecimalDigits="3"
                                        MinValue="0"
                                        Margin="0,5,0,5"
-                                       ValueChanged="PricePerGallon_ValueChanged"/>
+                                       ValueChanged="PricePerGallon_ValueChanged"
+                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <TextBlock Grid.Row="7" Grid.Column="0" Text="Total Cost ($):" Margin="0,5,10,5" VerticalAlignment="Center"/>
             <syncfusion:DoubleTextBox Grid.Row="7" Grid.Column="1"
@@ -123,14 +127,16 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,20,0,0">
-            <syncfusion:ButtonAdv Content="Cancel"
+            <syncfusion:ButtonAdv Label="Cancel"
                     Width="100"
                     Margin="0,0,10,0"
-                    Click="CancelButton_Click"/>
-            <syncfusion:ButtonAdv Content="Save"
+                    Click="CancelButton_Click"
+                    Style="{StaticResource BusBuddyButtonAdvStyle}"/>
+            <syncfusion:ButtonAdv Label="Save"
                     Width="100"
                     Click="SaveButton_Click"
-                    IsEnabled="{Binding IsValid}"/>
+                    IsEnabled="{Binding IsValid}"
+                    Style="{StaticResource BusBuddyButtonAdvStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

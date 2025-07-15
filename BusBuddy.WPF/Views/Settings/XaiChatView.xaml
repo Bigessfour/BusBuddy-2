@@ -3,14 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:chat="clr-namespace:Syncfusion.UI.Xaml.Chat;assembly=Syncfusion.SfChat.WPF"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionchat="clr-namespace:Syncfusion.UI.Xaml.Chat;assembly=Syncfusion.SfChat.WPF"
              xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="400">
+             d:DesignHeight="600" d:DesignWidth="400"
+             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <!-- No UserControl.Resources needed — SfSkinManager handles theme automatically -->
 
-    <Grid Background="#FFFFFF">
+    <Grid Background="{DynamicResource ContentBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -18,7 +20,7 @@
 
         <!-- Header -->
         <Border Grid.Row="0"
-                Background="#0078D4"
+                Background="{DynamicResource PrimaryBackground}"
                 Padding="16,12">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock Text="🤖"
@@ -28,21 +30,21 @@
                 <TextBlock Text="Bus Buddy AI Assistant"
                            FontSize="16"
                            FontWeight="SemiBold"
-                           Foreground="White"
+                           Foreground="{DynamicResource PrimaryForeground}"
                            VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 
         <!-- Syncfusion AI AssistView -->
-        <chat:SfAIAssistView Grid.Row="1"
+        <syncfusionchat:SfAIAssistView Grid.Row="1"
                             x:Name="AIAssistView"
                             CurrentUser="{Binding CurrentUser}"
                             Messages="{Binding Messages}"
                             Suggestions="{Binding Suggestions}"
                             ShowTypingIndicator="{Binding IsTyping}"
                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                            Background="#FFFFFF"
-                            Foreground="#000000"
+                            Background="{DynamicResource ContentBackground}"
+                            Foreground="{DynamicResource ContentForeground}"
                             Margin="0"/>
     </Grid>
 </UserControl>

@@ -60,8 +60,7 @@
                                PersistState="False"
                                ContainerMode="TDI"
                                Style="{StaticResource BusBuddyDockingManagerStyle}"
-                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                               Background="{StaticResource FluentDarkBackgroundBrush}">
+                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
         <!-- Main Driver List Panel (Document) -->
         <ContentControl syncfusion:DockingManager.Header="Driver Directory"
@@ -87,8 +86,8 @@
                                    Margin="0,0,0,10"/>
 
                         <!-- Search and Filter Panel -->
-                        <Border Background="{StaticResource FluentDarkSurfaceBrush}"
-                                BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                        <Border Background="{DynamicResource SurfaceBackground}"
+                                BorderBrush="{DynamicResource SurfaceBorder}"
                                 BorderThickness="1"
                                 CornerRadius="4"
                                 Padding="12">
@@ -96,16 +95,13 @@
                                 <syncfusion:SfTextBoxExt x:Name="SearchBox"
                                                       Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                                      Background="{StaticResource FluentDarkSurfaceBrush}"
-                                                      Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                                      BorderBrush="{StaticResource FluentDarkBorderBrush}"
                                                       Width="250"
                                                       Height="32"
                                                       Margin="0,0,10,0"/>
                                 <syncfusion:ButtonAdv Label="🔍 Search"
                                                      Command="{Binding SearchDriversCommand}"
                                                      CommandParameter="{Binding Text, ElementName=SearchBox}"
-                                                     Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                                     Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                                      Margin="0,0,10,0"/>
                                 <syncfusion:ComboBoxAdv ItemsSource="{Binding AvailableStatuses}"
@@ -113,9 +109,6 @@
                                                        DisplayMemberPath="Name"
                                                        Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                                       Background="{StaticResource FluentDarkSurfaceBrush}"
-                                                       Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                                       BorderBrush="{StaticResource FluentDarkBorderBrush}"
                                                        Width="150" Height="32"/>
                             </StackPanel>
                         </Border>
@@ -149,9 +142,6 @@
                                SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
                                Style="{StaticResource BusBuddySfDataGridStyle}"
                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                               Background="{StaticResource FluentDarkBackgroundBrush}"
-                               Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                               BorderBrush="{StaticResource FluentDarkBorderBrush}"
                                AutoGenerateColumns="False"
                                AllowResizingColumns="True"
                                AllowSorting="True"
@@ -206,26 +196,26 @@
                         <TextBlock Text="Showing"
                                    VerticalAlignment="Center"
                                    Margin="0,0,5,0"
-                                   Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                   Foreground="{DynamicResource SecondaryForeground}"/>
                         <TextBlock Text="{Binding Drivers.Count, Mode=OneWay}"
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center"
-                                   Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                   Foreground="{DynamicResource ContentForeground}"/>
                         <TextBlock Text="of"
                                    VerticalAlignment="Center"
                                    Margin="5,0"
-                                   Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                   Foreground="{DynamicResource SecondaryForeground}"/>
                         <TextBlock Text="{Binding TotalDrivers, Mode=OneWay}"
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center"
-                                   Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                   Foreground="{DynamicResource ContentForeground}"/>
                         <TextBlock Text="drivers"
                                    VerticalAlignment="Center"
                                    Margin="5,0,15,0"
-                                   Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                   Foreground="{DynamicResource SecondaryForeground}"/>
 
                         <!-- License Alert Indicator -->
-                        <Border Background="{StaticResource FluentDarkWarningBrush}"
+                        <Border Background="{DynamicResource WarningBackground}"
                                 CornerRadius="4"
                                 Padding="8,4"
                                 Visibility="{Binding HasExpiringLicenses, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -243,24 +233,24 @@
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <syncfusion:ButtonAdv Label="➕ Add Driver"
                                              Command="{Binding AddDriverCommand}"
-                                             Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                             Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                              Margin="5"/>
                         <syncfusion:ButtonAdv Label="✏️ Edit"
                                              Command="{Binding UpdateDriverCommand}"
                                              CommandParameter="{Binding SelectedDriver}"
-                                             Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                             Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                              Margin="5"/>
                         <syncfusion:ButtonAdv Label="🗑️ Delete"
                                              Command="{Binding DeleteDriverCommand}"
                                              CommandParameter="{Binding SelectedDriver}"
-                                             Style="{StaticResource BusBuddyDeleteButtonStyle}"
+                                             Style="{StaticResource BusBuddyButtonAdvStyle}"
                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                              Margin="5"/>
                         <syncfusion:ButtonAdv Label="📊 Reports"
                                              Command="{Binding GenerateReportsCommand}"
-                                             Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                             Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                              Margin="5"/>
                     </StackPanel>
@@ -274,7 +264,6 @@
                                     Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
                                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                     AnimationType="DoubleCircle"
-                                    Foreground="{StaticResource FluentDarkAccentBrush}"
                                     Background="Transparent"/>
 
     </syncfusion:DockingManager>

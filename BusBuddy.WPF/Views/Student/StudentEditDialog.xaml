@@ -342,19 +342,15 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,15,0,0">
-            <syncfusion:ButtonAdv Content="Save"
+            <syncfusion:ButtonAdv Label="Save"
                     Command="{Binding SaveCommand}"
-                    Style="{StaticResource DialogButton}"
-                    IsDefault="True"
-                    Background="#0078D7"
-                    Foreground="White"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    Style="{StaticResource BusBuddyButtonAdvStyle}"
+                    IsDefault="True"/>
 
-            <syncfusion:ButtonAdv Content="Cancel"
+            <syncfusion:ButtonAdv Label="Cancel"
                     Command="{Binding CancelCommand}"
-                    Style="{StaticResource DialogButton}"
-                    IsCancel="True"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    Style="{StaticResource BusBuddyButtonAdvStyle}"
+                    IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

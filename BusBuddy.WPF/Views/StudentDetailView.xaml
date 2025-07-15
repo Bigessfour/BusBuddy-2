@@ -24,10 +24,10 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <syncfusion:ButtonAdv Content="Save" Command="{Binding SaveCommand}" Width="75" Margin="5"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark" />
-            <syncfusion:ButtonAdv Content="Cancel" Command="{Binding CancelCommand}" Width="75" Margin="5"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark" />
+            <syncfusion:ButtonAdv Label="Save" Command="{Binding SaveCommand}" Width="75" Margin="5"
+                                 Style="{StaticResource BusBuddyButtonAdvStyle}" />
+            <syncfusion:ButtonAdv Label="Cancel" Command="{Binding CancelCommand}" Width="75" Margin="5"
+                                 Style="{StaticResource BusBuddyButtonAdvStyle}" />
         </StackPanel>
     </Grid>
 </Window>

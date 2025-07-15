@@ -23,10 +23,10 @@
         <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding AvailableRoutes}" SelectedItem="{Binding SelectedPmRoute}" DisplayMemberPath="RouteName" Margin="0,0,0,10"/>
 
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <syncfusion:ButtonAdv Content="Save" Command="{Binding SaveCommand}" IsDefault="True" Width="80" Margin="0,0,10,0"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
-            <syncfusion:ButtonAdv Content="Cancel" Command="{Binding CancelCommand}" IsCancel="True" Width="80"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+            <syncfusion:ButtonAdv Label="Save" Command="{Binding SaveCommand}" IsDefault="True" Width="80" Margin="0,0,10,0"
+                                 Style="{StaticResource BusBuddyButtonAdvStyle}"/>
+            <syncfusion:ButtonAdv Label="Cancel" Command="{Binding CancelCommand}" IsCancel="True" Width="80"
+                                 Style="{StaticResource BusBuddyButtonAdvStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

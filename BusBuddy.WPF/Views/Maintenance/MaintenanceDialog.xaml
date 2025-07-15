@@ -5,10 +5,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
-        Title="{Binding DialogTitle}" 
-        Height="650" 
-        Width="800" 
+        Title="{Binding DialogTitle}"
+        Height="650"
+        Width="800"
         WindowStartupLocation="CenterOwner">
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -16,12 +17,12 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
-        <TextBlock Text="{Binding DialogTitle}" 
-                   FontSize="20" 
-                   FontWeight="Bold" 
+
+        <TextBlock Text="{Binding DialogTitle}"
+                   FontSize="20"
+                   FontWeight="Bold"
                    Margin="0,0,0,20"/>
-        
+
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -45,148 +46,152 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                
+
                 <!-- Column 1 -->
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Bus:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" 
-                          ItemsSource="{Binding AvailableBuses}" 
-                          SelectedItem="{Binding SelectedBus}" 
-                          DisplayMemberPath="BusNumber" 
+                <ComboBox Grid.Row="0" Grid.Column="1"
+                          ItemsSource="{Binding AvailableBuses}"
+                          SelectedItem="{Binding SelectedBus}"
+                          DisplayMemberPath="BusNumber"
                           Margin="0,5,20,5"/>
-                
+
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Date:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <DatePicker Grid.Row="1" Grid.Column="1" 
-                            SelectedDate="{Binding Maintenance.Date}" 
+                <DatePicker Grid.Row="1" Grid.Column="1"
+                            SelectedDate="{Binding Maintenance.Date}"
                             Margin="0,5,20,5"/>
-                
+
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Odometer Reading:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <syncfusion:DoubleTextBox Grid.Row="2" Grid.Column="1" 
-                                           Value="{Binding Maintenance.OdometerReading}" 
-                                           MinValue="0" 
+                <syncfusion:DoubleTextBox Grid.Row="2" Grid.Column="1"
+                                           Value="{Binding Maintenance.OdometerReading}"
+                                           MinValue="0"
                                            Margin="0,5,20,5"/>
-                
+
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Maintenance Type:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="3" Grid.Column="1" 
-                          ItemsSource="{Binding MaintenanceTypes}" 
-                          SelectedItem="{Binding Maintenance.MaintenanceCompleted}" 
+                <ComboBox Grid.Row="3" Grid.Column="1"
+                          ItemsSource="{Binding MaintenanceTypes}"
+                          SelectedItem="{Binding Maintenance.MaintenanceCompleted}"
                           Margin="0,5,20,5"/>
-                
+
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Vendor:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="4" Grid.Column="1" 
-                         Text="{Binding Maintenance.Vendor}" 
+                <TextBox Grid.Row="4" Grid.Column="1"
+                         Text="{Binding Maintenance.Vendor}"
                          Margin="0,5,20,5"/>
-                
+
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Repair Cost ($):" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <syncfusion:DoubleTextBox Grid.Row="5" Grid.Column="1" 
-                                           Value="{Binding Maintenance.RepairCost}" 
-                                           NumberDecimalDigits="2" 
-                                           MinValue="0" 
+                <syncfusion:DoubleTextBox Grid.Row="5" Grid.Column="1"
+                                           Value="{Binding Maintenance.RepairCost}"
+                                           NumberDecimalDigits="2"
+                                           MinValue="0"
                                            Margin="0,5,20,5"/>
-                
+
                 <TextBlock Grid.Row="6" Grid.Column="0" Text="Status:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="6" Grid.Column="1" 
-                          ItemsSource="{Binding StatusOptions}" 
-                          SelectedItem="{Binding Maintenance.Status}" 
+                <ComboBox Grid.Row="6" Grid.Column="1"
+                          ItemsSource="{Binding StatusOptions}"
+                          SelectedItem="{Binding Maintenance.Status}"
                           Margin="0,5,20,5"/>
-                
+
                 <!-- Column 2 -->
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="Priority:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <ComboBox Grid.Row="0" Grid.Column="3" 
-                          ItemsSource="{Binding PriorityOptions}" 
-                          SelectedItem="{Binding Maintenance.Priority}" 
+                <ComboBox Grid.Row="0" Grid.Column="3"
+                          ItemsSource="{Binding PriorityOptions}"
+                          SelectedItem="{Binding Maintenance.Priority}"
                           Margin="0,5,0,5"/>
-                
+
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="Performed By:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="1" Grid.Column="3" 
-                         Text="{Binding Maintenance.PerformedBy}" 
+                <TextBox Grid.Row="1" Grid.Column="3"
+                         Text="{Binding Maintenance.PerformedBy}"
                          Margin="0,5,0,5"/>
-                
+
                 <TextBlock Grid.Row="2" Grid.Column="2" Text="Work Order #:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="2" Grid.Column="3" 
-                         Text="{Binding Maintenance.WorkOrderNumber}" 
+                <TextBox Grid.Row="2" Grid.Column="3"
+                         Text="{Binding Maintenance.WorkOrderNumber}"
                          Margin="0,5,0,5"/>
-                
+
                 <TextBlock Grid.Row="3" Grid.Column="2" Text="Next Service Due:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <DatePicker Grid.Row="3" Grid.Column="3" 
-                            SelectedDate="{Binding Maintenance.NextServiceDue}" 
+                <DatePicker Grid.Row="3" Grid.Column="3"
+                            SelectedDate="{Binding Maintenance.NextServiceDue}"
                             Margin="0,5,0,5"/>
-                
+
                 <TextBlock Grid.Row="4" Grid.Column="2" Text="Next Service Odometer:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <syncfusion:DoubleTextBox Grid.Row="4" Grid.Column="3" 
-                                           Value="{Binding Maintenance.NextServiceOdometer}" 
-                                           MinValue="0" 
+                <syncfusion:DoubleTextBox Grid.Row="4" Grid.Column="3"
+                                           Value="{Binding Maintenance.NextServiceOdometer}"
+                                           MinValue="0"
                                            Margin="0,5,0,5"/>
-                
+
                 <TextBlock Grid.Row="5" Grid.Column="2" Text="Labor Hours:" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <syncfusion:DoubleTextBox Grid.Row="5" Grid.Column="3" 
-                                           Value="{Binding Maintenance.LaborHours}" 
-                                           MinValue="0" 
+                <syncfusion:DoubleTextBox Grid.Row="5" Grid.Column="3"
+                                           Value="{Binding Maintenance.LaborHours}"
+                                           MinValue="0"
                                            Margin="0,5,0,5"/>
-                
+
                 <TextBlock Grid.Row="6" Grid.Column="2" Text="Labor Cost ($):" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <syncfusion:DoubleTextBox Grid.Row="6" Grid.Column="3" 
-                                           Value="{Binding Maintenance.LaborCost}" 
-                                           NumberDecimalDigits="2" 
-                                           MinValue="0" 
+                <syncfusion:DoubleTextBox Grid.Row="6" Grid.Column="3"
+                                           Value="{Binding Maintenance.LaborCost}"
+                                           NumberDecimalDigits="2"
+                                           MinValue="0"
                                            Margin="0,5,0,5"/>
-                
+
                 <!-- Span both columns -->
-                <CheckBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" 
-                          Content="Under Warranty" 
-                          IsChecked="{Binding Maintenance.Warranty}" 
+                <CheckBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4"
+                          Content="Under Warranty"
+                          IsChecked="{Binding Maintenance.Warranty}"
                           Margin="0,10,0,5"/>
-                
+
                 <TextBlock Grid.Row="8" Grid.Column="0" Text="Warranty Expiry:" Margin="0,5,10,5" VerticalAlignment="Center"
                            Visibility="{Binding Maintenance.Warranty, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <DatePicker Grid.Row="8" Grid.Column="1" 
-                            SelectedDate="{Binding Maintenance.WarrantyExpiry}" 
+                <DatePicker Grid.Row="8" Grid.Column="1"
+                            SelectedDate="{Binding Maintenance.WarrantyExpiry}"
                             Margin="0,5,20,5"
                             Visibility="{Binding Maintenance.Warranty, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                
+
                 <TextBlock Grid.Row="9" Grid.Column="0" Text="Parts Used:" Margin="0,5,10,5" VerticalAlignment="Top"/>
-                <TextBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" 
-                         Text="{Binding Maintenance.PartsUsed}" 
-                         Height="60" 
+                <TextBox Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
+                         Text="{Binding Maintenance.PartsUsed}"
+                         Height="60"
                          TextWrapping="Wrap"
                          AcceptsReturn="True"
                          VerticalScrollBarVisibility="Auto"
                          Margin="0,5,0,5"/>
-                
+
                 <TextBlock Grid.Row="10" Grid.Column="0" Text="Parts Cost ($):" Margin="0,5,10,5" VerticalAlignment="Center"/>
-                <syncfusion:DoubleTextBox Grid.Row="10" Grid.Column="1" 
-                                           Value="{Binding Maintenance.PartsCost}" 
-                                           NumberDecimalDigits="2" 
-                                           MinValue="0" 
+                <syncfusion:DoubleTextBox Grid.Row="10" Grid.Column="1"
+                                           Value="{Binding Maintenance.PartsCost}"
+                                           NumberDecimalDigits="2"
+                                           MinValue="0"
                                            Margin="0,5,20,5"/>
-                
+
                 <TextBlock Grid.Row="11" Grid.Column="0" Text="Notes:" Margin="0,5,10,5" VerticalAlignment="Top"/>
-                <TextBox Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="3" 
-                         Text="{Binding Maintenance.Notes}" 
-                         Height="80" 
+                <TextBox Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="3"
+                         Text="{Binding Maintenance.Notes}"
+                         Height="80"
                          TextWrapping="Wrap"
                          AcceptsReturn="True"
                          VerticalScrollBarVisibility="Auto"
                          Margin="0,5,0,5"/>
-                
-                <TextBlock Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="4" 
-                           Text="Total Cost: " 
-                           FontWeight="Bold" 
+
+                <TextBlock Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="4"
+                           Text="Total Cost: "
+                           FontWeight="Bold"
                            Margin="0,10,0,0">
                     <Run Text="{Binding Maintenance.TotalCost, StringFormat=C2}"/>
                 </TextBlock>
             </Grid>
         </ScrollViewer>
-        
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
                     Margin="0,20,0,0">
-            <Button Content="Cancel" 
-                    Width="100" 
-                    Margin="0,0,10,0" 
+            <syncfusion:ButtonAdv Label="Cancel"
+                    Width="100"
+                    Margin="0,0,10,0"
+                    Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
+                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                     Click="CancelButton_Click"/>
-            <Button Content="Save" 
-                    Width="100" 
+            <syncfusion:ButtonAdv Label="Save"
+                    Width="100"
+                    Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
+                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                     Click="SaveButton_Click"
                     IsEnabled="{Binding IsValid}"/>
         </StackPanel>

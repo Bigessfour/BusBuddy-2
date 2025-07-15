@@ -6,10 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusBuddy.WPF.Views.Schedule"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
-        Title="Activity Schedule Details" 
+        Title="Activity Schedule Details"
         Height="600" Width="700"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <Window.Resources>
         <Style TargetType="TextBlock" x:Key="FieldLabel">
@@ -17,14 +19,14 @@
             <Setter Property="Margin" Value="0,0,10,0"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-        
+
         <Style TargetType="Button" x:Key="DialogButton">
             <Setter Property="MinWidth" Value="80"/>
             <Setter Property="Margin" Value="5"/>
             <Setter Property="Padding" Value="10,5"/>
         </Style>
     </Window.Resources>
-    
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,7 +36,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Grid.Row="0" Text="Activity Schedule Details" 
+        <TextBlock Grid.Row="0" Text="Activity Schedule Details"
                    FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
 
         <!-- Form Fields -->
@@ -78,13 +80,13 @@
 
                 <!-- Leave Time -->
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Leave Time:" Style="{StaticResource FieldLabel}"/>
-                <TextBox Grid.Row="3" Grid.Column="1" Name="LeaveTimePicker" 
+                <TextBox Grid.Row="3" Grid.Column="1" Name="LeaveTimePicker"
                          Text="{Binding SelectedLeaveTime, StringFormat='hh:mm tt'}"
                          Margin="0,5,0,5"/>
 
                 <!-- Event Time -->
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Event Time:" Style="{StaticResource FieldLabel}"/>
-                <TextBox Grid.Row="4" Grid.Column="1" Name="EventTimePicker" 
+                <TextBox Grid.Row="4" Grid.Column="1" Name="EventTimePicker"
                          Text="{Binding SelectedEventTime, StringFormat='hh:mm tt'}"
                          Margin="0,5,0,5"/>
 
@@ -95,11 +97,13 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <ComboBox Grid.Column="0" Name="DriverComboBox" 
-                              DisplayMemberPath="DriverName" 
+                    <ComboBox Grid.Column="0" Name="DriverComboBox"
+                              DisplayMemberPath="DriverName"
                               SelectedValuePath="DriverId"/>
-                    <syncfusion:ButtonAdv Grid.Column="1" Content="Check Availability" Name="CheckDriverButton" 
-                            Margin="5,0,0,0" Padding="5,2"/>
+                    <syncfusion:ButtonAdv Grid.Column="1" Label="Check Availability" Name="CheckDriverButton"
+                            Margin="5,0,0,0" Padding="5,2"
+                            Style="{StaticResource BusBuddyButtonAdvStyle}"
+                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                 </Grid>
 
                 <!-- Vehicle -->
@@ -109,18 +113,21 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <ComboBox Grid.Column="0" Name="VehicleComboBox" 
-                              DisplayMemberPath="BusNumber" 
+                    <ComboBox Grid.Column="0" Name="VehicleComboBox"
+                              DisplayMemberPath="BusNumber"
                               SelectedValuePath="VehicleId"/>
-                    <syncfusion:ButtonAdv Grid.Column="1" Content="Check Availability" Name="CheckVehicleButton" 
-                            Margin="5,0,0,0" Padding="5,2"/>
+                    <syncfusion:ButtonAdv Grid.Column="1" Label="Check Availability" Name="CheckVehicleButton"
+                            Margin="5,0,0,0" Padding="5,2"
+                            Style="{StaticResource BusBuddyButtonAdvStyle}"
+                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
                 </Grid>
 
                 <!-- Riders -->
                 <TextBlock Grid.Row="7" Grid.Column="0" Text="Est. Riders:" Style="{StaticResource FieldLabel}"/>
-                <syncfusion:IntegerTextBox Grid.Row="7" Grid.Column="1" Name="RidersUpDown" 
-                                          MinValue="0" MaxValue="100" Value="0" 
-                                          Margin="0,5"/>
+                <syncfusion:IntegerTextBox Grid.Row="7" Grid.Column="1" Name="RidersUpDown"
+                                          MinValue="0" MaxValue="100" Value="0"
+                                          Margin="0,5"
+                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
                 <!-- Requested By -->
                 <TextBlock Grid.Row="8" Grid.Column="0" Text="Requested By:" Style="{StaticResource FieldLabel}"/>
@@ -136,14 +143,14 @@
                 </ComboBox>
 
                 <!-- Notes -->
-                <TextBlock Grid.Row="10" Grid.Column="0" Text="Notes:" Style="{StaticResource FieldLabel}" 
+                <TextBlock Grid.Row="10" Grid.Column="0" Text="Notes:" Style="{StaticResource FieldLabel}"
                            VerticalAlignment="Top" Margin="0,10,10,0"/>
-                <TextBox Grid.Row="10" Grid.Column="1" Name="NotesTextBox" 
-                         Height="80" TextWrapping="Wrap" AcceptsReturn="True" 
+                <TextBox Grid.Row="10" Grid.Column="1" Name="NotesTextBox"
+                         Height="80" TextWrapping="Wrap" AcceptsReturn="True"
                          VerticalScrollBarVisibility="Auto" Margin="0,5"/>
-                
+
                 <!-- Conflict Warning -->
-                <TextBlock Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" 
+                <TextBlock Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2"
                            Name="ConflictWarningTextBlock"
                            Foreground="Red" FontWeight="Bold" Visibility="Collapsed"
                            Margin="0,10,0,0"/>
@@ -157,11 +164,13 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                
-                <syncfusion:ButtonAdv Grid.Row="0" Content="Check for Conflicts" Name="CheckConflictsButton" 
-                        HorizontalAlignment="Left" Padding="10,5"/>
-                
-                <ItemsControl Grid.Row="1" Name="ConflictsItemsControl" Margin="0,10,0,0" 
+
+                <syncfusion:ButtonAdv Grid.Row="0" Label="Check for Conflicts" Name="CheckConflictsButton"
+                        HorizontalAlignment="Left" Padding="10,5"
+                        Style="{StaticResource BusBuddyButtonAdvStyle}"
+                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+
+                <ItemsControl Grid.Row="1" Name="ConflictsItemsControl" Margin="0,10,0,0"
                               Visibility="Collapsed">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -192,8 +201,12 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <syncfusion:ButtonAdv Content="Save" Name="SaveButton" IsDefault="True" Style="{StaticResource DialogButton}"/>
-            <syncfusion:ButtonAdv Content="Cancel" Name="CancelButton" IsCancel="True" Style="{StaticResource DialogButton}"/>
+            <syncfusion:ButtonAdv Label="Save" Name="SaveButton" IsDefault="True"
+                                Style="{StaticResource BusBuddyButtonAdvStyle}"
+                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+            <syncfusion:ButtonAdv Label="Cancel" Name="CancelButton" IsCancel="True"
+                                Style="{StaticResource BusBuddyButtonAdvStyle}"
+                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
         </StackPanel>
     </Grid>
 </Window>

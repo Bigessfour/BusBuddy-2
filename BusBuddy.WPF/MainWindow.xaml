@@ -24,14 +24,14 @@
         Title="Bus Buddy - Transportation Management System"
         Height="900" Width="1600"
         WindowStartupLocation="CenterScreen"
-        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}"
+        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
         Loaded="Window_Loaded">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- FluentDark theme resources are automatically applied via SfSkinManager -->
-                <!-- We provide fallback resources and custom styles below -->
+                <!-- Custom styles and resources are merged from CustomStyles.xaml -->
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Add converters -->
@@ -39,34 +39,10 @@
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter" />
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-            <!-- Fallback brushes for FluentDark theme -->
-            <SolidColorBrush x:Key="PrimaryBackgroundBrush" Color="#1E1E1E" />
-            <SolidColorBrush x:Key="PrimaryForegroundBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="AccentBackgroundBrush" Color="#0078D4" />
-            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="AccentMouseOverBackgroundBrush" Color="#106EBE" />
-            <SolidColorBrush x:Key="AccentPressedBackgroundBrush" Color="#005A9E" />
-            <SolidColorBrush x:Key="BorderBrush" Color="#323130" />
-            <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#2D2D30" />
-
-            <!-- Enhanced FluentDark theme fallback resources -->
-            <SolidColorBrush x:Key="FluentDarkBackgroundBrush" Color="#1E1E1E" />
-            <SolidColorBrush x:Key="FluentDarkForegroundBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="FluentDarkPrimaryBrush" Color="#0078D4" />
-            <SolidColorBrush x:Key="FluentDarkBorderBrush" Color="#323130" />
-            <SolidColorBrush x:Key="FluentDarkHoverBrush" Color="#2D2D30" />
-            <SolidColorBrush x:Key="FluentDarkSecondaryTextBrush" Color="#CCCCCC" />
-            <SolidColorBrush x:Key="FluentDarkSurfaceBrush" Color="#252526" />
-            <SolidColorBrush x:Key="FluentDarkSuccessBrush" Color="#2ECC71" />
-
-            <!-- FluentDark color resources -->
-            <Color x:Key="FluentDarkPrimaryColor">#0078D4</Color>
-            <Color x:Key="FluentDarkAccentColor">#106EBE</Color>
-
-            <!-- Navigation Panel Style — Uses FluentDark theme palette -->
+            <!-- Navigation Panel Style — Uses official Syncfusion FluentDark theme resources -->
             <Style x:Key="BusBuddyNavigationPanelStyle" TargetType="Border">
-                <Setter Property="Background" Value="{DynamicResource PrimaryBackgroundBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource SecondaryBackground}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource SecondaryBorder}"/>
                 <Setter Property="BorderThickness" Value="0,0,1,0"/>
                 <Setter Property="Padding" Value="0"/>
                 <Setter Property="Margin" Value="0"/>
@@ -100,38 +76,20 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Navigation Button Style — Uses FluentDark palette with reveal effects -->
-        <Style x:Key="BusBuddyNavigationButtonStyle" TargetType="syncfusion:ButtonAdv">
-            <Setter Property="Background" Value="{DynamicResource AccentBackgroundBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush}"/>
-            <Setter Property="BorderThickness" Value="0"/>
+        <!-- Navigation Button Style — Uses consolidated BusBuddyButtonAdvStyle -->
+        <Style x:Key="BusBuddyNavigationButtonStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource BusBuddyButtonAdvStyle}">
             <Setter Property="Padding" Value="10,5"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="CornerRadius" Value="3"/>
-            <Setter Property="SizeMode" Value="Normal"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource AccentMouseOverBackgroundBrush}"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource AccentPressedBackgroundBrush}"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
-        <!-- Icon Button Style — Theme-aware -->
-        <Style x:Key="BusBuddyIconButtonStyle" TargetType="syncfusion:ButtonAdv">
+        <!-- Icon Button Style — Uses consolidated BusBuddyButtonAdvStyle -->
+        <Style x:Key="BusBuddyIconButtonStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource BusBuddyButtonAdvStyle}">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="8"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="SizeMode" Value="Small"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
         <!-- FluentDark theme will automatically style the window -->

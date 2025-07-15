@@ -170,27 +170,27 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,20,0,0">
-            <syncfusion:ButtonAdv Content="Search"
+            <syncfusion:ButtonAdv Label="Search"
                     Command="{Binding SearchCommand}"
                     Width="100"
                     Padding="0,5"
                     Margin="0,0,10,0"
                     IsDefault="True"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    Style="{StaticResource BusBuddyButtonAdvStyle}"/>
 
-            <syncfusion:ButtonAdv Content="Clear All"
+            <syncfusion:ButtonAdv Label="Clear All"
                     Command="{Binding ClearCommand}"
                     Width="100"
                     Padding="0,5"
                     Margin="0,0,10,0"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    Style="{StaticResource BusBuddyButtonAdvStyle}"/>
 
-            <syncfusion:ButtonAdv Content="Cancel"
+            <syncfusion:ButtonAdv Label="Cancel"
                     Command="{Binding CancelCommand}"
                     Width="100"
                     Padding="0,5"
                     IsCancel="True"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    Style="{StaticResource BusBuddyButtonAdvStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

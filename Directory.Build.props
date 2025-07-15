@@ -10,5 +10,9 @@
     <LogFileDirectory>$(MSBuildThisFileDirectory)logs</LogFileDirectory>
     <MSBuildLogFile>$(LogFileDirectory)\msbuild-$(MSBuildProjectName)-$(Configuration).log</MSBuildLogFile>
     <MSBuildVerbosity>normal</MSBuildVerbosity>
+
+    <!-- Package Management for Production -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 </Project>

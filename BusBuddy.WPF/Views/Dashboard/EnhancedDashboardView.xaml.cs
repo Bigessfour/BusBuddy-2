@@ -41,6 +41,8 @@ namespace BusBuddy.WPF.Views.Dashboard
         private const int REFRESH_INTERVAL_SECONDS = 5;
         private readonly ILogger<EnhancedDashboardView>? _logger;
         private bool _isInitializing = false;
+        private int _fallbackAttempts = 0;
+        private const int MAX_FALLBACK_ATTEMPTS = 3;
 
         public EnhancedDashboardView()
         {
@@ -821,7 +823,16 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                _logger?.LogInformation("🔄 Creating fallback UI for EnhancedDashboardView");
+                // Prevent excessive fallback attempts
+                if (_fallbackAttempts >= MAX_FALLBACK_ATTEMPTS)
+                {
+                    _logger?.LogError("Fallback UI failed after {Attempts} attempts. Showing error message.", _fallbackAttempts);
+                    ShowCriticalErrorMessage();
+                    return;
+                }
+
+                _fallbackAttempts++;
+                _logger?.LogInformation("🔄 Creating fallback UI for EnhancedDashboardView (Attempt {Attempt}/{MaxAttempts})", _fallbackAttempts, MAX_FALLBACK_ATTEMPTS);
 
                 // Create a simple fallback UI programmatically
                 var fallbackGrid = new Grid();
@@ -888,14 +899,32 @@ namespace BusBuddy.WPF.Views.Dashboard
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to create fallback UI: {ErrorMessage}", ex.Message);
-                // Last resort: set a simple text content
+                ShowCriticalErrorMessage();
+            }
+        }
+
+        /// <summary>
+        /// Show a critical error message when all fallback attempts fail
+        /// </summary>
+        private void ShowCriticalErrorMessage()
+        {
+            try
+            {
                 this.Content = new TextBlock
                 {
-                    Text = "Dashboard Error",
+                    Text = "Critical Dashboard Error\n\nThe dashboard could not be loaded after multiple attempts.\nPlease restart the application or contact technical support.",
                     Foreground = Brushes.Red,
+                    FontSize = 16,
+                    FontWeight = FontWeights.Bold,
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextAlignment = TextAlignment.Center,
+                    Margin = new Thickness(20)
                 };
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogCritical(ex, "Failed to show critical error message");
             }
         }
     }

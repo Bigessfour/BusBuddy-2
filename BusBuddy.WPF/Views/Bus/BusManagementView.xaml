@@ -39,9 +39,6 @@
                            SelectedItem="{Binding SelectedBus, Mode=TwoWay}"
                            Style="{StaticResource BusBuddySfDataGridStyle}"
                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                           Background="{StaticResource FluentDarkBackgroundBrush}"
-                           Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                           BorderBrush="{StaticResource FluentDarkBorderBrush}"
                            AutoGenerateColumns="False"
                            AllowResizingColumns="True"
                            AllowSorting="True"
@@ -135,11 +132,11 @@
             </Grid.ColumnDefinitions>
 
             <!-- Records Info -->
-            <TextBlock Grid.Column="0" VerticalAlignment="Center" Foreground="{StaticResource FluentDarkSecondaryTextBrush}">
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryForeground}">
                 <Run Text="Showing "/>
-                <Run Text="{Binding Buses.Count, Mode=OneWay}" Foreground="{StaticResource FluentDarkPrimaryTextBrush}" FontWeight="SemiBold"/>
+                <Run Text="{Binding Buses.Count, Mode=OneWay}" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
                 <Run Text=" of "/>
-                <Run Text="{Binding TotalRecords, Mode=OneWay}" Foreground="{StaticResource FluentDarkPrimaryTextBrush}" FontWeight="SemiBold"/>
+                <Run Text="{Binding TotalRecords, Mode=OneWay}" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
                 <Run Text=" records"/>
             </TextBlock>
 
@@ -161,18 +158,18 @@
                         ToolTip="Previous Page"/>
 
                 <!-- Page Number Display -->
-                <Border BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                <Border BorderBrush="{DynamicResource ContentBorder}"
                         BorderThickness="1"
-                        Background="{StaticResource FluentDarkSurfaceBrush}"
+                        Background="{DynamicResource SurfaceBackground}"
                         Margin="5,0"
                         Padding="8,0"
                         VerticalAlignment="Center"
                         CornerRadius="3">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Page " VerticalAlignment="Center" Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
-                        <TextBlock Text="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Center" Foreground="{StaticResource FluentDarkPrimaryTextBrush}" FontWeight="SemiBold"/>
-                        <TextBlock Text=" of " VerticalAlignment="Center" Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
-                        <TextBlock Text="{Binding TotalPages, Mode=OneWay}" VerticalAlignment="Center" Foreground="{StaticResource FluentDarkPrimaryTextBrush}" FontWeight="SemiBold"/>
+                        <TextBlock Text="Page " VerticalAlignment="Center" Foreground="{DynamicResource SecondaryForeground}"/>
+                        <TextBlock Text="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Center" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
+                        <TextBlock Text=" of " VerticalAlignment="Center" Foreground="{DynamicResource SecondaryForeground}"/>
+                        <TextBlock Text="{Binding TotalPages, Mode=OneWay}" VerticalAlignment="Center" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Border>
 
@@ -193,21 +190,18 @@
 
                 <!-- Page Size Selector -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
-                    <TextBlock Text="Show " VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                    <TextBlock Text="Show " VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{DynamicResource SecondaryForeground}"/>
                     <syncfusion:ComboBoxAdv Width="65" Height="30"
                               SelectedValue="{Binding PageSize, Mode=TwoWay}"
                               Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                              Background="{StaticResource FluentDarkSurfaceBrush}"
-                              Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                              BorderBrush="{StaticResource FluentDarkBorderBrush}"
                               SelectionChanged="PageSize_SelectionChanged">
                         <syncfusion:ComboBoxItemAdv Content="10"/>
                         <syncfusion:ComboBoxItemAdv Content="20"/>
                         <syncfusion:ComboBoxItemAdv Content="50"/>
                         <syncfusion:ComboBoxItemAdv Content="100"/>
                     </syncfusion:ComboBoxAdv>
-                    <TextBlock Text="per page" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                    <TextBlock Text="per page" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource SecondaryForeground}"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
@@ -217,17 +211,19 @@
                 <syncfusion:ButtonAdv Label="➕ Add New Bus"
                                 Command="{Binding AddBusCommand}"
                                 Margin="5"
-                                Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
+                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                 ToolTip="Add a new bus to the fleet"/>
                 <syncfusion:ButtonAdv Label="✏️ Edit Selected"
                                 Command="{Binding UpdateBusCommand}"
                                 Margin="5"
-                                Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
+                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                 ToolTip="Edit the currently selected bus"/>
                 <syncfusion:ButtonAdv Label="🗑️ Delete"
                                 Command="{Binding DeleteBusCommand}"
                                 Margin="5"
-                                Style="{StaticResource BusBuddyDeleteButtonStyle}"
+                                Style="{StaticResource BusBuddyButtonAdvStyle}"
                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                 ToolTip="Delete the currently selected bus"/>
             </StackPanel>
@@ -239,7 +235,6 @@
                                     Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
                                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                     AnimationType="DoubleCircle"
-                                    Foreground="{StaticResource FluentDarkAccentBrush}"
                                     Background="Transparent"/>
     </Grid>
 </UserControl>

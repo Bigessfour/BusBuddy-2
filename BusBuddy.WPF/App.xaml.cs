@@ -100,12 +100,48 @@ public partial class App : Application
         // CRITICAL: Initialize error handling before anything else
         try
         {
+            // Dictionary to track repeated exceptions and prevent flood logging
+            var _exceptionOccurrences = new Dictionary<string, int>();
+            var _lastExceptionTime = new Dictionary<string, DateTime>();
+            const int MAX_EXCEPTION_OCCURRENCES = 5;
+            var EXCEPTION_TIMEOUT = TimeSpan.FromSeconds(30);
+
             // Set up global exception handlers immediately with intelligent filtering
             this.DispatcherUnhandledException += (sender, e) =>
             {
                 var exception = e.Exception;
                 var message = exception.Message;
                 var stackTrace = exception.StackTrace ?? "";
+
+                // Create a unique key for this exception type and message
+                var exceptionKey = $"{exception.GetType().Name}|{message.Substring(0, Math.Min(message.Length, 100))}";
+
+                // Check if this exception has occurred too frequently
+                var currentTime = DateTime.Now;
+                if (_exceptionOccurrences.ContainsKey(exceptionKey))
+                {
+                    var lastTime = _lastExceptionTime.GetValueOrDefault(exceptionKey, DateTime.MinValue);
+                    if (currentTime - lastTime < EXCEPTION_TIMEOUT)
+                    {
+                        _exceptionOccurrences[exceptionKey]++;
+                        if (_exceptionOccurrences[exceptionKey] > MAX_EXCEPTION_OCCURRENCES)
+                        {
+                            // Rate limit this exception
+                            e.Handled = true;
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // Reset counter if timeout has passed
+                        _exceptionOccurrences[exceptionKey] = 1;
+                    }
+                }
+                else
+                {
+                    _exceptionOccurrences[exceptionKey] = 1;
+                }
+                _lastExceptionTime[exceptionKey] = currentTime;
 
                 // Enhanced exception categorization with actionable recommendations
                 var exceptionCategory = CategorizeException(exception);
@@ -127,11 +163,20 @@ public partial class App : Application
                     return;
                 }
 
+                // Filter out BeginInit recursion issues
+                if (message.Contains("Cannot have nested BeginInit calls"))
+                {
+                    System.Diagnostics.Debug.WriteLine($"🔧 HANDLED: BeginInit recursion prevented - {message}");
+                    e.Handled = true;
+                    return;
+                }
+
                 // Enhanced logging with startup context and actionable insights
                 using (LogContext.PushProperty("ExceptionCategory", exceptionCategory))
                 using (LogContext.PushProperty("ActionableRecommendation", actionableRecommendation))
                 using (LogContext.PushProperty("IsStartupException", IsStartupPhase()))
                 using (LogContext.PushProperty("StartupPhase", GetCurrentStartupPhase()))
+                using (LogContext.PushProperty("ExceptionOccurrenceCount", _exceptionOccurrences[exceptionKey]))
                 {
                     // Log actionable exceptions with enhanced context
                     Log.Error(exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message} at {StackTraceLocation}",
@@ -234,6 +279,9 @@ public partial class App : Application
                 SfSkinManager.ApplicationTheme = new Theme("FluentDark");
                 Log.Information("🎨 FluentDark theme reapplied during startup");
             }
+
+            // Ensure theme settings are registered
+            SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
 
             Log.Information("🎨 Syncfusion FluentDark theme verified and ready");
         }
