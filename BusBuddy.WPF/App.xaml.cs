@@ -617,7 +617,11 @@ public partial class App : Application
             try
             {
                 SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
-                Log.Information("[STARTUP] 🎨 FluentDark theme settings registered successfully");
+
+                // Set global application theme for all Syncfusion controls
+                SfSkinManager.ApplicationTheme = new Theme("FluentDark");
+
+                Log.Information("[STARTUP] 🎨 FluentDark theme settings registered and applied globally");
             }
             catch (Exception themeEx)
             {

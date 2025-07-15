@@ -16,6 +16,8 @@ namespace BusBuddy.WPF.Utilities
     public static class XamlErrorHandler
     {
         private static readonly Serilog.ILogger Logger = Log.ForContext(typeof(XamlErrorHandler));
+        private static int _recoveryAttempts = 0;
+        private static readonly int MAX_RECOVERY_ATTEMPTS = 3;
 
         /// <summary>
         /// Initialize XAML error handling for the application
@@ -27,13 +29,24 @@ namespace BusBuddy.WPF.Utilities
             {
                 if (IsXamlParsingError(e.Exception))
                 {
-                    Logger.Error(e.Exception, "XAML parsing error detected - attempting graceful recovery");
+                    Logger.Error(e.Exception, "XAML parsing error detected - attempting graceful recovery (attempt {Attempt}/{MaxAttempts})",
+                        _recoveryAttempts + 1, MAX_RECOVERY_ATTEMPTS);
+
+                    // Prevent infinite recovery loops
+                    if (_recoveryAttempts >= MAX_RECOVERY_ATTEMPTS)
+                    {
+                        Logger.Warning("Maximum recovery attempts reached. Falling back to default error handling.");
+                        _recoveryAttempts = 0; // Reset for next session
+                        e.Handled = true;
+                        return;
+                    }
 
                     // Try to recover from common XAML errors
+                    _recoveryAttempts++;
                     if (TryHandleXamlError(e.Exception))
                     {
                         e.Handled = true;
-                        Logger.Information("Successfully recovered from XAML parsing error");
+                        Logger.Information("Successfully recovered from XAML parsing error (attempt {Attempt})", _recoveryAttempts);
                         return;
                     }
                 }
@@ -80,7 +93,7 @@ namespace BusBuddy.WPF.Utilities
                 {
                     Logger.Warning("Detected '*' parsing error - this is likely a Syncfusion control template issue");
 
-                    // The error is typically in Syncfusion control templates that try to parse 
+                    // The error is typically in Syncfusion control templates that try to parse
                     // star values as doubles. Since we can't modify the template at runtime,
                     // we'll just continue - the UI should still render with default values
                     return true;
