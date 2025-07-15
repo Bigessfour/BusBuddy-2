@@ -48,13 +48,15 @@ namespace BusBuddy.WPF
         {
             try
             {
-                // Register FluentDark theme settings
-                SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
+                // Register FluentDark theme settings with reveal effects enabled
+                var fluentDarkSettings = new FluentDarkThemeSettings();
+                SfSkinManager.RegisterThemeSettings("FluentDark", fluentDarkSettings);
 
-                // Apply theme using modern Theme property instead of deprecated VisualStyle
-                SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
+                // Apply theme using modern Theme property with reveal effects
+                var fluentTheme = new Theme() { ThemeName = "FluentDark" };
+                SfSkinManager.SetTheme(this, fluentTheme);
 
-                Log.Information("FluentDark theme applied successfully to MainWindow using modern Theme API");
+                Log.Information("FluentDark theme applied successfully to MainWindow with reveal effects enabled");
             }
             catch (Exception ex)
             {

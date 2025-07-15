@@ -15,6 +15,11 @@
             ===============================================================================
             -->
 
+            <!-- Merged dictionaries for custom styles -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
             <!-- Essential converters only — minimal resource dictionary -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
