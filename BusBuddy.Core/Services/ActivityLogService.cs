@@ -73,6 +73,7 @@ namespace BusBuddy.Core.Services
             try
             {
                 var logs = await _db.ActivityLogs
+                    .AsNoTracking() // Read-only query for better performance
                     .OrderByDescending(l => l.Timestamp)
                     .Take(count)
                     .ToListAsync();
@@ -109,6 +110,7 @@ namespace BusBuddy.Core.Services
             try
             {
                 var logs = await _db.ActivityLogs
+                    .AsNoTracking() // Read-only query for better performance
                     .OrderByDescending(l => l.Timestamp)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
@@ -140,6 +142,7 @@ namespace BusBuddy.Core.Services
             try
             {
                 var logs = await _db.ActivityLogs
+                    .AsNoTracking() // Read-only query for better performance
                     .Where(l => l.Timestamp >= startDate && l.Timestamp <= endDate)
                     .OrderByDescending(l => l.Timestamp)
                     .Take(count)
@@ -171,6 +174,7 @@ namespace BusBuddy.Core.Services
             try
             {
                 var logs = await _db.ActivityLogs
+                    .AsNoTracking() // Read-only query for better performance
                     .Where(l => l.User == user)
                     .OrderByDescending(l => l.Timestamp)
                     .Take(count)
@@ -202,6 +206,7 @@ namespace BusBuddy.Core.Services
             try
             {
                 var logs = await _db.ActivityLogs
+                    .AsNoTracking() // Read-only query for better performance
                     .Where(l => l.Action.Contains(action))
                     .OrderByDescending(l => l.Timestamp)
                     .Take(count)

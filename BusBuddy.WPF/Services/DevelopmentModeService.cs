@@ -45,10 +45,10 @@ namespace BusBuddy.WPF.Services
             {
                 // Check if database is empty and offer to seed data
                 await CheckAndOfferSeedDataAsync();
-                
+
                 // Add development menu items or buttons (if needed)
                 AddDevelopmentMenuItems();
-                
+
                 _logger.LogInformation("Development mode initialization completed.");
             }
             catch (Exception ex)
@@ -65,15 +65,18 @@ namespace BusBuddy.WPF.Services
             try
             {
                 var seedService = _serviceProvider.GetRequiredService<SeedDataService>();
-                
+
                 // This would typically show a dialog in development mode
                 // For now, we'll just log the availability
                 _logger.LogInformation("Seed data service available. Call SeedAllAsync() to populate with sample data.");
-                
+
                 // In a real implementation, you might want to:
                 // - Show a dialog asking if user wants to seed data
                 // - Add a menu item or button to trigger seeding
                 // - Automatically seed if database is completely empty
+
+                // Adding a minimal await to prevent CS1998 warning
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -157,6 +160,8 @@ namespace BusBuddy.WPF.Services
                 ["DatabaseTimeout"] = DevelopmentHelper.GetDatabaseTimeout(_configuration)
             };
 
+            // Adding a minimal await to prevent CS1998 warning
+            await Task.CompletedTask;
             return info;
         }
     }

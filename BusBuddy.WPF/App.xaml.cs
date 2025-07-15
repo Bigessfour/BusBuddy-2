@@ -3,14 +3,16 @@ using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.WPF.Logging;
 using BusBuddy.WPF.Utilities;
 using BusBuddy.WPF.ViewModels;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Context;
+using Serilog.Core;
+using Serilog.Core.Enrichers;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
 using System;
@@ -103,16 +105,9 @@ public partial class App : Application
                     return;
                 }
 
-                // Log actionable exceptions only
-                if (Log.Logger != null)
-                {
-                    Log.Error(exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message}",
-                        exception.GetType().Name, message);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"❌ App Dispatcher Exception: {message}");
-                }
+                // Log actionable exceptions only using Serilog directly
+                Log.Error(exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message}",
+                    exception.GetType().Name, message);
 
                 e.Handled = true; // Prevent crash
             };
@@ -127,7 +122,7 @@ public partial class App : Application
             System.Diagnostics.Debug.WriteLine($"Error setting up exception handlers: {ex.Message}");
         }
 
-        // Initialize Serilog directly first (before host)
+        // Initialize Serilog directly first (before host) with enrichment
         try
         {
             var startupConfig = new ConfigurationBuilder()
@@ -141,11 +136,14 @@ public partial class App : Application
                 .Enrich.WithMachineName()
                 .Enrich.WithThreadId()
                 .Enrich.WithProcessId()
+                .Enrich.WithProcessName()
+                .Enrich.WithEnvironmentName()
+                .Enrich.WithEnvironmentUserName()
                 .WriteTo.Console()
                 .WriteTo.File("logs/application-.log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
-            Log.Information("Serilog initialized successfully");
+            Log.Information("Serilog initialized successfully with enrichment capabilities");
         }
         catch (Exception logEx)
         {
@@ -299,12 +297,11 @@ public partial class App : Application
             Directory.CreateDirectory(logsDirectory);
         }
 
-        // Register logging with DI so ILogger<T> can be injected
+        // Register logging with DI so Serilog can be injected — removed Microsoft.Extensions.Logging dependency
         ServiceCollection services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
-        services.AddLogging(loggingBuilder =>
-        {
-            loggingBuilder.AddSerilog();
-        });
+
+        // Register Serilog as the primary logger without Microsoft logging wrapper
+        services.AddSerilog();
 
         // Initialize Serilog for robust logging, with enrichers
         try
@@ -319,17 +316,18 @@ public partial class App : Application
             var condensedFormatter = new CondensedLogFormatter(includeProperties: true, showAggregatedOnly: false);
             var consoleFormatter = new CondensedLogFormatter(includeProperties: false, showAggregatedOnly: true);
 
-            // Use consolidated Serilog configuration with aggressive aggregation
+            // Use consolidated Serilog configuration with enhanced enrichment capabilities
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information() // Reduce noise by starting at Information level
-                                            // Built-in enrichers (essential ones only)
+                                            // Built-in enrichers with Serilog enrichment extensions
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithThreadId()
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .Enrich.WithEnvironmentName()
-                // Custom BusBuddy enrichers (order matters - aggregation should be last)
+                .Enrich.WithEnvironmentUserName()
+                // Custom BusBuddy enrichers (order matters — aggregation should be last)
                 .Enrich.With(contextEnricher)
                 .Enrich.With(dbEnricher)
                 .Enrich.With(uiEnricher)
@@ -348,11 +346,11 @@ public partial class App : Application
                 .WriteTo.Console(consoleFormatter)
                 .CreateLogger();
 
-            Log.Information("BusBuddy WPF application starting with consolidated Serilog enrichers. Build: {BuildTime}", DateTime.Now);
-            Log.Information("Enrichers enabled: Context, Database, UI, Aggregation, Machine, Thread, Process, Environment");
+            Log.Information("BusBuddy WPF application starting with pure Serilog and enrichment (Microsoft.Extensions.Logging removed). Build: {BuildTime}", DateTime.Now);
+            Log.Information("Enhanced Enrichers enabled: Context, Database, UI, Aggregation, Machine, Thread, Process, Environment, EnvironmentUser");
             Log.Information("Consolidated logging: 2 files (main + errors) with smart aggregation");
             Log.Information("Logs directory: {LogsDirectory}", logsDirectory);
-            Log.Information("Enhanced structured logging with {EnricherCount} enrichers active", 8);
+            Log.Information("Enhanced structured logging with {EnricherCount} enrichers active (pure Serilog implementation)", 9);
             Log.Information("🔧 Improved Error Handling: ButtonAdv style conflicts filtered, actionable errors prioritized");
             Log.Information("📋 Log Lifecycle: 7-day retention for app logs, 30-day for actionable errors, auto-cleanup enabled");
         }
@@ -454,7 +452,7 @@ public partial class App : Application
                 }
                 else
                 {
-                    Log.Information("[STARTUP] ✅ All startup orchestration phases completed successfully - LoadingView progress indication functional");
+                    Log.Information("[STARTUP] ✅ All startup orchestration phases completed successfully — LoadingView progress indication functional (using pure Serilog)");
                 }
             }
             catch (Exception orchestrationEx)
@@ -484,8 +482,7 @@ public partial class App : Application
         */
 
         // Create and initialize startup performance monitor
-        var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
-        _startupMonitor = new StartupPerformanceMonitor(loggerFactory.CreateLogger<StartupPerformanceMonitor>());
+        _startupMonitor = new StartupPerformanceMonitor(Log.Logger);
         _startupMonitor.Start();
 
         // Log basic startup timing
@@ -583,6 +580,29 @@ public partial class App : Application
             _startupMonitor.BeginStep("ResolveMainViewModel");
             var scope = serviceProvider.CreateScope();
             var mainViewModel = scope.ServiceProvider.GetRequiredService<MainViewModel>();
+
+            // Start background preloading of essential ViewModels
+            var lazyViewModelService = scope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.ILazyViewModelService>();
+            var preloadService = scope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.IStartupPreloadService>();
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    // Preload essential data first
+                    await preloadService.PreloadEssentialDataAsync();
+
+                    // Then preload ViewModels
+                    await lazyViewModelService.PreloadEssentialViewModelsAsync();
+
+                    Log.Information("[STARTUP] Background preloading completed");
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "[STARTUP] Background preloading failed");
+                }
+            });
+
             _startupMonitor.EndStep();
 
             // Initialize theme service before creating UI with Fluent Dark
@@ -644,6 +664,21 @@ public partial class App : Application
             // Complete startup performance monitoring immediately
             _startupMonitor.Complete();
 
+            // Trigger background preloading after UI is shown (non-blocking)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(100); // Small delay to ensure UI is fully rendered
+                    await mainViewModel.PreloadEssentialViewModelsAsync();
+                    Log.Information("[STARTUP] Post-UI ViewModel preloading completed");
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "[STARTUP] Post-UI ViewModel preloading failed");
+                }
+            });
+
             // Log total time from the original stopwatch
             stopwatch.Stop();
             Log.Information("[STARTUP_PERF] Initial application startup completed in {ElapsedMs}ms",
@@ -698,8 +733,7 @@ public partial class App : Application
 
     private void ConfigureLoggingAndDiagnostics(IServiceCollection services)
     {
-        // Register logging so ILogger<T> can be injected into services
-        services.AddLogging();
+        // Use Serilog exclusively — no Microsoft Extensions Logging wrapper needed
 
         // Register Serilog enrichers as singletons (as recommended in the article)
         services.AddSingleton<BusBuddyContextEnricher>();
@@ -713,7 +747,7 @@ public partial class App : Application
         // Register log lifecycle management
         services.AddSingleton<BusBuddy.WPF.Utilities.LogLifecycleManager>();
 
-        // Register UI-specific logging services - DISABLED due to missing utilities
+        // Register UI-specific logging services — DISABLED due to missing utilities
         // services.AddUILogging();
 
         // Register performance monitoring utilities
@@ -815,7 +849,12 @@ public partial class App : Application
     {
         // Register AutoMapper services
         services.AddAutoMapper(typeof(BusBuddy.WPF.Mapping.MappingProfile));
-        services.AddSingleton<BusBuddy.WPF.Services.IMappingService, BusBuddy.WPF.Services.MappingService>();
+        services.AddSingleton<BusBuddy.WPF.Services.IMappingService>(provider =>
+        {
+            var mapper = provider.GetRequiredService<IMapper>();
+            var logger = Log.ForContext<BusBuddy.WPF.Services.MappingService>();
+            return new BusBuddy.WPF.Services.MappingService(mapper, logger);
+        });
 
         // Register WPF-specific Services - Changed RoutePopulationScaffold to Scoped
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
@@ -840,15 +879,16 @@ public partial class App : Application
         // Register database validation utilities
         services.AddScoped<BusBuddy.Core.Utilities.DatabaseValidator>();
 
-        // Register log consolidation utility - DISABLED due to missing utility
+        // Register log consolidation utility — DISABLED due to missing utility
         /*
         services.AddScoped<BusBuddy.WPF.Utilities.LogConsolidationUtility>(provider =>
         {
-            var logger = provider.GetRequiredService<ILogger<BusBuddy.WPF.Utilities.LogConsolidationUtility>>();
+            // Using Serilog directly instead of Microsoft.Extensions.Logging wrapper
+            var serilogLogger = Log.ForContext<BusBuddy.WPF.Utilities.LogConsolidationUtility>();
             string solutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
                                ?? Directory.GetCurrentDirectory();
             string logsDirectory = Path.Combine(solutionRoot, "logs");
-            return new BusBuddy.WPF.Utilities.LogConsolidationUtility(logger, logsDirectory);
+            return new BusBuddy.WPF.Utilities.LogConsolidationUtility(serilogLogger, logsDirectory);
         });
         */
 
@@ -858,12 +898,19 @@ public partial class App : Application
 
     private void ConfigureViewModels(IServiceCollection services)
     {
-        // Main/Dashboard/Navigation ViewModels - Changed MainViewModel to Scoped
+        // ⚡ LAZY LOADING SERVICE - Performance optimization
+        services.AddSingleton<BusBuddy.WPF.Services.ILazyViewModelService, BusBuddy.WPF.Services.LazyViewModelService>();
+
+        // ⚡ STARTUP PRELOAD SERVICE - Background data loading
+        services.AddScoped<BusBuddy.WPF.Services.IStartupPreloadService, BusBuddy.WPF.Services.StartupPreloadService>();
+
+        // Main/Dashboard/Navigation ViewModels - Essential ViewModels loaded eagerly
         services.AddScoped<BusBuddy.WPF.ViewModels.MainViewModel>();
-        services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>(); // Essential for immediate display
+        services.AddScoped<BusBuddy.WPF.ViewModels.LoadingViewModel>(); // Essential for startup
+
+        // Activity Log ViewModel - Loaded eagerly for startup logging
         services.AddScoped<BusBuddy.WPF.ViewModels.ActivityLogViewModel>();
-        services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
-        services.AddScoped<BusBuddy.WPF.ViewModels.LoadingViewModel>();
 
         // Dashboard Tile ViewModels
         services.AddScoped<BusBuddy.WPF.ViewModels.FleetStatusTileViewModel>();
@@ -871,7 +918,7 @@ public partial class App : Application
         services.AddScoped<Func<Action<string>?, BusBuddy.WPF.ViewModels.QuickActionsTileViewModel>>(provider =>
             (navigationAction) => new BusBuddy.WPF.ViewModels.QuickActionsTileViewModel(navigationAction));
 
-        // Management ViewModels
+        // Management ViewModels - Loaded lazily for better startup performance
         services.AddScoped<BusBuddy.WPF.ViewModels.BusManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.DriverManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.RouteManagementViewModel>();
@@ -881,10 +928,11 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.RoutePlanningViewModel>();
 
-        // List ViewModels
+        // List ViewModels - Loaded lazily
         services.AddScoped<BusBuddy.WPF.ViewModels.StudentListViewModel>();
 
-        // Settings and AI ViewModels
+        // Settings and AI ViewModels - Loaded lazily
+        services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.XaiChatViewModel>();
     }
 

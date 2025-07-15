@@ -1,182 +1,203 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace BusBuddy.WPF.Utilities
 {
     /// <summary>
-    /// Specialized performance monitor for tracking application startup sequence
+    /// Monitors and tracks startup performance metrics for the application
     /// </summary>
     public class StartupPerformanceMonitor
     {
-        private readonly ILogger<StartupPerformanceMonitor> _logger;
-        private readonly Stopwatch _totalStopwatch = new();
-        private readonly Dictionary<string, TimeSpan> _stepDurations = new();
-        private readonly Dictionary<string, DateTime> _stepStartTimes = new();
-        private readonly List<string> _startupSequence = new();
+        private readonly ILogger _logger;
+        private readonly Stopwatch _overallStopwatch;
+        private readonly Dictionary<string, Stopwatch> _stepStopwatches;
+        private readonly Dictionary<string, TimeSpan> _completedSteps;
+        private bool _isCompleted;
 
-        private DateTime _startTime;
-        private string _currentStep = string.Empty;
-
-        public StartupPerformanceMonitor(ILogger<StartupPerformanceMonitor> logger)
+        /// <summary>
+        /// Initializes a new instance of the StartupPerformanceMonitor
+        /// </summary>
+        /// <param name="logger">Logger instance for recording performance metrics</param>
+        public StartupPerformanceMonitor(ILogger logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _overallStopwatch = new Stopwatch();
+            _stepStopwatches = new Dictionary<string, Stopwatch>();
+            _completedSteps = new Dictionary<string, TimeSpan>();
+            _isCompleted = false;
         }
 
         /// <summary>
-        /// Starts measuring the total startup time
+        /// Starts the overall startup performance monitoring
         /// </summary>
         public void Start()
         {
-            _startTime = DateTime.Now;
-            _totalStopwatch.Start();
-            _logger.LogInformation("[STARTUP_PERF] StartupPerformanceMonitor initialized at {StartTime}", _startTime);
+            _overallStopwatch.Start();
+            _logger.Information("[STARTUP_PERF] Startup performance monitoring started");
         }
 
         /// <summary>
-        /// Starts timing a specific startup step
+        /// Begins timing a specific startup step
         /// </summary>
-        /// <param name="stepName">The name of the startup step</param>
+        /// <param name="stepName">Name of the startup step</param>
         public void BeginStep(string stepName)
         {
-            // Complete previous step if exists
-            if (!string.IsNullOrEmpty(_currentStep))
+            if (_isCompleted)
             {
-                EndStep();
+                _logger.Warning("[STARTUP_PERF] Cannot begin step '{StepName}' — monitoring already completed", stepName);
+                return;
             }
 
-            _currentStep = stepName;
-            _startupSequence.Add(stepName);
-            _stepStartTimes[stepName] = DateTime.Now;
-
-            _logger.LogInformation(
-                "[STARTUP_PERF] Step started: {StepName}, Time since app start: {ElapsedMs}ms",
-                stepName,
-                _totalStopwatch.ElapsedMilliseconds);
-        }
-
-        /// <summary>
-        /// Ends timing the current startup step
-        /// </summary>
-        public void EndStep()
-        {
-            if (string.IsNullOrEmpty(_currentStep))
-                return;
-
-            if (!_stepStartTimes.TryGetValue(_currentStep, out var startTime))
-                return;
-
-            var duration = DateTime.Now - startTime;
-            _stepDurations[_currentStep] = duration;
-
-            _logger.LogInformation(
-                "[STARTUP_PERF] Step completed: {StepName}, Duration: {DurationMs}ms, Time since app start: {ElapsedMs}ms",
-                _currentStep,
-                duration.TotalMilliseconds,
-                _totalStopwatch.ElapsedMilliseconds);
-
-            // Add a structured log entry with specific duration field
-            _logger.LogInformation(
-                "[STARTUP_PERF] {StepName} completed. Duration:{DurationMs}ms ElapsedSinceStart:{ElapsedMs}ms",
-                _currentStep,
-                duration.TotalMilliseconds,
-                _totalStopwatch.ElapsedMilliseconds);
-
-            _currentStep = string.Empty;
-        }
-
-        /// <summary>
-        /// Ends a specific named step (can be used from async context where current step might be lost)
-        /// </summary>
-        /// <param name="stepName">The name of the step to end</param>
-        public void EndNamedStep(string stepName)
-        {
-            if (!_stepStartTimes.TryGetValue(stepName, out var startTime))
-                return;
-
-            var duration = DateTime.Now - startTime;
-            _stepDurations[stepName] = duration;
-
-            _logger.LogInformation(
-                "[STARTUP_PERF] Named step completed: {StepName}, Duration: {DurationMs}ms, Time since app start: {ElapsedMs}ms",
-                stepName,
-                duration.TotalMilliseconds,
-                _totalStopwatch.ElapsedMilliseconds);
-
-            // Add a structured log entry with specific duration field
-            _logger.LogInformation(
-                "[STARTUP_PERF] {StepName} completed. Duration:{DurationMs}ms ElapsedSinceStart:{ElapsedMs}ms",
-                stepName,
-                duration.TotalMilliseconds,
-                _totalStopwatch.ElapsedMilliseconds);
-        }
-
-        /// <summary>
-        /// Tracks an asynchronous step by timing its execution
-        /// </summary>
-        /// <param name="stepName">The name of the step</param>
-        /// <param name="action">The async action to perform</param>
-        public async Task TrackStepAsync(string stepName, Func<Task> action)
-        {
-            BeginStep(stepName);
-            try
+            if (_stepStopwatches.ContainsKey(stepName))
             {
-                await action();
+                _logger.Warning("[STARTUP_PERF] Step '{StepName}' is already in progress", stepName);
+                return;
             }
-            finally
-            {
-                EndStep();
-            }
+
+            var stepStopwatch = Stopwatch.StartNew();
+            _stepStopwatches[stepName] = stepStopwatch;
+
+            _logger.Debug("[STARTUP_PERF] Started step: {StepName}", stepName);
         }
 
         /// <summary>
-        /// Completes startup timing and logs the summary
+        /// Ends timing for a specific startup step
+        /// </summary>
+        /// <param name="stepName">Name of the startup step to end</param>
+        public void EndStep(string stepName = "")
+        {
+            if (_isCompleted)
+            {
+                _logger.Warning("[STARTUP_PERF] Cannot end step '{StepName}' — monitoring already completed", stepName);
+                return;
+            }
+
+            // If no step name provided, end the most recently started step
+            if (string.IsNullOrEmpty(stepName))
+            {
+                if (_stepStopwatches.Count == 0)
+                {
+                    _logger.Warning("[STARTUP_PERF] No active steps to end");
+                    return;
+                }
+
+                // Get the most recently added step (assumes Dictionary maintains insertion order in .NET Core)
+                stepName = GetMostRecentStep();
+            }
+
+            if (!_stepStopwatches.TryGetValue(stepName, out var stepStopwatch))
+            {
+                _logger.Warning("[STARTUP_PERF] Step '{StepName}' was not found or already ended", stepName);
+                return;
+            }
+
+            stepStopwatch.Stop();
+            var elapsed = stepStopwatch.Elapsed;
+
+            _completedSteps[stepName] = elapsed;
+            _stepStopwatches.Remove(stepName);
+
+            _logger.Information("[STARTUP_PERF] Completed step '{StepName}' in {ElapsedMs}ms",
+                stepName, elapsed.TotalMilliseconds);
+        }
+
+        /// <summary>
+        /// Completes the startup performance monitoring and logs final metrics
         /// </summary>
         public void Complete()
         {
-            // End any current step
-            if (!string.IsNullOrEmpty(_currentStep))
+            if (_isCompleted)
             {
-                EndStep();
+                _logger.Warning("[STARTUP_PERF] Performance monitoring already completed");
+                return;
             }
 
-            _totalStopwatch.Stop();
-            var totalDuration = _totalStopwatch.Elapsed;
-
-            _logger.LogInformation(
-                "[STARTUP_PERF] Application startup completed in {TotalDurationMs}ms",
-                totalDuration.TotalMilliseconds);
-
-            // Generate detailed summary
-            _logger.LogInformation("[STARTUP_PERF] ===== Startup Performance Summary =====");
-
-            foreach (var step in _startupSequence)
+            // End any remaining active steps
+            var activeSteps = new List<string>(_stepStopwatches.Keys);
+            foreach (var stepName in activeSteps)
             {
-                if (_stepDurations.TryGetValue(step, out var duration))
-                {
-                    var percentage = (duration.TotalMilliseconds / totalDuration.TotalMilliseconds) * 100;
-                    _logger.LogInformation(
-                        "[STARTUP_PERF] Step: {StepName}, Duration: {DurationMs}ms ({Percentage:F1}% of total)",
-                        step,
-                        duration.TotalMilliseconds,
-                        percentage);
-                }
+                EndStep(stepName);
             }
 
-            _logger.LogInformation("[STARTUP_PERF] Total startup time: {TotalDurationMs}ms", totalDuration.TotalMilliseconds);
-            _logger.LogInformation("[STARTUP_PERF] ===== End of Startup Performance Summary =====");
+            _overallStopwatch.Stop();
+            _isCompleted = true;
+
+            // Log summary
+            var totalTime = _overallStopwatch.Elapsed;
+            _logger.Information("[STARTUP_PERF] 🎯 STARTUP COMPLETE — Total time: {TotalMs}ms", totalTime.TotalMilliseconds);
+
+            // Log detailed breakdown
+            LogDetailedBreakdown(totalTime);
         }
 
         /// <summary>
-        /// Gets all recorded step durations
+        /// Gets the current overall elapsed time
         /// </summary>
-        public IReadOnlyDictionary<string, TimeSpan> GetStepDurations() => _stepDurations;
+        public TimeSpan GetCurrentElapsed()
+        {
+            return _overallStopwatch.Elapsed;
+        }
 
         /// <summary>
-        /// Gets the total startup duration
+        /// Gets the elapsed time for a specific completed step
         /// </summary>
-        public TimeSpan GetTotalDuration() => _totalStopwatch.Elapsed;
+        /// <param name="stepName">Name of the step</param>
+        /// <returns>Elapsed time for the step, or null if step not found</returns>
+        public TimeSpan? GetStepElapsed(string stepName)
+        {
+            return _completedSteps.TryGetValue(stepName, out var elapsed) ? elapsed : null;
+        }
+
+        /// <summary>
+        /// Gets all completed step metrics
+        /// </summary>
+        /// <returns>Dictionary of step names and their elapsed times</returns>
+        public IReadOnlyDictionary<string, TimeSpan> GetAllStepMetrics()
+        {
+            return _completedSteps;
+        }
+
+        private string GetMostRecentStep()
+        {
+            string? mostRecent = null;
+            foreach (var key in _stepStopwatches.Keys)
+            {
+                mostRecent = key;
+            }
+            return mostRecent ?? "";
+        }
+
+        private void LogDetailedBreakdown(TimeSpan totalTime)
+        {
+            if (_completedSteps.Count == 0)
+            {
+                _logger.Information("[STARTUP_PERF] No individual steps were tracked");
+                return;
+            }
+
+            _logger.Information("[STARTUP_PERF] === DETAILED BREAKDOWN ===");
+
+            var totalStepTime = TimeSpan.Zero;
+            foreach (var step in _completedSteps)
+            {
+                var percentage = (step.Value.TotalMilliseconds / totalTime.TotalMilliseconds) * 100;
+                _logger.Information("[STARTUP_PERF] • {StepName}: {ElapsedMs}ms ({Percentage:F1}%)",
+                    step.Key, step.Value.TotalMilliseconds, percentage);
+                totalStepTime += step.Value;
+            }
+
+            // Calculate unaccounted time
+            var unaccountedTime = totalTime - totalStepTime;
+            if (unaccountedTime.TotalMilliseconds > 0)
+            {
+                var unaccountedPercentage = (unaccountedTime.TotalMilliseconds / totalTime.TotalMilliseconds) * 100;
+                _logger.Information("[STARTUP_PERF] • Unaccounted time: {UnaccountedMs}ms ({UnaccountedPercentage:F1}%)",
+                    unaccountedTime.TotalMilliseconds, unaccountedPercentage);
+            }
+
+            _logger.Information("[STARTUP_PERF] === END BREAKDOWN ===");
+        }
     }
 }

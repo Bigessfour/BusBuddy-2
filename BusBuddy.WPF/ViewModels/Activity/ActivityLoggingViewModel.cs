@@ -101,26 +101,46 @@ namespace BusBuddy.WPF.ViewModels
                 Logger?.LogDebug("Refreshing activity logs with filter: Start={StartDate}, End={EndDate}, Search={SearchText}",
                     StartDate, EndDate, SearchText);
 
-                // Get all logs (with limit) from service
-                var allLogs = await _logService.GetLogsAsync(_defaultLogLimit);
-
-                // Apply filters in memory
-                var filteredLogs = allLogs
-                    .Where(log => log.Timestamp >= StartDate.Date && log.Timestamp <= EndDate.Date.AddDays(1).AddSeconds(-1))
-                    .Where(log => string.IsNullOrWhiteSpace(SearchText) ||
-                                 log.Action.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                 log.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                                 (log.Details != null && log.Details.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
-                    .ToList();
-
-                Logs.Clear();
-                foreach (var log in filteredLogs)
+                // Use the optimized date range method if dates are specified
+                if (StartDate.Date != DateTime.Now.AddDays(-30).Date || EndDate.Date != DateTime.Now.Date)
                 {
-                    Logs.Add(log);
+                    var allLogs = await _logService.GetLogsByDateRangeAsync(StartDate, EndDate, _defaultLogLimit);
+
+                    // Apply search filter in memory (smaller dataset after date filter)
+                    var filteredLogs = allLogs
+                        .Where(log => string.IsNullOrWhiteSpace(SearchText) ||
+                                     log.Action.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                     log.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                     (log.Details != null && log.Details.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
+                        .ToList();
+
+                    Logs.Clear();
+                    foreach (var log in filteredLogs)
+                    {
+                        Logs.Add(log);
+                    }
+                }
+                else
+                {
+                    // Use paged method for recent logs
+                    var allLogs = await _logService.GetLogsPagedAsync(1, _defaultLogLimit);
+
+                    // Apply search filter in memory
+                    var filteredLogs = allLogs
+                        .Where(log => string.IsNullOrWhiteSpace(SearchText) ||
+                                     log.Action.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                     log.User.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                     (log.Details != null && log.Details.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
+                        .ToList();
+
+                    Logs.Clear();
+                    foreach (var log in filteredLogs)
+                    {
+                        Logs.Add(log);
+                    }
                 }
 
-                Logger?.LogInformation("Loaded {FilteredCount} activity logs after filtering from {TotalCount} total logs",
-                    Logs.Count, allLogs.Count());
+                Logger?.LogInformation("Loaded {FilteredCount} activity logs after filtering", Logs.Count);
             }
             catch (Exception ex)
             {

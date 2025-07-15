@@ -39,7 +39,7 @@ await developmentService.ClearSeedDataAsync();   // Clear sample data
 ### **Performance Monitoring**
 - **Memory Usage**: Automatically tracked and logged
 - **Query Performance**: Activity logs optimized with pagination
-- **Thresholds**: 
+- **Thresholds**:
   - Development: 200MB memory warning
   - Production: 500MB memory warning
 

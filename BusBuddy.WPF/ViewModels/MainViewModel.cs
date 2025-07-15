@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using BusBuddy.WPF.ViewModels;
 using BusBuddy.WPF.ViewModels.Schedule;
+using BusBuddy.WPF.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -29,48 +31,21 @@ namespace BusBuddy.WPF.ViewModels
         private object? _currentViewModel;
 
         private readonly ILogger<MainViewModel>? _logger;
-        private readonly DashboardViewModel _dashboardViewModel;
-        private readonly BusManagementViewModel _busManagementViewModel;
-        private readonly DriverManagementViewModel _driverManagementViewModel;
-        private readonly RouteManagementViewModel _routeManagementViewModel;
-        private readonly ScheduleManagementViewModel _scheduleManagementViewModel;
-        private readonly StudentManagementViewModel _studentManagementViewModel;
-        private readonly MaintenanceTrackingViewModel _maintenanceTrackingViewModel;
-        private readonly FuelManagementViewModel _fuelManagementViewModel;
-        private readonly ActivityLogViewModel _activityLogViewModel;
-        private readonly SettingsViewModel _settingsViewModel;
-        private readonly StudentListViewModel _studentListViewModel;
-        private readonly LoadingViewModel _loadingViewModel;
+        private readonly ILazyViewModelService _lazyViewModelService;
+        private readonly DashboardViewModel _dashboardViewModel; // Keep dashboard eager for immediate display
+        private readonly LoadingViewModel _loadingViewModel; // Keep loading view eager
 
         public ObservableCollection<NavigationItem> NavigationItems { get; }
 
         public MainViewModel(
             DashboardViewModel dashboardViewModel,
-            BusManagementViewModel busManagementViewModel,
-            DriverManagementViewModel driverManagementViewModel,
-            RouteManagementViewModel routeManagementViewModel,
-            ScheduleManagementViewModel scheduleManagementViewModel,
-            StudentManagementViewModel studentManagementViewModel,
-            MaintenanceTrackingViewModel maintenanceTrackingViewModel,
-            FuelManagementViewModel fuelManagementViewModel,
-            ActivityLogViewModel activityLogViewModel,
-            SettingsViewModel settingsViewModel,
-            StudentListViewModel studentListViewModel,
             LoadingViewModel loadingViewModel,
+            ILazyViewModelService lazyViewModelService,
             ILogger<MainViewModel>? logger = null)
         {
             _dashboardViewModel = dashboardViewModel;
-            _busManagementViewModel = busManagementViewModel;
-            _driverManagementViewModel = driverManagementViewModel;
-            _routeManagementViewModel = routeManagementViewModel;
-            _scheduleManagementViewModel = scheduleManagementViewModel;
-            _studentManagementViewModel = studentManagementViewModel;
-            _maintenanceTrackingViewModel = maintenanceTrackingViewModel;
-            _fuelManagementViewModel = fuelManagementViewModel;
-            _activityLogViewModel = activityLogViewModel;
-            _settingsViewModel = settingsViewModel;
-            _studentListViewModel = studentListViewModel;
             _loadingViewModel = loadingViewModel;
+            _lazyViewModelService = lazyViewModelService;
             _logger = logger;
 
             NavigationItems = new ObservableCollection<NavigationItem>
@@ -91,7 +66,7 @@ namespace BusBuddy.WPF.ViewModels
             // Start with loading view for smooth startup - no data loading yet
             CurrentViewModel = _loadingViewModel;
 
-            _logger?.LogInformation("MainViewModel initialized with {Count} navigation items", NavigationItems.Count);
+            _logger?.LogInformation("MainViewModel initialized with {Count} navigation items using lazy loading", NavigationItems.Count);
         }
 
         partial void OnCurrentViewModelChanged(object? value)
@@ -101,37 +76,76 @@ namespace BusBuddy.WPF.ViewModels
                 viewName, value?.GetType().Name ?? "null");
         }
 
+        /// <summary>
+        /// Navigate to a specific view model
+        /// </summary>
         [RelayCommand]
-        private void NavigateTo(string viewModelName)
+        private async Task NavigateTo(string viewModelName)
         {
             _logger?.LogInformation("UI Navigation initiated to {ViewModelName} via button click", viewModelName);
 
             object? previousViewModel = CurrentViewModel;
             var startTime = System.Diagnostics.Stopwatch.StartNew();
 
-            CurrentViewModel = viewModelName switch
+            try
             {
-                "Dashboard" => _dashboardViewModel,
-                "Buses" => _busManagementViewModel,
-                "Drivers" => _driverManagementViewModel,
-                "Routes" => _routeManagementViewModel,
-                "Schedule" => _scheduleManagementViewModel,
-                "Students" => _studentManagementViewModel,
-                "Maintenance" => _maintenanceTrackingViewModel,
-                "Fuel" => _fuelManagementViewModel,
-                "Activity" => _activityLogViewModel,
-                "Settings" => _settingsViewModel,
-                "StudentList" => _studentListViewModel,
-                "Loading" => _loadingViewModel,
-                "Error" => _loadingViewModel, // Use loading view for errors too
-                _ => _dashboardViewModel
-            };
+                // Show loading state for non-cached ViewModels
+                if (previousViewModel != _loadingViewModel)
+                {
+                    var stats = _lazyViewModelService.GetCacheStats();
+                    if (stats.CachedCount == 0 && viewModelName != "Dashboard" && viewModelName != "Loading")
+                    {
+                        CurrentViewModel = _loadingViewModel;
+                    }
+                }
 
-            startTime.Stop();
-            _logger?.LogInformation("UI View transition completed to {ViewModel} from {PreviousViewModel} in {ElapsedMs}ms",
-                CurrentViewModel?.GetType().Name,
-                previousViewModel?.GetType().Name ?? "null",
-                startTime.ElapsedMilliseconds);
+                CurrentViewModel = viewModelName switch
+                {
+                    "Dashboard" => _dashboardViewModel,
+                    "Buses" => await _lazyViewModelService.GetViewModelAsync<BusManagementViewModel>(),
+                    "Drivers" => await _lazyViewModelService.GetViewModelAsync<DriverManagementViewModel>(),
+                    "Routes" => await _lazyViewModelService.GetViewModelAsync<RouteManagementViewModel>(),
+                    "Schedule" => await _lazyViewModelService.GetViewModelAsync<ScheduleManagementViewModel>(),
+                    "Students" => await _lazyViewModelService.GetViewModelAsync<StudentManagementViewModel>(),
+                    "Maintenance" => await _lazyViewModelService.GetViewModelAsync<MaintenanceTrackingViewModel>(),
+                    "Fuel" => await _lazyViewModelService.GetViewModelAsync<FuelManagementViewModel>(),
+                    "Activity" => await _lazyViewModelService.GetViewModelAsync<ActivityLogViewModel>(),
+                    "Settings" => await _lazyViewModelService.GetViewModelAsync<SettingsViewModel>(),
+                    "StudentList" => await _lazyViewModelService.GetViewModelAsync<StudentListViewModel>(),
+                    "Loading" => _loadingViewModel,
+                    "Error" => _loadingViewModel, // Use loading view for errors too
+                    _ => _dashboardViewModel
+                };
+
+                startTime.Stop();
+                _logger?.LogInformation("UI View transition completed to {ViewModel} from {PreviousViewModel} in {ElapsedMs}ms",
+                    CurrentViewModel?.GetType().Name,
+                    previousViewModel?.GetType().Name ?? "null",
+                    startTime.ElapsedMilliseconds);
+            }
+            catch (Exception ex)
+            {
+                startTime.Stop();
+                _logger?.LogError(ex, "Error navigating to {ViewModelName} after {ElapsedMs}ms", viewModelName, startTime.ElapsedMilliseconds);
+                CurrentViewModel = _loadingViewModel;
+            }
+        }
+
+        /// <summary>
+        /// Preload essential ViewModels in the background
+        /// </summary>
+        public async Task PreloadEssentialViewModelsAsync()
+        {
+            try
+            {
+                _logger?.LogInformation("Starting background preload of essential ViewModels");
+                await _lazyViewModelService.PreloadEssentialViewModelsAsync();
+                _logger?.LogInformation("Background preload completed");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error during background ViewModel preload");
+            }
         }
     }
 }

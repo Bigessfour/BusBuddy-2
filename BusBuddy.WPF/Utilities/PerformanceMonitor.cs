@@ -41,7 +41,7 @@ namespace BusBuddy.WPF.Utilities
 
             if (currentMemory > _memoryWarningThreshold)
             {
-                _logger?.Warning("[MEMORY_WARNING] High memory usage detected: {MemoryMB}MB {Context}", 
+                _logger?.Warning("[MEMORY_WARNING] High memory usage detected: {MemoryMB}MB {Context}",
                     memoryMB, !string.IsNullOrEmpty(context) ? $"in {context}" : "");
             }
         }
@@ -55,7 +55,7 @@ namespace BusBuddy.WPF.Utilities
         {
             var stopwatch = Stopwatch.StartNew();
             var initialMemory = _currentProcess.WorkingSet64;
-            
+
             try
             {
                 action();
@@ -65,16 +65,16 @@ namespace BusBuddy.WPF.Utilities
                 stopwatch.Stop();
                 var finalMemory = _currentProcess.WorkingSet64;
                 var memoryDelta = finalMemory - initialMemory;
-                
+
                 RecordMetric(operationName, stopwatch.Elapsed);
-                
+
                 // Log memory usage if significant change or high usage
                 if (Math.Abs(memoryDelta) > 10 * 1024 * 1024 || finalMemory > _memoryWarningThreshold) // 10MB change
                 {
-                    _logger?.Debug("[MEMORY_TRACK] {Operation}: {DeltaMB}MB change, Current: {CurrentMB}MB", 
+                    _logger?.Debug("[MEMORY_TRACK] {Operation}: {DeltaMB}MB change, Current: {CurrentMB}MB",
                         operationName, memoryDelta / (1024 * 1024), finalMemory / (1024 * 1024));
                 }
-                
+
                 CheckMemoryUsage(operationName);
             }
         }

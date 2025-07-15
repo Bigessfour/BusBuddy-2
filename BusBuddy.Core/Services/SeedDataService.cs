@@ -28,7 +28,7 @@ namespace BusBuddy.Core.Services
             try
             {
                 using var context = _contextFactory.CreateDbContext();
-                
+
                 // Check if logs already exist
                 var existingCount = await context.ActivityLogs.CountAsync();
                 if (existingCount >= count)
@@ -75,7 +75,7 @@ namespace BusBuddy.Core.Services
             try
             {
                 using var context = _contextFactory.CreateDbContext();
-                
+
                 // Check if drivers already exist
                 var existingCount = await context.Drivers.CountAsync();
                 if (existingCount >= count)
@@ -96,7 +96,7 @@ namespace BusBuddy.Core.Services
                 {
                     var firstName = firstNames[random.Next(firstNames.Length)];
                     var lastName = lastNames[random.Next(lastNames.Length)];
-                    
+
                     drivers.Add(new Driver
                     {
                         DriverName = $"{firstName} {lastName}",
@@ -131,10 +131,10 @@ namespace BusBuddy.Core.Services
         public async Task SeedAllAsync()
         {
             _logger.LogInformation("Starting full development data seeding...");
-            
+
             await SeedActivityLogsAsync(100);
             await SeedDriversAsync(15);
-            
+
             _logger.LogInformation("Development data seeding completed");
         }
 
@@ -146,14 +146,14 @@ namespace BusBuddy.Core.Services
             try
             {
                 using var context = _contextFactory.CreateDbContext();
-                
+
                 _logger.LogWarning("Clearing all seeded data...");
-                
+
                 // Only clear data created by seed service
                 var seedLogs = await context.ActivityLogs
                     .Where(a => a.Details != null && a.Details.Contains("Generated for development testing"))
                     .ToListAsync();
-                
+
                 var seedDrivers = await context.Drivers
                     .Where(d => d.CreatedBy == "SeedDataService")
                     .ToListAsync();

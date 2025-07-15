@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using BusBuddy.WPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
 
@@ -14,18 +14,10 @@ namespace BusBuddy.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ILogger<MainWindow>? _logger;
-
         public MainWindow()
         {
             try
             {
-                // Get logger first for error tracking
-                if (Application.Current is App app && app.Services != null)
-                {
-                    _logger = app.Services.GetService<ILogger<MainWindow>>();
-                }
-
                 InitializeComponent();
 
                 // Apply FluentDark theme consistently
@@ -35,12 +27,12 @@ namespace BusBuddy.WPF
                 if (Application.Current is App appInstance && appInstance.Services != null)
                 {
                     DataContext = appInstance.Services.GetService<MainViewModel>();
-                    _logger?.LogInformation("MainWindow initialized with MainViewModel and FluentDark theme");
+                    Log.Information("MainWindow initialized with MainViewModel and FluentDark theme");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error initializing MainWindow");
+                Log.Error(ex, "Error initializing MainWindow");
                 throw;
             }
         }
@@ -58,11 +50,11 @@ namespace BusBuddy.WPF
                 // Apply theme to current window
                 SfSkinManager.SetVisualStyle(this, VisualStyles.FluentDark);
 
-                _logger?.LogInformation("FluentDark theme applied successfully to MainWindow");
+                Log.Information("FluentDark theme applied successfully to MainWindow");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error applying FluentDark theme to MainWindow");
+                Log.Error(ex, "Error applying FluentDark theme to MainWindow");
             }
         }
 
@@ -79,12 +71,12 @@ namespace BusBuddy.WPF
                         ? Visibility.Collapsed
                         : Visibility.Visible;
 
-                    _logger?.LogDebug("Navigation panel toggled to: {Visibility}", NavigationPanel.Visibility);
+                    Log.Debug("Navigation panel toggled to: {Visibility}", NavigationPanel.Visibility);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error toggling navigation panel");
+                Log.Error(ex, "Error toggling navigation panel");
             }
         }
 
@@ -98,11 +90,11 @@ namespace BusBuddy.WPF
                 // Ensure theme is applied after window loads
                 ApplyFluentDarkTheme();
 
-                _logger?.LogInformation("MainWindow loaded successfully with FluentDark theme");
+                Log.Information("MainWindow loaded successfully with FluentDark theme");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error in Window_Loaded event");
+                Log.Error(ex, "Error in Window_Loaded event");
             }
         }
     }

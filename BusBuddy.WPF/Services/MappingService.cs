@@ -2,7 +2,7 @@ using AutoMapper;
 using BusBuddy.WPF.Mapping;
 using BusBuddy.WPF.Utilities;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,9 +18,9 @@ namespace BusBuddy.WPF.Services
     {
         private readonly IMapper _mapper;
         private readonly PerformanceMonitor _performanceMonitor;
-        private readonly ILogger<MappingService>? _logger;
+        private readonly ILogger? _logger;
 
-        public MappingService(IMapper mapper, ILogger<MappingService>? logger = null)
+        public MappingService(IMapper mapper, ILogger? logger = null)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger;
@@ -44,7 +44,7 @@ namespace BusBuddy.WPF.Services
             finally
             {
                 stopwatch.Stop();
-                _logger?.LogTrace("Mapped {0} to {1} in {2}ms",
+                _logger?.Verbose("Mapped {SourceType} to {DestinationType} in {ElapsedMs}ms",
                     typeof(TSource).Name,
                     typeof(TDestination).Name,
                     stopwatch.ElapsedMilliseconds);
@@ -75,7 +75,7 @@ namespace BusBuddy.WPF.Services
             finally
             {
                 stopwatch.Stop();
-                _logger?.LogTrace("Mapped collection of {0} to {1} ({2} items) in {3}ms",
+                _logger?.Verbose("Mapped collection of {SourceType} to {DestinationType} ({ItemCount} items) in {ElapsedMs}ms",
                     typeof(TSource).Name,
                     typeof(TDestination).Name,
                     source.Count(),
@@ -104,7 +104,7 @@ namespace BusBuddy.WPF.Services
             finally
             {
                 stopwatch.Stop();
-                _logger?.LogTrace("Mapped {0} to existing {1} in {2}ms",
+                _logger?.Verbose("Mapped {SourceType} to existing {DestinationType} in {ElapsedMs}ms",
                     typeof(TSource).Name,
                     typeof(TDestination).Name,
                     stopwatch.ElapsedMilliseconds);

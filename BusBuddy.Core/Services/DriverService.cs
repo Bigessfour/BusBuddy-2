@@ -15,62 +15,67 @@ namespace BusBuddy.Core.Services
     {
         private readonly IBusBuddyDbContextFactory _contextFactory;
         private readonly ILogger<DriverService> _logger;
+        private readonly IEnhancedCachingService _cachingService;
         private static readonly SemaphoreSlim _semaphore = new(1, 1);
         private static bool _nullValuesFixed = false;
 
-        public DriverService(IBusBuddyDbContextFactory contextFactory, ILogger<DriverService> logger)
+        public DriverService(IBusBuddyDbContextFactory contextFactory, ILogger<DriverService> logger, IEnhancedCachingService cachingService)
         {
             _contextFactory = contextFactory;
             _logger = logger;
+            _cachingService = cachingService;
         }
 
         #region Basic CRUD Operations
 
         public async Task<List<Driver>> GetAllDriversAsync()
         {
-            await _semaphore.WaitAsync();
-            try
+            return (await _cachingService.GetAllDriversAsync(async () =>
             {
-                _logger.LogInformation("Retrieving all drivers from database");
-                using var context = _contextFactory.CreateDbContext();
-
-                // Fix any NULL values before attempting to read drivers
-                await FixNullDriverValuesIfNeeded(context);
-
-                return await context.Drivers
-                    .AsNoTracking()
-                    .ToListAsync();
-            }
-            catch (System.Data.SqlTypes.SqlNullValueException ex)
-            {
-                _logger.LogWarning(ex, "SQL NULL value error when retrieving drivers. Attempting to fix NULL values and retry.");
-
-                // Try to fix NULL values and retry once
+                await _semaphore.WaitAsync();
                 try
                 {
-                    using var fixContext = _contextFactory.CreateWriteDbContext();
-                    await FixNullDriverValuesIfNeeded(fixContext);
+                    _logger.LogInformation("Retrieving all drivers from database (cache miss)");
+                    using var context = _contextFactory.CreateDbContext();
 
-                    using var retryContext = _contextFactory.CreateDbContext();
-                    return await retryContext.Drivers
+                    // Fix any NULL values before attempting to read drivers
+                    await FixNullDriverValuesIfNeeded(context);
+
+                    return await context.Drivers
                         .AsNoTracking()
                         .ToListAsync();
                 }
-                catch (Exception retryEx)
+                catch (System.Data.SqlTypes.SqlNullValueException ex)
                 {
-                    _logger.LogError(retryEx, "Failed to fix NULL values and retry. Returning empty list to avoid application failure.");
-                    return new List<Driver>();
+                    _logger.LogWarning(ex, "SQL NULL value error when retrieving drivers. Attempting to fix NULL values and retry.");
+
+                    // Try to fix NULL values and retry once
+                    try
+                    {
+                        using var fixContext = _contextFactory.CreateWriteDbContext();
+                        await FixNullDriverValuesIfNeeded(fixContext);
+
+                        using var retryContext = _contextFactory.CreateDbContext();
+                        return await retryContext.Drivers
+                            .AsNoTracking()
+                            .ToListAsync();
+                    }
+                    catch (Exception retryEx)
+                    {
+                        _logger.LogError(retryEx, "Failed to fix NULL values and retry. Returning empty list to avoid application failure.");
+                        return new List<Driver>();
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving all drivers");
-                throw;
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error retrieving all drivers");
+                    throw;
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            })).ToList();
         }
 
         public async Task<Driver?> GetDriverByIdAsync(int driverId)
@@ -120,6 +125,9 @@ namespace BusBuddy.Core.Services
                 context.Drivers.Add(driver);
                 await context.SaveChangesAsync();
 
+                // Invalidate cache after adding driver
+                _cachingService.InvalidateCache("AllDrivers");
+
                 _logger.LogInformation("Successfully added driver with ID: {DriverId}", driver.DriverId);
                 return driver;
             }
@@ -163,6 +171,8 @@ namespace BusBuddy.Core.Services
 
                     if (success)
                     {
+                        // Invalidate cache after updating driver
+                        _cachingService.InvalidateCache("AllDrivers");
                         _logger.LogInformation("Successfully updated driver: {DriverName}", driver.DriverName);
                     }
                     else
@@ -220,6 +230,9 @@ namespace BusBuddy.Core.Services
 
                 context.Drivers.Remove(driver);
                 await context.SaveChangesAsync();
+
+                // Invalidate cache after deleting driver
+                _cachingService.InvalidateCache("AllDrivers");
 
                 _logger.LogInformation("Successfully deleted driver: {DriverName}", driver.DriverName);
                 return true;
