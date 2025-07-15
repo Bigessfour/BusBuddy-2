@@ -132,6 +132,15 @@ namespace BusBuddy.WPF.ViewModels
         }
 
         /// <summary>
+        /// Public method to navigate to Dashboard view - used by startup orchestration
+        /// </summary>
+        public void NavigateToDashboard()
+        {
+            _logger?.LogInformation("UI Navigation to Dashboard initiated from startup orchestration");
+            CurrentViewModel = _dashboardViewModel;
+        }
+
+        /// <summary>
         /// Preload essential ViewModels in the background
         /// </summary>
         public async Task PreloadEssentialViewModelsAsync()

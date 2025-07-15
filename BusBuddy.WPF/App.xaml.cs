@@ -379,20 +379,32 @@ public partial class App : Application
         // Set the Services property to the host's service provider for backward compatibility
         Services = _host.Services;
 
-        // 🔧 PROGRESS-AWARE STARTUP: Replace background validation with orchestrated startup sequence
+        // 🔧 PROGRESS-AWARE STARTUP: Orchestrated startup sequence with LoadingView integration
         Log.Information("[STARTUP] Running orchestrated startup sequence with LoadingView progress indication");
         var orchestrationStopwatch = Stopwatch.StartNew();
 
-        // Run orchestrated startup in background task to avoid blocking UI thread
+        // Create main window early to establish UI context
+        var mainWindow = new MainWindow();
+
+        // Get the main view model and loading view model
+        var mainViewModel = Services.GetRequiredService<MainViewModel>();
+        var loadingViewModel = Services.GetRequiredService<LoadingViewModel>();
+
+        // Set up the main window with the main view model
+        mainWindow.DataContext = mainViewModel;
+
+        // Show the main window with loading view active
+        mainWindow.Show();
+
+        // Start the orchestrated startup sequence
         _ = Task.Run(async () =>
         {
             try
             {
                 using var orchestrationScope = Services.CreateScope();
                 var orchestrationService = orchestrationScope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.StartupOrchestrationService>();
-                var loadingViewModel = orchestrationScope.ServiceProvider.GetRequiredService<BusBuddy.WPF.ViewModels.LoadingViewModel>();
 
-                // Connect orchestration service to LoadingView
+                // Execute orchestrated startup with progress updates
                 var startupResult = await orchestrationService.ExecuteStartupSequenceAsync(loadingViewModel);
 
                 orchestrationStopwatch.Stop();
@@ -417,9 +429,18 @@ public partial class App : Application
                     Log.Warning(logEx, "[STARTUP] Could not write orchestration results to file");
                 }
 
-                // If orchestration failed, log the results
-                if (!startupResult.IsSuccessful)
+                // Switch to dashboard after successful startup
+                if (startupResult.IsSuccessful)
                 {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        mainViewModel.NavigateToDashboard();
+                        Log.Information("[STARTUP] ✅ Startup completed successfully — switched to Dashboard");
+                    });
+                }
+                else
+                {
+                    // Handle startup failure
                     var failedPhases = string.Join("\n", startupResult.PhaseResults
                         .Where(r => !r.IsSuccessful)
                         .Select(r => $"• {r.PhaseName}: {r.ErrorMessage}"));
@@ -428,9 +449,14 @@ public partial class App : Application
 
                     if (isDevelopment)
                     {
-                        // In development, show warning but continue
-                        Log.Warning("[STARTUP] Orchestration phase failures detected in development environment - continuing startup");
+                        // In development, show warning but continue to dashboard
+                        Log.Warning("[STARTUP] Orchestration phase failures detected in development environment - continuing to dashboard");
                         Log.Warning("[STARTUP] Failed phases:\n{FailedPhases}", failedPhases);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            mainViewModel.NavigateToDashboard();
+                        });
                     }
                     else
                     {
@@ -447,17 +473,22 @@ public partial class App : Application
                                 "Startup Orchestration Failed",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Warning);
+
+                            // Still navigate to dashboard for usability
+                            mainViewModel.NavigateToDashboard();
                         });
                     }
-                }
-                else
-                {
-                    Log.Information("[STARTUP] ✅ All startup orchestration phases completed successfully — LoadingView progress indication functional (using pure Serilog)");
                 }
             }
             catch (Exception orchestrationEx)
             {
                 Log.Error(orchestrationEx, "[STARTUP] Error during startup orchestration");
+
+                // Fallback to dashboard even on error
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    mainViewModel.NavigateToDashboard();
+                });
             }
         });
 
@@ -576,35 +607,6 @@ public partial class App : Application
             // Log that we're about to initialize the UI
             Log.Information("[STARTUP] Creating and showing MainWindow");
 
-            // Get the MainViewModel - this is now scoped, so create scope first
-            _startupMonitor.BeginStep("ResolveMainViewModel");
-            var scope = serviceProvider.CreateScope();
-            var mainViewModel = scope.ServiceProvider.GetRequiredService<MainViewModel>();
-
-            // Start background preloading of essential ViewModels
-            var lazyViewModelService = scope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.ILazyViewModelService>();
-            var preloadService = scope.ServiceProvider.GetRequiredService<BusBuddy.WPF.Services.IStartupPreloadService>();
-
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    // Preload essential data first
-                    await preloadService.PreloadEssentialDataAsync();
-
-                    // Then preload ViewModels
-                    await lazyViewModelService.PreloadEssentialViewModelsAsync();
-
-                    Log.Information("[STARTUP] Background preloading completed");
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning(ex, "[STARTUP] Background preloading failed");
-                }
-            });
-
-            _startupMonitor.EndStep();
-
             // Initialize theme service before creating UI with Fluent Dark
             _startupMonitor.BeginStep("InitializeTheme");
             var themeService = serviceProvider.GetRequiredService<BusBuddy.WPF.Services.IThemeService>();
@@ -633,55 +635,8 @@ public partial class App : Application
             Log.Information("[STARTUP] Theme service initialized with theme: {Theme}", themeService.CurrentTheme);
             _startupMonitor.EndStep();
 
-            // Begin tracking MainWindow creation
-            _startupMonitor.BeginStep("CreateMainWindow");
-            var mainWindowStopwatch = Stopwatch.StartNew();
-
-            // Create the main window with MainViewModel - RESTORED DASHBOARD
-            var mainWindow = new MainWindow
-            {
-                DataContext = mainViewModel
-            };
-
-            // Log window creation with timing
-            mainWindowStopwatch.Stop();
-            Log.Information("[STARTUP] Created MainWindow with MainViewModel in {ElapsedMs}ms",
-                mainWindowStopwatch.ElapsedMilliseconds);
-            _startupMonitor.EndStep();
-
-            // Show window immediately to improve perceived performance
-            _startupMonitor.BeginStep("ShowMainWindow");
-            var showWindowStopwatch = Stopwatch.StartNew();
-
-            // Set main window DataContext to show dashboard immediately
-            mainWindow.DataContext = mainViewModel;
-
-            // Show the main window immediately with dashboard - RESTORED
-            mainWindow.Show();
-
-            // Show window immediately without complex initialization
-            showWindowStopwatch.Stop();
-            Log.Information("[STARTUP] MainWindow.Show() called and completed in {ElapsedMs}ms",
-                showWindowStopwatch.ElapsedMilliseconds);
-            _startupMonitor.EndStep();
-
-            // Complete startup performance monitoring immediately
+            // Complete startup performance monitoring
             _startupMonitor.Complete();
-
-            // Trigger background preloading after UI is shown (non-blocking)
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(100); // Small delay to ensure UI is fully rendered
-                    await mainViewModel.PreloadEssentialViewModelsAsync();
-                    Log.Information("[STARTUP] Post-UI ViewModel preloading completed");
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning(ex, "[STARTUP] Post-UI ViewModel preloading failed");
-                }
-            });
 
             // Log total time from the original stopwatch
             stopwatch.Stop();
