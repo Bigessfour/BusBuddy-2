@@ -93,6 +93,43 @@ namespace BusBuddy.Core.Services
             }
         }
 
+        /// <summary>
+        /// Get activity logs with pagination support for better performance
+        /// </summary>
+        /// <param name="pageNumber">Page number (1-based)</param>
+        /// <param name="pageSize">Number of records per page (default: 50)</param>
+        /// <returns>Paged activity logs</returns>
+        public async Task<IEnumerable<ActivityLog>> GetLogsPagedAsync(int pageNumber = 1, int pageSize = 50)
+        {
+#if DEBUG
+            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
+                "GetLogsPaged", $"Page: {pageNumber}, Size: {pageSize}");
+#endif
+
+            try
+            {
+                var logs = await _db.ActivityLogs
+                    .OrderByDescending(l => l.Timestamp)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+#if DEBUG
+                tracker?.Complete($"Retrieved {logs.Count} log entries for page {pageNumber}");
+#endif
+
+                return logs;
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                tracker?.Error(ex);
+#endif
+                _logger?.LogError(ex, "Error retrieving paged activity logs");
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<ActivityLog>> GetLogsByDateRangeAsync(DateTime startDate, DateTime endDate, int count = 1000)
         {
 #if DEBUG

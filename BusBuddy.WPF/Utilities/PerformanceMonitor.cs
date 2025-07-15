@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,10 +14,36 @@ namespace BusBuddy.WPF.Utilities
     {
         private readonly ILogger? _logger;
         private readonly ConcurrentDictionary<string, OperationMetric> _metrics = new();
+        private readonly long _memoryWarningThreshold;
+        private static readonly Process _currentProcess = Process.GetCurrentProcess();
 
-        public PerformanceMonitor(ILogger? logger = null)
+        public PerformanceMonitor(ILogger? logger = null, long memoryWarningThreshold = 250 * 1024 * 1024) // 250MB default
         {
             _logger = logger;
+            _memoryWarningThreshold = memoryWarningThreshold;
+        }
+
+        /// <summary>
+        /// Get current memory usage in MB
+        /// </summary>
+        public static long GetCurrentMemoryUsageMB()
+        {
+            return _currentProcess.WorkingSet64 / (1024 * 1024);
+        }
+
+        /// <summary>
+        /// Check and log memory usage if it exceeds threshold
+        /// </summary>
+        public void CheckMemoryUsage(string context = "")
+        {
+            var currentMemory = _currentProcess.WorkingSet64;
+            var memoryMB = currentMemory / (1024 * 1024);
+
+            if (currentMemory > _memoryWarningThreshold)
+            {
+                _logger?.Warning("[MEMORY_WARNING] High memory usage detected: {MemoryMB}MB {Context}", 
+                    memoryMB, !string.IsNullOrEmpty(context) ? $"in {context}" : "");
+            }
         }
 
         /// <summary>
@@ -28,6 +54,8 @@ namespace BusBuddy.WPF.Utilities
         public void TrackOperation(string operationName, Action action)
         {
             var stopwatch = Stopwatch.StartNew();
+            var initialMemory = _currentProcess.WorkingSet64;
+            
             try
             {
                 action();
@@ -35,7 +63,19 @@ namespace BusBuddy.WPF.Utilities
             finally
             {
                 stopwatch.Stop();
+                var finalMemory = _currentProcess.WorkingSet64;
+                var memoryDelta = finalMemory - initialMemory;
+                
                 RecordMetric(operationName, stopwatch.Elapsed);
+                
+                // Log memory usage if significant change or high usage
+                if (Math.Abs(memoryDelta) > 10 * 1024 * 1024 || finalMemory > _memoryWarningThreshold) // 10MB change
+                {
+                    _logger?.Debug("[MEMORY_TRACK] {Operation}: {DeltaMB}MB change, Current: {CurrentMB}MB", 
+                        operationName, memoryDelta / (1024 * 1024), finalMemory / (1024 * 1024));
+                }
+                
+                CheckMemoryUsage(operationName);
             }
         }
 
@@ -110,8 +150,8 @@ namespace BusBuddy.WPF.Utilities
                 });
 
             // Log the operation
-            _logger?.LogInformation(
-                "Performance: {0} completed in {1}ms",
+            _logger?.Information(
+                "Performance: {OperationName} completed in {ElapsedMs}ms",
                 operationName,
                 elapsed.TotalMilliseconds);
         }
