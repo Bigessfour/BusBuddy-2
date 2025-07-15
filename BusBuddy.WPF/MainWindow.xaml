@@ -49,6 +49,20 @@
             <SolidColorBrush x:Key="BorderBrush" Color="#323130" />
             <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#2D2D30" />
 
+            <!-- Enhanced FluentDark theme fallback resources -->
+            <SolidColorBrush x:Key="FluentDarkBackgroundBrush" Color="#1E1E1E" />
+            <SolidColorBrush x:Key="FluentDarkForegroundBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="FluentDarkPrimaryBrush" Color="#0078D4" />
+            <SolidColorBrush x:Key="FluentDarkBorderBrush" Color="#323130" />
+            <SolidColorBrush x:Key="FluentDarkHoverBrush" Color="#2D2D30" />
+            <SolidColorBrush x:Key="FluentDarkSecondaryTextBrush" Color="#CCCCCC" />
+            <SolidColorBrush x:Key="FluentDarkSurfaceBrush" Color="#252526" />
+            <SolidColorBrush x:Key="FluentDarkSuccessBrush" Color="#2ECC71" />
+
+            <!-- FluentDark color resources -->
+            <Color x:Key="FluentDarkPrimaryColor">#0078D4</Color>
+            <Color x:Key="FluentDarkAccentColor">#106EBE</Color>
+
             <!-- Navigation Panel Style — Uses FluentDark theme palette -->
             <Style x:Key="BusBuddyNavigationPanelStyle" TargetType="Border">
                 <Setter Property="Background" Value="{DynamicResource PrimaryBackgroundBrush}"/>
@@ -57,10 +71,9 @@
                 <Setter Property="Padding" Value="0"/>
                 <Setter Property="Margin" Value="0"/>
             </Style>
-        </ResourceDictionary>
 
-        <!-- Navigation ListView Style — Theme-aware -->
-        <Style x:Key="BusBuddyNavigationListViewStyle" TargetType="ListView">
+            <!-- Navigation ListView Style — Theme-aware -->
+            <Style x:Key="BusBuddyNavigationListViewStyle" TargetType="ListView">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Margin" Value="0"/>
@@ -160,6 +173,7 @@
         <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
             <views:StudentListView />
         </DataTemplate>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>

@@ -68,7 +68,23 @@
                 "showReuseMessage": false,
                 "clear": true
             },
-            "problemMatcher": ["$msCompile"],
+            "problemMatcher": [
+                "$msCompile",
+                {
+                    "base": "$msCompile",
+                    "pattern": [
+                        {
+                            "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(CS\\d+):\\s+(.*)$",
+                            "file": 1,
+                            "line": 2,
+                            "column": 3,
+                            "severity": 4,
+                            "code": 5,
+                            "message": 6
+                        }
+                    ]
+                }
+            ],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
@@ -96,9 +112,103 @@
                 "clear": true
             },
             "isBackground": true,
-            "problemMatcher": ["$msCompile"],
+            "problemMatcher": [
+                {
+                    "base": "$msCompile",
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^info: Microsoft.Hosting.Lifetime",
+                        "endsPattern": "^\\s*Application started\\.|^\\s*Now listening on:|^\\s*Hosting environment:"
+                    }
+                }
+            ],
             "options": {
                 "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Run Application with Enhanced Startup Monitoring",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "run",
+                "--project",
+                "BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "--no-build",
+                "--verbosity",
+                "detailed"
+            ],
+            "group": "build",
+            "dependsOn": "Build Solution",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "base": "$msCompile",
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^info: Microsoft.Hosting.Lifetime",
+                        "endsPattern": "^\\s*Application started\\.|^\\s*Now listening on:|^\\s*Hosting environment:"
+                    }
+                },
+                {
+                    "owner": "startup-exceptions",
+                    "fileLocation": "relative",
+                    "pattern": {
+                        "regexp": "^.*\\[ERROR\\].*ACTIONABLE.*EXCEPTION.*:\\s+(.*)\\s+at\\s+(.*):(\\d+)$",
+                        "file": 2,
+                        "line": 3,
+                        "message": 1
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^info: Microsoft.Hosting.Lifetime",
+                        "endsPattern": "^\\s*Application started\\.|^\\s*Now listening on:|^\\s*Hosting environment:"
+                    }
+                },
+                {
+                    "owner": "xaml-parsing",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^.*XamlParseException.*'(.*)' Line number '(\\d+)'.*line position '(\\d+)'.*$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3,
+                        "message": 1
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^info: Microsoft.Hosting.Lifetime",
+                        "endsPattern": "^\\s*Application started\\.|^\\s*Now listening on:|^\\s*Hosting environment:"
+                    }
+                },
+                {
+                    "owner": "dispatcher-exceptions",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^.*DISPATCHER EXCEPTION.*:\\s+(.*)\\s+-\\s+(.*)$",
+                        "message": 1
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^info: Microsoft.Hosting.Lifetime",
+                        "endsPattern": "^\\s*Application started\\.|^\\s*Now listening on:|^\\s*Hosting environment:"
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "ENABLE_ENHANCED_STARTUP_LOGGING": "true",
+                    "STARTUP_EXCEPTION_ENRICHMENT": "true"
+                }
             }
         },
         {

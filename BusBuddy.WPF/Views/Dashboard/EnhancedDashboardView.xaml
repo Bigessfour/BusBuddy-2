@@ -75,7 +75,7 @@
         </DataTemplate>
 
         <!-- Enhanced Tile Style for Modern Appearance with Theme Support -->
-        <Style x:Key="DashboardTileStyle" TargetType="Border" BasedOn="{StaticResource BusBuddyDashboardTileStyle}">
+        <Style x:Key="DashboardTileStyle" TargetType="Border">
             <Setter Property="Background" Value="{DynamicResource FluentDarkBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource FluentDarkBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -237,7 +237,6 @@
         <!-- Main Content — DockingManager with baseline theme -->
         <Grid Grid.Row="1">
             <syncfusion:DockingManager x:Name="MainDockingManager"
-                                       Style="{StaticResource BusBuddyDockingManagerStyle}"
                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
             <!-- Dashboard Overview Panel (Document) -->
@@ -287,7 +286,6 @@
                                                                         Width="70" Height="70"
                                                                         Progress="{Binding FleetActivePercentage}"
                                                                         Margin="5"
-                                                                        Style="{StaticResource BusBuddySfCircularProgressBarStyle}"
                                                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
                                             <progressbar:SfCircularProgressBar.Content>
                                                 <TextBlock Text="{Binding FleetActivePercentage, StringFormat='{}{0:F0}%'}" FontSize="12" FontWeight="Bold"
@@ -480,7 +478,6 @@
                                                                         Width="55" Height="55"
                                                                         HorizontalAlignment="Center"
                                                                         Progress="{Binding MaintenanceCompletionPercentage}"
-                                                                        Style="{StaticResource BusBuddySfCircularProgressBarStyle}"
                                                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                                                         FontSize="11"/>
                                     </Grid>

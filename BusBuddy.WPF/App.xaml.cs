@@ -105,6 +105,11 @@ public partial class App : Application
             {
                 var exception = e.Exception;
                 var message = exception.Message;
+                var stackTrace = exception.StackTrace ?? "";
+
+                // Enhanced exception categorization with actionable recommendations
+                var exceptionCategory = CategorizeException(exception);
+                var actionableRecommendation = GetActionableRecommendation(exception);
 
                 // Filter out known ButtonAdv style conflicts (already fixed)
                 if (message.Contains("ButtonAdv") && message.Contains("TargetType does not match"))
@@ -122,16 +127,33 @@ public partial class App : Application
                     return;
                 }
 
-                // Log actionable exceptions only using Serilog directly
-                Log.Error(exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message}",
-                    exception.GetType().Name, message);
+                // Enhanced logging with startup context and actionable insights
+                using (LogContext.PushProperty("ExceptionCategory", exceptionCategory))
+                using (LogContext.PushProperty("ActionableRecommendation", actionableRecommendation))
+                using (LogContext.PushProperty("IsStartupException", IsStartupPhase()))
+                using (LogContext.PushProperty("StartupPhase", GetCurrentStartupPhase()))
+                {
+                    // Log actionable exceptions with enhanced context
+                    Log.Error(exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message} at {StackTraceLocation}",
+                        exception.GetType().Name, message, ExtractStackTraceLocation(stackTrace));
+
+                    // Additional startup-specific logging if during startup
+                    if (IsStartupPhase())
+                    {
+                        Log.Error("🚀 STARTUP_PERF: Exception during startup phase {StartupPhase} - {ActionableRecommendation}",
+                            GetCurrentStartupPhase(), actionableRecommendation);
+                    }
+                }
 
                 e.Handled = true; // Prevent crash
             };
 
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
             {
-                System.Diagnostics.Debug.WriteLine($"App Domain Exception: {((Exception)e.ExceptionObject).Message}");
+                var exception = (Exception)e.ExceptionObject;
+                Log.Fatal(exception, "💥 CRITICAL APPLICATION DOMAIN EXCEPTION: {ExceptionType} - {Message}",
+                    exception.GetType().Name, exception.Message);
+                System.Diagnostics.Debug.WriteLine($"App Domain Exception: {exception.Message}");
             };
         }
         catch (Exception ex)
@@ -345,6 +367,7 @@ public partial class App : Application
             var dbEnricher = new DatabaseOperationEnricher();
             var uiEnricher = new UIOperationEnricher();
             var aggregationEnricher = new LogAggregationEnricher();
+            var startupExceptionEnricher = new StartupExceptionEnricher(); // Enhanced startup exception handling
 
             // Create custom formatters
             var condensedFormatter = new CondensedLogFormatter(includeProperties: true, showAggregatedOnly: false);
@@ -365,6 +388,7 @@ public partial class App : Application
                 .Enrich.With(contextEnricher)
                 .Enrich.With(dbEnricher)
                 .Enrich.With(uiEnricher)
+                .Enrich.With(startupExceptionEnricher)
                 .Enrich.With(aggregationEnricher)
                 // CONSOLIDATED: Only 2 log files with smart filtering
                 .WriteTo.File(condensedFormatter, Path.Combine(logsDirectory, "busbuddy-consolidated-.log"),
@@ -381,12 +405,13 @@ public partial class App : Application
                 .CreateLogger();
 
             Log.Information("BusBuddy WPF application starting with pure Serilog and enrichment (Microsoft.Extensions.Logging removed). Build: {BuildTime}", DateTime.Now);
-            Log.Information("Enhanced Enrichers enabled: Context, Database, UI, Aggregation, Machine, Thread, Process, Environment, EnvironmentUser");
+            Log.Information("Enhanced Enrichers enabled: Context, Database, UI, StartupException, Aggregation, Machine, Thread, Process, Environment, EnvironmentUser");
             Log.Information("Consolidated logging: 2 files (main + errors) with smart aggregation");
             Log.Information("Logs directory: {LogsDirectory}", logsDirectory);
-            Log.Information("Enhanced structured logging with {EnricherCount} enrichers active (pure Serilog implementation)", 9);
+            Log.Information("Enhanced structured logging with {EnricherCount} enrichers active (pure Serilog implementation)", 10);
             Log.Information("🔧 Improved Error Handling: ButtonAdv style conflicts filtered, actionable errors prioritized");
             Log.Information("📋 Log Lifecycle: 7-day retention for app logs, 30-day for actionable errors, auto-cleanup enabled");
+            Log.Information("🚀 Startup Exception Enrichment: Enhanced dispatcher exception handling with actionable recommendations");
         }
         catch (Exception serilogEx)
         {
@@ -716,6 +741,7 @@ public partial class App : Application
         services.AddSingleton<DatabaseOperationEnricher>();
         services.AddSingleton<UIOperationEnricher>();
         services.AddSingleton<LogAggregationEnricher>();
+        services.AddSingleton<StartupExceptionEnricher>(); // Enhanced startup exception handling
 
         // Register custom formatters
         services.AddSingleton<CondensedLogFormatter>();
@@ -965,25 +991,61 @@ public partial class App : Application
 
         try
         {
-            // CRITICAL FIX: Always suppress the exception without showing MessageBox to prevent stack overflow
+            // ENHANCED: Extract more actionable information from dispatcher exceptions
             string errorMessage = e.Exception?.Message ?? "Unknown error";
+            string exceptionType = e.Exception?.GetType().Name ?? "Unknown";
 
-            // Log detailed exception information for debugging
-            Log.Error(e.Exception, "[ERROR] Dispatcher unhandled exception suppressed to prevent stack overflow - Message: {ErrorMessage}", errorMessage);
+            // Enhanced exception categorization for actionable insights
+            var isXamlParsingError = e.Exception is System.Windows.Markup.XamlParseException;
+            var isSyncfusionError = e.Exception?.GetType().FullName?.Contains("Syncfusion") == true ||
+                                   e.Exception?.StackTrace?.Contains("Syncfusion") == true;
+            var isResourceError = errorMessage.Contains("StaticResource", StringComparison.OrdinalIgnoreCase) ||
+                                 errorMessage.Contains("resource", StringComparison.OrdinalIgnoreCase);
+            var isStartupError = errorMessage.Contains("initialization", StringComparison.OrdinalIgnoreCase) ||
+                                errorMessage.Contains("startup", StringComparison.OrdinalIgnoreCase);
+
+            // Enhanced logging with actionable context
+            if (isXamlParsingError && e.Exception is System.Windows.Markup.XamlParseException xamlEx)
+            {
+                Log.Error(e.Exception, "🚨 ACTIONABLE XAML PARSING EXCEPTION: {ExceptionType} - {Message} | Line: {LineNumber}, Position: {LinePosition} | File: {SourceFile}",
+                    exceptionType, errorMessage, xamlEx.LineNumber, xamlEx.LinePosition, xamlEx.BaseUri?.ToString() ?? "Unknown");
+            }
+            else if (isSyncfusionError)
+            {
+                Log.Error(e.Exception, "🚨 ACTIONABLE SYNCFUSION EXCEPTION: {ExceptionType} - {Message} | Check license registration and theme setup",
+                    exceptionType, errorMessage);
+            }
+            else if (isResourceError)
+            {
+                Log.Error(e.Exception, "🚨 ACTIONABLE RESOURCE EXCEPTION: {ExceptionType} - {Message} | Check StaticResource references and resource dictionaries",
+                    exceptionType, errorMessage);
+            }
+            else if (isStartupError)
+            {
+                Log.Error(e.Exception, "🚨 ACTIONABLE STARTUP EXCEPTION: {ExceptionType} - {Message} | Check application initialization sequence",
+                    exceptionType, errorMessage);
+            }
+            else
+            {
+                Log.Error(e.Exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message}",
+                    exceptionType, errorMessage);
+            }
 
             // CRITICAL: Mark as handled immediately without any UI interaction
             e.Handled = true;
 
             // Write to console for immediate feedback during development
-            System.Diagnostics.Debug.WriteLine($"UI Exception suppressed: {errorMessage}");
+            System.Diagnostics.Debug.WriteLine($"Enhanced UI Exception handled: {exceptionType} - {errorMessage}");
         }
         catch (Exception logEx)
         {
             try
             {
                 // Emergency fallback logging only - no UI interaction
-                string fallbackDetails = $"[ERROR] [{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] UI exception suppressed: {e.Exception?.Message ?? "Unknown"}\n" +
-                                       $"Logging error: {logEx.Message}\n";
+                string fallbackDetails = $"[ERROR] [{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] Enhanced UI exception handling failed: {e.Exception?.Message ?? "Unknown"}\n" +
+                                       $"Logging error: {logEx.Message}\n" +
+                                       $"Exception type: {e.Exception?.GetType().Name ?? "Unknown"}\n" +
+                                       $"Stack trace: {e.Exception?.StackTrace ?? "Unknown"}\n";
 
                 File.AppendAllText(fallbackLogPath, fallbackDetails);
                 e.Handled = true;
@@ -1188,4 +1250,116 @@ public partial class App : Application
             }
         }, "CachePreWarming", 500);
     }
+
+    #region Enhanced Exception Handling Helper Methods
+
+    private static string CategorizeException(Exception exception)
+    {
+        return exception switch
+        {
+            System.Windows.Markup.XamlParseException => "XAML_PARSING",
+            System.InvalidOperationException => "INVALID_OPERATION",
+            System.NullReferenceException => "NULL_REFERENCE",
+            System.ArgumentException => "ARGUMENT_INVALID",
+            System.IO.FileNotFoundException => "FILE_NOT_FOUND",
+            System.Configuration.ConfigurationErrorsException => "CONFIGURATION_ERROR",
+            Microsoft.Data.SqlClient.SqlException => "DATABASE_ERROR",
+            System.Net.NetworkInformation.NetworkInformationException => "NETWORK_ERROR",
+            System.UnauthorizedAccessException => "PERMISSION_DENIED",
+            System.OutOfMemoryException => "MEMORY_EXHAUSTED",
+            System.Threading.Tasks.TaskCanceledException => "TASK_CANCELLED",
+            _ => "GENERAL_EXCEPTION"
+        };
+    }
+
+    private static string GetActionableRecommendation(Exception exception)
+    {
+        return exception switch
+        {
+            System.Windows.Markup.XamlParseException xamlEx =>
+                $"Fix XAML syntax error. Check line numbers in error message. Common issues: unclosed tags, missing namespaces, invalid property values.",
+
+            System.InvalidOperationException dataEx when dataEx.Message.Contains("binding") =>
+                "Fix data binding expression. Check property names, data context, and binding syntax.",
+
+            System.NullReferenceException =>
+                "Add null checks before accessing objects. Use null-conditional operators (?.) or validate object initialization.",
+
+            System.ArgumentException argEx =>
+                $"Validate method arguments. Parameter '{GetParameterNameFromException(argEx)}' has invalid value.",
+
+            System.IO.FileNotFoundException fileEx =>
+                $"Ensure file exists: '{fileEx.FileName}'. Check file path and build action (Content/Copy if newer).",
+
+            System.Configuration.ConfigurationErrorsException =>
+                "Check appsettings.json syntax and required configuration values. Validate connection strings.",
+
+            Microsoft.Data.SqlClient.SqlException sqlEx =>
+                $"Database connection issue. Check connection string, server availability, and SQL syntax. Error: {sqlEx.Number}",
+
+            System.Net.NetworkInformation.NetworkInformationException =>
+                "Network connectivity issue. Check internet connection and firewall settings.",
+
+            System.UnauthorizedAccessException =>
+                "Insufficient permissions. Run as administrator or check file/folder permissions.",
+
+            System.OutOfMemoryException =>
+                "Memory exhausted. Reduce memory usage, dispose objects properly, or increase available memory.",
+
+            System.Threading.Tasks.TaskCanceledException =>
+                "Task was cancelled. Check cancellation tokens and async operation timeouts.",
+
+            _ => "General exception. Check logs for detailed stack trace and inner exceptions."
+        };
+    }
+
+    private static string GetParameterNameFromException(ArgumentException argEx)
+    {
+        return argEx.ParamName ?? "unknown";
+    }
+
+    private static string ExtractStackTraceLocation(string stackTrace)
+    {
+        if (string.IsNullOrEmpty(stackTrace))
+            return "Unknown location";
+
+        // Extract the first line that contains file path and line number
+        var lines = stackTrace.Split('\n');
+        foreach (var line in lines)
+        {
+            if (line.Contains(".cs:line"))
+            {
+                // Extract file name and line number
+                var parts = line.Split(new[] { " in " }, StringSplitOptions.None);
+                if (parts.Length > 1)
+                {
+                    var filePart = parts[1].Trim();
+                    if (filePart.Contains(":line"))
+                    {
+                        return filePart;
+                    }
+                }
+            }
+        }
+
+        return "Stack trace available but location not parsed";
+    }
+
+    private bool IsStartupPhase()
+    {
+        // Since we can't access the private _isCompleted field directly,
+        // we'll check if startup monitor exists and assume startup is in progress
+        // if the monitor hasn't been disposed
+        return _startupMonitor != null;
+    }
+
+    private string GetCurrentStartupPhase()
+    {
+        if (_startupMonitor == null)
+            return "Pre-Startup";
+
+        return "In Progress";
+    }
+
+    #endregion
 }
