@@ -16,8 +16,9 @@ namespace BusBuddy.WPF.Utilities
     public static class XamlErrorHandler
     {
         private static readonly Serilog.ILogger Logger = Log.ForContext(typeof(XamlErrorHandler));
-        private static int _recoveryAttempts = 0;
+        private static volatile int _recoveryAttempts = 0;
         private static readonly int MAX_RECOVERY_ATTEMPTS = 3;
+        private static readonly object _recoveryLock = new object();
 
         /// <summary>
         /// Initialize XAML error handling for the application
@@ -29,30 +30,32 @@ namespace BusBuddy.WPF.Utilities
             {
                 if (IsXamlParsingError(e.Exception))
                 {
-                    Logger.Error(e.Exception, "XAML parsing error detected - attempting graceful recovery (attempt {Attempt}/{MaxAttempts})",
-                        _recoveryAttempts + 1, MAX_RECOVERY_ATTEMPTS);
-
-                    // Prevent infinite recovery loops
-                    if (_recoveryAttempts >= MAX_RECOVERY_ATTEMPTS)
+                    lock (_recoveryLock)
                     {
-                        Logger.Warning("Maximum recovery attempts reached. Falling back to default error handling.");
-                        _recoveryAttempts = 0; // Reset for next session
-                        e.Handled = true;
-                        return;
-                    }
+                        Logger.Error(e.Exception, "XAML parsing error detected — attempting graceful recovery (attempt {Attempt}/{MaxAttempts})",
+                            _recoveryAttempts + 1, MAX_RECOVERY_ATTEMPTS);
 
-                    // Try to recover from common XAML errors
-                    _recoveryAttempts++;
-                    if (TryHandleXamlError(e.Exception))
-                    {
-                        e.Handled = true;
-                        Logger.Information("Successfully recovered from XAML parsing error (attempt {Attempt})", _recoveryAttempts);
-                        return;
+                        // Prevent infinite recovery loops
+                        if (_recoveryAttempts >= MAX_RECOVERY_ATTEMPTS)
+                        {
+                            Logger.Warning("Maximum recovery attempts reached. Falling back to default error handling.");
+                            e.Handled = true;
+                            return;
+                        }
+
+                        // Try to recover from common XAML errors
+                        _recoveryAttempts++;
+                        if (TryHandleXamlError(e.Exception))
+                        {
+                            e.Handled = true;
+                            Logger.Information("Successfully recovered from XAML parsing error (attempt {Attempt})", _recoveryAttempts);
+                            return;
+                        }
                     }
                 }
 
                 // Log all other unhandled exceptions and always suppress error dialogs
-                Logger.Error(e.Exception, "Unhandled dispatcher exception - {Message}", e.Exception.Message);
+                Logger.Error(e.Exception, "Unhandled dispatcher exception — {Message}", e.Exception.Message);
                 e.Handled = true; // Always suppress error dialogs to prevent UI crashes
             };
 
@@ -68,6 +71,18 @@ namespace BusBuddy.WPF.Utilities
                 Logger.Error(e.Exception, "Unobserved task exception caught");
                 e.SetObserved(); // Prevent crash
             };
+        }
+
+        /// <summary>
+        /// Reset recovery attempts counter — called after successful initialization
+        /// </summary>
+        public static void ResetRecoveryAttempts()
+        {
+            lock (_recoveryLock)
+            {
+                _recoveryAttempts = 0;
+                Logger.Information("Recovery attempts counter reset");
+            }
         }
 
         /// <summary>
@@ -91,11 +106,21 @@ namespace BusBuddy.WPF.Utilities
                 // Handle the specific "* is not a valid value for Double" error
                 if (exception.Message.Contains("* is not a valid value for Double"))
                 {
-                    Logger.Warning("Detected '*' parsing error - this is likely a Syncfusion control template issue");
+                    Logger.Warning("Detected '*' parsing error — this is likely a Syncfusion control template issue");
+                    return true;
+                }
 
-                    // The error is typically in Syncfusion control templates that try to parse
-                    // star values as doubles. Since we can't modify the template at runtime,
-                    // we'll just continue - the UI should still render with default values
+                // Handle resource not found errors
+                if (exception.Message.Contains("FluentDark") && exception.Message.Contains("resource"))
+                {
+                    Logger.Warning("FluentDark resource not found — theme resources may not be properly merged");
+                    return true;
+                }
+
+                // Handle BeginInit/EndInit nesting issues
+                if (exception.Message.Contains("BeginInit") || exception.Message.Contains("EndInit"))
+                {
+                    Logger.Warning("BeginInit/EndInit nesting issue detected — avoiding nested initialization");
                     return true;
                 }
 
@@ -104,8 +129,6 @@ namespace BusBuddy.WPF.Utilities
                 {
                     Logger.Warning("XAML parsing error at line {Line}: {Message}",
                         xamlEx.LineNumber, xamlEx.Message);
-
-                    // For most XAML errors, we can continue - WPF will use default values
                     return true;
                 }
 

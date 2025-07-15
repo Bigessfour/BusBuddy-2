@@ -5,9 +5,16 @@
              xmlns:converters="clr-namespace:BusBuddy.WPF.Converters">
     <Application.Resources>
         <ResourceDictionary>
-            <!-- Temporarily simplified for debugging -->
+            <!-- FluentDark theme resources merged globally -->
             <ResourceDictionary.MergedDictionaries>
-                <!-- Theme resources temporarily disabled -->
+                <!-- Core Syncfusion FluentDark theme -->
+                <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/FluentDark.xaml"/>
+                <!-- Custom FluentDark theme resources -->
+                <ResourceDictionary Source="Resources/SyncfusionFluentDarkTheme.xaml"/>
+                <!-- Additional unified styles -->
+                <ResourceDictionary Source="Resources/UnifiedStyles.xaml"/>
+                <ResourceDictionary Source="Resources/TileStyles.xaml"/>
+                <ResourceDictionary Source="Resources/UnifiedProgressBarStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Global Converters — Syncfusion Compatible -->

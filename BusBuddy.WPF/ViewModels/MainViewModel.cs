@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using BusBuddy.WPF.ViewModels;
 using BusBuddy.WPF.ViewModels.Schedule;
 using BusBuddy.WPF.Services;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -30,7 +30,7 @@ namespace BusBuddy.WPF.ViewModels
         [ObservableProperty]
         private object? _currentViewModel;
 
-        private readonly ILogger<MainViewModel>? _logger;
+        private readonly ILogger _logger;
         private readonly ILazyViewModelService _lazyViewModelService;
         private readonly DashboardViewModel _dashboardViewModel; // Keep dashboard eager for immediate display
         private readonly LoadingViewModel _loadingViewModel; // Keep loading view eager
@@ -40,13 +40,12 @@ namespace BusBuddy.WPF.ViewModels
         public MainViewModel(
             DashboardViewModel dashboardViewModel,
             LoadingViewModel loadingViewModel,
-            ILazyViewModelService lazyViewModelService,
-            ILogger<MainViewModel>? logger = null)
+            ILazyViewModelService lazyViewModelService)
         {
             _dashboardViewModel = dashboardViewModel;
             _loadingViewModel = loadingViewModel;
             _lazyViewModelService = lazyViewModelService;
-            _logger = logger;
+            _logger = Log.ForContext<MainViewModel>();
 
             NavigationItems = new ObservableCollection<NavigationItem>
             {
@@ -66,13 +65,13 @@ namespace BusBuddy.WPF.ViewModels
             // Start with loading view for smooth startup - no data loading yet
             CurrentViewModel = _loadingViewModel;
 
-            _logger?.LogInformation("MainViewModel initialized with {Count} navigation items using lazy loading", NavigationItems.Count);
+            _logger.Information("MainViewModel initialized with {Count} navigation items using lazy loading", NavigationItems.Count);
         }
 
         partial void OnCurrentViewModelChanged(object? value)
         {
             var viewName = value?.GetType().Name?.Replace("ViewModel", "") ?? "Unknown";
-            _logger?.LogInformation("UI View model changed - CurrentView is now {ViewName} ({ViewModelType})",
+            _logger.Information("UI View model changed - CurrentView is now {ViewName} ({ViewModelType})",
                 viewName, value?.GetType().Name ?? "null");
         }
 
@@ -82,7 +81,7 @@ namespace BusBuddy.WPF.ViewModels
         [RelayCommand]
         private async Task NavigateTo(string viewModelName)
         {
-            _logger?.LogInformation("UI Navigation initiated to {ViewModelName} via button click", viewModelName);
+            _logger.Information("UI Navigation initiated to {ViewModelName} via button click", viewModelName);
 
             object? previousViewModel = CurrentViewModel;
             var startTime = System.Diagnostics.Stopwatch.StartNew();
@@ -117,8 +116,22 @@ namespace BusBuddy.WPF.ViewModels
                     _ => _dashboardViewModel
                 };
 
+                // Initialize dashboard data if navigating to Dashboard
+                if (viewModelName == "Dashboard" && CurrentViewModel == _dashboardViewModel)
+                {
+                    try
+                    {
+                        await _dashboardViewModel.InitializeAsync();
+                        _logger.Information("Dashboard data initialized after navigation");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Error initializing dashboard data after navigation");
+                    }
+                }
+
                 startTime.Stop();
-                _logger?.LogInformation("UI View transition completed to {ViewModel} from {PreviousViewModel} in {ElapsedMs}ms",
+                _logger.Information("UI View transition completed to {ViewModel} from {PreviousViewModel} in {ElapsedMs}ms",
                     CurrentViewModel?.GetType().Name,
                     previousViewModel?.GetType().Name ?? "null",
                     startTime.ElapsedMilliseconds);
@@ -126,18 +139,50 @@ namespace BusBuddy.WPF.ViewModels
             catch (Exception ex)
             {
                 startTime.Stop();
-                _logger?.LogError(ex, "Error navigating to {ViewModelName} after {ElapsedMs}ms", viewModelName, startTime.ElapsedMilliseconds);
+                _logger.Error(ex, "Error navigating to {ViewModelName} after {ElapsedMs}ms", viewModelName, startTime.ElapsedMilliseconds);
                 CurrentViewModel = _loadingViewModel;
+            }
+        }        /// <summary>
+                 /// Public method to navigate to Dashboard view - used by startup orchestration
+                 /// </summary>
+        public async Task NavigateToDashboardAsync()
+        {
+            _logger.Information("UI Navigation to Dashboard initiated from startup orchestration");
+            CurrentViewModel = _dashboardViewModel;
+
+            // Initialize dashboard data after navigation
+            try
+            {
+                await _dashboardViewModel.InitializeAsync();
+                _logger.Information("Dashboard initialization completed after navigation");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error initializing dashboard after navigation");
             }
         }
 
         /// <summary>
-        /// Public method to navigate to Dashboard view - used by startup orchestration
+        /// Synchronous version for backward compatibility
         /// </summary>
         public void NavigateToDashboard()
         {
-            _logger?.LogInformation("UI Navigation to Dashboard initiated from startup orchestration");
+            _logger.Information("UI Navigation to Dashboard initiated from startup orchestration (sync)");
             CurrentViewModel = _dashboardViewModel;
+
+            // Initialize dashboard data in background
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _dashboardViewModel.InitializeAsync();
+                    _logger.Information("Dashboard initialization completed after navigation (background)");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error initializing dashboard after navigation (background)");
+                }
+            });
         }
 
         /// <summary>
@@ -147,13 +192,13 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                _logger?.LogInformation("Starting background preload of essential ViewModels");
+                _logger.Information("Starting background preload of essential ViewModels");
                 await _lazyViewModelService.PreloadEssentialViewModelsAsync();
-                _logger?.LogInformation("Background preload completed");
+                _logger.Information("Background preload completed");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error during background ViewModel preload");
+                _logger.Error(ex, "Error during background ViewModel preload");
             }
         }
     }
