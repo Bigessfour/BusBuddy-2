@@ -140,6 +140,11 @@ public class BusBuddyDbContext : DbContext
             entity.Property(e => e.Action).IsRequired().HasMaxLength(200);
             entity.Property(e => e.User).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Details).HasMaxLength(1000);
+
+            // Add index on Timestamp for better query performance
+            entity.HasIndex(e => e.Timestamp)
+                .HasDatabaseName("IX_ActivityLogs_Timestamp")
+                .IsDescending();
         });
 
         // DEBUG: Output the value of SkipGlobalSeedData to verify test isolation

@@ -16,6 +16,7 @@ namespace BusBuddy.Core.Services
         private readonly IBusBuddyDbContextFactory _contextFactory;
         private readonly ILogger<DriverService> _logger;
         private static readonly SemaphoreSlim _semaphore = new(1, 1);
+        private static bool _nullValuesFixed = false;
 
         public DriverService(IBusBuddyDbContextFactory contextFactory, ILogger<DriverService> logger)
         {
@@ -1047,13 +1048,19 @@ namespace BusBuddy.Core.Services
         /// </summary>
         private async Task FixNullDriverValuesIfNeeded(BusBuddyDbContext context)
         {
+            // Skip if already fixed in this session
+            if (_nullValuesFixed)
+            {
+                return;
+            }
+
             try
             {
                 // Check if there are any NULL values in required columns
                 var hasNullValues = await context.Database.ExecuteSqlRawAsync(@"
                     SELECT CASE WHEN EXISTS (
-                        SELECT 1 FROM Drivers 
-                        WHERE DriverName IS NULL OR DriversLicenceType IS NULL OR Status IS NULL
+                        SELECT 1 FROM Drivers
+                        WHERE DriverName IS NULL OR DriversLicenseType IS NULL OR Status IS NULL
                     ) THEN 1 ELSE 0 END
                 ");
 
@@ -1063,58 +1070,61 @@ namespace BusBuddy.Core.Services
 
                     // Fix NULL values
                     await context.Database.ExecuteSqlRawAsync(@"
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET DriverName = COALESCE(NULLIF(LTRIM(RTRIM(DriverName)), ''), 'Driver-' + CAST(DriverId AS VARCHAR(10)))
                         WHERE DriverName IS NULL OR LTRIM(RTRIM(DriverName)) = '';
 
-                        UPDATE Drivers 
-                        SET DriversLicenceType = COALESCE(NULLIF(LTRIM(RTRIM(DriversLicenceType)), ''), 'Standard')
-                        WHERE DriversLicenceType IS NULL OR LTRIM(RTRIM(DriversLicenceType)) = '';
+                        UPDATE Drivers
+                        SET DriversLicenseType = COALESCE(NULLIF(LTRIM(RTRIM(DriversLicenseType)), ''), 'Standard')
+                        WHERE DriversLicenseType IS NULL OR LTRIM(RTRIM(DriversLicenseType)) = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET Status = COALESCE(NULLIF(LTRIM(RTRIM(Status)), ''), 'Active')
                         WHERE Status IS NULL OR LTRIM(RTRIM(Status)) = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET FirstName = NULL
                         WHERE FirstName = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET LastName = NULL
                         WHERE LastName = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET DriverPhone = NULL
                         WHERE DriverPhone = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET DriverEmail = NULL
                         WHERE DriverEmail = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET Address = NULL
                         WHERE Address = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET City = NULL
                         WHERE City = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET State = NULL
                         WHERE State = '';
 
-                        UPDATE Drivers 
+                        UPDATE Drivers
                         SET Zip = NULL
                         WHERE Zip = '';
                     ");
 
                     _logger.LogInformation("Successfully fixed NULL values in Drivers table.");
                 }
+
+                // Mark as fixed for this session
+                _nullValuesFixed = true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while attempting to fix NULL values in Drivers table");
-                // Don't throw - let the calling method handle the original exception
+                // Don't throw — let the calling method handle the original exception
             }
         }
 

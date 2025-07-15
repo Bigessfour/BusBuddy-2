@@ -229,6 +229,10 @@ namespace BusBuddy.Core.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Timestamp")
+                        .IsDescending()
+                        .HasDatabaseName("IX_ActivityLogs_Timestamp");
+
                     b.ToTable("ActivityLogs", (string)null);
                 });
 
@@ -496,7 +500,7 @@ namespace BusBuddy.Core.Migrations
                         {
                             VehicleId = 1,
                             BusNumber = "001",
-                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5084),
+                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5562),
                             GPSTracking = false,
                             LicenseNumber = "TX123456",
                             Make = "Blue Bird",
@@ -512,7 +516,7 @@ namespace BusBuddy.Core.Migrations
                         {
                             VehicleId = 2,
                             BusNumber = "002",
-                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5131),
+                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5607),
                             GPSTracking = false,
                             LicenseNumber = "TX654321",
                             Make = "Thomas Built",
@@ -686,7 +690,7 @@ namespace BusBuddy.Core.Migrations
                         new
                         {
                             DriverId = 1,
-                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5335),
+                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5864),
                             DriverEmail = "john.smith@school.edu",
                             DriverName = "John Smith",
                             DriverPhone = "555-0123",
@@ -697,7 +701,7 @@ namespace BusBuddy.Core.Migrations
                         new
                         {
                             DriverId = 2,
-                            CreatedDate = new DateTime(2025, 7, 12, 8, 46, 17, 845, DateTimeKind.Utc).AddTicks(5347),
+                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5878),
                             DriverEmail = "mary.johnson@school.edu",
                             DriverName = "Mary Johnson",
                             DriverPhone = "555-0456",
