@@ -5,6 +5,11 @@
              xmlns:converters="clr-namespace:BusBuddy.WPF.Converters">
     <Application.Resources>
         <ResourceDictionary>
+            <!-- Temporarily simplified for debugging -->
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Theme resources temporarily disabled -->
+            </ResourceDictionary.MergedDictionaries>
+
             <!-- Global Converters — Syncfusion Compatible -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

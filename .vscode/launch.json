@@ -58,18 +58,7 @@
             "request": "attach",
             "processId": "${command:pickProcess}"
         },
-        {
-            "name": "Debug Standalone Project",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BusBuddy.Debug/bin/Debug/net8.0/BusBuddy.Debug.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/BusBuddy.Debug",
-            "console": "integratedTerminal",
-            "stopAtEntry": false,
-            "justMyCode": false
-        },
+
         {
             "name": "Debug with Validation Enabled",
             "type": "coreclr",

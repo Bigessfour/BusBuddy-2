@@ -18,6 +18,10 @@ namespace BusBuddy.WPF
         {
             try
             {
+                // CRITICAL: Set ApplyThemeAsDefaultStyle before InitializeComponent
+                // This ensures FluentDark theme resources are available globally
+                SfSkinManager.ApplyThemeAsDefaultStyle = true;
+
                 InitializeComponent();
 
                 // Apply FluentDark theme consistently
@@ -44,13 +48,13 @@ namespace BusBuddy.WPF
         {
             try
             {
-                // Register FluentDark theme
+                // Register FluentDark theme settings
                 SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
 
-                // Apply theme to current window
-                SfSkinManager.SetVisualStyle(this, VisualStyles.FluentDark);
+                // Apply theme using modern Theme property instead of deprecated VisualStyle
+                SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
 
-                Log.Information("FluentDark theme applied successfully to MainWindow");
+                Log.Information("FluentDark theme applied successfully to MainWindow using modern Theme API");
             }
             catch (Exception ex)
             {
@@ -65,13 +69,19 @@ namespace BusBuddy.WPF
         {
             try
             {
-                if (NavigationPanel != null)
+                // Find the NavigationPanel by name
+                var navigationPanel = FindName("NavigationPanel") as FrameworkElement;
+                if (navigationPanel != null)
                 {
-                    NavigationPanel.Visibility = NavigationPanel.Visibility == Visibility.Visible
+                    navigationPanel.Visibility = navigationPanel.Visibility == Visibility.Visible
                         ? Visibility.Collapsed
                         : Visibility.Visible;
 
-                    Log.Debug("Navigation panel toggled to: {Visibility}", NavigationPanel.Visibility);
+                    Log.Debug("Navigation panel toggled to: {Visibility}", navigationPanel.Visibility);
+                }
+                else
+                {
+                    Log.Warning("NavigationPanel not found in MainWindow");
                 }
             }
             catch (Exception ex)

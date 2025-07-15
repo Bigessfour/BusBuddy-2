@@ -24,7 +24,7 @@
         Title="Bus Buddy - Transportation Management System"
         Height="900" Width="1600"
         WindowStartupLocation="CenterScreen"
-        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+        syncfusionskin:SfSkinManager.Theme="{syncfusionskin:SkinManagerExtension ThemeName=FluentDark}"
         Loaded="Window_Loaded">
 
     <Window.Resources>

@@ -76,7 +76,7 @@
 
         <!-- Enhanced Tile Style for Modern Appearance with Theme Support -->
         <Style x:Key="DashboardTileStyle" TargetType="Border" BasedOn="{StaticResource BusBuddyDashboardTileStyle}">
-            <Setter Property="Background" Value="{StaticResource FluentDarkBackgroundBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource FluentDarkBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource FluentDarkBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="12"/>
@@ -176,7 +176,7 @@
         </Grid.RowDefinitions>
 
         <!-- Enhanced Header with Live Status -->
-        <Border Grid.Row="0" Background="{StaticResource FluentDarkPrimaryBrush}" Padding="16,12">
+        <Border Grid.Row="0" Background="{DynamicResource FluentDarkPrimaryBrush}" Padding="16,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -184,7 +184,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="🚌 Bus Buddy Dashboard" FontSize="28" FontWeight="Bold" Foreground="{StaticResource FluentDarkForegroundBrush}" VerticalAlignment="Center"/>
+                    <TextBlock Text="🚌 Bus Buddy Dashboard" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource FluentDarkForegroundBrush}" VerticalAlignment="Center"/>
                     <Border Background="{StaticResource FluentDarkSuccessBrush}" CornerRadius="12" Padding="8,4" Margin="16,0,0,0" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Width="8" Height="8" Fill="{StaticResource FluentDarkForegroundBrush}" VerticalAlignment="Center" Margin="0,0,6,0">
