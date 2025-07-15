@@ -151,6 +151,11 @@
     <SolidColorBrush x:Key="FluentDarkBorderBrush" Color="{StaticResource FluentDarkBorderColor}"/>
     <SolidColorBrush x:Key="FluentDarkSecondaryBorderBrush" Color="{StaticResource FluentDarkSecondaryBorderColor}"/>
 
+    <!-- ADDITIONAL THEME RESOURCES -->
+    <Color x:Key="FluentDarkPurpleColor">#9B59B6</Color>
+    <SolidColorBrush x:Key="FluentDarkPurpleBrush" Color="{StaticResource FluentDarkPurpleColor}"/>
+    <SolidColorBrush x:Key="FluentDarkOverlayBrush" Color="#505050"/>
+
     <!-- HOVER & SELECTION STATES -->
     <SolidColorBrush x:Key="FluentDarkHoverBrush" Color="#404040"/>
     <SolidColorBrush x:Key="FluentDarkSelectionBrush" Color="#094771"/>

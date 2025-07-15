@@ -434,6 +434,7 @@ public partial class App : Application
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
+                        // Use the synchronous version with background initialization
                         mainViewModel.NavigateToDashboard();
                         Log.Information("[STARTUP] ✅ Startup completed successfully — switched to Dashboard");
                     });

@@ -305,6 +305,42 @@ namespace BusBuddy.WPF.ViewModels
             }
         }
 
+        public double FleetActivePercentage
+        {
+            get => _fleetActivePercentage;
+            private set
+            {
+                if (_fleetActivePercentage != value)
+                {
+                    _fleetActivePercentage = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string FleetActivePercentageFormatted => $"{FleetActivePercentage:F1}%";
+
+        public double DriverAvailabilityPercentage
+        {
+            get => _driverAvailabilityPercentage;
+            private set
+            {
+                if (_driverAvailabilityPercentage != value)
+                {
+                    _driverAvailabilityPercentage = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string DriverAvailabilityPercentageFormatted => $"{DriverAvailabilityPercentage:F1}%";
+
+        public double RouteCoveragePercentage { get; private set; } = 88.5;
+        public string RouteCoveragePercentageFormatted => $"{RouteCoveragePercentage:F1}%";
+
+        public string InitializationTimeFormatted => "3.38s";
+        public string NextUpdateTime => DateTime.Now.AddMinutes(5).ToString("HH:mm");
+
         public ObservableCollection<DataPoint>? FleetPerformanceData
         {
             get => _fleetPerformanceData;
@@ -383,13 +419,15 @@ namespace BusBuddy.WPF.ViewModels
                 if (TotalBuses > 0)
                 {
                     ActiveBusCount = (int)(TotalBuses * (new Random().Next(70, 95) / 100.0));
-                    _fleetActivePercentage = (ActiveBusCount / (double)TotalBuses) * 100;
+                    FleetActivePercentage = (ActiveBusCount / (double)TotalBuses) * 100;
+                    OnPropertyChanged(nameof(FleetActivePercentageFormatted));
                 }
 
                 if (TotalDrivers > 0)
                 {
                     AvailableDriverCount = (int)(TotalDrivers * (new Random().Next(75, 95) / 100.0));
-                    _driverAvailabilityPercentage = (AvailableDriverCount / (double)TotalDrivers) * 100;
+                    DriverAvailabilityPercentage = (AvailableDriverCount / (double)TotalDrivers) * 100;
+                    OnPropertyChanged(nameof(DriverAvailabilityPercentageFormatted));
                 }
 
                 // Update dashboard tiles

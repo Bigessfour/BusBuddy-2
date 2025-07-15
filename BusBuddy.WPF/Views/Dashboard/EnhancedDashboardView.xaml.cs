@@ -91,6 +91,9 @@ namespace BusBuddy.WPF.Views.Dashboard
                 _logger?.LogInformation("🚀 EnhancedDashboardView: PRIMARY dashboard view initialized with FluentDark theme");
                 _logger?.LogInformation("🔧 ButtonAdv Conversion: All standard Button controls converted to Syncfusion ButtonAdv for v30.1.39 compatibility - RefreshDataButton, ViewReportsButton, DashboardSettingsButton");
 
+                // Reset recovery attempts after successful initialization
+                BusBuddy.WPF.Utilities.XamlErrorHandler.ResetRecoveryAttempts();
+
                 InitializeDataRefreshTimer();
                 // DataContext is set by DataTemplate - no manual initialization needed
                 Loaded += UserControl_Loaded;
@@ -853,7 +856,39 @@ namespace BusBuddy.WPF.Views.Dashboard
                     Margin = new Thickness(20)
                 };
 
+                // Add a retry button
+                var retryButton = new Button
+                {
+                    Content = "Retry Loading",
+                    Width = 120,
+                    Height = 35,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 20, 0, 0),
+                    Background = new SolidColorBrush(Color.FromRgb(0, 122, 204)),
+                    Foreground = Brushes.White,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold
+                };
+
+                retryButton.Click += (sender, e) =>
+                {
+                    try
+                    {
+                        // Reset and retry initialization
+                        _isInitializing = false;
+                        BusBuddy.WPF.Utilities.XamlErrorHandler.ResetRecoveryAttempts();
+                        InitializeComponent();
+                        _logger?.LogInformation("Dashboard retry successful");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Dashboard retry failed");
+                    }
+                };
+
                 fallbackGrid.Children.Add(fallbackMessage);
+                fallbackGrid.Children.Add(retryButton);
 
                 // Set this as the content
                 this.Content = fallbackGrid;
