@@ -7,18 +7,20 @@
             "type": "process",
             "args": [
                 "clean",
-                "BusBuddy.WPF/BusBuddy.WPF.csproj"
+                "BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "--verbosity",
+                "normal"
             ],
             "group": "build",
             "presentation": {
-                "echo": false,
-                "reveal": "silent",
-                "focus": false,
-                "panel": "shared",
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
                 "showReuseMessage": false,
                 "clear": true
             },
-            "problemMatcher": []
+            "problemMatcher": ["$msCompile"]
         },
         {
             "label": "Restore Packages",
@@ -26,19 +28,21 @@
             "type": "process",
             "args": [
                 "restore",
-                "BusBuddy.WPF/BusBuddy.WPF.csproj"
+                "BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "--verbosity",
+                "normal"
             ],
             "group": "build",
             "dependsOn": "Clean Solution",
             "presentation": {
-                "echo": false,
-                "reveal": "silent",
-                "focus": false,
-                "panel": "shared",
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
                 "showReuseMessage": false,
                 "clear": true
             },
-            "problemMatcher": []
+            "problemMatcher": ["$msCompile"]
         },
         {
             "label": "Build Solution",
@@ -48,7 +52,7 @@
                 "build",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "--verbosity",
-                "quiet",
+                "normal",
                 "--no-restore"
             ],
             "group": {
@@ -57,16 +61,14 @@
             },
             "dependsOn": "Restore Packages",
             "presentation": {
-                "echo": false,
-                "reveal": "silent",
-                "focus": false,
-                "panel": "shared",
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
                 "showReuseMessage": false,
                 "clear": true
             },
-            "problemMatcher": [
-                "$msCompile"
-            ],
+            "problemMatcher": ["$msCompile"],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
@@ -79,20 +81,22 @@
                 "run",
                 "--project",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "--no-build"
+                "--no-build",
+                "--verbosity",
+                "normal"
             ],
             "group": "build",
             "dependsOn": "Build Solution",
             "presentation": {
-                "echo": false,
-                "reveal": "silent",
-                "focus": false,
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
                 "panel": "dedicated",
                 "showReuseMessage": false,
                 "clear": true
             },
             "isBackground": true,
-            "problemMatcher": [],
+            "problemMatcher": ["$msCompile"],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
@@ -114,7 +118,9 @@
                 "echo": true,
                 "reveal": "always",
                 "focus": true,
-                "panel": "shared"
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
             }
         }
     ]

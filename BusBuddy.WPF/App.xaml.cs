@@ -80,6 +80,23 @@ public partial class App : Application
         // Enable Syncfusion to apply merged theme resources globally
         SfSkinManager.ApplyStylesOnApplication = true;
 
+        // 🎨 CRITICAL: Apply FluentDark theme globally before any UI initialization
+        // This replaces the need for manual resource dictionary merging
+        try
+        {
+            // Set the global theme for all Syncfusion controls
+            SfSkinManager.ApplicationTheme = new Theme("FluentDark");
+
+            // Register FluentDark theme settings for enhanced styling
+            SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
+
+            System.Diagnostics.Debug.WriteLine("✅ FluentDark theme applied globally via SkinManager");
+        }
+        catch (Exception themeEx)
+        {
+            System.Diagnostics.Debug.WriteLine($"⚠️ FluentDark theme setup failed: {themeEx.Message}");
+        }
+
         // CRITICAL: Initialize error handling before anything else
         try
         {
@@ -183,8 +200,25 @@ public partial class App : Application
         base.OnStartup(e);
 
         // Now that the host is started, Serilog should be initialized
-        // Ensure Syncfusion applies merged theme resources globally
-        SfSkinManager.ApplyStylesOnApplication = true;
+        // 🎨 CRITICAL: Ensure Syncfusion theme is properly applied before UI creation
+        try
+        {
+            // Ensure SkinManager is ready for application-wide theming
+            SfSkinManager.ApplyStylesOnApplication = true;
+
+            // Verify FluentDark theme is set
+            if (SfSkinManager.ApplicationTheme?.ThemeName != "FluentDark")
+            {
+                SfSkinManager.ApplicationTheme = new Theme("FluentDark");
+                Log.Information("🎨 FluentDark theme reapplied during startup");
+            }
+
+            Log.Information("🎨 Syncfusion FluentDark theme verified and ready");
+        }
+        catch (Exception themeEx)
+        {
+            Log.Warning(themeEx, "🎨 Theme setup warning during startup — using fallback");
+        }
 
         // Start performance monitoring
         var stopwatch = Stopwatch.StartNew();
@@ -608,32 +642,14 @@ public partial class App : Application
             // Log that we're about to initialize the UI
             Log.Information("[STARTUP] Creating and showing MainWindow");
 
-            // Initialize theme service before creating UI with Fluent Dark
+            // Initialize theme service with FluentDark already applied
             _startupMonitor.BeginStep("InitializeTheme");
             var themeService = serviceProvider.GetRequiredService<BusBuddy.WPF.Services.IThemeService>();
 
-            // 🎨 FLUENT DARK THEME ACTIVATION 🎨
-            // Set to FluentDark for modern, professional dark UI experience
-            SfSkinManager.ApplyStylesOnApplication = true;
-
-            // Register FluentDark theme settings for proper Syncfusion control styling
-            try
-            {
-                SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
-
-                // Set global application theme for all Syncfusion controls
-                SfSkinManager.ApplicationTheme = new Theme("FluentDark");
-
-                Log.Information("[STARTUP] 🎨 FluentDark theme settings registered and applied globally");
-            }
-            catch (Exception themeEx)
-            {
-                Log.Warning(themeEx, "[STARTUP] FluentDark theme registration failed, using fallback");
-            }
-
+            // Theme is already applied globally — just initialize the service
             themeService.InitializeTheme();
-            Log.Information("[STARTUP] 🎨 Fluent Dark theme ready - Theme service will activate on UI creation");
-            Log.Information("[STARTUP] Theme service initialized with theme: {Theme}", themeService.CurrentTheme);
+            Log.Information("🎨 Theme service initialized with FluentDark theme");
+            Log.Information("🎨 Current theme: {Theme}", themeService.CurrentTheme);
             _startupMonitor.EndStep();
 
             // Complete startup performance monitoring

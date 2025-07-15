@@ -5,19 +5,17 @@
              xmlns:converters="clr-namespace:BusBuddy.WPF.Converters">
     <Application.Resources>
         <ResourceDictionary>
-            <!-- FluentDark theme resources merged globally -->
-            <ResourceDictionary.MergedDictionaries>
-                <!-- Core Syncfusion FluentDark theme -->
-                <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/FluentDark.xaml"/>
-                <!-- Custom FluentDark theme resources -->
-                <ResourceDictionary Source="Resources/SyncfusionFluentDarkTheme.xaml"/>
-                <!-- Additional unified styles -->
-                <ResourceDictionary Source="Resources/UnifiedStyles.xaml"/>
-                <ResourceDictionary Source="Resources/TileStyles.xaml"/>
-                <ResourceDictionary Source="Resources/UnifiedProgressBarStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
+            <!--
+            ===============================================================================
+            SYNCFUSION FLUENTDARK THEME — PROPER IMPLEMENTATION
+            ===============================================================================
+            Using SkinManager approach (recommended by Syncfusion) instead of manual merging.
+            This prevents StaticResource conflicts and "Resource not available" errors.
+            All theme resources are loaded from NuGet packages at runtime.
+            ===============================================================================
+            -->
 
-            <!-- Global Converters — Syncfusion Compatible -->
+            <!-- Essential converters only — minimal resource dictionary -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
