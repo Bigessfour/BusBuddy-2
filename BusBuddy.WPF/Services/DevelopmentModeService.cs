@@ -2,7 +2,7 @@ using BusBuddy.Core.Configuration;
 using BusBuddy.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Windows;
 
 namespace BusBuddy.WPF.Services
@@ -14,13 +14,12 @@ namespace BusBuddy.WPF.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<DevelopmentModeService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<DevelopmentModeService>();
 
-        public DevelopmentModeService(IServiceProvider serviceProvider, IConfiguration configuration, ILogger<DevelopmentModeService> logger)
+        public DevelopmentModeService(IServiceProvider serviceProvider, IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
             _configuration = configuration;
-            _logger = logger;
         }
 
         /// <summary>
@@ -35,11 +34,11 @@ namespace BusBuddy.WPF.Services
         {
             if (!IsEnabled)
             {
-                _logger.LogInformation("Development mode disabled. Skipping development features.");
+                Logger.Information("Development mode disabled. Skipping development features.");
                 return;
             }
 
-            _logger.LogInformation("Development mode enabled. Initializing development features...");
+            Logger.Information("Development mode enabled. Initializing development features...");
 
             try
             {
@@ -49,11 +48,11 @@ namespace BusBuddy.WPF.Services
                 // Add development menu items or buttons (if needed)
                 AddDevelopmentMenuItems();
 
-                _logger.LogInformation("Development mode initialization completed.");
+                Logger.Information("Development mode initialization completed.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error initializing development mode");
+                Logger.Error(ex, "Error initializing development mode");
             }
         }
 
@@ -68,7 +67,7 @@ namespace BusBuddy.WPF.Services
 
                 // This would typically show a dialog in development mode
                 // For now, we'll just log the availability
-                _logger.LogInformation("Seed data service available. Call SeedAllAsync() to populate with sample data.");
+                Logger.Information("Seed data service available. Call SeedAllAsync() to populate with sample data.");
 
                 // In a real implementation, you might want to:
                 // - Show a dialog asking if user wants to seed data
@@ -80,7 +79,7 @@ namespace BusBuddy.WPF.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking seed data availability");
+                Logger.Error(ex, "Error checking seed data availability");
             }
         }
 
@@ -91,7 +90,7 @@ namespace BusBuddy.WPF.Services
         {
             // This would integrate with the main window to add development features
             // For example: Debug menu, seed data buttons, performance monitors, etc.
-            _logger.LogDebug("Development menu items would be added here");
+            Logger.Debug("Development menu items would be added here");
         }
 
         /// <summary>
@@ -101,20 +100,20 @@ namespace BusBuddy.WPF.Services
         {
             if (!IsEnabled)
             {
-                _logger.LogWarning("Seed data requested but development mode is disabled");
+                Logger.Warning("Seed data requested but development mode is disabled");
                 return;
             }
 
             try
             {
-                _logger.LogInformation("Starting manual seed data creation...");
+                Logger.Information("Starting manual seed data creation...");
                 var seedService = _serviceProvider.GetRequiredService<SeedDataService>();
                 await seedService.SeedAllAsync();
-                _logger.LogInformation("Manual seed data creation completed");
+                Logger.Information("Manual seed data creation completed");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during manual seed data creation");
+                Logger.Error(ex, "Error during manual seed data creation");
                 throw;
             }
         }
@@ -126,20 +125,20 @@ namespace BusBuddy.WPF.Services
         {
             if (!IsEnabled)
             {
-                _logger.LogWarning("Clear seed data requested but development mode is disabled");
+                Logger.Warning("Clear seed data requested but development mode is disabled");
                 return;
             }
 
             try
             {
-                _logger.LogInformation("Starting seed data clearing...");
+                Logger.Information("Starting seed data clearing...");
                 var seedService = _serviceProvider.GetRequiredService<SeedDataService>();
                 await seedService.ClearSeedDataAsync();
-                _logger.LogInformation("Seed data clearing completed");
+                Logger.Information("Seed data clearing completed");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during seed data clearing");
+                Logger.Error(ex, "Error during seed data clearing");
                 throw;
             }
         }

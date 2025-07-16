@@ -2,7 +2,8 @@ using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.Views.Fuel;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
@@ -55,230 +56,278 @@ namespace BusBuddy.WPF.ViewModels
         public RelayCommand ReportCommand { get; }
         public RelayCommand ReconciliationCommand { get; }
 
-        public FuelManagementViewModel(IFuelService fuelService, IBusService busService, ILogger<FuelManagementViewModel>? logger = null)
-            : base(logger)
+        public FuelManagementViewModel(IFuelService fuelService, IBusService busService)
+            : base()
         {
             _fuelService = fuelService;
             _busService = busService;
 
-            AddCommand = new RelayCommand(_ => { _ = AddFuelRecordAsync(); });
-            EditCommand = new RelayCommand(_ => { _ = EditFuelRecordAsync(); }, _ => CanEdit);
-            DeleteCommand = new RelayCommand(_ => { _ = DeleteFuelRecordAsync(); }, _ => CanDelete);
-            ExportCommand = new RelayCommand(_ => { _ = ExportFuelDataAsync(); });
-            ReportCommand = new RelayCommand(_ => { _ = ShowFuelReportAsync(); });
-            ReconciliationCommand = new RelayCommand(_ => { _ = ShowFuelReconciliationAsync(); });
+            using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+            using (LogContext.PushProperty("OperationType", "Construction"))
+            {
+                Logger.Information("FuelManagementViewModel constructor started");
 
-            // Set as ready for development
-            IsInDevelopment = false;
+                AddCommand = new RelayCommand(_ => { _ = AddFuelRecordAsync(); });
+                EditCommand = new RelayCommand(_ => { _ = EditFuelRecordAsync(); }, _ => CanEdit);
+                DeleteCommand = new RelayCommand(_ => { _ = DeleteFuelRecordAsync(); }, _ => CanDelete);
+                ExportCommand = new RelayCommand(_ => { _ = ExportFuelDataAsync(); });
+                ReportCommand = new RelayCommand(_ => { _ = ShowFuelReportAsync(); });
+                ReconciliationCommand = new RelayCommand(_ => { _ = ShowFuelReconciliationAsync(); });
 
-            _ = LoadFuelRecordsAsync();
+                // Set as ready for development
+                IsInDevelopment = false;
+
+                Logger.Information("FuelManagementViewModel constructor completed, initiating LoadFuelRecordsAsync");
+                _ = LoadFuelRecordsAsync();
+            }
         }
 
         private async Task LoadFuelRecordsAsync()
         {
-            try
+            await LoadDataAsync(async () =>
             {
-                FuelRecords.Clear();
-                var records = await _fuelService.GetAllFuelRecordsAsync();
-                foreach (var record in records)
-                    FuelRecords.Add(record);
-                CalculateTrends();
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
 
-                Logger?.LogInformation("Loaded {RecordCount} fuel records", FuelRecords.Count);
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "Error loading fuel records");
-                MessageBox.Show($"Error loading fuel records: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+                using (LogContext.PushProperty("OperationType", "LoadFuelRecords"))
+                {
+                    Logger.Information("Loading fuel records");
+
+                    FuelRecords.Clear();
+                    var records = await _fuelService.GetAllFuelRecordsAsync();
+                    foreach (var record in records)
+                        FuelRecords.Add(record);
+
+                    CalculateTrends();
+
+                    Logger.Information("Loaded {RecordCount} fuel records", FuelRecords.Count);
+                }
+            });
         }
 
         private async Task AddFuelRecordAsync()
         {
-            try
+            await ExecuteCommandAsync(async () =>
             {
-                // Get first bus for default
-                var buses = await _busService.GetAllBusesAsync();
-                var firstBus = buses.FirstOrDefault();
-                if (firstBus == null)
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
+
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+                using (LogContext.PushProperty("OperationType", "AddFuelRecord"))
                 {
-                    MessageBox.Show("No buses available. Please add buses first.", "No Buses", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
+                    Logger.Information("Adding new fuel record");
+
+                    // Get first bus for default
+                    var buses = await _busService.GetAllBusesAsync();
+                    var firstBus = buses.FirstOrDefault();
+                    if (firstBus == null)
+                    {
+                        Logger.Warning("No buses available for fuel record creation");
+                        MessageBox.Show("No buses available. Please add buses first.", "No Buses", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var newFuel = new Fuel
+                    {
+                        FuelDate = DateTime.Now,
+                        FuelLocation = "Key Pumps",
+                        VehicleFueledId = firstBus.VehicleId,
+                        VehicleOdometerReading = 0,
+                        FuelType = "Diesel",
+                        Gallons = 0,
+                        PricePerGallon = 0,
+                        TotalCost = 0
+                    };
+
+                    // Show dialog to edit the new record
+                    var dialog = new FuelDialog(newFuel, _busService);
+
+                    var result = dialog.ShowDialog();
+                    if (result.HasValue && result.Value)
+                    {
+                        var created = await _fuelService.CreateFuelRecordAsync(newFuel);
+                        FuelRecords.Add(created);
+                        CalculateTrends();
+
+                        Logger.Information("Added new fuel record with ID {FuelId}", created.FuelId);
+                    }
+                    else
+                    {
+                        Logger.Information("Fuel record creation cancelled by user");
+                    }
                 }
-
-                var newFuel = new Fuel
-                {
-                    FuelDate = DateTime.Now,
-                    FuelLocation = "Key Pumps",
-                    VehicleFueledId = firstBus.VehicleId,
-                    VehicleOdometerReading = 0,
-                    FuelType = "Diesel",
-                    Gallons = 0,
-                    PricePerGallon = 0,
-                    TotalCost = 0
-                };
-
-                // Show dialog to edit the new record
-                var dialog = new FuelDialog(newFuel, _busService, Logger as ILogger<FuelDialog>);
-
-                var result = dialog.ShowDialog();
-                if (result.HasValue && result.Value)
-                {
-                    var created = await _fuelService.CreateFuelRecordAsync(newFuel);
-                    FuelRecords.Add(created);
-                    CalculateTrends();
-
-                    Logger?.LogInformation("Added new fuel record with ID {FuelId}", created.FuelId);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "Error adding fuel record");
-                MessageBox.Show($"Error adding fuel record: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            });
         }
 
         private async Task EditFuelRecordAsync()
         {
             if (SelectedFuelRecord == null) return;
 
-            try
+            await ExecuteCommandAsync(async () =>
             {
-                // Create a copy to edit
-                var recordToEdit = new Fuel
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
+
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+                using (LogContext.PushProperty("OperationType", "EditFuelRecord"))
+                using (LogContext.PushProperty("FuelId", SelectedFuelRecord.FuelId))
                 {
-                    FuelId = SelectedFuelRecord.FuelId,
-                    FuelDate = SelectedFuelRecord.FuelDate,
-                    FuelLocation = SelectedFuelRecord.FuelLocation,
-                    VehicleFueledId = SelectedFuelRecord.VehicleFueledId,
-                    VehicleOdometerReading = SelectedFuelRecord.VehicleOdometerReading,
-                    FuelType = SelectedFuelRecord.FuelType,
-                    Gallons = SelectedFuelRecord.Gallons,
-                    PricePerGallon = SelectedFuelRecord.PricePerGallon,
-                    TotalCost = SelectedFuelRecord.TotalCost,
-                    Notes = SelectedFuelRecord.Notes
-                };
+                    Logger.Information("Editing fuel record with ID {FuelId}", SelectedFuelRecord.FuelId);
 
-                // Show dialog to edit the record
-                var dialog = new FuelDialog(recordToEdit, _busService, Logger as ILogger<FuelDialog>);
-
-                var result = dialog.ShowDialog();
-                if (result.HasValue && result.Value)
-                {
-                    var updated = await _fuelService.UpdateFuelRecordAsync(recordToEdit);
-
-                    // Update the selected record with new values
-                    var index = FuelRecords.IndexOf(SelectedFuelRecord);
-                    if (index >= 0)
+                    // Create a copy to edit
+                    var recordToEdit = new Fuel
                     {
-                        FuelRecords[index] = updated;
-                        SelectedFuelRecord = updated;
-                    }
+                        FuelId = SelectedFuelRecord.FuelId,
+                        FuelDate = SelectedFuelRecord.FuelDate,
+                        FuelLocation = SelectedFuelRecord.FuelLocation,
+                        VehicleFueledId = SelectedFuelRecord.VehicleFueledId,
+                        VehicleOdometerReading = SelectedFuelRecord.VehicleOdometerReading,
+                        FuelType = SelectedFuelRecord.FuelType,
+                        Gallons = SelectedFuelRecord.Gallons,
+                        PricePerGallon = SelectedFuelRecord.PricePerGallon,
+                        TotalCost = SelectedFuelRecord.TotalCost,
+                        Notes = SelectedFuelRecord.Notes
+                    };
 
-                    CalculateTrends();
-                    Logger?.LogInformation("Updated fuel record with ID {FuelId}", updated.FuelId);
+                    // Show dialog to edit the record
+                    var dialog = new FuelDialog(recordToEdit, _busService);
+
+                    var result = dialog.ShowDialog();
+                    if (result.HasValue && result.Value)
+                    {
+                        var updated = await _fuelService.UpdateFuelRecordAsync(recordToEdit);
+
+                        // Update the selected record with new values
+                        var index = FuelRecords.IndexOf(SelectedFuelRecord);
+                        if (index >= 0)
+                        {
+                            FuelRecords[index] = updated;
+                            SelectedFuelRecord = updated;
+                        }
+
+                        CalculateTrends();
+                        Logger.Information("Updated fuel record with ID {FuelId}", updated.FuelId);
+                    }
+                    else
+                    {
+                        Logger.Information("Fuel record edit cancelled by user");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "Error updating fuel record {FuelId}", SelectedFuelRecord.FuelId);
-                MessageBox.Show($"Error updating fuel record: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            });
         }
 
         private async Task DeleteFuelRecordAsync()
         {
             if (SelectedFuelRecord == null) return;
 
-            try
+            await ExecuteCommandAsync(async () =>
             {
-                // Confirm deletion
-                var result = MessageBox.Show(
-                    $"Are you sure you want to delete the fuel record from {SelectedFuelRecord.FuelDate:d} for {SelectedFuelRecord.Gallons} gallons?",
-                    "Confirm Deletion",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
 
-                if (result == MessageBoxResult.Yes)
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+                using (LogContext.PushProperty("OperationType", "DeleteFuelRecord"))
+                using (LogContext.PushProperty("FuelId", SelectedFuelRecord.FuelId))
                 {
-                    var deleted = await _fuelService.DeleteFuelRecordAsync(SelectedFuelRecord.FuelId);
-                    if (deleted)
-                    {
-                        var fuelId = SelectedFuelRecord.FuelId;
-                        FuelRecords.Remove(SelectedFuelRecord);
-                        SelectedFuelRecord = null;
-                        CalculateTrends();
+                    Logger.Information("Deleting fuel record with ID {FuelId}", SelectedFuelRecord.FuelId);
 
-                        Logger?.LogInformation("Deleted fuel record with ID {FuelId}", fuelId);
+                    // Confirm deletion
+                    var result = MessageBox.Show(
+                        $"Are you sure you want to delete the fuel record from {SelectedFuelRecord.FuelDate:d} for {SelectedFuelRecord.Gallons} gallons?",
+                        "Confirm Deletion",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        var deleted = await _fuelService.DeleteFuelRecordAsync(SelectedFuelRecord.FuelId);
+                        if (deleted)
+                        {
+                            var fuelId = SelectedFuelRecord.FuelId;
+                            FuelRecords.Remove(SelectedFuelRecord);
+                            SelectedFuelRecord = null;
+                            CalculateTrends();
+
+                            Logger.Information("Deleted fuel record with ID {FuelId}", fuelId);
+                        }
+                        else
+                        {
+                            Logger.Warning("Failed to delete fuel record with ID {FuelId}", SelectedFuelRecord.FuelId);
+                        }
+                    }
+                    else
+                    {
+                        Logger.Information("Fuel record deletion cancelled by user");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                if (SelectedFuelRecord != null)
-                {
-                    Logger?.LogError(ex, "Error deleting fuel record {FuelId}", SelectedFuelRecord.FuelId);
-                    MessageBox.Show($"Error deleting fuel record: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            });
         }
 
         private async Task ExportFuelDataAsync()
         {
-            try
+            await ExecuteCommandAsync(async () =>
             {
-                // Create a Save File Dialog
-                var dialog = new Microsoft.Win32.SaveFileDialog
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
+
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+                using (LogContext.PushProperty("OperationType", "ExportFuelData"))
                 {
-                    FileName = $"Fuel_Records_{DateTime.Now:yyyyMMdd}",
-                    DefaultExt = ".csv",
-                    Filter = "CSV Files (*.csv)|*.csv"
-                };
+                    Logger.Information("Starting fuel data export");
 
-                var result = dialog.ShowDialog();
-                if (result.HasValue && result.Value)
-                {
-                    // Export data to CSV
-                    using var writer = new System.IO.StreamWriter(dialog.FileName);
-
-                    // Write header
-                    writer.WriteLine("Fuel ID,Date,Location,Bus,Odometer,Fuel Type,Gallons,Price/Gallon,Total Cost,Notes");
-
-                    // Write data
-                    foreach (var record in FuelRecords)
+                    // Create a Save File Dialog
+                    var dialog = new Microsoft.Win32.SaveFileDialog
                     {
-                        var busNumber = "Unknown";
-                        try
+                        FileName = $"Fuel_Records_{DateTime.Now:yyyyMMdd}",
+                        DefaultExt = ".csv",
+                        Filter = "CSV Files (*.csv)|*.csv"
+                    };
+
+                    var result = dialog.ShowDialog();
+                    if (result.HasValue && result.Value)
+                    {
+                        // Export data to CSV
+                        using var writer = new System.IO.StreamWriter(dialog.FileName);
+
+                        // Write header
+                        writer.WriteLine("Fuel ID,Date,Location,Bus,Odometer,Fuel Type,Gallons,Price/Gallon,Total Cost,Notes");
+
+                        // Write data
+                        foreach (var record in FuelRecords)
                         {
-                            var bus = await _busService.GetBusByIdAsync(record.VehicleFueledId);
-                            if (bus != null)
-                                busNumber = bus.BusNumber;
+                            var busNumber = "Unknown";
+                            try
+                            {
+                                var bus = await _busService.GetBusByIdAsync(record.VehicleFueledId);
+                                if (bus != null)
+                                    busNumber = bus.BusNumber;
+                            }
+                            catch { /* Ignore errors and use default */ }
+
+                            writer.WriteLine(
+                                $"{record.FuelId}," +
+                                $"{record.FuelDate:yyyy-MM-dd}," +
+                                $"\"{record.FuelLocation}\"," +
+                                $"\"{busNumber}\"," +
+                                $"{record.VehicleOdometerReading}," +
+                                $"\"{record.FuelType}\"," +
+                                $"{record.Gallons}," +
+                                $"{record.PricePerGallon}," +
+                                $"{record.TotalCost}," +
+                                $"\"{record.Notes?.Replace("\"", "\"\"")}\"");
                         }
-                        catch { /* Ignore errors and use default */ }
 
-                        writer.WriteLine(
-                            $"{record.FuelId}," +
-                            $"{record.FuelDate:yyyy-MM-dd}," +
-                            $"\"{record.FuelLocation}\"," +
-                            $"\"{busNumber}\"," +
-                            $"{record.VehicleOdometerReading}," +
-                            $"\"{record.FuelType}\"," +
-                            $"{record.Gallons}," +
-                            $"{record.PricePerGallon}," +
-                            $"{record.TotalCost}," +
-                            $"\"{record.Notes?.Replace("\"", "\"\"")}\"");
+                        MessageBox.Show($"Successfully exported {FuelRecords.Count} fuel records to {dialog.FileName}",
+                            "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                        Logger.Information("Exported {RecordCount} fuel records to CSV", FuelRecords.Count);
                     }
-
-                    MessageBox.Show($"Successfully exported {FuelRecords.Count} fuel records to {dialog.FileName}",
-                        "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
-                    Logger?.LogInformation("Exported {RecordCount} fuel records to CSV", FuelRecords.Count);
+                    else
+                    {
+                        Logger.Information("Fuel data export cancelled by user");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "Error exporting fuel records");
-                MessageBox.Show($"Error exporting fuel records: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            });
         }
 
         private Task ShowFuelReportAsync()
@@ -290,42 +339,55 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task ShowFuelReconciliationAsync()
         {
-            try
+            await ExecuteCommandAsync(async () =>
             {
-                var dialog = new FuelReconciliationDialog(_fuelService, _busService, Logger as ILogger<FuelReconciliationDialog>);
-                _ = dialog.ShowDialog();
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
 
-                // No need to refresh data as reconciliation doesn't modify records
-                Logger?.LogInformation("Opened fuel reconciliation dialog");
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "Error opening fuel reconciliation dialog");
-                MessageBox.Show($"Error opening fuel reconciliation: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+                using (LogContext.PushProperty("OperationType", "ShowFuelReconciliation"))
+                {
+                    Logger.Information("Opening fuel reconciliation dialog");
+
+                    var dialog = new FuelReconciliationDialog(_fuelService, _busService);
+                    _ = dialog.ShowDialog();
+
+                    // No need to refresh data as reconciliation doesn't modify records
+                    Logger.Information("Opened fuel reconciliation dialog");
+                }
+            });
         }
 
         private void CalculateTrends()
         {
-            try
+            using (LogContext.PushProperty("ViewModelType", nameof(FuelManagementViewModel)))
+            using (LogContext.PushProperty("OperationType", "CalculateTrends"))
             {
-                FuelTrends.Clear();
-                // Simple trend: average MPG per month
-                var grouped = new System.Linq.EnumerableQuery<Fuel>(FuelRecords)
-                    .GroupBy(f => new { f.FuelDate.Year, f.FuelDate.Month })
-                    .Select(g => new FuelTrendPoint
-                    {
-                        Period = new DateTime(g.Key.Year, g.Key.Month, 1),
-                        AvgMPG = g.Average(f => f.Gallons.HasValue && f.Gallons > 0 ? (f.VehicleOdometerReading / (double)f.Gallons.Value) : 0)
-                    });
-                foreach (var pt in grouped)
-                    FuelTrends.Add(pt);
+                try
+                {
+                    Logger.Information("Calculating fuel trends");
 
-                Logger?.LogInformation("Calculated {TrendPointCount} fuel trend points", FuelTrends.Count);
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "Error calculating fuel trends");
+                    FuelTrends.Clear();
+                    // Simple trend: average MPG per month
+                    var grouped = new System.Linq.EnumerableQuery<Fuel>(FuelRecords)
+                        .GroupBy(f => new { f.FuelDate.Year, f.FuelDate.Month })
+                        .Select(g => new FuelTrendPoint
+                        {
+                            Period = new DateTime(g.Key.Year, g.Key.Month, 1),
+                            AvgMPG = g.Average(f => f.Gallons.HasValue && f.Gallons > 0 ? (f.VehicleOdometerReading / (double)f.Gallons.Value) : 0)
+                        });
+                    foreach (var pt in grouped)
+                        FuelTrends.Add(pt);
+
+                    Logger.Information("Calculated {TrendPointCount} fuel trend points", FuelTrends.Count);
+                }
+                catch (Exception ex)
+                {
+                    using (LogContext.PushProperty("ExceptionType", ex.GetType().Name))
+                    {
+                        Logger.Error(ex, "Error calculating fuel trends: {ErrorMessage}", ex.Message);
+                    }
+                }
             }
         }
 

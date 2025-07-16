@@ -4,17 +4,19 @@ using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
 using Syncfusion.UI.Xaml.Scheduler;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
+using Serilog;
 
 namespace BusBuddy.WPF.ViewModels.Schedule
 {
     public partial class ScheduleManagementViewModel : BaseInDevelopmentViewModel
     {
+        private static readonly new ILogger Logger = Log.ForContext<ScheduleManagementViewModel>();
+
         private readonly IScheduleService _scheduleService;
         private readonly IBusService _busService;
         private readonly IDriverService _driverService;
@@ -101,9 +103,8 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         public ScheduleManagementViewModel(
             IScheduleService scheduleService,
             IBusService busService,
-            IDriverService driverService,
-            ILogger<ScheduleManagementViewModel>? logger = null)
-            : base(logger)
+            IDriverService driverService)
+            : base()
         {
             _scheduleService = scheduleService;
             _busService = busService;
@@ -189,11 +190,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 await LoadResourcesAsync();
                 await UpdateStatisticsAsync();
 
-                Logger?.LogInformation("Loaded schedules, buses, and drivers data");
+                Logger.Information("Loaded schedules, buses, and drivers data");
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading schedule data");
+                Logger.Error(ex, "Error loading schedule data");
             }
             finally
             {
@@ -230,11 +231,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                     ScheduleAppointments.Add(appointment);
                 }
 
-                Logger?.LogInformation("Loaded {AppointmentCount} schedule appointments", ScheduleAppointments.Count);
+                Logger.Information("Loaded {AppointmentCount} schedule appointments", ScheduleAppointments.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading schedule appointments");
+                Logger.Error(ex, "Error loading schedule appointments");
             }
 
             return Task.CompletedTask;
@@ -272,12 +273,12 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                     DriverResources.Add(resource);
                 }
 
-                Logger?.LogInformation("Loaded {BusResourceCount} bus resources and {DriverResourceCount} driver resources",
+                Logger.Information("Loaded {BusResourceCount} bus resources and {DriverResourceCount} driver resources",
                     BusResources.Count, DriverResources.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading resources");
+                Logger.Error(ex, "Error loading resources");
             }
 
             return Task.CompletedTask;
@@ -296,12 +297,12 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 ConflictCount = await DetectConflictsAsync();
                 TotalSchedules = Schedules.Count;
 
-                Logger?.LogInformation("Updated schedule statistics: Today={Today}, Week={Week}, Conflicts={Conflicts}, Total={Total}",
+                Logger.Information("Updated schedule statistics: Today={Today}, Week={Week}, Conflicts={Conflicts}, Total={Total}",
                     TodayScheduleCount, WeekScheduleCount, ConflictCount, TotalSchedules);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error updating statistics");
+                Logger.Error(ex, "Error updating statistics");
             }
         }
 
@@ -373,7 +374,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         {
             if (SelectedSchedule != null)
             {
-                Logger?.LogInformation("Viewing details for schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                Logger.Information("Viewing details for schedule {ScheduleId}", SelectedSchedule.ScheduleId);
                 // TODO: Open schedule details dialog
             }
             return Task.CompletedTask;
@@ -383,7 +384,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         {
             if (SelectedSchedule != null)
             {
-                Logger?.LogInformation("Editing schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                Logger.Information("Editing schedule {ScheduleId}", SelectedSchedule.ScheduleId);
                 // TODO: Open schedule edit dialog
             }
             return Task.CompletedTask;
@@ -409,11 +410,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
 
                     await _scheduleService.AddScheduleAsync(newSchedule);
                     await LoadDataAsync();
-                    Logger?.LogInformation("Duplicated schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                    Logger.Information("Duplicated schedule {ScheduleId}", SelectedSchedule.ScheduleId);
                 }
                 catch (Exception ex)
                 {
-                    Logger?.LogError(ex, "Error duplicating schedule");
+                    Logger.Error(ex, "Error duplicating schedule");
                 }
             }
         }
@@ -422,7 +423,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         {
             if (SelectedSchedule != null)
             {
-                Logger?.LogInformation("Rescheduling schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                Logger.Information("Rescheduling schedule {ScheduleId}", SelectedSchedule.ScheduleId);
                 // TODO: Open reschedule dialog
             }
             return Task.CompletedTask;
@@ -438,11 +439,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                     SelectedSchedule.UpdatedDate = DateTime.UtcNow;
                     await _scheduleService.UpdateScheduleAsync(SelectedSchedule);
                     await LoadDataAsync();
-                    Logger?.LogInformation("Marked schedule {ScheduleId} as complete", SelectedSchedule.ScheduleId);
+                    Logger.Information("Marked schedule {ScheduleId} as complete", SelectedSchedule.ScheduleId);
                 }
                 catch (Exception ex)
                 {
-                    Logger?.LogError(ex, "Error marking schedule as complete");
+                    Logger.Error(ex, "Error marking schedule as complete");
                 }
             }
         }
@@ -457,11 +458,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                     SelectedSchedule.UpdatedDate = DateTime.UtcNow;
                     await _scheduleService.UpdateScheduleAsync(SelectedSchedule);
                     await LoadDataAsync();
-                    Logger?.LogInformation("Cancelled schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                    Logger.Information("Cancelled schedule {ScheduleId}", SelectedSchedule.ScheduleId);
                 }
                 catch (Exception ex)
                 {
-                    Logger?.LogError(ex, "Error cancelling schedule");
+                    Logger.Error(ex, "Error cancelling schedule");
                 }
             }
         }
@@ -470,7 +471,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         {
             if (SelectedSchedule != null)
             {
-                Logger?.LogInformation("Adding schedule {ScheduleId} to route", SelectedSchedule.ScheduleId);
+                Logger.Information("Adding schedule {ScheduleId} to route", SelectedSchedule.ScheduleId);
                 // TODO: Implement route integration
             }
             return Task.CompletedTask;
@@ -479,35 +480,35 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         // Report generation methods
         private Task GenerateDailyReportAsync()
         {
-            Logger?.LogInformation("Generating daily report");
+            Logger.Information("Generating daily report");
             // TODO: Implement daily report generation
             return Task.CompletedTask;
         }
 
         private Task GenerateWeeklyReportAsync()
         {
-            Logger?.LogInformation("Generating weekly report");
+            Logger.Information("Generating weekly report");
             // TODO: Implement weekly report generation
             return Task.CompletedTask;
         }
 
         private Task GenerateUtilizationReportAsync()
         {
-            Logger?.LogInformation("Generating utilization report");
+            Logger.Information("Generating utilization report");
             // TODO: Implement utilization report generation
             return Task.CompletedTask;
         }
 
         private Task ExportScheduleAsync()
         {
-            Logger?.LogInformation("Exporting schedule data");
+            Logger.Information("Exporting schedule data");
             // TODO: Implement Excel export
             return Task.CompletedTask;
         }
 
         private Task GenerateScheduleReportAsync()
         {
-            Logger?.LogInformation("Generating schedule report");
+            Logger.Information("Generating schedule report");
             // TODO: Implement schedule report generation
             return Task.CompletedTask;
         }
@@ -522,11 +523,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 {
                     Schedules.Add(s);
                 }
-                Logger?.LogInformation("Loaded {ScheduleCount} schedules", Schedules.Count);
+                Logger.Information("Loaded {ScheduleCount} schedules", Schedules.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading schedules");
+                Logger.Error(ex, "Error loading schedules");
             }
         }
 
@@ -540,11 +541,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 {
                     Buses.Add(bus);
                 }
-                Logger?.LogInformation("Loaded {BusCount} buses", Buses.Count);
+                Logger.Information("Loaded {BusCount} buses", Buses.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading buses");
+                Logger.Error(ex, "Error loading buses");
             }
         }
 
@@ -558,11 +559,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 {
                     Drivers.Add(driver);
                 }
-                Logger?.LogInformation("Loaded {DriverCount} drivers", Drivers.Count);
+                Logger.Information("Loaded {DriverCount} drivers", Drivers.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading drivers");
+                Logger.Error(ex, "Error loading drivers");
             }
         }
 
@@ -576,11 +577,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                     SelectedSchedule.ScheduleDate = DateTime.Now;
                     await _scheduleService.AddScheduleAsync(SelectedSchedule);
                     await LoadSchedulesAsync();
-                    Logger?.LogInformation("Added new schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
+                    Logger.Information("Added new schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
                 }
                 catch (Exception ex)
                 {
-                    Logger?.LogError(ex, "Error adding schedule");
+                    Logger.Error(ex, "Error adding schedule");
                 }
             }
         }
@@ -593,11 +594,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 {
                     await _scheduleService.UpdateScheduleAsync(SelectedSchedule);
                     await LoadSchedulesAsync();
-                    Logger?.LogInformation("Updated schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
+                    Logger.Information("Updated schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
                 }
                 catch (Exception ex)
                 {
-                    Logger?.LogError(ex, "Error updating schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                    Logger.Error(ex, "Error updating schedule {ScheduleId}", SelectedSchedule.ScheduleId);
                 }
             }
         }
@@ -610,11 +611,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 {
                     await _scheduleService.DeleteScheduleAsync(SelectedSchedule.ScheduleId);
                     await LoadSchedulesAsync();
-                    Logger?.LogInformation("Deleted schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
+                    Logger.Information("Deleted schedule with ID {ScheduleId}", SelectedSchedule.ScheduleId);
                 }
                 catch (Exception ex)
                 {
-                    Logger?.LogError(ex, "Error deleting schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                    Logger.Error(ex, "Error deleting schedule {ScheduleId}", SelectedSchedule.ScheduleId);
                 }
             }
         }
@@ -631,7 +632,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
 
             if (value != null)
             {
-                Logger?.LogDebug("Selected schedule changed to ID {ScheduleId}", value.ScheduleId);
+                Logger.Debug("Selected schedule changed to ID {ScheduleId}", value.ScheduleId);
             }
         }
 
@@ -640,7 +641,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
             if (value != null)
             {
                 SelectedSchedulerViewType = value.ViewType;
-                Logger?.LogDebug("View type changed to {ViewType}", value.Name);
+                Logger.Debug("View type changed to {ViewType}", value.Name);
             }
         }
 
@@ -648,7 +649,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         {
             if (value != null)
             {
-                Logger?.LogDebug("Schedule filter changed to {Filter}", value.Name);
+                Logger.Debug("Schedule filter changed to {Filter}", value.Name);
                 _ = ApplyFilterAsync(value.FilterValue);
             }
         }
@@ -688,11 +689,11 @@ namespace BusBuddy.WPF.ViewModels.Schedule
                 await LoadScheduleAppointmentsAsync();
                 await UpdateStatisticsAsync();
 
-                Logger?.LogInformation("Applied filter {Filter}, showing {Count} schedules", filterValue, Schedules.Count);
+                Logger.Information("Applied filter {Filter}, showing {Count} schedules", filterValue, Schedules.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error applying filter {Filter}", filterValue);
+                Logger.Error(ex, "Error applying filter {Filter}", filterValue);
             }
             finally
             {
@@ -722,3 +723,5 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         }
     }
 }
+
+

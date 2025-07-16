@@ -1,6 +1,6 @@
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -17,22 +17,20 @@ namespace BusBuddy.WPF.Services
         private readonly IDriverService _driverService;
         private readonly IRouteService _routeService;
         private readonly IStudentService _studentService;
-        private readonly ILogger<StartupPreloadService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<StartupPreloadService>();
 
         public StartupPreloadService(
             IEnhancedCachingService cachingService,
             IBusService busService,
             IDriverService driverService,
             IRouteService routeService,
-            IStudentService studentService,
-            ILogger<StartupPreloadService> logger)
+            IStudentService studentService)
         {
             _cachingService = cachingService;
             _busService = busService;
             _driverService = driverService;
             _routeService = routeService;
             _studentService = studentService;
-            _logger = logger;
         }
 
         /// <summary>
@@ -40,7 +38,7 @@ namespace BusBuddy.WPF.Services
         /// </summary>
         public async Task PreloadEssentialDataAsync()
         {
-            _logger.LogInformation("Starting essential data preload");
+            Logger.Information("Starting essential data preload");
             var overallStopwatch = Stopwatch.StartNew();
 
             try
@@ -57,12 +55,12 @@ namespace BusBuddy.WPF.Services
                 await Task.WhenAll(preloadTasks);
 
                 overallStopwatch.Stop();
-                _logger.LogInformation("Essential data preload completed in {ElapsedMs}ms", overallStopwatch.ElapsedMilliseconds);
+                Logger.Information("Essential data preload completed in {ElapsedMs}ms", overallStopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
                 overallStopwatch.Stop();
-                _logger.LogError(ex, "Error during essential data preload after {ElapsedMs}ms", overallStopwatch.ElapsedMilliseconds);
+                Logger.Error(ex, "Error during essential data preload after {ElapsedMs}ms", overallStopwatch.ElapsedMilliseconds);
                 throw;
             }
         }
@@ -72,7 +70,7 @@ namespace BusBuddy.WPF.Services
         /// </summary>
         public async Task PreloadDashboardDataAsync()
         {
-            _logger.LogInformation("Starting dashboard data preload");
+            Logger.Information("Starting dashboard data preload");
             var stopwatch = Stopwatch.StartNew();
 
             try
@@ -81,12 +79,12 @@ namespace BusBuddy.WPF.Services
                 await PreloadEssentialDataAsync();
 
                 stopwatch.Stop();
-                _logger.LogInformation("Dashboard data preload completed in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Information("Dashboard data preload completed in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger.LogError(ex, "Error during dashboard data preload after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Error(ex, "Error during dashboard data preload after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
                 throw;
             }
         }
@@ -136,7 +134,7 @@ namespace BusBuddy.WPF.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting preload statistics");
+                Logger.Error(ex, "Error getting preload statistics");
                 stats.IsDataCached = false;
             }
 
@@ -150,11 +148,11 @@ namespace BusBuddy.WPF.Services
                 var stopwatch = Stopwatch.StartNew();
                 await _cachingService.GetAllBusesAsync(async () => await _busService.GetAllBusesAsync());
                 stopwatch.Stop();
-                _logger.LogDebug("Preloaded buses in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Debug("Preloaded buses in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error preloading buses");
+                Logger.Error(ex, "Error preloading buses");
             }
         }
 
@@ -165,11 +163,11 @@ namespace BusBuddy.WPF.Services
                 var stopwatch = Stopwatch.StartNew();
                 await _cachingService.GetAllDriversAsync(async () => await _driverService.GetAllDriversAsync());
                 stopwatch.Stop();
-                _logger.LogDebug("Preloaded drivers in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Debug("Preloaded drivers in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error preloading drivers");
+                Logger.Error(ex, "Error preloading drivers");
             }
         }
 
@@ -180,11 +178,11 @@ namespace BusBuddy.WPF.Services
                 var stopwatch = Stopwatch.StartNew();
                 await _cachingService.GetAllRoutesAsync(async () => await _routeService.GetAllActiveRoutesAsync());
                 stopwatch.Stop();
-                _logger.LogDebug("Preloaded routes in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Debug("Preloaded routes in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error preloading routes");
+                Logger.Error(ex, "Error preloading routes");
             }
         }
 
@@ -195,11 +193,11 @@ namespace BusBuddy.WPF.Services
                 var stopwatch = Stopwatch.StartNew();
                 await _cachingService.GetAllStudentsAsync(async () => await _studentService.GetAllStudentsAsync());
                 stopwatch.Stop();
-                _logger.LogDebug("Preloaded students in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Debug("Preloaded students in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error preloading students");
+                Logger.Error(ex, "Error preloading students");
             }
         }
     }

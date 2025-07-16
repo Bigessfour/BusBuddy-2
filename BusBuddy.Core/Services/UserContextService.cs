@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Services
 {
@@ -8,15 +8,13 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class UserContextService : IUserContextService
     {
-        private readonly ILogger<UserContextService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<UserContextService>();
         private string _currentUserId = string.Empty;
         private string _currentUserName = string.Empty;
         private string _currentUserEmail = string.Empty;
 
-        public UserContextService(ILogger<UserContextService> logger)
+        public UserContextService()
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
             // For now, set a default system user
             // TODO: Replace with actual authentication when implemented
             SetDefaultUser();
@@ -54,7 +52,7 @@ namespace BusBuddy.Core.Services
             _currentUserName = userName ?? throw new ArgumentNullException(nameof(userName));
             _currentUserEmail = userEmail ?? string.Empty;
 
-            _logger.LogInformation("User context set for user: {UserId} ({UserName})", userId, userName);
+            Logger.Information("User context set for user: {UserId} ({UserName})", userId, userName);
         }
 
         /// <summary>
@@ -67,7 +65,7 @@ namespace BusBuddy.Core.Services
             _currentUserName = string.Empty;
             _currentUserEmail = string.Empty;
 
-            _logger.LogInformation("User context cleared for user: {UserId}", previousUser);
+            Logger.Information("User context cleared for user: {UserId}", previousUser);
         }
 
         /// <summary>
@@ -98,7 +96,7 @@ namespace BusBuddy.Core.Services
                 userEmail: "admin@busbuddy.local"
             );
 
-            _logger.LogDebug("Default user context established for development");
+            Logger.Debug("Default user context established for development");
         }
     }
 }

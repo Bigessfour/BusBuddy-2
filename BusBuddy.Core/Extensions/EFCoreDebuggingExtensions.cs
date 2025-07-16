@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Diagnostics;
 using System.Text;
 
@@ -13,12 +14,13 @@ namespace BusBuddy.Core.Extensions;
 /// </summary>
 public static class EFCoreDebuggingExtensions
 {
+    private static readonly Serilog.ILogger Logger = Log.ForContext("SourceContext", "EFCoreDebuggingExtensions");
+
     /// <summary>
     /// Configure DbContext for comprehensive debugging and logging
     /// </summary>
     public static DbContextOptionsBuilder EnableComprehensiveDebugging(
-        this DbContextOptionsBuilder optionsBuilder,
-        ILogger? logger = null)
+        this DbContextOptionsBuilder optionsBuilder)
     {
         return optionsBuilder
             .EnableSensitiveDataLogging() // Show parameter values in logs
@@ -27,7 +29,7 @@ public static class EFCoreDebuggingExtensions
             .LogTo(message =>
             {
                 Debug.WriteLine(message);
-                logger?.LogDebug(message);
+                Logger.Debug(message);
             }, LogLevel.Information)
             .ConfigureWarnings(warnings => warnings
                 .Throw(RelationalEventId.QueryPossibleUnintendedUseOfEqualsWarning)
@@ -106,7 +108,6 @@ public static class EFCoreDebuggingExtensions
     public static async Task<T> ExecuteWithDebugInfoAsync<T>(
         this DbContext context,
         Func<Task<T>> queryFunc,
-        ILogger? logger = null,
         string? queryName = null)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -114,14 +115,14 @@ public static class EFCoreDebuggingExtensions
 
         try
         {
-            logger?.LogDebug("Starting query execution: {QueryName}", queryName ?? "Unknown");
+            Logger.Debug("Starting query execution: {QueryName}", queryName ?? "Unknown");
 
             var result = await queryFunc();
 
             stopwatch.Stop();
             var afterTrackingInfo = context.ChangeTracker.Entries().Count();
 
-            logger?.LogInformation(
+            Logger.Information(
                 "Query completed: {QueryName}, Duration: {Duration}ms, " +
                 "Entities before: {Before}, Entities after: {After}",
                 queryName ?? "Unknown",
@@ -135,7 +136,7 @@ public static class EFCoreDebuggingExtensions
         {
             stopwatch.Stop();
 
-            logger?.LogError(ex,
+            Logger.Error(ex,
                 "Query failed: {QueryName}, Duration: {Duration}ms, Error: {Error}",
                 queryName ?? "Unknown",
                 stopwatch.ElapsedMilliseconds,
@@ -168,7 +169,7 @@ public static class EFCoreDebuggingExtensions
             {
                 // Get database size and other statistics via raw SQL
                 var sizeQuery = @"
-                    SELECT 
+                    SELECT
                         DB_NAME() as DatabaseName,
                         SUM(CAST(FILEPROPERTY(name, 'SpaceUsed') AS bigint) * 8192.) / 1024 / 1024 as SizeMB,
                         COUNT(*) as FileCount

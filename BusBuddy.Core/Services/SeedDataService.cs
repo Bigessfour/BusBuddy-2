@@ -1,7 +1,7 @@
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Services
 {
@@ -12,12 +12,11 @@ namespace BusBuddy.Core.Services
     public class SeedDataService : ISeedDataService
     {
         private readonly IBusBuddyDbContextFactory _contextFactory;
-        private readonly ILogger<SeedDataService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<SeedDataService>();
 
-        public SeedDataService(IBusBuddyDbContextFactory contextFactory, ILogger<SeedDataService> logger)
+        public SeedDataService(IBusBuddyDbContextFactory contextFactory)
         {
             _contextFactory = contextFactory;
-            _logger = logger;
         }
 
         /// <summary>
@@ -33,11 +32,11 @@ namespace BusBuddy.Core.Services
                 var existingCount = await context.ActivityLogs.CountAsync();
                 if (existingCount >= count)
                 {
-                    _logger.LogInformation("ActivityLogs already contain {ExistingCount} records. Skipping seed.", existingCount);
+                    Logger.Information("ActivityLogs already contain {ExistingCount} records. Skipping seed.", existingCount);
                     return;
                 }
 
-                _logger.LogInformation("Seeding {Count} sample activity logs...", count);
+                Logger.Information("Seeding {Count} sample activity logs...", count);
 
                 var random = new Random();
                 var actions = new[] { "User Login", "Data Export", "Report Generated", "Settings Changed", "Database Backup", "System Maintenance" };
@@ -58,11 +57,11 @@ namespace BusBuddy.Core.Services
                 context.ActivityLogs.AddRange(logs);
                 await context.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully seeded {Count} activity logs", count);
+                Logger.Information("Successfully seeded {Count} activity logs", count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error seeding activity logs");
+                Logger.Error(ex, "Error seeding activity logs");
                 throw;
             }
         }
@@ -80,11 +79,11 @@ namespace BusBuddy.Core.Services
                 var existingCount = await context.Drivers.CountAsync();
                 if (existingCount >= count)
                 {
-                    _logger.LogInformation("Drivers already contain {ExistingCount} records. Skipping seed.", existingCount);
+                    Logger.Information("Drivers already contain {ExistingCount} records. Skipping seed.", existingCount);
                     return;
                 }
 
-                _logger.LogInformation("Seeding {Count} sample drivers...", count);
+                Logger.Information("Seeding {Count} sample drivers...", count);
 
                 var random = new Random();
                 var firstNames = new[] { "John", "Jane", "Mike", "Sarah", "David", "Lisa", "Tom", "Anna", "Chris", "Emma" };
@@ -116,11 +115,11 @@ namespace BusBuddy.Core.Services
                 context.Drivers.AddRange(drivers);
                 await context.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully seeded {Count} drivers", count);
+                Logger.Information("Successfully seeded {Count} drivers", count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error seeding drivers");
+                Logger.Error(ex, "Error seeding drivers");
                 throw;
             }
         }
@@ -130,12 +129,12 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task SeedAllAsync()
         {
-            _logger.LogInformation("Starting full development data seeding...");
+            Logger.Information("Starting full development data seeding...");
 
             await SeedActivityLogsAsync(100);
             await SeedDriversAsync(15);
 
-            _logger.LogInformation("Development data seeding completed");
+            Logger.Information("Development data seeding completed");
         }
 
         /// <summary>
@@ -147,7 +146,7 @@ namespace BusBuddy.Core.Services
             {
                 using var context = _contextFactory.CreateDbContext();
 
-                _logger.LogWarning("Clearing all seeded data...");
+                Logger.Warning("Clearing all seeded data...");
 
                 // Only clear data created by seed service
                 var seedLogs = await context.ActivityLogs
@@ -161,21 +160,21 @@ namespace BusBuddy.Core.Services
                 if (seedLogs.Any())
                 {
                     context.ActivityLogs.RemoveRange(seedLogs);
-                    _logger.LogInformation("Removed {Count} seeded activity logs", seedLogs.Count);
+                    Logger.Information("Removed {Count} seeded activity logs", seedLogs.Count);
                 }
 
                 if (seedDrivers.Any())
                 {
                     context.Drivers.RemoveRange(seedDrivers);
-                    _logger.LogInformation("Removed {Count} seeded drivers", seedDrivers.Count);
+                    Logger.Information("Removed {Count} seeded drivers", seedDrivers.Count);
                 }
 
                 await context.SaveChangesAsync();
-                _logger.LogInformation("Seed data clearing completed");
+                Logger.Information("Seed data clearing completed");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error clearing seed data");
+                Logger.Error(ex, "Error clearing seed data");
                 throw;
             }
         }

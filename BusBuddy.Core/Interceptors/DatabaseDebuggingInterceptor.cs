@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Collections.Concurrent;
@@ -12,14 +12,14 @@ namespace BusBuddy.Core.Interceptors;
 /// </summary>
 public class DatabaseDebuggingInterceptor : DbCommandInterceptor
 {
-    private readonly ILogger<DatabaseDebuggingInterceptor> _logger;
+    private static readonly ILogger Logger = Log.ForContext<DatabaseDebuggingInterceptor>();
     private readonly ConcurrentDictionary<DbCommand, Stopwatch> _commandTimers = new();
     private readonly ConcurrentQueue<QueryExecutionInfo> _recentQueries = new();
     private const int MaxRecentQueries = 100;
 
-    public DatabaseDebuggingInterceptor(ILogger<DatabaseDebuggingInterceptor> logger)
+    public DatabaseDebuggingInterceptor()
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        // No parameters needed - using static Logger
     }
 
     public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
@@ -104,7 +104,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         var stopwatch = Stopwatch.StartNew();
         _commandTimers[command] = stopwatch;
 
-        _logger.LogDebug("Starting {Operation}: {CommandText}",
+        Logger.Debug("Starting {Operation}: {CommandText}",
             operation,
             TruncateCommandText(command.CommandText));
     }
@@ -157,7 +157,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
     {
         if (isError)
         {
-            _logger.LogError("SQL Command Failed: {Operation} in {Duration}ms - {Error}\nSQL: {CommandText}",
+            Logger.Error("SQL Command Failed: {Operation} in {Duration}ms - {Error}\nSQL: {CommandText}",
                 queryInfo.Operation,
                 queryInfo.DurationMs,
                 queryInfo.Error,
@@ -165,14 +165,14 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         }
         else if (queryInfo.DurationMs > 1000) // Log slow queries
         {
-            _logger.LogWarning("Slow SQL Query: {Operation} took {Duration}ms\nSQL: {CommandText}",
+            Logger.Warning("Slow SQL Query: {Operation} took {Duration}ms\nSQL: {CommandText}",
                 queryInfo.Operation,
                 queryInfo.DurationMs,
                 TruncateCommandText(queryInfo.CommandText));
         }
         else
         {
-            _logger.LogDebug("SQL Command Completed: {Operation} in {Duration}ms",
+            Logger.Debug("SQL Command Completed: {Operation} in {Duration}ms",
                 queryInfo.Operation,
                 queryInfo.DurationMs);
         }

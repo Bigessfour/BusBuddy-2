@@ -12,8 +12,8 @@ using BusBuddy.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using BusBuddy.WPF.Utilities;
+using Serilog;
 using Serilog.Context;
 using BusBuddy.Core;
 using BusBuddy.Core.Services;
@@ -116,7 +116,6 @@ namespace BusBuddy.WPF.ViewModels
 
     public class DashboardViewModel : BaseViewModel
     {
-        private readonly ILogger<DashboardViewModel> _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly PerformanceMonitor _performanceMonitor;
         private readonly IBusService _busService;
@@ -160,7 +159,6 @@ namespace BusBuddy.WPF.ViewModels
         private ObservableCollection<DashboardTileModel> _dashboardTiles;
 
         public DashboardViewModel(
-            ILogger<DashboardViewModel> logger,
             IServiceProvider serviceProvider,
             PerformanceMonitor performanceMonitor,
             IBusService busService,
@@ -170,7 +168,6 @@ namespace BusBuddy.WPF.ViewModels
             IEnhancedCachingService cachingService,
             LoadingViewModel? loadingViewModel = null)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _performanceMonitor = performanceMonitor ?? throw new ArgumentNullException(nameof(performanceMonitor));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
@@ -180,14 +177,18 @@ namespace BusBuddy.WPF.ViewModels
             _cachingService = cachingService ?? throw new ArgumentNullException(nameof(cachingService));
             LoadingViewModel = loadingViewModel;
 
-            // Initialize dashboard tiles and chart data
-            _dashboardTiles = InitializeDashboardTiles();
-            InitializeChartData();
+            using (LogContext.PushProperty("ViewModelType", nameof(DashboardViewModel)))
+            using (LogContext.PushProperty("OperationType", "Construction"))
+            {
+                Logger.Information("DashboardViewModel constructor started");
 
-            _logger.LogInformation("DashboardViewModel constructor completed successfully");
+                // Initialize dashboard tiles and chart data
+                _dashboardTiles = InitializeDashboardTiles();
+                InitializeChartData();
+
+                Logger.Information("DashboardViewModel constructor completed successfully");
+            }
         }
-
-        protected override ILogger? GetLogger() => _logger;
 
         private ObservableCollection<DashboardTileModel> InitializeDashboardTiles()
         {
@@ -224,17 +225,29 @@ namespace BusBuddy.WPF.ViewModels
 
         private void NavigateToBusManagement()
         {
-            _logger.LogInformation("Navigating to Bus Management");
+            using (LogContext.PushProperty("ViewModelType", nameof(DashboardViewModel)))
+            using (LogContext.PushProperty("OperationType", "Navigation"))
+            {
+                Logger.Information("Navigating to Bus Management");
+            }
         }
 
         private void NavigateToDriverManagement()
         {
-            _logger.LogInformation("Navigating to Driver Management");
+            using (LogContext.PushProperty("ViewModelType", nameof(DashboardViewModel)))
+            using (LogContext.PushProperty("OperationType", "Navigation"))
+            {
+                Logger.Information("Navigating to Driver Management");
+            }
         }
 
         private void NavigateToRouteManagement()
         {
-            _logger.LogInformation("Navigating to Route Management");
+            using (LogContext.PushProperty("ViewModelType", nameof(DashboardViewModel)))
+            using (LogContext.PushProperty("OperationType", "Navigation"))
+            {
+                Logger.Information("Navigating to Route Management");
+            }
         }
 
         // Required public properties
@@ -364,19 +377,26 @@ namespace BusBuddy.WPF.ViewModels
         // Required methods that are being called from the views
         public async Task InitializeAsync()
         {
-            _logger.LogInformation("DashboardViewModel.InitializeAsync called");
-
-            try
+            using (LogContext.PushProperty("ViewModelType", nameof(DashboardViewModel)))
+            using (LogContext.PushProperty("OperationType", "Initialization"))
             {
-                // Load initial data
-                await RefreshDashboardDataAsync();
+                Logger.Information("DashboardViewModel.InitializeAsync called");
 
-                _logger.LogInformation("Dashboard initialization completed successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during dashboard initialization: {ErrorMessage}", ex.Message);
-                throw;
+                try
+                {
+                    // Load initial data
+                    await RefreshDashboardDataAsync();
+
+                    Logger.Information("Dashboard initialization completed successfully");
+                }
+                catch (Exception ex)
+                {
+                    using (LogContext.PushProperty("ExceptionType", ex.GetType().Name))
+                    {
+                        Logger.Error(ex, "Error during dashboard initialization: {ErrorMessage}", ex.Message);
+                    }
+                    throw;
+                }
             }
         }
 
@@ -385,67 +405,98 @@ namespace BusBuddy.WPF.ViewModels
             // Prevent concurrent refreshes
             if (_isRefreshing)
             {
-                _logger.LogDebug("Skipping dashboard refresh - already in progress");
+                Logger.Debug("Skipping dashboard refresh - already in progress");
                 return;
             }
 
-            try
+            var correlationId = Guid.NewGuid().ToString("N")[..8];
+
+            using (LogContext.PushProperty("CorrelationId", correlationId))
+            using (LogContext.PushProperty("ViewModelType", nameof(DashboardViewModel)))
+            using (LogContext.PushProperty("OperationType", "DashboardRefresh"))
             {
-                _isRefreshing = true;
-                _logger.LogInformation("Starting dashboard data refresh");
+                var stopwatch = Stopwatch.StartNew();
 
-                // Load data from services
-                var metrics = await _dashboardMetricsService.GetDashboardMetricsAsync();
-
-                if (metrics != null)
+                try
                 {
-                    if (metrics.TryGetValue("BusCount", out int busCount))
-                    {
-                        TotalBuses = busCount;
-                    }
+                    _isRefreshing = true;
+                    Logger.Information("Starting dashboard data refresh");
 
-                    if (metrics.TryGetValue("DriverCount", out int driverCount))
+                    // Load data from services with performance monitoring
+                    await _performanceMonitor.TrackOperationAsync("DashboardRefresh", async () =>
                     {
-                        TotalDrivers = driverCount;
-                    }
+                        var metrics = await _dashboardMetricsService.GetDashboardMetricsAsync();
 
-                    if (metrics.TryGetValue("RouteCount", out int routeCount))
+                        if (metrics != null)
+                        {
+                            if (metrics.TryGetValue("BusCount", out int busCount))
+                            {
+                                TotalBuses = busCount;
+                            }
+
+                            if (metrics.TryGetValue("DriverCount", out int driverCount))
+                            {
+                                TotalDrivers = driverCount;
+                            }
+
+                            if (metrics.TryGetValue("RouteCount", out int routeCount))
+                            {
+                                TotalActiveRoutes = routeCount;
+                            }
+                        }
+
+                        // Calculate real-time metrics
+                        if (TotalBuses > 0)
+                        {
+                            ActiveBusCount = (int)(TotalBuses * (new Random().Next(70, 95) / 100.0));
+                            FleetActivePercentage = (ActiveBusCount / (double)TotalBuses) * 100;
+                            OnPropertyChanged(nameof(FleetActivePercentageFormatted));
+                        }
+
+                        if (TotalDrivers > 0)
+                        {
+                            AvailableDriverCount = (int)(TotalDrivers * (new Random().Next(75, 95) / 100.0));
+                            DriverAvailabilityPercentage = (AvailableDriverCount / (double)TotalDrivers) * 100;
+                            OnPropertyChanged(nameof(DriverAvailabilityPercentageFormatted));
+                        }
+
+                        // Update dashboard tiles
+                        UpdateDashboardTiles();
+
+                        // Update chart data
+                        UpdateChartData();
+                    });
+
+                    stopwatch.Stop();
+
+                    Logger.Information("Dashboard data refresh completed in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+
+                    // Log performance metrics
+                    Logger.Information("Dashboard performance metrics: {@Metrics}", new
                     {
-                        TotalActiveRoutes = routeCount;
-                    }
+                        RefreshTime = stopwatch.ElapsedMilliseconds,
+                        BusCount = ActiveBusCount,
+                        DriverCount = AvailableDriverCount,
+                        RouteCount = TotalActiveRoutes,
+                        FleetActivePercentage,
+                        DriverAvailabilityPercentage
+                    });
                 }
-
-                // Calculate real-time metrics
-                if (TotalBuses > 0)
+                catch (Exception ex)
                 {
-                    ActiveBusCount = (int)(TotalBuses * (new Random().Next(70, 95) / 100.0));
-                    FleetActivePercentage = (ActiveBusCount / (double)TotalBuses) * 100;
-                    OnPropertyChanged(nameof(FleetActivePercentageFormatted));
-                }
+                    stopwatch.Stop();
 
-                if (TotalDrivers > 0)
+                    using (LogContext.PushProperty("ExceptionType", ex.GetType().Name))
+                    {
+                        Logger.Error(ex, "Dashboard refresh failed after {ElapsedMs}ms: {ErrorMessage}",
+                            stopwatch.ElapsedMilliseconds, ex.Message);
+                    }
+                    throw;
+                }
+                finally
                 {
-                    AvailableDriverCount = (int)(TotalDrivers * (new Random().Next(75, 95) / 100.0));
-                    DriverAvailabilityPercentage = (AvailableDriverCount / (double)TotalDrivers) * 100;
-                    OnPropertyChanged(nameof(DriverAvailabilityPercentageFormatted));
+                    _isRefreshing = false;
                 }
-
-                // Update dashboard tiles
-                UpdateDashboardTiles();
-
-                // Update chart data
-                UpdateChartData();
-
-                _logger.LogInformation("Dashboard data refresh completed");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during dashboard refresh: {ErrorMessage}", ex.Message);
-                throw;
-            }
-            finally
-            {
-                _isRefreshing = false;
             }
         }
 

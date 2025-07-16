@@ -1,6 +1,5 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -76,8 +75,8 @@ namespace BusBuddy.WPF.ViewModels
         public ICommand ClearFiltersCommand { get; }
         public ICommand ViewDetailsCommand { get; }
 
-        public ActivityLoggingViewModel(IActivityLogService logService, ILogger<ActivityLoggingViewModel>? logger = null)
-            : base(logger)
+        public ActivityLoggingViewModel(IActivityLogService logService)
+            : base()
         {
             _logService = logService;
 
@@ -98,7 +97,7 @@ namespace BusBuddy.WPF.ViewModels
             try
             {
                 IsLoading = true;
-                Logger?.LogDebug("Refreshing activity logs with filter: Start={StartDate}, End={EndDate}, Search={SearchText}",
+                Logger.Debug("Refreshing activity logs with filter: Start={StartDate}, End={EndDate}, Search={SearchText}",
                     StartDate, EndDate, SearchText);
 
                 // Use the optimized date range method if dates are specified
@@ -140,11 +139,11 @@ namespace BusBuddy.WPF.ViewModels
                     }
                 }
 
-                Logger?.LogInformation("Loaded {FilteredCount} activity logs after filtering", Logs.Count);
+                Logger.Information("Loaded {FilteredCount} activity logs after filtering", Logs.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading activity logs");
+                Logger.Error(ex, "Error loading activity logs");
                 MessageBox.Show($"Error loading activity logs: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
@@ -167,7 +166,7 @@ namespace BusBuddy.WPF.ViewModels
                 var result = dialog.ShowDialog();
                 if (result.HasValue && result.Value)
                 {
-                    Logger?.LogInformation("Exporting {LogCount} activity logs to {FilePath}", Logs.Count, dialog.FileName);
+                    Logger.Information("Exporting {LogCount} activity logs to {FilePath}", Logs.Count, dialog.FileName);
 
                     using var writer = new StreamWriter(dialog.FileName);
 
@@ -193,7 +192,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error exporting activity logs");
+                Logger.Error(ex, "Error exporting activity logs");
                 MessageBox.Show($"Error exporting activity logs: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

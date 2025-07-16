@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Serilog.Context;
 using System.Diagnostics;
 
@@ -10,12 +10,13 @@ namespace BusBuddy.Core.Extensions
     /// </summary>
     public static class DbContextExtensions
     {
+        private static readonly ILogger Logger = Log.ForContext("SourceContext", "DbContextExtensions");
+
         /// <summary>
         /// Executes a query with detailed performance logging
         /// </summary>
         public static async Task<T> ExecuteWithLoggingAsync<T>(
             this DbContext dbContext,
-            ILogger logger,
             string queryName,
             Func<Task<T>> queryFunc,
             string? additionalContextName = null,
@@ -30,7 +31,7 @@ namespace BusBuddy.Core.Extensions
                 {
                     using (LogContext.PushProperty(additionalContextName, additionalContextValue))
                     {
-                        logger.LogDebug("Starting database query: {QueryName}", queryName);
+                        Logger.Debug("Starting database query: {QueryName}", queryName);
                         try
                         {
                             var result = await queryFunc();
@@ -38,7 +39,7 @@ namespace BusBuddy.Core.Extensions
 
                             using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                             {
-                                logger.LogInformation("Database query {QueryName} completed in {Duration}ms",
+                                Logger.Information("Database query {QueryName} completed in {Duration}ms",
                                     queryName, stopwatch.ElapsedMilliseconds);
                             }
 
@@ -50,7 +51,7 @@ namespace BusBuddy.Core.Extensions
 
                             using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                             {
-                                logger.LogError(ex, "Database query {QueryName} failed after {Duration}ms",
+                                Logger.Error(ex, "Database query {QueryName} failed after {Duration}ms",
                                     queryName, stopwatch.ElapsedMilliseconds);
                             }
 
@@ -60,7 +61,7 @@ namespace BusBuddy.Core.Extensions
                 }
                 else
                 {
-                    logger.LogDebug("Starting database query: {QueryName}", queryName);
+                    Logger.Debug("Starting database query: {QueryName}", queryName);
                     try
                     {
                         var result = await queryFunc();
@@ -68,7 +69,7 @@ namespace BusBuddy.Core.Extensions
 
                         using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                         {
-                            logger.LogInformation("Database query {QueryName} completed in {Duration}ms",
+                            Logger.Information("Database query {QueryName} completed in {Duration}ms",
                                 queryName, stopwatch.ElapsedMilliseconds);
                         }
 
@@ -80,7 +81,7 @@ namespace BusBuddy.Core.Extensions
 
                         using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                         {
-                            logger.LogError(ex, "Database query {QueryName} failed after {Duration}ms",
+                            Logger.Error(ex, "Database query {QueryName} failed after {Duration}ms",
                                 queryName, stopwatch.ElapsedMilliseconds);
                         }
 
@@ -95,7 +96,6 @@ namespace BusBuddy.Core.Extensions
         /// </summary>
         public static async Task<int> SaveChangesWithLoggingAsync(
             this DbContext dbContext,
-            ILogger logger,
             string operationName,
             string? additionalContextName = null,
             object? additionalContextValue = null)
@@ -109,7 +109,7 @@ namespace BusBuddy.Core.Extensions
                 {
                     using (LogContext.PushProperty(additionalContextName, additionalContextValue))
                     {
-                        logger.LogDebug("Starting database operation: {OperationName}", operationName);
+                        Logger.Debug("Starting database operation: {OperationName}", operationName);
                         try
                         {
                             var entriesBeforeSave = dbContext.ChangeTracker.Entries().Count();
@@ -119,7 +119,7 @@ namespace BusBuddy.Core.Extensions
                             using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                             using (LogContext.PushProperty("ChangedEntities", result))
                             {
-                                logger.LogInformation("Database operation {OperationName} completed in {Duration}ms. Changed {ChangedEntities} entities.",
+                                Logger.Information("Database operation {OperationName} completed in {Duration}ms. Changed {ChangedEntities} entities.",
                                     operationName, stopwatch.ElapsedMilliseconds, result);
                             }
 
@@ -131,7 +131,7 @@ namespace BusBuddy.Core.Extensions
 
                             using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                             {
-                                logger.LogError(ex, "Database operation {OperationName} failed after {Duration}ms",
+                                Logger.Error(ex, "Database operation {OperationName} failed after {Duration}ms",
                                     operationName, stopwatch.ElapsedMilliseconds);
                             }
 
@@ -141,7 +141,7 @@ namespace BusBuddy.Core.Extensions
                 }
                 else
                 {
-                    logger.LogDebug("Starting database operation: {OperationName}", operationName);
+                    Logger.Debug("Starting database operation: {OperationName}", operationName);
                     try
                     {
                         var entriesBeforeSave = dbContext.ChangeTracker.Entries().Count();
@@ -151,7 +151,7 @@ namespace BusBuddy.Core.Extensions
                         using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                         using (LogContext.PushProperty("ChangedEntities", result))
                         {
-                            logger.LogInformation("Database operation {OperationName} completed in {Duration}ms. Changed {ChangedEntities} entities.",
+                            Logger.Information("Database operation {OperationName} completed in {Duration}ms. Changed {ChangedEntities} entities.",
                                 operationName, stopwatch.ElapsedMilliseconds, result);
                         }
 
@@ -163,7 +163,7 @@ namespace BusBuddy.Core.Extensions
 
                         using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                         {
-                            logger.LogError(ex, "Database operation {OperationName} failed after {Duration}ms",
+                            Logger.Error(ex, "Database operation {OperationName} failed after {Duration}ms",
                                 operationName, stopwatch.ElapsedMilliseconds);
                         }
 

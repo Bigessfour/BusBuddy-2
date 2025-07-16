@@ -6,14 +6,15 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using BusBuddy.Core.Models;
 
 namespace BusBuddy.WPF.Views.Bus
 {
     public partial class BusManagementView : UserControl
     {
-        private readonly ILogger<BusManagementView>? _logger;
+        private static readonly ILogger Logger = Log.ForContext<BusManagementView>();
         private bool _isInitialized = false;
 
         // Define a static method to check if InitializeComponent exists
@@ -24,51 +25,66 @@ namespace BusBuddy.WPF.Views.Bus
 
         public BusManagementView()
         {
-            // First attempt to create a minimal UI directly in code
-            // This ensures we have a functional UI even if XAML loading fails
-            CreateMinimalUI();
-
             try
             {
-                // Only try InitializeComponent if it exists
-                if (_initializeComponentExists)
+                using (LogContext.PushProperty("ViewType", nameof(BusManagementView)))
+                using (LogContext.PushProperty("OperationType", "ViewInitialization"))
                 {
-                    // Using dynamic invoke for resilience
-                    typeof(BusManagementView).GetMethod("InitializeComponent",
-                        System.Reflection.BindingFlags.Instance |
-                        System.Reflection.BindingFlags.NonPublic)?.Invoke(this, null);
+                    Logger.Information("BusManagementView initialization started");
 
-                    // If we got here, XAML loaded successfully, so remove the minimal UI
-                    this.Content = null; // Clear the minimal UI
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("InitializeComponent method not found, using minimal UI");
+                    // First attempt to create a minimal UI directly in code
+                    // This ensures we have a functional UI even if XAML loading fails
+                    CreateMinimalUI();
+
+                    try
+                    {
+                        // Only try InitializeComponent if it exists
+                        if (_initializeComponentExists)
+                        {
+                            // Using dynamic invoke for resilience
+                            typeof(BusManagementView).GetMethod("InitializeComponent",
+                                System.Reflection.BindingFlags.Instance |
+                                System.Reflection.BindingFlags.NonPublic)?.Invoke(this, null);
+
+                            // If we got here, XAML loaded successfully, so remove the minimal UI
+                            this.Content = null; // Clear the minimal UI
+                        }
+                        else
+                        {
+                            Logger.Debug("InitializeComponent method not found, using minimal UI");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the exception but continue with the minimal UI
+                        Logger.Warning(ex, "InitializeComponent failed: {ErrorMessage}", ex.Message);
+                    }
+
+                    // Use DI to resolve the real IBusService and viewmodel
+                    if (System.Windows.Application.Current is App app && app.Services != null)
+                    {
+                        var viewModel = app.Services.GetService<BusManagementViewModel>();
+                        DataContext = viewModel;
+
+                        // If we're using the minimal UI, connect the DataGrid to the ViewModel
+                        if (!_initializeComponentExists || this.Content is Grid grid)
+                        {
+                            ConnectMinimalUIToViewModel(viewModel);
+                        }
+                    }
+
+                    // Add handlers for the UserControl lifecycle
+                    Loaded += UserControl_Loaded;
+                    IsVisibleChanged += UserControl_IsVisibleChanged;
+
+                    Logger.Information("BusManagementView initialization completed successfully");
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception but continue with the minimal UI
-                System.Diagnostics.Debug.WriteLine($"InitializeComponent failed: {ex.Message}");
+                Logger.Error(ex, "Failed to initialize BusManagementView: {ErrorMessage}", ex.Message);
+                throw;
             }
-
-            // Use DI to resolve the real IBusService and viewmodel
-            if (System.Windows.Application.Current is App app && app.Services != null)
-            {
-                var viewModel = app.Services.GetService<BusManagementViewModel>();
-                DataContext = viewModel;
-                _logger = app.Services.GetService<ILogger<BusManagementView>>();
-
-                // If we're using the minimal UI, connect the DataGrid to the ViewModel
-                if (!_initializeComponentExists || this.Content is Grid grid)
-                {
-                    ConnectMinimalUIToViewModel(viewModel);
-                }
-            }
-
-            // Add handlers for the UserControl lifecycle
-            Loaded += UserControl_Loaded;
-            IsVisibleChanged += UserControl_IsVisibleChanged;
         }
 
         /// <summary>
@@ -76,7 +92,7 @@ namespace BusBuddy.WPF.Views.Bus
         /// </summary>
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            _logger?.LogDebug("BusManagementView loaded");
+            Logger.Debug("BusManagementView loaded");
             _isInitialized = true;
             RefreshDataIfVisible();
         }
@@ -88,7 +104,7 @@ namespace BusBuddy.WPF.Views.Bus
         {
             if ((bool)e.NewValue)
             {
-                _logger?.LogDebug("BusManagementView became visible");
+                Logger.Debug("BusManagementView became visible");
                 RefreshDataIfVisible();
             }
         }
@@ -100,7 +116,7 @@ namespace BusBuddy.WPF.Views.Bus
         {
             if (_isInitialized && IsVisible && DataContext is BusManagementViewModel viewModel)
             {
-                _logger?.LogInformation("Refreshing bus data because view became active");
+                Logger.Information("Refreshing bus data because view became active");
                 viewModel.LoadBusesCommand.Execute(null);
             }
         }

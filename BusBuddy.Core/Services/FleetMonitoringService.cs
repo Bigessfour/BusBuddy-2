@@ -2,7 +2,7 @@ using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Services
 {
@@ -12,7 +12,7 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class FleetMonitoringService : BackgroundService
     {
-        private readonly ILogger<FleetMonitoringService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<FleetMonitoringService>();
         private readonly IServiceProvider _serviceProvider;
         private readonly BusBuddyAIReportingService _aiReportingService;
 
@@ -26,18 +26,16 @@ namespace BusBuddy.Core.Services
         private const double UtilizationThreshold = 85.0;
 
         public FleetMonitoringService(
-            ILogger<FleetMonitoringService> logger,
             IServiceProvider serviceProvider,
             BusBuddyAIReportingService aiReportingService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _aiReportingService = aiReportingService ?? throw new ArgumentNullException(nameof(aiReportingService));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Fleet Monitoring Service started");
+            Logger.Information("Fleet Monitoring Service started");
 
             try
             {
@@ -49,11 +47,11 @@ namespace BusBuddy.Core.Services
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInformation("Fleet Monitoring Service stopped");
+                Logger.Information("Fleet Monitoring Service stopped");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Fleet Monitoring Service encountered an error");
+                Logger.Error(ex, "Fleet Monitoring Service encountered an error");
             }
         }
 
@@ -65,7 +63,7 @@ namespace BusBuddy.Core.Services
                 var busService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IBusService>(scope.ServiceProvider);
                 var maintenanceService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IMaintenanceService>(scope.ServiceProvider);
 
-                _logger.LogDebug("Starting fleet monitoring cycle");
+                Logger.Debug("Starting fleet monitoring cycle");
 
                 // Get current fleet status
                 var buses = await busService.GetAllBusesAsync();
@@ -80,11 +78,11 @@ namespace BusBuddy.Core.Services
                 // Generate AI insights for any critical issues
                 await GenerateProactiveInsights(busList);
 
-                _logger.LogDebug($"Fleet monitoring cycle completed. Monitored {busList.Count} buses");
+                Logger.Debug("Fleet monitoring cycle completed. Monitored {BusCount} buses", busList.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during fleet monitoring cycle");
+                Logger.Error(ex, "Error during fleet monitoring cycle");
             }
         }
 
@@ -200,7 +198,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to generate proactive AI insights");
+                Logger.Warning(ex, "Failed to generate proactive AI insights");
             }
         }
 
@@ -223,22 +221,22 @@ namespace BusBuddy.Core.Services
 
         private void LogAlert(FleetAlert alert)
         {
-            var logLevel = alert.Priority switch
+            var logMethod = alert.Priority switch
             {
-                AlertPriority.Critical => LogLevel.Error,
-                AlertPriority.High => LogLevel.Warning,
-                AlertPriority.Medium => LogLevel.Information,
-                AlertPriority.Low => LogLevel.Debug,
-                _ => LogLevel.Information
+                AlertPriority.Critical => (Action<string, object, object, object>)Logger.Error,
+                AlertPriority.High => (Action<string, object, object, object>)Logger.Warning,
+                AlertPriority.Medium => (Action<string, object, object, object>)Logger.Information,
+                AlertPriority.Low => (Action<string, object, object, object>)Logger.Debug,
+                _ => (Action<string, object, object, object>)Logger.Information
             };
 
-            _logger.Log(logLevel, "Fleet Alert: {AlertType} - {Message} (Bus: {BusNumber})",
-                       alert.AlertType, alert.Message, alert.BusNumber);
+            logMethod("Fleet Alert: {AlertType} - {Message} (Bus: {BusNumber})",
+                     alert.AlertType, alert.Message, alert.BusNumber);
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Fleet Monitoring Service stopping");
+            Logger.Information("Fleet Monitoring Service stopping");
             await base.StopAsync(cancellationToken);
         }
     }

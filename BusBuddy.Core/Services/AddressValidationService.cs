@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Models;
 
@@ -17,12 +17,11 @@ namespace BusBuddy.Core.Services
     public class AddressValidationService : IAddressValidationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<AddressValidationService>? _logger;
+        private static readonly ILogger Logger = Log.ForContext<AddressValidationService>();
 
-        public AddressValidationService(IUnitOfWork unitOfWork, ILogger<AddressValidationService>? logger = null)
+        public AddressValidationService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _logger = logger;
         }
 
         /// <inheritdoc />
@@ -56,7 +55,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error validating address: {Address}", address);
+                Logger.Error(ex, "Error validating address: {Address}", address);
                 return Task.FromResult((false, (string?)null));
             }
         }
@@ -125,7 +124,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error finding nearby bus stops for address: {Address}", address);
+                Logger.Error(ex, "Error finding nearby bus stops for address: {Address}", address);
                 return new List<string>();
             }
         }
@@ -142,7 +141,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error calculating distance from {Address} to {BusStop}", address, busStop);
+                Logger.Error(ex, "Error calculating distance from {Address} to {BusStop}", address, busStop);
                 return Task.FromResult(-1.0); // Indicates error
             }
         }
@@ -227,7 +226,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error parsing address: {FormattedAddress}", formattedAddress);
+                Logger.Error(ex, "Error parsing address: {FormattedAddress}", formattedAddress);
                 return (formattedAddress, null, null, null);
             }
         }

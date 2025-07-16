@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Microsoft.EntityFrameworkCore;
 using BusBuddy.Core.Data;
 
@@ -10,12 +10,11 @@ namespace BusBuddy.Core.Services
     public class DatabaseNullFixService
     {
         private readonly BusBuddyDbContext _context;
-        private readonly ILogger<DatabaseNullFixService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<DatabaseNullFixService>();
 
-        public DatabaseNullFixService(BusBuddyDbContext context, ILogger<DatabaseNullFixService> logger)
+        public DatabaseNullFixService(BusBuddyDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         /// <summary>
@@ -25,26 +24,26 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Starting database NULL value fix...");
+                Logger.Information("Starting database NULL value fix...");
 
                 var migration = new DatabaseNullFixMigration(_context);
 
                 // Check current NULL counts
                 var beforeCounts = await GetNullCountsAsync();
-                _logger.LogInformation("NULL values before fix: {Counts}", string.Join(", ", beforeCounts.Select(kv => $"{kv.Key}: {kv.Value}")));
+                Logger.Information("NULL values before fix: {Counts}", string.Join(", ", beforeCounts.Select(kv => $"{kv.Key}: {kv.Value}")));
 
                 // Execute the fix
                 await migration.FixNullValuesAsync();
 
                 // Check after counts
                 var afterCounts = await GetNullCountsAsync();
-                _logger.LogInformation("NULL values after fix: {Counts}", string.Join(", ", afterCounts.Select(kv => $"{kv.Key}: {kv.Value}")));
+                Logger.Information("NULL values after fix: {Counts}", string.Join(", ", afterCounts.Select(kv => $"{kv.Key}: {kv.Value}")));
 
-                _logger.LogInformation("Database NULL value fix completed successfully");
+                Logger.Information("Database NULL value fix completed successfully");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to fix NULL values in database");
+                Logger.Error(ex, "Failed to fix NULL values in database");
                 throw;
             }
         }
@@ -60,35 +59,35 @@ namespace BusBuddy.Core.Services
             {
                 // Check Drivers NULL values
                 var driversNulls = await _context.Database.SqlQueryRaw<int>(@"
-                    SELECT COUNT(*) as Value FROM Drivers 
+                    SELECT COUNT(*) as Value FROM Drivers
                     WHERE DriverName IS NULL OR DriversLicenceType IS NULL OR Status IS NULL
                 ").FirstOrDefaultAsync();
                 counts["Drivers"] = driversNulls;
 
                 // Check Vehicles NULL values
                 var vehiclesNulls = await _context.Database.SqlQueryRaw<int>(@"
-                    SELECT COUNT(*) as Value FROM Vehicles 
+                    SELECT COUNT(*) as Value FROM Vehicles
                     WHERE BusNumber IS NULL OR Make IS NULL OR Model IS NULL OR Status IS NULL OR VINNumber IS NULL OR LicenseNumber IS NULL
                 ").FirstOrDefaultAsync();
                 counts["Vehicles"] = vehiclesNulls;
 
                 // Check Routes NULL values
                 var routesNulls = await _context.Database.SqlQueryRaw<int>(@"
-                    SELECT COUNT(*) as Value FROM Routes 
+                    SELECT COUNT(*) as Value FROM Routes
                     WHERE RouteName IS NULL
                 ").FirstOrDefaultAsync();
                 counts["Routes"] = routesNulls;
 
                 // Check Activities NULL values
                 var activitiesNulls = await _context.Database.SqlQueryRaw<int>(@"
-                    SELECT COUNT(*) as Value FROM Activities 
+                    SELECT COUNT(*) as Value FROM Activities
                     WHERE ActivityType IS NULL OR Destination IS NULL OR RequestedBy IS NULL OR Status IS NULL
                 ").FirstOrDefaultAsync();
                 counts["Activities"] = activitiesNulls;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking NULL value counts");
+                Logger.Error(ex, "Error checking NULL value counts");
                 // Return safe defaults
                 counts = new Dictionary<string, int>
                 {
@@ -109,27 +108,27 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Executing immediate fix for Driver NULL values...");
+                Logger.Information("Executing immediate fix for Driver NULL values...");
 
                 await _context.Database.ExecuteSqlRawAsync(@"
-                    UPDATE Drivers 
+                    UPDATE Drivers
                     SET DriverName = COALESCE(NULLIF(LTRIM(RTRIM(DriverName)), ''), 'Driver-' + CAST(DriverId AS VARCHAR(10)))
                     WHERE DriverName IS NULL OR LTRIM(RTRIM(DriverName)) = '';
 
-                    UPDATE Drivers 
+                    UPDATE Drivers
                     SET DriversLicenceType = COALESCE(NULLIF(LTRIM(RTRIM(DriversLicenceType)), ''), 'Standard')
                     WHERE DriversLicenceType IS NULL OR LTRIM(RTRIM(DriversLicenceType)) = '';
 
-                    UPDATE Drivers 
+                    UPDATE Drivers
                     SET Status = COALESCE(NULLIF(LTRIM(RTRIM(Status)), ''), 'Active')
                     WHERE Status IS NULL OR LTRIM(RTRIM(Status)) = '';
                 ");
 
-                _logger.LogInformation("Driver NULL values fixed successfully");
+                Logger.Information("Driver NULL values fixed successfully");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to fix Driver NULL values");
+                Logger.Error(ex, "Failed to fix Driver NULL values");
                 throw;
             }
         }

@@ -9,15 +9,17 @@ using System.Windows.Media;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.Views.Fuel
 {
     public partial class FuelReconciliationDialog : Window, INotifyPropertyChanged
     {
+        private static readonly ILogger Logger = Log.ForContext<FuelReconciliationDialog>();
+
         private readonly IFuelService _fuelService;
         private readonly IBusService _busService;
-        private readonly ILogger<FuelReconciliationDialog>? _logger;
 
         // Date range properties
         private DateTime _startDate = DateTime.Now.AddDays(-30);
@@ -174,11 +176,10 @@ namespace BusBuddy.WPF.Views.Fuel
         public BusBuddy.WPF.RelayCommand ExportCommand { get; }
         public BusBuddy.WPF.RelayCommand PrintCommand { get; }
 
-        public FuelReconciliationDialog(IFuelService fuelService, IBusService busService, ILogger<FuelReconciliationDialog>? logger = null)
+        public FuelReconciliationDialog(IFuelService fuelService, IBusService busService)
         {
             _fuelService = fuelService ?? throw new ArgumentNullException(nameof(fuelService));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
-            _logger = logger;
 
             InitializeComponent();
             DataContext = this;
@@ -299,12 +300,20 @@ namespace BusBuddy.WPF.Views.Fuel
                         $"{(Math.Abs(DiscrepancyPercentage) > 0.05 ? "This discrepancy requires investigation." : "This is within acceptable limits.")}";
                 }
 
-                _logger?.LogInformation("Loaded reconciliation data: {RecordCount} records, {DiscrepancyPercentage:P2} discrepancy",
-                    filteredRecords.Count, DiscrepancyPercentage);
+                using (LogContext.PushProperty("ViewType", "FuelReconciliationDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadReconciliationData"))
+                {
+                    Logger.Information("Loaded reconciliation data: {RecordCount} records, {DiscrepancyPercentage:P2} discrepancy",
+                        filteredRecords.Count, DiscrepancyPercentage);
+                }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error loading reconciliation data");
+                using (LogContext.PushProperty("ViewType", "FuelReconciliationDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadReconciliationData"))
+                {
+                    Logger.Error(ex, "Error loading reconciliation data");
+                }
                 MessageBox.Show($"Error loading reconciliation data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 ReconciliationSummary = "Error loading reconciliation data. Please try again.";
             }
@@ -412,12 +421,21 @@ namespace BusBuddy.WPF.Views.Fuel
 
                     MessageBox.Show($"Successfully exported reconciliation report to {dialog.FileName}",
                         "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
-                    _logger?.LogInformation("Exported fuel reconciliation report to CSV");
+
+                    using (LogContext.PushProperty("ViewType", "FuelReconciliationDialog"))
+                    using (LogContext.PushProperty("OperationType", "ExportReconciliationReport"))
+                    {
+                        Logger.Information("Exported fuel reconciliation report to CSV");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error exporting reconciliation report");
+                using (LogContext.PushProperty("ViewType", "FuelReconciliationDialog"))
+                using (LogContext.PushProperty("OperationType", "ExportReconciliationReport"))
+                {
+                    Logger.Error(ex, "Error exporting reconciliation report");
+                }
                 MessageBox.Show($"Error exporting report: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

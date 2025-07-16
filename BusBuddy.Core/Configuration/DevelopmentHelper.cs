@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog.Events;
 
 namespace BusBuddy.Core.Configuration
 {
@@ -20,9 +20,9 @@ namespace BusBuddy.Core.Configuration
         /// <summary>
         /// Get optimized logging configuration for current environment
         /// </summary>
-        public static LogLevel GetOptimalLogLevel(IConfiguration configuration)
+        public static LogEventLevel GetOptimalLogLevel(IConfiguration configuration)
         {
-            return IsDevelopment(configuration) ? LogLevel.Debug : LogLevel.Information;
+            return IsDevelopment(configuration) ? LogEventLevel.Debug : LogEventLevel.Information;
         }
 
         /// <summary>

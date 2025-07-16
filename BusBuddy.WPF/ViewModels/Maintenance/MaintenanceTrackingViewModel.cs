@@ -2,7 +2,8 @@ using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.Views.Maintenance;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ namespace BusBuddy.WPF.ViewModels
 {
     public class MaintenanceTrackingViewModel : BaseInDevelopmentViewModel
     {
+        private static readonly new ILogger Logger = Log.ForContext<MaintenanceTrackingViewModel>();
+
         private readonly IMaintenanceService _maintenanceService;
         private readonly IBusService _busService;
 
@@ -34,46 +37,58 @@ namespace BusBuddy.WPF.ViewModels
             set { _selectedRecord = value; OnPropertyChanged(); }
         }
 
-        public MaintenanceTrackingViewModel(IMaintenanceService maintenanceService, IBusService busService, ILogger<MaintenanceTrackingViewModel>? logger = null)
-            : base(logger)
+        public MaintenanceTrackingViewModel(IMaintenanceService maintenanceService, IBusService busService)
+            : base()
         {
             _maintenanceService = maintenanceService;
             _busService = busService;
 
-            AddCommand = new RelayCommand(_ => { _ = AddRecordAsync(); });
-            EditCommand = new RelayCommand(_ => { _ = EditRecordAsync(); }, _ => SelectedRecord != null);
-            DeleteCommand = new RelayCommand(_ => { _ = DeleteRecordAsync(); }, _ => SelectedRecord != null);
-            AlertsCommand = new RelayCommand(_ => { _ = ShowMaintenanceAlertsAsync(); });
-            ReportCommand = new RelayCommand(_ => MessageBox.Show("Maintenance reports will be implemented in the next sprint.",
-                "Coming Soon", MessageBoxButton.OK, MessageBoxImage.Information));
+            using (LogContext.PushProperty("ViewModelType", nameof(MaintenanceTrackingViewModel)))
+            using (LogContext.PushProperty("OperationType", "Construction"))
+            {
+                Logger.Information("MaintenanceTrackingViewModel constructor started");
 
-            // Set as ready for development
-            IsInDevelopment = false;
+                AddCommand = new RelayCommand(_ => { _ = AddRecordAsync(); });
+                EditCommand = new RelayCommand(_ => { _ = EditRecordAsync(); }, _ => SelectedRecord != null);
+                DeleteCommand = new RelayCommand(_ => { _ = DeleteRecordAsync(); }, _ => SelectedRecord != null);
+                AlertsCommand = new RelayCommand(_ => { _ = ShowMaintenanceAlertsAsync(); });
+                ReportCommand = new RelayCommand(_ => MessageBox.Show("Maintenance reports will be implemented in the next sprint.",
+                    "Coming Soon", MessageBoxButton.OK, MessageBoxImage.Information));
 
-            _ = LoadAsync();
+                // Set as ready for development
+                IsInDevelopment = false;
+
+                Logger.Information("MaintenanceTrackingViewModel constructor completed, initiating LoadAsync");
+                _ = LoadAsync();
+            }
         }
 
         private async Task LoadAsync()
         {
-            try
+            await LoadDataAsync(async () =>
             {
-                MaintenanceRecords.Clear();
-                var records = await _maintenanceService.GetAllMaintenanceRecordsAsync();
-                foreach (var record in records)
-                    MaintenanceRecords.Add(record);
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
 
-                AvailableBuses.Clear();
-                var buses = await _busService.GetAllBusesAsync();
-                foreach (var bus in buses)
-                    AvailableBuses.Add(bus);
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(MaintenanceTrackingViewModel)))
+                using (LogContext.PushProperty("OperationType", "LoadMaintenanceData"))
+                {
+                    Logger.Information("Loading maintenance data");
 
-                Logger?.LogInformation("Loaded {RecordCount} maintenance records and {BusCount} buses",
-                    MaintenanceRecords.Count, AvailableBuses.Count);
-            }
-            catch (Exception ex)
-            {
-                Logger?.LogError(ex, "Error loading maintenance data");
-            }
+                    MaintenanceRecords.Clear();
+                    var records = await _maintenanceService.GetAllMaintenanceRecordsAsync();
+                    foreach (var record in records)
+                        MaintenanceRecords.Add(record);
+
+                    AvailableBuses.Clear();
+                    var buses = await _busService.GetAllBusesAsync();
+                    foreach (var bus in buses)
+                        AvailableBuses.Add(bus);
+
+                    Logger.Information("Loaded {RecordCount} maintenance records and {BusCount} buses",
+                        MaintenanceRecords.Count, AvailableBuses.Count);
+                }
+            });
         }
 
         private async Task AddRecordAsync()
@@ -96,7 +111,7 @@ namespace BusBuddy.WPF.ViewModels
                 };
 
                 // Show dialog to edit the new record
-                var dialog = new MaintenanceDialog(newRecord, _busService, Logger as ILogger<MaintenanceDialog>);
+                var dialog = new MaintenanceDialog(newRecord, _busService);
 
                 var result = dialog.ShowDialog();
                 if (result.HasValue && result.Value)
@@ -104,12 +119,12 @@ namespace BusBuddy.WPF.ViewModels
                     var created = await _maintenanceService.CreateMaintenanceRecordAsync(newRecord);
                     MaintenanceRecords.Add(created);
 
-                    Logger?.LogInformation("Added new maintenance record with ID {MaintenanceId}", created.MaintenanceId);
+                    Logger.Information("Added new maintenance record with ID {MaintenanceId}", created.MaintenanceId);
                 }
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error adding maintenance record");
+                Logger.Error(ex, "Error adding maintenance record");
                 MessageBox.Show($"Error adding maintenance record: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -149,7 +164,7 @@ namespace BusBuddy.WPF.ViewModels
                 };
 
                 // Show dialog to edit the record
-                var dialog = new MaintenanceDialog(recordToEdit, _busService, Logger as ILogger<MaintenanceDialog>);
+                var dialog = new MaintenanceDialog(recordToEdit, _busService);
 
                 var result = dialog.ShowDialog();
                 if (result.HasValue && result.Value)
@@ -164,12 +179,12 @@ namespace BusBuddy.WPF.ViewModels
                         SelectedRecord = updated;
                     }
 
-                    Logger?.LogInformation("Updated maintenance record with ID {MaintenanceId}", updated.MaintenanceId);
+                    Logger.Information("Updated maintenance record with ID {MaintenanceId}", updated.MaintenanceId);
                 }
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error updating maintenance record {MaintenanceId}", SelectedRecord.MaintenanceId);
+                Logger.Error(ex, "Error updating maintenance record {MaintenanceId}", SelectedRecord.MaintenanceId);
                 MessageBox.Show($"Error updating maintenance record: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -196,14 +211,14 @@ namespace BusBuddy.WPF.ViewModels
                     {
                         MaintenanceRecords.Remove(SelectedRecord);
                         SelectedRecord = null;
-                        Logger?.LogInformation("Deleted maintenance record with ID {MaintenanceId}", maintenanceId);
+                        Logger.Information("Deleted maintenance record with ID {MaintenanceId}", maintenanceId);
                     }
                 }
             }
             catch (Exception ex)
             {
                 var id = SelectedRecord?.MaintenanceId ?? 0;
-                Logger?.LogError(ex, "Error deleting maintenance record {MaintenanceId}", id);
+                Logger.Error(ex, "Error deleting maintenance record {MaintenanceId}", id);
                 MessageBox.Show($"Error deleting maintenance record: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -212,7 +227,7 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                var alertsDialog = new Views.Maintenance.MaintenanceAlertsDialog(_maintenanceService, _busService, Logger as ILogger<Views.Maintenance.MaintenanceAlertsDialog>);
+                var alertsDialog = new Views.Maintenance.MaintenanceAlertsDialog(_maintenanceService, _busService);
                 var result = alertsDialog.ShowDialog();
 
                 if (result.HasValue && result.Value)
@@ -223,7 +238,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error showing maintenance alerts");
+                Logger.Error(ex, "Error showing maintenance alerts");
                 MessageBox.Show($"Error showing maintenance alerts: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

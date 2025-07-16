@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -13,7 +13,7 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class GoogleEarthEngineService
     {
-        private readonly ILogger<GoogleEarthEngineService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<GoogleEarthEngineService>();
         private readonly IConfiguration _configuration;
         private readonly string _projectId;
         private readonly string _serviceAccountEmail;
@@ -27,10 +27,8 @@ namespace BusBuddy.Core.Services
         ///   GoogleEarthEngine:ServiceAccountKeyPath
         /// Service account must have Earth Engine and Drive read/write permissions.
         /// </summary>
-        public GoogleEarthEngineService(ILogger<GoogleEarthEngineService> logger,
-                                       IConfiguration configuration)
+        public GoogleEarthEngineService(IConfiguration configuration)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
             // Load configuration
@@ -44,11 +42,11 @@ namespace BusBuddy.Core.Services
 
             if (!_isConfigured)
             {
-                _logger.LogWarning("Google Earth Engine not configured. Using mock data. Please update appsettings.json with your GEE credentials.");
+                Logger.Warning("Google Earth Engine not configured. Using mock data. Please update appsettings.json with your GEE credentials.");
             }
             else
             {
-                _logger.LogInformation($"Google Earth Engine configured for project: {_projectId}");
+                Logger.Information($"Google Earth Engine configured for project: {_projectId}");
             }
         }
 
@@ -62,7 +60,7 @@ namespace BusBuddy.Core.Services
         {
             if (!_isConfigured)
             {
-                _logger.LogWarning("GEE not configured. Returning mock GeoJSON.");
+                Logger.Warning("GEE not configured. Returning mock GeoJSON.");
                 return "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[-98.35,39.5],[-99.35,40.5],[-97.35,41.5]]},\"properties\":{}}]}";
             }
 
@@ -100,7 +98,7 @@ namespace BusBuddy.Core.Services
             string driveFileId = await PollForExportAndGetDriveFileIdAsync(taskName, accessToken, maxAttempts, initialDelayMs);
             if (string.IsNullOrEmpty(driveFileId))
             {
-                _logger.LogError("Export did not complete or file ID not found. Task: {TaskName}", taskName);
+                Logger.Error("Export did not complete or file ID not found. Task: {TaskName}", taskName);
                 throw new InvalidOperationException("Export did not complete or file ID not found.");
             }
 
@@ -110,7 +108,7 @@ namespace BusBuddy.Core.Services
             // 5. Clean up: Delete file from Drive after download
             bool deleted = await TryDeleteDriveFileAsync(driveFileId, accessToken);
             if (!deleted)
-                _logger.LogWarning("Failed to delete exported file from Drive: {FileId}", driveFileId);
+                Logger.Warning("Failed to delete exported file from Drive: {FileId}", driveFileId);
 
             return geoJson;
         }
@@ -130,7 +128,7 @@ namespace BusBuddy.Core.Services
                     var statusResponse = await httpClient.GetAsync(statusUrl);
                     if (!statusResponse.IsSuccessStatusCode)
                     {
-                        _logger.LogWarning("Polling attempt {Attempt}: Non-success status {StatusCode}", attempt, statusResponse.StatusCode);
+                        Logger.Warning("Polling attempt {Attempt}: Non-success status {StatusCode}", attempt, statusResponse.StatusCode);
                         if ((int)statusResponse.StatusCode == 429 || (int)statusResponse.StatusCode == 503)
                         {
                             // Quota or service unavailable, exponential backoff
@@ -153,24 +151,24 @@ namespace BusBuddy.Core.Services
                             {
                                 return fileIdElem.GetString() ?? string.Empty;
                             }
-                            _logger.LogError("Export succeeded but fileId not found in response.");
+                            Logger.Error("Export succeeded but fileId not found in response.");
                             return string.Empty;
                         }
                         else if (state == "FAILED" || state == "CANCELLED")
                         {
-                            _logger.LogError("GEE export failed or cancelled: {State}. Task: {TaskName}", state, taskName);
+                            Logger.Error("GEE export failed or cancelled: {State}. Task: {TaskName}", state, taskName);
                             return string.Empty;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Exception during export polling attempt {Attempt}", attempt);
+                    Logger.Error(ex, "Exception during export polling attempt {Attempt}", attempt);
                 }
                 await Task.Delay(delayMs);
                 delayMs = Math.Min(delayMs * 2, 60000); // Exponential backoff, cap at 60s
             }
-            _logger.LogError("GEE export polling timed out. Task: {TaskName}", taskName);
+            Logger.Error("GEE export polling timed out. Task: {TaskName}", taskName);
             return string.Empty;
         }
         /// <summary>
@@ -186,12 +184,12 @@ namespace BusBuddy.Core.Services
                 var response = await httpClient.DeleteAsync(deleteUrl);
                 if (response.IsSuccessStatusCode)
                     return true;
-                _logger.LogWarning("Drive file delete returned status {StatusCode} for file {FileId}", response.StatusCode, fileId);
+                Logger.Warning("Drive file delete returned status {StatusCode} for file {FileId}", response.StatusCode, fileId);
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception deleting Drive file {FileId}", fileId);
+                Logger.Error(ex, "Exception deleting Drive file {FileId}", fileId);
                 return false;
             }
         }
@@ -221,7 +219,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to download GeoJSON from Google Drive.");
+                Logger.Error(ex, "Failed to download GeoJSON from Google Drive.");
                 return string.Empty;
             }
         }
@@ -233,7 +231,7 @@ namespace BusBuddy.Core.Services
         {
             if (string.IsNullOrEmpty(_serviceAccountKeyPath) || !System.IO.File.Exists(_serviceAccountKeyPath))
             {
-                _logger.LogError($"Service account key file not found: {_serviceAccountKeyPath}");
+                Logger.Error($"Service account key file not found: {_serviceAccountKeyPath}");
                 return string.Empty;
             }
 
@@ -253,7 +251,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to obtain Google access token from service account.");
+                Logger.Error(ex, "Failed to obtain Google access token from service account.");
                 return string.Empty;
             }
         }

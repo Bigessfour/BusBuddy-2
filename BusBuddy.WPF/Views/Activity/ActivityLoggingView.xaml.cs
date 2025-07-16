@@ -1,35 +1,48 @@
+using System;
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.Views.Activity
 {
     public partial class ActivityLoggingView : UserControl
     {
-        private readonly ILogger<ActivityLoggingView>? _logger;
+        private static readonly ILogger Logger = Log.ForContext<ActivityLoggingView>();
 
         public ActivityLoggingView()
         {
-            InitializeComponent();
-
-            // Use DI to resolve the viewmodel if available
-            if (Application.Current is App app && app.Services != null)
+            try
             {
-                // Try to get the logger
-                _logger = app.Services.GetService<ILogger<ActivityLoggingView>>();
-                _logger?.LogInformation("ActivityLoggingView loaded");
+                using (LogContext.PushProperty("ViewType", nameof(ActivityLoggingView)))
+                using (LogContext.PushProperty("OperationType", "ViewInitialization"))
+                {
+                    Logger.Information("ActivityLoggingView initialization started");
 
-                var vm = app.Services.GetService<ViewModels.ActivityLoggingViewModel>();
-                if (vm != null)
-                {
-                    DataContext = vm;
-                    _logger?.LogInformation("ActivityLoggingViewModel successfully set as DataContext");
+                    InitializeComponent();
+
+                    if (Application.Current is App app && app.Services != null)
+                    {
+                        var vm = app.Services.GetService<ViewModels.ActivityLoggingViewModel>();
+                        if (vm != null)
+                        {
+                            DataContext = vm;
+                            Logger.Information("ActivityLoggingViewModel successfully set as DataContext");
+                        }
+                        else
+                        {
+                            Logger.Warning("ActivityLoggingViewModel could not be resolved from DI container");
+                        }
+                    }
+
+                    Logger.Information("ActivityLoggingView initialization completed successfully");
                 }
-                else
-                {
-                    _logger?.LogWarning("ActivityLoggingViewModel could not be resolved from DI container");
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to initialize ActivityLoggingView: {ErrorMessage}", ex.Message);
+                throw;
             }
         }
     }

@@ -4,7 +4,7 @@ using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.Core.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Serilog.Context;
 using System.Diagnostics;
 using ActivityType = BusBuddy.Core.Models.Activity;
@@ -14,7 +14,7 @@ namespace BusBuddy.Core.Services
     [DebuggerDisplay("BusService - Cache: {_cacheService != null}")]
     public class BusService : IBusService
     {
-        private readonly ILogger<BusService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<BusService>();
         private readonly IBusBuddyDbContextFactory _contextFactory;
         private readonly IBusCachingService _cacheService;
         private static readonly SemaphoreSlim _semaphore = new(1, 1);
@@ -22,11 +22,9 @@ namespace BusBuddy.Core.Services
         // Removed unused lists that were previously used for sample data fallback
 
         public BusService(
-            ILogger<BusService> logger,
             IBusBuddyDbContextFactory contextFactory,
             IBusCachingService cacheService)
         {
-            _logger = logger;
             _contextFactory = contextFactory;
             _cacheService = cacheService;
 
@@ -44,13 +42,13 @@ namespace BusBuddy.Core.Services
                 using (LogContext.PushProperty("OperationName", "DatabaseQuery"))
                 {
                     var stopwatch = Stopwatch.StartNew();
-                    _logger.LogInformation("Retrieving all bus entities (with caching)");
+                    Logger.Information("Retrieving all bus entities (with caching)");
 
                     try
                     {
                         var result = await _cacheService.GetAllBusesAsync(async () =>
                         {
-                            _logger.LogInformation("Cache miss - retrieving all bus entities from database");
+                            Logger.Information("Cache miss - retrieving all bus entities from database");
                             // Create a fresh context to avoid concurrency issues
                             var context = _contextFactory.CreateDbContext();
                             try
@@ -100,7 +98,7 @@ namespace BusBuddy.Core.Services
                         });
 
                         stopwatch.Stop();
-                        _logger.LogInformation("Retrieved {BusCount} bus entities in {Duration}ms",
+                        Logger.Information("Retrieved {BusCount} bus entities in {Duration}ms",
                             result.Count, stopwatch.ElapsedMilliseconds);
 
                         return result;
@@ -108,19 +106,19 @@ namespace BusBuddy.Core.Services
                     catch (System.Data.SqlTypes.SqlNullValueException ex)
                     {
                         stopwatch.Stop();
-                        _logger.LogWarning(ex, "SQL NULL value error when retrieving buses. Returning empty list to avoid application failure.");
+                        Logger.Warning(ex, "SQL NULL value error when retrieving buses. Returning empty list to avoid application failure.");
                         return new List<Bus>();
                     }
                     catch (Exception ex)
                     {
                         stopwatch.Stop();
-                        _logger.LogError(ex, "Error retrieving all bus entities after {Duration}ms",
+                        Logger.Error(ex, "Error retrieving all bus entities after {Duration}ms",
                             stopwatch.ElapsedMilliseconds);
 
                         // If we're debugging, break into the debugger for SqlNullValueException
                         if (Debugger.IsAttached && ex.ToString().Contains("SqlNullValueException"))
                         {
-                            _logger.LogDebug("Breaking into debugger due to SqlNullValueException");
+                            Logger.Debug("Breaking into debugger due to SqlNullValueException");
                             Debugger.Break();
                         }
 
@@ -144,7 +142,7 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("SortDirection", isAscending ? "Ascending" : "Descending"))
             {
                 var stopwatch = Stopwatch.StartNew();
-                _logger.LogInformation("Retrieving paginated bus entities (page {PageNumber}, size {PageSize})", pageNumber, pageSize);
+                Logger.Information("Retrieving paginated bus entities (page {PageNumber}, size {PageSize})", pageNumber, pageSize);
 
                 try
                 {
@@ -206,7 +204,7 @@ namespace BusBuddy.Core.Services
                         .ToListAsync();
 
                     stopwatch.Stop();
-                    _logger.LogInformation("Retrieved {BusCount} of {TotalCount} bus entities in {Duration}ms (page {PageNumber})",
+                    Logger.Information("Retrieved {BusCount} of {TotalCount} bus entities in {Duration}ms (page {PageNumber})",
                         buses.Count, totalCount, stopwatch.ElapsedMilliseconds, pageNumber);
 
                     return (buses, totalCount);
@@ -214,7 +212,7 @@ namespace BusBuddy.Core.Services
                 catch (Exception ex)
                 {
                     stopwatch.Stop();
-                    _logger.LogError(ex, "Error retrieving paginated bus entities after {Duration}ms",
+                    Logger.Error(ex, "Error retrieving paginated bus entities after {Duration}ms",
                         stopwatch.ElapsedMilliseconds);
                     throw; // Propagate the exception to the caller
                 }
@@ -228,13 +226,13 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("OperationName", "DatabaseQuery"))
             {
                 var stopwatch = Stopwatch.StartNew();
-                _logger.LogInformation("Retrieving bus entity with ID: {BusId} (with caching)", busId);
+                Logger.Information("Retrieving bus entity with ID: {BusId} (with caching)", busId);
 
                 try
                 {
                     var result = await _cacheService.GetBusByIdAsync(busId, async (id) =>
                     {
-                        _logger.LogInformation("Cache miss - retrieving bus entity with ID: {BusId} from database", id);
+                        Logger.Information("Cache miss - retrieving bus entity with ID: {BusId} from database", id);
                         // Create a fresh context to avoid concurrency issues
                         var context = _contextFactory.CreateDbContext();
                         try
@@ -258,12 +256,12 @@ namespace BusBuddy.Core.Services
                     stopwatch.Stop();
                     if (result != null)
                     {
-                        _logger.LogInformation("Retrieved bus entity {BusId} in {Duration}ms",
+                        Logger.Information("Retrieved bus entity {BusId} in {Duration}ms",
                             busId, stopwatch.ElapsedMilliseconds);
                     }
                     else
                     {
-                        _logger.LogWarning("Bus entity {BusId} not found after {Duration}ms",
+                        Logger.Warning("Bus entity {BusId} not found after {Duration}ms",
                             busId, stopwatch.ElapsedMilliseconds);
                     }
 
@@ -272,7 +270,7 @@ namespace BusBuddy.Core.Services
                 catch (Exception ex)
                 {
                     stopwatch.Stop();
-                    _logger.LogError(ex, "Error retrieving bus entity {BusId} after {Duration}ms",
+                    Logger.Error(ex, "Error retrieving bus entity {BusId} after {Duration}ms",
                         busId, stopwatch.ElapsedMilliseconds);
                     throw; // Propagate exception to caller - no fallback to sample data
                 }
@@ -284,14 +282,44 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("OperationType", "AddBusEntity"))
             using (LogContext.PushProperty("BusNumber", bus.BusNumber))
             {
-                _logger.LogInformation("Adding new bus entity: {BusNumber}", bus.BusNumber);
+                Logger.Information("Adding new bus entity: {BusNumber}", bus.BusNumber);
 
                 using var context = _contextFactory.CreateWriteDbContext();
                 context.Vehicles.Add(bus);
-                await context.SaveChangesWithLoggingAsync(_logger, "AddBus", "BusNumber", bus.BusNumber);
+
+                using (LogContext.PushProperty("OperationName", "AddBus"))
+                using (LogContext.PushProperty("DatabaseOperation", true))
+                using (LogContext.PushProperty("BusNumber", bus.BusNumber))
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    Logger.Debug("Starting database operation: AddBus");
+
+                    try
+                    {
+                        var result = await context.SaveChangesAsync();
+                        stopwatch.Stop();
+
+                        using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
+                        using (LogContext.PushProperty("ChangedEntities", result))
+                        {
+                            Logger.Information("Database operation AddBus completed in {Duration}ms. Changed {ChangedEntities} entities.",
+                                stopwatch.ElapsedMilliseconds, result);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        stopwatch.Stop();
+                        using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
+                        {
+                            Logger.Error(ex, "Database operation AddBus failed after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                        }
+                        throw;
+                    }
+                }
+
                 _cacheService.InvalidateAllBusCache();
 
-                _logger.LogInformation("Successfully added bus: {BusNumber} with ID {BusId}",
+                Logger.Information("Successfully added bus: {BusNumber} with ID {BusId}",
                     bus.BusNumber, bus.VehicleId);
 
                 return bus;
@@ -304,24 +332,54 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("BusId", bus.VehicleId))
             using (LogContext.PushProperty("BusNumber", bus.BusNumber))
             {
-                _logger.LogInformation("Updating bus entity with ID: {BusId}, Number: {BusNumber}",
+                Logger.Information("Updating bus entity with ID: {BusId}, Number: {BusNumber}",
                     bus.VehicleId, bus.BusNumber);
 
                 using var context = _contextFactory.CreateWriteDbContext();
                 context.Vehicles.Update(bus);
-                var result = await context.SaveChangesWithLoggingAsync(_logger, "UpdateBus", "BusId", bus.VehicleId);
 
-                if (result > 0)
+                using (LogContext.PushProperty("OperationName", "UpdateBus"))
+                using (LogContext.PushProperty("DatabaseOperation", true))
+                using (LogContext.PushProperty("BusId", bus.VehicleId))
                 {
-                    _cacheService.InvalidateBusCache(bus.VehicleId);
-                    _logger.LogInformation("Successfully updated bus with ID: {BusId}", bus.VehicleId);
-                }
-                else
-                {
-                    _logger.LogWarning("No changes detected when updating bus with ID: {BusId}", bus.VehicleId);
-                }
+                    var stopwatch = Stopwatch.StartNew();
+                    Logger.Debug("Starting database operation: UpdateBus");
 
-                return result > 0;
+                    try
+                    {
+                        var result = await context.SaveChangesAsync();
+                        stopwatch.Stop();
+
+                        using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
+                        using (LogContext.PushProperty("ChangedEntities", result))
+                        {
+                            Logger.Information("Database operation UpdateBus completed in {Duration}ms. Changed {ChangedEntities} entities.",
+                                stopwatch.ElapsedMilliseconds, result);
+                        }
+
+                        _cacheService.InvalidateAllBusCache();
+
+                        if (result > 0)
+                        {
+                            Logger.Information("Successfully updated bus with ID: {BusId}", bus.VehicleId);
+                            return true;
+                        }
+                        else
+                        {
+                            Logger.Warning("No changes detected when updating bus with ID: {BusId}", bus.VehicleId);
+                            return false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        stopwatch.Stop();
+                        using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
+                        {
+                            Logger.Error(ex, "Database operation UpdateBus failed after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                        }
+                        throw;
+                    }
+                }
             }
         }
 
@@ -330,7 +388,7 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("OperationType", "DeleteBusEntity"))
             using (LogContext.PushProperty("BusId", busId))
             {
-                _logger.LogInformation("Deleting bus entity with ID: {BusId}", busId);
+                Logger.Information("Deleting bus entity with ID: {BusId}", busId);
 
                 using var context = _contextFactory.CreateWriteDbContext();
                 var bus = await context.Vehicles.FindAsync(busId);
@@ -338,68 +396,108 @@ namespace BusBuddy.Core.Services
                 {
                     using (LogContext.PushProperty("BusNumber", bus.BusNumber))
                     {
-                        _logger.LogInformation("Found bus to delete: {BusNumber} (ID: {BusId})",
+                        Logger.Information("Found bus to delete: {BusNumber} (ID: {BusId})",
                             bus.BusNumber, busId);
 
                         context.Vehicles.Remove(bus);
-                        var result = await context.SaveChangesWithLoggingAsync(_logger, "DeleteBus", "BusId", busId);
 
-                        if (result > 0)
+                        using (LogContext.PushProperty("OperationName", "DeleteBus"))
+                        using (LogContext.PushProperty("DatabaseOperation", true))
+                        using (LogContext.PushProperty("BusId", busId))
                         {
-                            _cacheService.InvalidateBusCache(busId);
-                            _logger.LogInformation("Successfully deleted bus with ID: {BusId}", busId);
-                        }
-                        else
-                        {
-                            _logger.LogWarning("No changes detected when deleting bus with ID: {BusId}", busId);
-                        }
+                            var stopwatch = Stopwatch.StartNew();
+                            Logger.Debug("Starting database operation: DeleteBus");
 
-                        return result > 0;
+                            try
+                            {
+                                var result = await context.SaveChangesAsync();
+                                stopwatch.Stop();
+
+                                using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
+                                using (LogContext.PushProperty("ChangedEntities", result))
+                                {
+                                    Logger.Information("Database operation DeleteBus completed in {Duration}ms. Changed {ChangedEntities} entities.",
+                                        stopwatch.ElapsedMilliseconds, result);
+                                }
+
+                                _cacheService.InvalidateBusCache(busId);
+                                _cacheService.InvalidateAllBusCache();
+
+                                if (result > 0)
+                                {
+                                    Logger.Information("Successfully deleted bus with ID: {BusId}", busId);
+                                    return true;
+                                }
+                                else
+                                {
+                                    Logger.Warning("No changes detected when deleting bus with ID: {BusId}", busId);
+                                    return false;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                stopwatch.Stop();
+                                using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
+                                {
+                                    Logger.Error(ex, "Database operation DeleteBus failed after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                                }
+                                throw;
+                            }
+                        }
                     }
                 }
-
-                _logger.LogWarning("Bus with ID: {BusId} not found for deletion", busId);
-                return false;
+                else
+                {
+                    Logger.Warning("Bus with ID: {BusId} not found for deletion", busId);
+                    return false;
+                }
             }
         }
 
         public async Task<List<Driver>> GetAllDriversAsync()
         {
             using (LogContext.PushProperty("QueryType", "GetAllDrivers"))
+            using (LogContext.PushProperty("OperationName", "GetAllDrivers"))
             {
-                return await _logger.TrackPerformanceAsync("GetAllDrivers", async () =>
+                var stopwatch = Stopwatch.StartNew();
+                try
                 {
-                    try
-                    {
-                        _logger.LogInformation("Retrieving all drivers from database using projection");
-                        using var context = _contextFactory.CreateDbContext();
+                    Logger.Information("Retrieving all drivers from database using projection");
+                    using var context = _contextFactory.CreateDbContext();
 
-                        // Only select required fields instead of the whole entity
-                        var drivers = await context.Drivers
-                            .AsNoTracking()
-                            .Select(d => new Driver
-                            {
-                                DriverId = d.DriverId,
-                                DriverName = d.DriverName,
-                                DriverPhone = d.DriverPhone,
-                                DriverEmail = d.DriverEmail,
-                                DriversLicenceType = d.DriversLicenceType,
-                                Status = d.Status,
-                                TrainingComplete = d.TrainingComplete,
-                                LicenseExpiryDate = d.LicenseExpiryDate
-                                // Add more fields as needed by the UI
-                            })
+                    // Only select required fields instead of the whole entity
+                    var drivers = await context.Drivers
+                        .AsNoTracking()
+                        .Select(d => new Driver
+                        {
+                            DriverId = d.DriverId,
+                            DriverName = d.DriverName,
+                            DriverPhone = d.DriverPhone,
+                            DriverEmail = d.DriverEmail,
+                            DriversLicenceType = d.DriversLicenceType,
+                            Status = d.Status,
+                            TrainingComplete = d.TrainingComplete,
+                            LicenseExpiryDate = d.LicenseExpiryDate
+                            // Add more fields as needed by the UI
+                        })
                             .ToListAsync();
 
-                        _logger.LogInformation("Retrieved {DriverCount} drivers from database using projection", drivers.Count);
-                        return drivers;
-                    }
-                    catch (Exception ex)
+                    stopwatch.Stop();
+                    using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                     {
-                        _logger.LogError(ex, "Failed to retrieve drivers from database");
-                        throw; // Propagate exception to caller - no fallback to sample data
+                        Logger.Information("Retrieved {DriverCount} drivers from database using projection in {Duration}ms", drivers.Count, stopwatch.ElapsedMilliseconds);
                     }
-                });
+                    return drivers;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
+                    {
+                        Logger.Error(ex, "Failed to retrieve drivers from database after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                    }
+                    throw; // Propagate exception to caller - no fallback to sample data
+                }
             }
         }
 
@@ -408,22 +506,33 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("QueryType", "GetDriverEntityById"))
             using (LogContext.PushProperty("DriverId", driverId))
             {
-                return await _logger.TrackPerformanceAsync("GetDriverById", async () =>
+                var stopwatch = Stopwatch.StartNew();
+                try
                 {
-                    _logger.LogInformation("Retrieving driver entity with ID: {DriverId}", driverId);
+                    Logger.Information("Retrieving driver entity with ID: {DriverId}", driverId);
                     using var context = _contextFactory.CreateDbContext();
-                    return await context.Drivers
+                    var result = await context.Drivers
                         .Include(d => d.AMRoutes)
                         .Include(d => d.PMRoutes)
                         .Include(d => d.Activities)
                         .FirstOrDefaultAsync(d => d.DriverId == driverId);
-                }, "DriverId", driverId);
+
+                    stopwatch.Stop();
+                    Logger.Information("GetDriverById completed in {Duration}ms", stopwatch.ElapsedMilliseconds);
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    Logger.Error(ex, "GetDriverById failed after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                    throw;
+                }
             }
         }
 
         public async Task<Driver> AddDriverEntityAsync(Driver driver)
         {
-            _logger.LogInformation("Adding new driver entity: {DriverName}", driver.DriverName);
+            Logger.Information("Adding new driver entity: {DriverName}", driver.DriverName);
             using var context = _contextFactory.CreateWriteDbContext();
             context.Drivers.Add(driver);
             await context.SaveChangesAsync();
@@ -432,7 +541,7 @@ namespace BusBuddy.Core.Services
 
         public async Task<bool> UpdateDriverEntityAsync(Driver driver)
         {
-            _logger.LogInformation("Updating driver entity with ID: {DriverId}", driver.DriverId);
+            Logger.Information("Updating driver entity with ID: {DriverId}", driver.DriverId);
             using var context = _contextFactory.CreateWriteDbContext();
             context.Drivers.Update(driver);
             var result = await context.SaveChangesAsync();
@@ -441,7 +550,7 @@ namespace BusBuddy.Core.Services
 
         public async Task<bool> DeleteDriverEntityAsync(int driverId)
         {
-            _logger.LogInformation("Deleting driver entity with ID: {DriverId}", driverId);
+            Logger.Information("Deleting driver entity with ID: {DriverId}", driverId);
             using var context = _contextFactory.CreateWriteDbContext();
             var driver = await context.Drivers.FindAsync(driverId);
             if (driver != null)
@@ -457,7 +566,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving all route entities from database using projection");
+                Logger.Information("Retrieving all route entities from database using projection");
                 using var context = _contextFactory.CreateDbContext();
 
                 // Use projection to select only the fields needed
@@ -491,7 +600,7 @@ namespace BusBuddy.Core.Services
                         PMRiders = r.PMRiders,
                         PMBeginTime = r.PMBeginTime,
 
-                        // Include basic vehicle and driver information 
+                        // Include basic vehicle and driver information
                         BusNumber = r.BusNumber,
                         DriverName = r.DriverName
 
@@ -499,12 +608,12 @@ namespace BusBuddy.Core.Services
                     })
                     .ToListAsync();
 
-                _logger.LogInformation("Retrieved {RouteCount} route entities from database using projection", routes.Count);
+                Logger.Information("Retrieved {RouteCount} route entities from database using projection", routes.Count);
                 return routes;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to retrieve route entities from database");
+                Logger.Error(ex, "Failed to retrieve route entities from database");
                 throw; // Propagate exception to caller - no fallback to sample data
             }
         }
@@ -514,18 +623,29 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("QueryType", "GetActivitiesByDate"))
             using (LogContext.PushProperty("ActivityDate", date.ToString("yyyy-MM-dd")))
             {
-                return await _logger.TrackPerformanceAsync("GetActivitiesByDate", async () =>
+                var stopwatch = Stopwatch.StartNew();
+                try
                 {
-                    _logger.LogInformation("Retrieving activities for date: {Date}", date.ToShortDateString());
+                    Logger.Information("Retrieving activities for date: {Date}", date.ToShortDateString());
 
                     using var context = _contextFactory.CreateDbContext();
-                    return await context.Activities
+                    var result = await context.Activities
                         .Include(a => a.Vehicle)
                         .Include(a => a.Driver)
                         .Include(a => a.Route)
                         .Where(a => a.ActivityDate.Date == date.Date)
                         .ToListAsync();
-                });
+
+                    stopwatch.Stop();
+                    Logger.Information("GetActivitiesByDate completed in {Duration}ms", stopwatch.ElapsedMilliseconds);
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    Logger.Error(ex, "GetActivitiesByDate failed after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                    throw;
+                }
             }
         }
 
@@ -536,7 +656,7 @@ namespace BusBuddy.Core.Services
         {
             using (LogContext.PushProperty("QueryType", "GetAllBuses"))
             {
-                _logger.LogInformation("Retrieving all buses");
+                Logger.Information("Retrieving all buses");
 
                 try
                 {
@@ -545,7 +665,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to retrieve all buses");
+                    Logger.Error(ex, "Failed to retrieve all buses");
                     throw;
                 }
             }
@@ -556,7 +676,7 @@ namespace BusBuddy.Core.Services
         {
             using (LogContext.PushProperty("QueryType", "GetBusById"))
             {
-                _logger.LogInformation("Retrieving bus with ID: {BusId}", busId);
+                Logger.Information("Retrieving bus with ID: {BusId}", busId);
 
                 try
                 {
@@ -564,7 +684,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to retrieve bus with ID: {BusId}", busId);
+                    Logger.Error(ex, "Failed to retrieve bus with ID: {BusId}", busId);
                     throw;
                 }
             }
@@ -574,7 +694,7 @@ namespace BusBuddy.Core.Services
         {
             using (LogContext.PushProperty("QueryType", "AddBus"))
             {
-                _logger.LogInformation("Adding new bus: {BusNumber}", bus.BusNumber);
+                Logger.Information("Adding new bus: {BusNumber}", bus.BusNumber);
 
                 try
                 {
@@ -582,7 +702,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to add bus: {BusNumber}", bus.BusNumber);
+                    Logger.Error(ex, "Failed to add bus: {BusNumber}", bus.BusNumber);
                     throw;
                 }
             }
@@ -592,7 +712,7 @@ namespace BusBuddy.Core.Services
         {
             using (LogContext.PushProperty("QueryType", "UpdateBus"))
             {
-                _logger.LogInformation("Updating bus with ID: {BusId}", bus.VehicleId);
+                Logger.Information("Updating bus with ID: {BusId}", bus.VehicleId);
 
                 try
                 {
@@ -600,7 +720,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to update bus with ID: {BusId}", bus.VehicleId);
+                    Logger.Error(ex, "Failed to update bus with ID: {BusId}", bus.VehicleId);
                     throw;
                 }
             }
@@ -610,7 +730,7 @@ namespace BusBuddy.Core.Services
         {
             using (LogContext.PushProperty("QueryType", "DeleteBus"))
             {
-                _logger.LogInformation("Deleting bus with ID: {BusId}", busId);
+                Logger.Information("Deleting bus with ID: {BusId}", busId);
 
                 try
                 {
@@ -618,7 +738,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to delete bus with ID: {BusId}", busId);
+                    Logger.Error(ex, "Failed to delete bus with ID: {BusId}", busId);
                     throw;
                 }
             }
@@ -628,7 +748,7 @@ namespace BusBuddy.Core.Services
         {
             using (LogContext.PushProperty("QueryType", "GetActiveBuses"))
             {
-                _logger.LogInformation("Retrieving active buses");
+                Logger.Information("Retrieving active buses");
 
                 try
                 {
@@ -640,7 +760,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to retrieve active buses");
+                    Logger.Error(ex, "Failed to retrieve active buses");
                     throw;
                 }
             }
@@ -651,7 +771,7 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("QueryType", "GetBusesByStatus"))
             using (LogContext.PushProperty("Status", status))
             {
-                _logger.LogInformation("Retrieving buses with status: {Status}", status);
+                Logger.Information("Retrieving buses with status: {Status}", status);
 
                 try
                 {
@@ -663,7 +783,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to retrieve buses with status: {Status}", status);
+                    Logger.Error(ex, "Failed to retrieve buses with status: {Status}", status);
                     throw;
                 }
             }
@@ -674,7 +794,7 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("QueryType", "GetBusesByType"))
             using (LogContext.PushProperty("Type", type))
             {
-                _logger.LogInformation("Retrieving buses with type: {Type}", type);
+                Logger.Information("Retrieving buses with type: {Type}", type);
 
                 try
                 {
@@ -686,7 +806,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to retrieve buses with type: {Type}", type);
+                    Logger.Error(ex, "Failed to retrieve buses with type: {Type}", type);
                     throw;
                 }
             }
@@ -697,7 +817,7 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("QueryType", "SearchBuses"))
             using (LogContext.PushProperty("SearchTerm", searchTerm))
             {
-                _logger.LogInformation("Searching buses with term: {SearchTerm}", searchTerm);
+                Logger.Information("Searching buses with term: {SearchTerm}", searchTerm);
 
                 try
                 {
@@ -714,7 +834,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to search buses with term: {SearchTerm}", searchTerm);
+                    Logger.Error(ex, "Failed to search buses with term: {SearchTerm}", searchTerm);
                     throw;
                 }
             }
@@ -732,9 +852,10 @@ namespace BusBuddy.Core.Services
             using (LogContext.PushProperty("QueryType", "GetBusInfoList"))
             using (LogContext.PushProperty("LegacyMethod", true))
             {
-                return await _logger.TrackPerformanceAsync("GetBusInfoList_Legacy", async () =>
+                var stopwatch = Stopwatch.StartNew();
+                try
                 {
-                    _logger.LogInformation("Retrieving all buses (legacy method - using projection)");
+                    Logger.Information("Retrieving all buses (legacy method - using projection)");
 
                     try
                     {
@@ -756,7 +877,10 @@ namespace BusBuddy.Core.Services
                                 })
                                 .ToListAsync();
 
-                            _logger.LogInformation("Retrieved {BusCount} buses using projection", result.Count);
+                            Logger.Information("Retrieved {BusCount} buses using projection", result.Count);
+
+                            stopwatch.Stop();
+                            Logger.Information("GetBusInfoList_Legacy completed in {Duration}ms", stopwatch.ElapsedMilliseconds);
                             return result;
                         }
                         finally
@@ -767,10 +891,16 @@ namespace BusBuddy.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to retrieve buses from database");
+                        Logger.Error(ex, "Failed to retrieve buses from database");
                         throw; // Notify caller instead of using sample data
                     }
-                });
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    Logger.Error(ex, "GetBusInfoList_Legacy failed after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                    throw;
+                }
             }
         }
 
@@ -778,7 +908,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving bus info with ID: {BusId}", busId);
+                Logger.Information("Retrieving bus info with ID: {BusId}", busId);
 
                 // Create a fresh context for this operation
                 var context = _contextFactory.CreateDbContext();
@@ -801,7 +931,7 @@ namespace BusBuddy.Core.Services
 
                     if (bus == null)
                     {
-                        _logger.LogWarning("Bus with ID: {BusId} not found", busId);
+                        Logger.Warning("Bus with ID: {BusId} not found", busId);
                     }
 
                     return bus;
@@ -814,7 +944,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to retrieve bus with ID: {BusId}", busId);
+                Logger.Error(ex, "Failed to retrieve bus with ID: {BusId}", busId);
                 throw; // Propagate exception to caller - no fallback to sample data
             }
         }
@@ -823,7 +953,7 @@ namespace BusBuddy.Core.Services
 
         public Task<List<RouteInfo>> GetAllRoutesAsync()
         {
-            _logger.LogInformation("Retrieving all routes (legacy method - deprecated)");
+            Logger.Information("Retrieving all routes (legacy method - deprecated)");
 
             // This method should be replaced with proper route service calls
             // For now, throw an exception to indicate this method should not be used
@@ -833,7 +963,7 @@ namespace BusBuddy.Core.Services
 
         public Task<List<ScheduleInfo>> GetSchedulesByRouteAsync(int routeId)
         {
-            _logger.LogInformation("Retrieving schedules for route ID: {RouteId} (legacy method - deprecated)", routeId);
+            Logger.Information("Retrieving schedules for route ID: {RouteId} (legacy method - deprecated)", routeId);
 
             // This method should be replaced with proper schedule service calls
             // For now, throw an exception to indicate this method should not be used

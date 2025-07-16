@@ -1,11 +1,16 @@
 using BusBuddy.Configuration;
 using BusBuddy.Core.Models;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace BusBuddy.Core.Services
 {
@@ -15,8 +20,8 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class XAIService
     {
+        private static readonly ILogger Logger = Log.ForContext<XAIService>();
         private readonly HttpClient _httpClient;
-        private readonly ILogger<XAIService> _logger;
         private readonly IConfiguration _configuration;
         private readonly XAIDocumentationSettings _documentationSettings;
         private readonly string _apiKey;
@@ -26,11 +31,10 @@ namespace BusBuddy.Core.Services
         // API Endpoints
         public static readonly string CHAT_COMPLETIONS_ENDPOINT = "/chat/completions";
 
-        public XAIService(HttpClient httpClient, ILogger<XAIService> logger, IConfiguration configuration,
+        public XAIService(HttpClient httpClient, IConfiguration configuration,
             IOptions<XAIDocumentationSettings> documentationOptions)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _documentationSettings = documentationOptions?.Value ?? new XAIDocumentationSettings();
 
@@ -43,12 +47,12 @@ namespace BusBuddy.Core.Services
 
             if (!_isConfigured)
             {
-                _logger.LogWarning("xAI not configured or disabled. Using mock AI responses. Please set XAI_API_KEY environment variable and enable UseLiveAPI in appsettings.json.");
-                _logger.LogInformation("xAI Documentation: {ChatGuideUrl}", _documentationSettings.GetChatGuideUrl());
+                Logger.Warning("xAI not configured or disabled. Using mock AI responses. Please set XAI_API_KEY environment variable and enable UseLiveAPI in appsettings.json.");
+                Logger.Information("xAI Documentation: {ChatGuideUrl}", _documentationSettings.GetChatGuideUrl());
             }
             else
             {
-                _logger.LogInformation("xAI configured for live AI transportation intelligence");
+                Logger.Information("xAI configured for live AI transportation intelligence");
                 _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
                 _httpClient.Timeout = TimeSpan.FromSeconds(60);
             }
@@ -63,7 +67,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Requesting xAI route optimization analysis");
+                Logger.Information("Requesting xAI route optimization analysis");
 
                 if (!_isConfigured)
                 {
@@ -88,7 +92,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in xAI route optimization analysis");
+                Logger.Error(ex, "Error in xAI route optimization analysis");
                 return await GenerateMockAIRecommendations(request);
             }
         }
@@ -100,7 +104,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Requesting xAI maintenance prediction analysis");
+                Logger.Information("Requesting xAI maintenance prediction analysis");
 
                 var prompt = BuildMaintenancePredictionPrompt(request);
                 var xaiRequest = new XAIRequest
@@ -125,7 +129,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in xAI maintenance prediction");
+                Logger.Error(ex, "Error in xAI maintenance prediction");
                 return await GenerateMockMaintenancePrediction(request);
             }
         }
@@ -137,7 +141,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Requesting xAI safety risk analysis");
+                Logger.Information("Requesting xAI safety risk analysis");
 
                 var prompt = BuildSafetyAnalysisPrompt(request);
                 var xaiRequest = new XAIRequest
@@ -162,7 +166,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in xAI safety analysis");
+                Logger.Error(ex, "Error in xAI safety analysis");
                 return await GenerateMockSafetyAnalysis(request);
             }
         }
@@ -174,7 +178,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Requesting xAI student assignment optimization");
+                Logger.Information("Requesting xAI student assignment optimization");
 
                 var prompt = BuildStudentOptimizationPrompt(request);
                 var xaiRequest = new XAIRequest
@@ -199,7 +203,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in xAI student optimization");
+                Logger.Error(ex, "Error in xAI student optimization");
                 return await GenerateMockStudentOptimization(request);
             }
         }
@@ -211,7 +215,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Sending chat message to xAI: {Message}", message);
+                Logger.Information("Sending chat message to xAI: {Message}", message);
 
                 if (!_isConfigured)
                 {
@@ -240,7 +244,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in xAI chat message: {Message}", message);
+                Logger.Error(ex, "Error in xAI chat message: {Message}", message);
                 await Task.Delay(500); // Brief delay for mock response
                 return GenerateMockChatResponse(message);
             }
@@ -454,30 +458,30 @@ Be helpful, informative, and always prioritize student safety. Provide practical
                 var json = JsonSerializer.Serialize(request, options);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                _logger.LogDebug("Calling xAI API: {Endpoint} with model: {Model}", endpoint, request.Model);
+                Logger.Debug("Calling xAI API: {Endpoint} with model: {Model}", endpoint, request.Model);
 
                 var response = await _httpClient.PostAsync($"{_baseUrl}{endpoint}", content);
                 response.EnsureSuccessStatusCode();
 
                 var responseJson = await response.Content.ReadAsStringAsync();
-                _logger.LogDebug("xAI API response received: {ResponseLength} characters", responseJson.Length);
+                Logger.Debug("xAI API response received: {ResponseLength} characters", responseJson.Length);
 
                 var result = JsonSerializer.Deserialize<XAIResponse>(responseJson, options);
                 return result ?? new XAIResponse();
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "HTTP error calling xAI API: {Message}", ex.Message);
+                Logger.Error(ex, "HTTP error calling xAI API: {Message}", ex.Message);
                 throw;
             }
             catch (JsonException ex)
             {
-                _logger.LogError(ex, "JSON parsing error from xAI API: {Message}", ex.Message);
+                Logger.Error(ex, "JSON parsing error from xAI API: {Message}", ex.Message);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error calling xAI API: {Message}", ex.Message);
+                Logger.Error(ex, "Unexpected error calling xAI API: {Message}", ex.Message);
                 throw;
             }
         }
@@ -635,7 +639,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
                 if (response?.Choices?.Length > 0)
                 {
                     var content = response.Choices[0].Message.Content;
-                    _logger.LogDebug("Parsing xAI route optimization response: {Content}", content);
+                    Logger.Debug("Parsing xAI route optimization response: {Content}", content);
 
                     // Try to parse structured JSON response or extract key information
                     if (content.Contains("{") && content.Contains("}"))
@@ -665,7 +669,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error parsing xAI route recommendations");
+                Logger.Error(ex, "Error parsing xAI route recommendations");
                 return CreateDefaultRouteRecommendations("Error parsing AI response");
             }
         }
@@ -699,7 +703,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
                 if (response?.Choices?.Length > 0)
                 {
                     var content = response.Choices[0].Message.Content;
-                    _logger.LogDebug("Parsing xAI maintenance prediction response");
+                    Logger.Debug("Parsing xAI maintenance prediction response");
 
                     return new AIMaintenancePrediction
                     {
@@ -715,7 +719,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error parsing xAI maintenance prediction");
+                Logger.Error(ex, "Error parsing xAI maintenance prediction");
                 return new AIMaintenancePrediction();
             }
         }
@@ -727,7 +731,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
                 if (response?.Choices?.Length > 0)
                 {
                     var content = response.Choices[0].Message.Content;
-                    _logger.LogDebug("Parsing xAI safety analysis response");
+                    Logger.Debug("Parsing xAI safety analysis response");
 
                     return new AISafetyAnalysis
                     {
@@ -743,7 +747,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error parsing xAI safety analysis");
+                Logger.Error(ex, "Error parsing xAI safety analysis");
                 return new AISafetyAnalysis();
             }
         }
@@ -755,7 +759,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
                 if (response?.Choices?.Length > 0)
                 {
                     var content = response.Choices[0].Message.Content;
-                    _logger.LogDebug("Parsing xAI student optimization response");
+                    Logger.Debug("Parsing xAI student optimization response");
 
                     return new AIStudentOptimization
                     {
@@ -775,7 +779,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error parsing xAI student optimization");
+                Logger.Error(ex, "Error parsing xAI student optimization");
                 return new AIStudentOptimization();
             }
         }

@@ -1,6 +1,6 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Data;
 
 namespace BusBuddy.Core.Utilities;
@@ -11,15 +11,14 @@ namespace BusBuddy.Core.Utilities;
 /// </summary>
 public class DatabaseResilienceService
 {
-    private readonly ILogger<DatabaseResilienceService> _logger;
+    private static readonly ILogger Logger = Log.ForContext<DatabaseResilienceService>();
     private readonly TimeSpan _circuitBreakerTimeout = TimeSpan.FromMinutes(5);
     private DateTime _lastFailureTime = DateTime.MinValue;
     private int _consecutiveFailures = 0;
     private const int MaxConsecutiveFailures = 3;
 
-    public DatabaseResilienceService(ILogger<DatabaseResilienceService> logger)
+    public DatabaseResilienceService()
     {
-        _logger = logger;
     }
 
     /// <summary>
@@ -43,7 +42,7 @@ public class DatabaseResilienceService
         {
             try
             {
-                _logger.LogDebug("Executing database operation '{OperationName}', attempt {Attempt}/{MaxRetries}",
+                Logger.Debug("Executing database operation '{OperationName}', attempt {Attempt}/{MaxRetries}",
                     operationName, attempt, maxRetries);
 
                 var result = await operation();
@@ -51,7 +50,7 @@ public class DatabaseResilienceService
                 // Reset circuit breaker on success
                 ResetCircuitBreaker();
 
-                _logger.LogDebug("Database operation '{OperationName}' completed successfully", operationName);
+                Logger.Debug("Database operation '{OperationName}' completed successfully", operationName);
                 return result;
             }
             catch (Exception ex) when (ShouldRetry(ex, attempt, maxRetries))
@@ -59,7 +58,7 @@ public class DatabaseResilienceService
                 lastException = ex;
                 var currentDelay = TimeSpan.FromMilliseconds(delay.TotalMilliseconds * Math.Pow(2, attempt - 1));
 
-                _logger.LogWarning(ex,
+                Logger.Warning(ex,
                     "Database operation '{OperationName}' failed on attempt {Attempt}/{MaxRetries}. Retrying in {Delay}ms. Error: {ErrorMessage}",
                     operationName, attempt, maxRetries, currentDelay.TotalMilliseconds, ex.Message);
 
@@ -70,7 +69,7 @@ public class DatabaseResilienceService
                 lastException = ex;
                 RecordFailure();
 
-                _logger.LogError(ex,
+                Logger.Error(ex,
                     "Database operation '{OperationName}' failed permanently on attempt {Attempt}/{MaxRetries}. Error: {ErrorMessage}",
                     operationName, attempt, maxRetries, ex.Message);
 
@@ -138,7 +137,7 @@ public class DatabaseResilienceService
         _consecutiveFailures++;
         _lastFailureTime = DateTime.UtcNow;
 
-        _logger.LogWarning("Database failure recorded. Consecutive failures: {ConsecutiveFailures}", _consecutiveFailures);
+        Logger.Warning("Database failure recorded. Consecutive failures: {ConsecutiveFailures}", _consecutiveFailures);
     }
 
     /// <summary>
@@ -148,7 +147,7 @@ public class DatabaseResilienceService
     {
         if (_consecutiveFailures > 0)
         {
-            _logger.LogInformation("Database circuit breaker reset after successful operation");
+            Logger.Information("Database circuit breaker reset after successful operation");
             _consecutiveFailures = 0;
             _lastFailureTime = DateTime.MinValue;
         }
@@ -163,7 +162,7 @@ public class DatabaseResilienceService
 
         if (DateTime.UtcNow - _lastFailureTime > _circuitBreakerTimeout)
         {
-            _logger.LogInformation("Database circuit breaker timeout expired, allowing retry");
+            Logger.Information("Database circuit breaker timeout expired, allowing retry");
             return false;
         }
 
@@ -217,7 +216,7 @@ public class DatabaseResilienceService
 
             result.IsHealthy = !result.Issues.Any();
 
-            _logger.LogInformation("Database health check completed. Healthy: {IsHealthy}, Issues: {IssueCount}",
+            Logger.Information("Database health check completed. Healthy: {IsHealthy}, Issues: {IssueCount}",
                 result.IsHealthy, result.Issues.Count);
 
             return result;
@@ -225,7 +224,7 @@ public class DatabaseResilienceService
         catch (Exception ex)
         {
             result.AddIssue($"Health check failed: {ex.Message}");
-            _logger.LogError(ex, "Database health check encountered an error");
+            Logger.Error(ex, "Database health check encountered an error");
             return result;
         }
     }

@@ -1,7 +1,7 @@
 // Services/BusBuddyAIReportingService.cs
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -16,7 +16,7 @@ namespace BusBuddy.Core.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _cache;
-        private readonly ILogger<BusBuddyAIReportingService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<BusBuddyAIReportingService>();
         private readonly TransportationContext _transportationContext;
         private readonly ContextAwarePromptBuilder _promptBuilder;
         private readonly string _apiKey;
@@ -25,14 +25,12 @@ namespace BusBuddy.Core.Services
         public BusBuddyAIReportingService(
             HttpClient httpClient,
             IMemoryCache cache,
-            ILogger<BusBuddyAIReportingService> logger,
             TransportationContext transportationContext,
             ContextAwarePromptBuilder promptBuilder,
             IConfiguration configuration)
         {
             _httpClient = httpClient;
             _cache = cache;
-            _logger = logger;
             _transportationContext = transportationContext;
             _promptBuilder = promptBuilder;
             _apiKey = configuration["XAI:ApiKey"] ?? throw new ArgumentException("XAI:ApiKey configuration is required");
@@ -48,7 +46,7 @@ namespace BusBuddy.Core.Services
 
             try
             {
-                _logger.LogInformation("Starting AI report generation: {ReportType}, Operation: {OperationId}", reportType, operationId);
+                Logger.Information("Starting AI report generation: {ReportType}, Operation: {OperationId}", reportType, operationId);
 
                 // Get cached transportation context
                 var contextData = await _transportationContext.GetContextDataAsync("BusBuddy");
@@ -74,7 +72,7 @@ namespace BusBuddy.Core.Services
                 CacheReportAsync(reportType, reportResponse);
 
                 var duration = DateTime.UtcNow - startTime;
-                _logger.LogInformation("AI report generated successfully: {ReportType}, Duration: {Duration}ms, Tokens: {Tokens}",
+                Logger.Information("AI report generated successfully: {ReportType}, Duration: {Duration}ms, Tokens: {Tokens}",
                     reportType, duration.TotalMilliseconds, aiResponse.Usage?.TotalTokens);
 
                 return reportResponse;
@@ -82,7 +80,7 @@ namespace BusBuddy.Core.Services
             catch (Exception ex)
             {
                 var duration = DateTime.UtcNow - startTime;
-                _logger.LogError(ex, "AI report generation failed: {ReportType}, Duration: {Duration}ms, Operation: {OperationId}",
+                Logger.Error(ex, "AI report generation failed: {ReportType}, Duration: {Duration}ms, Operation: {OperationId}",
                     reportType, duration.TotalMilliseconds, operationId);
                 throw;
             }
@@ -132,7 +130,7 @@ namespace BusBuddy.Core.Services
                     }
                     else if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     {
-                        _logger.LogWarning("Rate limit hit, attempt {Attempt}/{MaxRetries}, retrying in {Delay}s",
+                        Logger.Warning("Rate limit hit, attempt {Attempt}/{MaxRetries}, retrying in {Delay}s",
                             attempt, maxRetries, retryDelay.TotalSeconds);
 
                         if (attempt < maxRetries)
@@ -147,7 +145,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (HttpRequestException) when (attempt < maxRetries)
                 {
-                    _logger.LogWarning("AI API call failed, attempt {Attempt}/{MaxRetries}, retrying in {Delay}s",
+                    Logger.Warning("AI API call failed, attempt {Attempt}/{MaxRetries}, retrying in {Delay}s",
                         attempt, maxRetries, retryDelay.TotalSeconds);
                     await Task.Delay(retryDelay);
                     retryDelay = TimeSpan.FromSeconds(retryDelay.TotalSeconds * 2);
@@ -171,7 +169,7 @@ namespace BusBuddy.Core.Services
             };
 
             _cache.Set(cacheKey, response, cacheOptions);
-            _logger.LogDebug("Cached AI report: {CacheKey}", cacheKey);
+            Logger.Debug("Cached AI report: {CacheKey}", cacheKey);
         }
 
         /// <summary>
@@ -196,7 +194,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to extract content from AI response");
+                Logger.Error(ex, "Failed to extract content from AI response");
                 return "Error parsing AI response";
             }
         }
@@ -216,7 +214,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to extract usage from AI response");
+                Logger.Error(ex, "Failed to extract usage from AI response");
                 return new TokenUsage();
             }
         }
@@ -228,14 +226,13 @@ namespace BusBuddy.Core.Services
     public class TransportationContext
     {
         private readonly IMemoryCache _cache;
-        private readonly ILogger<TransportationContext> _logger;
+        private static readonly ILogger Logger = Log.ForContext<TransportationContext>();
         private const string CACHE_KEY_PREFIX = "TransportationContext_";
         private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(30);
 
-        public TransportationContext(IMemoryCache cache, ILogger<TransportationContext> logger)
+        public TransportationContext(IMemoryCache cache)
         {
             _cache = cache;
-            _logger = logger;
         }
 
         public async Task<TransportationData> GetContextDataAsync(string contextId)
@@ -244,7 +241,7 @@ namespace BusBuddy.Core.Services
 
             if (_cache.TryGetValue(cacheKey, out TransportationData? cachedData) && cachedData != null)
             {
-                _logger.LogDebug("Retrieved transportation context from cache: {ContextId}", contextId);
+                Logger.Debug("Retrieved transportation context from cache: {ContextId}", contextId);
                 return cachedData;
             }
 
@@ -258,7 +255,7 @@ namespace BusBuddy.Core.Services
             };
 
             _cache.Set(cacheKey, data, cacheOptions);
-            _logger.LogDebug("Cached transportation context: {ContextId}", contextId);
+            Logger.Debug("Cached transportation context: {ContextId}", contextId);
 
             return data;
         }
@@ -267,7 +264,7 @@ namespace BusBuddy.Core.Services
         {
             var cacheKey = $"{CACHE_KEY_PREFIX}{contextId}";
             _cache.Remove(cacheKey);
-            _logger.LogDebug("Invalidated transportation context cache: {ContextId}", contextId);
+            Logger.Debug("Invalidated transportation context cache: {ContextId}", contextId);
         }
 
         private Task<TransportationData> FetchContextDataFromSourceAsync(string contextId)
@@ -295,11 +292,10 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class ContextAwarePromptBuilder
     {
-        private readonly ILogger<ContextAwarePromptBuilder> _logger;
+        private static readonly ILogger Logger = Log.ForContext<ContextAwarePromptBuilder>();
 
-        public ContextAwarePromptBuilder(ILogger<ContextAwarePromptBuilder> logger)
+        public ContextAwarePromptBuilder()
         {
-            _logger = logger;
         }
 
         public Task<string> BuildReportPromptAsync(string reportType, string location, TransportationData context, Dictionary<string, object> parameters)
@@ -317,7 +313,7 @@ CURRENT SYSTEM CONTEXT:
 
 Please provide a comprehensive analysis with specific recommendations and actionable insights for the Bus Buddy transportation system.";
 
-            _logger.LogDebug("Built context-aware prompt for {ReportType}, length: {Length} characters", reportType, fullPrompt.Length);
+            Logger.Debug("Built context-aware prompt for {ReportType}, length: {Length} characters", reportType, fullPrompt.Length);
             return Task.FromResult(fullPrompt);
         }
 

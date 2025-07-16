@@ -4,7 +4,7 @@ using BusBuddy.Core.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,17 +23,15 @@ namespace BusBuddy.WPF.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<StartupValidationService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<StartupValidationService>();
         private readonly List<ValidationResult> _validationResults = new();
 
         public StartupValidationService(
             IServiceProvider serviceProvider,
-            IConfiguration configuration,
-            ILogger<StartupValidationService> logger)
+            IConfiguration configuration)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -43,7 +41,7 @@ namespace BusBuddy.WPF.Services
         public async Task<StartupValidationResult> ValidateStartupAsync()
         {
             var overallStopwatch = Stopwatch.StartNew();
-            _logger.LogInformation("[STARTUP_VALIDATION] Beginning comprehensive startup validation for deployment readiness");
+            Logger.Information("[STARTUP_VALIDATION] Beginning comprehensive startup validation for deployment readiness");
 
             try
             {
@@ -71,22 +69,22 @@ namespace BusBuddy.WPF.Services
                 var passedCount = _validationResults.Count(r => r.IsValid);
                 var failedCount = _validationResults.Count - passedCount;
 
-                _logger.LogInformation(
+                Logger.Information(
                     "[STARTUP_VALIDATION] Validation complete: {PassedCount} passed, {FailedCount} failed, {TotalTimeMs}ms total",
                     passedCount, failedCount, result.TotalValidationTimeMs);
 
                 if (!result.IsValid)
                 {
-                    _logger.LogError("[STARTUP_VALIDATION] Application is NOT ready for deployment - validation failures detected");
+                    Logger.Error("[STARTUP_VALIDATION] Application is NOT ready for deployment - validation failures detected");
                     foreach (var failure in _validationResults.Where(r => !r.IsValid))
                     {
-                        _logger.LogError("[STARTUP_VALIDATION] FAILED: {ValidationName} - {ErrorMessage}",
+                        Logger.Error("[STARTUP_VALIDATION] FAILED: {ValidationName} - {ErrorMessage}",
                             failure.ValidationName, failure.ErrorMessage);
                     }
                 }
                 else
                 {
-                    _logger.LogInformation("[STARTUP_VALIDATION] ✅ Application is ready for deployment - all validations passed");
+                    Logger.Information("[STARTUP_VALIDATION] ✅ Application is ready for deployment - all validations passed");
                 }
 
                 return result;
@@ -94,7 +92,7 @@ namespace BusBuddy.WPF.Services
             catch (Exception ex)
             {
                 overallStopwatch.Stop();
-                _logger.LogCritical(ex, "[STARTUP_VALIDATION] Critical error during startup validation");
+                Logger.Fatal(ex, "[STARTUP_VALIDATION] Critical error during startup validation");
 
                 return new StartupValidationResult
                 {
@@ -121,7 +119,7 @@ namespace BusBuddy.WPF.Services
         {
             try
             {
-                _logger.LogInformation("[DEPLOYMENT_CHECK] Running quick deployment readiness check");
+                Logger.Information("[DEPLOYMENT_CHECK] Running quick deployment readiness check");
 
                 // Clear any previous results
                 _validationResults.Clear();
@@ -162,14 +160,14 @@ namespace BusBuddy.WPF.Services
 
                 var isReady = _validationResults.TrueForAll(r => r.IsValid);
 
-                _logger.LogInformation("[DEPLOYMENT_CHECK] Deployment readiness: {IsReady}",
+                Logger.Information("[DEPLOYMENT_CHECK] Deployment readiness: {IsReady}",
                     isReady ? "READY" : "NOT READY");
 
                 return isReady;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[DEPLOYMENT_CHECK] Error during deployment readiness check");
+                Logger.Error(ex, "[DEPLOYMENT_CHECK] Error during deployment readiness check");
                 return false;
             }
         }
@@ -266,7 +264,7 @@ namespace BusBuddy.WPF.Services
                 var environmentName = EnvironmentHelper.GetEnvironmentName();
                 var isDevelopment = EnvironmentHelper.IsDevelopment();
 
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating environment: {EnvironmentName}", environmentName);
+                Logger.Information("[STARTUP_VALIDATION] Validating environment: {EnvironmentName}", environmentName);
 
                 // Validate environment variables are set appropriately
                 var requiredEnvVars = new List<string>();
@@ -329,7 +327,7 @@ namespace BusBuddy.WPF.Services
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating configuration");
+                Logger.Information("[STARTUP_VALIDATION] Validating configuration");
 
                 var issues = new List<string>();
 
@@ -401,7 +399,7 @@ namespace BusBuddy.WPF.Services
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating database connectivity and schema");
+                Logger.Information("[STARTUP_VALIDATION] Validating database connectivity and schema");
 
                 using var scope = _serviceProvider.CreateScope();
                 var context = scope.ServiceProvider.GetService<BusBuddyDbContext>();
@@ -438,7 +436,7 @@ namespace BusBuddy.WPF.Services
                 var pendingMigrations = new List<string>(); // Placeholder - would need EF Core extensions
                 if (pendingMigrations.Any())
                 {
-                    _logger.LogWarning("[STARTUP_VALIDATION] Found {Count} pending migrations", pendingMigrations.Count());
+                    Logger.Warning("[STARTUP_VALIDATION] Found {Count} pending migrations", pendingMigrations.Count());
                     // This might be acceptable in some deployment scenarios, so it's a warning, not a failure
                 }
 
@@ -450,7 +448,7 @@ namespace BusBuddy.WPF.Services
                     var hasDrivers = context.Drivers.Any();
                     var hasRoutes = context.Routes.Any();
 
-                    _logger.LogDebug("[STARTUP_VALIDATION] Schema validation: vehicles table {VehicleStatus}, drivers table {DriverStatus}, routes table {RouteStatus}",
+                    Logger.Debug("[STARTUP_VALIDATION] Schema validation: vehicles table {VehicleStatus}, drivers table {DriverStatus}, routes table {RouteStatus}",
                         hasVehicles ? "accessible" : "empty/inaccessible",
                         hasDrivers ? "accessible" : "empty/inaccessible",
                         hasRoutes ? "accessible" : "empty/inaccessible");
@@ -498,7 +496,7 @@ namespace BusBuddy.WPF.Services
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating service dependencies");
+                Logger.Information("[STARTUP_VALIDATION] Validating service dependencies");
 
                 var criticalServices = new Dictionary<string, Type>
                 {
@@ -572,7 +570,7 @@ namespace BusBuddy.WPF.Services
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating licensing");
+                Logger.Information("[STARTUP_VALIDATION] Validating licensing");
 
                 // Check Syncfusion license
                 var licenseKey = _configuration["Syncfusion:LicenseKey"] ??
@@ -640,7 +638,7 @@ namespace BusBuddy.WPF.Services
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating security configuration");
+                Logger.Information("[STARTUP_VALIDATION] Validating security configuration");
 
                 var securityIssues = new List<string>();
 
@@ -712,7 +710,7 @@ namespace BusBuddy.WPF.Services
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating logging configuration");
+                Logger.Information("[STARTUP_VALIDATION] Validating logging configuration");
 
                 var issues = new List<string>();
 
@@ -789,7 +787,7 @@ namespace BusBuddy.WPF.Services
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                _logger.LogInformation("[STARTUP_VALIDATION] Validating performance requirements");
+                Logger.Information("[STARTUP_VALIDATION] Validating performance requirements");
 
                 var performanceIssues = new List<string>();
 

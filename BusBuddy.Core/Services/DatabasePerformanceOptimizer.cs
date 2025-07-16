@@ -1,6 +1,6 @@
 using BusBuddy.Core.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Diagnostics;
 
 namespace BusBuddy.Core.Services;
@@ -10,14 +10,11 @@ namespace BusBuddy.Core.Services;
 /// </summary>
 public class DatabasePerformanceOptimizer
 {
-    private readonly ILogger<DatabasePerformanceOptimizer> _logger;
+    private static readonly ILogger Logger = Log.ForContext<DatabasePerformanceOptimizer>();
     private readonly IBusBuddyDbContextFactory _contextFactory;
 
-    public DatabasePerformanceOptimizer(
-        ILogger<DatabasePerformanceOptimizer> logger,
-        IBusBuddyDbContextFactory contextFactory)
+    public DatabasePerformanceOptimizer(IBusBuddyDbContextFactory contextFactory)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
     }
 
@@ -84,7 +81,7 @@ public class DatabasePerformanceOptimizer
         // Check for missing indexes
         await CheckForMissingIndexes(result);
 
-        _logger.LogInformation("Database performance analysis completed. Found {IssueCount} potential issues.",
+        Logger.Information("Database performance analysis completed. Found {IssueCount} potential issues.",
             result.Issues.Count);
 
         return result;
@@ -107,12 +104,12 @@ public class DatabasePerformanceOptimizer
             // Clear any cached query plans
             context.ChangeTracker.Clear();
 
-            _logger.LogInformation("Applied database performance optimizations");
+            Logger.Information("Applied database performance optimizations");
             optimizationsApplied++;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to apply database optimizations");
+            Logger.Error(ex, "Failed to apply database optimizations");
         }
 
         return Task.FromResult(optimizationsApplied);
@@ -140,7 +137,7 @@ public class DatabasePerformanceOptimizer
             if (stopwatch.ElapsedMilliseconds > 1000) // Warn about queries over 1 second
             {
                 result.Issues.Add($"Slow query detected: {queryName} took {stopwatch.ElapsedMilliseconds}ms");
-                _logger.LogWarning("Slow query: {QueryName} took {Duration}ms", queryName, stopwatch.ElapsedMilliseconds);
+                Logger.Warning("Slow query: {QueryName} took {Duration}ms", queryName, stopwatch.ElapsedMilliseconds);
             }
         }
         catch (Exception ex)
@@ -158,7 +155,7 @@ public class DatabasePerformanceOptimizer
             result.Measurements.Add(measurement);
             result.Issues.Add($"Query failed: {queryName} - {ex.Message}");
 
-            _logger.LogError(ex, "Query failed: {QueryName}", queryName);
+            Logger.Error(ex, "Query failed: {QueryName}", queryName);
         }
     }
 

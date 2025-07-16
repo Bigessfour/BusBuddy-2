@@ -2,8 +2,7 @@ using BusBuddy.Core.Data;
 using BusBuddy.Core.Logging;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,23 +14,19 @@ namespace BusBuddy.Core.Services
     public class ActivityLogService : IActivityLogService
     {
         private readonly BusBuddyDbContext _db;
-        private readonly ILogger<ActivityLogService>? _logger;
+        private static readonly ILogger Logger = Log.ForContext<ActivityLogService>();
 
-        public ActivityLogService(BusBuddyDbContext db, ILogger<ActivityLogService>? logger = null)
+        public ActivityLogService(BusBuddyDbContext db)
         {
             _db = db;
-            _logger = logger;
         }
 
         public async Task LogAsync(string action, string user, string? details = null)
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "LogActivity", $"Action: {action}, User: {user}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting LogActivity - Action: {Action}, User: {User}", action, user);
+
                 // Truncate details if they exceed the database column size (1000 chars)
                 string? truncatedDetails = details;
                 if (details != null && details.Length > 995)
@@ -49,47 +44,33 @@ namespace BusBuddy.Core.Services
                 _db.ActivityLogs.Add(log);
                 await _db.SaveChangesAsync();
 
-#if DEBUG
-                tracker?.Complete($"Added log entry with ID: {log.Id}");
-#endif
+                Logger.Debug("[ACTIVITY_EXIT] Completed LogActivity - Added log entry with ID: {LogId}", log.Id);
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogError(ex, "Error logging activity: {Action} by {User}", action, user);
+                Logger.Error(ex, "Error logging activity: {Action} by {User}", action, user);
                 throw;
             }
         }
 
         public async Task<IEnumerable<ActivityLog>> GetLogsAsync(int count = 100)
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "GetLogs", $"Count: {count}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting GetLogs - Count: {Count}", count);
+
                 var logs = await _db.ActivityLogs
                     .AsNoTracking() // Read-only query for better performance
                     .OrderByDescending(l => l.Timestamp)
                     .Take(count)
                     .ToListAsync();
 
-#if DEBUG
-                tracker?.Complete($"Retrieved {logs.Count} log entries");
-#endif
-
+                Logger.Debug("[ACTIVITY_EXIT] Completed GetLogs - Retrieved {LogCount} log entries", logs.Count);
                 return logs;
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogError(ex, "Error retrieving activity logs");
+                Logger.Error(ex, "Error retrieving activity logs");
                 throw;
             }
         }
@@ -102,13 +83,10 @@ namespace BusBuddy.Core.Services
         /// <returns>Paged activity logs</returns>
         public async Task<IEnumerable<ActivityLog>> GetLogsPagedAsync(int pageNumber = 1, int pageSize = 50)
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "GetLogsPaged", $"Page: {pageNumber}, Size: {pageSize}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting GetLogsPaged - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
+
                 var logs = await _db.ActivityLogs
                     .AsNoTracking() // Read-only query for better performance
                     .OrderByDescending(l => l.Timestamp)
@@ -116,31 +94,22 @@ namespace BusBuddy.Core.Services
                     .Take(pageSize)
                     .ToListAsync();
 
-#if DEBUG
-                tracker?.Complete($"Retrieved {logs.Count} log entries for page {pageNumber}");
-#endif
-
+                Logger.Debug("[ACTIVITY_EXIT] Completed GetLogsPaged - Retrieved {LogCount} log entries for page {PageNumber}", logs.Count, pageNumber);
                 return logs;
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogError(ex, "Error retrieving paged activity logs");
+                Logger.Error(ex, "Error retrieving paged activity logs");
                 throw;
             }
         }
 
         public async Task<IEnumerable<ActivityLog>> GetLogsByDateRangeAsync(DateTime startDate, DateTime endDate, int count = 1000)
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "GetLogsByDateRange", $"StartDate: {startDate}, EndDate: {endDate}, Count: {count}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting GetLogsByDateRange - StartDate: {StartDate}, EndDate: {EndDate}, Count: {Count}", startDate, endDate, count);
+
                 var logs = await _db.ActivityLogs
                     .AsNoTracking() // Read-only query for better performance
                     .Where(l => l.Timestamp >= startDate && l.Timestamp <= endDate)
@@ -148,31 +117,22 @@ namespace BusBuddy.Core.Services
                     .Take(count)
                     .ToListAsync();
 
-#if DEBUG
-                tracker?.Complete($"Retrieved {logs.Count} log entries");
-#endif
-
+                Logger.Debug("[ACTIVITY_EXIT] Completed GetLogsByDateRange - Retrieved {LogCount} log entries", logs.Count);
                 return logs;
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogError(ex, "Error retrieving activity logs by date range");
+                Logger.Error(ex, "Error retrieving activity logs by date range");
                 throw;
             }
         }
 
         public async Task<IEnumerable<ActivityLog>> GetLogsByUserAsync(string user, int count = 100)
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "GetLogsByUser", $"User: {user}, Count: {count}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting GetLogsByUser - User: {User}, Count: {Count}", user, count);
+
                 var logs = await _db.ActivityLogs
                     .AsNoTracking() // Read-only query for better performance
                     .Where(l => l.User == user)
@@ -180,31 +140,22 @@ namespace BusBuddy.Core.Services
                     .Take(count)
                     .ToListAsync();
 
-#if DEBUG
-                tracker?.Complete($"Retrieved {logs.Count} log entries");
-#endif
-
+                Logger.Debug("[ACTIVITY_EXIT] Completed GetLogsByUser - Retrieved {LogCount} log entries", logs.Count);
                 return logs;
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogError(ex, "Error retrieving activity logs by user");
+                Logger.Error(ex, "Error retrieving activity logs by user");
                 throw;
             }
         }
 
         public async Task<IEnumerable<ActivityLog>> GetLogsByActionAsync(string action, int count = 100)
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "GetLogsByAction", $"Action: {action}, Count: {count}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting GetLogsByAction - Action: {Action}, Count: {Count}", action, count);
+
                 var logs = await _db.ActivityLogs
                     .AsNoTracking() // Read-only query for better performance
                     .Where(l => l.Action.Contains(action))
@@ -212,31 +163,22 @@ namespace BusBuddy.Core.Services
                     .Take(count)
                     .ToListAsync();
 
-#if DEBUG
-                tracker?.Complete($"Retrieved {logs.Count} log entries");
-#endif
-
+                Logger.Debug("[ACTIVITY_EXIT] Completed GetLogsByAction - Retrieved {LogCount} log entries", logs.Count);
                 return logs;
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogError(ex, "Error retrieving activity logs by action");
+                Logger.Error(ex, "Error retrieving activity logs by action");
                 throw;
             }
         }
 
         public async Task LogEntityActionAsync<T>(string action, string user, T entity, int? entityId = null) where T : class
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "LogEntityAction", $"Action: {action}, EntityType: {typeof(T).Name}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting LogEntityAction - Action: {Action}, EntityType: {EntityType}", action, typeof(T).Name);
+
                 // Extract entity type name for the log
                 string entityType = typeof(T).Name;
 
@@ -270,16 +212,11 @@ namespace BusBuddy.Core.Services
                 // Log with structured details
                 await LogAsync(formattedAction, user, JsonSerializer.Serialize(details));
 
-#if DEBUG
-                tracker?.Complete($"Logged entity action with type {entityType} and ID {id}");
-#endif
+                Logger.Debug("[ACTIVITY_EXIT] Completed LogEntityAction - Logged entity action with type {EntityType} and ID {EntityId}", entityType, id);
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogError(ex, "Error logging entity action for type {EntityType}", typeof(T).Name);
+                Logger.Error(ex, "Error logging entity action for type {EntityType}", typeof(T).Name);
 
                 // Fallback to simple logging if serialization fails
                 try
@@ -289,7 +226,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception fallbackEx)
                 {
-                    _logger?.LogError(fallbackEx, "Fallback logging also failed for entity action");
+                    Logger.Error(fallbackEx, "Fallback logging also failed for entity action");
                     throw;
                 }
             }
@@ -297,13 +234,10 @@ namespace BusBuddy.Core.Services
 
         private string SerializeEntityForLogging<T>(T entity) where T : class
         {
-#if DEBUG
-            using var tracker = new ActivityLoggingPerformanceTracker(_logger ?? NullLogger<ActivityLogService>.Instance,
-                "SerializeEntityForLogging", $"EntityType: {typeof(T).Name}");
-#endif
-
             try
             {
+                Logger.Debug("[ACTIVITY_ENTRY] Starting SerializeEntityForLogging - EntityType: {EntityType}", typeof(T).Name);
+
                 // Use a temporary dictionary to collect the properties we want to log
                 var propertiesToLog = new Dictionary<string, object?>();
 
@@ -334,19 +268,12 @@ namespace BusBuddy.Core.Services
                 }
 
                 var result = JsonSerializer.Serialize(propertiesToLog);
-
-#if DEBUG
-                tracker?.Complete($"Serialized entity with {propertiesToLog.Count} properties");
-#endif
-
+                Logger.Debug("[ACTIVITY_EXIT] Completed SerializeEntityForLogging - Serialized entity with {PropertyCount} properties", propertiesToLog.Count);
                 return result;
             }
             catch (Exception ex)
             {
-#if DEBUG
-                tracker?.Error(ex);
-#endif
-                _logger?.LogWarning(ex, "Error serializing entity of type {EntityType} for logging", typeof(T).Name);
+                Logger.Warning(ex, "Error serializing entity of type {EntityType} for logging", typeof(T).Name);
                 return "[Entity data unavailable]";
             }
         }

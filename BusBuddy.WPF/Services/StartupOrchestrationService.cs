@@ -1,6 +1,6 @@
 using BusBuddy.WPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,14 +15,12 @@ namespace BusBuddy.WPF.Services
     public class StartupOrchestrationService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<StartupOrchestrationService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<StartupOrchestrationService>();
 
         public StartupOrchestrationService(
-            IServiceProvider serviceProvider,
-            ILogger<StartupOrchestrationService> logger)
+            IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -35,7 +33,7 @@ namespace BusBuddy.WPF.Services
             var overallStopwatch = Stopwatch.StartNew();
             var result = new StartupResult();
 
-            _logger.LogInformation("[STARTUP_ORCHESTRATION] Beginning coordinated startup sequence");
+            Logger.Information("[STARTUP_ORCHESTRATION] Beginning coordinated startup sequence");
 
             try
             {
@@ -111,7 +109,7 @@ namespace BusBuddy.WPF.Services
                 result.TotalExecutionTimeMs = overallStopwatch.ElapsedMilliseconds;
                 result.IsSuccessful = true;
 
-                _logger.LogInformation("[STARTUP_ORCHESTRATION] ✅ Startup sequence completed successfully in {DurationMs}ms",
+                Logger.Information("[STARTUP_ORCHESTRATION] ✅ Startup sequence completed successfully in {DurationMs}ms",
                     result.TotalExecutionTimeMs);
 
                 return result;
@@ -124,7 +122,7 @@ namespace BusBuddy.WPF.Services
                 result.ErrorMessage = ex.Message;
 
                 loadingViewModel.Status = "Startup failed - see logs for details";
-                _logger.LogError(ex, "[STARTUP_ORCHESTRATION] ❌ Startup sequence failed after {DurationMs}ms",
+                Logger.Error(ex, "[STARTUP_ORCHESTRATION] ❌ Startup sequence failed after {DurationMs}ms",
                     result.TotalExecutionTimeMs);
 
                 return result;
@@ -144,8 +142,8 @@ namespace BusBuddy.WPF.Services
         {
             var phaseStopwatch = Stopwatch.StartNew();
             var phaseResult = new PhaseResult { PhaseName = phaseName };
-            
-            _logger.LogInformation("[STARTUP_ORCHESTRATION] Starting phase: {PhaseName}", phaseName);
+
+            Logger.Information("[STARTUP_ORCHESTRATION] Starting phase: {PhaseName}", phaseName);
 
             loadingViewModel.Status = phaseName;
             loadingViewModel.ProgressPercentage = startProgress;
@@ -167,12 +165,12 @@ namespace BusBuddy.WPF.Services
 
                 if (success)
                 {
-                    _logger.LogInformation("[STARTUP_ORCHESTRATION] ✅ Phase '{PhaseName}' completed in {DurationMs}ms",
+                    Logger.Information("[STARTUP_ORCHESTRATION] ✅ Phase '{PhaseName}' completed in {DurationMs}ms",
                         phaseName, phaseStopwatch.ElapsedMilliseconds);
                 }
                 else
                 {
-                    _logger.LogWarning("[STARTUP_ORCHESTRATION] ⚠️ Phase '{PhaseName}' completed with warnings in {DurationMs}ms",
+                    Logger.Warning("[STARTUP_ORCHESTRATION] ⚠️ Phase '{PhaseName}' completed with warnings in {DurationMs}ms",
                         phaseName, phaseStopwatch.ElapsedMilliseconds);
                 }
             }
@@ -182,8 +180,8 @@ namespace BusBuddy.WPF.Services
                 phaseResult.IsSuccessful = false;
                 phaseResult.ExecutionTimeMs = phaseStopwatch.ElapsedMilliseconds;
                 phaseResult.ErrorMessage = ex.Message;
-                
-                _logger.LogError(ex, "[STARTUP_ORCHESTRATION] ❌ Phase '{PhaseName}' failed after {DurationMs}ms",
+
+                Logger.Error(ex, "[STARTUP_ORCHESTRATION] ❌ Phase '{PhaseName}' failed after {DurationMs}ms",
                     phaseName, phaseStopwatch.ElapsedMilliseconds);
                 throw;
             }

@@ -1,7 +1,7 @@
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Text;
 
 namespace BusBuddy.Core.Services;
@@ -12,13 +12,12 @@ namespace BusBuddy.Core.Services;
 /// </summary>
 public class StudentService : IStudentService
 {
-    private readonly ILogger<StudentService> _logger;
+    private static readonly ILogger Logger = Log.ForContext<StudentService>();
     private readonly IBusBuddyDbContextFactory _contextFactory;
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
-    public StudentService(ILogger<StudentService> logger, IBusBuddyDbContextFactory contextFactory)
+    public StudentService(IBusBuddyDbContextFactory contextFactory)
     {
-        _logger = logger;
         _contextFactory = contextFactory;
     }
 
@@ -29,7 +28,7 @@ public class StudentService : IStudentService
         await _semaphore.WaitAsync();
         try
         {
-            _logger.LogInformation("Retrieving all students from database");
+            Logger.Information("Retrieving all students from database");
             var context = _contextFactory.CreateDbContext();
             try
             {
@@ -46,7 +45,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving all students");
+            Logger.Error(ex, "Error retrieving all students");
             throw;
         }
         finally
@@ -59,7 +58,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Retrieving student with ID: {StudentId}", studentId);
+            Logger.Information("Retrieving student with ID: {StudentId}", studentId);
             var context = _contextFactory.CreateDbContext();
             try
             {
@@ -75,7 +74,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving student with ID: {StudentId}", studentId);
+            Logger.Error(ex, "Error retrieving student with ID: {StudentId}", studentId);
             throw;
         }
     }
@@ -84,7 +83,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Retrieving students in grade: {Grade}", grade);
+            Logger.Information("Retrieving students in grade: {Grade}", grade);
             var context = _contextFactory.CreateDbContext();
             try
             {
@@ -102,7 +101,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving students by grade: {Grade}", grade);
+            Logger.Error(ex, "Error retrieving students by grade: {Grade}", grade);
             throw;
         }
     }
@@ -111,7 +110,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Retrieving students on route: {RouteName}", routeName);
+            Logger.Information("Retrieving students on route: {RouteName}", routeName);
             // Don't dispose the context here as it might be needed after the method returns
             var context = _contextFactory.CreateDbContext();
             return await context.Students
@@ -121,7 +120,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving students by route: {RouteName}", routeName);
+            Logger.Error(ex, "Error retrieving students by route: {RouteName}", routeName);
             throw;
         }
     }
@@ -130,7 +129,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Retrieving active students");
+            Logger.Information("Retrieving active students");
             // Don't dispose the context here as it might be needed after the method returns
             var context = _contextFactory.CreateDbContext();
             return await context.Students
@@ -140,7 +139,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving active students");
+            Logger.Error(ex, "Error retrieving active students");
             throw;
         }
     }
@@ -149,7 +148,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Retrieving students from school: {School}", school);
+            Logger.Information("Retrieving students from school: {School}", school);
             // Don't dispose the context here as it might be needed after the method returns
             var context = _contextFactory.CreateDbContext();
             return await context.Students
@@ -159,7 +158,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving students by school: {School}", school);
+            Logger.Error(ex, "Error retrieving students by school: {School}", school);
             throw;
         }
     }
@@ -168,7 +167,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Searching students with term: {SearchTerm}", searchTerm);
+            Logger.Information("Searching students with term: {SearchTerm}", searchTerm);
 
             var term = searchTerm.ToLower();
             // Don't dispose the context here as it might be needed after the method returns
@@ -181,7 +180,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching students with term: {SearchTerm}", searchTerm);
+            Logger.Error(ex, "Error searching students with term: {SearchTerm}", searchTerm);
             throw;
         }
     }
@@ -194,7 +193,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Adding new student: {StudentName}", student.StudentName);
+            Logger.Information("Adding new student: {StudentName}", student.StudentName);
 
             // Validate student data
             var validationErrors = await ValidateStudentAsync(student);
@@ -213,12 +212,12 @@ public class StudentService : IStudentService
             context.Students.Add(student);
             await context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully added student with ID: {StudentId}", student.StudentId);
+            Logger.Information("Successfully added student with ID: {StudentId}", student.StudentId);
             return student;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error adding student: {StudentName}", student.StudentName);
+            Logger.Error(ex, "Error adding student: {StudentName}", student.StudentName);
             throw;
         }
     }
@@ -227,7 +226,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Updating student with ID: {StudentId}", student.StudentId);
+            Logger.Information("Updating student with ID: {StudentId}", student.StudentId);
 
             // Validate student data
             var validationErrors = await ValidateStudentAsync(student);
@@ -243,18 +242,18 @@ public class StudentService : IStudentService
             var success = result > 0;
             if (success)
             {
-                _logger.LogInformation("Successfully updated student: {StudentName}", student.StudentName);
+                Logger.Information("Successfully updated student: {StudentName}", student.StudentName);
             }
             else
             {
-                _logger.LogWarning("No changes were made when updating student: {StudentId}", student.StudentId);
+                Logger.Warning("No changes were made when updating student: {StudentId}", student.StudentId);
             }
 
             return success;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating student with ID: {StudentId}", student.StudentId);
+            Logger.Error(ex, "Error updating student with ID: {StudentId}", student.StudentId);
             throw;
         }
     }
@@ -263,7 +262,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Deleting student with ID: {StudentId}", studentId);
+            Logger.Information("Deleting student with ID: {StudentId}", studentId);
 
             using var context = _contextFactory.CreateWriteDbContext();
             var student = await context.Students.FindAsync(studentId);
@@ -275,18 +274,18 @@ public class StudentService : IStudentService
                 var success = result > 0;
                 if (success)
                 {
-                    _logger.LogInformation("Successfully deleted student: {StudentName}", student.StudentName);
+                    Logger.Information("Successfully deleted student: {StudentName}", student.StudentName);
                 }
 
                 return success;
             }
 
-            _logger.LogWarning("Student with ID {StudentId} not found for deletion", studentId);
+            Logger.Warning("Student with ID {StudentId} not found for deletion", studentId);
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting student with ID: {StudentId}", studentId);
+            Logger.Error(ex, "Error deleting student with ID: {StudentId}", studentId);
             throw;
         }
     }
@@ -385,7 +384,7 @@ public class StudentService : IStudentService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error validating AM route: {AMRoute}", student.AMRoute);
+                    Logger.Error(ex, "Error validating AM route: {AMRoute}", student.AMRoute);
                     errors.Add($"AM Route '{student.AMRoute}' does not exist");
                 }
             }
@@ -402,14 +401,14 @@ public class StudentService : IStudentService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error validating PM route: {PMRoute}", student.PMRoute);
+                    Logger.Error(ex, "Error validating PM route: {PMRoute}", student.PMRoute);
                     errors.Add($"PM Route '{student.PMRoute}' does not exist");
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during basic student validation");
+            Logger.Error(ex, "Error during basic student validation");
             errors.Add("Validation error occurred");
         }
 
@@ -424,7 +423,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Calculating student statistics");
+            Logger.Information("Calculating student statistics");
 
             using var context = _contextFactory.CreateDbContext();
             var stats = new Dictionary<string, int>
@@ -452,7 +451,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calculating student statistics");
+            Logger.Error(ex, "Error calculating student statistics");
             throw;
         }
     }
@@ -461,7 +460,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Finding students with missing required information");
+            Logger.Information("Finding students with missing required information");
 
             using var context = _contextFactory.CreateDbContext();
             return await context.Students
@@ -474,7 +473,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error finding students with missing information");
+            Logger.Error(ex, "Error finding students with missing information");
             throw;
         }
     }
@@ -487,14 +486,14 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Assigning student {StudentId} to routes - AM: {AMRoute}, PM: {PMRoute}",
+            Logger.Information("Assigning student {StudentId} to routes - AM: {AMRoute}, PM: {PMRoute}",
                 studentId, amRoute, pmRoute);
 
             using var context = _contextFactory.CreateWriteDbContext();
             var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
-                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                Logger.Warning("Student with ID {StudentId} not found", studentId);
                 return false;
             }
 
@@ -506,14 +505,14 @@ public class StudentService : IStudentService
 
             if (success)
             {
-                _logger.LogInformation("Successfully assigned routes for student: {StudentName}", student.StudentName);
+                Logger.Information("Successfully assigned routes for student: {StudentName}", student.StudentName);
             }
 
             return success;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error assigning routes for student {StudentId}", studentId);
+            Logger.Error(ex, "Error assigning routes for student {StudentId}", studentId);
             throw;
         }
     }
@@ -522,13 +521,13 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Assigning student {StudentId} to bus stop: {BusStop}", studentId, busStop);
+            Logger.Information("Assigning student {StudentId} to bus stop: {BusStop}", studentId, busStop);
 
             using var context = _contextFactory.CreateWriteDbContext();
             var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
-                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                Logger.Warning("Student with ID {StudentId} not found", studentId);
                 return false;
             }
 
@@ -539,14 +538,14 @@ public class StudentService : IStudentService
 
             if (success)
             {
-                _logger.LogInformation("Successfully assigned bus stop for student: {StudentName}", student.StudentName);
+                Logger.Information("Successfully assigned bus stop for student: {StudentName}", student.StudentName);
             }
 
             return success;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error assigning bus stop for student {StudentId}", studentId);
+            Logger.Error(ex, "Error assigning bus stop for student {StudentId}", studentId);
             throw;
         }
     }
@@ -555,13 +554,13 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Updating active status for student {StudentId} to {IsActive}", studentId, isActive);
+            Logger.Information("Updating active status for student {StudentId} to {IsActive}", studentId, isActive);
 
             using var context = _contextFactory.CreateWriteDbContext();
             var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
-                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                Logger.Warning("Student with ID {StudentId} not found", studentId);
                 return false;
             }
 
@@ -571,14 +570,14 @@ public class StudentService : IStudentService
 
             if (success)
             {
-                _logger.LogInformation("Successfully updated active status for student: {StudentName}", student.StudentName);
+                Logger.Information("Successfully updated active status for student: {StudentName}", student.StudentName);
             }
 
             return success;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating active status for student {StudentId}", studentId);
+            Logger.Error(ex, "Error updating active status for student {StudentId}", studentId);
             throw;
         }
     }
@@ -591,7 +590,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Updating address information for student {StudentId}", studentId);
+            Logger.Information("Updating address information for student {StudentId}", studentId);
 
             // Validate address format
             var addressValidation = ValidateAddress(homeAddress, city, state, zip);
@@ -604,7 +603,7 @@ public class StudentService : IStudentService
             var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
-                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                Logger.Warning("Student with ID {StudentId} not found", studentId);
                 return false;
             }
 
@@ -618,14 +617,14 @@ public class StudentService : IStudentService
 
             if (success)
             {
-                _logger.LogInformation("Successfully updated address for student: {StudentName}", student.StudentName);
+                Logger.Information("Successfully updated address for student: {StudentName}", student.StudentName);
             }
 
             return success;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating address for student {StudentId}", studentId);
+            Logger.Error(ex, "Error updating address for student {StudentId}", studentId);
             throw;
         }
     }
@@ -634,7 +633,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Updating contact information for student {StudentId}", studentId);
+            Logger.Information("Updating contact information for student {StudentId}", studentId);
 
             // Validate phone number formats
             var phonePattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";
@@ -652,7 +651,7 @@ public class StudentService : IStudentService
             var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
-                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                Logger.Warning("Student with ID {StudentId} not found", studentId);
                 return false;
             }
 
@@ -665,14 +664,14 @@ public class StudentService : IStudentService
 
             if (success)
             {
-                _logger.LogInformation("Successfully updated contact information for student: {StudentName}", student.StudentName);
+                Logger.Information("Successfully updated contact information for student: {StudentName}", student.StudentName);
             }
 
             return success;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating contact information for student {StudentId}", studentId);
+            Logger.Error(ex, "Error updating contact information for student {StudentId}", studentId);
             throw;
         }
     }
@@ -681,7 +680,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Updating emergency contact information for student {StudentId}", studentId);
+            Logger.Information("Updating emergency contact information for student {StudentId}", studentId);
 
             // Validate phone number formats
             var phonePattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$";
@@ -699,7 +698,7 @@ public class StudentService : IStudentService
             var student = await context.Students.FindAsync(studentId);
             if (student == null)
             {
-                _logger.LogWarning("Student with ID {StudentId} not found", studentId);
+                Logger.Warning("Student with ID {StudentId} not found", studentId);
                 return false;
             }
 
@@ -713,14 +712,14 @@ public class StudentService : IStudentService
 
             if (success)
             {
-                _logger.LogInformation("Successfully updated emergency contact information for student: {StudentName}", student.StudentName);
+                Logger.Information("Successfully updated emergency contact information for student: {StudentName}", student.StudentName);
             }
 
             return success;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating emergency contact information for student {StudentId}", studentId);
+            Logger.Error(ex, "Error updating emergency contact information for student {StudentId}", studentId);
             throw;
         }
     }
@@ -762,7 +761,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogInformation("Exporting students to CSV format");
+            Logger.Information("Exporting students to CSV format");
 
             var students = await GetAllStudentsAsync();
             var csv = new StringBuilder();
@@ -796,12 +795,12 @@ public class StudentService : IStudentService
                               $"{student.EnrollmentDate?.ToString("yyyy-MM-dd") ?? ""}");
             }
 
-            _logger.LogInformation("Successfully exported {Count} students to CSV", students.Count);
+            Logger.Information("Successfully exported {Count} students to CSV", students.Count);
             return csv.ToString();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error exporting students to CSV");
+            Logger.Error(ex, "Error exporting students to CSV");
             throw;
         }
     }
@@ -819,7 +818,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogDebug("Retrieving diagnostic information for student {StudentId}", studentId);
+            Logger.Debug("Retrieving diagnostic information for student {StudentId}", studentId);
 
             using var context = _contextFactory.CreateDbContext();
             var student = await context.Students
@@ -828,7 +827,7 @@ public class StudentService : IStudentService
 
             if (student == null)
             {
-                _logger.LogWarning("Student with ID {StudentId} not found for diagnostics", studentId);
+                Logger.Warning("Student with ID {StudentId} not found for diagnostics", studentId);
                 return new Dictionary<string, object> { { "Error", "Student not found" } };
             }
 
@@ -870,7 +869,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating diagnostics for student {StudentId}", studentId);
+            Logger.Error(ex, "Error generating diagnostics for student {StudentId}", studentId);
             return new Dictionary<string, object> { { "Error", ex.Message } };
         }
     }
@@ -1009,7 +1008,7 @@ public class StudentService : IStudentService
     {
         try
         {
-            _logger.LogDebug("Retrieving student operation metrics");
+            Logger.Debug("Retrieving student operation metrics");
 
             var metrics = new Dictionary<string, object>();
             using var context = _contextFactory.CreateDbContext();
@@ -1070,7 +1069,7 @@ public class StudentService : IStudentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating student operation metrics");
+            Logger.Error(ex, "Error generating student operation metrics");
             return new Dictionary<string, object> { { "Error", ex.Message } };
         }
     }

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,12 +11,11 @@ namespace BusBuddy.WPF.Utilities
     /// </summary>
     public class LogConsolidationUtility
     {
-        private readonly ILogger<LogConsolidationUtility> _logger;
+        private static readonly ILogger Logger = Log.ForContext<LogConsolidationUtility>();
         private readonly string _logsDirectory;
 
-        public LogConsolidationUtility(ILogger<LogConsolidationUtility> logger, string logsDirectory)
+        public LogConsolidationUtility(string logsDirectory)
         {
-            _logger = logger;
             _logsDirectory = logsDirectory;
         }
 
@@ -27,7 +26,7 @@ namespace BusBuddy.WPF.Utilities
         {
             try
             {
-                _logger.LogInformation("[LOG_CONSOLIDATION] Starting log consolidation process");
+                Logger.Information("[LOG_CONSOLIDATION] Starting log consolidation process");
 
                 // Ensure logs directory exists
                 Directory.CreateDirectory(_logsDirectory);
@@ -41,11 +40,11 @@ namespace BusBuddy.WPF.Utilities
                 // Create consolidated log structure documentation
                 await CreateLogStructureDocumentationAsync();
 
-                _logger.LogInformation("[LOG_CONSOLIDATION] Log consolidation completed successfully");
+                Logger.Information("[LOG_CONSOLIDATION] Log consolidation completed successfully");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[LOG_CONSOLIDATION] Error during log consolidation: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "[LOG_CONSOLIDATION] Error during log consolidation: {ErrorMessage}", ex.Message);
                 throw;
             }
         }
@@ -73,12 +72,12 @@ namespace BusBuddy.WPF.Utilities
                     if (File.Exists(logFile))
                     {
                         File.Move(logFile, targetPath);
-                        _logger.LogInformation("[LOG_CONSOLIDATION] Moved log file: {SourceFile} -> {TargetFile}", logFile, targetPath);
+                        Logger.Information("[LOG_CONSOLIDATION] Moved log file: {SourceFile} -> {TargetFile}", logFile, targetPath);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "[LOG_CONSOLIDATION] Could not move log file {LogFile}: {ErrorMessage}", logFile, ex.Message);
+                    Logger.Warning(ex, "[LOG_CONSOLIDATION] Could not move log file {LogFile}: {ErrorMessage}", logFile, ex.Message);
                 }
             }
         }
@@ -109,7 +108,7 @@ namespace BusBuddy.WPF.Utilities
                         if (fileInfo.LastWriteTime < DateTime.Now.AddDays(-1))
                         {
                             File.Delete(file);
-                            _logger.LogInformation("[LOG_CONSOLIDATION] Deleted old log file: {FileName}", Path.GetFileName(file));
+                            Logger.Information("[LOG_CONSOLIDATION] Deleted old log file: {FileName}", Path.GetFileName(file));
                         }
                         else
                         {
@@ -118,14 +117,14 @@ namespace BusBuddy.WPF.Utilities
                             if (!File.Exists(archivedName))
                             {
                                 File.Move(file, archivedName);
-                                _logger.LogInformation("[LOG_CONSOLIDATION] Archived recent log file: {FileName}", Path.GetFileName(file));
+                                Logger.Information("[LOG_CONSOLIDATION] Archived recent log file: {FileName}", Path.GetFileName(file));
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "[LOG_CONSOLIDATION] Error cleaning up pattern {Pattern}: {ErrorMessage}", pattern, ex.Message);
+                    Logger.Warning(ex, "[LOG_CONSOLIDATION] Error cleaning up pattern {Pattern}: {ErrorMessage}", pattern, ex.Message);
                 }
             }
         }
@@ -184,7 +183,7 @@ Files with `archived-` prefix are old log files that have been consolidated but 
 Generated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             await File.WriteAllTextAsync(docPath, content);
-            _logger.LogInformation("[LOG_CONSOLIDATION] Created log structure documentation: {DocPath}", docPath);
+            Logger.Information("[LOG_CONSOLIDATION] Created log structure documentation: {DocPath}", docPath);
         }
 
         /// <summary>

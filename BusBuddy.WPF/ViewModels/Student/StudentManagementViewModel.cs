@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
@@ -14,6 +13,8 @@ using BusBuddy.WPF.Utilities;
 using BusBuddy.WPF.ViewModels.Student;
 using BusBuddy.WPF.Controls;
 using StudentViews = BusBuddy.WPF.Views.Student;
+using Serilog;
+using Serilog.Context;
 
 // Disable async method without await operator warnings
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -22,6 +23,8 @@ namespace BusBuddy.WPF.ViewModels
 {
     public partial class StudentManagementViewModel : BaseInDevelopmentViewModel
     {
+        private static readonly new ILogger Logger = Log.ForContext<StudentManagementViewModel>();
+
         // ...existing fields, properties, and constructor...
 
         [RelayCommand]
@@ -256,8 +259,7 @@ namespace BusBuddy.WPF.ViewModels
         public StudentManagementViewModel(
             IStudentService studentService,
             IBusService busService,
-            IRouteService routeService,
-            ILogger<StudentManagementViewModel> logger) : base(logger)
+            IRouteService routeService) : base()
         {
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
@@ -301,7 +303,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error during ViewModel initialization");
+                Logger.Error(ex, "Error during ViewModel initialization");
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in InitializeAsync: {ex.Message}");
 #endif
@@ -313,19 +315,24 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                var buses = await _busService.GetAllBusesAsync();
-                Buses = new ObservableCollection<Bus>(buses);
-                OnPropertyChanged(nameof(Buses));
+                using (LogContext.PushProperty("OperationType", "DataLoad"))
+                {
+                    Logger.Information("UI Loading buses and routes for student management");
 
-                var routes = await _routeService.GetAllActiveRoutesAsync();
-                Routes = new ObservableCollection<Route>(routes);
-                OnPropertyChanged(nameof(Routes));
+                    var buses = await _busService.GetAllBusesAsync();
+                    Buses = new ObservableCollection<Bus>(buses);
+                    OnPropertyChanged(nameof(Buses));
 
-                Logger?.LogInformation("Loaded {BusCount} buses and {RouteCount} routes", Buses.Count, Routes.Count);
+                    var routes = await _routeService.GetAllActiveRoutesAsync();
+                    Routes = new ObservableCollection<Route>(routes);
+                    OnPropertyChanged(nameof(Routes));
+
+                    Logger.Information("UI Loaded {BusCount} buses and {RouteCount} routes", Buses.Count, Routes.Count);
+                }
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading buses and routes");
+                Logger.Error(ex, "Error loading buses and routes");
             }
         }
 
@@ -336,28 +343,33 @@ namespace BusBuddy.WPF.ViewModels
 #endif
             try
             {
-                Students.Clear();
-                var students = await _studentService.GetAllStudentsAsync();
-                foreach (var s in students)
-                    Students.Add(s);
+                using (LogContext.PushProperty("OperationType", "StudentLoad"))
+                {
+                    Logger.Information("UI Loading students for management view");
 
-                // Update available filter options
-                UpdateFilterOptions();
+                    Students.Clear();
+                    var students = await _studentService.GetAllStudentsAsync();
+                    foreach (var s in students)
+                        Students.Add(s);
 
-                // Apply current filter
-                ApplyFilters();
+                    // Update available filter options
+                    UpdateFilterOptions();
 
-                // Update statistics
-                UpdateStatistics();
+                    // Apply current filter
+                    ApplyFilters();
 
-                Logger?.LogInformation("Loaded {StudentCount} students", Students.Count);
+                    // Update statistics
+                    UpdateStatistics();
+
+                    Logger.Information("UI Loaded {StudentCount} students", Students.Count);
+                }
 #if DEBUG
                 DebugConfig.WriteStudent($"DATA: Loaded {Students.Count} students");
 #endif
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading students");
+                Logger.Error(ex, "Error loading students");
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in LoadStudentsAsync: {ex.Message}");
 #endif
@@ -368,50 +380,55 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                // Update grade options
-                AvailableGrades.Clear();
-                AvailableGrades.Add("All Grades");
-
-                var grades = Students
-                    .Where(s => !string.IsNullOrEmpty(s.Grade))
-                    .Select(s => s.Grade)
-                    .Distinct()
-                    .OrderBy(g => g)
-                    .ToList();
-
-                foreach (var grade in grades)
+                using (LogContext.PushProperty("OperationType", "FilterUpdate"))
                 {
-                    if (!string.IsNullOrEmpty(grade))
+                    Logger.Debug("UI Updating filter options for student management");
+
+                    // Update grade options
+                    AvailableGrades.Clear();
+                    AvailableGrades.Add("All Grades");
+
+                    var grades = Students
+                        .Where(s => !string.IsNullOrEmpty(s.Grade))
+                        .Select(s => s.Grade)
+                        .Distinct()
+                        .OrderBy(g => g)
+                        .ToList();
+
+                    foreach (var grade in grades)
                     {
-                        AvailableGrades.Add(grade);
+                        if (!string.IsNullOrEmpty(grade))
+                        {
+                            AvailableGrades.Add(grade);
+                        }
                     }
-                }
 
-                // Update school options
-                AvailableSchools.Clear();
-                AvailableSchools.Add("All Schools");
+                    // Update school options
+                    AvailableSchools.Clear();
+                    AvailableSchools.Add("All Schools");
 
-                var schools = Students
-                    .Where(s => !string.IsNullOrEmpty(s.School))
-                    .Select(s => s.School)
-                    .Distinct()
-                    .OrderBy(s => s)
-                    .ToList();
+                    var schools = Students
+                        .Where(s => !string.IsNullOrEmpty(s.School))
+                        .Select(s => s.School)
+                        .Distinct()
+                        .OrderBy(s => s)
+                        .ToList();
 
-                foreach (var school in schools)
-                {
-                    if (!string.IsNullOrEmpty(school))
+                    foreach (var school in schools)
                     {
-                        AvailableSchools.Add(school);
+                        if (!string.IsNullOrEmpty(school))
+                        {
+                            AvailableSchools.Add(school);
+                        }
                     }
-                }
 
-                Logger?.LogInformation("Updated filter options: {GradeCount} grades, {SchoolCount} schools",
-                    AvailableGrades.Count - 1, AvailableSchools.Count - 1);
+                    Logger.Information("UI Updated filter options: {GradeCount} grades, {SchoolCount} schools",
+                        AvailableGrades.Count - 1, AvailableSchools.Count - 1);
+                }
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error updating filter options");
+                Logger.Error(ex, "Error updating filter options");
             }
         }
 
@@ -622,7 +639,7 @@ namespace BusBuddy.WPF.ViewModels
                     // Apply the filters
                     ApplyFilters();
 
-                    Logger?.LogInformation("Applied advanced search criteria");
+                    Logger.Information("Applied advanced search criteria");
 #if DEBUG
                     DebugConfig.WriteStudent("DATA: Applied advanced search criteria");
 #endif
@@ -632,7 +649,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error in advanced search");
+                Logger.Error(ex, "Error in advanced search");
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in AdvancedSearchAsync: {ex.Message}");
 #endif
@@ -646,7 +663,7 @@ namespace BusBuddy.WPF.ViewModels
             await Task.Delay(1); // Just to satisfy the async requirement
             ApplyFilters();
 
-            Logger?.LogInformation("Cleared advanced search criteria");
+            Logger.Information("Cleared advanced search criteria");
 #if DEBUG
             DebugConfig.WriteStudent("DATA: Cleared advanced search criteria");
 #endif
@@ -664,7 +681,7 @@ namespace BusBuddy.WPF.ViewModels
 
                 // Create and show the student edit dialog
                 var dialog = new StudentViews.StudentEditDialog();
-                var viewModel = new StudentEditViewModel(dialog, null);
+                var viewModel = new StudentEditViewModel(dialog);
                 viewModel.LoadStudent(); // Load as new student
                 dialog.DataContext = viewModel;
                 dialog.Owner = System.Windows.Application.Current.MainWindow;
@@ -678,7 +695,7 @@ namespace BusBuddy.WPF.ViewModels
                     ApplyFilters();
                     SelectedStudent = created;
 
-                    Logger?.LogInformation("Added new student with ID {StudentId}", created.StudentId);
+                    Logger.Information("Added new student with ID {StudentId}", created.StudentId);
 #if DEBUG
                     DebugConfig.WriteStudent($"DATA: Created student #{created.StudentId} '{created.StudentName}'");
 #endif
@@ -688,7 +705,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error adding student");
+                Logger.Error(ex, "Error adding student");
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in AddStudentAsync: {ex.Message}");
 #endif
@@ -715,7 +732,7 @@ namespace BusBuddy.WPF.ViewModels
 
                 // Create and show the student edit dialog
                 var dialog = new StudentViews.StudentEditDialog();
-                var viewModel = new StudentEditViewModel(dialog, null);
+                var viewModel = new StudentEditViewModel(dialog);
                 viewModel.LoadStudent(SelectedStudent); // Load existing student
                 dialog.DataContext = viewModel;
                 dialog.Owner = System.Windows.Application.Current.MainWindow;
@@ -726,7 +743,7 @@ namespace BusBuddy.WPF.ViewModels
                     var updatedStudent = viewModel.SaveToStudent();
                     await _studentService.UpdateStudentAsync(updatedStudent);
 
-                    Logger?.LogInformation("Updated student with ID {StudentId}", updatedStudent.StudentId);
+                    Logger.Information("Updated student with ID {StudentId}", updatedStudent.StudentId);
 #if DEBUG
                     DebugConfig.WriteStudent($"DATA: Updated student #{updatedStudent.StudentId} '{updatedStudent.StudentName}'");
 #endif
@@ -747,7 +764,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error updating student {StudentId}", SelectedStudent?.StudentId);
+                Logger.Error(ex, "Error updating student {StudentId}", SelectedStudent?.StudentId);
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in EditStudentAsync: {ex.Message}");
 #endif
@@ -782,7 +799,7 @@ namespace BusBuddy.WPF.ViewModels
                 ApplyFilters();
                 SelectedStudent = null;
 
-                Logger?.LogInformation("Deleted student with ID {StudentId}", studentId);
+                Logger.Information("Deleted student with ID {StudentId}", studentId);
 #if DEBUG
                 DebugConfig.WriteStudent($"DATA: Deleted student #{studentId} '{studentName}'");
 #endif
@@ -791,7 +808,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error deleting student {StudentId}", studentId);
+                Logger.Error(ex, "Error deleting student {StudentId}", studentId);
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in DeleteStudentAsync: {ex.Message}");
 #endif
@@ -820,7 +837,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error refreshing data");
+                Logger.Error(ex, "Error refreshing data");
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in RefreshAsync: {ex.Message}");
 #endif
@@ -859,12 +876,12 @@ namespace BusBuddy.WPF.ViewModels
                 StatusDistribution.Add(new StatusData { Status = "Active", Count = ActiveStudents });
                 StatusDistribution.Add(new StatusData { Status = "Inactive", Count = InactiveStudents });
 
-                Logger?.LogInformation("Student statistics updated: {TotalCount} total, {ActiveCount} active",
+                Logger.Information("Student statistics updated: {TotalCount} total, {ActiveCount} active",
                     TotalStudents, ActiveStudents);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error updating student statistics");
+                Logger.Error(ex, "Error updating student statistics");
             }
         }
 
@@ -904,7 +921,7 @@ namespace BusBuddy.WPF.ViewModels
                     SelectedStudent.PMRoute = viewModel.SelectedPmRoute?.RouteName;
                     await _studentService.UpdateStudentAsync(SelectedStudent);
                     ApplyFilters();
-                    Logger?.LogInformation("Assigned routes to student {StudentId}", SelectedStudent.StudentId);
+                    Logger.Information("Assigned routes to student {StudentId}", SelectedStudent.StudentId);
 #if DEBUG
                     DebugConfig.WriteStudent($"ROUTE: Assigned AM='{SelectedStudent.AMRoute}', PM='{SelectedStudent.PMRoute}' to student #{SelectedStudent.StudentId}");
 #endif
@@ -914,7 +931,7 @@ namespace BusBuddy.WPF.ViewModels
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error assigning route to student {StudentId}", SelectedStudent?.StudentId);
+                Logger.Error(ex, "Error assigning route to student {StudentId}", SelectedStudent?.StudentId);
 #if DEBUG
                 DebugConfig.WriteStudent($"ERROR in AssignRouteAsync: {ex.Message}");
 #endif

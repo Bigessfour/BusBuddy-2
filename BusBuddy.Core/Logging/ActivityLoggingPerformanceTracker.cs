@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -10,7 +10,7 @@ namespace BusBuddy.Core.Logging
     /// </summary>
     public class ActivityLoggingPerformanceTracker : IDisposable
     {
-        private readonly ILogger _logger;
+        private static readonly ILogger Logger = Log.ForContext<ActivityLoggingPerformanceTracker>();
         private readonly Stopwatch _stopwatch;
         private readonly string _operationName;
         private readonly string _methodName;
@@ -20,17 +20,14 @@ namespace BusBuddy.Core.Logging
         /// <summary>
         /// Creates a new instance of the ActivityLoggingPerformanceTracker for DEBUG instrumentation
         /// </summary>
-        /// <param name="logger">The logger to write to</param>
         /// <param name="operationName">Name of the logging operation</param>
         /// <param name="additionalContext">Optional additional context information</param>
         /// <param name="callerMemberName">Automatically populated with the calling method name</param>
         public ActivityLoggingPerformanceTracker(
-            ILogger logger,
             string operationName,
             string? additionalContext = null,
             [CallerMemberName] string callerMemberName = "")
         {
-            _logger = logger;
             _operationName = operationName;
             _methodName = callerMemberName;
             _additionalContext = additionalContext;
@@ -41,12 +38,12 @@ namespace BusBuddy.Core.Logging
             // Only log entry in DEBUG builds
             if (string.IsNullOrEmpty(additionalContext))
             {
-                _logger.LogDebug("[ACTIVITY_ENTRY] Starting {Operation} in {Method}",
+                Logger.Debug("[ACTIVITY_ENTRY] Starting {Operation} in {Method}",
                     _operationName, _methodName);
             }
             else
             {
-                _logger.LogDebug("[ACTIVITY_ENTRY] Starting {Operation} in {Method} - Context: {Context}",
+                Logger.Debug("[ACTIVITY_ENTRY] Starting {Operation} in {Method} - Context: {Context}",
                     _operationName, _methodName, _additionalContext);
             }
 #endif
@@ -67,19 +64,19 @@ namespace BusBuddy.Core.Logging
             // Only log completion in DEBUG builds
             if (string.IsNullOrEmpty(result))
             {
-                _logger.LogDebug("[ACTIVITY_EXIT] Completed {Operation} in {Method} - Duration: {Duration}ms",
+                Logger.Debug("[ACTIVITY_EXIT] Completed {Operation} in {Method} - Duration: {Duration}ms",
                     _operationName, _methodName, elapsed);
             }
             else
             {
-                _logger.LogDebug("[ACTIVITY_EXIT] Completed {Operation} in {Method} - Duration: {Duration}ms - Result: {Result}",
+                Logger.Debug("[ACTIVITY_EXIT] Completed {Operation} in {Method} - Duration: {Duration}ms - Result: {Result}",
                     _operationName, _methodName, elapsed, result);
             }
 
             // Log performance warning for slow operations
             if (elapsed > 50)
             {
-                _logger.LogWarning("[ACTIVITY_PERF] Slow {Operation} in {Method} - Duration: {Duration}ms",
+                Logger.Warning("[ACTIVITY_PERF] Slow {Operation} in {Method} - Duration: {Duration}ms",
                     _operationName, _methodName, elapsed);
             }
 #endif
@@ -98,20 +95,20 @@ namespace BusBuddy.Core.Logging
 
 #if DEBUG
             // In DEBUG mode, log detailed error information
-            _logger.LogError(exception,
+            Logger.Error(exception,
                 "[ACTIVITY_ERROR] Error in {Operation} in {Method} - Duration: {Duration}ms - Error: {ErrorMessage}",
                 _operationName, _methodName, elapsed, exception.Message);
 
             // Add inner exception details if available
             if (exception.InnerException != null)
             {
-                _logger.LogDebug("[ACTIVITY_ERROR_DETAIL] Inner exception: {InnerError}",
+                Logger.Debug("[ACTIVITY_ERROR_DETAIL] Inner exception: {InnerError}",
                     exception.InnerException.Message);
             }
 #else
             // In production, log minimal error information
-            _logger.LogError(exception, 
-                "Error in {Operation}: {ErrorMessage}", 
+            Logger.Error(exception,
+                "Error in {Operation}: {ErrorMessage}",
                 _operationName, exception.Message);
 #endif
         }

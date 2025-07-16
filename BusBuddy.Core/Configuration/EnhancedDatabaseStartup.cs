@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Configuration;
 
@@ -75,9 +76,9 @@ public static class EnhancedDatabaseStartup
     /// Call this from your WPF App.xaml.cs OnStartup method
     /// </summary>
     public static async Task<DatabaseInitializationResult> InitializeDatabaseAsync(
-        IServiceProvider serviceProvider,
-        ILogger logger)
+        IServiceProvider serviceProvider)
     {
+        var logger = Log.ForContext("SourceContext", "EnhancedDatabaseStartup");
         var result = new DatabaseInitializationResult();
 
         try
@@ -87,7 +88,7 @@ public static class EnhancedDatabaseStartup
             var resilienceService = scope.ServiceProvider.GetRequiredService<DatabaseResilienceService>();
             var validationService = scope.ServiceProvider.GetRequiredService<DatabaseValidationService>();
 
-            logger.LogInformation("Starting database initialization...");
+            logger.Information("Starting database initialization...");
 
             // 1. Check database health
             var healthResult = await resilienceService.CheckDatabaseHealthAsync(context);
@@ -99,7 +100,7 @@ public static class EnhancedDatabaseStartup
                 var fixResult = await validationService.FixCommonIssuesAsync(context);
                 if (fixResult.IssuesFixed > 0)
                 {
-                    logger.LogInformation("Fixed {IssuesFixed} database issues automatically", fixResult.IssuesFixed);
+                    logger.Information("Fixed {IssuesFixed} database issues automatically", fixResult.IssuesFixed);
                 }
             }
 
@@ -110,7 +111,7 @@ public static class EnhancedDatabaseStartup
             var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
             if (pendingMigrations.Any())
             {
-                logger.LogInformation("Applying {MigrationCount} pending migrations", pendingMigrations.Count());
+                logger.Information("Applying {MigrationCount} pending migrations", pendingMigrations.Count());
                 await context.Database.MigrateAsync();
             }
 
@@ -120,14 +121,14 @@ public static class EnhancedDatabaseStartup
 
             result.IsSuccessful = !result.Issues.Any() && schemaValidation.IsValid;
 
-            logger.LogInformation("Database initialization completed. Success: {IsSuccessful}", result.IsSuccessful);
+            logger.Information("Database initialization completed. Success: {IsSuccessful}", result.IsSuccessful);
 
             return result;
         }
         catch (Exception ex)
         {
             result.AddIssue($"Database initialization failed: {ex.Message}");
-            logger.LogError(ex, "Database initialization failed");
+            logger.Error(ex, "Database initialization failed");
 
             // Provide detailed analysis for troubleshooting
             var analysis = ExceptionHelper.AnalyzeException(ex);
@@ -141,25 +142,27 @@ public static class EnhancedDatabaseStartup
     /// Configures global exception handling for applications
     /// Call this from your application startup to handle unhandled database exceptions
     /// </summary>
-    public static void ConfigureGlobalExceptionHandling(ILogger logger)
+    public static void ConfigureGlobalExceptionHandling()
     {
+        var logger = Log.ForContext("SourceContext", "EnhancedDatabaseStartup");
+
         // Handle unhandled exceptions in background threads
         AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
         {
             if (e.ExceptionObject is Exception ex)
             {
-                logger.LogCritical(ex, "Unhandled background thread exception");
+                logger.Fatal(ex, "Unhandled background thread exception");
                 var analysis = ExceptionHelper.AnalyzeException(ex);
 
                 // Log analysis for debugging
-                logger.LogCritical("Exception Analysis: {Analysis}", analysis);
+                logger.Fatal("Exception Analysis: {Analysis}", analysis);
             }
         };
 
         // Handle task exceptions
         TaskScheduler.UnobservedTaskException += (sender, e) =>
         {
-            logger.LogError(e.Exception, "Unobserved task exception");
+            logger.Error(e.Exception, "Unobserved task exception");
             e.SetObserved(); // Prevent process termination
         };
     }
@@ -201,12 +204,7 @@ public class DatabaseInitializationResult
 /// </summary>
 public class DatabaseValidationService
 {
-    private readonly ILogger<DatabaseValidationService> _logger;
-
-    public DatabaseValidationService(ILogger<DatabaseValidationService> logger)
-    {
-        _logger = logger;
-    }
+    private static readonly Serilog.ILogger Logger = Log.ForContext<DatabaseValidationService>();
 
     public async Task<SchemaValidationResult> ValidateSchemaAsync(BusBuddyDbContext context)
     {
@@ -270,7 +268,7 @@ public class DatabaseValidationService
         catch (Exception ex)
         {
             result.AddIssue($"Schema validation failed: {ex.Message}");
-            _logger.LogError(ex, "Schema validation encountered an error");
+            Logger.Error(ex, "Schema validation encountered an error");
             return result;
         }
     }
@@ -309,12 +307,7 @@ public class FixResult
 /// </summary>
 public class DatabaseMigrationService
 {
-    private readonly ILogger<DatabaseMigrationService> _logger;
-
-    public DatabaseMigrationService(ILogger<DatabaseMigrationService> logger)
-    {
-        _logger = logger;
-    }
+    private static readonly Serilog.ILogger Logger = Log.ForContext<DatabaseMigrationService>();
 
     // Add migration management logic here
 }

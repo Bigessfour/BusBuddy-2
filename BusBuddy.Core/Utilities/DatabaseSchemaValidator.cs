@@ -1,6 +1,6 @@
 using BusBuddy.Core.Data;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Data.SqlClient;
@@ -17,56 +17,56 @@ namespace BusBuddy.Core.Utilities
     /// </summary>
     public static class DatabaseSchemaValidator
     {
+        private static readonly ILogger Logger = Log.ForContext(typeof(DatabaseSchemaValidator));
+
         public static void ValidateAndPatchSchema(IServiceProvider serviceProvider)
         {
             try
             {
-                var logger = serviceProvider.GetService<ILogger<BusBuddyDbContext>>();
                 var context = serviceProvider.GetRequiredService<BusBuddyDbContext>();
                 var connectionString = context.Database.GetConnectionString();
 
                 if (string.IsNullOrEmpty(connectionString))
                 {
                     Debug.WriteLine("[DEBUG] DatabaseSchemaValidator: Connection string is null or empty");
-                    logger?.LogError("Connection string is null or empty");
+                    Logger.Error("Connection string is null or empty");
                     return;
                 }
 
                 Debug.WriteLine("[DEBUG] DatabaseSchemaValidator: Validating database schema");
-                logger?.LogInformation("Validating database schema");
+                Logger.Information("Validating database schema");
 
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
 
                     // Validate Routes table schema
-                    ValidateRoutesTable(connection, logger!);
+                    ValidateRoutesTable(connection);
 
                     // Validate Activities table
-                    ValidateActivitiesTable(connection, logger!);
+                    ValidateActivitiesTable(connection);
 
                     // Validate Drivers table
-                    ValidateDriversTable(connection, logger!);
+                    ValidateDriversTable(connection);
 
                     // Validate Vehicles (Buses) table
-                    ValidateVehiclesTable(connection, logger!);
+                    ValidateVehiclesTable(connection);
 
                     Debug.WriteLine("[DEBUG] DatabaseSchemaValidator: Schema validation complete");
-                    logger?.LogInformation("Database schema validation complete");
+                    Logger.Information("Database schema validation complete");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[DEBUG] Error in DatabaseSchemaValidator: {ex.Message}");
-                var logger = serviceProvider.GetService<ILogger<BusBuddyDbContext>>();
-                logger?.LogError(ex, "Error validating and patching database schema");
+                Logger.Error(ex, "Error validating and patching database schema");
             }
         }
 
         /// <summary>
         /// Comprehensive validation of the Routes table
         /// </summary>
-        private static void ValidateRoutesTable(SqlConnection connection, ILogger logger)
+        private static void ValidateRoutesTable(SqlConnection connection)
         {
             Debug.WriteLine("[DEBUG] Validating Routes table schema");
 
@@ -79,7 +79,7 @@ namespace BusBuddy.Core.Utilities
                 { "Date", "datetime2" },
                 { "Description", "nvarchar(500)" },
                 { "IsActive", "bit" },
-                
+
                 // AM information
                 { "AMVehicleId", "int" },
                 { "AMDriverId", "int" },
@@ -87,7 +87,7 @@ namespace BusBuddy.Core.Utilities
                 { "AMEndMiles", "decimal(10,2)" },
                 { "AMRiders", "int" },
                 { "AMBeginTime", "time" },
-                
+
                 // PM information
                 { "PMVehicleId", "int" },
                 { "PMDriverId", "int" },
@@ -95,7 +95,7 @@ namespace BusBuddy.Core.Utilities
                 { "PMEndMiles", "decimal(10,2)" },
                 { "PMRiders", "int" },
                 { "PMBeginTime", "time" },
-                
+
                 // Additional properties
                 { "Distance", "decimal(10,2)" },
                 { "EstimatedDuration", "int" },
@@ -112,7 +112,7 @@ namespace BusBuddy.Core.Utilities
                 if (!ColumnExists(connection, "Routes", column.Key))
                 {
                     Debug.WriteLine($"[DEBUG] Missing column '{column.Key}' in Routes table, adding it");
-                    logger?.LogWarning("Missing column '{ColumnName}' in Routes table, adding it", column.Key);
+                    Logger.Warning("Missing column '{ColumnName}' in Routes table, adding it", column.Key);
 
                     string sql;
                     if (column.Key == "IsActive")
@@ -156,7 +156,7 @@ namespace BusBuddy.Core.Utilities
         /// <summary>
         /// Validates the Activities table schema
         /// </summary>
-        private static void ValidateActivitiesTable(SqlConnection connection, ILogger logger)
+        private static void ValidateActivitiesTable(SqlConnection connection)
         {
             Debug.WriteLine("[DEBUG] Validating Activities table schema");
 
@@ -196,7 +196,7 @@ namespace BusBuddy.Core.Utilities
                 if (!ColumnExists(connection, "Activities", column.Key))
                 {
                     Debug.WriteLine($"[DEBUG] Missing column '{column.Key}' in Activities table, adding it");
-                    logger?.LogWarning("Missing column '{ColumnName}' in Activities table, adding it", column.Key);
+                    Logger.Warning("Missing column '{ColumnName}' in Activities table, adding it", column.Key);
 
                     string sql;
                     if (column.Key == "ApprovalRequired" || column.Key == "Approved")
@@ -226,7 +226,7 @@ namespace BusBuddy.Core.Utilities
         /// <summary>
         /// Validates the Drivers table schema
         /// </summary>
-        private static void ValidateDriversTable(SqlConnection connection, ILogger logger)
+        private static void ValidateDriversTable(SqlConnection connection)
         {
             Debug.WriteLine("[DEBUG] Validating Drivers table schema");
 
@@ -274,7 +274,7 @@ namespace BusBuddy.Core.Utilities
                 if (!ColumnExists(connection, "Drivers", column.Key))
                 {
                     Debug.WriteLine($"[DEBUG] Missing column '{column.Key}' in Drivers table, adding it");
-                    logger?.LogWarning("Missing column '{ColumnName}' in Drivers table, adding it", column.Key);
+                    Logger.Warning("Missing column '{ColumnName}' in Drivers table, adding it", column.Key);
 
                     string sql;
                     if (column.Key == "TrainingComplete")
@@ -304,7 +304,7 @@ namespace BusBuddy.Core.Utilities
         /// <summary>
         /// Validates the Vehicles (Buses) table schema
         /// </summary>
-        private static void ValidateVehiclesTable(SqlConnection connection, ILogger logger)
+        private static void ValidateVehiclesTable(SqlConnection connection)
         {
             Debug.WriteLine("[DEBUG] Validating Vehicles table schema");
 
@@ -350,7 +350,7 @@ namespace BusBuddy.Core.Utilities
                 if (!ColumnExists(connection, "Vehicles", column.Key))
                 {
                     Debug.WriteLine($"[DEBUG] Missing column '{column.Key}' in Vehicles table, adding it");
-                    logger?.LogWarning("Missing column '{ColumnName}' in Vehicles table, adding it", column.Key);
+                    Logger.Warning("Missing column '{ColumnName}' in Vehicles table, adding it", column.Key);
 
                     string sql;
                     if (column.Key == "GPSTracking")

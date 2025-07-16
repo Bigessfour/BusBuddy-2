@@ -1,6 +1,7 @@
 using BusBuddy.Core.Services;
 using BusBuddy.WPF.Services;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -8,12 +9,11 @@ using System.Windows.Input;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public class SettingsViewModel : INotifyPropertyChanged
+    public class SettingsViewModel : BaseViewModel
     {
         private readonly IConfigurationService _configService;
         private readonly IThemeService _themeService;
         private readonly IUserSettingsService _userSettingsService;
-        private readonly ILogger<SettingsViewModel>? _logger;
         private string _theme = string.Empty;
         private string _notificationPreference = string.Empty;
         private bool _isDarkTheme = false;
@@ -67,53 +67,58 @@ namespace BusBuddy.WPF.ViewModels
         }
 
         public SettingsViewModel(IConfigurationService configService, IThemeService themeService,
-            IUserSettingsService userSettingsService, ILogger<SettingsViewModel>? logger = null)
+            IUserSettingsService userSettingsService)
         {
             _configService = configService;
             _themeService = themeService;
             _userSettingsService = userSettingsService;
-            _logger = logger;
 
-            SaveSettingsCommand = new global::BusBuddy.WPF.RelayCommand(_ => SaveSettingsAsync().GetAwaiter().GetResult());
-            ToggleThemeCommand = new global::BusBuddy.WPF.RelayCommand(_ => ToggleTheme());
-            ResetSettingsCommand = new global::BusBuddy.WPF.RelayCommand(_ => ResetSettingsAsync().GetAwaiter().GetResult());
+            using (LogContext.PushProperty("ViewModelType", nameof(SettingsViewModel)))
+            using (LogContext.PushProperty("OperationType", "Construction"))
+            {
+                Logger.Information("SettingsViewModel constructor started");
 
-            // Load settings asynchronously
-            _ = InitializeSettingsAsync();
+                SaveSettingsCommand = new global::BusBuddy.WPF.RelayCommand(_ => SaveSettingsAsync().GetAwaiter().GetResult());
+                ToggleThemeCommand = new global::BusBuddy.WPF.RelayCommand(_ => ToggleTheme());
+                ResetSettingsCommand = new global::BusBuddy.WPF.RelayCommand(_ => ResetSettingsAsync().GetAwaiter().GetResult());
+
+                // Load settings asynchronously
+                _ = InitializeSettingsAsync();
+
+                Logger.Information("SettingsViewModel constructor completed");
+            }
         }
 
         private async Task InitializeSettingsAsync()
         {
-            try
+            await LoadDataAsync(async () =>
             {
-                // Load user settings first
-                await _userSettingsService.LoadSettingsAsync();
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
 
-                // Initialize with saved settings or defaults
-                Theme = await _userSettingsService.GetSettingAsync("Theme", "Office2019Colorful");
-                NotificationPreference = await _userSettingsService.GetSettingAsync("NotificationPreference", "All");
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(SettingsViewModel)))
+                using (LogContext.PushProperty("OperationType", "InitializeSettings"))
+                {
+                    Logger.Information("Initializing settings");
 
-                // Apply the saved theme and update status
-                _themeService.ApplyTheme(Theme);
-                UpdateDarkThemeStatus();
+                    // Load user settings first
+                    await _userSettingsService.LoadSettingsAsync();
 
-                // Subscribe to theme changes
-                _themeService.ThemeChanged += OnThemeChanged;
+                    // Initialize with saved settings or defaults
+                    Theme = await _userSettingsService.GetSettingAsync("Theme", "Office2019Colorful");
+                    NotificationPreference = await _userSettingsService.GetSettingAsync("NotificationPreference", "All");
 
-                _logger?.LogInformation("Settings initialized successfully. Theme: {Theme}, Notifications: {Notifications}",
-                    Theme, NotificationPreference);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Error initializing settings, using defaults");
+                    // Apply the saved theme and update status
+                    _themeService.ApplyTheme(Theme);
+                    UpdateDarkThemeStatus();
 
-                // Fall back to defaults
-                Theme = "Office2019Colorful";
-                NotificationPreference = "All";
-                _themeService.ApplyTheme(Theme);
-                UpdateDarkThemeStatus();
-                _themeService.ThemeChanged += OnThemeChanged;
-            }
+                    // Subscribe to theme changes
+                    _themeService.ThemeChanged += OnThemeChanged;
+
+                    Logger.Information("Settings initialized successfully. Theme: {Theme}, Notifications: {Notifications}",
+                        Theme, NotificationPreference);
+                }
+            });
         }
 
         private void OnThemeChanged(object? sender, string newTheme)
@@ -143,98 +148,92 @@ namespace BusBuddy.WPF.ViewModels
 
         public async Task SaveSettingsAsync()
         {
-            try
+            await ExecuteCommandAsync(async () =>
             {
-                // Save theme setting to user settings service
-                await _userSettingsService.SetSettingAsync("Theme", Theme);
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
 
-                // Save notification preference
-                await _userSettingsService.SetSettingAsync("NotificationPreference", NotificationPreference);
-
-                // Persist the settings to file
-                bool saveSuccess = await _userSettingsService.SaveSettingsAsync();
-
-                if (saveSuccess)
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(SettingsViewModel)))
+                using (LogContext.PushProperty("OperationType", "SaveSettings"))
                 {
-                    _logger?.LogInformation("Settings saved successfully. Theme: {Theme}, Notifications: {Notifications}",
-                        Theme, NotificationPreference);
+                    Logger.Information("Saving settings");
 
-                    // Optional: Show success message to user
-                    System.Windows.MessageBox.Show(
-                        "Settings saved successfully!",
-                        "Settings",
-                        System.Windows.MessageBoxButton.OK,
-                        System.Windows.MessageBoxImage.Information);
-                }
-                else
-                {
-                    throw new InvalidOperationException("Failed to save settings to persistent storage.");
-                }
-            }
-            catch (System.Exception ex)
-            {
-                _logger?.LogError(ex, "Error saving settings");
+                    // Save theme setting to user settings service
+                    await _userSettingsService.SetSettingAsync("Theme", Theme);
 
-                // Handle save error appropriately
-                System.Windows.MessageBox.Show(
-                    $"Error saving settings: {ex.Message}",
-                    "Error",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error);
-                throw;
-            }
-        }
+                    // Save notification preference
+                    await _userSettingsService.SetSettingAsync("NotificationPreference", NotificationPreference);
 
-        public async Task ResetSettingsAsync()
-        {
-            try
-            {
-                var result = System.Windows.MessageBox.Show(
-                    "Are you sure you want to reset all settings to their default values?",
-                    "Reset Settings",
-                    System.Windows.MessageBoxButton.YesNo,
-                    System.Windows.MessageBoxImage.Question);
+                    // Persist the settings to file
+                    bool saveSuccess = await _userSettingsService.SaveSettingsAsync();
 
-                if (result == System.Windows.MessageBoxResult.Yes)
-                {
-                    bool resetSuccess = await _userSettingsService.ResetSettingsAsync();
-
-                    if (resetSuccess)
+                    if (saveSuccess)
                     {
-                        // Reset to defaults
-                        Theme = "Office2019Colorful";
-                        NotificationPreference = "All";
+                        Logger.Information("Settings saved successfully. Theme: {Theme}, Notifications: {Notifications}",
+                            Theme, NotificationPreference);
 
-                        _logger?.LogInformation("Settings reset to defaults successfully");
-
+                        // Optional: Show success message to user
                         System.Windows.MessageBox.Show(
-                            "Settings have been reset to default values.",
-                            "Settings Reset",
+                            "Settings saved successfully!",
+                            "Settings",
                             System.Windows.MessageBoxButton.OK,
                             System.Windows.MessageBoxImage.Information);
                     }
                     else
                     {
-                        throw new InvalidOperationException("Failed to reset settings.");
+                        throw new InvalidOperationException("Failed to save settings to persistent storage.");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Error resetting settings");
-
-                System.Windows.MessageBox.Show(
-                    $"Error resetting settings: {ex.Message}",
-                    "Error",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error);
-            }
+            });
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        public async Task ResetSettingsAsync()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            await ExecuteCommandAsync(async () =>
+            {
+                var correlationId = Guid.NewGuid().ToString("N")[..8];
+
+                using (LogContext.PushProperty("CorrelationId", correlationId))
+                using (LogContext.PushProperty("ViewModelType", nameof(SettingsViewModel)))
+                using (LogContext.PushProperty("OperationType", "ResetSettings"))
+                {
+                    Logger.Information("Resetting settings");
+
+                    var result = System.Windows.MessageBox.Show(
+                        "Are you sure you want to reset all settings to their default values?",
+                        "Reset Settings",
+                        System.Windows.MessageBoxButton.YesNo,
+                        System.Windows.MessageBoxImage.Question);
+
+                    if (result == System.Windows.MessageBoxResult.Yes)
+                    {
+                        bool resetSuccess = await _userSettingsService.ResetSettingsAsync();
+
+                        if (resetSuccess)
+                        {
+                            // Reset to defaults
+                            Theme = "Office2019Colorful";
+                            NotificationPreference = "All";
+
+                            Logger.Information("Settings reset to defaults successfully");
+
+                            System.Windows.MessageBox.Show(
+                                "Settings have been reset to default values.",
+                                "Settings Reset",
+                                System.Windows.MessageBoxButton.OK,
+                                System.Windows.MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Failed to reset settings.");
+                        }
+                    }
+                    else
+                    {
+                        Logger.Information("Settings reset cancelled by user");
+                    }
+                }
+            });
         }
     }
 }

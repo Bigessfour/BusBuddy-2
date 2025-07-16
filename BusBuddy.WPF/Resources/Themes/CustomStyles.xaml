@@ -173,13 +173,20 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
+    <!-- =============================================================================== -->
+    <!-- SYNCFUSION CONTROL STYLES (V30.1.40 — CONSOLIDATED) -->
+    <!-- =============================================================================== -->
+
     <!-- SfBulletGraph Style -->
     <Style x:Key="BusBuddySfBulletGraphStyle" TargetType="syncfusion:SfBulletGraph">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfCircularProgressBar Style -->
+    <!-- Progress Bar Controls -->
     <Style x:Key="BusBuddySfCircularProgressBarStyle" TargetType="syncfusion:SfCircularProgressBar">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource AccentBackground}" />
@@ -187,7 +194,6 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfLinearProgressBar Style -->
     <Style x:Key="BusBuddySfLinearProgressBarStyle" TargetType="syncfusion:SfLinearProgressBar">
         <Setter Property="Background" Value="{DynamicResource SecondaryBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource AccentBackground}" />
@@ -195,21 +201,19 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfStepProgressBar Style -->
     <Style x:Key="BusBuddySfStepProgressBarStyle" TargetType="syncfusion:SfStepProgressBar">
         <Setter Property="Background" Value="{DynamicResource SecondaryBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource AccentBackground}" />
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfBusyIndicator Style -->
+    <!-- Feedback and Utility Controls -->
     <Style x:Key="BusBuddySfBusyIndicatorStyle" TargetType="syncfusion:SfBusyIndicator">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfHubTile Style -->
     <Style x:Key="BusBuddySfHubTileStyle" TargetType="syncfusion:SfHubTile">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
@@ -218,7 +222,7 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfRichTextBoxAdv Style -->
+    <!-- Text and Input Controls -->
     <Style x:Key="BusBuddySfRichTextBoxAdvStyle" TargetType="syncfusion:SfRichTextBoxAdv">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
@@ -227,71 +231,14 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfTextInputLayout Style -->
     <Style x:Key="BusBuddySfTextInputLayoutStyle" TargetType="syncfusion:SfTextInputLayout">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfNavigationDrawer Style -->
-    <Style x:Key="BusBuddySfNavigationDrawerStyle" TargetType="syncfusion:SfNavigationDrawer">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource SurfaceForeground}" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfAccordion Style -->
-    <Style x:Key="BusBuddySfAccordionStyle" TargetType="syncfusion:SfAccordion">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfRadialMenu Style -->
-    <Style x:Key="BusBuddySfRadialMenuStyle" TargetType="syncfusion:SfRadialMenu">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfDiagram Style -->
-    <Style x:Key="BusBuddySfDiagramStyle" TargetType="syncfusion:SfDiagram">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfSpreadsheet Style -->
-    <Style x:Key="BusBuddySfSpreadsheetStyle" TargetType="syncfusion:SfSpreadsheet">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfBarcode Style -->
-    <Style x:Key="BusBuddySfBarcodeStyle" TargetType="syncfusionbarcode:SfBarcode">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- PdfViewerControl Style -->
-    <Style x:Key="BusBuddyPdfViewerControlStyle" TargetType="syncfusionpdfviewer:PdfViewerControl">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- ComboBoxAdv Style -->
     <Style x:Key="BusBuddyComboBoxAdvStyle" TargetType="syncfusion:ComboBoxAdv">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
@@ -302,32 +249,6 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfScheduler Style -->
-    <Style x:Key="BusBuddySfSchedulerStyle" TargetType="syncfusion:SfScheduler">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfBulletGraph Style -->
-    <Style x:Key="BusBuddySfBulletGraphStyle" TargetType="syncfusion:SfBulletGraph">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfRangeSlider Style -->
-    <Style x:Key="BusBuddySfRangeSliderStyle" TargetType="syncfusion:SfRangeSlider">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource AccentBackground}" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- ColorPicker Style -->
     <Style x:Key="BusBuddyColorPickerStyle" TargetType="syncfusion:ColorPicker">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
@@ -336,138 +257,13 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfTabControl Style -->
-    <Style x:Key="BusBuddySfTabControlStyle" TargetType="syncfusiontools:TabControlExt">
+    <Style x:Key="BusBuddySfRangeSliderStyle" TargetType="syncfusion:SfRangeSlider">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentBackground}" />
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfAccordion Style -->
-    <Style x:Key="BusBuddySfAccordionStyle" TargetType="syncfusion:SfAccordion">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- Carousel Style -->
-    <Style x:Key="BusBuddyCarouselStyle" TargetType="syncfusion:Carousel">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- NotifyIcon Style - Commented out as control not available -->
-    <!--
-    <Style x:Key="BusBuddyNotifyIconStyle" TargetType="syncfusiontools:NotifyIcon">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-    -->
-
-    <!-- SfAIAssistView Style -->
-    <Style x:Key="BusBuddySfAIAssistViewStyle" TargetType="syncfusionchat:SfAIAssistView">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- PdfViewerControl Style -->
-    <Style x:Key="BusBuddyPdfViewerControlStyle2" TargetType="syncfusionpdfviewer:PdfViewerControl">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfSpreadsheet Style -->
-    <Style x:Key="BusBuddySfSpreadsheetStyle" TargetType="syncfusion:SfSpreadsheet">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfBarcode Style -->
-    <Style x:Key="BusBuddySfBarcodeStyle" TargetType="syncfusionbarcode:SfBarcode">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfImageEditor Style -->
-    <Style x:Key="BusBuddySfImageEditorStyle" TargetType="syncfusionimageeditor:SfImageEditor">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfSpellChecker Style -->
-    <Style x:Key="BusBuddySfSpellCheckerStyle" TargetType="syncfusion:SfSpellChecker">
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- EditControl (Syntax Editor) Style -->
-    <Style x:Key="BusBuddyEditControlStyle" TargetType="syncfusion:EditControl">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfRichTextBoxAdv Style -->
-    <Style x:Key="BusBuddySfRichTextBoxAdvStyle" TargetType="syncfusion:SfRichTextBoxAdv">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfScheduler Style -->
-    <Style x:Key="BusBuddySfSchedulerStyle" TargetType="syncfusion:SfScheduler">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfKanban Style -->
-    <Style x:Key="BusBuddySfKanbanStyle" TargetType="syncfusionkanban:SfKanban">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfMap Style -->
-    <Style x:Key="BusBuddySfMapStyle" TargetType="syncfusionmaps:SfMap">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
-    <!-- SfNavigationDrawer Style -->
+    <!-- Navigation and Layout Controls -->
     <Style x:Key="BusBuddySfNavigationDrawerStyle" TargetType="syncfusion:SfNavigationDrawer">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
@@ -476,8 +272,114 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- SfTextInputLayout Style -->
-    <Style x:Key="BusBuddySfTextInputLayoutStyle" TargetType="syncfusion:SfTextInputLayout">
+    <Style x:Key="BusBuddySfAccordionStyle" TargetType="syncfusion:SfAccordion">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfRadialMenuStyle" TargetType="syncfusion:SfRadialMenu">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfTabControlStyle" TargetType="syncfusiontools:TabControlExt">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddyCarouselStyle" TargetType="syncfusion:Carousel">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <!-- Visualization and Media Controls -->
+    <Style x:Key="BusBuddySfDiagramStyle" TargetType="syncfusion:SfDiagram">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfSpreadsheetStyle" TargetType="syncfusion:SfSpreadsheet">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfBarcodeStyle" TargetType="syncfusionbarcode:SfBarcode">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfImageEditorStyle" TargetType="syncfusionimageeditor:SfImageEditor">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddyPdfViewerControlStyle" TargetType="syncfusionpdfviewer:PdfViewerControl">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <!-- Specialized Controls -->
+    <Style x:Key="BusBuddySfSchedulerStyle" TargetType="syncfusion:SfScheduler">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfKanbanStyle" TargetType="syncfusionkanban:SfKanban">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfMapStyle" TargetType="syncfusionmaps:SfMap">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddySfSpellCheckerStyle" TargetType="syncfusion:SfSpellChecker">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <Style x:Key="BusBuddyEditControlStyle" TargetType="syncfusion:EditControl">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
+    </Style>
+
+    <!-- AI and Chat Controls -->
+    <Style x:Key="BusBuddySfAIAssistViewStyle" TargetType="syncfusionchat:SfAIAssistView">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
@@ -727,7 +629,7 @@
     </Style>
 
     <!-- SfAIAssistView Style -->
-    <Style x:Key="BusBuddySfAIAssistViewStyle" TargetType="syncfusion:SfAIAssistView">
+    <Style x:Key="BusBuddySfAIAssistViewStyle" TargetType="syncfusionchat:SfAIAssistView">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />

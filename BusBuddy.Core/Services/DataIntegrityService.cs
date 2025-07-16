@@ -2,7 +2,7 @@ using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Diagnostics;
 using System.Text;
 using System.Data;
@@ -16,16 +16,13 @@ namespace BusBuddy.Core.Services;
 /// </summary>
 public class DataIntegrityService
 {
-    private readonly ILogger<DataIntegrityService> _logger;
+    private static readonly ILogger Logger = Log.ForContext<DataIntegrityService>();
     private readonly IBusBuddyDbContextFactory _contextFactory;
     private readonly List<string> _debugQueries = new();
     private readonly StringBuilder _debugLog = new();
 
-    public DataIntegrityService(
-        ILogger<DataIntegrityService> logger,
-        IBusBuddyDbContextFactory contextFactory)
+    public DataIntegrityService(IBusBuddyDbContextFactory contextFactory)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
     }
 
@@ -79,7 +76,7 @@ public class DataIntegrityService
         catch (Exception ex)
         {
             _debugLog.AppendLine($"\nERROR in debug info collection: {ex.Message}");
-            _logger.LogError(ex, "Error collecting EF Core debug information");
+            Logger.Error(ex, "Error collecting EF Core debug information");
         }
 
         return _debugLog.ToString();
@@ -110,12 +107,12 @@ public class DataIntegrityService
                 script += $"  - {migration}\n";
             }
 
-            _logger.LogInformation("Generated debug migration info ({Length} characters)", script.Length);
+            Logger.Information("Generated debug migration info ({Length} characters)", script.Length);
             return script;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating migration script");
+            Logger.Error(ex, "Error generating migration script");
             return $"Error generating script: {ex.Message}";
         }
     }
@@ -145,14 +142,14 @@ public class DataIntegrityService
             await ValidateEntitySet<Route>(context, report, "Routes");
             await ValidateEntitySet<Student>(context, report, "Students");
 
-            _logger.LogInformation("Schema validation completed. Valid: {IsValid}, Issues: {IssueCount}",
+            Logger.Information("Schema validation completed. Valid: {IsValid}, Issues: {IssueCount}",
                 report.SchemaValid, report.Issues.Count);
         }
         catch (Exception ex)
         {
             report.SchemaValid = false;
             report.Issues.Add($"Schema validation error: {ex.Message}");
-            _logger.LogError(ex, "Error during schema validation");
+            Logger.Error(ex, "Error during schema validation");
         }
 
         return report;
@@ -186,31 +183,31 @@ public class DataIntegrityService
         {
             // Raw SQL for comprehensive data integrity check
             var sql = @"
-                SELECT 
+                SELECT
                     'Bus' as EntityType,
                     VehicleId as EntityId,
-                    CASE 
+                    CASE
                         WHEN BusNumber IS NULL OR BusNumber = '' THEN 'BusNumber is NULL/Empty; '
                         ELSE ''
                     END +
-                    CASE 
+                    CASE
                         WHEN Make IS NULL OR Make = '' THEN 'Make is NULL/Empty; '
                         ELSE ''
                     END +
-                    CASE 
+                    CASE
                         WHEN Model IS NULL OR Model = '' THEN 'Model is NULL/Empty; '
                         ELSE ''
                     END +
-                    CASE 
+                    CASE
                         WHEN VINNumber IS NULL OR VINNumber = '' THEN 'VINNumber is NULL/Empty; '
                         ELSE ''
                     END +
-                    CASE 
+                    CASE
                         WHEN LicenseNumber IS NULL OR LicenseNumber = '' THEN 'LicenseNumber is NULL/Empty; '
                         ELSE ''
                     END as Issues
-                FROM Vehicles 
-                WHERE BusNumber IS NULL OR BusNumber = '' 
+                FROM Vehicles
+                WHERE BusNumber IS NULL OR BusNumber = ''
                    OR Make IS NULL OR Make = ''
                    OR Model IS NULL OR Model = ''
                    OR VINNumber IS NULL OR VINNumber = ''
@@ -218,49 +215,49 @@ public class DataIntegrityService
 
                 UNION ALL
 
-                SELECT 
+                SELECT
                     'Driver' as EntityType,
                     DriverId as EntityId,
-                    CASE 
+                    CASE
                         WHEN DriverName IS NULL OR DriverName = '' THEN 'DriverName is NULL/Empty; '
                         ELSE ''
                     END +
-                    CASE 
+                    CASE
                         WHEN DriversLicenceType IS NULL OR DriversLicenceType = '' THEN 'DriversLicenceType is NULL/Empty; '
                         ELSE ''
                     END as Issues
-                FROM Drivers 
-                WHERE DriverName IS NULL OR DriverName = '' 
+                FROM Drivers
+                WHERE DriverName IS NULL OR DriverName = ''
                    OR DriversLicenceType IS NULL OR DriversLicenceType = ''
 
                 UNION ALL
 
-                SELECT 
+                SELECT
                     'Route' as EntityType,
                     RouteId as EntityId,
-                    CASE 
+                    CASE
                         WHEN RouteName IS NULL OR RouteName = '' THEN 'RouteName is NULL/Empty; '
                         ELSE ''
                     END +
-                    CASE 
+                    CASE
                         WHEN Date < '2020-01-01' OR Date > DATEADD(year, 1, GETDATE()) THEN 'Invalid Date; '
                         ELSE ''
                     END as Issues
-                FROM Routes 
-                WHERE RouteName IS NULL OR RouteName = '' 
-                   OR Date < '2020-01-01' 
+                FROM Routes
+                WHERE RouteName IS NULL OR RouteName = ''
+                   OR Date < '2020-01-01'
                    OR Date > DATEADD(year, 1, GETDATE())
 
                 UNION ALL
 
-                SELECT 
+                SELECT
                     'Student' as EntityType,
                     StudentId as EntityId,
-                    CASE 
+                    CASE
                         WHEN StudentName IS NULL OR StudentName = '' THEN 'StudentName is NULL/Empty; '
                         ELSE ''
                     END as Issues
-                FROM Students 
+                FROM Students
                 WHERE StudentName IS NULL OR StudentName = ''
             ";
 
@@ -286,14 +283,14 @@ public class DataIntegrityService
             report.ExecutionTimeMs = stopwatch.ElapsedMilliseconds;
             report.TotalRecordsScanned = report.Issues.Count;
 
-            _logger.LogInformation("Advanced data integrity check completed in {ElapsedMs}ms. Found {IssueCount} issues.",
+            Logger.Information("Advanced data integrity check completed in {ElapsedMs}ms. Found {IssueCount} issues.",
                 stopwatch.ElapsedMilliseconds, report.Issues.Count);
 
         }
         catch (Exception ex)
         {
             report.Issues.Add($"Advanced check error: {ex.Message}");
-            _logger.LogError(ex, "Error during advanced data integrity check");
+            Logger.Error(ex, "Error during advanced data integrity check");
         }
 
         return report;
@@ -369,13 +366,13 @@ public class DataIntegrityService
                 }
             }
 
-            _logger.LogInformation("Query performance analysis completed. Tested {QueryCount} queries.", queries.Count);
+            Logger.Information("Query performance analysis completed. Tested {QueryCount} queries.", queries.Count);
 
         }
         catch (Exception ex)
         {
             report.SlowQueries.Add($"Performance analysis error: {ex.Message}");
-            _logger.LogError(ex, "Error during query performance analysis");
+            Logger.Error(ex, "Error during query performance analysis");
         }
 
         return report;
@@ -404,12 +401,12 @@ public class DataIntegrityService
             // Check Students for data issues
             await ScanStudentsAsync(context, report);
 
-            _logger.LogInformation("Data integrity scan completed. Found {IssueCount} issues.",
+            Logger.Information("Data integrity scan completed. Found {IssueCount} issues.",
                 report.Issues.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during data integrity scan");
+            Logger.Error(ex, "Error during data integrity scan");
             report.Issues.Add($"Scan error: {ex.Message}");
         }
 
@@ -439,11 +436,11 @@ public class DataIntegrityService
             // Save all changes
             await context.SaveChangesAsync();
 
-            _logger.LogInformation("Fixed {IssueCount} data integrity issues", issuesFixed);
+            Logger.Information("Fixed {IssueCount} data integrity issues", issuesFixed);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fixing data issues");
+            Logger.Error(ex, "Error fixing data issues");
         }
 
         return issuesFixed;

@@ -1,6 +1,6 @@
 using BusBuddy.Core.Data.Interfaces;
 using BusBuddy.Core.Models;
-using Microsoft.Extensions.Logging;
+using Serilog;
 // ...existing code...
 
 namespace BusBuddy.Core.Services
@@ -13,18 +13,16 @@ namespace BusBuddy.Core.Services
         private readonly IRouteRepository _routeRepository;
         private readonly XAIService _xaiService;
         private readonly GoogleEarthEngineService _geeService;
-        private readonly ILogger<AIEnhancedRouteService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<AIEnhancedRouteService>();
 
         public AIEnhancedRouteService(
             IRouteRepository routeRepository,
             XAIService xaiService,
-            GoogleEarthEngineService geeService,
-            ILogger<AIEnhancedRouteService> logger)
+            GoogleEarthEngineService geeService)
         {
             _routeRepository = routeRepository ?? throw new ArgumentNullException(nameof(routeRepository));
             _xaiService = xaiService ?? throw new ArgumentNullException(nameof(xaiService));
             _geeService = geeService ?? throw new ArgumentNullException(nameof(geeService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -34,7 +32,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Starting AI-enhanced route analysis for route {RouteId}", routeId);
+                Logger.Information("Starting AI-enhanced route analysis for route {RouteId}", routeId);
 
                 // Get route from local database
                 var route = await _routeRepository.GetByIdAsync(routeId);
@@ -65,7 +63,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in AI route analysis for route {RouteId}", routeId);
+                Logger.Error(ex, "Error in AI route analysis for route {RouteId}", routeId);
                 throw;
             }
         }
@@ -98,7 +96,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting routes with AI summary");
+                Logger.Error(ex, "Error getting routes with AI summary");
                 throw;
             }
         }
@@ -129,14 +127,14 @@ namespace BusBuddy.Core.Services
                         $"Safety score: {recommendations.SafetyScore:F1}";
 
                     await _routeRepository.UpdateAsync(route);
-                    _logger.LogInformation("Route {RouteId} optimized using AI recommendations", routeId);
+                    Logger.Information("Route {RouteId} optimized using AI recommendations", routeId);
                 }
 
                 return route;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error optimizing route {RouteId}", routeId);
+                Logger.Error(ex, "Error optimizing route {RouteId}", routeId);
                 throw;
             }
         }

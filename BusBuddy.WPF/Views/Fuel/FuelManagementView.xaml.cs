@@ -2,7 +2,8 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using BusBuddy.WPF.ViewModels;
 
 namespace BusBuddy.WPF.Views.Fuel
@@ -13,36 +14,41 @@ namespace BusBuddy.WPF.Views.Fuel
     /// </summary>
     public partial class FuelManagementView : UserControl
     {
-        private readonly ILogger<FuelManagementView>? _logger;
+        private static readonly ILogger Logger = Log.ForContext<FuelManagementView>();
 
         public FuelManagementView()
         {
             try
             {
-                InitializeComponent();
-
-                // Get logger for control interaction tracking
-                if (Application.Current is App app && app.Services != null)
+                using (LogContext.PushProperty("ViewType", nameof(FuelManagementView)))
+                using (LogContext.PushProperty("OperationType", "ViewInitialization"))
                 {
-                    _logger = app.Services.GetService<ILogger<FuelManagementView>>();
-                    var viewModel = app.Services.GetService<FuelManagementViewModel>();
+                    Logger.Information("FuelManagementView initialization started");
 
-                    if (viewModel != null)
+                    InitializeComponent();
+
+                    // Get logger for control interaction tracking
+                    if (Application.Current is App app && app.Services != null)
                     {
-                        DataContext = viewModel;
-                        _logger?.LogInformation("⛽ FuelManagementView: ViewModel initialized successfully");
+                        var viewModel = app.Services.GetService<FuelManagementViewModel>();
+
+                        if (viewModel != null)
+                        {
+                            DataContext = viewModel;
+                            Logger.Information("⛽ FuelManagementView: ViewModel initialized successfully");
+                        }
+                        else
+                        {
+                            Logger.Warning("⛽ FuelManagementView: ViewModel service not found");
+                        }
                     }
-                    else
-                    {
-                        _logger?.LogWarning("⛽ FuelManagementView: ViewModel service not found");
-                    }
+
+                    Logger.Information("⛽ FuelManagementView: Enhanced fuel management view initialized");
                 }
-
-                _logger?.LogInformation("⛽ FuelManagementView: Enhanced fuel management view initialized");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ FuelManagementView: Failed to initialize - {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ FuelManagementView: Failed to initialize - {ErrorMessage}", ex.Message);
                 System.Diagnostics.Debug.WriteLine($"❌ FuelManagementView initialization failed: {ex.Message}");
             }
         }
@@ -54,22 +60,22 @@ namespace BusBuddy.WPF.Views.Fuel
         {
             try
             {
-                _logger?.LogInformation("⛽ UI Fuel control clicked: Add Fuel Record button - opening new fuel record dialog");
+                Logger.Information("⛽ UI Fuel control clicked: Add Fuel Record button - opening new fuel record dialog");
 
                 var viewModel = DataContext as FuelManagementViewModel;
                 if (viewModel?.AddCommand?.CanExecute(null) == true)
                 {
                     viewModel.AddCommand.Execute(null);
-                    _logger?.LogInformation("⛽ UI Fuel Add command executed successfully");
+                    Logger.Information("⛽ UI Fuel Add command executed successfully");
                 }
                 else
                 {
-                    _logger?.LogWarning("⛽ UI Fuel Add Fuel Record button clicked but command is not available or cannot execute");
+                    Logger.Warning("⛽ UI Fuel Add Fuel Record button clicked but command is not available or cannot execute");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel Add Fuel Record button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel Add Fuel Record button failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -80,22 +86,22 @@ namespace BusBuddy.WPF.Views.Fuel
         {
             try
             {
-                _logger?.LogInformation("⛽ UI Fuel control clicked: Generate Fuel Report button - creating fuel efficiency report");
+                Logger.Information("⛽ UI Fuel control clicked: Generate Fuel Report button - creating fuel efficiency report");
 
                 var viewModel = DataContext as FuelManagementViewModel;
                 if (viewModel?.ReportCommand?.CanExecute(null) == true)
                 {
                     viewModel.ReportCommand.Execute(null);
-                    _logger?.LogInformation("⛽ UI Fuel Generate Report command executed successfully");
+                    Logger.Information("⛽ UI Fuel Generate Report command executed successfully");
                 }
                 else
                 {
-                    _logger?.LogWarning("⛽ UI Fuel Generate Report button clicked but command is not available or cannot execute");
+                    Logger.Warning("⛽ UI Fuel Generate Report button clicked but command is not available or cannot execute");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel Generate Report button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel Generate Report button failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -106,49 +112,49 @@ namespace BusBuddy.WPF.Views.Fuel
         {
             try
             {
-                _logger?.LogInformation("⛽ UI Fuel control clicked: Fuel Reconciliation button - comparing bulk station data with vehicle usage");
+                Logger.Information("⛽ UI Fuel control clicked: Fuel Reconciliation button - comparing bulk station data with vehicle usage");
 
                 var viewModel = DataContext as FuelManagementViewModel;
                 if (viewModel?.ReconciliationCommand?.CanExecute(null) == true)
                 {
                     viewModel.ReconciliationCommand.Execute(null);
-                    _logger?.LogInformation("⛽ UI Fuel Reconciliation command executed successfully");
+                    Logger.Information("⛽ UI Fuel Reconciliation command executed successfully");
                 }
                 else
                 {
-                    _logger?.LogWarning("⛽ UI Fuel Reconciliation button clicked but command is not available or cannot execute");
+                    Logger.Warning("⛽ UI Fuel Reconciliation button clicked but command is not available or cannot execute");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel Reconciliation button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel Reconciliation button failed: {ErrorMessage}", ex.Message);
             }
         }
 
         /// <summary>
-        /// Handle Refresh button clicks with logging  
+        /// Handle Refresh button clicks with logging
         /// </summary>
         private void RefreshFuelButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                _logger?.LogInformation("⛽ UI Fuel control clicked: Refresh button - refreshing fuel data and analytics");
+                Logger.Information("⛽ UI Fuel control clicked: Refresh button - refreshing fuel data and analytics");
 
                 var viewModel = DataContext as FuelManagementViewModel;
                 if (viewModel != null)
                 {
                     // Since there's no explicit refresh command, we can trigger a data reload
-                    _logger?.LogInformation("⛽ UI Fuel Refresh triggered - will reload fuel data and recalculate metrics");
+                    Logger.Information("⛽ UI Fuel Refresh triggered - will reload fuel data and recalculate metrics");
                     // For now, we'll just log the action since the ViewModel might not expose a public refresh command
                 }
                 else
                 {
-                    _logger?.LogWarning("⛽ UI Fuel Refresh button clicked but ViewModel is not available");
+                    Logger.Warning("⛽ UI Fuel Refresh button clicked but ViewModel is not available");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel Refresh button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel Refresh button failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -162,7 +168,7 @@ namespace BusBuddy.WPF.Views.Fuel
                 if (sender is FrameworkElement tile)
                 {
                     var tileName = tile.Name ?? "UnknownFuelTile";
-                    _logger?.LogInformation("⛽ UI Fuel tile clicked: {TileName} - potential drill-down navigation", tileName);
+                    Logger.Information("⛽ UI Fuel tile clicked: {TileName} - potential drill-down navigation", tileName);
 
                     var viewModel = DataContext as FuelManagementViewModel;
                     if (viewModel != null)
@@ -171,19 +177,19 @@ namespace BusBuddy.WPF.Views.Fuel
                         switch (tileName)
                         {
                             case "MonthlyFuelCostTile":
-                                _logger?.LogInformation("⛽ UI Fuel opening monthly cost breakdown view");
+                                Logger.Information("⛽ UI Fuel opening monthly cost breakdown view");
                                 // viewModel.ShowMonthlyCostBreakdown();
                                 break;
                             case "AverageMPGTile":
-                                _logger?.LogInformation("⛽ UI Fuel opening MPG analysis view");
+                                Logger.Information("⛽ UI Fuel opening MPG analysis view");
                                 // viewModel.ShowMPGAnalysis();
                                 break;
                             case "TotalGallonsTile":
-                                _logger?.LogInformation("⛽ UI Fuel opening consumption analysis view");
+                                Logger.Information("⛽ UI Fuel opening consumption analysis view");
                                 // viewModel.ShowConsumptionAnalysis();
                                 break;
                             case "CostPerMileTile":
-                                _logger?.LogInformation("⛽ UI Fuel opening efficiency analysis view");
+                                Logger.Information("⛽ UI Fuel opening efficiency analysis view");
                                 // viewModel.ShowEfficiencyAnalysis();
                                 break;
                         }
@@ -192,7 +198,7 @@ namespace BusBuddy.WPF.Views.Fuel
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel tile interaction failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel tile interaction failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -206,19 +212,19 @@ namespace BusBuddy.WPF.Views.Fuel
                 if (e.AddedItems?.Count > 0)
                 {
                     var selectedItem = e.AddedItems[0];
-                    _logger?.LogInformation("⛽ UI Fuel grid selection changed: Selected fuel record - {ItemType}",
+                    Logger.Information("⛽ UI Fuel grid selection changed: Selected fuel record - {ItemType}",
                         selectedItem?.GetType().Name ?? "Unknown");
 
                     var viewModel = DataContext as FuelManagementViewModel;
                     if (viewModel != null)
                     {
-                        _logger?.LogDebug("⛽ UI Fuel selection processed successfully");
+                        Logger.Debug("⛽ UI Fuel selection processed successfully");
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel grid selection change failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel grid selection change failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -232,29 +238,29 @@ namespace BusBuddy.WPF.Views.Fuel
                 var columnName = e.Column?.MappingName ?? "Unknown";
                 var rowIndex = e.RowColumnIndex.RowIndex;
 
-                _logger?.LogInformation("⛽ UI Fuel grid cell tapped: Column '{ColumnName}' at row {RowIndex}",
+                Logger.Information("⛽ UI Fuel grid cell tapped: Column '{ColumnName}' at row {RowIndex}",
                     columnName, rowIndex);
 
                 // Special handling for specific columns
                 switch (columnName)
                 {
                     case "MPG":
-                        _logger?.LogInformation("⛽ UI Fuel MPG column tapped - potential efficiency analysis");
+                        Logger.Information("⛽ UI Fuel MPG column tapped - potential efficiency analysis");
                         break;
                     case "TotalCost":
-                        _logger?.LogInformation("⛽ UI Fuel cost column tapped - potential cost breakdown view");
+                        Logger.Information("⛽ UI Fuel cost column tapped - potential cost breakdown view");
                         break;
                     case "Gallons":
-                        _logger?.LogInformation("⛽ UI Fuel gallons column tapped - potential consumption details");
+                        Logger.Information("⛽ UI Fuel gallons column tapped - potential consumption details");
                         break;
                     case "FuelLocation":
-                        _logger?.LogInformation("⛽ UI Fuel location column tapped - potential station analysis");
+                        Logger.Information("⛽ UI Fuel location column tapped - potential station analysis");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel grid cell tap failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel grid cell tap failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -268,27 +274,27 @@ namespace BusBuddy.WPF.Views.Fuel
                 if (sender is FrameworkElement chart)
                 {
                     var chartName = chart.Name ?? "UnnamedFuelChart";
-                    _logger?.LogInformation("⛽ UI Fuel chart interaction: {ChartName} clicked at position ({X}, {Y})",
+                    Logger.Information("⛽ UI Fuel chart interaction: {ChartName} clicked at position ({X}, {Y})",
                         chartName, e.GetPosition(chart).X, e.GetPosition(chart).Y);
 
                     // Could trigger chart drill-down or detailed analysis
                     switch (chartName)
                     {
                         case "MPGTrendsChart":
-                            _logger?.LogInformation("⛽ UI Fuel MPG trends chart clicked - potential period drill-down");
+                            Logger.Information("⛽ UI Fuel MPG trends chart clicked - potential period drill-down");
                             break;
                         case "CostAnalysisChart":
-                            _logger?.LogInformation("⛽ UI Fuel cost analysis chart clicked - potential monthly details");
+                            Logger.Information("⛽ UI Fuel cost analysis chart clicked - potential monthly details");
                             break;
                         case "EfficiencyDistributionChart":
-                            _logger?.LogInformation("⛽ UI Fuel efficiency distribution chart clicked - potential bus details");
+                            Logger.Information("⛽ UI Fuel efficiency distribution chart clicked - potential bus details");
                             break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel chart interaction failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel chart interaction failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -303,7 +309,7 @@ namespace BusBuddy.WPF.Views.Fuel
                 if (e.Source is FrameworkElement element)
                 {
                     var elementName = element.Name ?? element.GetType().Name;
-                    _logger?.LogDebug("⛽ UI Fuel preview click on: {ElementName} ({ElementType})",
+                    Logger.Debug("⛽ UI Fuel preview click on: {ElementName} ({ElementType})",
                         elementName, element.GetType().Name);
                 }
 
@@ -311,7 +317,7 @@ namespace BusBuddy.WPF.Views.Fuel
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ UI Fuel preview click handling failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ UI Fuel preview click handling failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -322,18 +328,18 @@ namespace BusBuddy.WPF.Views.Fuel
         {
             try
             {
-                _logger?.LogInformation("⛽ FuelManagementView: View fully loaded and ready for interaction");
+                Logger.Information("⛽ FuelManagementView: View fully loaded and ready for interaction");
 
                 // Could initialize any view-specific settings here
                 var viewModel = DataContext as FuelManagementViewModel;
                 if (viewModel != null)
                 {
-                    _logger?.LogInformation("⛽ FuelManagementView: ViewModel binding confirmed");
+                    Logger.Information("⛽ FuelManagementView: ViewModel binding confirmed");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ FuelManagementView: Load event failed - {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ FuelManagementView: Load event failed - {ErrorMessage}", ex.Message);
             }
         }
 
@@ -344,11 +350,11 @@ namespace BusBuddy.WPF.Views.Fuel
         {
             try
             {
-                _logger?.LogInformation("⛽ FuelManagementView: View unloaded - cleanup completed");
+                Logger.Information("⛽ FuelManagementView: View unloaded - cleanup completed");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "⛽ FuelManagementView: Unload event failed - {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "⛽ FuelManagementView: Unload event failed - {ErrorMessage}", ex.Message);
             }
         }
     }

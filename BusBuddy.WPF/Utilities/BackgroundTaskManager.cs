@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.WPF.Utilities
 {
@@ -11,11 +11,10 @@ namespace BusBuddy.WPF.Utilities
     /// </summary>
     public class BackgroundTaskManager
     {
-        private readonly ILogger<BackgroundTaskManager> _logger;
+        private static readonly ILogger Logger = Log.ForContext<BackgroundTaskManager>();
 
-        public BackgroundTaskManager(ILogger<BackgroundTaskManager> logger)
+        public BackgroundTaskManager()
         {
-            _logger = logger;
         }
 
         /// <summary>
@@ -38,19 +37,19 @@ namespace BusBuddy.WPF.Utilities
                     // Set lower thread priority for background operations
                     Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
 
-                    _logger.LogInformation("[BACKGROUND] Starting background task: {TaskName}", taskName);
+                    Logger.Information("[BACKGROUND] Starting background task: {TaskName}", taskName);
                     var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
                     // Execute the action
                     action();
 
                     stopwatch.Stop();
-                    _logger.LogInformation("[BACKGROUND] Completed background task: {TaskName} in {ElapsedMs}ms",
+                    Logger.Information("[BACKGROUND] Completed background task: {TaskName} in {ElapsedMs}ms",
                         taskName, stopwatch.ElapsedMilliseconds);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "[BACKGROUND] Error in background task {TaskName}: {ErrorMessage}",
+                    Logger.Error(ex, "[BACKGROUND] Error in background task {TaskName}: {ErrorMessage}",
                         taskName, ex.Message);
                 }
             });
@@ -76,19 +75,19 @@ namespace BusBuddy.WPF.Utilities
                     // Set lower thread priority for background operations
                     Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
 
-                    _logger.LogInformation("[BACKGROUND] Starting async background task: {TaskName}", taskName);
+                    Logger.Information("[BACKGROUND] Starting async background task: {TaskName}", taskName);
                     var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
                     // Execute the async action
                     await asyncAction();
 
                     stopwatch.Stop();
-                    _logger.LogInformation("[BACKGROUND] Completed async background task: {TaskName} in {ElapsedMs}ms",
+                    Logger.Information("[BACKGROUND] Completed async background task: {TaskName} in {ElapsedMs}ms",
                         taskName, stopwatch.ElapsedMilliseconds);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "[BACKGROUND] Error in async background task {TaskName}: {ErrorMessage}",
+                    Logger.Error(ex, "[BACKGROUND] Error in async background task {TaskName}: {ErrorMessage}",
                         taskName, ex.Message);
                 }
             });

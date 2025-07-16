@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BusBuddy.Core.Models;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Services
 {
@@ -25,16 +25,15 @@ namespace BusBuddy.Core.Services
     public class EnhancedCachingService : IEnhancedCachingService
     {
         private readonly IMemoryCache _cache;
-        private readonly ILogger<EnhancedCachingService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<EnhancedCachingService>();
         private static readonly TimeSpan DefaultCacheTime = TimeSpan.FromMinutes(15);
         private static readonly HashSet<string> _allCacheKeys = new HashSet<string>();
         private static readonly object _cacheLock = new object();
 
-        public EnhancedCachingService(IMemoryCache cache, ILogger<EnhancedCachingService> logger)
+        public EnhancedCachingService(IMemoryCache cache)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _logger.LogInformation("EnhancedCachingService initialized");
+            Logger.Information("EnhancedCachingService initialized");
         }
 
         public async Task<IReadOnlyList<Bus>> GetAllBusesAsync(Func<Task<IEnumerable<Bus>>> fetchFunc)
@@ -64,12 +63,12 @@ namespace BusBuddy.Core.Services
 
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, int>? cachedResult) && cachedResult != null)
             {
-                _logger.LogDebug("Cache hit for {Key}, returning cached dashboard metrics", cacheKey);
+                Logger.Debug("Cache hit for {Key}, returning cached dashboard metrics", cacheKey);
                 Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache HIT for '{cacheKey}' with {cachedResult.Count} metrics");
                 return Task.FromResult(cachedResult);
             }
 
-            _logger.LogDebug("No cached dashboard metrics found");
+            Logger.Debug("No cached dashboard metrics found");
             Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache MISS for '{cacheKey}'");
             return Task.FromResult(new Dictionary<string, int>());
         }
@@ -81,19 +80,19 @@ namespace BusBuddy.Core.Services
 
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, int>? cachedResult) && cachedResult != null)
             {
-                _logger.LogDebug("Cache hit for {Key}, returned dashboard metrics", cacheKey);
+                Logger.Debug("Cache hit for {Key}, returned dashboard metrics", cacheKey);
                 Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache HIT for '{cacheKey}' with {cachedResult.Count} metrics");
                 return cachedResult;
             }
 
-            _logger.LogInformation("Cache miss for {Key}, fetching dashboard metrics", cacheKey);
+            Logger.Information("Cache miss for {Key}, fetching dashboard metrics", cacheKey);
             Debug.WriteLine($"[DEBUG] EnhancedCachingService: Cache MISS for '{cacheKey}', fetching data");
 
             var stopwatch = Stopwatch.StartNew();
             var result = await fetchFunc();
             stopwatch.Stop();
 
-            _logger.LogInformation("Fetched dashboard metrics in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+            Logger.Information("Fetched dashboard metrics in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             Debug.WriteLine($"[DEBUG] EnhancedCachingService: Fetched dashboard metrics in {stopwatch.ElapsedMilliseconds}ms");
 
             // Add to cache with a shorter expiration for metrics
@@ -118,13 +117,13 @@ namespace BusBuddy.Core.Services
 
             if (metrics == null || !metrics.Any())
             {
-                _logger.LogWarning("Attempted to cache empty dashboard metrics");
+                Logger.Warning("Attempted to cache empty dashboard metrics");
                 Debug.WriteLine($"[DEBUG] EnhancedCachingService: Attempted to cache empty metrics, skipping");
                 return;
             }
 
             const string cacheKey = "DashboardMetrics";
-            _logger.LogInformation("Directly setting dashboard metrics cache with {Count} values", metrics.Count);
+            Logger.Information("Directly setting dashboard metrics cache with {Count} values", metrics.Count);
             Debug.WriteLine($"[DEBUG] EnhancedCachingService: Setting cache for key '{cacheKey}' with {metrics.Count} values");
 
             // Add to cache with a shorter expiration for metrics
@@ -140,13 +139,13 @@ namespace BusBuddy.Core.Services
                 _allCacheKeys.Add(cacheKey);
             }
 
-            _logger.LogDebug("Dashboard metrics cached: {Metrics}",
+            Logger.Debug("Dashboard metrics cached: {Metrics}",
                 string.Join(", ", metrics.Select(kv => $"{kv.Key}={kv.Value}")));
         }
 
         public void InvalidateCache(string key)
         {
-            _logger.LogInformation("Invalidating cache for key: {Key}", key);
+            Logger.Information("Invalidating cache for key: {Key}", key);
             _cache.Remove(key);
 
             lock (_cacheLock)
@@ -157,7 +156,7 @@ namespace BusBuddy.Core.Services
 
         public void InvalidateAllCaches()
         {
-            _logger.LogInformation("Invalidating all caches");
+            Logger.Information("Invalidating all caches");
 
             lock (_cacheLock)
             {
@@ -173,11 +172,11 @@ namespace BusBuddy.Core.Services
         {
             if (_cache.TryGetValue(key, out IReadOnlyList<T>? cachedResult) && cachedResult != null)
             {
-                _logger.LogDebug("Cache hit for {Key}, returned {Count} items", key, cachedResult.Count);
+                Logger.Debug("Cache hit for {Key}, returned {Count} items", key, cachedResult.Count);
                 return cachedResult;
             }
 
-            _logger.LogInformation("Cache miss for {Key}, fetching data", key);
+            Logger.Information("Cache miss for {Key}, fetching data", key);
             var stopwatch = Stopwatch.StartNew();
 
             try
@@ -185,7 +184,7 @@ namespace BusBuddy.Core.Services
                 var result = (await fetchFunc()).ToList();
                 stopwatch.Stop();
 
-                _logger.LogInformation("Fetched {Count} items for {Key} in {ElapsedMs}ms",
+                Logger.Information("Fetched {Count} items for {Key} in {ElapsedMs}ms",
                     result.Count, key, stopwatch.ElapsedMilliseconds);
 
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
@@ -204,7 +203,7 @@ namespace BusBuddy.Core.Services
             catch (System.Data.SqlTypes.SqlNullValueException ex)
             {
                 stopwatch.Stop();
-                _logger.LogWarning(ex, "SQL NULL value error when fetching data for {Key} after {ElapsedMs}ms. Returning empty list to prevent application failure.",
+                Logger.Warning(ex, "SQL NULL value error when fetching data for {Key} after {ElapsedMs}ms. Returning empty list to prevent application failure.",
                     key, stopwatch.ElapsedMilliseconds);
 
                 // Return empty list instead of throwing to prevent application failures
@@ -227,7 +226,7 @@ namespace BusBuddy.Core.Services
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger.LogError(ex, "Error fetching data for {Key} after {ElapsedMs}ms",
+                Logger.Error(ex, "Error fetching data for {Key} after {ElapsedMs}ms",
                     key, stopwatch.ElapsedMilliseconds);
                 throw;
             }

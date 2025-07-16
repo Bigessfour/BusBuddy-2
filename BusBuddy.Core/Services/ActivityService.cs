@@ -2,7 +2,7 @@ using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Text;
 
 namespace BusBuddy.Core.Services;
@@ -13,19 +13,19 @@ namespace BusBuddy.Core.Services;
 public class ActivityService : IActivityService
 {
     private readonly BusBuddyDbContext _context;
-    private readonly ILogger<ActivityService> _logger;
+    private static readonly ILogger Logger = Log.ForContext<ActivityService>();
 
-    public ActivityService(BusBuddyDbContext context, ILogger<ActivityService> logger)
+    public ActivityService(BusBuddyDbContext context)
     {
         _context = context;
-        _logger = logger;
     }
 
     public async Task<IEnumerable<Activity>> GetAllActivitiesAsync()
     {
         try
         {
-            _logger.LogInformation("Retrieving all activities"); return await _context.Activities
+            Logger.Information("Retrieving all activities");
+            return await _context.Activities
             .Include(a => a.AssignedVehicle)
             .Include(a => a.Route)
             .Include(a => a.Driver)
@@ -34,7 +34,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities");
+            Logger.Error(ex, "Error retrieving activities");
             throw;
         }
     }
@@ -43,7 +43,8 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activity with ID: {ActivityId}", id); return await _context.Activities
+            Logger.Information("Retrieving activity with ID: {ActivityId}", id);
+            return await _context.Activities
             .Include(a => a.AssignedVehicle)
             .Include(a => a.Route)
             .Include(a => a.Driver)
@@ -51,7 +52,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activity with ID: {ActivityId}", id);
+            Logger.Error(ex, "Error retrieving activity with ID: {ActivityId}", id);
             throw;
         }
     }
@@ -60,17 +61,17 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Creating new activity for date: {ActivityDate}", activity.Date);
+            Logger.Information("Creating new activity for date: {ActivityDate}", activity.Date);
 
             _context.Activities.Add(activity);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully created activity with ID: {ActivityId}", activity.ActivityId);
+            Logger.Information("Successfully created activity with ID: {ActivityId}", activity.ActivityId);
             return activity;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating activity");
+            Logger.Error(ex, "Error creating activity");
             throw;
         }
     }
@@ -79,17 +80,17 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Updating activity with ID: {ActivityId}", activity.ActivityId);
+            Logger.Information("Updating activity with ID: {ActivityId}", activity.ActivityId);
 
             _context.Activities.Update(activity);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully updated activity with ID: {ActivityId}", activity.ActivityId);
+            Logger.Information("Successfully updated activity with ID: {ActivityId}", activity.ActivityId);
             return activity;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating activity with ID: {ActivityId}", activity.ActivityId);
+            Logger.Error(ex, "Error updating activity with ID: {ActivityId}", activity.ActivityId);
             throw;
         }
     }
@@ -98,24 +99,24 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Deleting activity with ID: {ActivityId}", id);
+            Logger.Information("Deleting activity with ID: {ActivityId}", id);
 
             var activity = await _context.Activities.FindAsync(id);
             if (activity == null)
             {
-                _logger.LogWarning("Activity with ID {ActivityId} not found for deletion", id);
+                Logger.Warning("Activity with ID {ActivityId} not found for deletion", id);
                 return false;
             }
 
             _context.Activities.Remove(activity);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully deleted activity with ID: {ActivityId}", id);
+            Logger.Information("Successfully deleted activity with ID: {ActivityId}", id);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting activity with ID: {ActivityId}", id);
+            Logger.Error(ex, "Error deleting activity with ID: {ActivityId}", id);
             throw;
         }
     }
@@ -124,7 +125,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities between {StartDate} and {EndDate}", startDate, endDate);
+            Logger.Information("Retrieving activities between {StartDate} and {EndDate}", startDate, endDate);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -136,7 +137,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities for date range");
+            Logger.Error(ex, "Error retrieving activities for date range");
             throw;
         }
     }
@@ -145,7 +146,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities for route ID: {RouteId}", routeId);
+            Logger.Information("Retrieving activities for route ID: {RouteId}", routeId);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -156,7 +157,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities for route ID: {RouteId}", routeId);
+            Logger.Error(ex, "Error retrieving activities for route ID: {RouteId}", routeId);
             throw;
         }
     }
@@ -165,7 +166,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities for driver ID: {DriverId}", driverId);
+            Logger.Information("Retrieving activities for driver ID: {DriverId}", driverId);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -176,7 +177,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities for driver ID: {DriverId}", driverId);
+            Logger.Error(ex, "Error retrieving activities for driver ID: {DriverId}", driverId);
             throw;
         }
     }
@@ -185,7 +186,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities for vehicle ID: {VehicleId}", vehicleId);
+            Logger.Information("Retrieving activities for vehicle ID: {VehicleId}", vehicleId);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -196,7 +197,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities for vehicle ID: {VehicleId}", vehicleId);
+            Logger.Error(ex, "Error retrieving activities for vehicle ID: {VehicleId}", vehicleId);
             throw;
         }
     }
@@ -206,7 +207,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities for date: {Date}", date);
+            Logger.Information("Retrieving activities for date: {Date}", date);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -217,7 +218,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities for date: {Date}", date);
+            Logger.Error(ex, "Error retrieving activities for date: {Date}", date);
             throw;
         }
     }
@@ -229,7 +230,7 @@ public class ActivityService : IActivityService
             var startDate = DateTime.Today;
             var endDate = startDate.AddDays(days);
 
-            _logger.LogInformation("Retrieving upcoming activities for next {Days} days", days);
+            Logger.Information("Retrieving upcoming activities for next {Days} days", days);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -241,7 +242,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving upcoming activities");
+            Logger.Error(ex, "Error retrieving upcoming activities");
             throw;
         }
     }
@@ -250,7 +251,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities for type: {ActivityType}", activityType);
+            Logger.Information("Retrieving activities for type: {ActivityType}", activityType);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -261,7 +262,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities for type: {ActivityType}", activityType);
+            Logger.Error(ex, "Error retrieving activities for type: {ActivityType}", activityType);
             throw;
         }
     }
@@ -270,7 +271,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities with status: {Status}", status);
+            Logger.Information("Retrieving activities with status: {Status}", status);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -281,7 +282,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities with status: {Status}", status);
+            Logger.Error(ex, "Error retrieving activities with status: {Status}", status);
             throw;
         }
     }
@@ -290,7 +291,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities requested by: {RequestedBy}", requestedBy);
+            Logger.Information("Retrieving activities requested by: {RequestedBy}", requestedBy);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
@@ -301,7 +302,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities requested by: {RequestedBy}", requestedBy);
+            Logger.Error(ex, "Error retrieving activities requested by: {RequestedBy}", requestedBy);
             throw;
         }
     }
@@ -310,7 +311,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Searching activities with term: {SearchTerm}", searchTerm);
+            Logger.Information("Searching activities with term: {SearchTerm}", searchTerm);
 
             var lowerSearchTerm = searchTerm.ToLower();
 
@@ -329,7 +330,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching activities with term: {SearchTerm}", searchTerm);
+            Logger.Error(ex, "Error searching activities with term: {SearchTerm}", searchTerm);
             throw;
         }
     }
@@ -338,12 +339,12 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Assigning driver {DriverId} to activity {ActivityId}", driverId, activityId);
+            Logger.Information("Assigning driver {DriverId} to activity {ActivityId}", driverId, activityId);
 
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found for driver assignment", activityId);
+                Logger.Warning("Activity {ActivityId} not found for driver assignment", activityId);
                 return false;
             }
 
@@ -352,12 +353,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully assigned driver {DriverId} to activity {ActivityId}", driverId, activityId);
+            Logger.Information("Successfully assigned driver {DriverId} to activity {ActivityId}", driverId, activityId);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error assigning driver {DriverId} to activity {ActivityId}", driverId, activityId);
+            Logger.Error(ex, "Error assigning driver {DriverId} to activity {ActivityId}", driverId, activityId);
             throw;
         }
     }
@@ -366,12 +367,12 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Assigning vehicle {VehicleId} to activity {ActivityId}", vehicleId, activityId);
+            Logger.Information("Assigning vehicle {VehicleId} to activity {ActivityId}", vehicleId, activityId);
 
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found for vehicle assignment", activityId);
+                Logger.Warning("Activity {ActivityId} not found for vehicle assignment", activityId);
                 return false;
             }
 
@@ -380,12 +381,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully assigned vehicle {VehicleId} to activity {ActivityId}", vehicleId, activityId);
+            Logger.Information("Successfully assigned vehicle {VehicleId} to activity {ActivityId}", vehicleId, activityId);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error assigning vehicle {VehicleId} to activity {ActivityId}", vehicleId, activityId);
+            Logger.Error(ex, "Error assigning vehicle {VehicleId} to activity {ActivityId}", vehicleId, activityId);
             throw;
         }
     }
@@ -394,12 +395,12 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Updating activity {ActivityId} status to {Status}", activityId, status);
+            Logger.Information("Updating activity {ActivityId} status to {Status}", activityId, status);
 
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found for status update", activityId);
+                Logger.Warning("Activity {ActivityId} not found for status update", activityId);
                 return false;
             }
 
@@ -408,12 +409,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully updated activity {ActivityId} status to {Status}", activityId, status);
+            Logger.Information("Successfully updated activity {ActivityId} status to {Status}", activityId, status);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating activity {ActivityId} status to {Status}", activityId, status);
+            Logger.Error(ex, "Error updating activity {ActivityId} status to {Status}", activityId, status);
             throw;
         }
     }
@@ -422,7 +423,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Finding available drivers for activity on {Date} from {StartTime} to {EndTime}",
+            Logger.Information("Finding available drivers for activity on {Date} from {StartTime} to {EndTime}",
                 activityDate, startTime, endTime);
 
             // Get all active drivers
@@ -449,7 +450,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error finding available drivers for activity");
+            Logger.Error(ex, "Error finding available drivers for activity");
             throw;
         }
     }
@@ -458,7 +459,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Finding available vehicles for activity on {Date} from {StartTime} to {EndTime}",
+            Logger.Information("Finding available vehicles for activity on {Date} from {StartTime} to {EndTime}",
                 activityDate, startTime, endTime);
 
             // Get all active vehicles
@@ -485,7 +486,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error finding available vehicles for activity");
+            Logger.Error(ex, "Error finding available vehicles for activity");
             throw;
         }
     }
@@ -494,7 +495,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Checking if driver {DriverId} is available on {Date} from {StartTime} to {EndTime}",
+            Logger.Information("Checking if driver {DriverId} is available on {Date} from {StartTime} to {EndTime}",
                 driverId, activityDate, startTime, endTime);
 
             // Check if the driver is scheduled during this time
@@ -512,7 +513,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking driver availability");
+            Logger.Error(ex, "Error checking driver availability");
             throw;
         }
     }
@@ -521,7 +522,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Checking if vehicle {VehicleId} is available on {Date} from {StartTime} to {EndTime}",
+            Logger.Information("Checking if vehicle {VehicleId} is available on {Date} from {StartTime} to {EndTime}",
                 vehicleId, activityDate, startTime, endTime);
 
             // Check if the vehicle is scheduled during this time
@@ -539,7 +540,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking vehicle availability");
+            Logger.Error(ex, "Error checking vehicle availability");
             throw;
         }
     }
@@ -548,7 +549,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Creating recurring activities from {StartDate} to {EndDate} with {RecurrenceType} recurrence",
+            Logger.Information("Creating recurring activities from {StartDate} to {EndDate} with {RecurrenceType} recurrence",
                 startDate, endDate, recurrenceType);
 
             var activities = new List<Activity>();
@@ -625,12 +626,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully created {Count} recurring activities", activities.Count);
+            Logger.Information("Successfully created {Count} recurring activities", activities.Count);
             return activities;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating recurring activities");
+            Logger.Error(ex, "Error creating recurring activities");
             throw;
         }
     }
@@ -639,13 +640,13 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving recurring series for activity {ActivityId}", activityId);
+            Logger.Information("Retrieving recurring series for activity {ActivityId}", activityId);
 
             // First get the activity to check if it's part of a series
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found", activityId);
+                Logger.Warning("Activity {ActivityId} not found", activityId);
                 return new List<Activity>();
             }
 
@@ -664,7 +665,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving recurring series for activity {ActivityId}", activityId);
+            Logger.Error(ex, "Error retrieving recurring series for activity {ActivityId}", activityId);
             throw;
         }
     }
@@ -673,7 +674,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Updating recurring series for activity {ActivityId}, updateAll: {UpdateAll}",
+            Logger.Information("Updating recurring series for activity {ActivityId}, updateAll: {UpdateAll}",
                 updatedActivity.ActivityId, updateAll);
 
             if (!updateAll)
@@ -709,12 +710,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully updated {Count} activities in recurring series", activitiesInSeries.Count);
+            Logger.Information("Successfully updated {Count} activities in recurring series", activitiesInSeries.Count);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating recurring series for activity {ActivityId}", updatedActivity.ActivityId);
+            Logger.Error(ex, "Error updating recurring series for activity {ActivityId}", updatedActivity.ActivityId);
             throw;
         }
     }
@@ -723,14 +724,14 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Deleting recurring series for activity {ActivityId}, deleteAll: {DeleteAll}",
+            Logger.Information("Deleting recurring series for activity {ActivityId}, deleteAll: {DeleteAll}",
                 activityId, deleteAll);
 
             // First get the activity to check if it's part of a series
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found for deletion", activityId);
+                Logger.Warning("Activity {ActivityId} not found for deletion", activityId);
                 return false;
             }
 
@@ -752,12 +753,12 @@ public class ActivityService : IActivityService
             _context.Activities.RemoveRange(activitiesInSeries);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully deleted {Count} activities in recurring series", activitiesInSeries.Count);
+            Logger.Information("Successfully deleted {Count} activities in recurring series", activitiesInSeries.Count);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting recurring series for activity {ActivityId}", activityId);
+            Logger.Error(ex, "Error deleting recurring series for activity {ActivityId}", activityId);
             throw;
         }
     }
@@ -766,12 +767,12 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Submitting activity {ActivityId} for approval", activityId);
+            Logger.Information("Submitting activity {ActivityId} for approval", activityId);
 
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found for approval submission", activityId);
+                Logger.Warning("Activity {ActivityId} not found for approval submission", activityId);
                 return false;
             }
 
@@ -780,12 +781,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully submitted activity {ActivityId} for approval", activityId);
+            Logger.Information("Successfully submitted activity {ActivityId} for approval", activityId);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error submitting activity {ActivityId} for approval", activityId);
+            Logger.Error(ex, "Error submitting activity {ActivityId} for approval", activityId);
             throw;
         }
     }
@@ -794,12 +795,12 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Approving activity {ActivityId} by {ApprovedBy}", activityId, approvedBy);
+            Logger.Information("Approving activity {ActivityId} by {ApprovedBy}", activityId, approvedBy);
 
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found for approval", activityId);
+                Logger.Warning("Activity {ActivityId} not found for approval", activityId);
                 return false;
             }
 
@@ -810,12 +811,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully approved activity {ActivityId} by {ApprovedBy}", activityId, approvedBy);
+            Logger.Information("Successfully approved activity {ActivityId} by {ApprovedBy}", activityId, approvedBy);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error approving activity {ActivityId} by {ApprovedBy}", activityId, approvedBy);
+            Logger.Error(ex, "Error approving activity {ActivityId} by {ApprovedBy}", activityId, approvedBy);
             throw;
         }
     }
@@ -824,13 +825,13 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Rejecting activity {ActivityId} by {RejectedBy}: {Reason}",
+            Logger.Information("Rejecting activity {ActivityId} by {RejectedBy}: {Reason}",
                 activityId, rejectedBy, rejectionReason);
 
             var activity = await _context.Activities.FindAsync(activityId);
             if (activity == null)
             {
-                _logger.LogWarning("Activity {ActivityId} not found for rejection", activityId);
+                Logger.Warning("Activity {ActivityId} not found for rejection", activityId);
                 return false;
             }
 
@@ -844,12 +845,12 @@ public class ActivityService : IActivityService
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Successfully rejected activity {ActivityId} by {RejectedBy}", activityId, rejectedBy);
+            Logger.Information("Successfully rejected activity {ActivityId} by {RejectedBy}", activityId, rejectedBy);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error rejecting activity {ActivityId} by {RejectedBy}", activityId, rejectedBy);
+            Logger.Error(ex, "Error rejecting activity {ActivityId} by {RejectedBy}", activityId, rejectedBy);
             throw;
         }
     }
@@ -858,7 +859,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving activities pending approval");
+            Logger.Information("Retrieving activities pending approval");
 
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
@@ -871,7 +872,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activities pending approval");
+            Logger.Error(ex, "Error retrieving activities pending approval");
             throw;
         }
     }
@@ -880,7 +881,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Detecting schedule conflicts for activity on {Date} from {StartTime} to {EndTime}",
+            Logger.Information("Detecting schedule conflicts for activity on {Date} from {StartTime} to {EndTime}",
                 newActivity.Date, newActivity.LeaveTime, newActivity.ReturnTime);
 
             // Check for conflicts with other activities
@@ -897,12 +898,12 @@ public class ActivityService : IActivityService
                     (a.DriverId == newActivity.DriverId || a.AssignedVehicleId == newActivity.AssignedVehicleId)) // Same driver or vehicle
                 .ToListAsync();
 
-            _logger.LogInformation("Found {Count} schedule conflicts", conflicts.Count);
+            Logger.Information("Found {Count} schedule conflicts", conflicts.Count);
             return conflicts;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error detecting schedule conflicts");
+            Logger.Error(ex, "Error detecting schedule conflicts");
             throw;
         }
     }
@@ -913,7 +914,7 @@ public class ActivityService : IActivityService
 
         try
         {
-            _logger.LogInformation("Validating activity for {Date}", activity.Date);
+            Logger.Information("Validating activity for {Date}", activity.Date);
 
             // Check required fields
             if (string.IsNullOrEmpty(activity.ActivityType))
@@ -966,12 +967,12 @@ public class ActivityService : IActivityService
                     errors.Add("Selected vehicle is not active");
             }
 
-            _logger.LogInformation("Activity validation complete with {Count} errors", errors.Count);
+            Logger.Information("Activity validation complete with {Count} errors", errors.Count);
             return errors;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error validating activity");
+            Logger.Error(ex, "Error validating activity");
             errors.Add($"Validation error: {ex.Message}");
             return errors;
         }
@@ -981,7 +982,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Generating activity statistics from {StartDate} to {EndDate}", startDate, endDate);
+            Logger.Information("Generating activity statistics from {StartDate} to {EndDate}", startDate, endDate);
 
             var activities = await _context.Activities
                 .Where(a => a.Date >= startDate && a.Date <= endDate)
@@ -1020,12 +1021,12 @@ public class ActivityService : IActivityService
             stats["Total_Drivers"] = activities.Select(a => a.DriverId).Distinct().Count();
             stats["Total_Vehicles"] = activities.Select(a => a.AssignedVehicleId).Distinct().Count();
 
-            _logger.LogInformation("Successfully generated activity statistics with {Count} metrics", stats.Count);
+            Logger.Information("Successfully generated activity statistics with {Count} metrics", stats.Count);
             return stats;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating activity statistics");
+            Logger.Error(ex, "Error generating activity statistics");
             throw;
         }
     }
@@ -1034,7 +1035,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Generating activity metrics from {StartDate} to {EndDate}", startDate, endDate);
+            Logger.Information("Generating activity metrics from {StartDate} to {EndDate}", startDate, endDate);
 
             var activities = await _context.Activities
                 .Where(a => a.Date >= startDate && a.Date <= endDate)
@@ -1073,12 +1074,12 @@ public class ActivityService : IActivityService
                     : 0;
             }
 
-            _logger.LogInformation("Successfully generated activity metrics with {Count} values", metrics.Count);
+            Logger.Information("Successfully generated activity metrics with {Count} values", metrics.Count);
             return metrics;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating activity metrics");
+            Logger.Error(ex, "Error generating activity metrics");
             throw;
         }
     }
@@ -1090,7 +1091,7 @@ public class ActivityService : IActivityService
             startDate ??= DateTime.Today.AddMonths(-1);
             endDate ??= DateTime.Today.AddMonths(1);
 
-            _logger.LogInformation("Exporting activities to CSV from {StartDate} to {EndDate}", startDate, endDate);
+            Logger.Information("Exporting activities to CSV from {StartDate} to {EndDate}", startDate, endDate);
 
             var activities = await _context.Activities
                 .Include(a => a.AssignedVehicle)
@@ -1127,12 +1128,12 @@ public class ActivityService : IActivityService
                 ));
             }
 
-            _logger.LogInformation("Successfully exported {Count} activities to CSV", activities.Count);
+            Logger.Information("Successfully exported {Count} activities to CSV", activities.Count);
             return sb.ToString();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error exporting activities to CSV");
+            Logger.Error(ex, "Error exporting activities to CSV");
             throw;
         }
     }
@@ -1155,7 +1156,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Generating report for activity {ActivityId}", activityId);
+            Logger.Information("Generating report for activity {ActivityId}", activityId);
 
             // Not implemented - would require a reporting library
             // This is a stub that would be implemented with a PDF/report generation library
@@ -1165,7 +1166,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating activity report");
+            Logger.Error(ex, "Error generating activity report");
             throw;
         }
     }
@@ -1174,7 +1175,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Generating calendar report from {StartDate} to {EndDate}", startDate, endDate);
+            Logger.Information("Generating calendar report from {StartDate} to {EndDate}", startDate, endDate);
 
             // Not implemented - would require a reporting library
             // This is a stub that would be implemented with a PDF/report generation library
@@ -1184,7 +1185,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating activity calendar report");
+            Logger.Error(ex, "Error generating activity calendar report");
             throw;
         }
     }
@@ -1194,7 +1195,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving diagnostics for activity {ActivityId}", activityId);
+            Logger.Information("Retrieving diagnostics for activity {ActivityId}", activityId);
 
             var activity = await _context.Activities
                 .Include(a => a.AssignedVehicle)
@@ -1259,7 +1260,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving activity diagnostics");
+            Logger.Error(ex, "Error retrieving activity diagnostics");
             return new Dictionary<string, object>
             {
                 ["Error"] = ex.Message,
@@ -1272,7 +1273,7 @@ public class ActivityService : IActivityService
     {
         try
         {
-            _logger.LogInformation("Retrieving schedule operation metrics");
+            Logger.Information("Retrieving schedule operation metrics");
 
             var now = DateTime.UtcNow;
             var today = DateTime.Today;
@@ -1336,7 +1337,7 @@ public class ActivityService : IActivityService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving schedule operation metrics");
+            Logger.Error(ex, "Error retrieving schedule operation metrics");
             return new Dictionary<string, object>
             {
                 ["Error"] = ex.Message,

@@ -1,6 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 
@@ -13,14 +13,13 @@ namespace BusBuddy.WPF.Services;
 public class BusBuddyScheduleDataProvider
 {
     private readonly IActivityService _activityService;
-    private readonly ILogger<BusBuddyScheduleDataProvider> _logger;
+    private static readonly ILogger Logger = Log.ForContext<BusBuddyScheduleDataProvider>();
     private ObservableCollection<BusBuddyScheduleAppointment> _masterList;
     private bool _isDirty;
 
-    public BusBuddyScheduleDataProvider(IActivityService activityService, ILogger<BusBuddyScheduleDataProvider> logger)
+    public BusBuddyScheduleDataProvider(IActivityService activityService)
     {
         _activityService = activityService;
-        _logger = logger;
         _masterList = new ObservableCollection<BusBuddyScheduleAppointment>();
         _isDirty = false;
     }
@@ -88,14 +87,14 @@ public class BusBuddyScheduleDataProvider
     {
         _masterList.Add(item);
         _isDirty = true;
-        _logger.LogInformation("Added appointment: {Subject}", item.Subject);
+        Logger.Information("Added appointment: {Subject}", item.Subject);
     }
 
     public void RemoveItem(BusBuddyScheduleAppointment item)
     {
         _masterList.Remove(item);
         _isDirty = true;
-        _logger.LogInformation("Removed appointment: {Subject}", item.Subject);
+        Logger.Information("Removed appointment: {Subject}", item.Subject);
     }
 
     public void CommitChanges()
@@ -103,13 +102,13 @@ public class BusBuddyScheduleDataProvider
         if (!_isDirty) return;
         try
         {
-            _logger.LogInformation("Committing schedule changes to database");
+            Logger.Information("Committing schedule changes to database");
             _isDirty = false;
-            _logger.LogInformation("Successfully committed schedule changes");
+            Logger.Information("Successfully committed schedule changes");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error committing schedule changes");
+            Logger.Error(ex, "Error committing schedule changes");
             throw;
         }
     }
@@ -118,7 +117,7 @@ public class BusBuddyScheduleDataProvider
     {
         try
         {
-            _logger.LogInformation("Loading activities from {StartDate} to {EndDate}", startDate, endDate);
+            Logger.Information("Loading activities from {StartDate} to {EndDate}", startDate, endDate);
             var activities = await _activityService.GetActivitiesByDateRangeAsync(startDate, endDate);
             _masterList.Clear();
             foreach (var activity in activities)
@@ -127,11 +126,11 @@ public class BusBuddyScheduleDataProvider
                 _masterList.Add(appointment);
             }
             _isDirty = false;
-            _logger.LogInformation("Loaded {Count} activities as appointments", _masterList.Count);
+            Logger.Information("Loaded {Count} activities as appointments", _masterList.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error loading activities");
+            Logger.Error(ex, "Error loading activities");
             throw;
         }
     }

@@ -6,14 +6,16 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.Views.Maintenance
 {
     public partial class MaintenanceDialog : Window, INotifyPropertyChanged
     {
+        private static readonly ILogger Logger = Log.ForContext<MaintenanceDialog>();
+
         private readonly IBusService _busService;
-        private readonly ILogger<MaintenanceDialog>? _logger;
         private BusBuddy.Core.Models.Maintenance _maintenance;
         private BusBuddy.Core.Models.Bus? _selectedBus;
         private bool _isValid = false;
@@ -71,11 +73,10 @@ namespace BusBuddy.WPF.Views.Maintenance
             }
         }
 
-        public MaintenanceDialog(BusBuddy.Core.Models.Maintenance maintenance, IBusService busService, ILogger<MaintenanceDialog>? logger = null)
+        public MaintenanceDialog(BusBuddy.Core.Models.Maintenance maintenance, IBusService busService)
         {
             _maintenance = maintenance ?? throw new ArgumentNullException(nameof(maintenance));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
-            _logger = logger;
 
             DialogTitle = maintenance.MaintenanceId == 0 ? "Add Maintenance Record" : "Edit Maintenance Record";
 
@@ -108,11 +109,19 @@ namespace BusBuddy.WPF.Views.Maintenance
                 _selectedBus = AvailableBuses.FirstOrDefault(b => b.VehicleId == Maintenance.VehicleId);
                 OnPropertyChanged(nameof(SelectedBus));
 
-                _logger?.LogInformation("Loaded {BusCount} buses for maintenance dialog", AvailableBuses.Count);
+                using (LogContext.PushProperty("ViewType", "MaintenanceDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadBuses"))
+                {
+                    Logger.Information("Loaded {BusCount} buses for maintenance dialog", AvailableBuses.Count);
+                }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error loading buses for maintenance dialog");
+                using (LogContext.PushProperty("ViewType", "MaintenanceDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadBuses"))
+                {
+                    Logger.Error(ex, "Error loading buses for maintenance dialog");
+                }
                 MessageBox.Show($"Error loading buses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

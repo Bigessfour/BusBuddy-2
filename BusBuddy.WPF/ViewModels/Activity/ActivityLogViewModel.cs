@@ -1,6 +1,5 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -12,8 +11,8 @@ namespace BusBuddy.WPF.ViewModels
         private readonly IActivityLogService _activityLogService;
         public ObservableCollection<ActivityLog> Logs { get; } = new();
 
-        public ActivityLogViewModel(IActivityLogService activityLogService, ILogger<ActivityLogViewModel>? logger = null)
-            : base(logger)
+        public ActivityLogViewModel(IActivityLogService activityLogService)
+            : base()
         {
             _activityLogService = activityLogService;
             _ = LoadLogsAsync();
@@ -32,11 +31,11 @@ namespace BusBuddy.WPF.ViewModels
                 foreach (var log in logs)
                     Logs.Add(log);
 
-                Logger?.LogInformation("Loaded {LogCount} activity logs using pagination", Logs.Count);
+                Logger.Information("Loaded {LogCount} activity logs using pagination", Logs.Count);
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading activity logs");
+                Logger.Error(ex, "Error loading activity logs");
             }
         }
     }

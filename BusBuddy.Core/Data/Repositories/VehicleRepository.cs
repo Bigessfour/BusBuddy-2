@@ -2,7 +2,7 @@ using BusBuddy.Core.Data.Interfaces;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Data.Repositories
 {
@@ -12,17 +12,15 @@ namespace BusBuddy.Core.Data.Repositories
     public class VehicleRepository : Repository<Bus>, IVehicleRepository
     {
         private readonly IBusBuddyDbContextFactory _contextFactory;
-        private readonly ILogger<VehicleRepository> _logger;
+        private static readonly ILogger Logger = Log.ForContext<VehicleRepository>();
 
         public VehicleRepository(
             BusBuddyDbContext context,
             IUserContextService userContextService,
-            IBusBuddyDbContextFactory contextFactory,
-            ILogger<VehicleRepository> logger)
+            IBusBuddyDbContextFactory contextFactory)
             : base(context, userContextService)
         {
             _contextFactory = contextFactory;
-            _logger = logger;
         }
 
         /// <summary>
@@ -45,7 +43,7 @@ namespace BusBuddy.Core.Data.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading vehicles with routes");
+                Logger.Error(ex, "Error loading vehicles with routes");
                 throw;
             }
         }
@@ -74,7 +72,7 @@ namespace BusBuddy.Core.Data.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading vehicle with details for ID {VehicleId}", vehicleId);
+                Logger.Error(ex, "Error loading vehicle with details for ID {VehicleId}", vehicleId);
                 throw;
             }
         }
@@ -95,7 +93,7 @@ namespace BusBuddy.Core.Data.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading active vehicles");
+                Logger.Error(ex, "Error loading active vehicles");
                 throw;
             }
         }
@@ -117,7 +115,7 @@ namespace BusBuddy.Core.Data.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading vehicles due for maintenance");
+                Logger.Error(ex, "Error loading vehicles due for maintenance");
                 throw;
             }
         }

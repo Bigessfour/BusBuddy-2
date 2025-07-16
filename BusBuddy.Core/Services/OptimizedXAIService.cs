@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
@@ -27,7 +27,7 @@ namespace BusBuddy.Core.Services
 
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _cache;
-        private readonly ILogger<OptimizedXAIService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<OptimizedXAIService>();
         private readonly string _apiKey;
         private readonly string _model;
         private readonly TokenBudgetManager _budgetManager;
@@ -57,10 +57,9 @@ namespace BusBuddy.Core.Services
 
         #region Constructor
 
-        public OptimizedXAIService(IConfiguration configuration, IMemoryCache cache, ILogger<OptimizedXAIService> logger)
+        public OptimizedXAIService(IConfiguration configuration, IMemoryCache cache)
         {
             _cache = cache;
-            _logger = logger;
 
             // Load configuration
             var xaiConfig = configuration.GetSection("XAI");
@@ -129,7 +128,7 @@ namespace BusBuddy.Core.Services
             catch (Exception ex)
             {
                 Interlocked.Increment(ref _totalErrors);
-                _logger.LogError(ex, "Error processing XAI request");
+                Logger.Error(ex, "Error processing XAI request");
                 throw;
             }
             finally
@@ -316,7 +315,7 @@ namespace BusBuddy.Core.Services
             {
                 _cacheHits.Add(1);
                 Interlocked.Increment(ref _cacheHitCount);
-                _logger.LogDebug("Cache hit for prompt hash: {CacheKey}", cacheKey);
+                Logger.Debug("Cache hit for prompt hash: {CacheKey}", cacheKey);
                 return cachedResponse;
             }
 
@@ -324,7 +323,7 @@ namespace BusBuddy.Core.Services
 
             // Cache the response with TTL
             _cache.Set(cacheKey, response, CACHE_DURATION);
-            _logger.LogDebug("Cached response for prompt hash: {CacheKey}", cacheKey);
+            Logger.Debug("Cached response for prompt hash: {CacheKey}", cacheKey);
 
             return response;
         }
@@ -387,7 +386,7 @@ namespace BusBuddy.Core.Services
                 catch (Exception ex)
                 {
                     lastException = ex;
-                    _logger.LogWarning(ex, "API request attempt {Attempt} failed", attempt + 1);
+                    Logger.Warning(ex, "API request attempt {Attempt} failed", attempt + 1);
 
                     if (attempt < _retryPolicy - 1)
                     {

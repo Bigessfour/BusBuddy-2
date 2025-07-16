@@ -5,29 +5,28 @@ using System.Collections.Generic;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.WPF.Services
 {
     public class RoutePopulationScaffold : IRoutePopulationScaffold
     {
         private readonly BusBuddy.Core.Services.IRouteService _routeService;
-        private readonly ILogger<RoutePopulationScaffold>? _logger;
+        private static readonly ILogger Logger = Log.ForContext<RoutePopulationScaffold>();
         private static readonly object _cacheLock = new object();
         private static List<BusBuddy.Core.Models.Route>? _cachedRoutes;
         private static DateTime _lastCacheUpdate = DateTime.MinValue;
         private static readonly TimeSpan _cacheExpiry = TimeSpan.FromMinutes(5); // Cache for 5 minutes
 
-        public RoutePopulationScaffold(BusBuddy.Core.Services.IRouteService routeService, ILogger<RoutePopulationScaffold>? logger = null)
+        public RoutePopulationScaffold(BusBuddy.Core.Services.IRouteService routeService)
         {
             _routeService = routeService;
-            _logger = logger;
         }
 
         public async Task<System.Collections.Generic.List<BusBuddy.Core.Models.Route>> GetOptimizedRoutesAsync()
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            _logger?.LogDebug("RoutePopulationScaffold.GetOptimizedRoutesAsync START");
+            Logger.Debug("RoutePopulationScaffold.GetOptimizedRoutesAsync START");
 
             try
             {
@@ -36,7 +35,7 @@ namespace BusBuddy.WPF.Services
                 {
                     if (_cachedRoutes != null && DateTime.Now - _lastCacheUpdate < _cacheExpiry)
                     {
-                        _logger?.LogDebug("Returning cached routes ({Count} routes) in {ElapsedMs}ms",
+                        Logger.Debug("Returning cached routes ({Count} routes) in {ElapsedMs}ms",
                             _cachedRoutes.Count, stopwatch.ElapsedMilliseconds);
                         return new List<BusBuddy.Core.Models.Route>(_cachedRoutes);
                     }
@@ -54,14 +53,14 @@ namespace BusBuddy.WPF.Services
                 }
 
                 stopwatch.Stop();
-                _logger?.LogInformation("Retrieved {Count} routes from service in {ElapsedMs}ms",
+                Logger.Information("Retrieved {Count} routes from service in {ElapsedMs}ms",
                     routeList.Count, stopwatch.ElapsedMilliseconds);
 
                 return routeList;
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error in GetOptimizedRoutesAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Error(ex, "Error in GetOptimizedRoutesAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
                 return new List<BusBuddy.Core.Models.Route>();
             }
         }
@@ -69,7 +68,7 @@ namespace BusBuddy.WPF.Services
         public async Task PopulateRoutesAsync()
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            _logger?.LogDebug("RoutePopulationScaffold.PopulateRoutesAsync START");
+            Logger.Debug("RoutePopulationScaffold.PopulateRoutesAsync START");
 
             try
             {
@@ -77,20 +76,20 @@ namespace BusBuddy.WPF.Services
                 var routes = await GetOptimizedRoutesAsync();
 
                 stopwatch.Stop();
-                _logger?.LogInformation("PopulateRoutesAsync completed with {Count} routes in {ElapsedMs}ms",
+                Logger.Information("PopulateRoutesAsync completed with {Count} routes in {ElapsedMs}ms",
                     routes.Count, stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger?.LogError(ex, "Error in PopulateRoutesAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Error(ex, "Error in PopulateRoutesAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
         }
 
         public async Task PopulateRouteMetadataAsync()
         {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            _logger?.LogDebug("RoutePopulationScaffold.PopulateRouteMetadataAsync START");
+            Logger.Debug("RoutePopulationScaffold.PopulateRouteMetadataAsync START");
 
             try
             {
@@ -107,21 +106,21 @@ namespace BusBuddy.WPF.Services
 
                 if (needsRefresh)
                 {
-                    _logger?.LogDebug("Cache miss - warming up route cache");
+                    Logger.Debug("Cache miss - warming up route cache");
                     await GetOptimizedRoutesAsync();
                 }
                 else
                 {
-                    _logger?.LogDebug("Using existing cached route data");
+                    Logger.Debug("Using existing cached route data");
                 }
 
                 stopwatch.Stop();
-                _logger?.LogInformation("PopulateRouteMetadataAsync completed in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Information("PopulateRouteMetadataAsync completed in {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger?.LogError(ex, "Error in PopulateRouteMetadataAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+                Logger.Error(ex, "Error in PopulateRouteMetadataAsync after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
                 // Don't throw to avoid startup failures
             }
         }

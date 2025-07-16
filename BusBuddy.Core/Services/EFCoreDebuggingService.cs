@@ -2,7 +2,7 @@ using BusBuddy.Core.Data;
 using BusBuddy.Core.Extensions;
 using BusBuddy.Core.Interceptors;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
@@ -15,16 +15,14 @@ namespace BusBuddy.Core.Services;
 /// </summary>
 public class EFCoreDebuggingService
 {
-    private readonly ILogger<EFCoreDebuggingService> _logger;
+    private static readonly ILogger Logger = Log.ForContext<EFCoreDebuggingService>();
     private readonly IBusBuddyDbContextFactory _contextFactory;
     private readonly DatabaseDebuggingInterceptor? _interceptor;
 
     public EFCoreDebuggingService(
-        ILogger<EFCoreDebuggingService> logger,
         IBusBuddyDbContextFactory contextFactory,
         DatabaseDebuggingInterceptor? interceptor = null)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
         _interceptor = interceptor;
     }
@@ -37,7 +35,7 @@ public class EFCoreDebuggingService
         var report = new EFCoreDebugReport();
         var stopwatch = Stopwatch.StartNew();
 
-        _logger.LogInformation("Starting comprehensive EF Core debug report generation");
+        Logger.Information("Starting comprehensive EF Core debug report generation");
 
         try
         {
@@ -68,12 +66,12 @@ public class EFCoreDebuggingService
             stopwatch.Stop();
             report.GenerationTimeMs = stopwatch.ElapsedMilliseconds;
 
-            _logger.LogInformation("EF Core debug report completed in {Duration}ms", stopwatch.ElapsedMilliseconds);
+            Logger.Information("EF Core debug report completed in {Duration}ms", stopwatch.ElapsedMilliseconds);
         }
         catch (Exception ex)
         {
             report.Errors.Add($"Error generating debug report: {ex.Message}");
-            _logger.LogError(ex, "Error generating EF Core debug report");
+            Logger.Error(ex, "Error generating EF Core debug report");
         }
 
         return report;
@@ -107,13 +105,13 @@ public class EFCoreDebuggingService
             // Check for migration conflicts
             await CheckMigrationConflictsAsync(context, debugInfo);
 
-            _logger.LogInformation("Migration debugging completed. Applied: {Applied}, Pending: {Pending}",
+            Logger.Information("Migration debugging completed. Applied: {Applied}, Pending: {Pending}",
                 debugInfo.AppliedMigrations.Count, debugInfo.PendingMigrations.Count);
         }
         catch (Exception ex)
         {
             debugInfo.Errors.Add($"Migration debug error: {ex.Message}");
-            _logger.LogError(ex, "Error debugging migrations");
+            Logger.Error(ex, "Error debugging migrations");
         }
 
         return debugInfo;
@@ -158,12 +156,12 @@ public class EFCoreDebuggingService
                     .Select(g => new { RouteName = g.Key, Count = g.Count() })
                     .ToListAsync());
 
-            _logger.LogInformation("Query performance debugging completed for {EntityType}", entityType);
+            Logger.Information("Query performance debugging completed for {EntityType}", entityType);
         }
         catch (Exception ex)
         {
             debugInfo.Errors.Add($"Query debug error: {ex.Message}");
-            _logger.LogError(ex, "Error debugging query performance for {EntityType}", entityType);
+            Logger.Error(ex, "Error debugging query performance for {EntityType}", entityType);
         }
 
         return debugInfo;
@@ -198,12 +196,12 @@ public class EFCoreDebuggingService
             var textReportPath = Path.Combine(outputDirectory, $"EFCore_Debug_Report_{timestamp}.txt");
             await File.WriteAllTextAsync(textReportPath, FormatReportAsText(report));
 
-            _logger.LogInformation("Debug data exported to {ReportPath} and {TextReportPath}", reportPath, textReportPath);
+            Logger.Information("Debug data exported to {ReportPath} and {TextReportPath}", reportPath, textReportPath);
             return reportPath;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error exporting debug data to {OutputDirectory}", outputDirectory);
+            Logger.Error(ex, "Error exporting debug data to {OutputDirectory}", outputDirectory);
             throw;
         }
     }

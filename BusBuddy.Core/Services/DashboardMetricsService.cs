@@ -5,7 +5,7 @@ using System.Data;
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
 using System.Linq;
@@ -20,19 +20,18 @@ namespace BusBuddy.Core.Services
     public class DashboardMetricsService : IDashboardMetricsService, IDisposable
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<DashboardMetricsService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<DashboardMetricsService>();
         private readonly SemaphoreSlim _semaphore = new(1, 1);
         private bool _disposed = false;
 
-        public DashboardMetricsService(IServiceProvider serviceProvider, ILogger<DashboardMetricsService> logger)
+        public DashboardMetricsService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<Dictionary<string, int>> GetDashboardMetricsAsync()
         {
-            _logger.LogInformation("Fetching dashboard metrics with optimized query");
+            Logger.Information("Fetching dashboard metrics with optimized query");
             System.Diagnostics.Debug.WriteLine("[DEBUG] DashboardMetricsService.GetDashboardMetricsAsync START");
             var result = new Dictionary<string, int>();
             var totalStopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -74,7 +73,7 @@ namespace BusBuddy.Core.Services
                 result["StudentCount"] = 0;
                 result["OpenTicketCount"] = 0;
 
-                _logger.LogInformation("Successfully fetched dashboard metrics: {Metrics}",
+                Logger.Information("Successfully fetched dashboard metrics: {Metrics}",
                     string.Join(", ", result.Select(kv => $"{kv.Key}={kv.Value}")));
 
                 totalStopwatch.Stop();
@@ -85,7 +84,7 @@ namespace BusBuddy.Core.Services
             catch (Exception ex)
             {
                 totalStopwatch.Stop();
-                _logger.LogError(ex, "Error fetching dashboard metrics");
+                Logger.Error(ex, "Error fetching dashboard metrics");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] DashboardMetricsService.GetDashboardMetricsAsync EXCEPTION: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] Failed after {totalStopwatch.ElapsedMilliseconds}ms");
 

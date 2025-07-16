@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,12 +11,11 @@ namespace BusBuddy.WPF.Utilities;
 /// </summary>
 public class LogLifecycleManager
 {
-    private readonly ILogger<LogLifecycleManager> _logger;
+    private static readonly ILogger Logger = Log.ForContext<LogLifecycleManager>();
     private readonly string _logsDirectory;
 
-    public LogLifecycleManager(ILogger<LogLifecycleManager> logger, string logsDirectory = "logs")
+    public LogLifecycleManager(string logsDirectory = "logs")
     {
-        _logger = logger;
         _logsDirectory = logsDirectory;
     }
 
@@ -30,7 +29,7 @@ public class LogLifecycleManager
         {
             if (!Directory.Exists(_logsDirectory))
             {
-                _logger.LogWarning("📁 Logs directory not found: {LogsDirectory}", _logsDirectory);
+                Logger.Warning("📁 Logs directory not found: {LogsDirectory}", _logsDirectory);
                 return;
             }
 
@@ -44,7 +43,7 @@ public class LogLifecycleManager
                 SpaceFreed = 0L
             };
 
-            _logger.LogInformation("🧹 Starting intelligent log cleanup for {FileCount} files", logFiles.Length);
+            Logger.Information("🧹 Starting intelligent log cleanup for {FileCount} files", logFiles.Length);
 
             foreach (var logFile in logFiles)
             {
@@ -80,23 +79,23 @@ public class LogLifecycleManager
                             SpaceFreed = cleanupSummary.SpaceFreed + fileSize
                         };
 
-                        _logger.LogDebug("🗑️ Deleted log file: {FileName} ({FileSize:N0} bytes)", fileName, fileSize);
+                        Logger.Debug("🗑️ Deleted log file: {FileName} ({FileSize:N0} bytes)", fileName, fileSize);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "⚠️ Failed to delete log file: {FileName}", fileName);
+                        Logger.Warning(ex, "⚠️ Failed to delete log file: {FileName}", fileName);
                     }
                 }
 
                 cleanupSummary = cleanupSummary with { FilesProcessed = cleanupSummary.FilesProcessed + 1 };
             }
 
-            _logger.LogInformation("✅ Log cleanup completed: {ProcessedCount} processed, {DeletedCount} deleted, {SpaceFreed:N0} bytes freed",
+            Logger.Information("✅ Log cleanup completed: {ProcessedCount} processed, {DeletedCount} deleted, {SpaceFreed:N0} bytes freed",
                 cleanupSummary.FilesProcessed, cleanupSummary.FilesDeleted, cleanupSummary.SpaceFreed);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Failed to perform log cleanup: {ErrorMessage}", ex.Message);
+            Logger.Error(ex, "❌ Failed to perform log cleanup: {ErrorMessage}", ex.Message);
         }
     }
 
@@ -208,7 +207,7 @@ public class LogLifecycleManager
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Failed to get log summary: {ErrorMessage}", ex.Message);
+            Logger.Error(ex, "❌ Failed to get log summary: {ErrorMessage}", ex.Message);
             return new LogSummary { TotalFiles = 0, TotalSize = 0, Categories = new() };
         }
     }

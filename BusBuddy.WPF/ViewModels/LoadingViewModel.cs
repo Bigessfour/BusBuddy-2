@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using System.Threading.Tasks;
 using System;
 
@@ -12,12 +13,14 @@ namespace BusBuddy.WPF.ViewModels
         private int _progressPercentage = 0;
         private bool _isIndeterminate = true;
         private bool _isComplete = false;
-        private readonly ILogger<LoadingViewModel> _logger;
 
-        public LoadingViewModel(ILogger<LoadingViewModel> logger)
+        public LoadingViewModel()
         {
-            _logger = logger;
-            _logger.LogInformation("LoadingViewModel created");
+            using (LogContext.PushProperty("ViewModelType", nameof(LoadingViewModel)))
+            using (LogContext.PushProperty("OperationType", "Construction"))
+            {
+                Logger.Information("LoadingViewModel created");
+            }
         }
 
         public string Status
@@ -29,7 +32,12 @@ namespace BusBuddy.WPF.ViewModels
                 {
                     _status = value;
                     OnPropertyChanged();
-                    _logger.LogDebug("Loading status changed to: {Status}", value);
+
+                    using (LogContext.PushProperty("ViewModelType", nameof(LoadingViewModel)))
+                    using (LogContext.PushProperty("OperationType", "StatusChange"))
+                    {
+                        Logger.Debug("Loading status changed to: {Status}", value);
+                    }
                 }
             }
         }
@@ -43,14 +51,19 @@ namespace BusBuddy.WPF.ViewModels
                 {
                     _progressPercentage = value;
                     OnPropertyChanged();
-                    _logger.LogDebug("Progress changed to: {Progress}%", value);
 
-                    // Update IsComplete when progress reaches 100%
-                    if (value >= 100 && !_isComplete)
+                    using (LogContext.PushProperty("ViewModelType", nameof(LoadingViewModel)))
+                    using (LogContext.PushProperty("OperationType", "ProgressChange"))
                     {
-                        _isComplete = true;
-                        OnPropertyChanged(nameof(IsComplete));
-                        _logger.LogInformation("✅ Application initialization completed - ready for use");
+                        Logger.Debug("Progress changed to: {Progress}%", value);
+
+                        // Update IsComplete when progress reaches 100%
+                        if (value >= 100 && !_isComplete)
+                        {
+                            _isComplete = true;
+                            OnPropertyChanged(nameof(IsComplete));
+                            Logger.Information("✅ Application initialization completed - ready for use");
+                        }
                     }
                 }
             }
@@ -95,12 +108,16 @@ namespace BusBuddy.WPF.ViewModels
         /// </summary>
         public void Reset()
         {
-            ProgressPercentage = 0;
-            Status = "Initializing...";
-            IsIndeterminate = true;
-            _isComplete = false;
-            OnPropertyChanged(nameof(IsComplete));
-            _logger.LogInformation("🔄 LoadingViewModel reset for new initialization sequence");
+            using (LogContext.PushProperty("ViewModelType", nameof(LoadingViewModel)))
+            using (LogContext.PushProperty("OperationType", "Reset"))
+            {
+                ProgressPercentage = 0;
+                Status = "Initializing...";
+                IsIndeterminate = true;
+                _isComplete = false;
+                OnPropertyChanged(nameof(IsComplete));
+                Logger.Information("🔄 LoadingViewModel reset for new initialization sequence");
+            }
         }
 
         /// <summary>
@@ -113,7 +130,5 @@ namespace BusBuddy.WPF.ViewModels
             IsIndeterminate = false;
             InitializationCompleted?.Invoke(this, EventArgs.Empty);
         }
-
-        protected override ILogger? GetLogger() => _logger;
     }
 }

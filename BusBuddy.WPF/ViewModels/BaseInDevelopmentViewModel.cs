@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -9,13 +10,15 @@ namespace BusBuddy.WPF.ViewModels
     /// </summary>
     public abstract class BaseInDevelopmentViewModel : BaseViewModel
     {
-        protected readonly ILogger? Logger;
         private bool _isInDevelopment = true;
 
-        protected BaseInDevelopmentViewModel(ILogger? logger = null)
+        protected BaseInDevelopmentViewModel()
         {
-            Logger = logger;
-            Logger?.LogInformation($"{GetType().Name} initialized in development mode");
+            using (LogContext.PushProperty("ViewModelType", GetType().Name))
+            using (LogContext.PushProperty("OperationType", "Construction"))
+            {
+                Logger.Information("{ViewModelType} initialized in development mode", GetType().Name);
+            }
         }
 
         /// <summary>
@@ -27,7 +30,5 @@ namespace BusBuddy.WPF.ViewModels
             get => _isInDevelopment;
             set => SetProperty(ref _isInDevelopment, value);
         }
-
-        protected override ILogger? GetLogger() => Logger;
     }
 }

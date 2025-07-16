@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Serilog.Context;
 using System.Diagnostics;
 
@@ -66,7 +66,7 @@ namespace BusBuddy.Core.Utilities
 
                 using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                 {
-                    logger.LogInformation("{OperationName} completed in {Duration}ms",
+                    logger.Information("{OperationName} completed in {Duration}ms",
                         operationName, stopwatch.ElapsedMilliseconds);
                 }
 
@@ -78,7 +78,7 @@ namespace BusBuddy.Core.Utilities
 
                 using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                 {
-                    logger.LogError(ex, "{OperationName} failed after {Duration}ms",
+                    logger.Error(ex, "{OperationName} failed after {Duration}ms",
                         operationName, stopwatch.ElapsedMilliseconds);
                 }
 
@@ -99,7 +99,7 @@ namespace BusBuddy.Core.Utilities
 
                 using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                 {
-                    logger.LogInformation("{OperationName} completed in {Duration}ms",
+                    logger.Information("{OperationName} completed in {Duration}ms",
                         operationName, stopwatch.ElapsedMilliseconds);
                 }
 
@@ -111,7 +111,7 @@ namespace BusBuddy.Core.Utilities
 
                 using (LogContext.PushProperty("Duration", stopwatch.ElapsedMilliseconds))
                 {
-                    logger.LogError(ex, "{OperationName} failed after {Duration}ms",
+                    logger.Error(ex, "{OperationName} failed after {Duration}ms",
                         operationName, stopwatch.ElapsedMilliseconds);
                 }
 

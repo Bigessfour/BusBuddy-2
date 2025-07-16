@@ -8,15 +8,17 @@ using System.Windows;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.Views.Maintenance
 {
     public partial class MaintenanceAlertsDialog : Window, INotifyPropertyChanged
     {
+        private static readonly ILogger Logger = Log.ForContext<MaintenanceAlertsDialog>();
+
         private readonly IMaintenanceService _maintenanceService;
         private readonly IBusService _busService;
-        private readonly ILogger<MaintenanceAlertsDialog>? _logger;
 
         // Observable collections
         public ObservableCollection<MaintenanceAlertItem> OverdueItems { get; } = new();
@@ -67,11 +69,10 @@ namespace BusBuddy.WPF.Views.Maintenance
         public BusBuddy.WPF.RelayCommand ScheduleAlertCommand { get; }
         public BusBuddy.WPF.RelayCommand ExportCommand { get; }
 
-        public MaintenanceAlertsDialog(IMaintenanceService maintenanceService, IBusService busService, ILogger<MaintenanceAlertsDialog>? logger = null)
+        public MaintenanceAlertsDialog(IMaintenanceService maintenanceService, IBusService busService)
         {
             _maintenanceService = maintenanceService ?? throw new ArgumentNullException(nameof(maintenanceService));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
-            _logger = logger;
 
             InitializeComponent();
             DataContext = this;
@@ -191,12 +192,20 @@ namespace BusBuddy.WPF.Views.Maintenance
                 foreach (var item in upcomingList)
                     UpcomingItems.Add(item);
 
-                _logger?.LogInformation("Loaded {OverdueCount} overdue and {UpcomingCount} upcoming maintenance items",
-                    OverdueItems.Count, UpcomingItems.Count);
+                using (LogContext.PushProperty("ViewType", "MaintenanceAlertsDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadAlerts"))
+                {
+                    Logger.Information("Loaded {OverdueCount} overdue and {UpcomingCount} upcoming maintenance items",
+                        OverdueItems.Count, UpcomingItems.Count);
+                }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error loading maintenance alerts");
+                using (LogContext.PushProperty("ViewType", "MaintenanceAlertsDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadAlerts"))
+                {
+                    Logger.Error(ex, "Error loading maintenance alerts");
+                }
                 MessageBox.Show($"Error loading maintenance alerts: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -229,7 +238,11 @@ namespace BusBuddy.WPF.Views.Maintenance
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error creating new maintenance from alerts");
+                using (LogContext.PushProperty("ViewType", "MaintenanceAlertsDialog"))
+                using (LogContext.PushProperty("OperationType", "CreateNewMaintenance"))
+                {
+                    Logger.Error(ex, "Error creating new maintenance from alerts");
+                }
                 MessageBox.Show($"Error creating new maintenance: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -289,12 +302,21 @@ namespace BusBuddy.WPF.Views.Maintenance
 
                     MessageBox.Show($"Successfully exported {OverdueItems.Count + UpcomingItems.Count} maintenance alerts to {dialog.FileName}",
                         "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
-                    _logger?.LogInformation("Exported {AlertCount} maintenance alerts to CSV", OverdueItems.Count + UpcomingItems.Count);
+
+                    using (LogContext.PushProperty("ViewType", "MaintenanceAlertsDialog"))
+                    using (LogContext.PushProperty("OperationType", "ExportAlerts"))
+                    {
+                        Logger.Information("Exported {AlertCount} maintenance alerts to CSV", OverdueItems.Count + UpcomingItems.Count);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error exporting maintenance alerts");
+                using (LogContext.PushProperty("ViewType", "MaintenanceAlertsDialog"))
+                using (LogContext.PushProperty("OperationType", "ExportAlerts"))
+                {
+                    Logger.Error(ex, "Error exporting maintenance alerts");
+                }
                 MessageBox.Show($"Error exporting alerts: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

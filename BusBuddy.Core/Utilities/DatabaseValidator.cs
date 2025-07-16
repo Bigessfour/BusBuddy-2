@@ -1,6 +1,6 @@
 using BusBuddy.Core.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,14 +15,12 @@ namespace BusBuddy.Core.Utilities
     public class DatabaseValidator
     {
         private readonly IBusBuddyDbContextFactory _contextFactory;
-        private readonly ILogger<DatabaseValidator> _logger;
+        private static readonly ILogger Logger = Log.ForContext<DatabaseValidator>();
 
         public DatabaseValidator(
-            IBusBuddyDbContextFactory contextFactory,
-            ILogger<DatabaseValidator> logger)
+            IBusBuddyDbContextFactory contextFactory)
         {
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -52,13 +50,13 @@ namespace BusBuddy.Core.Utilities
                 {
                     var vehicleIdsWithNulls = string.Join(", ", vehiclesWithNullValues.Select(v => $"{v.VehicleId} ({v.BusNumber ?? "null"})"));
                     issues.Add($"Found {vehiclesWithNullValues.Count} vehicles with NULL values in critical fields: {vehicleIdsWithNulls}");
-                    _logger.LogWarning("Found {Count} vehicles with NULL values in critical fields: {VehicleIds}",
+                    Logger.Warning("Found {Count} vehicles with NULL values in critical fields: {VehicleIds}",
                         vehiclesWithNullValues.Count, vehicleIdsWithNulls);
 
                     // Break into the debugger if requested and in debug mode
                     if (breakOnIssue && Debugger.IsAttached)
                     {
-                        _logger.LogDebug("NULL values found in vehicles");
+                        Logger.Debug("NULL values found in vehicles");
                         // Debugger.Break(); // Commented out to prevent unwanted breaks
                     }
                 }
@@ -74,12 +72,12 @@ namespace BusBuddy.Core.Utilities
                 if (routesWithInvalidVehicles.Any())
                 {
                     issues.Add($"Found {routesWithInvalidVehicles.Count} routes with invalid vehicle references");
-                    _logger.LogWarning("Found {Count} routes with invalid vehicle references", routesWithInvalidVehicles.Count);
+                    Logger.Warning("Found {Count} routes with invalid vehicle references", routesWithInvalidVehicles.Count);
 
                     // Break into the debugger if requested and in debug mode
                     if (breakOnIssue && Debugger.IsAttached)
                     {
-                        _logger.LogDebug("Routes with invalid vehicle references found");
+                        Logger.Debug("Routes with invalid vehicle references found");
                         // Debugger.Break(); // Commented out to prevent unwanted breaks
                     }
                 }
@@ -95,25 +93,25 @@ namespace BusBuddy.Core.Utilities
                 if (routesWithInvalidDrivers.Any())
                 {
                     issues.Add($"Found {routesWithInvalidDrivers.Count} routes with invalid driver references");
-                    _logger.LogWarning("Found {Count} routes with invalid driver references", routesWithInvalidDrivers.Count);
+                    Logger.Warning("Found {Count} routes with invalid driver references", routesWithInvalidDrivers.Count);
 
                     // Break into the debugger if requested and in debug mode
                     if (breakOnIssue && Debugger.IsAttached)
                     {
-                        _logger.LogDebug("Routes with invalid driver references found");
+                        Logger.Debug("Routes with invalid driver references found");
                         // Debugger.Break(); // Commented out to prevent unwanted breaks
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error validating database data");
+                Logger.Error(ex, "Error validating database data");
                 issues.Add($"Database validation error: {ex.Message}");
 
                 // Break into the debugger on exception if requested and in debug mode
                 if (breakOnIssue && Debugger.IsAttached)
                 {
-                    _logger.LogDebug("Exception in database validation: {ExceptionType}", ex.GetType().Name);
+                    Logger.Debug("Exception in database validation: {ExceptionType}", ex.GetType().Name);
                     // Debugger.Break(); // Commented out to prevent unwanted breaks
                 }
             }
@@ -191,7 +189,7 @@ namespace BusBuddy.Core.Utilities
                         // Break into the debugger for the first fix if requested and in debug mode
                         if (breakOnFix && Debugger.IsAttached && fixCount == 1)
                         {
-                            _logger.LogDebug("Database fix applied for Vehicle ID {VehicleId}", vehicle.VehicleId);
+                            Logger.Debug("Database fix applied for Vehicle ID {VehicleId}", vehicle.VehicleId);
                             // Debugger.Break(); // Commented out to prevent unwanted breaks
                         }
                     }
@@ -201,17 +199,17 @@ namespace BusBuddy.Core.Utilities
                 if (fixCount > 0)
                 {
                     await context.SaveChangesAsync();
-                    _logger.LogInformation("Fixed {Count} vehicles with NULL values", fixCount);
+                    Logger.Information("Fixed {Count} vehicles with NULL values", fixCount);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error running automatic fixes for database integrity");
+                Logger.Error(ex, "Error running automatic fixes for database integrity");
 
                 // Break into the debugger on exception if in debug mode
                 if (Debugger.IsAttached)
                 {
-                    _logger.LogDebug("Exception in database fixes: {ExceptionType}", ex.GetType().Name);
+                    Logger.Debug("Exception in database fixes: {ExceptionType}", ex.GetType().Name);
                     // Debugger.Break(); // Commented out to prevent unwanted breaks
                 }
             }

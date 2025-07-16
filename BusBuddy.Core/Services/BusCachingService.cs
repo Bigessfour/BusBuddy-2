@@ -1,6 +1,6 @@
 using BusBuddy.Core.Models;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Services
 {
@@ -10,7 +10,7 @@ namespace BusBuddy.Core.Services
     public class BusCachingService : IBusCachingService
     {
         private readonly IMemoryCache _cache;
-        private readonly ILogger<BusCachingService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<BusCachingService>();
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         // Cache keys
@@ -21,10 +21,9 @@ namespace BusBuddy.Core.Services
         private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(5);
         private readonly TimeSpan _extendedCacheDuration = TimeSpan.FromMinutes(15);
 
-        public BusCachingService(IMemoryCache cache, ILogger<BusCachingService> logger)
+        public BusCachingService(IMemoryCache cache)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -34,7 +33,7 @@ namespace BusBuddy.Core.Services
         {
             if (_cache.TryGetValue(ALL_BUSES_KEY, out List<Bus>? buses))
             {
-                _logger.LogInformation("Retrieved all buses from cache");
+                Logger.Information("Retrieved all buses from cache");
                 return buses ?? new List<Bus>();
             }
 
@@ -45,7 +44,7 @@ namespace BusBuddy.Core.Services
                 // Double-check after acquiring semaphore
                 if (_cache.TryGetValue(ALL_BUSES_KEY, out buses) && buses != null)
                 {
-                    _logger.LogInformation("Retrieved all buses from cache after semaphore");
+                    Logger.Information("Retrieved all buses from cache after semaphore");
                     return buses;
                 }
 
@@ -74,16 +73,16 @@ namespace BusBuddy.Core.Services
                         .SetPriority(CacheItemPriority.High);
 
                     _cache.Set(ALL_BUSES_KEY, buses, cacheOptions);
-                    _logger.LogInformation("Added all buses to cache");
+                    Logger.Information("Added all buses to cache");
                 }
                 catch (System.Data.SqlTypes.SqlNullValueException ex)
                 {
-                    _logger.LogWarning(ex, "SQL NULL value error when retrieving buses. Returning empty list to avoid application failure.");
+                    Logger.Warning(ex, "SQL NULL value error when retrieving buses. Returning empty list to avoid application failure.");
                     buses = new List<Bus>();
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error retrieving buses for caching");
+                    Logger.Error(ex, "Error retrieving buses for caching");
                     throw;
                 }
 
@@ -104,7 +103,7 @@ namespace BusBuddy.Core.Services
 
             if (_cache.TryGetValue(cacheKey, out Bus? bus))
             {
-                _logger.LogInformation("Retrieved bus ID {BusId} from cache", busId);
+                Logger.Information("Retrieved bus ID {BusId} from cache", busId);
                 return bus;
             }
 
@@ -115,7 +114,7 @@ namespace BusBuddy.Core.Services
                 // Double-check after acquiring semaphore
                 if (_cache.TryGetValue(cacheKey, out bus) && bus != null)
                 {
-                    _logger.LogInformation("Retrieved bus ID {BusId} from cache after semaphore", busId);
+                    Logger.Information("Retrieved bus ID {BusId} from cache after semaphore", busId);
                     return bus;
                 }
 
@@ -129,7 +128,7 @@ namespace BusBuddy.Core.Services
                         .SetPriority(CacheItemPriority.Normal);
 
                     _cache.Set(cacheKey, bus, cacheOptions);
-                    _logger.LogInformation("Added bus ID {BusId} to cache", busId);
+                    Logger.Information("Added bus ID {BusId} to cache", busId);
                 }
 
                 return bus;
@@ -145,7 +144,7 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public void InvalidateBusCache(int busId)
         {
-            _logger.LogInformation("Invalidating cache for bus ID {BusId}", busId);
+            Logger.Information("Invalidating cache for bus ID {BusId}", busId);
             _cache.Remove($"{BUS_ENTITY_PREFIX}{busId}");
             _cache.Remove(ALL_BUSES_KEY);
         }
@@ -155,7 +154,7 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public void InvalidateAllBusCache()
         {
-            _logger.LogInformation("Invalidating all bus caches");
+            Logger.Information("Invalidating all bus caches");
             _cache.Remove(ALL_BUSES_KEY);
         }
     }

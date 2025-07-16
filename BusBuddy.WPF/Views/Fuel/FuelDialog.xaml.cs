@@ -7,15 +7,17 @@ using System.Windows;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using CoreModels = BusBuddy.Core.Models;
 
 namespace BusBuddy.WPF.Views.Fuel
 {
     public partial class FuelDialog : Window, INotifyPropertyChanged
     {
+        private static readonly ILogger Logger = Log.ForContext<FuelDialog>();
+
         private readonly IBusService _busService;
-        private readonly ILogger<FuelDialog>? _logger;
         private CoreModels.Fuel _fuel;
         private CoreModels.Bus? _selectedBus;
         private bool _isValid = false;
@@ -82,11 +84,10 @@ namespace BusBuddy.WPF.Views.Fuel
             }
         }
 
-        public FuelDialog(CoreModels.Fuel fuel, IBusService busService, ILogger<FuelDialog>? logger = null)
+        public FuelDialog(CoreModels.Fuel fuel, IBusService busService)
         {
             _fuel = fuel ?? throw new ArgumentNullException(nameof(fuel));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
-            _logger = logger;
 
             DialogTitle = fuel.FuelId == 0 ? "Add Fuel Record" : "Edit Fuel Record";
 
@@ -119,11 +120,19 @@ namespace BusBuddy.WPF.Views.Fuel
                 _selectedBus = AvailableBuses.FirstOrDefault(b => b.VehicleId == Fuel.VehicleFueledId);
                 OnPropertyChanged(nameof(SelectedBus));
 
-                _logger?.LogInformation("Loaded {BusCount} buses for fuel dialog", AvailableBuses.Count);
+                using (LogContext.PushProperty("ViewType", "FuelDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadBuses"))
+                {
+                    Logger.Information("Loaded {BusCount} buses for fuel dialog", AvailableBuses.Count);
+                }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error loading buses for fuel dialog");
+                using (LogContext.PushProperty("ViewType", "FuelDialog"))
+                using (LogContext.PushProperty("OperationType", "LoadBuses"))
+                {
+                    Logger.Error(ex, "Error loading buses for fuel dialog");
+                }
                 MessageBox.Show($"Error loading buses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

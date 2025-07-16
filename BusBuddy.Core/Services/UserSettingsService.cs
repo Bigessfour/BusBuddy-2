@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Text.Json;
 
 namespace BusBuddy.Core.Services
@@ -17,14 +17,12 @@ namespace BusBuddy.Core.Services
 
     public class UserSettingsService : IUserSettingsService
     {
-        private readonly ILogger<UserSettingsService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<UserSettingsService>();
         private readonly string _settingsFilePath;
         private Dictionary<string, object> _settings;
 
-        public UserSettingsService(ILogger<UserSettingsService> logger)
+        public UserSettingsService()
         {
-            _logger = logger;
-
             // Store settings in user's AppData folder
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var appFolder = Path.Combine(appDataPath, "BusBuddy");
@@ -38,7 +36,7 @@ namespace BusBuddy.Core.Services
             _settingsFilePath = Path.Combine(appFolder, "user-settings.json");
             _settings = new Dictionary<string, object>();
 
-            _logger.LogDebug("UserSettingsService initialized with settings file: {SettingsFilePath}", _settingsFilePath);
+            Logger.Debug("UserSettingsService initialized with settings file: {SettingsFilePath}", _settingsFilePath);
         }
 
         public Task<T> GetSettingAsync<T>(string key, T defaultValue = default!)
@@ -84,7 +82,7 @@ namespace BusBuddy.Core.Services
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogWarning(ex, "Failed to convert setting {Key} from {ValueType} to {TargetType}",
+                            Logger.Warning(ex, "Failed to convert setting {Key} from {ValueType} to {TargetType}",
                                 key, value.GetType().Name, typeof(T).Name);
                             return Task.FromResult(defaultValue);
                         }
@@ -95,7 +93,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting setting {Key}", key);
+                Logger.Error(ex, "Error getting setting {Key}", key);
                 return Task.FromResult(defaultValue);
             }
         }
@@ -107,19 +105,19 @@ namespace BusBuddy.Core.Services
                 if (value != null)
                 {
                     _settings[key] = value;
-                    _logger.LogDebug("Setting {Key} updated to {Value}", key, value);
+                    Logger.Debug("Setting {Key} updated to {Value}", key, value);
                 }
                 else
                 {
                     _settings.Remove(key);
-                    _logger.LogDebug("Setting {Key} removed", key);
+                    Logger.Debug("Setting {Key} removed", key);
                 }
 
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error setting {Key} to {Value}", key, value);
+                Logger.Error(ex, "Error setting {Key} to {Value}", key, value);
                 throw;
             }
         }
@@ -137,12 +135,12 @@ namespace BusBuddy.Core.Services
                 var json = JsonSerializer.Serialize(_settings, options);
                 await File.WriteAllTextAsync(_settingsFilePath, json);
 
-                _logger.LogInformation("User settings saved successfully to {FilePath}", _settingsFilePath);
+                Logger.Information("User settings saved successfully to {FilePath}", _settingsFilePath);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving user settings to {FilePath}", _settingsFilePath);
+                Logger.Error(ex, "Error saving user settings to {FilePath}", _settingsFilePath);
                 return false;
             }
         }
@@ -167,19 +165,19 @@ namespace BusBuddy.Core.Services
                                 _settings[kvp.Key] = kvp.Value;
                             }
 
-                            _logger.LogInformation("User settings loaded successfully from {FilePath}. {Count} settings loaded.",
+                            Logger.Information("User settings loaded successfully from {FilePath}. {Count} settings loaded.",
                                 _settingsFilePath, _settings.Count);
                         }
                     }
                 }
                 else
                 {
-                    _logger.LogInformation("No existing settings file found at {FilePath}. Starting with empty settings.", _settingsFilePath);
+                    Logger.Information("No existing settings file found at {FilePath}. Starting with empty settings.", _settingsFilePath);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading user settings from {FilePath}. Starting with empty settings.", _settingsFilePath);
+                Logger.Error(ex, "Error loading user settings from {FilePath}. Starting with empty settings.", _settingsFilePath);
                 _settings.Clear();
             }
         }
@@ -195,12 +193,12 @@ namespace BusBuddy.Core.Services
                     File.Delete(_settingsFilePath);
                 }
 
-                _logger.LogInformation("User settings reset successfully");
+                Logger.Information("User settings reset successfully");
                 return Task.FromResult(true);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error resetting user settings");
+                Logger.Error(ex, "Error resetting user settings");
                 return Task.FromResult(false);
             }
         }

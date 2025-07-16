@@ -3,7 +3,7 @@ using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -17,12 +17,6 @@ namespace BusBuddy.Tests
     public class ComprehensiveNullHandlingTests
     {
         private Mock<IBusBuddyDbContextFactory> _mockContextFactory;
-        private Mock<ILogger<DriverService>> _mockDriverServiceLogger;
-        private Mock<ILogger<StudentService>> _mockStudentServiceLogger;
-        private Mock<ILogger<FuelService>> _mockFuelServiceLogger;
-        private Mock<ILogger<RouteService>> _mockRouteServiceLogger;
-        private Mock<ILogger<ActivityService>> _mockActivityServiceLogger;
-        private Mock<ILogger<MaintenanceService>> _mockMaintenanceServiceLogger;
         private Mock<BusBuddyDbContext> _mockDbContext;
         private DriverService _driverService;
         private StudentService _studentService;
@@ -32,21 +26,15 @@ namespace BusBuddy.Tests
         public void Setup()
         {
             _mockContextFactory = new Mock<IBusBuddyDbContextFactory>();
-            _mockDriverServiceLogger = new Mock<ILogger<DriverService>>();
-            _mockStudentServiceLogger = new Mock<ILogger<StudentService>>();
-            _mockFuelServiceLogger = new Mock<ILogger<FuelService>>();
-            _mockRouteServiceLogger = new Mock<ILogger<RouteService>>();
-            _mockActivityServiceLogger = new Mock<ILogger<ActivityService>>();
-            _mockMaintenanceServiceLogger = new Mock<ILogger<MaintenanceService>>();
             _mockDbContext = new Mock<BusBuddyDbContext>();
 
             // Create test context factory
             _mockContextFactory.Setup(f => f.CreateDbContext()).Returns(_mockDbContext.Object);
             _mockContextFactory.Setup(f => f.CreateWriteDbContext()).Returns(_mockDbContext.Object);
 
-            // Create service instances
-            _driverService = new DriverService(_mockContextFactory.Object, _mockDriverServiceLogger.Object);
-            _studentService = new StudentService(_mockStudentServiceLogger.Object, _mockContextFactory.Object);
+            // Create service instances - no logger dependencies needed since services use static Serilog loggers
+            _driverService = new DriverService(_mockContextFactory.Object);
+            _studentService = new StudentService(_mockContextFactory.Object);
             _fuelService = new FuelService(_mockContextFactory.Object);
         }
 

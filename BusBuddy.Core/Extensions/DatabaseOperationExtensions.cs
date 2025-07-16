@@ -3,7 +3,7 @@ using BusBuddy.Core.Utilities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Extensions;
 
@@ -29,9 +29,9 @@ public static class DatabaseOperationExtensions
     public static async Task<List<T>> SafeQueryAsync<T>(
         this DbContext context,
         IQueryable<T> query,
-        ILogger logger,
         string operationName = "Query") where T : class
     {
+        var logger = Log.ForContext<SafeDatabaseOperations>();
         try
         {
             return await ExceptionHelper.ExecuteWithRetryAsync(async () =>
@@ -48,13 +48,13 @@ public static class DatabaseOperationExtensions
         }
         catch (SqlException sqlEx)
         {
-            logger.LogError(sqlEx, "SQL error during {OperationName}: {ErrorAnalysis}",
+            logger.Error(sqlEx, "SQL error during {OperationName}: {ErrorAnalysis}",
                 operationName, ExceptionHelper.AnalyzeSqlException(sqlEx));
             throw new DatabaseOperationException($"Database query failed: {operationName}", sqlEx);
         }
         catch (InvalidCastException castEx)
         {
-            logger.LogError(castEx, "Type casting error during {OperationName}: {ErrorAnalysis}",
+            logger.Error(castEx, "Type casting error during {OperationName}: {ErrorAnalysis}",
                 operationName, ExceptionHelper.AnalyzeInvalidCastException(castEx));
             throw new DatabaseOperationException($"Data type mismatch in query: {operationName}", castEx);
         }
@@ -66,10 +66,10 @@ public static class DatabaseOperationExtensions
     public static async Task<T> SafeExecuteAsync<T>(
         this DbContext context,
         Func<Task<T>> operation,
-        ILogger logger,
         string operationName = "Operation",
         bool useTransaction = true)
     {
+        var logger = Log.ForContext<SafeDatabaseOperations>();
         if (useTransaction)
         {
             var strategy = context.Database.CreateExecutionStrategy();
@@ -78,17 +78,17 @@ public static class DatabaseOperationExtensions
                 using var transaction = await context.Database.BeginTransactionAsync();
                 try
                 {
-                    logger.LogDebug("Starting database operation: {OperationName}", operationName);
+                    logger.Debug("Starting database operation: {OperationName}", operationName);
 
                     var result = await operation();
                     await transaction.CommitAsync();
 
-                    logger.LogDebug("Successfully completed database operation: {OperationName}", operationName);
+                    logger.Debug("Successfully completed database operation: {OperationName}", operationName);
                     return result;
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Rolling back transaction for operation: {OperationName}", operationName);
+                    logger.Error(ex, "Rolling back transaction for operation: {OperationName}", operationName);
                     await transaction.RollbackAsync();
                     throw;
                 }
@@ -103,8 +103,9 @@ public static class DatabaseOperationExtensions
     /// <summary>
     /// Validates entity before saving to prevent common exceptions
     /// </summary>
-    public static void ValidateEntity<T>(this T entity, ILogger logger) where T : class
+    public static void ValidateEntity<T>(this T entity) where T : class
     {
+        var logger = Log.ForContext<SafeDatabaseOperations>();
         var entityType = typeof(T);
         var properties = entityType.GetProperties();
 
@@ -118,7 +119,7 @@ public static class DatabaseOperationExtensions
                 var isRequired = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false).Any();
                 if (isRequired && string.IsNullOrWhiteSpace(value?.ToString()))
                 {
-                    logger.LogWarning("Required property {PropertyName} is null or empty for entity {EntityType}",
+                    logger.Warning("Required property {PropertyName} is null or empty for entity {EntityType}",
                         property.Name, entityType.Name);
                 }
             }
@@ -129,7 +130,7 @@ public static class DatabaseOperationExtensions
                 var intValue = (int?)value ?? 0;
                 if (intValue <= 0)
                 {
-                    logger.LogWarning("Foreign key property {PropertyName} has invalid value {Value} for entity {EntityType}",
+                    logger.Warning("Foreign key property {PropertyName} has invalid value {Value} for entity {EntityType}",
                         property.Name, intValue, entityType.Name);
                 }
             }
@@ -142,14 +143,11 @@ public static class DatabaseOperationExtensions
 /// </summary>
 public class SafeDatabaseOperations
 {
-    private readonly ILogger<SafeDatabaseOperations> _logger;
+    private static readonly ILogger Logger = Log.ForContext<SafeDatabaseOperations>();
     private readonly DatabaseResilienceService _resilienceService;
 
-    public SafeDatabaseOperations(
-        ILogger<SafeDatabaseOperations> logger,
-        DatabaseResilienceService resilienceService)
+    public SafeDatabaseOperations(DatabaseResilienceService resilienceService)
     {
-        _logger = logger;
         _resilienceService = resilienceService;
     }
 
@@ -162,7 +160,6 @@ public class SafeDatabaseOperations
         {
             return await context.SafeQueryAsync(
                 context.Vehicles.Where(v => v.Status == "Active"),
-                _logger,
                 "GetBuses");
         }, "GetBuses");
     }
@@ -176,7 +173,6 @@ public class SafeDatabaseOperations
         {
             return await context.SafeQueryAsync(
                 context.Drivers.Where(d => d.Status == "Active"),
-                _logger,
                 "GetDrivers");
         }, "GetDrivers");
     }
@@ -204,7 +200,7 @@ public class SafeDatabaseOperations
             catch (InvalidCastException ex) when (ex.Message.Contains("BusId"))
             {
                 // Handle the specific BusId mapping issue
-                _logger.LogWarning("BusId mapping issue detected, falling back to basic route query");
+                Logger.Warning("BusId mapping issue detected, falling back to basic route query");
 
                 return await context.Routes
                     .AsNoTracking()
@@ -220,14 +216,14 @@ public class SafeDatabaseOperations
     {
         return await _resilienceService.ExecuteWithResilienceAsync(async () =>
         {
-            entity.ValidateEntity(_logger);
+            entity.ValidateEntity();
 
             return await context.SafeExecuteAsync(async () =>
             {
                 context.Set<T>().Add(entity);
                 await context.SaveChangesAsync();
                 return entity;
-            }, _logger, $"Save{typeof(T).Name}");
+            }, $"Save{typeof(T).Name}");
         }, $"SaveEntity{typeof(T).Name}");
     }
 
@@ -238,14 +234,14 @@ public class SafeDatabaseOperations
     {
         return await _resilienceService.ExecuteWithResilienceAsync(async () =>
         {
-            entity.ValidateEntity(_logger);
+            entity.ValidateEntity();
 
             return await context.SafeExecuteAsync(async () =>
             {
                 context.Set<T>().Update(entity);
                 await context.SaveChangesAsync();
                 return entity;
-            }, _logger, $"Update{typeof(T).Name}");
+            }, $"Update{typeof(T).Name}");
         }, $"UpdateEntity{typeof(T).Name}");
     }
 

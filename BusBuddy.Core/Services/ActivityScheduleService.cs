@@ -4,7 +4,7 @@ using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -17,16 +17,14 @@ namespace BusBuddy.Core.Services
     public class ActivityScheduleService : IActivityScheduleService
     {
         private readonly IBusBuddyDbContextFactory _contextFactory;
-        private readonly ILogger<ActivityScheduleService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<ActivityScheduleService>();
         private readonly IUnitOfWork _unitOfWork;
 
         public ActivityScheduleService(
             IBusBuddyDbContextFactory contextFactory,
-            ILogger<ActivityScheduleService> logger,
             IUnitOfWork unitOfWork)
         {
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
@@ -36,7 +34,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving all activity schedules");
+                Logger.Information("Retrieving all activity schedules");
 
                 // Use QueryNoTracking to get a queryable and then apply includes and ordering
                 var query = _unitOfWork.ActivitySchedules.QueryNoTracking()
@@ -48,7 +46,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving all activity schedules");
+                Logger.Error(ex, "Error retrieving all activity schedules");
                 throw;
             }
         }
@@ -57,7 +55,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving activity schedule with ID: {ActivityScheduleId}", id);
+                Logger.Information("Retrieving activity schedule with ID: {ActivityScheduleId}", id);
 
                 // Use QueryNoTracking to get a queryable and then apply includes
                 return await _unitOfWork.ActivitySchedules.QueryNoTracking()
@@ -67,7 +65,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving activity schedule with ID: {ActivityScheduleId}", id);
+                Logger.Error(ex, "Error retrieving activity schedule with ID: {ActivityScheduleId}", id);
                 throw;
             }
         }
@@ -79,7 +77,7 @@ namespace BusBuddy.Core.Services
 
             try
             {
-                _logger.LogInformation("Creating new activity schedule for date: {ScheduledDate}", activitySchedule.ScheduledDate);
+                Logger.Information("Creating new activity schedule for date: {ScheduledDate}", activitySchedule.ScheduledDate);
 
                 // Validate that the schedule doesn't have conflicts
                 if (await HasConflictsAsync(activitySchedule))
@@ -107,12 +105,12 @@ namespace BusBuddy.Core.Services
                 await _unitOfWork.ActivitySchedules.AddAsync(activitySchedule);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully created activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
+                Logger.Information("Successfully created activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
                 return activitySchedule;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating activity schedule");
+                Logger.Error(ex, "Error creating activity schedule");
                 throw;
             }
         }
@@ -124,7 +122,7 @@ namespace BusBuddy.Core.Services
 
             try
             {
-                _logger.LogInformation("Updating activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
+                Logger.Information("Updating activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
 
                 // Get the existing record
                 var existingSchedule = await _unitOfWork.ActivitySchedules.GetByIdAsync(activitySchedule.ActivityScheduleId);
@@ -158,12 +156,12 @@ namespace BusBuddy.Core.Services
                 _unitOfWork.ActivitySchedules.Update(existingSchedule);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully updated activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
+                Logger.Information("Successfully updated activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
                 return existingSchedule;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
+                Logger.Error(ex, "Error updating activity schedule with ID: {ActivityScheduleId}", activitySchedule.ActivityScheduleId);
                 throw;
             }
         }
@@ -172,24 +170,24 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Deleting activity schedule with ID: {ActivityScheduleId}", id);
+                Logger.Information("Deleting activity schedule with ID: {ActivityScheduleId}", id);
 
                 var activitySchedule = await _unitOfWork.ActivitySchedules.GetByIdAsync(id);
                 if (activitySchedule == null)
                 {
-                    _logger.LogWarning("Activity schedule with ID: {ActivityScheduleId} not found for deletion", id);
+                    Logger.Warning("Activity schedule with ID: {ActivityScheduleId} not found for deletion", id);
                     return false;
                 }
 
                 _unitOfWork.ActivitySchedules.Remove(activitySchedule);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully deleted activity schedule with ID: {ActivityScheduleId}", id);
+                Logger.Information("Successfully deleted activity schedule with ID: {ActivityScheduleId}", id);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting activity schedule with ID: {ActivityScheduleId}", id);
+                Logger.Error(ex, "Error deleting activity schedule with ID: {ActivityScheduleId}", id);
                 throw;
             }
         }
@@ -202,13 +200,13 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving activity schedules between {StartDate} and {EndDate}", startDate, endDate);
+                Logger.Information("Retrieving activity schedules between {StartDate} and {EndDate}", startDate, endDate);
 
                 return await _unitOfWork.ActivitySchedules.FindAsync(a => a.ScheduledDate >= startDate && a.ScheduledDate <= endDate);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving activity schedules for date range");
+                Logger.Error(ex, "Error retrieving activity schedules for date range");
                 throw;
             }
         }
@@ -217,13 +215,13 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving activity schedules for driver ID: {DriverId}", driverId);
+                Logger.Information("Retrieving activity schedules for driver ID: {DriverId}", driverId);
 
                 return await _unitOfWork.ActivitySchedules.FindAsync(a => a.ScheduledDriverId == driverId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving activity schedules for driver ID: {DriverId}", driverId);
+                Logger.Error(ex, "Error retrieving activity schedules for driver ID: {DriverId}", driverId);
                 throw;
             }
         }
@@ -232,13 +230,13 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving activity schedules for vehicle ID: {VehicleId}", vehicleId);
+                Logger.Information("Retrieving activity schedules for vehicle ID: {VehicleId}", vehicleId);
 
                 return await _unitOfWork.ActivitySchedules.FindAsync(a => a.ScheduledVehicleId == vehicleId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving activity schedules for vehicle ID: {VehicleId}", vehicleId);
+                Logger.Error(ex, "Error retrieving activity schedules for vehicle ID: {VehicleId}", vehicleId);
                 throw;
             }
         }
@@ -247,13 +245,13 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving activity schedules with status: {Status}", status);
+                Logger.Information("Retrieving activity schedules with status: {Status}", status);
 
                 return await _unitOfWork.ActivitySchedules.FindAsync(a => a.Status == status);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving activity schedules with status: {Status}", status);
+                Logger.Error(ex, "Error retrieving activity schedules with status: {Status}", status);
                 throw;
             }
         }
@@ -262,13 +260,13 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving activity schedules with trip type: {TripType}", tripType);
+                Logger.Information("Retrieving activity schedules with trip type: {TripType}", tripType);
 
                 return await _unitOfWork.ActivitySchedules.FindAsync(a => a.TripType == tripType);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving activity schedules with trip type: {TripType}", tripType);
+                Logger.Error(ex, "Error retrieving activity schedules with trip type: {TripType}", tripType);
                 throw;
             }
         }
@@ -277,13 +275,13 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving activity schedules with destination: {Destination}", destination);
+                Logger.Information("Retrieving activity schedules with destination: {Destination}", destination);
 
                 return await _unitOfWork.ActivitySchedules.FindAsync(a => a.ScheduledDestination.Contains(destination));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving activity schedules with destination: {Destination}", destination);
+                Logger.Error(ex, "Error retrieving activity schedules with destination: {Destination}", destination);
                 throw;
             }
         }
@@ -309,7 +307,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking vehicle availability for vehicle ID: {VehicleId}", vehicleId);
+                Logger.Error(ex, "Error checking vehicle availability for vehicle ID: {VehicleId}", vehicleId);
                 throw;
             }
         }
@@ -331,7 +329,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking driver availability for driver ID: {DriverId}", driverId);
+                Logger.Error(ex, "Error checking driver availability for driver ID: {DriverId}", driverId);
                 throw;
             }
         }
@@ -364,7 +362,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting available drivers for date: {Date}", date);
+                Logger.Error(ex, "Error getting available drivers for date: {Date}", date);
                 throw;
             }
         }
@@ -397,7 +395,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting available vehicles for date: {Date}", date);
+                Logger.Error(ex, "Error getting available vehicles for date: {Date}", date);
                 throw;
             }
         }
@@ -409,7 +407,7 @@ namespace BusBuddy.Core.Services
                 var activitySchedule = await _unitOfWork.ActivitySchedules.GetByIdAsync(activityScheduleId);
                 if (activitySchedule == null)
                 {
-                    _logger.LogWarning("Activity schedule with ID: {ActivityScheduleId} not found for confirmation", activityScheduleId);
+                    Logger.Warning("Activity schedule with ID: {ActivityScheduleId} not found for confirmation", activityScheduleId);
                     return false;
                 }
 
@@ -419,12 +417,12 @@ namespace BusBuddy.Core.Services
                 _unitOfWork.ActivitySchedules.Update(activitySchedule);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully confirmed activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
+                Logger.Information("Successfully confirmed activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error confirming activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
+                Logger.Error(ex, "Error confirming activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
                 throw;
             }
         }
@@ -436,7 +434,7 @@ namespace BusBuddy.Core.Services
                 var activitySchedule = await _unitOfWork.ActivitySchedules.GetByIdAsync(activityScheduleId);
                 if (activitySchedule == null)
                 {
-                    _logger.LogWarning("Activity schedule with ID: {ActivityScheduleId} not found for cancellation", activityScheduleId);
+                    Logger.Warning("Activity schedule with ID: {ActivityScheduleId} not found for cancellation", activityScheduleId);
                     return false;
                 }
 
@@ -453,12 +451,12 @@ namespace BusBuddy.Core.Services
                 _unitOfWork.ActivitySchedules.Update(activitySchedule);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully cancelled activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
+                Logger.Information("Successfully cancelled activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cancelling activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
+                Logger.Error(ex, "Error cancelling activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
                 throw;
             }
         }
@@ -470,7 +468,7 @@ namespace BusBuddy.Core.Services
                 var activitySchedule = await _unitOfWork.ActivitySchedules.GetByIdAsync(activityScheduleId);
                 if (activitySchedule == null)
                 {
-                    _logger.LogWarning("Activity schedule with ID: {ActivityScheduleId} not found for completion", activityScheduleId);
+                    Logger.Warning("Activity schedule with ID: {ActivityScheduleId} not found for completion", activityScheduleId);
                     return false;
                 }
 
@@ -480,12 +478,12 @@ namespace BusBuddy.Core.Services
                 _unitOfWork.ActivitySchedules.Update(activitySchedule);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully completed activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
+                Logger.Information("Successfully completed activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error completing activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
+                Logger.Error(ex, "Error completing activity schedule with ID: {ActivityScheduleId}", activityScheduleId);
                 throw;
             }
         }
@@ -518,7 +516,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error finding schedule conflicts for date: {Date}", date);
+                Logger.Error(ex, "Error finding schedule conflicts for date: {Date}", date);
                 throw;
             }
         }
@@ -544,7 +542,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking for scheduling conflicts");
+                Logger.Error(ex, "Error checking for scheduling conflicts");
                 throw;
             }
         }
@@ -565,7 +563,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting activity schedule statistics by trip type");
+                Logger.Error(ex, "Error getting activity schedule statistics by trip type");
                 throw;
             }
         }
@@ -592,7 +590,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting activity schedule statistics by driver");
+                Logger.Error(ex, "Error getting activity schedule statistics by driver");
                 throw;
             }
         }
@@ -619,7 +617,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting activity schedule statistics by vehicle");
+                Logger.Error(ex, "Error getting activity schedule statistics by vehicle");
                 throw;
             }
         }
@@ -636,7 +634,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting activity schedule statistics by date");
+                Logger.Error(ex, "Error getting activity schedule statistics by date");
                 throw;
             }
         }
@@ -653,7 +651,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting activity schedule statistics by status");
+                Logger.Error(ex, "Error getting activity schedule statistics by status");
                 throw;
             }
         }
@@ -692,7 +690,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error exporting activity schedules to CSV");
+                Logger.Error(ex, "Error exporting activity schedules to CSV");
                 throw;
             }
         }
@@ -777,7 +775,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting activity schedule diagnostics for ID: {ActivityScheduleId}", activityScheduleId);
+                Logger.Error(ex, "Error getting activity schedule diagnostics for ID: {ActivityScheduleId}", activityScheduleId);
                 return new Dictionary<string, object>
                 {
                     ["Error"] = ex.Message,
@@ -849,7 +847,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting activity schedule operation metrics");
+                Logger.Error(ex, "Error getting activity schedule operation metrics");
                 return new Dictionary<string, object>
                 {
                     ["Error"] = ex.Message,

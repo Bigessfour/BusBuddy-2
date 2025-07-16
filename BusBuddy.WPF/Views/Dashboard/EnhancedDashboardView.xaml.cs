@@ -18,14 +18,11 @@ using System.Windows.Markup; // For XamlParseException
 using Syncfusion.Windows.Tools.Controls;
 using BusBuddy.WPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using Syncfusion.Windows.Tools;  // For ActiveWindowChangedEventArgs if needed
 using Syncfusion.SfSkinManager;  // For FluentDark theme support
 using Syncfusion.Themes.FluentDark.WPF;
-using Syncfusion.Themes.FluentLight.WPF;
-using Syncfusion.Themes.MaterialDark.WPF;
-using Syncfusion.Themes.MaterialLight.WPF;
-using Syncfusion.Themes.Office2019Colorful.WPF;
 
 namespace BusBuddy.WPF.Views.Dashboard
 {
@@ -39,7 +36,7 @@ namespace BusBuddy.WPF.Views.Dashboard
         // Ensure this class is partial and matches the x:Class in EnhancedDashboardView.xaml
         private DispatcherTimer? _dataRefreshTimer;
         private const int REFRESH_INTERVAL_SECONDS = 5;
-        private readonly ILogger<EnhancedDashboardView>? _logger;
+        private static readonly ILogger Logger = Log.ForContext<EnhancedDashboardView>();
         private bool _isInitializing = false;
         private int _fallbackAttempts = 0;
         private const int MAX_FALLBACK_ATTEMPTS = 3;
@@ -51,44 +48,44 @@ namespace BusBuddy.WPF.Views.Dashboard
                 // Prevent nested initialization calls
                 if (_isInitializing)
                 {
-                    _logger?.LogWarning("EnhancedDashboardView is already initializing. Skipping nested initialization.");
+                    Logger.Warning("EnhancedDashboardView is already initializing. Skipping nested initialization.");
                     return;
                 }
 
                 _isInitializing = true;
 
-                // Get logger first for error tracking
-                if (Application.Current is App app && app.Services != null)
+                using (LogContext.PushProperty("ViewType", nameof(EnhancedDashboardView)))
+                using (LogContext.PushProperty("OperationType", "ViewInitialization"))
                 {
-                    _logger = app.Services.GetService<ILogger<EnhancedDashboardView>>();
+                    Logger.Information("EnhancedDashboardView initialization started");
+
+                    // Verify theme resources are available before InitializeComponent
+                    if (!VerifyThemeResources())
+                    {
+                        Logger.Warning("⚠️ EnhancedDashboardView: Theme resources verification failed, applying fallback theme");
+                        ApplyFallbackTheme();
+                    }
+
+                    // Initialize the XAML - will be resolved during build
+                    InitializeComponent();
+
+                    // 🎨 Apply FluentDark theme for modern appearance
+                    SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
+
+                    Logger.Information("🚀 EnhancedDashboardView: PRIMARY dashboard view initialized with FluentDark theme");
+                    Logger.Information("🔧 ButtonAdv Conversion: All standard Button controls converted to Syncfusion ButtonAdv for v30.1.39 compatibility");
+
+                    InitializeDataRefreshTimer();
+                    // DataContext is set by DataTemplate - no manual initialization needed
+                    Loaded += UserControl_Loaded;
+                    Unloaded += UserControl_Unloaded;
+
+                    _isInitializing = false;
                 }
-
-                // Verify theme resources are available before InitializeComponent
-                if (!VerifyThemeResources())
-                {
-                    _logger?.LogWarning("⚠️ EnhancedDashboardView: Theme resources verification failed, applying fallback theme");
-                    ApplyFallbackTheme();
-                }
-
-                // Initialize the XAML
-                InitializeComponent();
-
-                // 🎨 Apply FluentDark theme for modern appearance
-                SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
-
-                _logger?.LogInformation("🚀 EnhancedDashboardView: PRIMARY dashboard view initialized with FluentDark theme");
-                _logger?.LogInformation("🔧 ButtonAdv Conversion: All standard Button controls converted to Syncfusion ButtonAdv for v30.1.39 compatibility");
-
-                InitializeDataRefreshTimer();
-                // DataContext is set by DataTemplate - no manual initialization needed
-                Loaded += UserControl_Loaded;
-                Unloaded += UserControl_Unloaded;
-
-                _isInitializing = false;
             }
             catch (XamlParseException xamlEx)
             {
-                _logger?.LogError(xamlEx, "❌ EnhancedDashboardView XAML parsing failed: {ErrorMessage}", xamlEx.Message);
+                Logger.Error(xamlEx, "❌ EnhancedDashboardView XAML parsing failed: {ErrorMessage}", xamlEx.Message);
                 _isInitializing = false;
 
                 // Create a minimal fallback UI instead of retrying InitializeComponent
@@ -96,7 +93,7 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to initialize EnhancedDashboardView: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Failed to initialize EnhancedDashboardView: {ErrorMessage}", ex.Message);
                 _isInitializing = false;
 
                 // Create a minimal fallback UI
@@ -205,7 +202,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 // TODO: Fix for new Syncfusion version - NewActiveWindow property no longer available
                 // var newWindowName = (e.NewActiveWindow as FrameworkElement)?.Name ?? "Unknown";
                 var newWindowName = "Unknown";
-                _logger?.LogInformation($"Active window changed to {newWindowName}");
+                Logger.Information($"Active window changed to {newWindowName}");
 
                 // Optional: Trigger specific refreshes based on active panel
                 var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
@@ -216,7 +213,7 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
             catch (Exception ex)
             {
-                _logger?.LogWarning(ex, "Error handling active window change");
+                Logger.Warning(ex, "Error handling active window change");
             }
         }
 
@@ -336,22 +333,22 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                _logger?.LogInformation("🔄 UI Dashboard Syncfusion ButtonAdv clicked: Refresh Data button (converted from standard Button) - triggering data refresh");
+                Logger.Information("🔄 UI Dashboard Syncfusion ButtonAdv clicked: Refresh Data button (converted from standard Button) - triggering data refresh");
 
                 var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
                 if (viewModel != null)
                 {
                     await viewModel.RefreshDashboardDataAsync();
-                    _logger?.LogInformation("UI Dashboard data refresh completed successfully");
+                    Logger.Information("UI Dashboard data refresh completed successfully");
                 }
                 else
                 {
-                    _logger?.LogWarning("UI Dashboard Refresh Data button clicked but ViewModel is null - potential binding issue");
+                    Logger.Warning("UI Dashboard Refresh Data button clicked but ViewModel is null - potential binding issue");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard Refresh Data button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard Refresh Data button failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -362,23 +359,23 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                _logger?.LogInformation("📊 UI Dashboard Syncfusion ButtonAdv clicked: View Reports button (converted from standard Button) - navigating to reports");
+                Logger.Information("📊 UI Dashboard Syncfusion ButtonAdv clicked: View Reports button (converted from standard Button) - navigating to reports");
 
                 var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
                 if (viewModel != null)
                 {
                     // Navigate to reports view
-                    _logger?.LogInformation("UI Dashboard navigating to reports view");
+                    Logger.Information("UI Dashboard navigating to reports view");
                     // TODO: Implement reports navigation when available
                 }
                 else
                 {
-                    _logger?.LogWarning("UI Dashboard View Reports button clicked but ViewModel is null - potential binding issue");
+                    Logger.Warning("UI Dashboard View Reports button clicked but ViewModel is null - potential binding issue");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard View Reports button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard View Reports button failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -389,7 +386,7 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                _logger?.LogInformation("⚙️ UI Dashboard Syncfusion ButtonAdv clicked: Settings button (converted from standard Button) - opening theme settings");
+                Logger.Information("⚙️ UI Dashboard Syncfusion ButtonAdv clicked: Settings button (converted from standard Button) - opening theme settings");
 
                 // Open theme customization panel
                 ShowThemeCustomizationPanel();
@@ -397,17 +394,17 @@ namespace BusBuddy.WPF.Views.Dashboard
                 var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
                 if (viewModel != null)
                 {
-                    _logger?.LogInformation("UI Dashboard navigating to settings view");
+                    Logger.Information("UI Dashboard navigating to settings view");
                     // TODO: Implement settings navigation when available
                 }
                 else
                 {
-                    _logger?.LogWarning("UI Dashboard Settings button clicked but ViewModel is null - potential binding issue");
+                    Logger.Warning("UI Dashboard Settings button clicked but ViewModel is null - potential binding issue");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard Settings button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard Settings button failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -497,7 +494,7 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to show theme customization panel: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Failed to show theme customization panel: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -508,7 +505,7 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                _logger?.LogInformation("🎨 Applying theme: {ThemeName}", themeName);
+                Logger.Information("🎨 Applying theme: {ThemeName}", themeName);
 
                 switch (themeName)
                 {
@@ -532,11 +529,11 @@ namespace BusBuddy.WPF.Views.Dashboard
                         break;
                 }
 
-                _logger?.LogInformation("✅ Theme applied successfully: {ThemeName}", themeName);
+                Logger.Information("✅ Theme applied successfully: {ThemeName}", themeName);
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to apply theme {ThemeName}: {ErrorMessage}", themeName, ex.Message);
+                Logger.Error(ex, "Failed to apply theme {ThemeName}: {ErrorMessage}", themeName, ex.Message);
             }
         }
 
@@ -547,22 +544,22 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                _logger?.LogInformation("UI Dashboard Syncfusion control clicked: RefreshAnalytics ButtonAdv - refreshing analytics data");
+                Logger.Information("UI Dashboard Syncfusion control clicked: RefreshAnalytics ButtonAdv - refreshing analytics data");
 
                 var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
                 if (viewModel != null)
                 {
                     await viewModel.RefreshDashboardDataAsync();
-                    _logger?.LogInformation("UI Dashboard analytics refresh completed successfully");
+                    Logger.Information("UI Dashboard analytics refresh completed successfully");
                 }
                 else
                 {
-                    _logger?.LogWarning("UI Dashboard RefreshAnalytics ButtonAdv clicked but ViewModel is null - potential Syncfusion binding issue");
+                    Logger.Warning("UI Dashboard RefreshAnalytics ButtonAdv clicked but ViewModel is null - potential Syncfusion binding issue");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard RefreshAnalytics ButtonAdv failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard RefreshAnalytics ButtonAdv failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -571,7 +568,7 @@ namespace BusBuddy.WPF.Views.Dashboard
         /// </summary>
         private void DashboardControl_InteractionFailed(object sender, string controlName, string interactionType, Exception exception)
         {
-            _logger?.LogError(exception, "UI Dashboard control interaction failed - Control: {ControlName}, Interaction: {InteractionType}, Error: {ErrorMessage}",
+            Logger.Error(exception, "UI Dashboard control interaction failed - Control: {ControlName}, Interaction: {InteractionType}, Error: {ErrorMessage}",
                 controlName, interactionType, exception.Message);
         }
 
@@ -585,20 +582,20 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is Syncfusion.Windows.Tools.Controls.ComboBoxAdv comboBox)
                 {
                     var selectedItem = comboBox.SelectedItem?.ToString() ?? "Unknown";
-                    _logger?.LogInformation("🚌 UI Dashboard analytics filter changed: {FilterValue} - triggering data refresh", selectedItem);
+                    Logger.Information("🚌 UI Dashboard analytics filter changed: {FilterValue} - triggering data refresh", selectedItem);
 
                     // Trigger analytics refresh if needed
                     var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
                     if (viewModel != null)
                     {
                         // Could trigger specific analytics refresh based on filter
-                        _logger?.LogDebug("🚌 UI Dashboard analytics filter applied successfully for {FilterValue}", selectedItem);
+                        Logger.Debug("🚌 UI Dashboard analytics filter applied successfully for {FilterValue}", selectedItem);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "🚌 UI Dashboard analytics filter selection failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "🚌 UI Dashboard analytics filter selection failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -612,19 +609,19 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is FrameworkElement button)
                 {
                     var moduleName = button.Name ?? button.GetType().Name;
-                    _logger?.LogInformation("🚌 UI Dashboard module navigation: {ModuleName} clicked - initiating module switch", moduleName);
+                    Logger.Information("🚌 UI Dashboard module navigation: {ModuleName} clicked - initiating module switch", moduleName);
 
                     var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
                     if (viewModel != null)
                     {
                         // Could trigger module switching logic
-                        _logger?.LogInformation("🚌 UI Dashboard module navigation processed for {ModuleName}", moduleName);
+                        Logger.Information("🚌 UI Dashboard module navigation processed for {ModuleName}", moduleName);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "🚌 UI Dashboard module navigation failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "🚌 UI Dashboard module navigation failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -638,13 +635,13 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is Syncfusion.UI.Xaml.Charts.SfChart chart)
                 {
                     var chartName = chart.Name ?? "UnnamedChart";
-                    _logger?.LogInformation("UI Dashboard chart interaction: {ChartName} clicked at position ({X}, {Y})",
+                    Logger.Information("UI Dashboard chart interaction: {ChartName} clicked at position ({X}, {Y})",
                         chartName, e.GetPosition(chart).X, e.GetPosition(chart).Y);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard chart interaction failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard chart interaction failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -658,19 +655,19 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is FrameworkElement tile)
                 {
                     var tileName = tile.Name ?? "UnnamedTile";
-                    _logger?.LogInformation("UI Dashboard tile clicked: {TileName} - potential navigation trigger", tileName);
+                    Logger.Information("UI Dashboard tile clicked: {TileName} - potential navigation trigger", tileName);
 
                     // Could trigger navigation based on tile clicked
                     var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
                     if (viewModel != null)
                     {
-                        _logger?.LogDebug("UI Dashboard tile interaction processed for {TileName}", tileName);
+                        Logger.Debug("UI Dashboard tile interaction processed for {TileName}", tileName);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard tile interaction failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard tile interaction failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -684,13 +681,13 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is FrameworkElement control)
                 {
                     var controlName = control.Name ?? control.GetType().Name;
-                    _logger?.LogWarning("UI Dashboard control interaction failed to respond: {ControlName} - {ControlType}",
+                    Logger.Warning("UI Dashboard control interaction failed to respond: {ControlName} - {ControlType}",
                         controlName, control.GetType().Name);
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard control failure logging failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard control failure logging failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -705,7 +702,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (e.Source is FrameworkElement element)
                 {
                     var elementName = element.Name ?? element.GetType().Name;
-                    _logger?.LogDebug("UI Dashboard preview click on: {ElementName} ({ElementType})",
+                    Logger.Debug("UI Dashboard preview click on: {ElementName} ({ElementType})",
                         elementName, element.GetType().Name);
                 }
 
@@ -713,7 +710,7 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "UI Dashboard preview click handling failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard preview click handling failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -737,7 +734,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 var app = Application.Current;
                 if (app?.Resources == null)
                 {
-                    _logger?.LogWarning("Application resources not available for theme verification");
+                    Logger.Warning("Application resources not available for theme verification");
                     return false;
                 }
 
@@ -758,18 +755,18 @@ namespace BusBuddy.WPF.Views.Dashboard
 
                         if (!foundInMerged)
                         {
-                            _logger?.LogWarning("Missing FluentDark theme resource: {ResourceKey}", resourceKey);
+                            Logger.Warning("Missing FluentDark theme resource: {ResourceKey}", resourceKey);
                             return false;
                         }
                     }
                 }
 
-                _logger?.LogInformation("✅ FluentDark theme resources verified successfully");
+                Logger.Information("✅ FluentDark theme resources verified successfully");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error verifying theme resources: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Error verifying theme resources: {ErrorMessage}", ex.Message);
                 return false;
             }
         }
@@ -781,7 +778,7 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                _logger?.LogInformation("🔄 Applying fallback theme due to missing FluentDark resources");
+                Logger.Information("🔄 Applying fallback theme due to missing FluentDark resources");
 
                 // Apply default WPF theme using SfSkinManager
                 SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentLight" });
@@ -807,11 +804,11 @@ namespace BusBuddy.WPF.Views.Dashboard
                         app.Resources.Add("FluentDarkSuccessBrush", new SolidColorBrush(Color.FromRgb(46, 204, 113)));
                 }
 
-                _logger?.LogInformation("✅ Fallback theme applied successfully");
+                Logger.Information("✅ Fallback theme applied successfully");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to apply fallback theme: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Failed to apply fallback theme: {ErrorMessage}", ex.Message);
                 throw;
             }
         }
@@ -826,13 +823,13 @@ namespace BusBuddy.WPF.Views.Dashboard
                 // Prevent excessive fallback attempts
                 if (_fallbackAttempts >= MAX_FALLBACK_ATTEMPTS)
                 {
-                    _logger?.LogError("Fallback UI failed after {Attempts} attempts. Showing error message.", _fallbackAttempts);
+                    Logger.Error("Fallback UI failed after {Attempts} attempts. Showing error message.", _fallbackAttempts);
                     ShowCriticalErrorMessage();
                     return;
                 }
 
                 _fallbackAttempts++;
-                _logger?.LogInformation("🔄 Creating fallback UI for EnhancedDashboardView (Attempt {Attempt}/{MaxAttempts})", _fallbackAttempts, MAX_FALLBACK_ATTEMPTS);
+                Logger.Information("🔄 Creating fallback UI for EnhancedDashboardView (Attempt {Attempt}/{MaxAttempts})", _fallbackAttempts, MAX_FALLBACK_ATTEMPTS);
 
                 // Create a simple fallback UI programmatically
                 var fallbackGrid = new Grid();
@@ -869,7 +866,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 {
                     try
                     {
-                        _logger?.LogInformation("Dashboard retry attempted - navigating to dashboard");
+                        Logger.Information("Dashboard retry attempted - navigating to dashboard");
 
                         // Instead of retrying initialization, navigate to dashboard via main view model
                         if (Application.Current is App app && app.Services != null)
@@ -878,13 +875,13 @@ namespace BusBuddy.WPF.Views.Dashboard
                             if (mainViewModel != null)
                             {
                                 mainViewModel.NavigateToDashboard();
-                                _logger?.LogInformation("Dashboard retry navigation successful");
+                                Logger.Information("Dashboard retry navigation successful");
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger?.LogError(ex, "Dashboard retry failed");
+                        Logger.Error(ex, "Dashboard retry failed");
                     }
                 };
 
@@ -894,11 +891,11 @@ namespace BusBuddy.WPF.Views.Dashboard
                 // Set this as the content
                 this.Content = fallbackGrid;
 
-                _logger?.LogInformation("✅ Fallback UI created successfully");
+                Logger.Information("✅ Fallback UI created successfully");
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Failed to create fallback UI: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Failed to create fallback UI: {ErrorMessage}", ex.Message);
                 ShowCriticalErrorMessage();
             }
         }
@@ -924,7 +921,7 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
             catch (Exception ex)
             {
-                _logger?.LogCritical(ex, "Failed to show critical error message");
+                Logger.Fatal(ex, "Failed to show critical error message");
             }
         }
     }

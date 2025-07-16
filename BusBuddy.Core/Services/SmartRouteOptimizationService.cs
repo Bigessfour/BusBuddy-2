@@ -1,5 +1,9 @@
 using BusBuddy.Core.Services.Interfaces;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BusBuddy.Core.Services
 {
@@ -9,20 +13,18 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class SmartRouteOptimizationService
     {
-        private readonly ILogger<SmartRouteOptimizationService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<SmartRouteOptimizationService>();
         private readonly IRouteService _routeService;
         private readonly IBusService _busService;
         private readonly IStudentService _studentService;
         private readonly BusBuddyAIReportingService _aiReportingService;
 
         public SmartRouteOptimizationService(
-            ILogger<SmartRouteOptimizationService> logger,
             IRouteService routeService,
             IBusService busService,
             IStudentService studentService,
             BusBuddyAIReportingService aiReportingService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _routeService = routeService ?? throw new ArgumentNullException(nameof(routeService));
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
@@ -36,7 +38,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Starting comprehensive route efficiency analysis");
+                Logger.Information("Starting comprehensive route efficiency analysis");
 
                 // Get current data
                 var routes = await _routeService.GetAllActiveRoutesAsync();
@@ -60,12 +62,12 @@ namespace BusBuddy.Core.Services
                 // Identify specific improvement opportunities
                 await IdentifyImprovementOpportunities(report, routes, buses);
 
-                _logger.LogInformation("Route efficiency analysis completed successfully");
+                Logger.Information("Route efficiency analysis completed successfully");
                 return report;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during route efficiency analysis");
+                Logger.Error(ex, "Error during route efficiency analysis");
                 throw;
             }
         }
@@ -77,7 +79,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Generating optimized route suggestions");
+                Logger.Information("Generating optimized route suggestions");
 
                 var suggestions = new List<RouteOptimizationSuggestion>();
 
@@ -98,12 +100,12 @@ namespace BusBuddy.Core.Services
                 // Sort suggestions by potential impact
                 suggestions = suggestions.OrderByDescending(s => s.EstimatedSavings).ToList();
 
-                _logger.LogInformation($"Generated {suggestions.Count} route optimization suggestions");
+                Logger.Information($"Generated {suggestions.Count} route optimization suggestions");
                 return suggestions;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating optimized routes");
+                Logger.Error(ex, "Error generating optimized routes");
                 throw;
             }
         }
@@ -139,7 +141,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error monitoring route performance for route {RouteId}", routeId);
+                Logger.Error(ex, "Error monitoring route performance for route {RouteId}", routeId);
                 throw;
             }
         }
@@ -194,11 +196,11 @@ namespace BusBuddy.Core.Services
 
                 report.AIGeneratedInsights = response.Content ?? "AI insights temporarily unavailable.";
 
-                _logger.LogDebug("AI optimization insights generated successfully");
+                Logger.Debug("AI optimization insights generated successfully");
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to generate AI optimization insights");
+                Logger.Warning(ex, "Failed to generate AI optimization insights");
                 report.AIGeneratedInsights = "AI insights could not be generated at this time.";
             }
         }

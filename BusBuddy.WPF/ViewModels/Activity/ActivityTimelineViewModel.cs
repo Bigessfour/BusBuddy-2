@@ -1,7 +1,6 @@
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
-using Microsoft.Extensions.Logging;
-using Syncfusion.UI.Xaml.Schedule;
+using Syncfusion.UI.Xaml.Scheduler;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -85,8 +84,8 @@ namespace BusBuddy.WPF.ViewModels
 
         public ICommand RefreshCommand { get; }
 
-        public ActivityTimelineViewModel(IActivityLogService logService, ILogger<ActivityTimelineViewModel>? logger = null)
-            : base(logger)
+        public ActivityTimelineViewModel(IActivityLogService logService)
+            : base()
         {
             _logService = logService;
 
@@ -191,7 +190,7 @@ namespace BusBuddy.WPF.ViewModels
                 IsLoading = true;
                 HasNoData = false;
 
-                Logger?.LogDebug("Refreshing activity timeline with filter: Start={StartDate}, End={EndDate}, EventTypes={EventTypes}",
+                Logger.Debug("Refreshing activity timeline with filter: Start={StartDate}, End={EndDate}, EventTypes={EventTypes}",
                     StartDate, EndDate, string.Join(",", SelectedEventTypes.Select(e => e.EventType)));
 
                 // Get all logs (with increased limit for timeline) from service
@@ -246,12 +245,12 @@ namespace BusBuddy.WPF.ViewModels
                 // Check if we have data to display
                 HasNoData = TimelineEvents.Count == 0;
 
-                Logger?.LogInformation("Loaded {FilteredCount} activity timeline events after filtering from {TotalCount} total logs",
+                Logger.Information("Loaded {FilteredCount} activity timeline events after filtering from {TotalCount} total logs",
                     TimelineEvents.Count, allLogs.Count());
             }
             catch (Exception ex)
             {
-                Logger?.LogError(ex, "Error loading activity timeline");
+                Logger.Error(ex, "Error loading activity timeline");
                 // We'll leave error handling to the UI via HasNoData
                 HasNoData = true;
             }
@@ -289,7 +288,7 @@ namespace BusBuddy.WPF.ViewModels
         }
     }
 
-    public class ActivityTimelineEvent : Syncfusion.UI.Xaml.Schedule.ScheduleAppointment
+    public class ActivityTimelineEvent : Syncfusion.UI.Xaml.Scheduler.ScheduleAppointment
     {
         public int LogId { get; set; }
         public Brush EventColor { get; set; } = new SolidColorBrush(Colors.Blue);

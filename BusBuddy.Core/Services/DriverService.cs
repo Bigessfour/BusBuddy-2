@@ -1,7 +1,7 @@
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -14,15 +14,14 @@ namespace BusBuddy.Core.Services
     public class DriverService : IDriverService
     {
         private readonly IBusBuddyDbContextFactory _contextFactory;
-        private readonly ILogger<DriverService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<DriverService>();
         private readonly IEnhancedCachingService _cachingService;
         private static readonly SemaphoreSlim _semaphore = new(1, 1);
         private static bool _nullValuesFixed = false;
 
-        public DriverService(IBusBuddyDbContextFactory contextFactory, ILogger<DriverService> logger, IEnhancedCachingService cachingService)
+        public DriverService(IBusBuddyDbContextFactory contextFactory, IEnhancedCachingService cachingService)
         {
             _contextFactory = contextFactory;
-            _logger = logger;
             _cachingService = cachingService;
         }
 
@@ -35,7 +34,7 @@ namespace BusBuddy.Core.Services
                 await _semaphore.WaitAsync();
                 try
                 {
-                    _logger.LogInformation("Retrieving all drivers from database (cache miss)");
+                    Logger.Information("Retrieving all drivers from database (cache miss)");
                     using var context = _contextFactory.CreateDbContext();
 
                     // Fix any NULL values before attempting to read drivers
@@ -47,7 +46,7 @@ namespace BusBuddy.Core.Services
                 }
                 catch (System.Data.SqlTypes.SqlNullValueException ex)
                 {
-                    _logger.LogWarning(ex, "SQL NULL value error when retrieving drivers. Attempting to fix NULL values and retry.");
+                    Logger.Warning(ex, "SQL NULL value error when retrieving drivers. Attempting to fix NULL values and retry.");
 
                     // Try to fix NULL values and retry once
                     try
@@ -62,13 +61,13 @@ namespace BusBuddy.Core.Services
                     }
                     catch (Exception retryEx)
                     {
-                        _logger.LogError(retryEx, "Failed to fix NULL values and retry. Returning empty list to avoid application failure.");
+                        Logger.Error(retryEx, "Failed to fix NULL values and retry. Returning empty list to avoid application failure.");
                         return new List<Driver>();
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error retrieving all drivers");
+                    Logger.Error(ex, "Error retrieving all drivers");
                     throw;
                 }
                 finally
@@ -82,7 +81,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving driver with ID: {DriverId}", driverId);
+                Logger.Information("Retrieving driver with ID: {DriverId}", driverId);
                 using var context = _contextFactory.CreateDbContext();
                 return await context.Drivers
                     .AsNoTracking()
@@ -92,7 +91,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving driver with ID: {DriverId}", driverId);
+                Logger.Error(ex, "Error retrieving driver with ID: {DriverId}", driverId);
                 throw;
             }
         }
@@ -101,7 +100,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Adding new driver: {DriverName}", driver.DriverName);
+                Logger.Information("Adding new driver: {DriverName}", driver.DriverName);
 
                 // Validate driver data
                 var validationErrors = await ValidateDriverAsync(driver);
@@ -128,12 +127,12 @@ namespace BusBuddy.Core.Services
                 // Invalidate cache after adding driver
                 _cachingService.InvalidateCache("AllDrivers");
 
-                _logger.LogInformation("Successfully added driver with ID: {DriverId}", driver.DriverId);
+                Logger.Information("Successfully added driver with ID: {DriverId}", driver.DriverId);
                 return driver;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding driver: {DriverName}", driver.DriverName);
+                Logger.Error(ex, "Error adding driver: {DriverName}", driver.DriverName);
                 throw;
             }
         }
@@ -142,7 +141,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Updating driver with ID: {DriverId}", driver.DriverId);
+                Logger.Information("Updating driver with ID: {DriverId}", driver.DriverId);
 
                 // Validate driver data
                 var validationErrors = await ValidateDriverAsync(driver);
@@ -173,11 +172,11 @@ namespace BusBuddy.Core.Services
                     {
                         // Invalidate cache after updating driver
                         _cachingService.InvalidateCache("AllDrivers");
-                        _logger.LogInformation("Successfully updated driver: {DriverName}", driver.DriverName);
+                        Logger.Information("Successfully updated driver: {DriverName}", driver.DriverName);
                     }
                     else
                     {
-                        _logger.LogWarning("No changes were made when updating driver: {DriverId}", driver.DriverId);
+                        Logger.Warning("No changes were made when updating driver: {DriverId}", driver.DriverId);
                     }
 
                     return success;
@@ -186,19 +185,19 @@ namespace BusBuddy.Core.Services
                 {
                     if (!await context.Drivers.AnyAsync(e => e.DriverId == driver.DriverId))
                     {
-                        _logger.LogWarning("Driver with ID {DriverId} not found for update", driver.DriverId);
+                        Logger.Warning("Driver with ID {DriverId} not found for update", driver.DriverId);
                         return false;
                     }
                     else
                     {
-                        _logger.LogError(ex, "Concurrency error updating driver: {DriverId}", driver.DriverId);
+                        Logger.Error(ex, "Concurrency error updating driver: {DriverId}", driver.DriverId);
                         throw;
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating driver with ID: {DriverId}", driver.DriverId);
+                Logger.Error(ex, "Error updating driver with ID: {DriverId}", driver.DriverId);
                 throw;
             }
         }
@@ -207,7 +206,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Deleting driver with ID: {DriverId}", driverId);
+                Logger.Information("Deleting driver with ID: {DriverId}", driverId);
 
                 // First check if the driver is assigned to any routes
                 using var checkContext = _contextFactory.CreateDbContext();
@@ -216,7 +215,7 @@ namespace BusBuddy.Core.Services
 
                 if (hasActiveRoutes)
                 {
-                    _logger.LogWarning("Cannot delete driver {DriverId} as they are assigned to active routes", driverId);
+                    Logger.Warning("Cannot delete driver {DriverId} as they are assigned to active routes", driverId);
                     throw new InvalidOperationException("Cannot delete driver as they are assigned to active routes. Remove from routes first or mark as inactive.");
                 }
 
@@ -224,7 +223,7 @@ namespace BusBuddy.Core.Services
                 var driver = await context.Drivers.FindAsync(driverId);
                 if (driver == null)
                 {
-                    _logger.LogWarning("Driver with ID {DriverId} not found for deletion", driverId);
+                    Logger.Warning("Driver with ID {DriverId} not found for deletion", driverId);
                     return false;
                 }
 
@@ -234,7 +233,7 @@ namespace BusBuddy.Core.Services
                 // Invalidate cache after deleting driver
                 _cachingService.InvalidateCache("AllDrivers");
 
-                _logger.LogInformation("Successfully deleted driver: {DriverName}", driver.DriverName);
+                Logger.Information("Successfully deleted driver: {DriverName}", driver.DriverName);
                 return true;
             }
             catch (InvalidOperationException)
@@ -244,7 +243,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting driver with ID: {DriverId}", driverId);
+                Logger.Error(ex, "Error deleting driver with ID: {DriverId}", driverId);
                 throw;
             }
         }
@@ -257,7 +256,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving active drivers");
+                Logger.Information("Retrieving active drivers");
                 using var context = _contextFactory.CreateDbContext();
 
                 // Fix any NULL values before attempting to read drivers
@@ -270,7 +269,7 @@ namespace BusBuddy.Core.Services
             }
             catch (System.Data.SqlTypes.SqlNullValueException ex)
             {
-                _logger.LogWarning(ex, "SQL NULL value error when retrieving active drivers. Attempting to fix and retry.");
+                Logger.Warning(ex, "SQL NULL value error when retrieving active drivers. Attempting to fix and retry.");
 
                 try
                 {
@@ -285,13 +284,13 @@ namespace BusBuddy.Core.Services
                 }
                 catch (Exception retryEx)
                 {
-                    _logger.LogError(retryEx, "Failed to fix NULL values and retry. Returning empty list.");
+                    Logger.Error(retryEx, "Failed to fix NULL values and retry. Returning empty list.");
                     return new List<Driver>();
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving active drivers");
+                Logger.Error(ex, "Error retrieving active drivers");
                 throw;
             }
         }
@@ -300,7 +299,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving drivers by qualification status: {Status}", status);
+                Logger.Information("Retrieving drivers by qualification status: {Status}", status);
                 using var context = _contextFactory.CreateDbContext();
 
                 // Since QualificationStatus is a computed property, we need to calculate it in memory
@@ -312,7 +311,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving drivers by qualification status: {Status}", status);
+                Logger.Error(ex, "Error retrieving drivers by qualification status: {Status}", status);
                 throw;
             }
         }
@@ -321,7 +320,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Retrieving drivers by license status: {Status}", status);
+                Logger.Information("Retrieving drivers by license status: {Status}", status);
                 using var context = _contextFactory.CreateDbContext();
 
                 // Handle license status filter
@@ -333,7 +332,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving drivers by license status: {Status}", status);
+                Logger.Error(ex, "Error retrieving drivers by license status: {Status}", status);
                 throw;
             }
         }
@@ -342,7 +341,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Searching drivers with term: {SearchTerm}", searchTerm);
+                Logger.Information("Searching drivers with term: {SearchTerm}", searchTerm);
 
                 if (string.IsNullOrWhiteSpace(searchTerm))
                 {
@@ -364,7 +363,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching drivers with term: {SearchTerm}", searchTerm);
+                Logger.Error(ex, "Error searching drivers with term: {SearchTerm}", searchTerm);
                 throw;
             }
         }
@@ -377,7 +376,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Finding available drivers for route date: {RouteDate}, AM: {IsAMRoute}",
+                Logger.Information("Finding available drivers for route date: {RouteDate}, AM: {IsAMRoute}",
                     routeDate.ToShortDateString(), isAMRoute);
 
                 using var context = _contextFactory.CreateDbContext();
@@ -407,7 +406,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error finding available drivers for route date: {RouteDate}",
+                Logger.Error(ex, "Error finding available drivers for route date: {RouteDate}",
                     routeDate.ToShortDateString());
                 throw;
             }
@@ -417,7 +416,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Assigning driver {DriverId} to route {RouteId}, AM: {IsAMRoute}",
+                Logger.Information("Assigning driver {DriverId} to route {RouteId}, AM: {IsAMRoute}",
                     driverId, routeId, isAMRoute);
 
                 using var context = _contextFactory.CreateWriteDbContext();
@@ -426,13 +425,13 @@ namespace BusBuddy.Core.Services
                 var driver = await context.Drivers.FindAsync(driverId);
                 if (driver == null)
                 {
-                    _logger.LogWarning("Driver with ID {DriverId} not found", driverId);
+                    Logger.Warning("Driver with ID {DriverId} not found", driverId);
                     return false;
                 }
 
                 if (driver.Status != "Active" || !driver.TrainingComplete || driver.LicenseStatus == "Expired")
                 {
-                    _logger.LogWarning("Driver {DriverId} is not qualified for assignment", driverId);
+                    Logger.Warning("Driver {DriverId} is not qualified for assignment", driverId);
                     throw new InvalidOperationException("Driver is not qualified for assignment: " +
                         (driver.Status != "Active" ? "inactive status" :
                          !driver.TrainingComplete ? "training incomplete" :
@@ -443,14 +442,14 @@ namespace BusBuddy.Core.Services
                 var route = await context.Routes.FindAsync(routeId);
                 if (route == null)
                 {
-                    _logger.LogWarning("Route with ID {RouteId} not found", routeId);
+                    Logger.Warning("Route with ID {RouteId} not found", routeId);
                     return false;
                 }
 
                 // Check driver is available
                 if (!await IsDriverAvailableForRouteAsync(driverId, route.Date, isAMRoute))
                 {
-                    _logger.LogWarning("Driver {DriverId} is already assigned to another route on {Date}",
+                    Logger.Warning("Driver {DriverId} is already assigned to another route on {Date}",
                         driverId, route.Date.ToShortDateString());
                     throw new InvalidOperationException("Driver is already assigned to another route at this time");
                 }
@@ -468,7 +467,7 @@ namespace BusBuddy.Core.Services
                 }
 
                 await context.SaveChangesAsync();
-                _logger.LogInformation("Successfully assigned driver {DriverId} to route {RouteId}", driverId, routeId);
+                Logger.Information("Successfully assigned driver {DriverId} to route {RouteId}", driverId, routeId);
                 return true;
             }
             catch (InvalidOperationException)
@@ -478,7 +477,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error assigning driver {DriverId} to route {RouteId}", driverId, routeId);
+                Logger.Error(ex, "Error assigning driver {DriverId} to route {RouteId}", driverId, routeId);
                 throw;
             }
         }
@@ -487,14 +486,14 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Removing driver from route {RouteId}, AM: {IsAMRoute}", routeId, isAMRoute);
+                Logger.Information("Removing driver from route {RouteId}, AM: {IsAMRoute}", routeId, isAMRoute);
 
                 using var context = _contextFactory.CreateWriteDbContext();
 
                 var route = await context.Routes.FindAsync(routeId);
                 if (route == null)
                 {
-                    _logger.LogWarning("Route with ID {RouteId} not found", routeId);
+                    Logger.Warning("Route with ID {RouteId} not found", routeId);
                     return false;
                 }
 
@@ -508,12 +507,12 @@ namespace BusBuddy.Core.Services
                 }
 
                 await context.SaveChangesAsync();
-                _logger.LogInformation("Successfully removed driver from route {RouteId}", routeId);
+                Logger.Information("Successfully removed driver from route {RouteId}", routeId);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing driver from route {RouteId}", routeId);
+                Logger.Error(ex, "Error removing driver from route {RouteId}", routeId);
                 throw;
             }
         }
@@ -522,7 +521,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Getting routes for driver {DriverId} from {StartDate} to {EndDate}",
+                Logger.Information("Getting routes for driver {DriverId} from {StartDate} to {EndDate}",
                     driverId, startDate?.ToShortDateString() ?? "all past", endDate?.ToShortDateString() ?? "all future");
 
                 using var context = _contextFactory.CreateDbContext();
@@ -550,7 +549,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting routes for driver {DriverId}", driverId);
+                Logger.Error(ex, "Error getting routes for driver {DriverId}", driverId);
                 throw;
             }
         }
@@ -559,7 +558,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Checking if driver {DriverId} is available on {RouteDate}, AM: {IsAMRoute}",
+                Logger.Information("Checking if driver {DriverId} is available on {RouteDate}, AM: {IsAMRoute}",
                     driverId, routeDate.ToShortDateString(), isAMRoute);
 
                 using var context = _contextFactory.CreateDbContext();
@@ -580,7 +579,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking driver {DriverId} availability", driverId);
+                Logger.Error(ex, "Error checking driver {DriverId} availability", driverId);
                 throw;
             }
         }
@@ -594,14 +593,14 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Updating license info for driver {DriverId}", driverId);
+                Logger.Information("Updating license info for driver {DriverId}", driverId);
 
                 using var context = _contextFactory.CreateWriteDbContext();
 
                 var driver = await context.Drivers.FindAsync(driverId);
                 if (driver == null)
                 {
-                    _logger.LogWarning("Driver with ID {DriverId} not found", driverId);
+                    Logger.Warning("Driver with ID {DriverId} not found", driverId);
                     return false;
                 }
 
@@ -629,7 +628,7 @@ namespace BusBuddy.Core.Services
                 driver.UpdatedDate = DateTime.UtcNow;
 
                 await context.SaveChangesAsync();
-                _logger.LogInformation("Successfully updated license info for driver {DriverId}", driverId);
+                Logger.Information("Successfully updated license info for driver {DriverId}", driverId);
                 return true;
             }
             catch (ArgumentException)
@@ -639,7 +638,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating license info for driver {DriverId}", driverId);
+                Logger.Error(ex, "Error updating license info for driver {DriverId}", driverId);
                 throw;
             }
         }
@@ -649,14 +648,14 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Updating qualification info for driver {DriverId}", driverId);
+                Logger.Information("Updating qualification info for driver {DriverId}", driverId);
 
                 using var context = _contextFactory.CreateWriteDbContext();
 
                 var driver = await context.Drivers.FindAsync(driverId);
                 if (driver == null)
                 {
-                    _logger.LogWarning("Driver with ID {DriverId} not found", driverId);
+                    Logger.Warning("Driver with ID {DriverId} not found", driverId);
                     return false;
                 }
 
@@ -687,12 +686,12 @@ namespace BusBuddy.Core.Services
                 driver.UpdatedDate = DateTime.UtcNow;
 
                 await context.SaveChangesAsync();
-                _logger.LogInformation("Successfully updated qualification info for driver {DriverId}", driverId);
+                Logger.Information("Successfully updated qualification info for driver {DriverId}", driverId);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating qualification info for driver {DriverId}", driverId);
+                Logger.Error(ex, "Error updating qualification info for driver {DriverId}", driverId);
                 throw;
             }
         }
@@ -701,7 +700,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Updating status for driver {DriverId} to {Status}", driverId, status);
+                Logger.Information("Updating status for driver {DriverId} to {Status}", driverId, status);
 
                 // Validate status
                 var validStatuses = new[] { "Active", "Inactive", "On Leave", "Suspended", "Terminated" };
@@ -715,7 +714,7 @@ namespace BusBuddy.Core.Services
                 var driver = await context.Drivers.FindAsync(driverId);
                 if (driver == null)
                 {
-                    _logger.LogWarning("Driver with ID {DriverId} not found", driverId);
+                    Logger.Warning("Driver with ID {DriverId} not found", driverId);
                     return false;
                 }
 
@@ -727,7 +726,7 @@ namespace BusBuddy.Core.Services
 
                     if (hasActiveRoutes)
                     {
-                        _logger.LogWarning("Cannot mark driver {DriverId} as {Status} as they have active route assignments", driverId, status);
+                        Logger.Warning("Cannot mark driver {DriverId} as {Status} as they have active route assignments", driverId, status);
                         throw new InvalidOperationException("Cannot change driver status as they have active route assignments. Please reassign routes first.");
                     }
                 }
@@ -736,7 +735,7 @@ namespace BusBuddy.Core.Services
                 driver.UpdatedDate = DateTime.UtcNow;
 
                 await context.SaveChangesAsync();
-                _logger.LogInformation("Successfully updated status for driver {DriverId} to {Status}", driverId, status);
+                Logger.Information("Successfully updated status for driver {DriverId} to {Status}", driverId, status);
                 return true;
             }
             catch (ArgumentException)
@@ -751,7 +750,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating status for driver {DriverId}", driverId);
+                Logger.Error(ex, "Error updating status for driver {DriverId}", driverId);
                 throw;
             }
         }
@@ -845,7 +844,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during driver validation");
+                Logger.Error(ex, "Error during driver validation");
                 errors.Add("Validation error occurred");
             }
 
@@ -860,7 +859,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Calculating driver statistics");
+                Logger.Information("Calculating driver statistics");
 
                 using var context = _contextFactory.CreateDbContext();
                 var stats = new Dictionary<string, int>
@@ -896,7 +895,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error calculating driver statistics");
+                Logger.Error(ex, "Error calculating driver statistics");
                 throw;
             }
         }
@@ -905,7 +904,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Finding drivers needing renewal");
+                Logger.Information("Finding drivers needing renewal");
 
                 using var context = _contextFactory.CreateDbContext();
 
@@ -937,7 +936,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error finding drivers needing renewal");
+                Logger.Error(ex, "Error finding drivers needing renewal");
                 throw;
             }
         }
@@ -946,7 +945,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Calculating driver assignment metrics from {StartDate} to {EndDate}",
+                Logger.Information("Calculating driver assignment metrics from {StartDate} to {EndDate}",
                     startDate.ToShortDateString(), endDate.ToShortDateString());
 
                 using var context = _contextFactory.CreateDbContext();
@@ -1002,7 +1001,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error calculating driver assignment metrics");
+                Logger.Error(ex, "Error calculating driver assignment metrics");
                 throw;
             }
         }
@@ -1011,7 +1010,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("Exporting drivers to CSV format");
+                Logger.Information("Exporting drivers to CSV format");
 
                 var drivers = await GetAllDriversAsync();
                 var csv = new StringBuilder();
@@ -1042,12 +1041,12 @@ namespace BusBuddy.Core.Services
                                   $"\"{driver.Notes?.Replace("\"", "\"\"") ?? ""}\"");
                 }
 
-                _logger.LogInformation("Successfully exported {Count} drivers to CSV", drivers.Count);
+                Logger.Information("Successfully exported {Count} drivers to CSV", drivers.Count);
                 return csv.ToString();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error exporting drivers to CSV");
+                Logger.Error(ex, "Error exporting drivers to CSV");
                 throw;
             }
         }
@@ -1079,7 +1078,7 @@ namespace BusBuddy.Core.Services
 
                 if (hasNullValues > 0)
                 {
-                    _logger.LogWarning("Found NULL values in required Driver columns. Fixing automatically.");
+                    Logger.Warning("Found NULL values in required Driver columns. Fixing automatically.");
 
                     // Fix NULL values
                     await context.Database.ExecuteSqlRawAsync(@"
@@ -1128,7 +1127,7 @@ namespace BusBuddy.Core.Services
                         WHERE Zip = '';
                     ");
 
-                    _logger.LogInformation("Successfully fixed NULL values in Drivers table.");
+                    Logger.Information("Successfully fixed NULL values in Drivers table.");
                 }
 
                 // Mark as fixed for this session
@@ -1136,7 +1135,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while attempting to fix NULL values in Drivers table");
+                Logger.Error(ex, "Error while attempting to fix NULL values in Drivers table");
                 // Don't throw — let the calling method handle the original exception
             }
         }
@@ -1150,7 +1149,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogDebug("Retrieving diagnostic information for driver {DriverId}", driverId);
+                Logger.Debug("Retrieving diagnostic information for driver {DriverId}", driverId);
 
                 using var context = _contextFactory.CreateDbContext();
                 var driver = await context.Drivers
@@ -1161,7 +1160,7 @@ namespace BusBuddy.Core.Services
 
                 if (driver == null)
                 {
-                    _logger.LogWarning("Driver with ID {DriverId} not found for diagnostics", driverId);
+                    Logger.Warning("Driver with ID {DriverId} not found for diagnostics", driverId);
                     return new Dictionary<string, object> { { "Error", "Driver not found" } };
                 }
 
@@ -1225,7 +1224,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating diagnostics for driver {DriverId}", driverId);
+                Logger.Error(ex, "Error generating diagnostics for driver {DriverId}", driverId);
                 return new Dictionary<string, object> { { "Error", ex.Message } };
             }
         }
@@ -1234,7 +1233,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogDebug("Retrieving driver operation metrics");
+                Logger.Debug("Retrieving driver operation metrics");
 
                 var metrics = new Dictionary<string, object>();
                 using var context = _contextFactory.CreateDbContext();
@@ -1296,7 +1295,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating driver operation metrics");
+                Logger.Error(ex, "Error generating driver operation metrics");
                 return new Dictionary<string, object> { { "Error", ex.Message } };
             }
         }

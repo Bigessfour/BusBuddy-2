@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Syncfusion.SfSkinManager;
 using System;
 using System.Windows;
@@ -21,7 +21,7 @@ namespace BusBuddy.WPF.Services
 
     public class ThemeService : IThemeService
     {
-        private readonly ILogger<ThemeService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<ThemeService>();
         private string _currentTheme = "FluentDark"; // 🎨 FLUENT DARK as default theme
 
         public event EventHandler<string>? ThemeChanged;
@@ -29,17 +29,16 @@ namespace BusBuddy.WPF.Services
         public string CurrentTheme => _currentTheme;
         public bool IsDarkTheme => _currentTheme.Contains("Dark") || _currentTheme.Contains("Black");
 
-        public ThemeService(ILogger<ThemeService> logger)
+        public ThemeService()
         {
-            _logger = logger;
-            _logger.LogDebug("[DEBUG] 🎨 ThemeService initialized with Fluent Dark theme: {Theme}", _currentTheme);
+            Logger.Debug("[DEBUG] 🎨 ThemeService initialized with Fluent Dark theme: {Theme}", _currentTheme);
         }
 
         public void ApplyTheme(string themeName)
         {
             try
             {
-                _logger.LogDebug("[DEBUG] ThemeService.ApplyTheme: Switching to theme: {ThemeName}", themeName);
+                Logger.Debug("[DEBUG] ThemeService.ApplyTheme: Switching to theme: {ThemeName}", themeName);
 
                 // CRITICAL: Set global theme FIRST before applying to individual windows
                 SfSkinManager.ApplyThemeAsDefaultStyle = true;
@@ -55,14 +54,14 @@ namespace BusBuddy.WPF.Services
                     if (Application.Current.MainWindow != null)
                     {
                         SfSkinManager.SetTheme(Application.Current.MainWindow, new Theme(themeName));
-                        _logger.LogDebug("[DEBUG] ThemeService.ApplyTheme: Applied theme to MainWindow");
+                        Logger.Debug("[DEBUG] ThemeService.ApplyTheme: Applied theme to MainWindow");
                     }
 
                     // Apply to ALL other windows (including popups, dialogs, etc.)
                     foreach (Window window in Application.Current.Windows)
                     {
                         SfSkinManager.SetTheme(window, new Theme(themeName));
-                        _logger.LogDebug("[DEBUG] ThemeService.ApplyTheme: Applied theme to window: {WindowType}", window.GetType().Name);
+                        Logger.Debug("[DEBUG] ThemeService.ApplyTheme: Applied theme to window: {WindowType}", window.GetType().Name);
                     }
 
                     // ENHANCED: Force immediate visual refresh
@@ -82,11 +81,11 @@ namespace BusBuddy.WPF.Services
 
                 // Notify subscribers
                 ThemeChanged?.Invoke(this, themeName);
-                _logger.LogInformation("[THEME] Theme successfully changed to: {ThemeName} and applied universally", themeName);
+                Logger.Information("[THEME] Theme successfully changed to: {ThemeName} and applied universally", themeName);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[THEME] Error applying theme {ThemeName}: {Error}", themeName, ex.Message);
+                Logger.Error(ex, "[THEME] Error applying theme {ThemeName}: {Error}", themeName, ex.Message);
                 throw;
             }
         }
@@ -118,7 +117,7 @@ namespace BusBuddy.WPF.Services
         {
             // 🎨 Enhanced theme toggle: FluentDark ⟷ FluentLight
             string newTheme = IsDarkTheme ? "FluentLight" : "FluentDark";
-            _logger.LogDebug("[DEBUG] 🎨 ThemeService.ToggleTheme: Current={Current}, New={New}", _currentTheme, newTheme);
+            Logger.Debug("[DEBUG] 🎨 ThemeService.ToggleTheme: Current={Current}, New={New}", _currentTheme, newTheme);
             ApplyTheme(newTheme);
         }
 
@@ -129,17 +128,17 @@ namespace BusBuddy.WPF.Services
         {
             try
             {
-                _logger.LogDebug("[DEBUG] ThemeService.InitializeTheme: Setting up global theme defaults");
+                Logger.Debug("[DEBUG] ThemeService.InitializeTheme: Setting up global theme defaults");
 
                 // Set global defaults for all Syncfusion controls
                 SfSkinManager.ApplyThemeAsDefaultStyle = true;
                 SfSkinManager.ApplicationTheme = new Theme(_currentTheme);
 
-                _logger.LogInformation("Theme system initialized with theme: {Theme}", _currentTheme);
+                Logger.Information("Theme system initialized with theme: {Theme}", _currentTheme);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error initializing theme system: {Error}", ex.Message);
+                Logger.Error(ex, "Error initializing theme system: {Error}", ex.Message);
                 throw;
             }
         }
