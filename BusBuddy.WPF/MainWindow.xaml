@@ -100,155 +100,286 @@
     </Window.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <!-- Enhanced Navigation with SfNavigationDrawer Implementation -->
+        <syncfusion:SfNavigationDrawer x:Name="MainNavigationDrawer"
+                                      DrawerWidth="280"
+                                      DrawerPosition="Left"
+                                      DisplayMode="Expanded"
+                                      EnableSwipeGesture="True"
+                                      IsOpen="True"
+                                      DrawerBackground="{DynamicResource ProfessionalSurfaceDark}"
+                                      ContentBackground="{DynamicResource ProfessionalSurfaceMedium}"
+                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
-        <!-- Header with Navigation — Uses FluentDark theme colors -->
-        <Border Grid.Row="0" Background="{DynamicResource AccentBackgroundBrush}" Height="50">
-            <DockPanel>
-                <!-- Navigation Drawer Toggle -->
-                <syncfusion:ButtonAdv DockPanel.Dock="Left"
-                        x:Name="MenuToggleButton"
-                        Label="☰"
-                        Width="30" Height="30"
-                        Click="MenuToggleButton_Click"
-                        Style="{StaticResource BusBuddyIconButtonStyle}"/>
+            <!-- Professional Navigation Header -->
+            <syncfusion:SfNavigationDrawer.DrawerHeaderView>
+                <Grid Background="{DynamicResource BrandPrimaryBrush}" Height="70">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                        <!-- Professional Bus Icon -->
+                        <Border Background="{DynamicResource BrandSchoolBusYellowBrush}"
+                                Width="40" Height="40"
+                                CornerRadius="8"
+                                Margin="0,0,15,0">
+                            <TextBlock Text="🚌"
+                                      FontSize="20"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
 
-                <!-- Title and Navigation Buttons -->
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,20,0">
-                    <!-- Dashboard Navigation Buttons -->
-                    <syncfusion:ButtonAdv Label="Dashboard"
-                            Command="{Binding NavigateToCommand}"
-                            CommandParameter="Dashboard"
-                            Margin="5,0" Padding="10,5"
-                            Style="{StaticResource BusBuddyNavigationButtonStyle}"/>
-                    <syncfusion:ButtonAdv Label="Buses"
-                            Command="{Binding NavigateToCommand}"
-                            CommandParameter="Buses"
-                            Margin="5,0" Padding="10,5"
-                            Style="{StaticResource BusBuddyNavigationButtonStyle}"/>
-                    <syncfusion:ButtonAdv Label="Drivers"
-                            Command="{Binding NavigateToCommand}"
-                            CommandParameter="Drivers"
-                            Margin="5,0" Padding="10,5"
-                            Style="{StaticResource BusBuddyNavigationButtonStyle}"/>
-                    <syncfusion:ButtonAdv Label="Routes"
-                            Command="{Binding NavigateToCommand}"
-                            CommandParameter="Routes"
-                            Margin="5,0" Padding="10,5"
-                            Style="{StaticResource BusBuddyNavigationButtonStyle}"/>
-                    <syncfusion:ButtonAdv Label="Settings"
-                            Command="{Binding NavigateToCommand}"
-                            CommandParameter="Settings"
-                            Margin="5,0" Padding="10,5"
-                            Style="{StaticResource BusBuddyNavigationButtonStyle}"/>
-                </StackPanel>
+                        <!-- Professional Title -->
+                        <StackPanel>
+                            <TextBlock Text="Bus Buddy Pro"
+                                      FontSize="20"
+                                      FontWeight="Bold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+                            <TextBlock Text="Transportation Management"
+                                      FontSize="12"
+                                      Foreground="{DynamicResource ProfessionalTextSecondary}"
+                                      Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </syncfusion:SfNavigationDrawer.DrawerHeaderView>
 
-                <!-- Title and Debug Info -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Bus Buddy"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource AccentForegroundBrush}"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Margin="10,0"/>
-                    <!-- Debug info -->
-                    <TextBlock Text="{Binding CurrentViewModel, Converter={StaticResource DebugConverter}, StringFormat='Current View: {0}'}"
-                               Foreground="{DynamicResource AccentForegroundBrush}"
-                               Margin="20,0,0,0"
-                               VerticalAlignment="Center"
-                               FontSize="12"/>
-                </StackPanel>
-            </DockPanel>
-        </Border>
+            <!-- Enhanced Navigation Content -->
+            <syncfusion:SfNavigationDrawer.DrawerContentView>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-        <!-- Main Content Area with Navigation Drawer -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+                    <!-- Quick Actions Panel -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource ProfessionalSurfaceLight}"
+                            Margin="10,10,10,5"
+                            CornerRadius="8"
+                            Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="Quick Actions"
+                                      FontSize="14"
+                                      FontWeight="SemiBold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      Margin="0,0,0,10"/>
 
-            <!-- Navigation Drawer Panel -->
-            <Border x:Name="NavigationPanel"
-                    Grid.Column="0"
-                    Width="240"
-                    Style="{StaticResource BusBuddyNavigationPanelStyle}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <syncfusion:ButtonAdv Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                                    Content="🚨"
+                                                    ToolTip="Emergency Alert"
+                                                    Width="36" Height="36"
+                                                    Margin="2"/>
+                                <syncfusion:ButtonAdv Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                                    Content="📊"
+                                                    ToolTip="Reports"
+                                                    Width="36" Height="36"
+                                                    Margin="2"/>
+                                <syncfusion:ButtonAdv Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                                    Content="⚙️"
+                                                    ToolTip="Settings"
+                                                    Width="36" Height="36"
+                                                    Margin="2"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Professional Navigation List -->
+                    <ScrollViewer Grid.Row="1"
+                                  Margin="10,5,10,10"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding NavigationItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,2"
+                                            CornerRadius="6"
+                                            Background="Transparent">
+                                        <syncfusion:ButtonAdv Command="{Binding Path=DataContext.NavigateToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                                                            CommandParameter="{Binding ViewModelName}"
+                                                            Style="{StaticResource BusBuddyNavigationButtonAdvStyle}"
+                                                            ToolTip="{Binding Tooltip}"
+                                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                            <syncfusion:ButtonAdv.Content>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Professional Icon with Background -->
+                                                    <Border Grid.Column="0"
+                                                            Background="{DynamicResource BrandPrimaryBrush}"
+                                                            Width="32" Height="32"
+                                                            CornerRadius="6"
+                                                            Margin="0,0,12,0">
+                                                        <TextBlock Text="{Binding Icon}"
+                                                                  FontSize="14"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"
+                                                                  Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+                                                    </Border>
+
+                                                    <!-- Navigation Text -->
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}"
+                                                                  FontSize="14"
+                                                                  FontWeight="SemiBold"
+                                                                  Foreground="{Binding IsDeprecated, Converter={StaticResource BooleanToDeprecatedForegroundConverter}, FallbackValue={DynamicResource ProfessionalTextPrimary}}">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsDeprecated}" Value="True">
+                                                                            <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+
+                                                        <!-- Optional Description -->
+                                                        <TextBlock Text="{Binding Description}"
+                                                                  FontSize="11"
+                                                                  Foreground="{DynamicResource ProfessionalTextSecondary}"
+                                                                  Margin="0,2,0,0"
+                                                                  Visibility="{Binding Description, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                                    </StackPanel>
+
+                                                    <!-- Status Indicators -->
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                        <TextBlock Text="⚠️"
+                                                                  FontSize="12"
+                                                                  Foreground="{DynamicResource BrandSafetyOrangeBrush}"
+                                                                  HorizontalAlignment="Right"
+                                                                  Visibility="{Binding IsDeprecated, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                        <TextBlock Text="NEW"
+                                                                  FontSize="10"
+                                                                  FontWeight="Bold"
+                                                                  Foreground="{DynamicResource BrandFleetGreenBrush}"
+                                                                  HorizontalAlignment="Right"
+                                                                  Visibility="{Binding IsNew, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </syncfusion:ButtonAdv.Content>
+                                        </syncfusion:ButtonAdv>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Professional Footer -->
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource ProfessionalSurfaceLight}"
+                            Margin="10,5,10,10"
+                            CornerRadius="8"
+                            Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="System Status"
+                                      FontSize="12"
+                                      FontWeight="SemiBold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      Margin="0,0,0,8"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Ellipse Grid.Column="0"
+                                        Width="8" Height="8"
+                                        Fill="{DynamicResource BrandFleetGreenBrush}"
+                                        Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="1"
+                                          Text="All Systems Operational"
+                                          FontSize="11"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </syncfusion:SfNavigationDrawer.DrawerContentView>
+
+            <!-- Enhanced Main Content Area -->
+            <syncfusion:SfNavigationDrawer.ContentView>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Background="{DynamicResource AccentBackgroundBrush}" Height="50">
-                        <TextBlock Text="Navigation"
-                                   Foreground="{DynamicResource AccentForegroundBrush}"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Margin="15,0,0,0"/>
+                    <!-- Professional Header Bar -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource BrandPrimaryBrush}"
+                            Height="60">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Navigation Toggle -->
+                            <syncfusion:ButtonAdv Grid.Column="0"
+                                                x:Name="MenuToggleButton"
+                                                Content="☰"
+                                                Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                                Click="MenuToggleButton_Click"
+                                                ToolTip="Toggle Navigation"
+                                                Margin="15,0,0,0"/>
+
+                            <!-- Professional Title Section -->
+                            <StackPanel Grid.Column="1"
+                                       Orientation="Horizontal"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center">
+                                <TextBlock Text="Bus Buddy Pro — School Transportation Management"
+                                          VerticalAlignment="Center"
+                                          Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                          FontSize="18"
+                                          FontWeight="SemiBold"/>
+
+                                <!-- Debug Information (Development Only) -->
+                                <TextBlock Text="{Binding CurrentViewModel, Converter={StaticResource DebugConverter}, StringFormat=' | Current View: {0}'}"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"
+                                          Margin="15,0,0,0"
+                                          VerticalAlignment="Center"
+                                          FontSize="12"
+                                          Visibility="{Binding IsDebugMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </StackPanel>
+
+                            <!-- Professional Action Buttons -->
+                            <StackPanel Grid.Column="2"
+                                       Orientation="Horizontal"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,15,0">
+                                <syncfusion:ButtonAdv Content="📊"
+                                                    Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                                    ToolTip="System Dashboard"
+                                                    Margin="5,0"/>
+                                <syncfusion:ButtonAdv Content="🔔"
+                                                    Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                                    ToolTip="Notifications"
+                                                    Margin="5,0"/>
+                                <syncfusion:ButtonAdv Content="⚙️"
+                                                    Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                                    ToolTip="Settings"
+                                                    Margin="5,0"/>
+                            </StackPanel>
+                        </Grid>
                     </Border>
 
-                    <ListView Grid.Row="1"
-                              ItemsSource="{Binding NavigationItems}"
-                              Margin="0,10,0,0"
-                              Style="{StaticResource BusBuddyNavigationListViewStyle}">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem" BasedOn="{StaticResource BusBuddyNavigationListViewItemStyle}">
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <syncfusion:ButtonAdv Command="{Binding Path=DataContext.NavigateToCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
-                                            CommandParameter="{Binding ViewModelName}"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            HorizontalContentAlignment="Left"
-                                            HorizontalAlignment="Stretch"
-                                            FontSize="14"
-                                            Foreground="{Binding IsDeprecated, Converter={StaticResource BooleanToDeprecatedForegroundConverter}, FallbackValue=#FFFFFF}"
-                                            ToolTip="{Binding Tooltip}"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                                        <syncfusion:ButtonAdv.Content>
-                                            <TextBlock Text="{Binding Name}"
-                                                       FontSize="14"
-                                                       Foreground="{Binding IsDeprecated, Converter={StaticResource BooleanToDeprecatedForegroundConverter}, FallbackValue=#FFFFFF}">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsDeprecated}" Value="True">
-                                                                <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </syncfusion:ButtonAdv.Content>
-                                    </syncfusion:ButtonAdv>
-                                    <TextBlock Text="(Deprecated)"
-                                               HorizontalAlignment="Right"
-                                               VerticalAlignment="Center"
-                                               Margin="0,0,10,0"
-                                               FontSize="10"
-                                               Foreground="Red"
-                                               Visibility="{Binding IsDeprecated, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                    <!-- Main Content Container -->
+                    <ContentControl x:Name="MainContentControl"
+                                    Grid.Row="1"
+                                    Content="{Binding CurrentViewModel}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Background="{DynamicResource ProfessionalSurfaceMedium}"
+                                    Margin="0"/>
                 </Grid>
-            </Border>
-
-            <!-- Main Content Area with Stretch Alignment -->
-            <ContentControl x:Name="MainContentControl"
-                            Grid.Column="1"
-                            Content="{Binding CurrentViewModel}"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Margin="0"/>
-        </Grid>
+            </syncfusion:SfNavigationDrawer.ContentView>
+        </syncfusion:SfNavigationDrawer>
     </Grid>
 </Window>

@@ -244,6 +244,16 @@
           "Serilog": "4.2.0"
         }
       },
+      "Syncfusion.Pdf.Wpf": {
+        "type": "Direct",
+        "requested": "[30.1.40, )",
+        "resolved": "30.1.40",
+        "contentHash": "Fgl79bzpMyrP5IcHX/x0ZRnYrNj4gwpnXVcMPrvyBDz7jXCQS64JtL7Kzzo5zM6RaVMc/ALbLkmnVNS+DVVu4A==",
+        "dependencies": {
+          "Syncfusion.Compression.Base": "30.1.40",
+          "Syncfusion.Licensing": "30.1.40"
+        }
+      },
       "Azure.Core": {
         "type": "Transitive",
         "resolved": "1.38.0",
@@ -722,6 +732,16 @@
           "Microsoft.Extensions.Logging": "9.0.0",
           "Serilog": "4.2.0"
         }
+      },
+      "Syncfusion.Compression.Base": {
+        "type": "Transitive",
+        "resolved": "30.1.40",
+        "contentHash": "cyziGW3VHSGwsjeK+8fcDr272bw9AvnNVE/c+L545Ssq3AFJT4JJ8KeIpBYtJWRGEwtapcTcFxsOHjFy+EwgYg=="
+      },
+      "Syncfusion.Licensing": {
+        "type": "Transitive",
+        "resolved": "30.1.40",
+        "contentHash": "X0X0CWhCxczUMkFoGe6Jaa5/e190BWJx26FtHbBXZPthmln8GkKjR1ovMAZP2DP+MItzzRjFtLDRcejW9Oqd9w=="
       },
       "System.ClientModel": {
         "type": "Transitive",

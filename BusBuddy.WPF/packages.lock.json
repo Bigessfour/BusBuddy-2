@@ -1400,7 +1400,8 @@
           "Serilog": "[4.3.0, )",
           "Serilog.Extensions.Hosting": "[9.0.0, )",
           "Serilog.Sinks.Console": "[6.0.0, )",
-          "Serilog.Sinks.File": "[7.0.0, )"
+          "Serilog.Sinks.File": "[7.0.0, )",
+          "Syncfusion.Pdf.Wpf": "[30.1.40, )"
         }
       }
     }

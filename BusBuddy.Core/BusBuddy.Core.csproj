@@ -26,6 +26,9 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.70.0.3834" />
+
+    <!-- Syncfusion PDF Generation Libraries for .NET 8.0 -->
+    <PackageReference Include="Syncfusion.Pdf.NET" Version="30.1.40" />
   </ItemGroup>
 
   <ItemGroup>

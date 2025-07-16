@@ -13,6 +13,7 @@ namespace BusBuddy.WPF.ViewModels
     {
         public required string Name { get; set; }
         public required string ViewModelName { get; set; }
+        public required string Icon { get; set; }
 
         /// <summary>
         /// Gets or sets whether this navigation item is for a deprecated module.
@@ -20,15 +21,43 @@ namespace BusBuddy.WPF.ViewModels
         public bool IsDeprecated { get; set; }
 
         /// <summary>
+        /// Gets or sets whether this navigation item is for a new module.
+        /// </summary>
+        public bool IsNew { get; set; }
+
+        /// <summary>
         /// Gets or sets a tooltip to display for this navigation item.
         /// </summary>
         public string? Tooltip { get; set; }
+
+        /// <summary>
+        /// Gets or sets a description to display for this navigation item.
+        /// </summary>
+        public string? Description { get; set; }
     }
 
     public partial class MainViewModel : BaseViewModel
     {
         [ObservableProperty]
         private object? _currentViewModel;
+
+        [ObservableProperty]
+        private NavigationItem? _selectedNavigationItem;
+
+        /// <summary>
+        /// Gets whether the application is running in debug mode
+        /// </summary>
+        public bool IsDebugMode
+        {
+            get
+            {
+#if DEBUG
+                return true;
+#else
+                return System.Diagnostics.Debugger.IsAttached;
+#endif
+            }
+        }
 
         private readonly ILogger _logger;
         private readonly ILazyViewModelService _lazyViewModelService;
@@ -49,17 +78,83 @@ namespace BusBuddy.WPF.ViewModels
 
             NavigationItems = new ObservableCollection<NavigationItem>
             {
-                new NavigationItem { Name = "Dashboard", ViewModelName = "Dashboard" },
-                new NavigationItem { Name = "Buses", ViewModelName = "Buses" },
-                new NavigationItem { Name = "Drivers", ViewModelName = "Drivers" },
-                new NavigationItem { Name = "Routes", ViewModelName = "Routes" },
-                new NavigationItem { Name = "Schedule", ViewModelName = "Schedule" },
-                new NavigationItem { Name = "Students", ViewModelName = "Students" },
-                new NavigationItem { Name = "Maintenance", ViewModelName = "Maintenance" },
-                new NavigationItem { Name = "Fuel", ViewModelName = "Fuel" },
-                new NavigationItem { Name = "Activity", ViewModelName = "Activity" },
-                new NavigationItem { Name = "Student List", ViewModelName = "StudentList" },
-                new NavigationItem { Name = "Settings", ViewModelName = "Settings" }
+                new NavigationItem {
+                    Name = "Dashboard",
+                    ViewModelName = "Dashboard",
+                    Icon = "📊",
+                    Description = "Fleet Overview & Analytics",
+                    Tooltip = "View real-time fleet performance and key metrics"
+                },
+                new NavigationItem {
+                    Name = "Buses",
+                    ViewModelName = "Buses",
+                    Icon = "🚌",
+                    Description = "Fleet Management",
+                    Tooltip = "Manage bus inventory, maintenance schedules, and assignments"
+                },
+                new NavigationItem {
+                    Name = "Drivers",
+                    ViewModelName = "Drivers",
+                    Icon = "👨‍💼",
+                    Description = "Driver Management",
+                    Tooltip = "Manage driver licenses, assignments, and performance"
+                },
+                new NavigationItem {
+                    Name = "Routes",
+                    ViewModelName = "Routes",
+                    Icon = "🗺️",
+                    Description = "Route Planning",
+                    Tooltip = "Create and optimize bus routes and stops"
+                },
+                new NavigationItem {
+                    Name = "Schedule",
+                    ViewModelName = "Schedule",
+                    Icon = "📅",
+                    Description = "Schedule Management",
+                    Tooltip = "Manage bus schedules and timetables"
+                },
+                new NavigationItem {
+                    Name = "Students",
+                    ViewModelName = "Students",
+                    Icon = "👨‍🎓",
+                    Description = "Student Management",
+                    Tooltip = "Manage student information and bus assignments"
+                },
+                new NavigationItem {
+                    Name = "Maintenance",
+                    ViewModelName = "Maintenance",
+                    Icon = "🔧",
+                    Description = "Maintenance Tracking",
+                    Tooltip = "Track maintenance schedules and service history"
+                },
+                new NavigationItem {
+                    Name = "Fuel",
+                    ViewModelName = "Fuel",
+                    Icon = "⛽",
+                    Description = "Fuel Management",
+                    Tooltip = "Monitor fuel consumption and costs"
+                },
+                new NavigationItem {
+                    Name = "Activity",
+                    ViewModelName = "Activity",
+                    Icon = "📝",
+                    Description = "Activity Logging",
+                    Tooltip = "View system activity and audit trails"
+                },
+                new NavigationItem {
+                    Name = "Student List",
+                    ViewModelName = "StudentList",
+                    Icon = "📋",
+                    Description = "Student Rosters",
+                    Tooltip = "View and manage student rosters and assignments"
+                },
+                new NavigationItem {
+                    Name = "Settings",
+                    ViewModelName = "Settings",
+                    Icon = "⚙️",
+                    Description = "System Settings",
+                    Tooltip = "Configure application settings and preferences"
+                }
             };
 
             // Start with loading view for smooth startup - no data loading yet

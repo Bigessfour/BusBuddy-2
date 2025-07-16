@@ -463,7 +463,6 @@
                     <TabItem Header="Available Buses">
                         <ListBox ItemsSource="{Binding UnassignedBuses}"
                                     SelectedItem="{Binding SelectedUnassignedBus}"
-                                    DisplayMemberPath="BusNumber"
                                     SelectionMode="Single"
                                     AllowDrop="True">
                             <ListBox.ItemTemplate>

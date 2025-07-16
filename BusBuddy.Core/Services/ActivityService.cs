@@ -13,11 +13,13 @@ namespace BusBuddy.Core.Services;
 public class ActivityService : IActivityService
 {
     private readonly BusBuddyDbContext _context;
+    private readonly PdfReportService _pdfReportService;
     private static readonly ILogger Logger = Log.ForContext<ActivityService>();
 
-    public ActivityService(BusBuddyDbContext context)
+    public ActivityService(BusBuddyDbContext context, PdfReportService pdfReportService)
     {
         _context = context;
+        _pdfReportService = pdfReportService;
     }
 
     public async Task<IEnumerable<Activity>> GetAllActivitiesAsync()
@@ -1156,13 +1158,21 @@ public class ActivityService : IActivityService
     {
         try
         {
-            Logger.Information("Generating report for activity {ActivityId}", activityId);
+            Logger.Information("Generating PDF report for activity {ActivityId}", activityId);
 
-            // Not implemented - would require a reporting library
-            // This is a stub that would be implemented with a PDF/report generation library
+            var activity = await _context.Activities
+                .Include(a => a.AssignedVehicle)
+                .Include(a => a.Route)
+                .Include(a => a.Driver)
+                .FirstOrDefaultAsync(a => a.ActivityId == activityId);
 
-            await Task.CompletedTask; // Placeholder
-            throw new NotImplementedException("Report generation is not implemented");
+            if (activity == null)
+            {
+                throw new ArgumentException($"Activity with ID {activityId} not found");
+            }
+
+            // Generate professional PDF activity report using the dedicated service
+            return _pdfReportService.GenerateActivityReport(activity);
         }
         catch (Exception ex)
         {
@@ -1175,13 +1185,19 @@ public class ActivityService : IActivityService
     {
         try
         {
-            Logger.Information("Generating calendar report from {StartDate} to {EndDate}", startDate, endDate);
+            Logger.Information("Generating PDF calendar report from {StartDate} to {EndDate}", startDate, endDate);
 
-            // Not implemented - would require a reporting library
-            // This is a stub that would be implemented with a PDF/report generation library
+            // Get activities for the specified date range
+            var activities = await _context.Activities
+                .Include(a => a.AssignedVehicle)
+                .Include(a => a.Route)
+                .Include(a => a.Driver)
+                .Where(a => a.Date >= startDate && a.Date <= endDate)
+                .OrderBy(a => a.Date)
+                .ToListAsync();
 
-            await Task.CompletedTask; // Placeholder
-            throw new NotImplementedException("Calendar report generation is not implemented");
+            // Generate professional PDF calendar report using the dedicated service
+            return _pdfReportService.GenerateActivityCalendarReport(activities, startDate, endDate);
         }
         catch (Exception ex)
         {

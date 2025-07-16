@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
+using Syncfusion.UI.Xaml.NavigationDrawer;
 
 namespace BusBuddy.WPF
 {
@@ -65,30 +66,33 @@ namespace BusBuddy.WPF
         }
 
         /// <summary>
-        /// Toggle navigation panel visibility
+        /// Toggle navigation drawer visibility
         /// </summary>
         private void MenuToggleButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Find the NavigationPanel by name
-                var navigationPanel = FindName("NavigationPanel") as FrameworkElement;
-                if (navigationPanel != null)
+                // Toggle the SfNavigationDrawer
+                if (MainNavigationDrawer != null)
                 {
-                    navigationPanel.Visibility = navigationPanel.Visibility == Visibility.Visible
-                        ? Visibility.Collapsed
-                        : Visibility.Visible;
+                    MainNavigationDrawer.IsOpen = !MainNavigationDrawer.IsOpen;
 
-                    Log.Debug("Navigation panel toggled to: {Visibility}", navigationPanel.Visibility);
+                    // Update button content based on state
+                    if (sender is Syncfusion.Windows.Tools.Controls.ButtonAdv button)
+                    {
+                        button.Content = MainNavigationDrawer.IsOpen ? "☰" : "☰";
+                    }
+
+                    Log.Debug("Navigation drawer toggled to: {IsOpen}", MainNavigationDrawer.IsOpen);
                 }
                 else
                 {
-                    Log.Warning("NavigationPanel not found in MainWindow");
+                    Log.Warning("MainNavigationDrawer not found in MainWindow");
                 }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error toggling navigation panel");
+                Log.Error(ex, "Error toggling navigation drawer");
             }
         }
 

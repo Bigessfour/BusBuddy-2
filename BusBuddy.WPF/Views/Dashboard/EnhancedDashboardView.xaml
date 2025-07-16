@@ -30,14 +30,17 @@
         <!-- StatusIndicatorStyle, and PerformanceTileStyle are now global resources. -->
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Background="{DynamicResource ProfessionalSurfaceMedium}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Enhanced Header with Live Status -->
-        <Border Grid.Row="0" Background="#1E1E1E" Padding="16,12">
+        <!-- Professional Header with Status -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource BrandPrimaryBrush}"
+                Padding="24,16">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -45,58 +48,512 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="🚌 Bus Buddy Dashboard" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
-                    <Border Background="#2ECC71" CornerRadius="12" Padding="8,4" Margin="16,0,0,0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Fill="#FFFFFF" VerticalAlignment="Center" Margin="0,0,6,0">
-                                <Ellipse.RenderTransform>
-                                    <ScaleTransform x:Name="PulseTransform" ScaleX="1" ScaleY="1" CenterX="4" CenterY="4"/>
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever">
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PulseTransform" Storyboard.TargetProperty="ScaleX">
-                                                    <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
-                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1.3"/>
-                                                    <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
-                                                </DoubleAnimationUsingKeyFrames>
-                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PulseTransform" Storyboard.TargetProperty="ScaleY">
-                                                    <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
-                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1.3"/>
-                                                    <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
-                                                </DoubleAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
-                            <TextBlock Text="LIVE" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
-                        </StackPanel>
+                    <Border Background="{DynamicResource BrandSchoolBusYellowBrush}"
+                            Width="48" Height="48"
+                            CornerRadius="12"
+                            Margin="0,0,16,0">
+                        <TextBlock Text="🚌"
+                                  FontSize="24"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
                     </Border>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Fleet Command Center"
+                                  FontSize="28"
+                                  FontWeight="Bold"
+                                  Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+                        <TextBlock Text="Real-time Transportation Management Dashboard"
+                                  FontSize="14"
+                                  Foreground="{DynamicResource ProfessionalTextSecondary}"
+                                  Margin="0,4,0,0"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="#252526" CornerRadius="8" Padding="12,6" Margin="0,0,12,0" Opacity="0.9">
+                    <Border Background="{DynamicResource BrandFleetGreenBrush}"
+                            CornerRadius="16"
+                            Padding="12,6"
+                            Margin="8,0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🕒" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='HH:mm:ss'}"
-                                      FontSize="14" FontWeight="SemiBold" Foreground="#0078D4" VerticalAlignment="Center"/>
+                            <Ellipse Width="10" Height="10"
+                                    Fill="{DynamicResource ProfessionalTextPrimary}"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,8,0">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Style.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard RepeatBehavior="Forever">
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                        From="1.0" To="0.3" Duration="0:0:1"
+                                                                        AutoReverse="True"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Text="All Systems Operational"
+                                      FontSize="12"
+                                      FontWeight="SemiBold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
                         </StackPanel>
                     </Border>
-                    <Border Background="#252526" CornerRadius="8" Padding="12,6" Opacity="0.9">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📅" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='MMM dd, yyyy'}"
-                                      FontSize="14" FontWeight="SemiBold" Foreground="#0078D4" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
+
+                    <TextBlock Text="{Binding LastUpdateTime, StringFormat='Last Updated: {0:HH:mm:ss}'}"
+                              FontSize="11"
+                              Foreground="{DynamicResource ProfessionalTextSecondary}"
+                              VerticalAlignment="Center"
+                              Margin="16,0,0,0"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Main Content with DockingManager and baseline theme -->
-        <Grid Grid.Row="1">
+        <!-- Professional Quick Actions Bar -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource ProfessionalSurfaceLight}"
+                Padding="24,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="Quick Actions"
+                              FontSize="16"
+                              FontWeight="SemiBold"
+                              Foreground="{DynamicResource ProfessionalTextPrimary}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,20,0"/>
+
+                    <syncfusion:ButtonAdv Content="🚨 Emergency Alert"
+                                        Style="{StaticResource BusBuddyEmergencyButtonAdvStyle}"
+                                        Margin="8,0"/>
+                    <syncfusion:ButtonAdv Content="📊 Generate Report"
+                                        Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
+                                        Margin="8,0"/>
+                    <syncfusion:ButtonAdv Content="🔧 Quick Maintenance"
+                                        Style="{StaticResource BusBuddySafetyButtonAdvStyle}"
+                                        Margin="8,0"/>
+                    <syncfusion:ButtonAdv Content="📋 Student Roster"
+                                        Style="{StaticResource BusBuddyFleetSuccessButtonAdvStyle}"
+                                        Margin="8,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <syncfusion:ButtonAdv Content="🔄"
+                                        Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                        ToolTip="Refresh Data"
+                                        Command="{Binding RefreshCommand}"
+                                        Margin="4,0"/>
+                    <syncfusion:ButtonAdv Content="⚙️"
+                                        Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                        ToolTip="Dashboard Settings"
+                                        Margin="4,0"/>
+                    <syncfusion:ButtonAdv Content="📤"
+                                        Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                                        ToolTip="Export Dashboard"
+                                        Margin="4,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Professional Dashboard Content -->
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="24,16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>   <!-- KPI Cards Row -->
+                    <RowDefinition Height="Auto"/>   <!-- Operations Row -->
+                    <RowDefinition Height="Auto"/>   <!-- Live Dashboard Row -->
+                    <RowDefinition Height="*"/>     <!-- Future Content Row -->
+                </Grid.RowDefinitions>
+
+                <!-- Professional KPI Cards Row -->
+                <UniformGrid Grid.Row="0"
+                            Rows="1"
+                            Columns="4"
+                            Margin="0,0,0,20">
+
+                    <!-- Active Buses KPI -->
+                    <Border Style="{StaticResource DashboardTileStyle}"
+                            Background="{DynamicResource BrandPrimaryBrush}"
+                            Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="Active Buses"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+
+                            <TextBlock Grid.Row="1"
+                                      Text="{Binding ActiveBuses, FallbackValue='24'}"
+                                      FontSize="48"
+                                      FontWeight="Bold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="🚌" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Fleet Status: Operational"
+                                          FontSize="12"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Routes Active KPI -->
+                    <Border Style="{StaticResource DashboardTileStyle}"
+                            Background="{DynamicResource BrandFleetGreenBrush}"
+                            Margin="5,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="Active Routes"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+
+                            <TextBlock Grid.Row="1"
+                                      Text="{Binding ActiveRoutes, FallbackValue='18'}"
+                                      FontSize="48"
+                                      FontWeight="Bold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="🗺️" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Route Coverage: 95%"
+                                          FontSize="12"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Students Transported KPI -->
+                    <Border Style="{StaticResource DashboardTileStyle}"
+                            Background="{DynamicResource BrandSchoolBusYellowBrush}"
+                            Margin="5,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="Students Today"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="#1E1E1E"/>
+
+                            <TextBlock Grid.Row="1"
+                                      Text="{Binding StudentsTransported, FallbackValue='1,247'}"
+                                      FontSize="48"
+                                      FontWeight="Bold"
+                                      Foreground="#1E1E1E"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="👨‍🎓" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Attendance: 98.3%"
+                                          FontSize="12"
+                                          Foreground="#2D2D30"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Safety Score KPI -->
+                    <Border Style="{StaticResource DashboardTileStyle}"
+                            Background="{DynamicResource BrandSafetyOrangeBrush}"
+                            Margin="10,0,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="Safety Score"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+
+                            <TextBlock Grid.Row="1"
+                                      Text="{Binding SafetyScore, FallbackValue='A+'}"
+                                      FontSize="48"
+                                      FontWeight="Bold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="🛡️" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Zero Incidents: 45 days"
+                                          FontSize="12"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Professional Operations Dashboard Row 2 -->
+                <UniformGrid Grid.Row="1"
+                            Rows="1"
+                            Columns="3"
+                            Margin="0,0,0,20">
+
+                    <!-- Maintenance Status KPI -->
+                    <Border Style="{StaticResource DashboardTileStyle}"
+                            Background="{DynamicResource BrandSafetyOrangeBrush}"
+                            Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="Maintenance Status"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+
+                            <TextBlock Grid.Row="1"
+                                      Text="✅ Current"
+                                      FontSize="32"
+                                      FontWeight="Bold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="🔧" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Next Service: 3 days"
+                                          FontSize="12"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Fuel Efficiency KPI -->
+                    <Border Style="{StaticResource DashboardTileStyle}"
+                            Background="{DynamicResource BrandFleetGreenBrush}"
+                            Margin="5,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="Fuel Efficiency"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+
+                            <TextBlock Grid.Row="1"
+                                      Text="8.2L/100km"
+                                      FontSize="28"
+                                      FontWeight="Bold"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="⛽" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Excellent Rating"
+                                          FontSize="12"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- System Status KPI -->
+                    <Border Style="{StaticResource DashboardTileStyle}"
+                            Background="{DynamicResource BrandPrimaryBrush}"
+                            Margin="10,0,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                      Text="System Status"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+
+                            <StackPanel Grid.Row="1"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <Ellipse Width="8" Height="8"
+                                        Fill="#2ECC71"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,0,0,8">
+                                    <Ellipse.RenderTransform>
+                                        <ScaleTransform x:Name="PulseTransform" ScaleX="1" ScaleY="1" CenterX="4" CenterY="4"/>
+                                    </Ellipse.RenderTransform>
+                                    <Ellipse.Triggers>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard RepeatBehavior="Forever">
+                                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PulseTransform" Storyboard.TargetProperty="ScaleX">
+                                                        <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
+                                                        <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1.3"/>
+                                                        <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                    <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PulseTransform" Storyboard.TargetProperty="ScaleY">
+                                                        <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
+                                                        <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1.3"/>
+                                                        <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
+                                                    </DoubleAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Ellipse.Triggers>
+                                </Ellipse>
+                                <TextBlock Text="ALL SYSTEMS"
+                                          FontSize="18"
+                                          FontWeight="Bold"
+                                          Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                          HorizontalAlignment="Center"/>
+                                <TextBlock Text="OPERATIONAL"
+                                          FontSize="16"
+                                          FontWeight="Bold"
+                                          Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                          HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="⚡" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Performance: 98%"
+                                          FontSize="12"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Enhanced Real-time Dashboard Row 3 -->
+                <Border Grid.Row="2"
+                        Style="{StaticResource DashboardTileStyle}"
+                        Background="{DynamicResource ProfessionalSurfaceDark}"
+                        Margin="0,0,0,20">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="🔴 LIVE Dashboard"
+                                      Style="{StaticResource TileHeaderStyle}"
+                                      Foreground="{DynamicResource ProfessionalTextPrimary}"
+                                      Margin="0,0,0,16"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <Border Background="{DynamicResource BrandFleetGreenBrush}"
+                                        CornerRadius="12"
+                                        Padding="8,4"
+                                        Margin="0,0,12,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8"
+                                                Fill="#FFFFFF"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,6,0">
+                                            <Ellipse.RenderTransform>
+                                                <ScaleTransform x:Name="LivePulse" ScaleX="1" ScaleY="1" CenterX="4" CenterY="4"/>
+                                            </Ellipse.RenderTransform>
+                                            <Ellipse.Triggers>
+                                                <EventTrigger RoutedEvent="Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetName="LivePulse"
+                                                                            Storyboard.TargetProperty="ScaleX"
+                                                                            From="1.0" To="1.5" Duration="0:0:1"
+                                                                            AutoReverse="True"/>
+                                                            <DoubleAnimation Storyboard.TargetName="LivePulse"
+                                                                            Storyboard.TargetProperty="ScaleY"
+                                                                            From="1.0" To="1.5" Duration="0:0:1"
+                                                                            AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Ellipse.Triggers>
+                                        </Ellipse>
+                                        <TextBlock Text="LIVE DATA"
+                                                  FontSize="12"
+                                                  FontWeight="Bold"
+                                                  Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Auto-refresh: 5 seconds"
+                                          FontSize="12"
+                                          Foreground="{DynamicResource ProfessionalTextSecondary}"
+                                          VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Background="#2D2D30" CornerRadius="8" Padding="12,6" Margin="0,0,12,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🕒" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='HH:mm:ss'}"
+                                              FontSize="14" FontWeight="SemiBold"
+                                              Foreground="{DynamicResource BrandPrimaryBrush}"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#2D2D30" CornerRadius="8" Padding="12,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📅" FontSize="16" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='MMM dd, yyyy'}"
+                                              FontSize="14" FontWeight="SemiBold"
+                                              Foreground="{DynamicResource BrandPrimaryBrush}"
+                                              VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <!-- Future Content Placeholder -->
+                <Border Grid.Row="3"
+                        Style="{StaticResource DashboardTileStyle}"
+                        Background="{DynamicResource ProfessionalSurfaceDark}"
+                        Margin="0,0,0,20">
+                    <Grid>
+                        <TextBlock Text="📊 Advanced Analytics Coming Soon"
+                                  Style="{StaticResource TileHeaderStyle}"
+                                  Foreground="{DynamicResource ProfessionalTextSecondary}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Main Docking Manager for Secondary Panels -->
+        <Grid Grid.Row="2">
             <syncfusion:DockingManager x:Name="MainDockingManager"
                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
