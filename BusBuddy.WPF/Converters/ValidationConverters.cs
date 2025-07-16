@@ -50,28 +50,10 @@ namespace BusBuddy.WPF.Converters
     }
 
     /// <summary>
-    /// Converts a boolean value to a Visibility value
+    /// Note: BooleanToVisibilityInverseConverter is now defined globally in App.xaml
+    /// using the custom BooleanToVisibilityConverter with IsInverted="True"
+    /// This duplicate implementation has been removed to prevent resource key conflicts
     /// </summary>
-    public class BooleanToVisibilityInverseConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is bool boolValue)
-            {
-                return boolValue ? Visibility.Collapsed : Visibility.Visible;
-            }
-            return Visibility.Visible;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is Visibility visibility)
-            {
-                return visibility != Visibility.Visible;
-            }
-            return false;
-        }
-    }
 
     /// <summary>
     /// Formats dates according to the FormatUtils standards

@@ -65,7 +65,7 @@
                          Label="{Binding IsDarkTheme, Converter={StaticResource ThemeTextConverter}}"
                          VerticalAlignment="Center"
                          FontSize="12"
-                         Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                         Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
             </StackPanel>
         </StackPanel>
@@ -108,18 +108,18 @@
                     Command="{Binding ToggleThemeCommand}"
                     Width="150" Height="35"
                     Margin="0,0,12,0"
-                    Style="{StaticResource BusBuddyInfoButtonStyle}"
+                    Style="{StaticResource BusBuddyInfoButtonAdvStyle}"
                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
             <syncfusion:ButtonAdv Label="Save Settings"
                     Command="{Binding SaveSettingsCommand}"
                     Width="120" Height="35"
                     Margin="0,0,12,0"
-                    Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                    Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
             <syncfusion:ButtonAdv Label="Reset Settings"
                     Command="{Binding ResetSettingsCommand}"
                     Width="120" Height="35"
-                    Style="{StaticResource BusBuddyErrorButtonStyle}"
+                    Style="{StaticResource BusBuddyDangerButtonAdvStyle}"
                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
         </StackPanel>
     </Grid>

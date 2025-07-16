@@ -17,8 +17,6 @@ namespace BusBuddy.Tests
     public class DatabaseNullHandlingTests
     {
         private Mock<IBusBuddyDbContextFactory> _mockContextFactory;
-        private Mock<ILogger<DatabaseValidator>> _mockValidatorLogger;
-        private Mock<ILogger<BusService>> _mockBusServiceLogger;
         private Mock<IBusCachingService> _mockCachingService;
         private Mock<BusBuddyDbContext> _mockDbContext;
         private DatabaseValidator _validator;
@@ -28,8 +26,6 @@ namespace BusBuddy.Tests
         public void Setup()
         {
             _mockContextFactory = new Mock<IBusBuddyDbContextFactory>();
-            _mockValidatorLogger = new Mock<ILogger<DatabaseValidator>>();
-            _mockBusServiceLogger = new Mock<ILogger<BusService>>();
             _mockCachingService = new Mock<IBusCachingService>();
             _mockDbContext = new Mock<BusBuddyDbContext>();
 
@@ -128,8 +124,8 @@ namespace BusBuddy.Tests
             _mockContextFactory.Setup(f => f.CreateDbContext()).Returns(_mockDbContext.Object);
             _mockContextFactory.Setup(f => f.CreateWriteDbContext()).Returns(_mockDbContext.Object);
 
-            _validator = new DatabaseValidator(_mockContextFactory.Object, _mockValidatorLogger.Object);
-            _busService = new BusService(_mockBusServiceLogger.Object, _mockContextFactory.Object, _mockCachingService.Object);
+            _validator = new DatabaseValidator(_mockContextFactory.Object);
+            _busService = new BusService(_mockContextFactory.Object, _mockCachingService.Object);
         }
 
         [Test]
@@ -328,7 +324,7 @@ namespace BusBuddy.Tests
                 BusNumber = "Bus-12",
                 SeatingCapacity = 30, // This is required, not nullable
                 Year = 2020, // Required field
-                Make = "Blue Bird", // Required field  
+                Make = "Blue Bird", // Required field
                 Model = "Vision", // Required field
                 VINNumber = "1BAANV1A5XF123456", // Required field
                 LicenseNumber = "ABC123", // Required field
@@ -435,12 +431,12 @@ namespace BusBuddy.Tests
             var bus = new Bus();
 
             // Act - Try to assign null values to string properties (this tests the property setters)
-            bus.BusNumber = null;
-            bus.Make = null;
-            bus.Model = null;
-            bus.VINNumber = null;
-            bus.LicenseNumber = null;
-            bus.Status = null;
+            bus.BusNumber = null!;
+            bus.Make = null!;
+            bus.Model = null!;
+            bus.VINNumber = null!;
+            bus.LicenseNumber = null!;
+            bus.Status = null!;
 
             // Assert - The property setters should handle null values gracefully
             Assert.That(bus.BusNumber, Is.Not.Null, "BusNumber should not be null after null assignment");

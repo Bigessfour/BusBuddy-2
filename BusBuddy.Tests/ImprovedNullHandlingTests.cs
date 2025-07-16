@@ -28,12 +28,12 @@ namespace BusBuddy.Tests
             var bus = new Bus();
 
             // Act - Set null/invalid values
-            bus.BusNumber = null;
+            bus.BusNumber = null!;
             bus.Make = "";
             bus.Model = "   ";
-            bus.VINNumber = null;
+            bus.VINNumber = null!;
             bus.LicenseNumber = "";
-            bus.Status = null;
+            bus.Status = null!;
             bus.Year = 0;
             bus.SeatingCapacity = -1;
 
@@ -60,7 +60,7 @@ namespace BusBuddy.Tests
             var driver = new Driver { DriverId = 123 };
 
             // Act - Set null/invalid values
-            driver.DriverName = null;
+            driver.DriverName = null!;
             driver.DriversLicenceType = "";
             driver.Status = "   ";
 
@@ -82,7 +82,7 @@ namespace BusBuddy.Tests
 
             // Act - Set invalid dates
             route.Date = default(DateTime);
-            route.RouteName = null;
+            route.RouteName = null!;
 
             // Assert - Date and name should be valid
             Assert.That(route.Date, Is.EqualTo(DateTime.Today), "Date should default to today");

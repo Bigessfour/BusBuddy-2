@@ -91,6 +91,34 @@
         <Setter Property="Margin" Value="4" />
     </Style>
 
+    <!-- Info ButtonAdv Style -->
+    <Style x:Key="BusBuddyInfoButtonAdvStyle" TargetType="{x:Type syncfusion:ButtonAdv}" BasedOn="{StaticResource BusBuddyButtonAdvStyle}">
+        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}" />
+    </Style>
+
+    <!-- Danger ButtonAdv Style -->
+    <Style x:Key="BusBuddyDangerButtonAdvStyle" TargetType="{x:Type syncfusion:ButtonAdv}" BasedOn="{StaticResource BusBuddyButtonAdvStyle}">
+        <Setter Property="Background" Value="{DynamicResource ErrorBackground}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ErrorBackground}" />
+    </Style>
+
+    <!-- Warning ButtonAdv Style -->
+    <Style x:Key="BusBuddyWarningButtonAdvStyle" TargetType="{x:Type syncfusion:ButtonAdv}" BasedOn="{StaticResource BusBuddyButtonAdvStyle}">
+        <Setter Property="Background" Value="{DynamicResource WarningBackground}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBackground}" />
+    </Style>
+
+    <!-- Success ButtonAdv Style -->
+    <Style x:Key="BusBuddySuccessButtonAdvStyle" TargetType="{x:Type syncfusion:ButtonAdv}" BasedOn="{StaticResource BusBuddyButtonAdvStyle}">
+        <Setter Property="Background" Value="{DynamicResource SuccessBackground}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBackground}" />
+    </Style>
+
     <!-- Icon Button Style (Standard WPF Button) -->
     <Style x:Key="BusBuddyIconButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />

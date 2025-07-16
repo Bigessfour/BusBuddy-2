@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -224,7 +225,10 @@ public partial class App : Application
                 .Enrich.WithEnvironmentName()
                 .Enrich.WithEnvironmentUserName()
                 .WriteTo.Console()
-                .WriteTo.File("logs/application-.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("logs/application-.log",
+                    rollingInterval: RollingInterval.Day,
+                    shared: true, // Enable shared access for concurrent processes
+                    flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();
 
             Log.Information("Serilog initialized successfully with enrichment capabilities");
@@ -308,7 +312,7 @@ public partial class App : Application
             return;
         }
 
-        // --- BEGIN: Enhanced Build log diagnostics ---
+        // --- BEGIN: Enhanced Build log diagnostics with safe concurrent access ---
         string buildLogTestPath = Path.Combine(
             Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName ?? Directory.GetCurrentDirectory(),
             "logs", "build.log");
@@ -328,41 +332,23 @@ public partial class App : Application
                                  $"[BUILDLOG TEST] Process ID: {Environment.ProcessId}\n" +
                                  $"[BUILDLOG TEST] Log Directory: {logDir}\n";
 
-            File.AppendAllText(buildLogTestPath, startupInfo);
+            // Use safe concurrent file writing with retry logic
+            SafeWriteToFile(buildLogTestPath, startupInfo);
 
             // Also write to a secondary location to ensure we're getting logs somewhere
             string secondaryLogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_diagnostic.log");
-            File.AppendAllText(secondaryLogPath, startupInfo);
+            SafeWriteToFile(secondaryLogPath, startupInfo);
 
             // Create an empty marker file that we can check for existence
-            File.WriteAllText(Path.Combine(logDir, "app_started.marker"), DateTime.Now.ToString("o"));
+            SafeWriteToFile(Path.Combine(logDir, "app_started.marker"), DateTime.Now.ToString("o"));
         }
         catch (Exception ex)
         {
-            // If the primary logging fails, use multiple fallbacks
-            try
-            {
-                // Fallback 1: app base directory
-                string fallback1 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "buildlog_fallback.txt");
-                File.AppendAllText(fallback1, $"[BUILDLOG TEST] Could not write to logs/build.log: {ex}\n" +
-                                            $"[BUILDLOG TEST] Exception details: {ex.ToString()}\n" +
-                                            $"[BUILDLOG TEST] Inner exception: {ex.InnerException?.ToString()}\n");
-
-                // Fallback 2: current directory
-                string fallback2 = Path.Combine(Environment.CurrentDirectory, "buildlog_fallback_current.txt");
-                File.AppendAllText(fallback2, $"[BUILDLOG TEST] Could not write to logs/build.log: {ex}\n");
-
-                // Fallback 3: temp directory
-                string fallback3 = Path.Combine(Path.GetTempPath(), "BusBuddy_buildlog_fallback.txt");
-                File.AppendAllText(fallback3, $"[BUILDLOG TEST] Could not write to logs/build.log: {ex}\n");
-            }
-            catch (Exception fallbackEx)
-            {
-                // Last resort - try to output to console
-                Console.WriteLine($"CRITICAL: All logging fallbacks failed. Initial error: {ex.Message}, Fallback error: {fallbackEx.Message}");
-            }
+            // If the primary logging fails, use console output as fallback
+            Console.WriteLine($"[BUILDLOG TEST] Could not write to logs/build.log: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[BUILDLOG TEST] Could not write to logs/build.log: {ex.Message}");
         }
-        // --- END: Enhanced Build log diagnostics ---
+        // --- END: Enhanced Build log diagnostics with safe concurrent access ---
 
         string appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
 
@@ -438,15 +424,19 @@ public partial class App : Application
                 .Enrich.With(uiEnricher)
                 .Enrich.With(startupExceptionEnricher)
                 .Enrich.With(aggregationEnricher)
-                // CONSOLIDATED: Only 2 log files with smart filtering
+                // CONSOLIDATED: Only 2 log files with smart filtering and safe concurrent access
                 .WriteTo.File(condensedFormatter, Path.Combine(logsDirectory, "busbuddy-consolidated-.log"),
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 30,
-                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
+                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
+                    shared: true, // Enable shared access for concurrent processes
+                    flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .WriteTo.File(Path.Combine(logsDirectory, "busbuddy-errors-.log"),
                     restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: 30,
+                    shared: true, // Enable shared access for concurrent processes
+                    flushToDiskInterval: TimeSpan.FromSeconds(1),
                     outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] [{LogCategory}] {Message:lj}{NewLine}    📊 {EventSignature} (Count: {EventOccurrenceCount}){NewLine}    🔍 {Properties:j}{NewLine}{Exception}")
                 // Simplified console output with aggregation info
                 .WriteTo.Console(consoleFormatter)
@@ -748,8 +738,8 @@ public partial class App : Application
                                             $"Stack trace: {startupEx.StackTrace}\n" +
                                             $"Inner exception: {startupEx.InnerException?.ToString() ?? "None"}\n";
 
-                File.WriteAllText(Path.Combine(logsDirectory, "startup_failure.log"), startupErrorDetails);
-                File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_failure.log"), startupErrorDetails);
+                SafeWriteToFile(Path.Combine(logsDirectory, "startup_failure.log"), startupErrorDetails);
+                SafeWriteToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_failure.log"), startupErrorDetails);
 
                 MessageBox.Show(
                     $"A critical error occurred during application startup:\n\n{startupEx.Message}\n\n" +
@@ -986,6 +976,57 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.XaiChatViewModel>();
     }
 
+    #region Safe File Writing Helper Method
+
+    /// <summary>
+    /// Safely writes text to a file with retry logic to handle concurrent access
+    /// </summary>
+    private static void SafeWriteToFile(string filePath, string content)
+    {
+        const int maxRetries = 3;
+        const int retryDelayMs = 100;
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            try
+            {
+                // Use FileStream with proper sharing to handle concurrent access
+                using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+                using (var streamWriter = new StreamWriter(fileStream))
+                {
+                    streamWriter.Write(content);
+                    streamWriter.Flush();
+                }
+                return; // Success
+            }
+            catch (IOException) when (i < maxRetries - 1)
+            {
+                // Wait before retry
+                Thread.Sleep(retryDelayMs);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Try with different approach
+                try
+                {
+                    File.AppendAllText(filePath, content);
+                    return;
+                }
+                catch
+                {
+                    // Fall back to console output
+                    Console.WriteLine($"[SAFE_WRITE] Could not write to {filePath}: {content}");
+                    return;
+                }
+            }
+        }
+
+        // Final fallback
+        Console.WriteLine($"[SAFE_WRITE] Failed to write to {filePath} after {maxRetries} attempts: {content}");
+    }
+
+    #endregion
+
     #region Global Exception Handling
 
     /// <summary>
@@ -1016,10 +1057,9 @@ public partial class App : Application
         }
         catch (Exception logEx)
         {
-            // Ensure fallback logging goes to the logs directory
             try
             {
-                File.AppendAllText(fallbackLogPath,
+                SafeWriteToFile(fallbackLogPath,
                     $"[FATAL] [{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] Unhandled domain exception: {e.ExceptionObject}\n" +
                     $"[LOGGING ERROR]: {logEx}\n");
             }
@@ -1095,7 +1135,7 @@ public partial class App : Application
                                        $"Exception type: {e.Exception?.GetType().Name ?? "Unknown"}\n" +
                                        $"Stack trace: {e.Exception?.StackTrace ?? "Unknown"}\n";
 
-                File.AppendAllText(fallbackLogPath, fallbackDetails);
+                SafeWriteToFile(fallbackLogPath, fallbackDetails);
                 e.Handled = true;
             }
             catch
@@ -1130,7 +1170,7 @@ public partial class App : Application
         {
             try
             {
-                File.AppendAllText(fallbackLogPath,
+                SafeWriteToFile(fallbackLogPath,
                     $"[ERROR] [{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] Unobserved task exception: {e.Exception}\n" +
                     $"[LOGGING ERROR]: {logEx}\n");
 

@@ -41,11 +41,9 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:RouteManagementViewModel}"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-    <!-- Local resources removed — all converters now global in App.xaml -->
-    <Grid>
 
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!-- BooleanToVisibilityConverter is now global in App.xaml — removed duplicate -->
 
         <!-- Enhanced Route Status Templates -->
         <DataTemplate x:Key="RouteStatusTemplate">
@@ -113,7 +111,7 @@
                                                Margin="0,0,10,0"/>                                <syncfusion:ButtonAdv Label="🔍"
                                               Command="{Binding SearchRoutesCommand}"
                                               CommandParameter="{Binding Text, ElementName=RouteSearchBox}"
-                                              Style="{StaticResource BusBuddyIconButtonStyle}"
+                                              Style="{StaticResource BusBuddyIconButtonAdvStyle}"
                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                               Width="40" Height="32"
                                               Margin="0,0,10,0"/>
@@ -323,25 +321,25 @@
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                         <syncfusion:ButtonAdv Label="➕ Add Route"
                                               Command="{Binding AddRouteCommand}"
-                                              Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                              Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                               Width="120" Height="36"
                                               Margin="5,0"/>
                         <syncfusion:ButtonAdv Label="✏️ Edit"
                                               Command="{Binding UpdateRouteCommand}"
                                               CommandParameter="{Binding SelectedRoute}"
-                                              Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                              Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                               Width="80" Height="36"
                                               Margin="5,0"/>
                         <syncfusion:ButtonAdv Label="🔄 Optimize"
                                               Command="{Binding OptimizeAllRoutesCommand}"
-                                              Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                              Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                               Width="100" Height="36"
                                               Margin="5,0"/>
                         <syncfusion:ButtonAdv Label="🔧 Tools"
-                                              Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                              Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                               Width="100" Height="36"
                                               Margin="5,0">
@@ -362,7 +360,7 @@
                         <syncfusion:ButtonAdv Label="🗑️ Delete"
                                               Command="{Binding DeleteRouteCommand}"
                                               CommandParameter="{Binding SelectedRoute}"
-                                              Style="{StaticResource BusBuddyDeleteButtonStyle}"
+                                              Style="{StaticResource BusBuddyDangerButtonAdvStyle}"
                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                               Width="80" Height="36"
                                               Margin="5,0"/>
@@ -532,19 +530,19 @@
                 <StackPanel Grid.Row="3" Margin="0,15,0,0">
                     <syncfusion:ButtonAdv Label="✅ Assign Selected"
                                       Command="{Binding AssignResourcesCommand}"
-                                      Style="{StaticResource BusBuddyPrimaryButtonStyle}"
+                                      Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                       Height="36"
                                       Margin="0,0,0,8"/>
                     <syncfusion:ButtonAdv Label="🔄 Auto-Assign All"
                                       Command="{Binding AutoAssignAllCommand}"
-                                      Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                                      Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                       Height="32"
                                       Margin="0,0,0,8"/>
                     <syncfusion:ButtonAdv Label="❌ Clear Assignment"
                                       Command="{Binding ClearAssignmentCommand}"
-                                      Style="{StaticResource BusBuddyDeleteButtonStyle}"
+                                      Style="{StaticResource BusBuddyDangerButtonAdvStyle}"
                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                       Height="32"/>
                 </StackPanel>

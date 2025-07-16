@@ -32,8 +32,11 @@ namespace BusBuddy.Tests
             _mockContextFactory.Setup(f => f.CreateDbContext()).Returns(_mockDbContext.Object);
             _mockContextFactory.Setup(f => f.CreateWriteDbContext()).Returns(_mockDbContext.Object);
 
+            // Create enhanced caching service mock for DriverService
+            var mockCachingService = new Mock<IEnhancedCachingService>();
+
             // Create service instances - no logger dependencies needed since services use static Serilog loggers
-            _driverService = new DriverService(_mockContextFactory.Object);
+            _driverService = new DriverService(_mockContextFactory.Object, mockCachingService.Object);
             _studentService = new StudentService(_mockContextFactory.Object);
             _fuelService = new FuelService(_mockContextFactory.Object);
         }
@@ -68,9 +71,9 @@ namespace BusBuddy.Tests
             var driver = new Driver();
 
             // Act - Try to assign null values to string properties
-            driver.DriverName = null;
-            driver.DriversLicenceType = null;
-            driver.Status = null;
+            driver.DriverName = null!;
+            driver.DriversLicenceType = null!;
+            driver.Status = null!;
             driver.DriverPhone = null;
             driver.DriverEmail = null;
             driver.Address = null;
@@ -468,6 +471,9 @@ namespace BusBuddy.Tests
         public async Task FuelService_GetTotalCost_ShouldHandleNullCosts()
         {
             Console.WriteLine("DEBUG: Starting FuelService_GetTotalCost_ShouldHandleNullCosts test");
+
+            // Add await to fix CS1998 warning
+            await Task.CompletedTask;
 
             // This would require more complex mocking to test the actual service
             // For now, test the null-handling concept

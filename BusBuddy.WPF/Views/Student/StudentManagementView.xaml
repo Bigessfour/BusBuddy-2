@@ -129,7 +129,7 @@
                           Command="{Binding ToggleStatisticsCommand}"
                           Margin="0,0,10,0"
                           Padding="8,4"
-                          Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                          Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                           ToolTip="Show/Hide Statistics"
                           Label="📊 Statistics"/>
@@ -139,7 +139,7 @@
                     Command="{Binding AdvancedSearchCommand}"
                     Margin="0,0,10,0"
                     Padding="8,4"
-                    Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                    Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                     ToolTip="Advanced Search Options"
                     Label="🔍 Advanced"/>
@@ -150,7 +150,7 @@
                     Margin="0,0,10,0"
                     Padding="8,4"
                     Visibility="{Binding AdvancedSearchCriteria, Converter={StaticResource ObjectToVisibilityConverter}}"
-                    Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                    Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                     ToolTip="Clear Advanced Search"
                     Label="❌ Clear Advanced"/>
@@ -158,7 +158,7 @@
             <!-- Refresh Button -->
             <syncfusion:ButtonAdv Grid.Column="7"
                     Command="{Binding RefreshCommand}"
-                    Style="{StaticResource BusBuddySecondaryButtonStyle}"
+                    Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                     ToolTip="Refresh student list"
                     Label="⟳ Refresh"/>

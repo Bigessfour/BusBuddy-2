@@ -25,7 +25,6 @@
 
             <!-- Essential converters only — minimal resource dictionary -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
-            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
             <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
@@ -51,7 +50,6 @@
             <!-- CRITICAL: Add missing converters to prevent local definitions -->
             <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
-            <converters:BooleanToVisibilityInverseConverter x:Key="BooleanToVisibilityInverseConverter"/>
 
             <!-- Standard WPF converters as global resources -->
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
