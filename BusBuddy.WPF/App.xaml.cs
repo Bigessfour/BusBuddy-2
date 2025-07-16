@@ -15,6 +15,7 @@ using Serilog.Core;
 using Serilog.Core.Enrichers;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
+using Syncfusion.Themes.FluentLight.WPF;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -82,20 +83,34 @@ public partial class App : Application
         SfSkinManager.ApplyStylesOnApplication = true;
 
         // 🎨 CRITICAL: Apply FluentDark theme globally before any UI initialization
-        // This replaces the need for manual resource dictionary merging
+        // FluentDark is the primary theme — FluentLight is available as switchable fallback
         try
         {
-            // Set the global theme for all Syncfusion controls
+            // Set the global theme for all Syncfusion controls to FluentDark (primary)
             SfSkinManager.ApplicationTheme = new Theme("FluentDark");
 
             // Register FluentDark theme settings for enhanced styling
             SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
 
-            System.Diagnostics.Debug.WriteLine("✅ FluentDark theme applied globally via SkinManager");
+            // Register FluentLight theme settings for fallback/switchable option
+            SfSkinManager.RegisterThemeSettings("FluentLight", new FluentLightThemeSettings());
+
+            System.Diagnostics.Debug.WriteLine("✅ FluentDark theme applied globally as primary, FluentLight available as fallback");
         }
         catch (Exception themeEx)
         {
             System.Diagnostics.Debug.WriteLine($"⚠️ FluentDark theme setup failed: {themeEx.Message}");
+            // Fallback to FluentLight if FluentDark fails
+            try
+            {
+                SfSkinManager.ApplicationTheme = new Theme("FluentLight");
+                SfSkinManager.RegisterThemeSettings("FluentLight", new FluentLightThemeSettings());
+                System.Diagnostics.Debug.WriteLine("✅ Fallback to FluentLight theme successful");
+            }
+            catch (Exception fallbackEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"⚠️ FluentLight fallback also failed: {fallbackEx.Message}");
+            }
         }
 
         // CRITICAL: Initialize error handling before anything else
@@ -277,17 +292,18 @@ public partial class App : Application
             // Ensure SkinManager is ready for application-wide theming
             SfSkinManager.ApplyStylesOnApplication = true;
 
-            // Verify FluentDark theme is set
+            // Verify FluentDark (Fluent Black) theme is set
             if (SfSkinManager.ApplicationTheme?.ThemeName != "FluentDark")
             {
                 SfSkinManager.ApplicationTheme = new Theme("FluentDark");
-                Log.Information("🎨 FluentDark theme reapplied during startup");
+                Log.Information("🎨 FluentDark (Fluent Black) theme reapplied during startup");
             }
 
             // Ensure theme settings are registered
             SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
+            SfSkinManager.RegisterThemeSettings("FluentLight", new FluentLightThemeSettings());
 
-            Log.Information("🎨 Syncfusion FluentDark theme verified and ready");
+            Log.Information("🎨 Syncfusion FluentDark theme verified and ready (FluentLight available as fallback)");
         }
         catch (Exception themeEx)
         {
@@ -711,7 +727,7 @@ public partial class App : Application
 
             // Theme is already applied globally — just initialize the service
             themeService.InitializeTheme();
-            Log.Information("🎨 Theme service initialized with FluentDark theme");
+            Log.Information("🎨 Theme service initialized with FluentDark (Fluent Black) theme");
             Log.Information("🎨 Current theme: {Theme}", themeService.CurrentTheme);
             _startupMonitor.EndStep();
 

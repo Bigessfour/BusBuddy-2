@@ -23,6 +23,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         private readonly IScheduleService _scheduleService;
         private readonly IBusService _busService;
         private readonly IDriverService _driverService;
+        private readonly IStudentScheduleService _studentScheduleService;
         private readonly IServiceProvider _serviceProvider;
 
         [ObservableProperty]
@@ -104,16 +105,34 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         public IAsyncRelayCommand ExportScheduleCommand { get; }
         public IAsyncRelayCommand GenerateScheduleReportCommand { get; }
 
+        // Student Assignment Commands
+        public IAsyncRelayCommand ViewStudentAssignmentsCommand { get; }
+        public IAsyncRelayCommand ManageStudentAssignmentsCommand { get; }
+        public IAsyncRelayCommand AssignStudentsToScheduleCommand { get; }
+        public IAsyncRelayCommand RemoveStudentFromScheduleCommand { get; }
+
+        // Student Assignment Properties
+        [ObservableProperty]
+        private ObservableCollection<BusBuddy.Core.Models.Student> _assignedStudents = new();
+
+        [ObservableProperty]
+        private ObservableCollection<StudentSchedule> _studentSchedules = new();
+
+        [ObservableProperty]
+        private int _assignedStudentsCount;
+
         public ScheduleManagementViewModel(
             IScheduleService scheduleService,
             IBusService busService,
             IDriverService driverService,
+            IStudentScheduleService studentScheduleService,
             IServiceProvider serviceProvider)
             : base()
         {
             _scheduleService = scheduleService;
             _busService = busService;
             _driverService = driverService;
+            _studentScheduleService = studentScheduleService;
             _serviceProvider = serviceProvider;
 
             // Initialize collections
@@ -176,6 +195,12 @@ namespace BusBuddy.WPF.ViewModels.Schedule
             GenerateUtilizationReportCommand = new AsyncRelayCommand(GenerateUtilizationReportAsync);
             ExportScheduleCommand = new AsyncRelayCommand(ExportScheduleAsync);
             GenerateScheduleReportCommand = new AsyncRelayCommand(GenerateScheduleReportAsync);
+
+            // Initialize student assignment commands
+            ViewStudentAssignmentsCommand = new AsyncRelayCommand(ViewStudentAssignmentsAsync);
+            ManageStudentAssignmentsCommand = new AsyncRelayCommand(ManageStudentAssignmentsAsync);
+            AssignStudentsToScheduleCommand = new AsyncRelayCommand(AssignStudentsToScheduleAsync);
+            RemoveStudentFromScheduleCommand = new AsyncRelayCommand(RemoveStudentFromScheduleAsync);
 
             // Schedule Management is now production-ready!
             IsInDevelopment = false;
@@ -929,6 +954,9 @@ namespace BusBuddy.WPF.ViewModels.Schedule
             if (value != null)
             {
                 Logger.Debug("Selected schedule changed to ID {ScheduleId}", value.ScheduleId);
+
+                // Load students for the selected schedule
+                _ = LoadScheduleStudentsAsync();
             }
         }
 

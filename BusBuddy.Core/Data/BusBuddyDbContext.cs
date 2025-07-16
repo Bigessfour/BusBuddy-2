@@ -67,6 +67,7 @@ public class BusBuddyDbContext : DbContext
     public virtual DbSet<Maintenance> MaintenanceRecords { get; set; }
     public virtual DbSet<Student> Students { get; set; }
     public virtual DbSet<Schedule> Schedules { get; set; }
+    public virtual DbSet<StudentSchedule> StudentSchedules { get; set; }
     public virtual DbSet<TripEvent> TripEvents { get; set; }
     public virtual DbSet<RouteStop> RouteStops { get; set; }
     public virtual DbSet<SchoolCalendar> SchoolCalendar { get; set; }
@@ -484,6 +485,47 @@ public class BusBuddyDbContext : DbContext
             entity.HasIndex(e => e.BusId).HasDatabaseName("IX_Schedules_BusId");
             entity.HasIndex(e => e.DriverId).HasDatabaseName("IX_Schedules_DriverId");
             entity.HasIndex(e => e.RouteId).HasDatabaseName("IX_Schedules_RouteId");
+        });
+
+        // Configure StudentSchedule entity
+        modelBuilder.Entity<StudentSchedule>(entity =>
+        {
+            entity.ToTable("StudentSchedules");
+            entity.HasKey(e => e.StudentScheduleId);
+
+            // Properties
+            entity.Property(e => e.AssignmentType).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.PickupLocation).HasMaxLength(100);
+            entity.Property(e => e.DropoffLocation).HasMaxLength(100);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            entity.Property(e => e.UpdatedBy).HasMaxLength(100);
+
+            // Relationships
+            entity.HasOne(ss => ss.Student)
+                  .WithMany(s => s.StudentSchedules)
+                  .HasForeignKey(ss => ss.StudentId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_StudentSchedules_Student");
+
+            entity.HasOne(ss => ss.Schedule)
+                  .WithMany(s => s.StudentSchedules)
+                  .HasForeignKey(ss => ss.ScheduleId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_StudentSchedules_Schedule");
+
+            entity.HasOne(ss => ss.ActivitySchedule)
+                  .WithMany(a => a.StudentSchedules)
+                  .HasForeignKey(ss => ss.ActivityScheduleId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_StudentSchedules_ActivitySchedule");
+
+            // Indexes for performance
+            entity.HasIndex(e => e.StudentId).HasDatabaseName("IX_StudentSchedules_StudentId");
+            entity.HasIndex(e => e.ScheduleId).HasDatabaseName("IX_StudentSchedules_ScheduleId");
+            entity.HasIndex(e => e.ActivityScheduleId).HasDatabaseName("IX_StudentSchedules_ActivityScheduleId");
+            entity.HasIndex(e => e.AssignmentType).HasDatabaseName("IX_StudentSchedules_AssignmentType");
+            entity.HasIndex(e => new { e.StudentId, e.ScheduleId }).IsUnique().HasDatabaseName("IX_StudentSchedules_StudentSchedule");
         });
 
         // Configure TripEvent entity

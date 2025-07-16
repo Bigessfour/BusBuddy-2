@@ -447,6 +447,9 @@ public class Activity : INotifyPropertyChanged
     // Route navigation property for activities
     public virtual Route? Route { get; set; }
 
+    // Activity schedules for this activity
+    public virtual ICollection<ActivitySchedule> ActivitySchedules { get; set; } = new List<ActivitySchedule>();
+
     // INotifyPropertyChanged implementation for Syncfusion data binding
     public event PropertyChangedEventHandler? PropertyChanged;
 

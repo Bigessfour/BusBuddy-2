@@ -1,6 +1,7 @@
 using Serilog;
 using Syncfusion.SfSkinManager;
 using System;
+using System.Linq;
 using System.Windows;
 
 namespace BusBuddy.WPF.Services
@@ -13,25 +14,35 @@ namespace BusBuddy.WPF.Services
     {
         string CurrentTheme { get; }
         bool IsDarkTheme { get; }
+        string[] AvailableThemes { get; }
+        string PrimaryTheme { get; }
+        string FallbackTheme { get; }
         void ApplyTheme(string themeName);
         void ToggleTheme();
         void InitializeTheme();
+        bool IsThemeSupported(string themeName);
         event EventHandler<string> ThemeChanged;
     }
 
     public class ThemeService : IThemeService
     {
         private static readonly ILogger Logger = Log.ForContext<ThemeService>();
-        private string _currentTheme = "FluentDark"; // 🎨 FLUENT DARK as default theme
+        private string _currentTheme = "FluentDark"; // 🎨 FLUENT DARK as primary theme
+        private const string PRIMARY_THEME = "FluentDark";
+        private const string FALLBACK_THEME = "FluentLight";
 
         public event EventHandler<string>? ThemeChanged;
 
         public string CurrentTheme => _currentTheme;
         public bool IsDarkTheme => _currentTheme.Contains("Dark") || _currentTheme.Contains("Black");
+        public string[] AvailableThemes => new[] { PRIMARY_THEME, FALLBACK_THEME };
+        public string PrimaryTheme => PRIMARY_THEME;
+        public string FallbackTheme => FALLBACK_THEME;
 
         public ThemeService()
         {
-            Logger.Debug("[DEBUG] 🎨 ThemeService initialized with Fluent Dark theme: {Theme}", _currentTheme);
+            Logger.Debug("[DEBUG] 🎨 ThemeService initialized with FluentDark as primary theme: {Theme}", _currentTheme);
+            Logger.Debug("[DEBUG] 🎨 Fallback theme available: {FallbackTheme}", FALLBACK_THEME);
         }
 
         public void ApplyTheme(string themeName)
@@ -39,6 +50,15 @@ namespace BusBuddy.WPF.Services
             try
             {
                 Logger.Debug("[DEBUG] ThemeService.ApplyTheme: Switching to theme: {ThemeName}", themeName);
+
+                // Validate theme name and fall back to supported themes if necessary
+                string validatedTheme = ValidateTheme(themeName);
+                if (validatedTheme != themeName)
+                {
+                    Logger.Warning("[THEME] Theme '{RequestedTheme}' not supported, using '{ValidatedTheme}' instead",
+                        themeName, validatedTheme);
+                    themeName = validatedTheme;
+                }
 
                 // CRITICAL: Set global theme FIRST before applying to individual windows
                 SfSkinManager.ApplyThemeAsDefaultStyle = true;
@@ -86,7 +106,25 @@ namespace BusBuddy.WPF.Services
             catch (Exception ex)
             {
                 Logger.Error(ex, "[THEME] Error applying theme {ThemeName}: {Error}", themeName, ex.Message);
-                throw;
+
+                // Fallback to primary theme if current theme fails
+                if (themeName != PRIMARY_THEME)
+                {
+                    Logger.Warning("[THEME] Falling back to primary theme: {PrimaryTheme}", PRIMARY_THEME);
+                    try
+                    {
+                        ApplyTheme(PRIMARY_THEME);
+                    }
+                    catch (Exception fallbackEx)
+                    {
+                        Logger.Error(fallbackEx, "[THEME] Fallback to primary theme also failed");
+                        throw;
+                    }
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
 
@@ -115,10 +153,41 @@ namespace BusBuddy.WPF.Services
 
         public void ToggleTheme()
         {
-            // 🎨 Enhanced theme toggle: FluentDark only (FluentLight removed due to KeyNotFoundException in v30.1.40)
-            string newTheme = "FluentDark"; // Always use FluentDark as the stable theme
+            // 🎨 Enhanced theme toggle: Switch between FluentDark and FluentLight
+            string newTheme = _currentTheme == PRIMARY_THEME ? FALLBACK_THEME : PRIMARY_THEME;
             Logger.Debug("[DEBUG] 🎨 ThemeService.ToggleTheme: Current={Current}, New={New}", _currentTheme, newTheme);
             ApplyTheme(newTheme);
+        }
+
+        /// <summary>
+        /// Validates the theme name and returns a supported theme
+        /// </summary>
+        /// <param name="themeName">The requested theme name</param>
+        /// <returns>A valid theme name</returns>
+        private string ValidateTheme(string themeName)
+        {
+            // List of supported themes in order of preference
+            var supportedThemes = new[] { PRIMARY_THEME, FALLBACK_THEME };
+
+            if (supportedThemes.Contains(themeName))
+            {
+                return themeName;
+            }
+
+            // If requested theme is not supported, return primary theme
+            Logger.Warning("[THEME] Theme '{RequestedTheme}' not in supported list: [{SupportedThemes}]",
+                themeName, string.Join(", ", supportedThemes));
+            return PRIMARY_THEME;
+        }
+
+        /// <summary>
+        /// Checks if a theme is supported by the application
+        /// </summary>
+        /// <param name="themeName">The theme name to check</param>
+        /// <returns>True if the theme is supported, false otherwise</returns>
+        public bool IsThemeSupported(string themeName)
+        {
+            return AvailableThemes.Contains(themeName);
         }
 
         /// <summary>
@@ -134,7 +203,29 @@ namespace BusBuddy.WPF.Services
                 SfSkinManager.ApplyThemeAsDefaultStyle = true;
                 SfSkinManager.ApplicationTheme = new Theme(_currentTheme);
 
-                Logger.Information("Theme system initialized with theme: {Theme}", _currentTheme);
+                // Ensure both primary and fallback themes are registered
+                try
+                {
+                    SfSkinManager.RegisterThemeSettings(PRIMARY_THEME, new Syncfusion.Themes.FluentDark.WPF.FluentDarkThemeSettings());
+                    Logger.Debug("[DEBUG] ThemeService.InitializeTheme: FluentDark theme settings registered");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warning(ex, "[THEME] Failed to register FluentDark theme settings");
+                }
+
+                try
+                {
+                    SfSkinManager.RegisterThemeSettings(FALLBACK_THEME, new Syncfusion.Themes.FluentLight.WPF.FluentLightThemeSettings());
+                    Logger.Debug("[DEBUG] ThemeService.InitializeTheme: FluentLight theme settings registered");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warning(ex, "[THEME] Failed to register FluentLight theme settings");
+                }
+
+                Logger.Information("Theme system initialized with primary theme: {PrimaryTheme}, fallback available: {FallbackTheme}",
+                    _currentTheme, FALLBACK_THEME);
             }
             catch (Exception ex)
             {

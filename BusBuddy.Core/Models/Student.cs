@@ -185,6 +185,9 @@ public class Student : INotifyPropertyChanged
     [Display(Name = "Grade Level")]
     public string GradeLevel => Grade ?? "Unknown";
 
+    // Navigation properties for schedule assignments
+    public virtual ICollection<StudentSchedule> StudentSchedules { get; set; } = new List<StudentSchedule>();
+
     // INotifyPropertyChanged implementation for Syncfusion data binding
     public event PropertyChangedEventHandler? PropertyChanged;
 

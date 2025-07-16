@@ -20,18 +20,21 @@
         <ResourceDictionary>
             <!--
             ===============================================================================
-            SYNCFUSION FLUENTDARK THEME — OFFICIAL SKINMANAGER IMPLEMENTATION
+            SYNCFUSION FLUENTDARK THEME — PRIMARY WITH FLUENTLIGHT FALLBACK
             ===============================================================================
             Theme is applied via SfSkinManager.ApplicationTheme in App.xaml.cs
-            This loads the official Syncfusion FluentDark theme resources automatically
-            Only custom styles and compatibility mappings are included here
+            - Primary Theme: FluentDark (official Syncfusion dark theme)
+            - Fallback Theme: FluentLight (available for theme switching)
+            This loads the official Syncfusion theme resources automatically
 
-            IMPORTANT: All views must use FluentDark theme consistently
+            IMPORTANT: All views must use FluentDark theme consistently by default
             Each control should have: syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+            Theme switching is available via ThemeService.ToggleTheme()
             ===============================================================================
             -->
             <ResourceDictionary.MergedDictionaries>
                 <!-- Syncfusion FluentDark theme resources (loaded automatically by SfSkinManager) -->
+                <!-- FluentLight theme also available for switching -->
                 <!-- Custom styles that use official Syncfusion FluentDark resource names -->
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>

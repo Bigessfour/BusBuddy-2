@@ -114,6 +114,9 @@ public class ActivitySchedule
     public virtual Bus ScheduledVehicle { get; set; } = null!;
     public virtual Driver ScheduledDriver { get; set; } = null!;
 
+    // Student assignments for this activity schedule
+    public virtual ICollection<StudentSchedule> StudentSchedules { get; set; } = new List<StudentSchedule>();
+
     // Link to detailed trip information
     [ForeignKey("TripEvent")]
     [Display(Name = "Trip Event")]

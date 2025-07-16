@@ -60,4 +60,7 @@ public class Schedule
     public virtual Bus Bus { get; set; } = null!;
     public virtual Route Route { get; set; } = null!;
     public virtual Driver Driver { get; set; } = null!;
+
+    // Student assignments for this schedule
+    public virtual ICollection<StudentSchedule> StudentSchedules { get; set; } = new List<StudentSchedule>();
 }

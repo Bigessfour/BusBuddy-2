@@ -7,9 +7,9 @@
 - **100% Pure WPF Application** - Built exclusively with WPF (Windows Presentation Foundation) using Syncfusion's professional WPF UI component suite
 - **Zero Legacy Dependencies** - Completely modernized architecture with no Windows Forms, WinForms, or legacy UI frameworks
 - **.NET 8 (net8.0-windows)** - Latest .NET framework with cutting-edge WPF architecture patterns and performance optimizations
-- **Premium Syncfusion WPF Components** - Professional-grade UI controls including DataGrid, DockingManager, Charts, Ribbon, and FluentDark theming
+- **Premium Syncfusion WPF Components** - Professional-grade UI controls including DataGrid, DockingManager, Charts, Ribbon, and FluentDark theming with FluentLight fallback
 - **Advanced MVVM Architecture** - Follows WPF best practices with ViewModels, Data Binding, Command patterns, and INotifyPropertyChanged implementations
-- **Modern WPF Theming** - Syncfusion FluentDark theme applied consistently across all UI components
+- **Modern WPF Theming** - Syncfusion FluentDark theme as primary with FluentLight switchable fallback applied consistently across all UI components
 - **Syncfusion Licensing** - Properly handled via environment variable (`SYNCFUSION_LICENSE_KEY`) or `appsettings.json` fallback
 - **Enterprise-Ready** - Production-ready codebase with comprehensive error handling, WPF-specific logging, and extensive testing
 - **🎉 Complete Serilog Migration** - **100% migration completed July 15, 2025** - All 59 application files now use Serilog with structured logging and enrichment
@@ -32,7 +32,7 @@ A comprehensive school bus transportation management system built with **C# .NET
 
 This project is built **exclusively with WPF** to provide:
 - **Rich Desktop Experience**: Native Windows application with hardware-accelerated graphics and smooth animations
-- **Professional UI Components**: Leverages Syncfusion's mature WPF control suite with Office2019Colorful theming
+- **Professional UI Components**: Leverages Syncfusion's mature WPF control suite with FluentDark theming and FluentLight fallback
 - **Powerful Data Binding**: Declarative XAML binding for real-time UI synchronization and responsive interfaces
 - **Pure MVVM Architecture**: Industry-standard pattern for maintainable desktop applications without legacy UI dependencies
 - **Scalable Performance**: Optimized for handling large datasets in transportation management with WPF virtualization
@@ -41,13 +41,13 @@ This project is built **exclusively with WPF** to provide:
 - **No Legacy Baggage**: Zero Windows Forms, WinForms, or other deprecated UI framework dependencies
 
 ## Key WPF Architecture Benefits
-- **Pure WPF Desktop UI**: Native Windows desktop application with hardware acceleration and modern theming
+- **Pure WPF Desktop UI**: Native Windows desktop application with hardware acceleration and modern FluentDark theming
 - **Advanced Data Binding**: Powerful XAML data binding with INotifyPropertyChanged for real-time UI updates
 - **Modern MVVM Pattern**: Clean separation of concerns with Model-View-ViewModel architecture (no code-behind dependencies)
 - **Premium Syncfusion WPF Components**: Professional UI controls optimized specifically for WPF desktop performance
 - **Responsive WPF Design**: Adaptive layouts using WPF's flexible layout system for different screen resolutions
 - **Native Windows Performance**: Direct Windows API integration through WPF for optimal performance
-- **Office2019Colorful Theming**: Consistent, professional appearance across all Syncfusion WPF controls
+- **Dual Theme Support**: FluentDark primary theme with FluentLight fallback for consistent professional appearance across all Syncfusion WPF controls
 - **Zero Legacy Dependencies**: No Windows Forms, WinForms, or deprecated UI framework references
 
 ## Features
@@ -75,7 +75,7 @@ This project is built **exclusively with WPF** to provide:
 - ✅ **PDF Report Generation**: Professional PDF reporting with Syncfusion.Pdf.NET
 
 ### Core WPF Features
-- **Modern Syncfusion WPF Interface**: Professional desktop UI with rich controls and FluentDark theming
+- **Modern Syncfusion WPF Interface**: Professional desktop UI with rich controls and FluentDark theming (FluentLight fallback available)
 - **Pure MVVM Architecture**: Clean separation using ViewModels, Commands, and Data Binding (zero code-behind complexity)
 - **Advanced Database Integration**: Entity Framework Core with SQL Server for robust data management via WPF data binding
 - **Modern Dependency Injection**: .NET 8 dependency injection container for clean architecture without legacy dependencies
@@ -85,10 +85,11 @@ This project is built **exclusively with WPF** to provide:
 - **WPF-Native Exception Handling**: WPF-specific error handling with professional dialog presentation and user experience
 - **Professional PDF Generation**: Syncfusion.Pdf.NET integration for enterprise-grade reporting
 - **No Legacy UI Dependencies**: Completely free of Windows Forms, WinForms, or other deprecated UI frameworks
+- **Dynamic Theme Switching**: Toggle between FluentDark and FluentLight themes via ThemeService with automatic fallback
 
 ## Technology Stack
 - **.NET 8 Pure WPF Application** - Modern Windows Presentation Foundation desktop application (zero legacy UI dependencies)
-- **Syncfusion WPF Premium Components** - Professional-grade UI controls (DataGrid, DockingManager, Charts, Ribbon) with FluentDark theming
+- **Syncfusion WPF Premium Components** - Professional-grade UI controls (DataGrid, DockingManager, Charts, Ribbon) with FluentDark primary theme and FluentLight fallback
 - **Syncfusion.Pdf.NET 30.1.40** - Enterprise PDF generation library for professional reports
 - **Entity Framework Core 9.0.7** - Latest object-relational mapping for data access with WPF data binding support
 - **SQL Server** - Enterprise database backend with WPF-optimized data access patterns
@@ -97,6 +98,7 @@ This project is built **exclusively with WPF** to provide:
 - **Microsoft Extensions** - Dependency Injection, Configuration management optimized for WPF applications
 - **XAML** - Declarative markup for rich WPF user interfaces with professional styling and theming
 - **Modern C# 12/.NET 8 Features** - Latest language features integrated with WPF development patterns
+- **Theme Management Service** - Dynamic theme switching between FluentDark and FluentLight with automatic fallback support
 
 ## Getting Started
 
@@ -222,6 +224,47 @@ For detailed migration analysis and patterns, see: [SERILOG_MIGRATION_ANALYSIS.m
 - **Maintenance**: Vehicle service records
 - **Fuel**: Consumption tracking
 
+## Theme Management System
+
+### FluentDark Primary Theme with FluentLight Fallback
+The application uses a sophisticated theme management system built on Syncfusion's official theming infrastructure:
+
+- **Primary Theme**: FluentDark (official Syncfusion dark theme)
+- **Fallback Theme**: FluentLight (available for theme switching)
+- **Dynamic Switching**: Toggle between themes using the ThemeService
+- **Automatic Fallback**: If FluentDark fails, automatically falls back to FluentLight
+- **Theme Validation**: Invalid theme requests automatically fall back to FluentDark
+- **Comprehensive Logging**: All theme operations include detailed logging for troubleshooting
+
+### Theme Service Features
+```csharp
+// Available through dependency injection
+public interface IThemeService
+{
+    string CurrentTheme { get; }           // Current active theme
+    string[] AvailableThemes { get; }      // ["FluentDark", "FluentLight"]
+    string PrimaryTheme { get; }           // "FluentDark"
+    string FallbackTheme { get; }          // "FluentLight"
+    bool IsDarkTheme { get; }              // True if current theme is dark
+    bool IsThemeSupported(string theme);   // Check if theme is available
+    void ToggleTheme();                    // Switch between themes
+    void ApplyTheme(string themeName);     // Apply specific theme
+    event EventHandler<string> ThemeChanged; // Theme change notifications
+}
+```
+
+### Configuration
+Theme settings are managed through `appsettings.json`:
+```json
+{
+  "AppSettings": {
+    "Theme": "FluentDark",
+    "FallbackTheme": "FluentLight",
+    "AllowThemeSwitching": true
+  }
+}
+```
+
 ## Usage
 
 ### Bus Management
@@ -297,9 +340,9 @@ This application uses Syncfusion's professional WPF UI component suite and requi
 - **Charts**: Professional charting and visualization controls with WPF hardware acceleration
 - **Ribbon**: Modern ribbon interface components following Office design patterns
 - **Navigation**: TabControl, TreeView, and menu controls with FluentDark theming
-- **FluentDark Theme**: Modern dark theme applied consistently across all Syncfusion WPF controls
-- **SfSkinManager**: Advanced theming system for unified visual experience
+- **SfSkinManager**: Advanced theming system for unified visual experience with FluentDark primary and FluentLight fallback
 - **PDF Generation**: Syncfusion.Pdf.NET for enterprise-grade PDF report generation
+- **Theme Management**: Dynamic theme switching between FluentDark and FluentLight with automatic fallback support
 
 
 For detailed testing documentation, see: [SYNCFUSION_TEST_FREEZE_MITIGATIONS.md](BusBuddy.Tests/SYNCFUSION_TEST_FREEZE_MITIGATIONS.md)
