@@ -69,7 +69,7 @@
             <StackPanel>
                 <!-- PREMIUM APP BRANDING -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,40">
-                    <!-- ICON PLACEHOLDER — Could add custom icon here -->
+                    <!-- ICON PLACEHOLDER - Could add custom icon here -->
                     <Border Background="{DynamicResource PrimaryBackground}"
                             CornerRadius="8" Width="48" Height="48" Margin="0,0,15,0">
                         <TextBlock Text="🚌" FontSize="24" HorizontalAlignment="Center"

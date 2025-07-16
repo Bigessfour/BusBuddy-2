@@ -690,6 +690,22 @@ namespace BusBuddy.WPF.Views.Dashboard
         }
 
         /// <summary>
+        /// Handle Window_Loaded event for the main window
+        /// </summary>
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("EnhancedDashboardView window loaded event triggered");
+                // Additional window-specific initialization if needed
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Window_Loaded event failed: {ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Override to capture any unhandled UI exceptions in the dashboard
         /// </summary>
         protected override void OnPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)

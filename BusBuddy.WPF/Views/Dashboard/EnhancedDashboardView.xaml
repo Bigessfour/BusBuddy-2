@@ -71,9 +71,9 @@
             </ContentControl>
         </DataTemplate>
 
-        <!-- Dashboard styles have been moved to global CustomStyles.xaml -->
+        <!-- Dashboard styles have been moved to global CustomStyles.xaml. -->
         <!-- All DashboardTileStyle, TileHeaderStyle, TileContentStyle, TileValueStyle, -->
-        <!-- StatusIndicatorStyle, and PerformanceTileStyle are now global resources -->
+        <!-- StatusIndicatorStyle, and PerformanceTileStyle are now global resources. -->
     </UserControl.Resources>
 
     <Grid>
@@ -141,7 +141,7 @@
             </Grid>
         </Border>
 
-        <!-- Main Content — DockingManager with baseline theme -->
+        <!-- Main Content with DockingManager and baseline theme -->
         <Grid Grid.Row="1">
             <syncfusion:DockingManager x:Name="MainDockingManager"
                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
@@ -914,7 +914,6 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          Content="{Binding BusManagementViewModel, FallbackValue={x:Null}}"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <!-- Driver Management Panel (Docked Left) -->
@@ -926,7 +925,6 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          Content="{Binding DriverManagementViewModel, FallbackValue={x:Null}}"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <!-- Route Management Panel (Document Tab) -->
@@ -936,7 +934,6 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          Content="{Binding RouteManagementViewModel, FallbackValue={x:Null}}"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
 
             <!-- Schedule Management Panel (Auto Hidden) -->
@@ -948,10 +945,13 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                <ContentControl Content="{Binding ScheduleManagementViewModel, FallbackValue={x:Null}}"
-                               Margin="10"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"/>
+                <Grid Margin="10">
+                    <TextBlock Text="Schedule Management"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             FontSize="16"
+                             Foreground="{DynamicResource SecondaryForeground}"/>
+                </Grid>
             </ContentControl>
 
             <!-- Student Management Panel (Docked Bottom) -->
@@ -964,10 +964,13 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                <ContentControl Content="{Binding StudentManagementViewModel, FallbackValue={x:Null}}"
-                               Margin="10"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"/>
+                <Grid Margin="10">
+                    <TextBlock Text="Student Management"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             FontSize="16"
+                             Foreground="{DynamicResource SecondaryForeground}"/>
+                </Grid>
             </ContentControl>
 
             <!-- Maintenance Tracking Panel (Tabbed with Student Management) -->
@@ -980,10 +983,13 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                <ContentControl Content="{Binding MaintenanceTrackingViewModel, FallbackValue={x:Null}}"
-                               Margin="10"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"/>
+                <Grid Margin="10">
+                    <TextBlock Text="Maintenance Tracking"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             FontSize="16"
+                             Foreground="{DynamicResource SecondaryForeground}"/>
+                </Grid>
             </ContentControl>
 
             <!-- Fuel Management Panel (Float) -->
@@ -994,10 +1000,13 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                <ContentControl Content="{Binding FuelManagementViewModel, FallbackValue={x:Null}}"
-                               Margin="10"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"/>
+                <Grid Margin="10">
+                    <TextBlock Text="Fuel Management"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             FontSize="16"
+                             Foreground="{DynamicResource SecondaryForeground}"/>
+                </Grid>
             </ContentControl>
 
             <!-- Activity Logging Panel (Auto Hidden) -->
@@ -1009,13 +1018,16 @@
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-                <ContentControl Content="{Binding ActivityLogViewModel, FallbackValue={x:Null}}"
-                               Margin="10"
-                               HorizontalAlignment="Stretch"
-                               VerticalAlignment="Stretch"/>
+                <Grid Margin="10">
+                    <TextBlock Text="Activity Logging"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             FontSize="16"
+                             Foreground="{DynamicResource SecondaryForeground}"/>
+                </Grid>
             </ContentControl>
 
-            <!-- System Loading Panel (Auto Hidden) — NEWLY INTEGRATED -->
+            <!-- System Loading Panel (Auto Hidden) - NEWLY INTEGRATED -->
             <ContentControl x:Name="SystemLoadingPanel"
                           syncfusion:DockingManager.Header="⚡ System Loading"
                           syncfusion:DockingManager.State="AutoHidden"
@@ -1030,7 +1042,7 @@
                                   VerticalAlignment="Stretch"/>
             </ContentControl>
 
-            <!-- 🤖 XAI Chat Panel (Right Docked) — NEW ENHANCEMENT -->
+            <!-- XAI Chat Panel (Right Docked) - NEW ENHANCEMENT -->
             <ContentControl x:Name="XAIChatPanel"
                           syncfusion:DockingManager.Header="🤖 XAI Assistant"
                           syncfusion:DockingManager.State="Dock"
@@ -1058,7 +1070,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Chat Control — Using RichTextBox instead of non-existent SfChat -->
+                    <!-- Chat Control - Using RichTextBox instead of non-existent SfChat -->
                     <Border Grid.Row="1" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="0,0,8,8">
                         <Grid Margin="5">
                             <Grid.RowDefinitions>
@@ -1136,7 +1148,7 @@
                 </Grid>
             </ContentControl>
 
-            <!-- 🌍 Google Earth Engine Panel (Floating) — NEW ENHANCEMENT -->
+            <!-- Google Earth Engine Panel (Floating) - NEW ENHANCEMENT -->
             <ContentControl x:Name="EarthEnginePanel"
                           syncfusion:DockingManager.Header="🌍 Earth Engine Maps"
                           syncfusion:DockingManager.State="Float"

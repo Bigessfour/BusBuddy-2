@@ -40,7 +40,7 @@
              d:DesignHeight="500" d:DesignWidth="600"
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
-    <!-- No local resources — ThemeTextConverter is now global in App.xaml -->
+    <!-- No local resources - ThemeTextConverter is now global in App.xaml -->
 
     <Grid Margin="24" Background="{DynamicResource ContentBackground}">
         <Grid.RowDefinitions>

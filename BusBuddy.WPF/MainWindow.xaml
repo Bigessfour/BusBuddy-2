@@ -35,11 +35,11 @@
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Add converters — Only those not already in App.xaml -->
+            <!-- Add converters - Only those not already in App.xaml -->
             <local:DebugConverter x:Key="DebugConverter" />
             <!-- BooleanToDeprecatedForegroundConverter and BooleanToVisibilityConverter are now global -->
 
-            <!-- Navigation Panel Style — Uses official Syncfusion FluentDark theme resources -->
+            <!-- Navigation Panel Style - Uses official Syncfusion FluentDark theme resources -->
             <Style x:Key="BusBuddyNavigationPanelStyle" TargetType="Border">
                 <Setter Property="Background" Value="{DynamicResource SecondaryBackground}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource SecondaryBorder}"/>

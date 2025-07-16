@@ -43,7 +43,7 @@
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <UserControl.Resources>
-        <!-- BooleanToVisibilityConverter is now global in App.xaml — removed duplicate -->
+        <!-- BooleanToVisibilityConverter is now global in App.xaml - removed duplicate -->
 
         <!-- Enhanced Route Status Templates -->
         <DataTemplate x:Key="RouteStatusTemplate">

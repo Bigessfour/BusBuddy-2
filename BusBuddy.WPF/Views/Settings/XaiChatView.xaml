@@ -10,7 +10,7 @@
              d:DesignHeight="600" d:DesignWidth="400"
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
-    <!-- No UserControl.Resources needed — SfSkinManager handles theme automatically -->
+    <!-- No UserControl.Resources needed - SfSkinManager handles theme automatically -->
 
     <Grid Background="{DynamicResource ContentBackground}">
         <Grid.RowDefinitions>

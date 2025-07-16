@@ -62,7 +62,7 @@
                 </syncfusion:QuickAccessToolBar>
             </syncfusion:Ribbon.QuickAccessToolBar>
 
-            <!-- HOME Tab — Core Operations -->
+            <!-- HOME Tab - Core Operations -->
             <syncfusion:RibbonTab Caption="HOME" IsChecked="True" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
                 <!-- Dashboard Group -->
@@ -153,7 +153,7 @@
 
             </syncfusion:RibbonTab>
 
-            <!-- OPERATIONS Tab — Fleet Management -->
+            <!-- OPERATIONS Tab - Fleet Management -->
             <syncfusion:RibbonTab Caption="OPERATIONS" IsChecked="False" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
                 <!-- Fleet Group -->
@@ -271,7 +271,7 @@
 
         </syncfusion:Ribbon>
 
-        <!-- Content Area — Dashboard Views -->
+        <!-- Content Area - Dashboard Views -->
         <Grid Grid.Row="1" x:Name="ContentArea" Background="{StaticResource ContentBackground}">
             <!-- Default content will be the Enhanced Dashboard View -->
             <!-- Primary Enhanced Dashboard View -->

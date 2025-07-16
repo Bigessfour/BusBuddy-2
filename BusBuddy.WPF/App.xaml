@@ -23,13 +23,13 @@
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Essential converters only — minimal resource dictionary -->
+            <!-- Essential converters only - minimal resource dictionary -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
             <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
 
-            <!-- Missing Inverse Converter — Critical Fix -->
+            <!-- Missing Inverse Converter - Critical Fix -->
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter" IsInverted="True"/>
 
             <!-- Status and Data Converters -->
