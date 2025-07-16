@@ -40,11 +40,9 @@
              d:DesignHeight="500" d:DesignWidth="600"
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
-    <UserControl.Resources>
-        <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
-    </UserControl.Resources>
+    <!-- No local resources — ThemeTextConverter is now global in App.xaml -->
 
-    <Grid Margin="24" Background="{StaticResource ContentBackground}">
+    <Grid Margin="24" Background="{DynamicResource ContentBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -59,7 +57,7 @@
                       FontWeight="Bold"
                       FontSize="14"
                       Margin="0,0,0,8"
-                      Foreground="{StaticResource Foreground}"/>
+                      Foreground="{DynamicResource Foreground}"/>
             <StackPanel Orientation="Horizontal">
                 <syncfusion:ButtonAdv x:Name="ThemeToggle"
                          IsCheckable="True"
@@ -78,7 +76,7 @@
                       FontWeight="Bold"
                       FontSize="14"
                       Margin="0,0,0,8"
-                      Foreground="{StaticResource Foreground}"/>
+                      Foreground="{DynamicResource Foreground}"/>
             <syncfusion:ComboBoxAdv x:Name="ThemeComboBox"
                                    ItemsSource="{Binding ThemeOptions}"
                                    SelectedItem="{Binding Theme, Mode=TwoWay}"

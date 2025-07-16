@@ -379,6 +379,46 @@
     </Style>
 
     <!-- =============================================================================== -->
+    <!-- RIBBON WINDOW STYLES (MOVED FROM EnhancedRibbonWindow.xaml) -->
+    <!-- =============================================================================== -->
+
+    <!-- Button Icons as Text (Simple Implementation) -->
+    <Style x:Key="RibbonIconStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{DynamicResource Foreground}"/>
+    </Style>
+
+    <!-- Style for Ribbon Button -->
+    <Style x:Key="RibbonButtonStyle" TargetType="syncfusion:RibbonButton">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource Foreground}"/>
+    </Style>
+
+    <!-- Style for SplitButton -->
+    <Style x:Key="RibbonSplitButtonStyle" TargetType="syncfusion:SplitButton">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource Foreground}"/>
+    </Style>
+
+    <!-- Style for DropDownButton -->
+    <Style x:Key="RibbonDropDownButtonStyle" TargetType="syncfusion:DropDownButton">
+        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource Foreground}"/>
+    </Style>
+
+    <!-- Style for DropDownMenuItem -->
+    <Style x:Key="DropDownMenuItemStyle" TargetType="syncfusion:DropDownMenuItem">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Foreground}"/>
+    </Style>
+
+    <!-- =============================================================================== -->
     <!-- MISSING STYLES FOR VIEWS (ALIGNED WITH FLUENTDARK) -->
     <!-- =============================================================================== -->
 
@@ -815,6 +855,9 @@
     <!-- Additional FluentDark Accent Brushes -->
     <SolidColorBrush x:Key="FluentDarkPurpleBrush" Color="#6A1B9A" />
     <SolidColorBrush x:Key="FluentDarkBorderBrush" Color="#323130" />
+
+    <!-- Critical Missing Resource: Foreground -->
+    <SolidColorBrush x:Key="Foreground" Color="#FFFFFF" />
 
     <!-- Pressed and Selected States -->
     <SolidColorBrush x:Key="PressedBackground" Color="#404040" />

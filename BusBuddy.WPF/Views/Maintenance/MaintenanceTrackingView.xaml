@@ -44,7 +44,7 @@
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!-- BooleanToVisibilityConverter is now global in App.xaml -->
         <!-- Use FluentDark theme brushes instead of hardcoded colors -->
         <SolidColorBrush x:Key="HighPriorityBrush" Color="{StaticResource ErrorColor}"/>
         <SolidColorBrush x:Key="MediumPriorityBrush" Color="{StaticResource WarningColor}"/>

@@ -10,9 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:BusManagementViewModel}"
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    </UserControl.Resources>
+    <!-- Local resources removed — all converters now global in App.xaml -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

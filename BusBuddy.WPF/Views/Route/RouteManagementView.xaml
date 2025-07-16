@@ -40,7 +40,9 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:RouteManagementViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+    <!-- Local resources removed — all converters now global in App.xaml -->
+    <Grid>
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

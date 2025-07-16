@@ -12,6 +12,9 @@
             Theme is applied via SfSkinManager.ApplicationTheme in App.xaml.cs
             This loads the official Syncfusion FluentDark theme resources automatically
             Only custom styles and compatibility mappings are included here
+
+            IMPORTANT: All views must use FluentDark theme consistently
+            Each control should have: syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
             ===============================================================================
             -->
             <ResourceDictionary.MergedDictionaries>
@@ -25,6 +28,7 @@
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
+            <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
 
             <!-- Missing Inverse Converter — Critical Fix -->
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter" IsInverted="True"/>
@@ -40,6 +44,17 @@
             <converters:LicenseExpiredConverter x:Key="LicenseExpiredConverter"/>
             <converters:LicenseExpiringSoonConverter x:Key="LicenseExpiringSoonConverter"/>
             <converters:DaysRemainingToColorConverter x:Key="DaysRemainingToColorConverter"/>
+
+            <!-- Additional converters commonly used in views -->
+            <converters:ScheduleStatusToColorConverter x:Key="ScheduleStatusToColorConverter"/>
+
+            <!-- CRITICAL: Add missing converters to prevent local definitions -->
+            <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>
+            <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+            <converters:BooleanToVisibilityInverseConverter x:Key="BooleanToVisibilityInverseConverter"/>
+
+            <!-- Standard WPF converters as global resources -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

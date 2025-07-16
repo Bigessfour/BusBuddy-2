@@ -42,8 +42,7 @@
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <converters:ScheduleStatusToColorConverter x:Key="ScheduleStatusToColorConverter"/>
+        <!-- BooleanToVisibilityConverter and ScheduleStatusToColorConverter are now global in App.xaml -->
 
         <!-- Schedule Status Templates -->
         <DataTemplate x:Key="ScheduleStatusTemplate">

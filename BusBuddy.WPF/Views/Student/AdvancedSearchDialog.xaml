@@ -18,6 +18,7 @@
         d:DataContext="{d:DesignInstance Type=viewModels:AdvancedSearchViewModel}">
 
     <Window.Resources>
+        <!-- Local styles maintained for dialog-specific styling -->
         <Style x:Key="HeaderStyle" TargetType="TextBlock">
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="0,10,0,5"/>
@@ -29,7 +30,7 @@
         <Style x:Key="FieldGroup" TargetType="StackPanel">
             <Setter Property="Margin" Value="0,5"/>
         </Style>
-        <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+        <!-- EnumToBooleanConverter is now global in App.xaml -->
     </Window.Resources>
 
     <Grid Margin="20">

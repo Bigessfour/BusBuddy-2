@@ -35,10 +35,9 @@
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Add converters -->
+            <!-- Add converters — Only those not already in App.xaml -->
             <local:DebugConverter x:Key="DebugConverter" />
-            <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter" />
-            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <!-- BooleanToDeprecatedForegroundConverter and BooleanToVisibilityConverter are now global -->
 
             <!-- Navigation Panel Style — Uses official Syncfusion FluentDark theme resources -->
             <Style x:Key="BusBuddyNavigationPanelStyle" TargetType="Border">

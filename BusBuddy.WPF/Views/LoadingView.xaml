@@ -19,7 +19,7 @@
 
     <UserControl.Resources>
         <!-- CONVERTERS -->
-        <converters:BooleanToVisibilityInverseConverter x:Key="BooleanToVisibilityInverseConverter"/>
+        <!-- BooleanToVisibilityInverseConverter is now global in App.xaml -->
 
         <!-- PREMIUM LOADING ANIMATIONS -->
         <Storyboard x:Key="FadeInAnimation" RepeatBehavior="Forever">

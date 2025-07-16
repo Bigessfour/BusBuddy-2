@@ -43,9 +43,7 @@
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    </UserControl.Resources>
+    <!-- Local resources removed — all converters now global in App.xaml -->
 
     <!-- Enhanced Fuel Management with Syncfusion DockingManager -->
     <syncfusion:DockingManager UseDocumentContainer="True"
