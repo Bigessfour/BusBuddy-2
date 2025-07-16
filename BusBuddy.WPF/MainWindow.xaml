@@ -103,12 +103,11 @@
         <!-- Enhanced Navigation with SfNavigationDrawer Implementation -->
         <syncfusion:SfNavigationDrawer x:Name="MainNavigationDrawer"
                                       DrawerWidth="280"
-                                      DrawerPosition="Left"
+                                      Position="Left"
                                       DisplayMode="Expanded"
                                       EnableSwipeGesture="True"
                                       IsOpen="True"
                                       DrawerBackground="{DynamicResource ProfessionalSurfaceDark}"
-                                      ContentBackground="{DynamicResource ProfessionalSurfaceMedium}"
                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
             <!-- Professional Navigation Header -->

@@ -4,11 +4,14 @@ using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Syncfusion.UI.Xaml.Scheduler;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Text;
+using System.IO;
 using Serilog;
 
 namespace BusBuddy.WPF.ViewModels.Schedule
@@ -20,6 +23,7 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         private readonly IScheduleService _scheduleService;
         private readonly IBusService _busService;
         private readonly IDriverService _driverService;
+        private readonly IServiceProvider _serviceProvider;
 
         [ObservableProperty]
         private ObservableCollection<BusBuddy.Core.Models.Schedule> _schedules;
@@ -103,12 +107,14 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         public ScheduleManagementViewModel(
             IScheduleService scheduleService,
             IBusService busService,
-            IDriverService driverService)
+            IDriverService driverService,
+            IServiceProvider serviceProvider)
             : base()
         {
             _scheduleService = scheduleService;
             _busService = busService;
             _driverService = driverService;
+            _serviceProvider = serviceProvider;
 
             // Initialize collections
             Schedules = new ObservableCollection<BusBuddy.Core.Models.Schedule>();
@@ -375,7 +381,18 @@ namespace BusBuddy.WPF.ViewModels.Schedule
             if (SelectedSchedule != null)
             {
                 Logger.Information("Viewing details for schedule {ScheduleId}", SelectedSchedule.ScheduleId);
-                // TODO: Open schedule details dialog
+
+                try
+                {
+                    // Create and show the schedule details dialog with proper DI
+                    var detailsDialog = new Views.Schedule.ScheduleDetailsDialog(SelectedSchedule, _serviceProvider);
+                    detailsDialog.Owner = System.Windows.Application.Current.MainWindow;
+                    detailsDialog.ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error opening schedule details dialog for schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                }
             }
             return Task.CompletedTask;
         }
@@ -384,8 +401,53 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         {
             if (SelectedSchedule != null)
             {
-                Logger.Information("Editing schedule {ScheduleId}", SelectedSchedule.ScheduleId);
-                // TODO: Open schedule edit dialog
+                try
+                {
+                    Logger.Information("Opening edit dialog for schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+
+                    // Create and show the edit schedule dialog
+                    var editDialog = new Views.Schedule.AddEditScheduleDialog();
+
+                    // Get the route service from the service provider
+                    var routeService = _serviceProvider.GetService<IRouteService>();
+                    if (routeService == null)
+                    {
+                        Logger.Error("Route service not available for schedule editing");
+                        System.Windows.MessageBox.Show("Route service not available. Cannot edit schedule.",
+                                                      "Service Error",
+                                                      System.Windows.MessageBoxButton.OK,
+                                                      System.Windows.MessageBoxImage.Error);
+                        return Task.CompletedTask;
+                    }
+
+                    // Create the view model with the selected schedule for editing
+                    var editViewModel = new AddEditScheduleViewModel(_scheduleService, routeService, _busService, _driverService, SelectedSchedule);
+                    editDialog.DataContext = editViewModel;
+                    editDialog.Owner = System.Windows.Application.Current.MainWindow;
+
+                    if (editDialog.ShowDialog() == true)
+                    {
+                        // Refresh the schedule list after successful edit
+                        _ = LoadDataAsync();
+                        Logger.Information("Schedule {ScheduleId} edited successfully", SelectedSchedule.ScheduleId);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error opening edit dialog for schedule {ScheduleId}", SelectedSchedule.ScheduleId);
+                    System.Windows.MessageBox.Show($"Error opening edit dialog: {ex.Message}",
+                                                  "Error",
+                                                  System.Windows.MessageBoxButton.OK,
+                                                  System.Windows.MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                Logger.Warning("No schedule selected for editing");
+                System.Windows.MessageBox.Show("Please select a schedule to edit.",
+                                              "No Selection",
+                                              System.Windows.MessageBoxButton.OK,
+                                              System.Windows.MessageBoxImage.Information);
             }
             return Task.CompletedTask;
         }
@@ -478,18 +540,182 @@ namespace BusBuddy.WPF.ViewModels.Schedule
         }
 
         // Report generation methods
-        private Task GenerateDailyReportAsync()
+        private async Task GenerateDailyReportAsync()
         {
-            Logger.Information("Generating daily report");
-            // TODO: Implement daily report generation
-            return Task.CompletedTask;
+            try
+            {
+                Logger.Information("Generating daily schedule report for {Date}", SelectedDate.Date);
+
+                var todaySchedules = Schedules.Where(s => s.ScheduleDate.Date == SelectedDate.Date).ToList();
+
+                if (!todaySchedules.Any())
+                {
+                    Logger.Warning("No schedules found for date {Date}", SelectedDate.Date);
+                    System.Windows.MessageBox.Show($"No schedules found for {SelectedDate.Date:MMM dd, yyyy}.",
+                                                  "No Data",
+                                                  System.Windows.MessageBoxButton.OK,
+                                                  System.Windows.MessageBoxImage.Information);
+                    return;
+                }
+
+                var reportData = new StringBuilder();
+                reportData.AppendLine($"DAILY SCHEDULE REPORT - {SelectedDate.Date:MMM dd, yyyy}");
+                reportData.AppendLine(new string('=', 50));
+                reportData.AppendLine($"Generated: {DateTime.Now:MMM dd, yyyy HH:mm}");
+                reportData.AppendLine($"Total Schedules: {todaySchedules.Count}");
+                reportData.AppendLine();
+
+                // Group by status
+                var statusGroups = todaySchedules.GroupBy(s => s.Status).ToList();
+                foreach (var group in statusGroups)
+                {
+                    reportData.AppendLine($"{group.Key}: {group.Count()} schedules");
+                }
+                reportData.AppendLine();
+
+                // Detailed schedule list
+                reportData.AppendLine("SCHEDULE DETAILS:");
+                reportData.AppendLine(new string('-', 50));
+
+                foreach (var schedule in todaySchedules.OrderBy(s => s.DepartureTime))
+                {
+                    reportData.AppendLine($"Schedule ID: {schedule.ScheduleId}");
+                    reportData.AppendLine($"Route: {schedule.Route?.RouteName ?? "Unknown"}");
+                    reportData.AppendLine($"Bus: {schedule.Bus?.BusNumber ?? "Unknown"}");
+                    reportData.AppendLine($"Driver: {schedule.Driver?.FullName ?? "Unknown"}");
+                    reportData.AppendLine($"Departure: {schedule.DepartureTime:HH:mm}");
+                    reportData.AppendLine($"Arrival: {schedule.ArrivalTime:HH:mm}");
+                    reportData.AppendLine($"Status: {schedule.Status}");
+                    if (!string.IsNullOrWhiteSpace(schedule.Notes))
+                    {
+                        reportData.AppendLine($"Notes: {schedule.Notes}");
+                    }
+                    reportData.AppendLine();
+                }
+
+                // Save to file
+                var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                {
+                    Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                    DefaultExt = "txt",
+                    FileName = $"Daily_Schedule_Report_{SelectedDate.Date:yyyyMMdd}.txt"
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    await File.WriteAllTextAsync(saveFileDialog.FileName, reportData.ToString());
+                    Logger.Information("Daily report saved to {FilePath}", saveFileDialog.FileName);
+
+                    System.Windows.MessageBox.Show($"Daily schedule report generated successfully!\nSaved to: {saveFileDialog.FileName}",
+                                                  "Report Generated",
+                                                  System.Windows.MessageBoxButton.OK,
+                                                  System.Windows.MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error generating daily schedule report");
+                System.Windows.MessageBox.Show($"Error generating daily report: {ex.Message}",
+                                              "Error",
+                                              System.Windows.MessageBoxButton.OK,
+                                              System.Windows.MessageBoxImage.Error);
+            }
         }
 
-        private Task GenerateWeeklyReportAsync()
+        private async Task GenerateWeeklyReportAsync()
         {
-            Logger.Information("Generating weekly report");
-            // TODO: Implement weekly report generation
-            return Task.CompletedTask;
+            try
+            {
+                Logger.Information("Generating weekly schedule report for week of {Date}", SelectedDate.Date);
+
+                var startOfWeek = SelectedDate.AddDays(-(int)SelectedDate.DayOfWeek);
+                var endOfWeek = startOfWeek.AddDays(6);
+
+                var weekSchedules = Schedules.Where(s => s.ScheduleDate.Date >= startOfWeek.Date &&
+                                                        s.ScheduleDate.Date <= endOfWeek.Date).ToList();
+
+                if (!weekSchedules.Any())
+                {
+                    Logger.Warning("No schedules found for week of {StartDate} to {EndDate}", startOfWeek.Date, endOfWeek.Date);
+                    System.Windows.MessageBox.Show($"No schedules found for week of {startOfWeek.Date:MMM dd} - {endOfWeek.Date:MMM dd, yyyy}.",
+                                                  "No Data",
+                                                  System.Windows.MessageBoxButton.OK,
+                                                  System.Windows.MessageBoxImage.Information);
+                    return;
+                }
+
+                var reportData = new StringBuilder();
+                reportData.AppendLine($"WEEKLY SCHEDULE REPORT - {startOfWeek.Date:MMM dd} - {endOfWeek.Date:MMM dd, yyyy}");
+                reportData.AppendLine(new string('=', 60));
+                reportData.AppendLine($"Generated: {DateTime.Now:MMM dd, yyyy HH:mm}");
+                reportData.AppendLine($"Total Schedules: {weekSchedules.Count}");
+                reportData.AppendLine();
+
+                // Daily breakdown
+                reportData.AppendLine("DAILY BREAKDOWN:");
+                reportData.AppendLine(new string('-', 30));
+
+                for (int i = 0; i < 7; i++)
+                {
+                    var currentDay = startOfWeek.AddDays(i);
+                    var daySchedules = weekSchedules.Where(s => s.ScheduleDate.Date == currentDay.Date).ToList();
+                    reportData.AppendLine($"{currentDay:dddd, MMM dd}: {daySchedules.Count} schedules");
+                }
+                reportData.AppendLine();
+
+                // Status summary
+                reportData.AppendLine("STATUS SUMMARY:");
+                reportData.AppendLine(new string('-', 30));
+                var statusGroups = weekSchedules.GroupBy(s => s.Status).ToList();
+                foreach (var group in statusGroups)
+                {
+                    reportData.AppendLine($"{group.Key}: {group.Count()} schedules");
+                }
+                reportData.AppendLine();
+
+                // Resource utilization
+                reportData.AppendLine("RESOURCE UTILIZATION:");
+                reportData.AppendLine(new string('-', 30));
+                var busUtilization = weekSchedules.GroupBy(s => s.Bus?.BusNumber ?? "Unknown").ToList();
+                foreach (var group in busUtilization)
+                {
+                    reportData.AppendLine($"Bus {group.Key}: {group.Count()} schedules");
+                }
+                reportData.AppendLine();
+
+                var driverUtilization = weekSchedules.GroupBy(s => s.Driver?.FullName ?? "Unknown").ToList();
+                foreach (var group in driverUtilization)
+                {
+                    reportData.AppendLine($"Driver {group.Key}: {group.Count()} schedules");
+                }
+
+                // Save to file
+                var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                {
+                    Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                    DefaultExt = "txt",
+                    FileName = $"Weekly_Schedule_Report_{startOfWeek.Date:yyyyMMdd}.txt"
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    await File.WriteAllTextAsync(saveFileDialog.FileName, reportData.ToString());
+                    Logger.Information("Weekly report saved to {FilePath}", saveFileDialog.FileName);
+
+                    System.Windows.MessageBox.Show($"Weekly schedule report generated successfully!\nSaved to: {saveFileDialog.FileName}",
+                                                  "Report Generated",
+                                                  System.Windows.MessageBoxButton.OK,
+                                                  System.Windows.MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error generating weekly schedule report");
+                System.Windows.MessageBox.Show($"Error generating weekly report: {ex.Message}",
+                                              "Error",
+                                              System.Windows.MessageBoxButton.OK,
+                                              System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private Task GenerateUtilizationReportAsync()
@@ -499,11 +725,81 @@ namespace BusBuddy.WPF.ViewModels.Schedule
             return Task.CompletedTask;
         }
 
-        private Task ExportScheduleAsync()
+        private async Task ExportScheduleAsync()
         {
-            Logger.Information("Exporting schedule data");
-            // TODO: Implement Excel export
-            return Task.CompletedTask;
+            try
+            {
+                Logger.Information("Exporting schedule data to CSV");
+
+                if (!Schedules.Any())
+                {
+                    Logger.Warning("No schedules available for export");
+                    System.Windows.MessageBox.Show("No schedules available for export.",
+                                                  "No Data",
+                                                  System.Windows.MessageBoxButton.OK,
+                                                  System.Windows.MessageBoxImage.Information);
+                    return;
+                }
+
+                var csvData = new StringBuilder();
+
+                // CSV Header
+                csvData.AppendLine("Schedule ID,Route,Bus Number,Driver,Schedule Date,Departure Time,Arrival Time,Status,Notes,Created Date,Updated Date");
+
+                // CSV Data rows
+                foreach (var schedule in Schedules.OrderBy(s => s.ScheduleDate).ThenBy(s => s.DepartureTime))
+                {
+                    var csvRow = $"{schedule.ScheduleId}," +
+                                $"\"{schedule.Route?.RouteName ?? "Unknown"}\"," +
+                                $"\"{schedule.Bus?.BusNumber ?? "Unknown"}\"," +
+                                $"\"{schedule.Driver?.FullName ?? "Unknown"}\"," +
+                                $"{schedule.ScheduleDate:yyyy-MM-dd}," +
+                                $"{schedule.DepartureTime:HH:mm}," +
+                                $"{schedule.ArrivalTime:HH:mm}," +
+                                $"\"{schedule.Status}\"," +
+                                $"\"{schedule.Notes?.Replace("\"", "\"\"") ?? ""}\"," +
+                                $"{schedule.CreatedDate:yyyy-MM-dd HH:mm}," +
+                                $"{schedule.UpdatedDate?.ToString("yyyy-MM-dd HH:mm") ?? ""}";
+
+                    csvData.AppendLine(csvRow);
+                }
+
+                // Save to file
+                var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                {
+                    Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*",
+                    DefaultExt = "csv",
+                    FileName = $"Schedule_Export_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    await File.WriteAllTextAsync(saveFileDialog.FileName, csvData.ToString());
+                    Logger.Information("Schedule data exported to {FilePath}", saveFileDialog.FileName);
+
+                    var result = System.Windows.MessageBox.Show($"Schedule data exported successfully!\nSaved to: {saveFileDialog.FileName}\n\nWould you like to open the file?",
+                                                               "Export Complete",
+                                                               System.Windows.MessageBoxButton.YesNo,
+                                                               System.Windows.MessageBoxImage.Information);
+
+                    if (result == System.Windows.MessageBoxResult.Yes)
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = saveFileDialog.FileName,
+                            UseShellExecute = true
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error exporting schedule data");
+                System.Windows.MessageBox.Show($"Error exporting schedule data: {ex.Message}",
+                                              "Error",
+                                              System.Windows.MessageBoxButton.OK,
+                                              System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private Task GenerateScheduleReportAsync()

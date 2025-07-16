@@ -963,6 +963,8 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.ViewModels.DriverManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.RouteManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.Schedule.ScheduleManagementViewModel>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.ScheduleManagement.ScheduleViewModel>();
+        services.AddScoped<BusBuddy.WPF.ViewModels.Schedule.AddEditScheduleViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.StudentManagementViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel>();
         services.AddScoped<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();

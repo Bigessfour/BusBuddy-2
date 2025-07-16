@@ -60,7 +60,7 @@ namespace BusBuddy.Core.Services
 
                 var totalActivities = activities.Count;
                 var activeDrivers = activities.Where(a => a.DriverId.HasValue).Select(a => a.DriverId).Distinct().Count();
-                var activeVehicles = activities.Where(a => a.AssignedVehicleId.HasValue).Select(a => a.AssignedVehicleId).Distinct().Count();
+                var activeVehicles = activities.Where(a => a.AssignedVehicleId > 0).Select(a => a.AssignedVehicleId).Distinct().Count();
 
                 graphics.DrawString($"Total Activities: {totalActivities}", bodyFont,
                     new PdfSolidBrush(textColor), new PointF(30, currentY));
@@ -236,7 +236,7 @@ namespace BusBuddy.Core.Services
             sb.AppendLine("SUMMARY");
             sb.AppendLine($"Total Activities: {activities.Count}");
             sb.AppendLine($"Active Drivers: {activities.Where(a => a.DriverId.HasValue).Select(a => a.DriverId).Distinct().Count()}");
-            sb.AppendLine($"Active Vehicles: {activities.Where(a => a.AssignedVehicleId.HasValue).Select(a => a.AssignedVehicleId).Distinct().Count()}");
+            sb.AppendLine($"Active Vehicles: {activities.Where(a => a.AssignedVehicleId > 0).Select(a => a.AssignedVehicleId).Distinct().Count()}");
             sb.AppendLine();
 
             // Status breakdown
