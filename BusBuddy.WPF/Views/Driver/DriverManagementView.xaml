@@ -130,7 +130,7 @@
                                            Style="{StaticResource BusBuddyTileContentStyle}"/>
                                 <TextBlock Text="{Binding LicenseExpiringCount}"
                                            Style="{StaticResource BusBuddyTileValueStyle}"
-                                           Foreground="{StaticResource FluentDarkWarningBrush}"/>
+                                           Foreground="{StaticResource WarningBrush}"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -179,7 +179,7 @@
                             <MenuItem Header="Generate Report" Command="{Binding GenerateDriverReportCommand}"/>
                             <Separator/>
                             <MenuItem Header="Delete Driver" Command="{Binding DeleteDriverCommand}"
-                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
+                                     Foreground="{StaticResource ErrorBrush}"/>
                         </ContextMenu>
                     </syncfusion:SfDataGrid.ContextMenu>
                 </syncfusion:SfDataGrid>

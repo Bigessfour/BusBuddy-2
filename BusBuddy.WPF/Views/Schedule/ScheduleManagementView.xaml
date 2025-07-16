@@ -317,11 +317,11 @@
                                AllowEditing="True"
                                ShowRowHeader="False"
                                BorderThickness="1"
-                               BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                               BorderBrush="{StaticResource BorderBrush}"
                                Style="{StaticResource BusBuddySfDataGridStyle}"
                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                               Background="{StaticResource FluentDarkBackgroundBrush}"
-                               Foreground="{StaticResource FluentDarkForegroundBrush}"
+                               Background="{StaticResource ContentBackground}"
+                               Foreground="{StaticResource Foreground}"
                                GridLinesVisibility="Both">
 
                     <syncfusion:SfDataGrid.Columns>
@@ -340,14 +340,14 @@
                         <syncfusion:GridTemplateColumn MappingName="BusAssignment" HeaderText="Bus" Width="100">
                             <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource FluentDarkAccentBrush}"
+                                    <Border Background="{StaticResource AccentBrush}"
                                           CornerRadius="4"
                                           Padding="4,2"
                                           Margin="1">
                                         <TextBlock Text="{Binding BusNumber, StringFormat='Bus {0}'}"
                                                   FontSize="10"
                                                   FontWeight="SemiBold"
-                                                  Foreground="{StaticResource FluentDarkBackgroundBrush}"
+                                                  Foreground="{StaticResource ContentBackground}"
                                                   HorizontalAlignment="Center"/>
                                     </Border>
                                 </DataTemplate>
@@ -358,14 +358,14 @@
                         <syncfusion:GridTemplateColumn MappingName="DriverAssignment" HeaderText="Driver" Width="120">
                             <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource FluentDarkSecondaryBrush}"
+                                    <Border Background="{StaticResource SecondaryBrush}"
                                           CornerRadius="4"
                                           Padding="4,2"
                                           Margin="1">
                                         <TextBlock Text="{Binding DriverName}"
                                                   FontSize="10"
                                                   FontWeight="SemiBold"
-                                                  Foreground="{StaticResource FluentDarkBackgroundBrush}"
+                                                  Foreground="{StaticResource ContentBackground}"
                                                   HorizontalAlignment="Center"
                                                   TextTrimming="CharacterEllipsis"/>
                                     </Border>
@@ -395,7 +395,7 @@
                             <MenuItem Header="Mark as Complete" Command="{Binding MarkCompleteCommand}"/>
                             <MenuItem Header="Cancel Schedule"
                                      Command="{Binding CancelScheduleCommand}"
-                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
+                                     Foreground="{StaticResource ErrorBrush}"/>
                             <Separator/>
                             <MenuItem Header="Generate Report" Command="{Binding GenerateScheduleReportCommand}"/>
                         </ContextMenu>
@@ -412,7 +412,7 @@
                     <!-- Schedule Summary -->
                     <TextBlock Grid.Row="0"
                              Margin="0,0,0,10"
-                             Foreground="{StaticResource FluentDarkPrimaryTextBrush}">
+                             Foreground="{StaticResource PrimaryForeground}">
                         <Run Text="Showing"/>
                         <Run Text="{Binding Schedules.Count, Mode=OneWay}" FontWeight="Bold"/>
                         <Run Text="of"/>
@@ -461,7 +461,7 @@
                           FontSize="18"
                           FontWeight="Bold"
                           Margin="0,0,0,15"
-                          Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                          Foreground="{StaticResource PrimaryForeground}"/>
 
                 <!-- Analytics Charts -->
                 <Grid Grid.Row="1">
@@ -472,7 +472,7 @@
 
                     <!-- Schedule Volume Chart -->
                     <Border Grid.Column="0"
-                           BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                           BorderBrush="{StaticResource BorderBrush}"
                            BorderThickness="1"
                            CornerRadius="6"
                            Margin="0,0,10,0">
@@ -480,7 +480,7 @@
                                          Margin="15"
                                          Style="{StaticResource BusBuddySfChartStyle}"
                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                         Background="{StaticResource FluentDarkSurfaceBrush}">
+                                         Background="{StaticResource ContentBackground}">
                             <syncfusion:SfChart.PrimaryAxis>
                                 <syncfusion:DateTimeAxis Header="Date"/>
                             </syncfusion:SfChart.PrimaryAxis>
@@ -490,13 +490,13 @@
                             <syncfusion:LineSeries ItemsSource="{Binding ScheduleVolumeData}"
                                                  XBindingPath="Date"
                                                  YBindingPath="Count"
-                                                 Interior="{StaticResource FluentDarkAccentBrush}"/>
+                                                 Interior="{StaticResource AccentBrush}"/>
                         </syncfusion:SfChart>
                     </Border>
 
                     <!-- Resource Utilization Chart -->
                     <Border Grid.Column="1"
-                           BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                           BorderBrush="{StaticResource BorderBrush}"
                            BorderThickness="1"
                            CornerRadius="6"
                            Margin="10,0,0,0">
@@ -504,7 +504,7 @@
                                          Margin="15"
                                          Style="{StaticResource BusBuddySfChartStyle}"
                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                         Background="{StaticResource FluentDarkSurfaceBrush}">
+                                         Background="{StaticResource ContentBackground}">
                             <syncfusion:PieSeries ItemsSource="{Binding ResourceUtilizationData}"
                                                 XBindingPath="ResourceType"
                                                 YBindingPath="UtilizationPercentage"
@@ -524,9 +524,9 @@
                                     ShowRowHeader="False"
                                     Style="{StaticResource BusBuddySfDataGridStyle}"
                                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                    Background="{StaticResource FluentDarkBackgroundBrush}"
-                                    Foreground="{StaticResource FluentDarkForegroundBrush}"
-                                    BorderBrush="{StaticResource FluentDarkBorderBrush}">
+                                    Background="{StaticResource ContentBackground}"
+                                    Foreground="{StaticResource Foreground}"
+                                    BorderBrush="{StaticResource BorderBrush}">
                     <syncfusion:SfDataGrid.Columns>
                         <syncfusion:GridDateTimeColumn MappingName="Date" HeaderText="Date" Width="100" Pattern="ShortDate"/>
                         <syncfusion:GridNumericColumn MappingName="TotalSchedules" HeaderText="Total Schedules" Width="120"/>

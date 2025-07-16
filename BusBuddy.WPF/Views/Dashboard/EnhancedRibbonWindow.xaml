@@ -20,8 +20,8 @@
                          Height="900" Width="1400"
                          WindowStartupLocation="CenterScreen"
                          WindowState="Maximized"
-                         Background="{StaticResource FluentDarkBackgroundBrush}"
-                         Foreground="{StaticResource FluentDarkForegroundBrush}"
+                         Background="{StaticResource ContentBackground}"
+                         Foreground="{StaticResource Foreground}"
                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                          d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
 
@@ -32,38 +32,38 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="{StaticResource FluentDarkForegroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource Foreground}"/>
         </Style>
 
         <!-- Style for Ribbon Button -->
         <Style x:Key="RibbonButtonStyle" TargetType="syncfusion:RibbonButton">
             <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource FluentDarkForegroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource Foreground}"/>
         </Style>
 
         <!-- Style for SplitButton -->
         <Style x:Key="RibbonSplitButtonStyle" TargetType="syncfusion:SplitButton">
             <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource FluentDarkForegroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource Foreground}"/>
         </Style>
 
         <!-- Style for DropDownButton -->
         <Style x:Key="RibbonDropDownButtonStyle" TargetType="syncfusion:DropDownButton">
             <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark"/>
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource FluentDarkForegroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource Foreground}"/>
         </Style>
 
         <!-- Style for DropDownMenuItem -->
         <Style x:Key="DropDownMenuItemStyle" TargetType="syncfusion:DropDownMenuItem">
-            <Setter Property="Background" Value="{StaticResource FluentDarkBackgroundBrush}"/>
-            <Setter Property="Foreground" Value="{StaticResource FluentDarkForegroundBrush}"/>
+            <Setter Property="Background" Value="{StaticResource ContentBackground}"/>
+            <Setter Property="Foreground" Value="{StaticResource Foreground}"/>
         </Style>
     </syncfusion:RibbonWindow.Resources>
 
-    <Grid Background="{StaticResource FluentDarkBackgroundBrush}">
+    <Grid Background="{StaticResource ContentBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -74,8 +74,8 @@
                           Grid.Row="0"
                           VerticalAlignment="Top"
                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                          Background="{StaticResource FluentDarkPrimaryBrush}"
-                          Foreground="{StaticResource FluentDarkForegroundBrush}">
+                          Background="{StaticResource PrimaryBrush}"
+                          Foreground="{StaticResource Foreground}">
 
             <!-- Quick Access Toolbar -->
             <syncfusion:Ribbon.QuickAccessToolBar>
@@ -108,7 +108,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="📊" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Overview" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Overview" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -121,7 +121,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="🖥️" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Enhanced" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Enhanced" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -134,7 +134,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="📱" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Simple" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Simple" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -150,7 +150,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="🔄" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Refresh All" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Refresh All" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -175,7 +175,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="🏠" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Reset" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Reset" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -199,7 +199,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="🚌" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Buses" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Buses" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -212,7 +212,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="👨‍💼" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Drivers" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Drivers" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -225,7 +225,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="🗺️" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Routes" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Routes" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -244,7 +244,7 @@
                         <syncfusion:RibbonButton.Content>
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Text="🔧" Style="{StaticResource RibbonIconStyle}"/>
-                                <TextBlock Text="Maintenance" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Maintenance" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </syncfusion:RibbonButton.Content>
                     </syncfusion:RibbonButton>
@@ -270,32 +270,32 @@
 
             <!-- BackStage for File Operations -->
             <syncfusion:Ribbon.BackStage>
-                <syncfusion:Backstage syncfusionskin:SfSkinManager.VisualStyle="FluentDark" Background="{StaticResource FluentDarkBackgroundBrush}">
-                    <syncfusion:BackstageTabItem Header="Settings" IsSelected="True" Background="{StaticResource FluentDarkBackgroundBrush}" Foreground="{StaticResource FluentDarkForegroundBrush}">
-                        <Grid Margin="20" Background="{StaticResource FluentDarkBackgroundBrush}">
+                <syncfusion:Backstage syncfusionskin:SfSkinManager.VisualStyle="FluentDark" Background="{StaticResource ContentBackground}">
+                    <syncfusion:BackstageTabItem Header="Settings" IsSelected="True" Background="{StaticResource ContentBackground}" Foreground="{StaticResource Foreground}">
+                        <Grid Margin="20" Background="{StaticResource ContentBackground}">
                             <StackPanel>
-                                <TextBlock Text="Application Settings" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,20" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <CheckBox Content="Enable auto-refresh (5 seconds)" IsChecked="True" Margin="0,0,0,10" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <CheckBox Content="Save layout on exit" IsChecked="True" Margin="0,0,0,10" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <CheckBox Content="Show performance metrics" IsChecked="True" Margin="0,0,0,10" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <CheckBox Content="Enable accessibility features" IsChecked="False" Margin="0,0,0,20" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <Button Content="Apply Settings" Width="120" HorizontalAlignment="Left" Background="{StaticResource FluentDarkPrimaryBrush}" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Application Settings" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,20" Foreground="{StaticResource Foreground}"/>
+                                <CheckBox Content="Enable auto-refresh (5 seconds)" IsChecked="True" Margin="0,0,0,10" Foreground="{StaticResource Foreground}"/>
+                                <CheckBox Content="Save layout on exit" IsChecked="True" Margin="0,0,0,10" Foreground="{StaticResource Foreground}"/>
+                                <CheckBox Content="Show performance metrics" IsChecked="True" Margin="0,0,0,10" Foreground="{StaticResource Foreground}"/>
+                                <CheckBox Content="Enable accessibility features" IsChecked="False" Margin="0,0,0,20" Foreground="{StaticResource Foreground}"/>
+                                <Button Content="Apply Settings" Width="120" HorizontalAlignment="Left" Background="{StaticResource PrimaryBrush}" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </Grid>
                     </syncfusion:BackstageTabItem>
 
-                    <syncfusion:BackstageTabItem Header="About" Background="{StaticResource FluentDarkBackgroundBrush}" Foreground="{StaticResource FluentDarkForegroundBrush}">
-                        <Grid Margin="20" Background="{StaticResource FluentDarkBackgroundBrush}">
+                    <syncfusion:BackstageTabItem Header="About" Background="{StaticResource ContentBackground}" Foreground="{StaticResource Foreground}">
+                        <Grid Margin="20" Background="{StaticResource ContentBackground}">
                             <StackPanel>
-                                <TextBlock Text="Bus Buddy" FontSize="24" FontWeight="Bold" Margin="0,0,0,10" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="Transportation Management System" FontSize="16" Margin="0,0,0,10" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="Version 4.0 - Enhanced UI" FontSize="14" Margin="0,0,0,20" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="Features:" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="• Professional IDE-style interface with DockingManager" Margin="20,0,0,5" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="• Custom tile-based dashboard" Margin="20,0,0,5" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="• Real-time data updates (5-second refresh)" Margin="20,0,0,5" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="• Layout persistence" Margin="20,0,0,5" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
-                                <TextBlock Text="• Comprehensive fleet management" Margin="20,0,0,5" Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                <TextBlock Text="Bus Buddy" FontSize="24" FontWeight="Bold" Margin="0,0,0,10" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="Transportation Management System" FontSize="16" Margin="0,0,0,10" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="Version 4.0 - Enhanced UI" FontSize="14" Margin="0,0,0,20" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="Features:" FontWeight="SemiBold" Margin="0,0,0,10" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="• Professional IDE-style interface with DockingManager" Margin="20,0,0,5" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="• Custom tile-based dashboard" Margin="20,0,0,5" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="• Real-time data updates (5-second refresh)" Margin="20,0,0,5" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="• Layout persistence" Margin="20,0,0,5" Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="• Comprehensive fleet management" Margin="20,0,0,5" Foreground="{StaticResource Foreground}"/>
                             </StackPanel>
                         </Grid>
                     </syncfusion:BackstageTabItem>
@@ -305,7 +305,7 @@
         </syncfusion:Ribbon>
 
         <!-- Content Area — Dashboard Views -->
-        <Grid Grid.Row="1" x:Name="ContentArea" Background="{StaticResource FluentDarkBackgroundBrush}">
+        <Grid Grid.Row="1" x:Name="ContentArea" Background="{StaticResource ContentBackground}">
             <!-- Default content will be the Enhanced Dashboard View -->
             <!-- Primary Enhanced Dashboard View -->
             <dashboard:EnhancedDashboardView x:Name="EnhancedDashboard"

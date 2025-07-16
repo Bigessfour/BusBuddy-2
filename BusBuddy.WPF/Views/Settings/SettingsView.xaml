@@ -44,7 +44,7 @@
         <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
     </UserControl.Resources>
 
-    <Grid Margin="24" Background="{StaticResource FluentDarkBackgroundBrush}">
+    <Grid Margin="24" Background="{StaticResource ContentBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -59,7 +59,7 @@
                       FontWeight="Bold"
                       FontSize="14"
                       Margin="0,0,0,8"
-                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                      Foreground="{StaticResource Foreground}"/>
             <StackPanel Orientation="Horizontal">
                 <syncfusion:ButtonAdv x:Name="ThemeToggle"
                          IsCheckable="True"
@@ -78,7 +78,7 @@
                       FontWeight="Bold"
                       FontSize="14"
                       Margin="0,0,0,8"
-                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                      Foreground="{StaticResource Foreground}"/>
             <syncfusion:ComboBoxAdv x:Name="ThemeComboBox"
                                    ItemsSource="{Binding ThemeOptions}"
                                    SelectedItem="{Binding Theme, Mode=TwoWay}"
@@ -94,7 +94,7 @@
                       FontWeight="Bold"
                       FontSize="14"
                       Margin="0,0,0,8"
-                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                      Foreground="{StaticResource Foreground}"/>
             <syncfusion:ComboBoxAdv x:Name="NotificationComboBox"
                                    ItemsSource="{Binding NotificationOptions}"
                                    SelectedItem="{Binding NotificationPreference, Mode=TwoWay}"

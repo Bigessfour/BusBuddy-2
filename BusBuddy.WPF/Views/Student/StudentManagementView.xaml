@@ -81,9 +81,9 @@
                                    Watermark="Search students..."
                                    ShowClearButton="True"
                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                   Background="{StaticResource FluentDarkSurfaceBrush}"
-                                   Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                   BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                   Background="{StaticResource ContentBackground}"
+                                   Foreground="{StaticResource PrimaryForeground}"
+                                   BorderBrush="{StaticResource BorderBrush}"
                                    Margin="0,0,10,0"/>
 
             <!-- Filter Dropdown -->
@@ -186,9 +186,9 @@
                               SelectedItem="{Binding SelectedStudent, Mode=TwoWay}"
                               Style="{StaticResource BusBuddySfDataGridStyle}"
                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                              Background="{StaticResource FluentDarkBackgroundBrush}"
-                              Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                              BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                              Background="{StaticResource ContentBackground}"
+                              Foreground="{StaticResource PrimaryForeground}"
+                              BorderBrush="{StaticResource BorderBrush}"
                               AutoGenerateColumns="False"
                               AllowResizingColumns="True"
                               AllowSorting="True"
@@ -261,11 +261,11 @@
                               Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                               AnimationType="DoubleCircle"
-                              Foreground="{StaticResource FluentDarkAccentBrush}"
+                              Foreground="{StaticResource AccentBrush}"
                               Background="Transparent">
             <syncfusion:SfBusyIndicator.Content>
                 <TextBlock Text="Loading..."
-                           Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                           Foreground="{StaticResource PrimaryForeground}"
                            FontSize="16"
                            Margin="0,10,0,0"
                            HorizontalAlignment="Center"/>
@@ -280,7 +280,7 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        FontSize="20"
-                       Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                       Foreground="{StaticResource PrimaryForeground}"/>
         </Border>
     </Grid>
 </UserControl>

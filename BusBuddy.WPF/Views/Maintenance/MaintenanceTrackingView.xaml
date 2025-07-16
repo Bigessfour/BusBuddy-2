@@ -46,12 +46,12 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <!-- Use FluentDark theme brushes instead of hardcoded colors -->
-        <SolidColorBrush x:Key="HighPriorityBrush" Color="{StaticResource FluentDarkErrorColor}"/>
-        <SolidColorBrush x:Key="MediumPriorityBrush" Color="{StaticResource FluentDarkWarningColor}"/>
-        <SolidColorBrush x:Key="LowPriorityBrush" Color="{StaticResource FluentDarkSuccessColor}"/>
-        <SolidColorBrush x:Key="PendingStatusBrush" Color="{StaticResource FluentDarkWarningColor}"/>
-        <SolidColorBrush x:Key="CompletedStatusBrush" Color="{StaticResource FluentDarkSuccessColor}"/>
-        <SolidColorBrush x:Key="OverdueStatusBrush" Color="{StaticResource FluentDarkErrorColor}"/>
+        <SolidColorBrush x:Key="HighPriorityBrush" Color="{StaticResource ErrorColor}"/>
+        <SolidColorBrush x:Key="MediumPriorityBrush" Color="{StaticResource WarningColor}"/>
+        <SolidColorBrush x:Key="LowPriorityBrush" Color="{StaticResource SuccessColor}"/>
+        <SolidColorBrush x:Key="PendingStatusBrush" Color="{StaticResource WarningColor}"/>
+        <SolidColorBrush x:Key="CompletedStatusBrush" Color="{StaticResource SuccessColor}"/>
+        <SolidColorBrush x:Key="OverdueStatusBrush" Color="{StaticResource ErrorColor}"/>
     </UserControl.Resources>
 
     <!-- Enhanced Maintenance Tracking with Syncfusion DockingManager -->
@@ -60,7 +60,7 @@
                               ContainerMode="TDI"
                               Style="{StaticResource BusBuddyDockingManagerStyle}"
                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                              Background="{StaticResource FluentDarkBackgroundBrush}">
+                              Background="{StaticResource ContentBackground}">
 
         <!-- Maintenance Overview (Document) -->
         <ContentControl syncfusion:DockingManager.Header="Maintenance Overview"
@@ -111,17 +111,17 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="⏳ Pending" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkWarningBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkWarningBrush}" DockPanel.Dock="Right"
+                                          Foreground="{StaticResource WarningBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource WarningBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock Text="{Binding PendingMaintenanceCount}"
                                       FontSize="28" FontWeight="Bold"
-                                      Foreground="{StaticResource FluentDarkWarningBrush}"
+                                      Foreground="{StaticResource WarningBrush}"
                                       HorizontalAlignment="Center"
                                       Margin="0,10,0,5"/>
                             <TextBlock Text="Items" FontSize="12"
-                                      Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                      Foreground="{StaticResource SecondaryForeground}"
                                       HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
@@ -133,17 +133,17 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="🚨 Overdue" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkErrorBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkErrorBrush}" DockPanel.Dock="Right"
+                                          Foreground="{StaticResource ErrorBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource ErrorBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock Text="{Binding OverdueMaintenanceCount}"
                                       FontSize="28" FontWeight="Bold"
-                                      Foreground="{StaticResource FluentDarkErrorBrush}"
+                                      Foreground="{StaticResource ErrorBrush}"
                                       HorizontalAlignment="Center"
                                       Margin="0,10,0,5"/>
                             <TextBlock Text="Critical" FontSize="12"
-                                      Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                      Foreground="{StaticResource SecondaryForeground}"
                                       HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
@@ -155,17 +155,17 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="✅ Completed" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkSuccessBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkSuccessBrush}" DockPanel.Dock="Right"
+                                          Foreground="{StaticResource SuccessBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock Text="{Binding CompletedMaintenanceCount}"
                                       FontSize="28" FontWeight="Bold"
-                                      Foreground="{StaticResource FluentDarkSuccessBrush}"
+                                      Foreground="{StaticResource SuccessBrush}"
                                       HorizontalAlignment="Center"
                                       Margin="0,10,0,5"/>
                             <TextBlock Text="This Month" FontSize="12"
-                                      Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                      Foreground="{StaticResource SecondaryForeground}"
                                       HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
@@ -177,8 +177,8 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="💰 Monthly Cost" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkAccentBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkAccentBrush}" DockPanel.Dock="Right"
+                                          Foreground="{StaticResource AccentBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource AccentBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <Grid Margin="0,5,0,0">
@@ -189,13 +189,13 @@
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="{Binding MonthlyMaintenanceCost, StringFormat='{}{0:C0}'}"
                                               FontSize="18" FontWeight="Bold"
-                                              Foreground="{StaticResource FluentDarkAccentBrush}"/>
+                                              Foreground="{StaticResource AccentBrush}"/>
                                     <TextBlock Text="Budget Usage:" FontSize="10"
-                                              Foreground="{StaticResource FluentDarkSecondaryTextBrush}" Margin="0,5,0,0"/>
+                                              Foreground="{StaticResource SecondaryForeground}" Margin="0,5,0,0"/>
                                     <syncfusion:SfLinearProgressBar Progress="{Binding BudgetUsagePercentage}"
                                                                    Height="8"
-                                                                   Background="{StaticResource FluentDarkSurfaceBrush}"
-                                                                   Foreground="{StaticResource FluentDarkAccentBrush}"
+                                                                   Background="{StaticResource ContentBackground}"
+                                                                   Foreground="{StaticResource AccentBrush}"
                                                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                                                    Minimum="0" Maximum="100"/>
                                 </StackPanel>
@@ -204,16 +204,16 @@
                                         <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                            StartValue="0" EndValue="100"
                                                            ShowTicks="False" ShowLabels="False"
-                                                           RimStroke="{StaticResource FluentDarkBorderBrush}" RimStrokeThickness="4">
+                                                           RimStroke="{StaticResource BorderBrush}" RimStrokeThickness="4">
                                             <gauge:CircularScale.Pointers>
                                                 <gauge:CircularPointer NeedlePointerType="Triangle"
-                                                                     PointerCapStroke="{StaticResource FluentDarkAccentBrush}"
-                                                                     NeedlePointerStroke="{StaticResource FluentDarkAccentBrush}"
+                                                                     PointerCapStroke="{StaticResource AccentBrush}"
+                                                                     NeedlePointerStroke="{StaticResource AccentBrush}"
                                                                      Value="{Binding BudgetUsagePercentage}"/>
                                             </gauge:CircularScale.Pointers>
                                             <gauge:CircularScale.Ranges>
                                                 <gauge:CircularRange StartValue="0" EndValue="100"
-                                                                   Stroke="{StaticResource FluentDarkAccentBrush}" StrokeThickness="4"/>
+                                                                   Stroke="{StaticResource AccentBrush}" StrokeThickness="4"/>
                                             </gauge:CircularScale.Ranges>
                                         </gauge:CircularScale>
                                     </gauge:SfCircularGauge.Scales>
@@ -230,9 +230,9 @@
                                       SelectedItem="{Binding SelectedRecord, Mode=TwoWay}"
                                       Style="{StaticResource BusBuddySfDataGridStyle}"
                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                      Background="{StaticResource FluentDarkBackgroundBrush}"
-                                      Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                      BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                      Background="{StaticResource ContentBackground}"
+                                      Foreground="{StaticResource PrimaryForeground}"
+                                      BorderBrush="{StaticResource BorderBrush}"
                                       AutoGenerateColumns="False"
                                       AllowResizingColumns="True"
                                       AllowSorting="True"
@@ -253,12 +253,12 @@
                         <syncfusion:GridTemplateColumn MappingName="BusNumber" HeaderText="Bus" Width="100">
                             <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource FluentDarkSurfaceBrush}" CornerRadius="4" Padding="6,3" Margin="2">
+                                    <Border Background="{StaticResource ContentBackground}" CornerRadius="4" Padding="6,3" Margin="2">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="🚌" FontSize="12" VerticalAlignment="Center" Margin="0,0,4,0"/>
                                             <TextBlock Text="{Binding BusNumber}"
                                                       FontWeight="SemiBold" FontSize="11"
-                                                      Foreground="{StaticResource FluentDarkPrimaryTextBrush}" VerticalAlignment="Center"/>
+                                                      Foreground="{StaticResource PrimaryForeground}" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -273,7 +273,7 @@
                                         <TextBlock Text="🔧" FontSize="12" VerticalAlignment="Center" Margin="0,0,4,0"/>
                                         <TextBlock Text="{Binding MaintenanceType}"
                                                   FontSize="11" VerticalAlignment="Center"
-                                                  Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                                  Foreground="{StaticResource PrimaryForeground}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </syncfusion:GridTemplateColumn.CellTemplate>
@@ -293,10 +293,10 @@
                         <syncfusion:GridTemplateColumn MappingName="Priority" HeaderText="Priority" Width="90">
                             <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource FluentDarkWarningBrush}"
+                                    <Border Background="{StaticResource WarningBrush}"
                                            CornerRadius="3" Padding="6,2" Margin="1">
                                         <TextBlock Text="{Binding Priority}"
-                                                  Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                                  Foreground="{StaticResource PrimaryForeground}"
                                                   FontSize="10" FontWeight="SemiBold"
                                                   HorizontalAlignment="Center"/>
                                     </Border>
@@ -308,10 +308,10 @@
                         <syncfusion:GridTemplateColumn MappingName="Status" HeaderText="Status" Width="100">
                             <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource FluentDarkWarningBrush}"
+                                    <Border Background="{StaticResource WarningBrush}"
                                            CornerRadius="12" Padding="8,3" Margin="1">
                                         <TextBlock Text="{Binding Status}"
-                                                  Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                                  Foreground="{StaticResource PrimaryForeground}"
                                                   FontSize="10" FontWeight="SemiBold"
                                                   HorizontalAlignment="Center"/>
                                     </Border>
@@ -335,29 +335,29 @@
 
                     <!-- Context Menu -->
                     <syncfusion:SfDataGrid.ContextMenu>
-                        <ContextMenu Background="{StaticResource FluentDarkSurfaceBrush}"
-                                     Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                     BorderBrush="{StaticResource FluentDarkBorderBrush}">
+                        <ContextMenu Background="{StaticResource ContentBackground}"
+                                     Foreground="{StaticResource PrimaryForeground}"
+                                     BorderBrush="{StaticResource BorderBrush}">
                             <MenuItem Header="📝 Edit Maintenance" Command="{Binding EditMaintenanceCommand}"
-                                     Background="{StaticResource FluentDarkSurfaceBrush}"
-                                     Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                     Background="{StaticResource ContentBackground}"
+                                     Foreground="{StaticResource PrimaryForeground}"/>
                             <MenuItem Header="✅ Mark Complete" Command="{Binding MarkCompleteCommand}"
-                                     Background="{StaticResource FluentDarkSurfaceBrush}"
-                                     Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                     Background="{StaticResource ContentBackground}"
+                                     Foreground="{StaticResource PrimaryForeground}"/>
                             <MenuItem Header="📋 Duplicate" Command="{Binding DuplicateMaintenanceCommand}"
-                                     Background="{StaticResource FluentDarkSurfaceBrush}"
-                                     Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
-                            <Separator Background="{StaticResource FluentDarkBorderBrush}"/>
+                                     Background="{StaticResource ContentBackground}"
+                                     Foreground="{StaticResource PrimaryForeground}"/>
+                            <Separator Background="{StaticResource BorderBrush}"/>
                             <MenuItem Header="📊 Generate Report" Command="{Binding GenerateItemReportCommand}"
-                                     Background="{StaticResource FluentDarkSurfaceBrush}"
-                                     Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
+                                     Background="{StaticResource ContentBackground}"
+                                     Foreground="{StaticResource PrimaryForeground}"/>
                             <MenuItem Header="🔔 Set Reminder" Command="{Binding SetReminderCommand}"
-                                     Background="{StaticResource FluentDarkSurfaceBrush}"
-                                     Foreground="{StaticResource FluentDarkPrimaryTextBrush}"/>
-                            <Separator Background="{StaticResource FluentDarkBorderBrush}"/>
+                                     Background="{StaticResource ContentBackground}"
+                                     Foreground="{StaticResource PrimaryForeground}"/>
+                            <Separator Background="{StaticResource BorderBrush}"/>
                             <MenuItem Header="🗑️ Delete" Command="{Binding DeleteMaintenanceCommand}"
-                                     Background="{StaticResource FluentDarkSurfaceBrush}"
-                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
+                                     Background="{StaticResource ContentBackground}"
+                                     Foreground="{StaticResource ErrorBrush}"/>
                         </ContextMenu>
                     </syncfusion:SfDataGrid.ContextMenu>
                 </syncfusion:SfDataGrid>
@@ -371,14 +371,14 @@
                        syncfusion:DockingManager.DesiredWidthInDockedMode="350"
                        syncfusion:DockingManager.CanSerialize="True">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15"
-                         Background="{StaticResource FluentDarkBackgroundBrush}">
+                         Background="{StaticResource ContentBackground}">
                 <StackPanel>
                     <TextBlock Text="📈 Analytics"
                               Style="{StaticResource BusBuddyTileHeaderStyle}"
                               Margin="0,0,0,20"/>
 
                     <!-- Maintenance Trends Chart -->
-                    <Border BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                    <Border BorderBrush="{StaticResource BorderBrush}"
                           BorderThickness="1" CornerRadius="6" Margin="0,0,0,20"
                           Style="{StaticResource BusBuddyDashboardTileStyle}">
                         <StackPanel Margin="15">
@@ -388,20 +388,20 @@
                             <chart:SfChart x:Name="MaintenanceTrendsChart"
                                           Height="200"
                                           Background="Transparent"
-                                          Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                          Foreground="{StaticResource PrimaryForeground}"
                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
                                 <chart:SfChart.PrimaryAxis>
                                     <chart:CategoryAxis ShowGridLines="False">
                                                       <chart:CategoryAxis.LabelStyle>
-                                                          <chart:LabelStyle Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                                          <chart:LabelStyle Foreground="{StaticResource SecondaryForeground}"/>
                                                       </chart:CategoryAxis.LabelStyle>
                                     </chart:CategoryAxis>
                                 </chart:SfChart.PrimaryAxis>
                                 <chart:SfChart.SecondaryAxis>
                                     <chart:NumericalAxis ShowGridLines="True">
                                                        <chart:NumericalAxis.LabelStyle>
-                                                           <chart:LabelStyle Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                                           <chart:LabelStyle Foreground="{StaticResource SecondaryForeground}"/>
                                                        </chart:NumericalAxis.LabelStyle>
                                     </chart:NumericalAxis>
                                 </chart:SfChart.SecondaryAxis>
@@ -409,14 +409,14 @@
                                     <chart:ColumnSeries ItemsSource="{Binding MaintenanceTrendsData}"
                                                        XBindingPath="Month"
                                                        YBindingPath="Count"
-                                                       Interior="{StaticResource FluentDarkAccentBrush}"/>
+                                                       Interior="{StaticResource AccentBrush}"/>
                                 </chart:SfChart.Series>
                             </chart:SfChart>
                         </StackPanel>
                     </Border>
 
                     <!-- Cost Distribution Chart -->
-                    <Border BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                    <Border BorderBrush="{StaticResource BorderBrush}"
                           BorderThickness="1" CornerRadius="6" Margin="0,0,0,20"
                           Style="{StaticResource BusBuddyDashboardTileStyle}">
                         <StackPanel Margin="15">
@@ -426,7 +426,7 @@
                             <chart:SfChart x:Name="CostDistributionChart"
                                           Height="180"
                                           Background="Transparent"
-                                          Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                          Foreground="{StaticResource PrimaryForeground}"
                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
                                 <chart:PieSeries ItemsSource="{Binding CostDistributionData}"
@@ -438,11 +438,11 @@
                                     <chart:PieSeries.ColorModel>
                                         <chart:ChartColorModel>
                                             <chart:ChartColorModel.CustomBrushes>
-                                                <SolidColorBrush Color="{StaticResource FluentDarkAccentColor}"/>
-                                                <SolidColorBrush Color="{StaticResource FluentDarkSuccessColor}"/>
-                                                <SolidColorBrush Color="{StaticResource FluentDarkWarningColor}"/>
-                                                <SolidColorBrush Color="{StaticResource FluentDarkErrorColor}"/>
-                                                <SolidColorBrush Color="{StaticResource FluentDarkSecondaryColor}"/>
+                                                <SolidColorBrush Color="{StaticResource AccentColor}"/>
+                                                <SolidColorBrush Color="{StaticResource SuccessColor}"/>
+                                                <SolidColorBrush Color="{StaticResource WarningColor}"/>
+                                                <SolidColorBrush Color="{StaticResource ErrorColor}"/>
+                                                <SolidColorBrush Color="{StaticResource SecondaryColor}"/>
                                             </chart:ChartColorModel.CustomBrushes>
                                         </chart:ChartColorModel>
                                     </chart:PieSeries.ColorModel>
@@ -452,7 +452,7 @@
                     </Border>
 
                     <!-- Performance Metrics -->
-                    <Border BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                    <Border BorderBrush="{StaticResource BorderBrush}"
                           BorderThickness="1" CornerRadius="6"
                           Style="{StaticResource BusBuddyDashboardTileStyle}">
                         <StackPanel Margin="15">
@@ -463,36 +463,36 @@
                             <!-- Average Response Time -->
                             <DockPanel Margin="0,0,0,10">
                                 <TextBlock Text="Avg Response Time:" DockPanel.Dock="Left"
-                                          Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                          Foreground="{StaticResource SecondaryForeground}"
                                           FontSize="12"/>
                                 <TextBlock Text="{Binding AverageResponseTime}" DockPanel.Dock="Right"
                                           FontWeight="SemiBold" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkSuccessBrush}"/>
+                                          Foreground="{StaticResource SuccessBrush}"/>
                             </DockPanel>
 
                             <!-- Completion Rate -->
                             <DockPanel Margin="0,0,0,10">
                                 <TextBlock Text="Completion Rate:" DockPanel.Dock="Left"
-                                          Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                          Foreground="{StaticResource SecondaryForeground}"
                                           FontSize="12"/>
                                 <TextBlock Text="{Binding CompletionRate, StringFormat='{}{0:P0}'}" DockPanel.Dock="Right"
                                           FontWeight="SemiBold" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkWarningBrush}"/>
+                                          Foreground="{StaticResource WarningBrush}"/>
                             </DockPanel>
 
                             <!-- Budget Variance -->
                             <DockPanel Margin="0,0,0,15">
                                 <TextBlock Text="Budget Variance:" DockPanel.Dock="Left"
-                                          Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                          Foreground="{StaticResource SecondaryForeground}"
                                           FontSize="12"/>
                                 <TextBlock Text="{Binding BudgetVariance, StringFormat='{}{0:P1}'}" DockPanel.Dock="Right"
                                           FontWeight="SemiBold" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkAccentBrush}"/>
+                                          Foreground="{StaticResource AccentBrush}"/>
                             </DockPanel>
 
                             <!-- Performance Gauge -->
                             <TextBlock Text="Overall Performance:"
-                                      Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                      Foreground="{StaticResource SecondaryForeground}"
                                       FontSize="12" Margin="0,0,0,5"/>
                             <gauge:SfCircularGauge Width="100" Height="100" HorizontalAlignment="Center"
                                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
@@ -501,24 +501,24 @@
                                     <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                        StartValue="0" EndValue="100"
                                                        Interval="20" MinorTicksPerInterval="1"
-                                                       RimStroke="{StaticResource FluentDarkBorderBrush}"
+                                                       RimStroke="{StaticResource BorderBrush}"
                                                        RimStrokeThickness="8"
-                                                       TickStroke="{StaticResource FluentDarkSecondaryTextBrush}"
+                                                       TickStroke="{StaticResource SecondaryForeground}"
                                                        TickStrokeThickness="1"
-                                                       LabelStroke="{StaticResource FluentDarkSecondaryTextBrush}">
+                                                       LabelStroke="{StaticResource SecondaryForeground}">
                                         <gauge:CircularScale.Pointers>
                                             <gauge:CircularPointer NeedlePointerType="Triangle"
-                                                                 PointerCapStroke="{StaticResource FluentDarkSuccessBrush}"
-                                                                 NeedlePointerStroke="{StaticResource FluentDarkSuccessBrush}"
+                                                                 PointerCapStroke="{StaticResource SuccessBrush}"
+                                                                 NeedlePointerStroke="{StaticResource SuccessBrush}"
                                                                  Value="{Binding OverallPerformanceScore}"/>
                                         </gauge:CircularScale.Pointers>
                                         <gauge:CircularScale.Ranges>
                                             <gauge:CircularRange StartValue="0" EndValue="40"
-                                                               Stroke="{StaticResource FluentDarkErrorBrush}" StrokeThickness="8"/>
+                                                               Stroke="{StaticResource ErrorBrush}" StrokeThickness="8"/>
                                             <gauge:CircularRange StartValue="40" EndValue="70"
-                                                               Stroke="{StaticResource FluentDarkWarningBrush}" StrokeThickness="8"/>
+                                                               Stroke="{StaticResource WarningBrush}" StrokeThickness="8"/>
                                             <gauge:CircularRange StartValue="70" EndValue="100"
-                                                               Stroke="{StaticResource FluentDarkSuccessBrush}" StrokeThickness="8"/>
+                                                               Stroke="{StaticResource SuccessBrush}" StrokeThickness="8"/>
                                         </gauge:CircularScale.Ranges>
                                     </gauge:CircularScale>
                                 </gauge:SfCircularGauge.Scales>
@@ -527,7 +527,7 @@
                                         <gauge:GaugeAnnotation.Content>
                                             <TextBlock Text="{Binding OverallPerformanceScore, StringFormat='{}{0:F0}%'}"
                                                       FontSize="14" FontWeight="Bold"
-                                                      Foreground="{StaticResource FluentDarkSuccessBrush}"
+                                                      Foreground="{StaticResource SuccessBrush}"
                                                       HorizontalAlignment="Center"
                                                       VerticalAlignment="Center"/>
                                         </gauge:GaugeAnnotation.Content>
@@ -546,12 +546,12 @@
                                     Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
                                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                     AnimationType="DoubleCircle"
-                                    Foreground="{StaticResource FluentDarkAccentBrush}"
-                                    Background="{StaticResource FluentDarkBackgroundBrush}"
+                                    Foreground="{StaticResource AccentBrush}"
+                                    Background="{StaticResource ContentBackground}"
                                     Opacity="0.9">
             <syncfusion:SfBusyIndicator.Content>
                 <TextBlock Text="Loading maintenance data..."
-                          Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                          Foreground="{StaticResource PrimaryForeground}"
                           FontSize="16"
                           Margin="0,15,0,0"
                           HorizontalAlignment="Center"/>

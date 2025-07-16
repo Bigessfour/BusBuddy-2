@@ -11,6 +11,11 @@ namespace BusBuddy.WPF.Converters
     public class BooleanToVisibilityConverter : IValueConverter
     {
         /// <summary>
+        /// Gets or sets a value indicating whether the conversion should be inverted.
+        /// </summary>
+        public bool IsInverted { get; set; } = false;
+
+        /// <summary>
         /// Converts a Boolean value to a Visibility value.
         /// </summary>
         /// <param name="value">The Boolean value to convert.</param>
@@ -22,7 +27,8 @@ namespace BusBuddy.WPF.Converters
         {
             if (value is bool boolValue)
             {
-                return boolValue ? Visibility.Visible : Visibility.Collapsed;
+                bool result = IsInverted ? !boolValue : boolValue;
+                return result ? Visibility.Visible : Visibility.Collapsed;
             }
             return Visibility.Collapsed;
         }
@@ -39,7 +45,8 @@ namespace BusBuddy.WPF.Converters
         {
             if (value is Visibility visibility)
             {
-                return visibility == Visibility.Visible;
+                bool result = visibility == Visibility.Visible;
+                return IsInverted ? !result : result;
             }
             return false;
         }

@@ -498,6 +498,16 @@
           "Syncfusion.SfSkinManager.WPF": "30.1.40"
         }
       },
+      "Syncfusion.Themes.FluentLight.WPF": {
+        "type": "Direct",
+        "requested": "[30.1.40, )",
+        "resolved": "30.1.40",
+        "contentHash": "ZPkb01VOil540RXU+x3Bp88by/Pj3NmKgYYMQ3s2aPBMhiXIm4fAKDuuFp/fScyloKECBa6QylV0b4lVmsiqMg==",
+        "dependencies": {
+          "Syncfusion.Licensing": "30.1.40",
+          "Syncfusion.SfSkinManager.WPF": "30.1.40"
+        }
+      },
       "Syncfusion.Tools.WPF": {
         "type": "Direct",
         "requested": "[30.1.40, )",

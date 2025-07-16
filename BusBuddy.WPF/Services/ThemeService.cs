@@ -115,8 +115,8 @@ namespace BusBuddy.WPF.Services
 
         public void ToggleTheme()
         {
-            // 🎨 Enhanced theme toggle: FluentDark ⟷ FluentLight
-            string newTheme = IsDarkTheme ? "FluentLight" : "FluentDark";
+            // 🎨 Enhanced theme toggle: FluentDark only (FluentLight removed due to KeyNotFoundException in v30.1.40)
+            string newTheme = "FluentDark"; // Always use FluentDark as the stable theme
             Logger.Debug("[DEBUG] 🎨 ThemeService.ToggleTheme: Current={Current}, New={New}", _currentTheme, newTheme);
             ApplyTheme(newTheme);
         }

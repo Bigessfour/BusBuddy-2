@@ -53,7 +53,7 @@
                               ContainerMode="TDI"
                               Style="{StaticResource BusBuddyDockingManagerStyle}"
                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                              Background="{StaticResource FluentDarkBackgroundBrush}">
+                              Background="{StaticResource ContentBackground}">
 
         <!-- Fuel Overview Dashboard (Document) -->
         <ContentControl syncfusion:DockingManager.Header="Fuel Overview"
@@ -111,13 +111,13 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="💰 Monthly Cost" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkSuccessBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkSuccessBrush}" DockPanel.Dock="Right"
+                                          Foreground="{StaticResource SuccessBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock Text="{Binding MonthlyFuelCost, StringFormat='{}{0:C0}'}"
                                       FontSize="28" FontWeight="Bold"
-                                      Foreground="{StaticResource FluentDarkSuccessBrush}"
+                                      Foreground="{StaticResource SuccessBrush}"
                                       HorizontalAlignment="Center"
                                       Margin="0,10,0,5"/>
                             <Grid>
@@ -127,16 +127,16 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="Budget:" FontSize="10"
-                                              Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                              Foreground="{StaticResource SecondaryForeground}"/>
                                     <syncfusion:SfLinearProgressBar Progress="{Binding BudgetUsagePercentage}"
                                                                    Height="6"
-                                                                   Background="{StaticResource FluentDarkSurfaceBrush}"
-                                                                   Foreground="{StaticResource FluentDarkSuccessBrush}"
+                                                                   Background="{StaticResource ContentBackground}"
+                                                                   Foreground="{StaticResource SuccessBrush}"
                                                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                                                    Minimum="0" Maximum="100"/>
                                 </StackPanel>
                                 <TextBlock Grid.Column="1" Text="{Binding BudgetUsagePercentage, StringFormat='{}{0:F0}%'}"
-                                          FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource FluentDarkSuccessBrush}"
+                                          FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}"
                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
                             </Grid>
                         </StackPanel>
@@ -149,8 +149,8 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="📊 Fleet MPG" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkInfoBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkInfoBrush}" DockPanel.Dock="Right"
+                                          Foreground="{StaticResource InfoBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource InfoBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <Grid Margin="0,10,0,0">
@@ -161,9 +161,9 @@
                                 <StackPanel Grid.Column="0">
                                     <TextBlock Text="{Binding AverageFleetMPG, StringFormat='{}{0:F1} MPG'}"
                                               FontSize="18" FontWeight="Bold"
-                                              Foreground="{StaticResource FluentDarkInfoBrush}"/>
+                                              Foreground="{StaticResource InfoBrush}"/>
                                     <TextBlock Text="Target: 8.5 MPG" FontSize="10"
-                                              Foreground="{StaticResource FluentDarkSecondaryTextBrush}" Margin="0,5,0,0"/>
+                                              Foreground="{StaticResource SecondaryForeground}" Margin="0,5,0,0"/>
                                     <TextBlock Text="{Binding MPGTrend}" FontSize="10"
                                               FontWeight="SemiBold" Margin="0,2,0,0"/>
                                 </StackPanel>
@@ -173,20 +173,20 @@
                                         <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                            StartValue="0" EndValue="15"
                                                            ShowTicks="False" ShowLabels="False"
-                                                           RimStroke="{StaticResource FluentDarkSurfaceBrush}" RimStrokeThickness="4">
+                                                           RimStroke="{StaticResource ContentBackground}" RimStrokeThickness="4">
                                             <gauge:CircularScale.Pointers>
                                                 <gauge:CircularPointer NeedlePointerType="Triangle"
-                                                                     PointerCapStroke="{StaticResource FluentDarkInfoBrush}"
-                                                                     NeedlePointerStroke="{StaticResource FluentDarkInfoBrush}"
+                                                                     PointerCapStroke="{StaticResource InfoBrush}"
+                                                                     NeedlePointerStroke="{StaticResource InfoBrush}"
                                                                      Value="{Binding AverageFleetMPG}"/>
                                             </gauge:CircularScale.Pointers>
                                             <gauge:CircularScale.Ranges>
                                                 <gauge:CircularRange StartValue="0" EndValue="6"
-                                                                   Stroke="{StaticResource FluentDarkErrorBrush}" StrokeThickness="4"/>
+                                                                   Stroke="{StaticResource ErrorBrush}" StrokeThickness="4"/>
                                                 <gauge:CircularRange StartValue="6" EndValue="10"
-                                                                   Stroke="{StaticResource FluentDarkWarningBrush}" StrokeThickness="4"/>
+                                                                   Stroke="{StaticResource WarningBrush}" StrokeThickness="4"/>
                                                 <gauge:CircularRange StartValue="10" EndValue="15"
-                                                                   Stroke="{StaticResource FluentDarkSuccessBrush}" StrokeThickness="4"/>
+                                                                   Stroke="{StaticResource SuccessBrush}" StrokeThickness="4"/>
                                             </gauge:CircularScale.Ranges>
                                         </gauge:CircularScale>
                                     </gauge:SfCircularGauge.Scales>
@@ -202,18 +202,18 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="⛽ Monthly Gallons" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkWarningBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkWarningBrush}" DockPanel.Dock="Right"
+                                          Foreground="{StaticResource WarningBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource WarningBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock Text="{Binding MonthlyGallonsConsumed, StringFormat='{}{0:N0}'}"
                                       FontSize="28" FontWeight="Bold"
-                                      Foreground="{StaticResource FluentDarkWarningBrush}"
+                                      Foreground="{StaticResource WarningBrush}"
                                       HorizontalAlignment="Center"
                                       Margin="0,10,0,5"/>
                             <StackPanel>
                                 <TextBlock Text="gallons" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                          Foreground="{StaticResource SecondaryForeground}"
                                           HorizontalAlignment="Center"/>
                                 <TextBlock Text="{Binding GallonsVsLastMonth}" FontSize="10"
                                           FontWeight="SemiBold"
@@ -230,23 +230,23 @@
                         <StackPanel>
                             <DockPanel>
                                 <TextBlock Text="💲 Cost Per Mile" FontSize="14" FontWeight="SemiBold"
-                                          Foreground="{StaticResource FluentDarkPurpleBrush}" DockPanel.Dock="Left"/>
-                                <Ellipse Width="10" Height="10" Fill="{StaticResource FluentDarkPurpleBrush}" DockPanel.Dock="Right"
+                                          Foreground="{DynamicResource PrimaryBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{DynamicResource PrimaryBrush}" DockPanel.Dock="Right"
                                         VerticalAlignment="Center"/>
                             </DockPanel>
                             <TextBlock Text="{Binding CostPerMile, StringFormat='{}{0:C2}'}"
                                       FontSize="24" FontWeight="Bold"
-                                      Foreground="{StaticResource FluentDarkPurpleBrush}"
+                                      Foreground="{DynamicResource PrimaryBrush}"
                                       HorizontalAlignment="Center"
                                       Margin="0,10,0,5"/>
                             <StackPanel>
                                 <TextBlock Text="per mile" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkSecondaryTextBrush}"
+                                          Foreground="{StaticResource SecondaryForeground}"
                                           HorizontalAlignment="Center"/>
-                                <Border Background="{StaticResource FluentDarkPurpleBrush}" CornerRadius="3" Padding="6,2"
+                                <Border Background="{DynamicResource PrimaryBrush}" CornerRadius="3" Padding="6,2"
                                        HorizontalAlignment="Center" Margin="0,8,0,0">
                                     <TextBlock Text="{Binding EfficiencyRating}"
-                                              Foreground="{StaticResource FluentDarkForegroundBrush}" FontSize="10" FontWeight="SemiBold"/>
+                                              Foreground="{StaticResource Foreground}" FontSize="10" FontWeight="SemiBold"/>
                                 </Border>
                             </StackPanel>
                         </StackPanel>
@@ -274,7 +274,7 @@
                                       SelectionChanged="FuelDataGrid_SelectionChanged"
                                       CellTapped="FuelDataGrid_CellTapped"
                                       BorderThickness="1"
-                                      BorderBrush="{StaticResource FluentDarkBorderBrush}">
+                                      BorderBrush="{StaticResource BorderBrush}">
                     <syncfusion:SfDataGrid.Columns>
                         <!-- Enhanced Date Column -->
                         <syncfusion:GridDateTimeColumn MappingName="FuelDate" HeaderText="Date" Width="100"
@@ -284,12 +284,12 @@
                         <syncfusion:GridTemplateColumn MappingName="BusNumber" HeaderText="Bus" Width="80">
                             <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource FluentDarkInfoLightBrush}" CornerRadius="4" Padding="4,2" Margin="1">
+                                    <Border Background="{StaticResource InfoBrush}" CornerRadius="4" Padding="4,2" Margin="1">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="🚌" FontSize="10" VerticalAlignment="Center" Margin="0,0,3,0"/>
                                             <TextBlock Text="{Binding BusNumber}"
                                                       FontWeight="SemiBold" FontSize="10"
-                                                      Foreground="{StaticResource FluentDarkInfoBrush}" VerticalAlignment="Center"/>
+                                                      Foreground="{StaticResource InfoBrush}" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -310,7 +310,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="⛽" FontSize="10" VerticalAlignment="Center" Margin="0,0,3,0"/>
                                         <TextBlock Text="{Binding FuelType}" FontSize="10" VerticalAlignment="Center"
-                                                  Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                                  Foreground="{StaticResource Foreground}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </syncfusion:GridTemplateColumn.CellTemplate>
@@ -330,10 +330,10 @@
                         <syncfusion:GridTemplateColumn MappingName="MPG" HeaderText="MPG" Width="80">
                             <syncfusion:GridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource FluentDarkSuccessLightBrush}" CornerRadius="3" Padding="4,2" Margin="1">
+                                    <Border Background="{StaticResource SuccessBrush}" CornerRadius="3" Padding="4,2" Margin="1">
                                         <TextBlock Text="{Binding MPG, StringFormat='{}{0:F1}'}"
                                                   FontSize="10" FontWeight="SemiBold"
-                                                  Foreground="{StaticResource FluentDarkSuccessBrush}" HorizontalAlignment="Center"/>
+                                                  Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Center"/>
                                     </Border>
                                 </DataTemplate>
                             </syncfusion:GridTemplateColumn.CellTemplate>
@@ -362,7 +362,7 @@
                             <Separator Style="{StaticResource BusBuddyContextMenuSeparatorStyle}"/>
                             <MenuItem Header="🗑️ Delete" Command="{Binding DeleteCommand}"
                                      Style="{StaticResource BusBuddyContextMenuItemStyle}"
-                                     Foreground="{StaticResource FluentDarkErrorBrush}"/>
+                                     Foreground="{StaticResource ErrorBrush}"/>
                         </ContextMenu>
                     </syncfusion:SfDataGrid.ContextMenu>
                 </syncfusion:SfDataGrid>
@@ -380,10 +380,10 @@
                     <TextBlock Text="📈 Fuel Analytics" FontSize="16" FontWeight="Bold" Margin="0,0,0,20"/>
 
                     <!-- MPG Trends Chart -->
-                    <Border BorderBrush="{StaticResource FluentDarkBorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
                         <StackPanel Margin="15">
                             <TextBlock Text="MPG Trends" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10"
-                                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                      Foreground="{StaticResource Foreground}"/>
                             <chart:SfChart x:Name="MPGTrendsChart"
                                           Height="200"
                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
@@ -394,7 +394,7 @@
                                                        LabelFormat="MMM"
                                                        IntervalType="Months">
                                                        <chart:DateTimeAxis.LabelStyle>
-                                                           <chart:LabelStyle Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                                           <chart:LabelStyle Foreground="{StaticResource SecondaryForeground}"/>
                                                        </chart:DateTimeAxis.LabelStyle>
                                     </chart:DateTimeAxis>
                                 </chart:SfChart.PrimaryAxis>
@@ -402,10 +402,10 @@
                                     <chart:NumericalAxis ShowGridLines="True"
                                                         Header="Miles Per Gallon">
                                                         <chart:NumericalAxis.HeaderStyle>
-                                                            <chart:LabelStyle Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                                            <chart:LabelStyle Foreground="{StaticResource Foreground}"/>
                                                         </chart:NumericalAxis.HeaderStyle>
                                                         <chart:NumericalAxis.LabelStyle>
-                                                            <chart:LabelStyle Foreground="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                                            <chart:LabelStyle Foreground="{StaticResource SecondaryForeground}"/>
                                                         </chart:NumericalAxis.LabelStyle>
                                     </chart:NumericalAxis>
                                 </chart:SfChart.SecondaryAxis>
@@ -414,11 +414,11 @@
                                                           XBindingPath="Period"
                                                           YBindingPath="AverageMPG"
                                                           StrokeThickness="3"
-                                                          Stroke="{StaticResource FluentDarkInfoBrush}">
+                                                          Stroke="{StaticResource InfoBrush}">
                                         <chart:SplineAreaSeries.Interior>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Color="{StaticResource FluentDarkInfoTransparentBrush}" Offset="0"/>
-                                                <GradientStop Color="{StaticResource FluentDarkInfoBrush}" Offset="1"/>
+                                                <GradientStop Color="{StaticResource InfoBrush}" Offset="0"/>
+                                                <GradientStop Color="{StaticResource InfoBrush}" Offset="1"/>
                                             </LinearGradientBrush>
                                         </chart:SplineAreaSeries.Interior>
                                     </chart:SplineAreaSeries>
@@ -428,10 +428,10 @@
                     </Border>
 
                     <!-- Cost Analysis Chart -->
-                    <Border BorderBrush="{StaticResource FluentDarkBorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
                         <StackPanel Margin="15">
                             <TextBlock Text="Monthly Cost Analysis" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10"
-                                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                      Foreground="{StaticResource Foreground}"/>
                             <chart:SfChart x:Name="CostAnalysisChart"
                                           Height="200"
                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
@@ -441,7 +441,7 @@
                                     <chart:CategoryAxis ShowGridLines="False">
                                         <chart:CategoryAxis.LabelStyle>
                                             <Style TargetType="Label">
-                                                <Setter Property="Foreground" Value="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource SecondaryForeground}"/>
                                             </Style>
                                         </chart:CategoryAxis.LabelStyle>
                                     </chart:CategoryAxis>
@@ -451,12 +451,12 @@
                                                         Header="Cost ($)">
                                         <chart:NumericalAxis.HeaderStyle>
                                             <Style TargetType="Label">
-                                                <Setter Property="Foreground" Value="{StaticResource FluentDarkForegroundBrush}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource Foreground}"/>
                                             </Style>
                                         </chart:NumericalAxis.HeaderStyle>
                                         <chart:NumericalAxis.LabelStyle>
                                             <Style TargetType="Label">
-                                                <Setter Property="Foreground" Value="{StaticResource FluentDarkSecondaryTextBrush}"/>
+                                                <Setter Property="Foreground" Value="{StaticResource SecondaryForeground}"/>
                                             </Style>
                                         </chart:NumericalAxis.LabelStyle>
                                     </chart:NumericalAxis>
@@ -467,8 +467,8 @@
                                                        YBindingPath="TotalCost">
                                         <chart:ColumnSeries.Interior>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                                <GradientStop Color="{StaticResource FluentDarkSuccessBrush}" Offset="0"/>
-                                                <GradientStop Color="{StaticResource FluentDarkSuccessDarkBrush}" Offset="1"/>
+                                                <GradientStop Color="{StaticResource SuccessBrush}" Offset="0"/>
+                                                <GradientStop Color="{StaticResource SuccessBrush}" Offset="1"/>
                                             </LinearGradientBrush>
                                         </chart:ColumnSeries.Interior>
                                     </chart:ColumnSeries>
@@ -478,10 +478,10 @@
                     </Border>
 
                     <!-- Fuel Efficiency Distribution -->
-                    <Border BorderBrush="{StaticResource FluentDarkBorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
                         <StackPanel Margin="15">
                             <TextBlock Text="Fleet Efficiency Distribution" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10"
-                                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                      Foreground="{StaticResource Foreground}"/>
                             <chart:SfChart x:Name="EfficiencyDistributionChart"
                                           Height="180"
                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
@@ -498,60 +498,60 @@
                     </Border>
 
                     <!-- Performance Summary -->
-                    <Border BorderBrush="{StaticResource FluentDarkBorderBrush}" BorderThickness="1" CornerRadius="6">
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6">
                         <StackPanel Margin="15">
                             <TextBlock Text="Performance Summary" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,15"
-                                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                      Foreground="{StaticResource Foreground}"/>
 
                             <!-- Best Performing Bus -->
                             <DockPanel Margin="0,0,0,8">
                                 <TextBlock Text="🏆 Best MPG:" DockPanel.Dock="Left" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                          Foreground="{StaticResource Foreground}"/>
                                 <TextBlock Text="{Binding BestPerformingBus}" DockPanel.Dock="Right"
-                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource FluentDarkSuccessBrush}"/>
+                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource SuccessBrush}"/>
                             </DockPanel>
 
                             <!-- Most Efficient Route -->
                             <DockPanel Margin="0,0,0,8">
                                 <TextBlock Text="🛣️ Most Efficient Route:" DockPanel.Dock="Left" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                          Foreground="{StaticResource Foreground}"/>
                                 <TextBlock Text="{Binding MostEfficientRoute}" DockPanel.Dock="Right"
-                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource FluentDarkInfoBrush}"/>
+                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource InfoBrush}"/>
                             </DockPanel>
 
                             <!-- Potential Savings -->
                             <DockPanel Margin="0,0,0,15">
                                 <TextBlock Text="💡 Potential Savings:" DockPanel.Dock="Left" FontSize="12"
-                                          Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                          Foreground="{StaticResource Foreground}"/>
                                 <TextBlock Text="{Binding PotentialSavings, StringFormat='{}{0:C0}/month'}" DockPanel.Dock="Right"
-                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource FluentDarkWarningBrush}"/>
+                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource WarningBrush}"/>
                             </DockPanel>
 
                             <!-- Efficiency Score Gauge -->
                             <TextBlock Text="Fleet Efficiency Score:" FontSize="12" Margin="0,0,0,5"
-                                      Foreground="{StaticResource FluentDarkForegroundBrush}"/>
+                                      Foreground="{StaticResource Foreground}"/>
                             <gauge:SfCircularGauge Width="120" Height="120" HorizontalAlignment="Center"
                                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
                                 <gauge:SfCircularGauge.Scales>
                                     <gauge:CircularScale StartAngle="135" SweepAngle="270"
                                                        StartValue="0" EndValue="100"
                                                        Interval="20" MinorTicksPerInterval="1"
-                                                       RimStroke="{StaticResource FluentDarkSurfaceBrush}" RimStrokeThickness="10"
-                                                       TickStroke="{StaticResource FluentDarkSecondaryTextBrush}" TickStrokeThickness="1"
-                                                       LabelStroke="{StaticResource FluentDarkForegroundBrush}">
+                                                       RimStroke="{StaticResource ContentBackground}" RimStrokeThickness="10"
+                                                       TickStroke="{StaticResource SecondaryForeground}" TickStrokeThickness="1"
+                                                       LabelStroke="{StaticResource Foreground}">
                                         <gauge:CircularScale.Pointers>
                                             <gauge:CircularPointer NeedlePointerType="Triangle"
-                                                                 PointerCapStroke="{StaticResource FluentDarkSuccessBrush}"
-                                                                 NeedlePointerStroke="{StaticResource FluentDarkSuccessBrush}"
+                                                                 PointerCapStroke="{StaticResource SuccessBrush}"
+                                                                 NeedlePointerStroke="{StaticResource SuccessBrush}"
                                                                  Value="{Binding FleetEfficiencyScore}"/>
                                         </gauge:CircularScale.Pointers>
                                         <gauge:CircularScale.Ranges>
                                             <gauge:CircularRange StartValue="0" EndValue="40"
-                                                               Stroke="{StaticResource FluentDarkErrorBrush}" StrokeThickness="10"/>
+                                                               Stroke="{StaticResource ErrorBrush}" StrokeThickness="10"/>
                                             <gauge:CircularRange StartValue="40" EndValue="70"
-                                                               Stroke="{StaticResource FluentDarkWarningBrush}" StrokeThickness="10"/>
+                                                               Stroke="{StaticResource WarningBrush}" StrokeThickness="10"/>
                                             <gauge:CircularRange StartValue="70" EndValue="100"
-                                                               Stroke="{StaticResource FluentDarkSuccessBrush}" StrokeThickness="10"/>
+                                                               Stroke="{StaticResource SuccessBrush}" StrokeThickness="10"/>
                                         </gauge:CircularScale.Ranges>
                                     </gauge:CircularScale>
                                 </gauge:SfCircularGauge.Scales>
@@ -561,9 +561,9 @@
                                             <StackPanel HorizontalAlignment="Center">
                                                 <TextBlock Text="{Binding FleetEfficiencyScore, StringFormat='{}{0:F0}%'}"
                                                           FontSize="16" FontWeight="Bold"
-                                                          Foreground="{StaticResource FluentDarkSuccessBrush}" HorizontalAlignment="Center"/>
+                                                          Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="Efficiency" FontSize="10"
-                                                          Foreground="{StaticResource FluentDarkSecondaryTextBrush}" HorizontalAlignment="Center"/>
+                                                          Foreground="{StaticResource SecondaryForeground}" HorizontalAlignment="Center"/>
                                             </StackPanel>
                                         </gauge:GaugeAnnotation.Content>
                                     </gauge:GaugeAnnotation>
@@ -577,18 +577,18 @@
 
         <!-- Loading Indicator -->
         <Border syncfusion:DockingManager.CanSerialize="False"
-                Background="{StaticResource FluentDarkOverlayBrush}"
+                Background="{StaticResource OverlayBrush}"
                 Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <syncfusion:SfBusyIndicator IsBusy="True"
                                            AnimationType="DoubleCircle"
-                                           Foreground="{StaticResource FluentDarkForegroundBrush}"
+                                           Foreground="{StaticResource Foreground}"
                                            Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                            Height="60"
                                            Width="60"/>
                 <TextBlock Text="Loading fuel data..."
-                           Foreground="{StaticResource FluentDarkForegroundBrush}"
+                           Foreground="{StaticResource Foreground}"
                            FontSize="16"
                            Margin="0,15,0,0"
                            HorizontalAlignment="Center"/>

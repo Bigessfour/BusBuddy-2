@@ -1,4 +1,4 @@
-﻿<Application x:Class="BusBuddy.WPF.App"
+<Application x:Class="BusBuddy.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:BusBuddy.WPF"
@@ -13,8 +13,9 @@
             This loads the official Syncfusion FluentDark theme resources automatically
             Only custom styles and compatibility mappings are included here
             ===============================================================================
-            -->            <!-- Load custom application styles with official theme resource alignment -->
+            -->
             <ResourceDictionary.MergedDictionaries>
+                <!-- Syncfusion FluentDark theme resources (loaded automatically by SfSkinManager) -->
                 <!-- Custom styles that use official Syncfusion FluentDark resource names -->
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -24,6 +25,9 @@
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
+
+            <!-- Missing Inverse Converter — Critical Fix -->
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter" IsInverted="True"/>
 
             <!-- Status and Data Converters -->
             <converters:ActiveStatusToColorConverter x:Key="ActiveStatusToColorConverter"/>

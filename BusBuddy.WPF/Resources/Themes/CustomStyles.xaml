@@ -11,7 +11,7 @@
                     xmlns:syncfusionmaps="clr-namespace:Syncfusion.UI.Xaml.Maps;assembly=Syncfusion.SfMaps.WPF">
 
     <!-- =============================================================================== -->
-    <!-- SYNCFUSION FLUENTDARK THEME — OFFICIAL RESOURCE ALIGNMENT (V30.1.39) -->
+    <!-- SYNCFUSION FLUENTDARK THEME — OFFICIAL RESOURCE ALIGNMENT (V30.1.40) -->
     <!-- =============================================================================== -->
     <!-- Applied globally via SfSkinManager.ApplicationTheme in App.xaml.cs -->
     <!-- Using documented Syncfusion.Themes.FluentDark.WPF resource names -->
@@ -19,7 +19,7 @@
     <!-- =============================================================================== -->
 
     <!--
-    OFFICIAL SYNCFUSION FLUENTDARK THEME RESOURCE NAMES (V30.1.39):
+    OFFICIAL SYNCFUSION FLUENTDARK THEME RESOURCE NAMES (V30.1.40):
     Based on Syncfusion.Themes.FluentDark.WPF NuGet package:
 
     Core Theme Resources (automatically loaded by SfSkinManager):
@@ -34,7 +34,7 @@
     -->
 
     <!-- =============================================================================== -->
-    <!-- SYNCFUSION BUTTONADV STYLES (V30.1.39 APPROVED CONTROL) -->
+    <!-- SYNCFUSION BUTTONADV STYLES (V30.1.40 APPROVED CONTROL) -->
     <!-- =============================================================================== -->
 
     <!-- Base ButtonAdv Style using official Syncfusion FluentDark resources -->
@@ -378,15 +378,6 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <!-- AI and Chat Controls -->
-    <Style x:Key="BusBuddySfAIAssistViewStyle" TargetType="syncfusionchat:SfAIAssistView">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
     <!-- =============================================================================== -->
     <!-- MISSING STYLES FOR VIEWS (ALIGNED WITH FLUENTDARK) -->
     <!-- =============================================================================== -->
@@ -490,6 +481,154 @@
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Background" Value="{DynamicResource PressedBackground}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Danger Button Style (Standard WPF Button) -->
+    <Style x:Key="BusBuddyDangerButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource ErrorBackground}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ErrorBackground}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#C0392B" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#A93226" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Delete Button Style (Standard WPF Button) -->
+    <Style x:Key="BusBuddyDeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource BusBuddyDangerButtonStyle}">
+    </Style>
+
+    <!-- Drop Down Button Style (Standard WPF Button) -->
+    <Style x:Key="BusBuddyDropDownButtonStyle" TargetType="Button" BasedOn="{StaticResource BusBuddySecondaryButtonStyle}">
+        <Setter Property="Content" Value="▼" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="MinWidth" Value="30" />
+    </Style>
+
+    <!-- Info Button Style (Standard WPF Button) -->
+    <Style x:Key="BusBuddyInfoButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#0056B3" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#004085" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Warning Button Style (Standard WPF Button) -->
+    <Style x:Key="BusBuddyWarningButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource WarningBackground}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBackground}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#E67E22" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#D35400" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Success Button Style (Standard WPF Button) -->
+    <Style x:Key="BusBuddySuccessButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource SuccessBackground}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBackground}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Margin" Value="4" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#27AE60" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#229954" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -644,42 +783,274 @@
     <!-- New code should use the official Syncfusion FluentDark resource names above -->
     <!-- =============================================================================== -->
 
-    <!-- Legacy FluentDark prefixed resources (DEPRECATED) -->
-    <SolidColorBrush x:Key="FluentDarkBorderBrush" Color="#323130" />
+    <!-- Essential color brushes for custom dashboard components -->
+    <SolidColorBrush x:Key="WarningBrush" Color="#FF8C00" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#E74856" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#2ECC71" />
+    <SolidColorBrush x:Key="InfoBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="HoverBackground" Color="#2D2D30" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#323130" />
+    <SolidColorBrush x:Key="PrimaryBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="SecondaryForeground" Color="#CCCCCC" />
+    <SolidColorBrush x:Key="ContentForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ContentBackground" Color="#252526" />
+    <SolidColorBrush x:Key="ContentBorder" Color="#323130" />
+    <SolidColorBrush x:Key="SuccessBackground" Color="#2ECC71" />
+
+    <!-- FluentDark theme aliases for backward compatibility -->
+    <SolidColorBrush x:Key="FluentDarkSuccessBrush" Color="#2ECC71" />
     <SolidColorBrush x:Key="FluentDarkPrimaryBrush" Color="#0078D4" />
     <SolidColorBrush x:Key="FluentDarkBackgroundBrush" Color="#1E1E1E" />
     <SolidColorBrush x:Key="FluentDarkForegroundBrush" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="FluentDarkHoverBrush" Color="#2D2D30" />
-    <SolidColorBrush x:Key="FluentDarkSecondaryTextBrush" Color="#CCCCCC" />
-    <SolidColorBrush x:Key="FluentDarkSurfaceBrush" Color="#252526" />
-    <SolidColorBrush x:Key="FluentDarkSuccessBrush" Color="#2ECC71" />
-    <SolidColorBrush x:Key="FluentDarkWarningBrush" Color="#FF8C00" />
-    <SolidColorBrush x:Key="FluentDarkErrorBrush" Color="#E74856" />
-    <SolidColorBrush x:Key="FluentDarkInfoBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="FluentDarkAccentBrush" Color="#0078D4" />
 
-    <!-- Legacy custom resource mappings (DEPRECATED) -->
-    <SolidColorBrush x:Key="PrimaryBackgroundBrush" Color="#1E1E1E" />
-    <SolidColorBrush x:Key="PrimaryForegroundBrush" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="SecondaryBackgroundBrush" Color="#2D2D30" />
-    <SolidColorBrush x:Key="SecondaryForegroundBrush" Color="#CCCCCC" />
-    <SolidColorBrush x:Key="AccentBackgroundBrush" Color="#0078D4" />
-    <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="AccentMouseOverBackgroundBrush" Color="#106EBE" />
-    <SolidColorBrush x:Key="AccentMouseOverBorderBrush" Color="#005A9E" />
-    <SolidColorBrush x:Key="AccentPressedBackgroundBrush" Color="#005A9E" />
-    <SolidColorBrush x:Key="BorderBrush" Color="#323130" />
-    <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#2D2D30" />
-    <SolidColorBrush x:Key="PressedBackgroundBrush" Color="#252526" />
-    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#3C3C3C" />
-    <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#666666" />
-    <SolidColorBrush x:Key="SuccessBrush" Color="#107C10" />
-    <SolidColorBrush x:Key="WarningBrush" Color="#FF8C00" />
-    <SolidColorBrush x:Key="ErrorBrush" Color="#E74856" />
-    <SolidColorBrush x:Key="InfoBrush" Color="#0078D4" />
-    <SolidColorBrush x:Key="PurpleBrush" Color="#8B5CF6" />
+    <!-- =============================================================================== -->
+    <!-- MISSING FLUENTDARK THEME RESOURCES — CRITICAL FIXES -->
+    <!-- =============================================================================== -->
+    <!-- These resources are referenced in XAML but missing from the Syncfusion theme -->
+    <!-- Adding them here to prevent StaticResourceExtension exceptions -->
+    <!-- =============================================================================== -->
 
-    <!-- Colors for gradients (DEPRECATED) -->
+    <!-- Additional FluentDark Accent Brushes -->
+    <SolidColorBrush x:Key="FluentDarkPurpleBrush" Color="#6A1B9A" />
+    <SolidColorBrush x:Key="FluentDarkBorderBrush" Color="#323130" />
+
+    <!-- Pressed and Selected States -->
+    <SolidColorBrush x:Key="PressedBackground" Color="#404040" />
+    <SolidColorBrush x:Key="SelectedBackground" Color="#0078D4" />
+    <SolidColorBrush x:Key="DisabledBackground" Color="#252526" />
+    <SolidColorBrush x:Key="DisabledForeground" Color="#666666" />
+    <SolidColorBrush x:Key="DisabledBorder" Color="#323130" />
+
+    <!-- Semantic State Colors -->
+    <SolidColorBrush x:Key="ErrorBackground" Color="#E74856" />
+    <SolidColorBrush x:Key="WarningBackground" Color="#FF8C00" />
+
+    <!-- Secondary and Accent Colors -->
+    <SolidColorBrush x:Key="SecondaryBackground" Color="#2D2D30" />
+    <SolidColorBrush x:Key="SecondaryBorder" Color="#323130" />
+    <SolidColorBrush x:Key="AccentBackground" Color="#0078D4" />
+    <SolidColorBrush x:Key="AccentForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AccentBorder" Color="#106EBE" />
+
+    <!-- Surface Colors -->
+    <SolidColorBrush x:Key="SurfaceBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="SurfaceForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SurfaceBorder" Color="#323130" />
+
+    <!-- Primary Colors -->
+    <SolidColorBrush x:Key="PrimaryForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="PrimaryBorder" Color="#106EBE" />
+
+    <!-- Missing Colors for Custom Controls -->
+    <Color x:Key="WarningColor">#FF8C00</Color>
+    <Color x:Key="ErrorColor">#E74856</Color>
+    <Color x:Key="SuccessColor">#2ECC71</Color>
+    <Color x:Key="InfoColor">#0078D4</Color>
     <Color x:Key="PrimaryColor">#0078D4</Color>
-    <Color x:Key="AccentColor">#106EBE</Color>
+    <Color x:Key="FluentDarkPrimaryColor">#0078D4</Color>
+
+    <!-- =============================================================================== -->
+    <!-- MISSING FORM AND UI ELEMENT STYLES — CRITICAL FIXES -->
+    <!-- =============================================================================== -->
+    <!-- These styles are used across multiple views but were missing from global resources -->
+    <!-- Adding them here to prevent StaticResourceExtension exceptions -->
+    <!-- =============================================================================== -->
+
+    <!-- Field Label Style — Used in forms throughout the application -->
+    <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="Margin" Value="0,0,0,5" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Section Header Style — Used for form section headers -->
+    <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryForeground}" />
+        <Setter Property="Margin" Value="0,20,0,15" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Statistics Card Style — Used in dashboard and statistics panels -->
+    <Style x:Key="StatCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="15,10" />
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.15" Direction="270"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Statistics Number Style — Used for displaying numbers in stat cards -->
+    <Style x:Key="StatNumberStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentBackground}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Statistics Label Style — Used for labels in stat cards -->
+    <Style x:Key="StatLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,5,0,0" />
+    </Style>
+
+    <!-- Tile Content Style — Used for tile content text -->
+    <Style x:Key="BusBuddyTileContentStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,2" />
+    </Style>
+
+    <!-- Tile Value Style — Used for tile value text -->
+    <Style x:Key="BusBuddyTileValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentBackground}" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,2" />
+    </Style>
+
+    <!-- =============================================================================== -->
+    <!-- RESOURCE NAMING CONSISTENCY FIXES — BRUSH SUFFIX VARIANTS -->
+    <!-- =============================================================================== -->
+    <!-- Adding Brush suffix variants to maintain consistency across XAML files -->
+    <!-- These are aliases to the existing resources without the Brush suffix -->
+    <!-- =============================================================================== -->
+
+    <!-- Background Brush Aliases -->
+    <SolidColorBrush x:Key="ContentBackgroundBrush" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="SurfaceBackgroundBrush" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="AccentBackgroundBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#404040" />
+    <SolidColorBrush x:Key="PrimaryBackgroundBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="SecondaryBackgroundBrush" Color="#2D2D30" />
+
+    <!-- Foreground Brush Aliases -->
+    <SolidColorBrush x:Key="PrimaryForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SecondaryForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ContentForegroundBrush" Color="#FFFFFF" />
+
+    <!-- Border Brush Aliases -->
+    <!-- BorderBrush already defined in main theme resources section — removed duplicate -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#0078D4" />
+
+    <!-- Semantic State Brush Aliases -->
+    <!-- All semantic brushes (SuccessBrush, WarningBrush, ErrorBrush, InfoBrush) -->
+    <!-- are already defined in the main theme resources section — removed duplicates -->
+
+    <!-- =============================================================================== -->
+    <!-- ENHANCED DASHBOARD STYLES — MOVED FROM LOCAL TO GLOBAL -->
+    <!-- =============================================================================== -->
+
+    <!-- Enhanced Tile Style for Modern Appearance with Theme Support -->
+    <Style x:Key="DashboardTileStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Margin" Value="10"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="12" Direction="270" ShadowDepth="3" Opacity="0.15"/>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBackground}"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect BlurRadius="16" Direction="270" ShadowDepth="4" Opacity="0.25"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Enhanced Tile Header Style with Theme Support -->
+    <Style x:Key="TileHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}"/>
+        <Setter Property="Margin" Value="0,0,0,15"/>
+    </Style>
+
+    <!-- Enhanced Tile Content Style with Theme Support -->
+    <Style x:Key="TileContentStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForeground}"/>
+        <Setter Property="Margin" Value="0,0,0,6"/>
+    </Style>
+
+    <!-- Enhanced Tile Value Style with Theme Support -->
+    <Style x:Key="TileValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+    </Style>
+
+    <!-- Status Indicator Style -->
+    <Style x:Key="StatusIndicatorStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="Margin" Value="8,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Performance Tile Style for Metrics with Theme Support -->
+    <Style x:Key="PerformanceTileStyle" TargetType="Border">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#0078D4" Offset="0"/>
+                    <GradientStop Color="#106EBE" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBackground}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Margin" Value="10"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="12" Direction="270" ShadowDepth="3" Opacity="0.2"/>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
 </ResourceDictionary>

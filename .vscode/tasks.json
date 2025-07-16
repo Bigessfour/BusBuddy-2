@@ -9,7 +9,7 @@
                 "clean",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "--verbosity",
-                "normal"
+                "minimal"
             ],
             "group": "build",
             "presentation": {
@@ -30,7 +30,7 @@
                 "restore",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "--verbosity",
-                "normal"
+                "minimal"
             ],
             "group": "build",
             "dependsOn": "Clean Solution",
@@ -52,7 +52,7 @@
                 "build",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "--verbosity",
-                "normal",
+                "minimal",
                 "--no-restore"
             ],
             "group": {
@@ -99,7 +99,7 @@
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "--no-build",
                 "--verbosity",
-                "normal"
+                "minimal"
             ],
             "group": "build",
             "dependsOn": "Build Solution",

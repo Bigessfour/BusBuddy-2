@@ -448,7 +448,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 var themes = new[]
                 {
                     new { Name = "🌙 Fluent Dark", Theme = "FluentDark" },
-                    new { Name = "☀️ Fluent Light", Theme = "FluentLight" },
+                    // FluentLight removed — causes KeyNotFoundException in v30.1.40
                     new { Name = "🎯 Material Dark", Theme = "MaterialDark" },
                     new { Name = "🌞 Material Light", Theme = "MaterialLight" },
                     new { Name = "🏢 Office 2019", Theme = "Office2019Colorful" }
@@ -512,9 +512,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                     case "FluentDark":
                         SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
                         break;
-                    case "FluentLight":
-                        SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentLight" });
-                        break;
+                    // FluentLight removed — causes KeyNotFoundException in v30.1.40
                     case "MaterialDark":
                         SfSkinManager.SetTheme(this, new Theme() { ThemeName = "MaterialDark" });
                         break;
@@ -721,14 +719,14 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                // Check for essential FluentDark theme resources
+                // Check for essential FluentDark theme resources (correct Syncfusion v30.1.40 names)
                 var requiredResources = new[]
                 {
-                    "FluentDarkPrimaryBrush",
-                    "FluentDarkBackgroundBrush",
-                    "FluentDarkForegroundBrush",
-                    "FluentDarkAccentBrush",
-                    "FluentDarkSuccessBrush"
+                    "PrimaryBackground",
+                    "ContentBackground",
+                    "ContentForeground",
+                    "AccentBackground",
+                    "SuccessBackground"
                 };
 
                 var app = Application.Current;
@@ -780,8 +778,8 @@ namespace BusBuddy.WPF.Views.Dashboard
             {
                 Logger.Information("🔄 Applying fallback theme due to missing FluentDark resources");
 
-                // Apply default WPF theme using SfSkinManager
-                SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentLight" });
+                // Apply FluentDark theme (NOT FluentLight — this causes KeyNotFoundException)
+                SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
 
                 // Add basic fallback resources to Application.Resources if not present
                 var app = Application.Current;
@@ -789,7 +787,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 {
                     // Add essential fallback brushes
                     if (!app.Resources.Contains("FluentDarkPrimaryBrush"))
-                        app.Resources.Add("FluentDarkPrimaryBrush", new SolidColorBrush(Color.FromRgb(45, 45, 48)));
+                        app.Resources.Add("FluentDarkPrimaryBrush", new SolidColorBrush(Color.FromRgb(0, 120, 212)));
 
                     if (!app.Resources.Contains("FluentDarkBackgroundBrush"))
                         app.Resources.Add("FluentDarkBackgroundBrush", new SolidColorBrush(Color.FromRgb(30, 30, 30)));
@@ -798,10 +796,14 @@ namespace BusBuddy.WPF.Views.Dashboard
                         app.Resources.Add("FluentDarkForegroundBrush", new SolidColorBrush(Color.FromRgb(240, 240, 240)));
 
                     if (!app.Resources.Contains("FluentDarkAccentBrush"))
-                        app.Resources.Add("FluentDarkAccentBrush", new SolidColorBrush(Color.FromRgb(0, 122, 204)));
+                        app.Resources.Add("FluentDarkAccentBrush", new SolidColorBrush(Color.FromRgb(0, 120, 212)));
 
                     if (!app.Resources.Contains("FluentDarkSuccessBrush"))
                         app.Resources.Add("FluentDarkSuccessBrush", new SolidColorBrush(Color.FromRgb(46, 204, 113)));
+
+                    // Add the missing FluentDarkPurpleBrush that's causing the StaticResource exception
+                    if (!app.Resources.Contains("FluentDarkPurpleBrush"))
+                        app.Resources.Add("FluentDarkPurpleBrush", new SolidColorBrush(Color.FromRgb(106, 27, 154)));
                 }
 
                 Logger.Information("✅ Fallback theme applied successfully");

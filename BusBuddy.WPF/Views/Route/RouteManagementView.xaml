@@ -451,9 +451,9 @@
                                             DefaultText="Select driver..."
                                             Style="{StaticResource BusBuddyComboBoxAdvStyle}"
                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                            Background="{StaticResource FluentDarkSurfaceBrush}"
-                                            Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                            BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                            Background="{StaticResource ContentBackground}"
+                                            Foreground="{StaticResource PrimaryForeground}"
+                                            BorderBrush="{StaticResource BorderBrush}"
                                             Height="32"/>
                     </Grid>
                 </Grid>
@@ -572,12 +572,12 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Route Efficiency Chart -->
-                    <Border Grid.Column="0" BorderBrush="{StaticResource FluentDarkBorderBrush}" BorderThickness="1"
+                    <Border Grid.Column="0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                            CornerRadius="6" Margin="0,0,10,0">
                         <syncfusion:SfChart Header="Route Efficiency Trends"
                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                          Background="{StaticResource FluentDarkSurfaceBrush}"
-                                          Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                          Background="{StaticResource ContentBackground}"
+                                          Foreground="{StaticResource PrimaryForeground}"
                                           Margin="15">
                             <syncfusion:SfChart.PrimaryAxis>
                                 <syncfusion:CategoryAxis Header="Routes"/>
@@ -588,17 +588,17 @@
                             <syncfusion:ColumnSeries ItemsSource="{Binding RouteEfficiencyData}"
                                            XBindingPath="RouteName"
                                            YBindingPath="EfficiencyScore"
-                                           Interior="{StaticResource FluentDarkAccentBrush}"/>
+                                           Interior="{StaticResource AccentBrush}"/>
                         </syncfusion:SfChart>
                     </Border>
 
                     <!-- Resource Utilization Pie Chart -->
-                    <Border Grid.Column="1" BorderBrush="{StaticResource FluentDarkBorderBrush}" BorderThickness="1"
+                    <Border Grid.Column="1" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                            CornerRadius="6" Margin="10,0,0,0">
                         <syncfusion:SfChart Header="Resource Utilization"
                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                          Background="{StaticResource FluentDarkSurfaceBrush}"
-                                          Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
+                                          Background="{StaticResource ContentBackground}"
+                                          Foreground="{StaticResource PrimaryForeground}"
                                           Margin="15">
                             <syncfusion:PieSeries ItemsSource="{Binding ResourceUtilizationData}"
                                         XBindingPath="Category"
@@ -614,9 +614,9 @@
                                    ItemsSource="{Binding RouteAnalyticsData}"
                                    Style="{StaticResource BusBuddySfDataGridStyle}"
                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-                                   Background="{StaticResource FluentDarkBackgroundBrush}"
-                                   Foreground="{StaticResource FluentDarkPrimaryTextBrush}"
-                                   BorderBrush="{StaticResource FluentDarkBorderBrush}"
+                                   Background="{StaticResource ContentBackground}"
+                                   Foreground="{StaticResource PrimaryForeground}"
+                                   BorderBrush="{StaticResource BorderBrush}"
                                    AutoGenerateColumns="False"
                                    AllowSorting="True"
                                    AllowFiltering="True"
@@ -640,7 +640,7 @@
                                 Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                 AnimationType="DoubleCircle"
-                                Foreground="{StaticResource FluentDarkAccentBrush}"
+                                Foreground="{StaticResource AccentBrush}"
                                 Background="Transparent"/>
     </syncfusion:DockingManager>
 </UserControl>
