@@ -24,53 +24,7 @@
              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
 
     <UserControl.Resources>
-        <!-- DataTemplates to map ViewModels to Views -->
-        <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
-            <busView:BusManagementView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:DriverManagementViewModel}">
-            <driverView:DriverManagementView/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
-            <routeView:RouteManagementView/>
-        </DataTemplate>
-        <!-- Enhanced DataTemplates for additional ViewModels -->
-        <DataTemplate DataType="{x:Type scheduleViewModels:ScheduleManagementViewModel}">
-            <ContentControl>
-                <ContentControl.Content>
-                    <scheduleView:ScheduleManagementView />
-                </ContentControl.Content>
-            </ContentControl>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
-            <ContentControl>
-                <ContentControl.Content>
-                    <studentView:StudentManagementView />
-                </ContentControl.Content>
-            </ContentControl>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
-            <ContentControl>
-                <ContentControl.Content>
-                    <maintenanceView:MaintenanceTrackingView />
-                </ContentControl.Content>
-            </ContentControl>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
-            <ContentControl>
-                <ContentControl.Content>
-                    <fuelView:FuelManagementView />
-                </ContentControl.Content>
-            </ContentControl>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
-            <ContentControl>
-                <ContentControl.Content>
-                    <activityView:ActivityLoggingView />
-                </ContentControl.Content>
-            </ContentControl>
-        </DataTemplate>
-
+        <!-- DataTemplates have been moved to App.xaml for global availability -->
         <!-- Dashboard styles have been moved to global CustomStyles.xaml. -->
         <!-- All DashboardTileStyle, TileHeaderStyle, TileContentStyle, TileValueStyle, -->
         <!-- StatusIndicatorStyle, and PerformanceTileStyle are now global resources. -->

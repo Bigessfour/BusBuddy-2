@@ -95,42 +95,7 @@
         <!-- FluentDark theme will automatically style the window -->
         <!-- Removed custom BusBuddyWindowStyle as it conflicts with SfSkinManager.VisualStyle="FluentDark" -->
 
-        <DataTemplate DataType="{x:Type viewModels:LoadingViewModel}">
-            <views:LoadingView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
-            <dashboard:EnhancedDashboardView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
-            <bus:BusManagementView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:DriverManagementViewModel}">
-            <driver:DriverManagementView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
-            <route:RouteManagementView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type scheduleViewModels:ScheduleManagementViewModel}">
-            <schedule:ScheduleManagementView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
-            <student:StudentManagementView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
-            <maintenance:MaintenanceTrackingView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
-            <fuel:FuelManagementView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
-            <activity:ActivityLoggingView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
-            <settings:SettingsView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
-            <views:StudentListView />
-        </DataTemplate>
+        <!-- DataTemplates have been moved to App.xaml for global availability -->
         </ResourceDictionary>
     </Window.Resources>
 

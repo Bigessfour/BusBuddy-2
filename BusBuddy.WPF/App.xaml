@@ -2,7 +2,20 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:BusBuddy.WPF"
-             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters">
+             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
+             xmlns:views="clr-namespace:BusBuddy.WPF.Views"
+             xmlns:bus="clr-namespace:BusBuddy.WPF.Views.Bus"
+             xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
+             xmlns:route="clr-namespace:BusBuddy.WPF.Views.Route"
+             xmlns:driver="clr-namespace:BusBuddy.WPF.Views.Driver"
+             xmlns:schedule="clr-namespace:BusBuddy.WPF.Views.Schedule"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
+             xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
+             xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
+             xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
+             xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
+             xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule">
     <Application.Resources>
         <ResourceDictionary>
             <!--
@@ -22,6 +35,49 @@
                 <!-- Custom styles that use official Syncfusion FluentDark resource names -->
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- ===============================================================================
+            VIEWMODEL TO VIEW MAPPING — MVVM PATTERN IMPLEMENTATION
+            ===============================================================================
+            DataTemplates that map ViewModels to their corresponding Views
+            This enables proper MVVM view rendering instead of displaying ViewModel type names
+            =============================================================================== -->
+            <DataTemplate DataType="{x:Type viewModels:LoadingViewModel}">
+                <views:LoadingView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
+                <dashboard:EnhancedDashboardView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
+                <bus:BusManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:DriverManagementViewModel}">
+                <driver:DriverManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
+                <route:RouteManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type scheduleViewModels:ScheduleManagementViewModel}">
+                <schedule:ScheduleManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
+                <student:StudentManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
+                <maintenance:MaintenanceTrackingView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
+                <fuel:FuelManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
+                <activity:ActivityLoggingView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+                <settings:SettingsView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
+                <views:StudentListView />
+            </DataTemplate>
 
             <!-- Essential converters only - minimal resource dictionary -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
