@@ -325,6 +325,220 @@
             }
         },
         {
+            "label": "🔧 Format All XAML Files",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Format-XamlFiles.ps1' -Path '${workspaceFolder}' -Format -Validate"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "xaml-formatter",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^❌.*Processing (.*):(\\d+).*: (.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "message": 3
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🔍 Validate XAML Syntax",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Format-XamlFiles.ps1' -Path '${workspaceFolder}' -Validate"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "xaml-validator",
+                    "fileLocation": "absolute",
+                    "pattern": [
+                        {
+                            "regexp": "^❌.*Validation failed for (.*)$",
+                            "file": 1
+                        },
+                        {
+                            "regexp": "^\\s*-\\s*(.*)$",
+                            "message": 1
+                        }
+                    ]
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🧹 Remove Deprecated Syncfusion Attributes",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Format-XamlFiles.ps1' -Path '${workspaceFolder}' -RemoveDeprecated -Format"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "📋 Pre-Commit XAML Check",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Format-XamlFiles.ps1' -PreCommitMode"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "pre-commit",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^❌.*failed.*: (.*)$",
+                        "message": 1
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🔥 Run Debug Filter (Scheduling Focus)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/test-debug-filter.ps1' -Mode Stream -SchedulingFocus -UINotifications -Priority 2"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "owner": "debug-filter-scheduling",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^\\[\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\]\\s+🔥\\s+\\[CRITICAL\\].*?\\s+(.*)$",
+                        "message": 1
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^🔄 Starting real-time log monitoring",
+                        "endsPattern": "^Press Ctrl\\+C to stop monitoring"
+                    }
+                },
+                {
+                    "owner": "debug-filter-high",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^\\[\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\]\\s+⚠️\\s+\\[HIGH\\].*?\\s+(.*)$",
+                        "message": 1
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^🔄 Starting real-time log monitoring",
+                        "endsPattern": "^Press Ctrl\\+C to stop monitoring"
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🩺 Weekly Health Check",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "Write-Host '🩺 Running Weekly Bus Buddy Health Check...' -ForegroundColor Cyan; & '${workspaceFolder}/Tools/Scripts/test-debug-filter.ps1' -Mode File -Priority 1; Write-Host '📊 Generating Health Report...' -ForegroundColor Cyan; bb-diagnostic"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🚀 Full Development Cycle",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "📋 Pre-Commit XAML Check",
+                "Build Solution",
+                "🔥 Run Debug Filter (Scheduling Focus)"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            }
+        },
+        {
             "label": "Build Solution with Enhanced Debug Output",
             "dependsOrder": "sequence",
             "dependsOn": [
