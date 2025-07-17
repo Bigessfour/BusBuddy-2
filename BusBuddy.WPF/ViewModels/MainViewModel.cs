@@ -78,17 +78,20 @@ namespace BusBuddy.WPF.ViewModels
         private readonly ILazyViewModelService _lazyViewModelService;
         private readonly DashboardViewModel _dashboardViewModel; // Keep dashboard eager for immediate display
         private readonly LoadingViewModel _loadingViewModel; // Keep loading view eager
+        private readonly INavigationService? _navigationService; // Optional navigation service for centralized navigation
 
         public ObservableCollection<NavigationItem> NavigationItems { get; }
 
         public MainViewModel(
             DashboardViewModel dashboardViewModel,
             LoadingViewModel loadingViewModel,
-            ILazyViewModelService lazyViewModelService)
+            ILazyViewModelService lazyViewModelService,
+            INavigationService? navigationService = null)
         {
             _dashboardViewModel = dashboardViewModel;
             _loadingViewModel = loadingViewModel;
             _lazyViewModelService = lazyViewModelService;
+            _navigationService = navigationService;
             _logger = Log.ForContext<MainViewModel>();
 
             NavigationItems = new ObservableCollection<NavigationItem>
@@ -201,6 +204,50 @@ namespace BusBuddy.WPF.ViewModels
         {
             _logger.Information("UI Navigation initiated to {ViewModelName} via button click", viewModelName);
 
+            // Use NavigationService if available, otherwise use legacy method
+            if (_navigationService != null)
+            {
+                try
+                {
+                    // Map legacy view model names to NavigationService names
+                    var navigationName = viewModelName switch
+                    {
+                        "Buses" => "BusManagement",
+                        "Drivers" => "DriverManagement",
+                        "Routes" => "RouteManagement",
+                        "Schedule" => "ScheduleManagement",
+                        "SportsSchedule" => "ScheduleManagement",
+                        "Students" => "StudentManagement",
+                        "Maintenance" => "Maintenance",
+                        "Fuel" => "FuelManagement",
+                        "Activity" => "ActivityLog",
+                        "Settings" => "Settings",
+                        "StudentList" => "StudentManagement",
+                        "Dashboard" => "Dashboard",
+                        _ => "Dashboard"
+                    };
+
+                    _navigationService.NavigateTo(navigationName);
+                    _logger.Information("Navigation completed using NavigationService to {NavigationName}", navigationName);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error navigating using NavigationService, falling back to legacy method");
+                }
+            }
+
+            // Legacy navigation method (fallback)
+            await NavigateToLegacy(viewModelName);
+        }
+
+        /// <summary>
+        /// Legacy navigation method for backward compatibility
+        /// </summary>
+        private async Task NavigateToLegacy(string viewModelName)
+        {
+            _logger.Information("UI Navigation initiated to {ViewModelName} via button click", viewModelName);
+
             object? previousViewModel = CurrentViewModel;
             var startTime = System.Diagnostics.Stopwatch.StartNew();
 
@@ -281,6 +328,23 @@ namespace BusBuddy.WPF.ViewModels
         public async Task NavigateToDashboardAsync()
         {
             _logger.Information("UI Navigation to Dashboard initiated from startup orchestration");
+
+            // Use NavigationService if available
+            if (_navigationService != null)
+            {
+                try
+                {
+                    _navigationService.NavigateTo("Dashboard");
+                    _logger.Information("Dashboard navigation completed using NavigationService");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error navigating to Dashboard using NavigationService, falling back to legacy method");
+                }
+            }
+
+            // Legacy fallback
             CurrentViewModel = _dashboardViewModel;
 
             // Initialize dashboard data after navigation
@@ -301,6 +365,23 @@ namespace BusBuddy.WPF.ViewModels
         public void NavigateToDashboard()
         {
             _logger.Information("UI Navigation to Dashboard initiated from startup orchestration (sync)");
+
+            // Use NavigationService if available
+            if (_navigationService != null)
+            {
+                try
+                {
+                    _navigationService.NavigateTo("Dashboard");
+                    _logger.Information("Dashboard navigation completed using NavigationService (sync)");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error navigating to Dashboard using NavigationService (sync), falling back to legacy method");
+                }
+            }
+
+            // Legacy fallback
             CurrentViewModel = _dashboardViewModel;
 
             // Initialize dashboard data in background

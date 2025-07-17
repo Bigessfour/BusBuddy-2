@@ -191,5 +191,36 @@ namespace BusBuddy.WPF.Services
                 _currentViewModel,
                 _currentViewTitle));
         }
+
+        /// <summary>
+        /// Get the current navigation state for debugging or logging purposes
+        /// </summary>
+        public string GetCurrentNavigationState()
+        {
+            var currentView = _currentViewModel != null ? GetViewNameFromViewModel(_currentViewModel) : "None";
+            return $"Current: {currentView}, History: [{string.Join(", ", _navigationHistory)}]";
+        }
+
+        /// <summary>
+        /// Check if we can navigate to a specific view
+        /// </summary>
+        public bool CanNavigateTo(string viewName)
+        {
+            return viewName switch
+            {
+                "Dashboard" or "BusManagement" or "DriverManagement" or "RouteManagement" or
+                "ScheduleManagement" or "StudentManagement" or "Maintenance" or "FuelManagement" or
+                "ActivityLog" or "Settings" => true,
+                _ => false
+            };
+        }
+
+        /// <summary>
+        /// Navigate to Dashboard (convenience method)
+        /// </summary>
+        public void NavigateToDashboard()
+        {
+            NavigateTo("Dashboard");
+        }
     }
 }

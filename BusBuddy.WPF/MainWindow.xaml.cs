@@ -40,13 +40,13 @@ namespace BusBuddy.WPF
                     _viewModel = appInstance.Services.GetService<MainViewModel>();
                     _navigationService = appInstance.Services.GetService<INavigationService>();
                     DataContext = _viewModel;
-                    
+
                     // Subscribe to navigation events
                     if (_navigationService != null)
                     {
                         _navigationService.NavigationChanged += OnNavigationChanged;
                     }
-                    
+
                     Log.Information("MainWindow initialized with enhanced navigation drawer and FluentDark theme");
                 }
             }
@@ -203,7 +203,7 @@ namespace BusBuddy.WPF
             try
             {
                 Log.Information("Navigation changed to: {ViewName}", e.ViewName);
-                
+
                 // Update the view model's current view
                 if (_viewModel != null && e.ViewModel != null)
                 {
