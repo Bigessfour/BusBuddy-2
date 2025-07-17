@@ -26,6 +26,8 @@
         xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
         xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
         xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
+        xmlns:xai="clr-namespace:BusBuddy.WPF.Views.XAI"
+        xmlns:googleearth="clr-namespace:BusBuddy.WPF.Views.GoogleEarth"
         xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
@@ -63,6 +65,7 @@
                                      HorizontalContentAlignment="Left"
                                      Margin="4,2"
                                      Padding="16,12"
+                                     Style="{StaticResource NavigationItemStyle}"
                                      Background="Transparent"
                                      Foreground="{DynamicResource TextPrimary}"
                                      BorderThickness="0"
@@ -95,6 +98,7 @@
     <Grid Background="{DynamicResource SurfaceBackground}">
         <!-- COMPREHENSIVE DOCKING MANAGER - Professional IDE-style Layout -->
         <syncfusion:DockingManager x:Name="MainDockingManager"
+                                  Style="{StaticResource StandardDockingManagerStyle}"
                                   UseDocumentContainer="True"
                                   PersistState="True"
                                   DockFill="True"
@@ -104,6 +108,7 @@
 
             <!-- NAVIGATION DRAWER PANEL (Left Docked) -->
             <syncfusion:SfNavigationDrawer x:Name="NavigationDrawer"
+                                          Style="{StaticResource StandardNavigationDrawerStyle}"
                                           syncfusion:DockingManager.Header="🧭 Navigation"
                                           syncfusion:DockingManager.State="Dock"
                                           syncfusion:DockingManager.SideInDockedMode="Left"
@@ -124,70 +129,84 @@
                                           Background="{DynamicResource SurfaceBackground}">
 
                 <!-- PROPER NAVIGATION ITEMS - Using NavigationItem controls -->
-                <syncfusion:NavigationItem Header="Dashboard" Tag="Dashboard" IsSelected="True">
+                <syncfusion:NavigationItem Header="Dashboard" Tag="Dashboard" IsSelected="True" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Bus Management" Tag="BusManagement">
+                <syncfusion:NavigationItem Header="Bus Management" Tag="BusManagement" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15V3H9V5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6.01M6.5,7H17.5L19,12H5L6.5,7M7.5,13A1.5,1.5 0 0,1 9,14.5A1.5,1.5 0 0,1 7.5,16A1.5,1.5 0 0,1 6,14.5A1.5,1.5 0 0,1 7.5,13M16.5,13A1.5,1.5 0 0,1 18,14.5A1.5,1.5 0 0,1 16.5,16A1.5,1.5 0 0,1 15,14.5A1.5,1.5 0 0,1 16.5,13Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Driver Management" Tag="DriverManagement">
+                <syncfusion:NavigationItem Header="Driver Management" Tag="DriverManagement" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Route Management" Tag="RouteManagement">
+                <syncfusion:NavigationItem Header="Route Management" Tag="RouteManagement" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M20,10C22,12 22,16 20,18L18.5,16.5C19.9,15.1 19.9,12.9 18.5,11.5L20,10M4,10L5.5,11.5C4.1,12.9 4.1,15.1 5.5,16.5L4,18C2,16 2,12 4,10M15,10L16.5,11.5C17.9,12.9 17.9,15.1 16.5,16.5L15,18C13,16 13,12 15,10M9,10L10.5,11.5C11.9,12.9 11.9,15.1 10.5,16.5L9,18C7,16 7,12 9,10M12,13A1,1 0 0,1 13,14A1,1 0 0,1 12,15A1,1 0 0,1 11,14A1,1 0 0,1 12,13Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Schedule Management" Tag="ScheduleManagement">
+                <syncfusion:NavigationItem Header="Schedule Management" Tag="ScheduleManagement" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M7,10H9V12H7V10M15,10H17V12H15V10M11,10H13V12H11V10M7,14H9V16H7V14M15,14H17V16H15V14M11,14H13V16H11V14Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Student Management" Tag="StudentManagement">
+                <syncfusion:NavigationItem Header="Student Management" Tag="StudentManagement" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Maintenance" Tag="Maintenance">
+                <syncfusion:NavigationItem Header="Maintenance" Tag="Maintenance" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Fuel Management" Tag="FuelManagement">
+                <syncfusion:NavigationItem Header="Fuel Management" Tag="FuelManagement" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M14,2H10A2,2 0 0,0 8,4V16A2,2 0 0,0 10,18H14A2,2 0 0,0 16,16V4A2,2 0 0,0 14,2M14,16H10V4H14V16M19,6V18A2,2 0 0,1 17,20H7A2,2 0 0,1 5,18V6H7V18H17V6H19Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Activity Log" Tag="ActivityLog">
+                <syncfusion:NavigationItem Header="Activity Log" Tag="ActivityLog" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
                               Fill="{DynamicResource ContentForeground}"/>
                     </syncfusion:NavigationItem.Icon>
                 </syncfusion:NavigationItem>
 
-                <syncfusion:NavigationItem Header="Settings" Tag="Settings">
+                <syncfusion:NavigationItem Header="XAI Chat" Tag="XAIChat" Style="{StaticResource NavigationItemStyle}">
+                    <syncfusion:NavigationItem.Icon>
+                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,7.5A1.5,1.5 0 0,1 9.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,7.5M12,17.23C10.25,17.23 8.71,16.5 7.81,15.42L9.23,14C9.68,14.72 10.75,15.23 12,15.23C13.25,15.23 14.32,14.72 14.77,14L16.19,15.42C15.29,16.5 13.75,17.23 12,17.23M16,10.5A1.5,1.5 0 0,1 14.5,9A1.5,1.5 0 0,1 16,7.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 16,10.5Z"
+                              Fill="{DynamicResource ContentForeground}"/>
+                    </syncfusion:NavigationItem.Icon>
+                </syncfusion:NavigationItem>
+
+                <syncfusion:NavigationItem Header="Google Earth" Tag="GoogleEarth" Style="{StaticResource NavigationItemStyle}">
+                    <syncfusion:NavigationItem.Icon>
+                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z"
+                              Fill="{DynamicResource ContentForeground}"/>
+                    </syncfusion:NavigationItem.Icon>
+                </syncfusion:NavigationItem>
+
+                <syncfusion:NavigationItem Header="Settings" Tag="Settings" Style="{StaticResource NavigationItemStyle}">
                     <syncfusion:NavigationItem.Icon>
                         <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
                               Fill="{DynamicResource ContentForeground}"/>
@@ -245,6 +264,12 @@
                     <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
                         <settings:SettingsView/>
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:XAIChatViewModel}">
+                        <xai:XAIChatView/>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:GoogleEarthViewModel}">
+                        <googleearth:GoogleEarthView/>
+                    </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>
 
@@ -274,6 +299,7 @@
                     <syncfusion:ButtonAdv x:Name="MenuToggleButton"
                                           Grid.Column="0"
                                           Width="40" Height="40"
+                                          Style="{StaticResource IconButtonAdvStyle}"
                                           Background="Transparent"
                                           BorderThickness="0"
                                           Click="MenuToggleButton_Click"
@@ -301,6 +327,7 @@
                         <syncfusion:ComboBoxAdv x:Name="DisplayModeComboBox"
                                                 Width="120"
                                                 Height="32"
+                                                Style="{StaticResource StandardComboBoxStyle}"
                                                 Margin="4,0"
                                                 SelectedIndex="2"
                                                 SelectionChanged="DisplayModeComboBox_SelectionChanged"
@@ -340,6 +367,7 @@
 
                         <!-- SETTINGS -->
                         <syncfusion:ButtonAdv Width="40" Height="40"
+                                              Style="{StaticResource IconButtonAdvStyle}"
                                               Background="Transparent"
                                               BorderThickness="0"
                                               Margin="4,0"
@@ -421,6 +449,7 @@
                                            Margin="0,0,0,8"/>
                                 <syncfusion:SfCircularProgressBar Height="60"
                                                                  Width="60"
+                                                                 Style="{StaticResource LoadingIndicatorStyle}"
                                                                  Progress="92"
                                                                  syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
                                     <syncfusion:SfCircularProgressBar.Content>
@@ -507,6 +536,7 @@
 
             <!-- BUSY INDICATOR OVERLAY -->
             <syncfusion:SfBusyIndicator x:Name="BusyIndicator"
+                                      Style="{StaticResource LoadingIndicatorStyle}"
                                       IsBusy="{Binding IsLoading}"
                                       AnimationType="Gear"
                                       ViewboxWidth="50"

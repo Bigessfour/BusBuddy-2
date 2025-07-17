@@ -35,6 +35,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <!-- Syncfusion FluentDark theme resources (loaded automatically by SfSkinManager) -->
                 <!-- FluentLight theme also available for switching -->
+                <!-- Phase 2: Syncfusion Base Resources for standardized patterns -->
+                <ResourceDictionary Source="Resources/Themes/SyncfusionBaseResources.xaml" />
                 <!-- Custom styles that use official Syncfusion FluentDark resource names -->
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>

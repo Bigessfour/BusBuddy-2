@@ -131,31 +131,31 @@
                               Margin="0,0,20,0"/>
 
                     <syncfusion:ButtonAdv Content="🚨 Emergency Alert"
-                                        Style="{StaticResource BusBuddyEmergencyButtonAdvStyle}"
+                                        Style="{StaticResource EmergencyButtonAdvStyle}"
                                         Margin="8,0"/>
                     <syncfusion:ButtonAdv Content="📊 Generate Report"
-                                        Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
+                                        Style="{StaticResource PrimaryButtonAdvStyle}"
                                         Margin="8,0"/>
-                    <syncfusion:ButtonAdv Content="🔧 Quick Maintenance"
-                                        Style="{StaticResource BusBuddySafetyButtonAdvStyle}"
+                    <syncfusion:ButtonAdv Content=" Quick Maintenance"
+                                        Style="{StaticResource SafetyButtonAdvStyle}"
                                         Margin="8,0"/>
-                    <syncfusion:ButtonAdv Content="📋 Student Roster"
-                                        Style="{StaticResource BusBuddyFleetSuccessButtonAdvStyle}"
+                    <syncfusion:ButtonAdv Content=" Student Roster"
+                                        Style="{StaticResource FleetSuccessButtonAdvStyle}"
                                         Margin="8,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <syncfusion:ButtonAdv Content="🔄"
-                                        Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                    <syncfusion:ButtonAdv Content=""
+                                        Style="{StaticResource IconButtonAdvStyle}"
                                         ToolTip="Refresh Data"
                                         Command="{Binding RefreshCommand}"
                                         Margin="4,0"/>
-                    <syncfusion:ButtonAdv Content="⚙️"
-                                        Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                    <syncfusion:ButtonAdv Content=""
+                                        Style="{StaticResource IconButtonAdvStyle}"
                                         ToolTip="Dashboard Settings"
                                         Margin="4,0"/>
-                    <syncfusion:ButtonAdv Content="📤"
-                                        Style="{StaticResource BusBuddyIconButtonAdvStyle}"
+                    <syncfusion:ButtonAdv Content=""
+                                        Style="{StaticResource IconButtonAdvStyle}"
                                         ToolTip="Export Dashboard"
                                         Margin="4,0"/>
                 </StackPanel>
@@ -1638,3 +1638,4 @@
         </Grid>
     </Grid>
 </UserControl>
+

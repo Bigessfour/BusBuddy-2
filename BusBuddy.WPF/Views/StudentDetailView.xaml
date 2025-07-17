@@ -25,9 +25,9 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
             <syncfusion:ButtonAdv Label="Save" Command="{Binding SaveCommand}" Width="75" Margin="5"
-                                 Style="{StaticResource BusBuddyButtonAdvStyle}" />
+                                 Style="{StaticResource PrimaryButtonAdvStyle}" />
             <syncfusion:ButtonAdv Label="Cancel" Command="{Binding CancelCommand}" Width="75" Margin="5"
-                                 Style="{StaticResource BusBuddyButtonAdvStyle}" />
+                                 Style="{StaticResource SecondaryButtonAdvStyle}" />
         </StackPanel>
     </Grid>
 </Window>

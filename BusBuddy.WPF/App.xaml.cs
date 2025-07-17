@@ -957,6 +957,9 @@ public partial class App : Application
         // Register Navigation Service for centralized navigation management
         services.AddSingleton<BusBuddy.WPF.Services.INavigationService, BusBuddy.WPF.Services.NavigationService>();
 
+        // Register Google Earth Service for geospatial mapping and route visualization
+        services.AddScoped<BusBuddy.WPF.Services.IGoogleEarthService, BusBuddy.WPF.Services.GoogleEarthService>();
+
         // Register startup validation service for deployment readiness
         services.AddScoped<BusBuddy.WPF.Services.StartupValidationService>();
 
@@ -1028,6 +1031,9 @@ public partial class App : Application
 
         // List ViewModels - Loaded lazily
         services.AddScoped<BusBuddy.WPF.ViewModels.StudentListViewModel>();
+
+        // Google Earth Integration ViewModel
+        services.AddScoped<BusBuddy.WPF.ViewModels.GoogleEarthViewModel>();
 
         // Settings and AI ViewModels - Loaded lazily
         services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
