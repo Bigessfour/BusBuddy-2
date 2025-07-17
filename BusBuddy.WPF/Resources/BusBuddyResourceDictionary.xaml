@@ -12,6 +12,40 @@
                     xmlns:syncfusionscheduler="clr-namespace:Syncfusion.UI.Xaml.Scheduler;assembly=Syncfusion.SfScheduler.WPF"
                     xmlns:syncfusionshared="clr-namespace:Syncfusion.Windows.Shared;assembly=Syncfusion.Shared.WPF">
 
+    <!-- ✅ SYNCFUSION WPF 30.1.40 THEME RESOURCE MERGING -->
+    <ResourceDictionary.MergedDictionaries>
+        <!-- 🎨 FLUENTDARK THEME RESOURCES -->
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/MSControl/MSControl.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfSkinManager/SfSkinManager.xaml" />
+
+        <!-- 🎨 FLUENTLIGHT THEME RESOURCES (FALLBACK) -->
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentLight.WPF;component/MSControl/MSControl.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentLight.WPF;component/SfSkinManager/SfSkinManager.xaml" />
+
+        <!-- 🎯 SYNCFUSION CONTROL THEME RESOURCES -->
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfDataGrid/SfDataGrid.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfChart/SfChart.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfBusyIndicator/SfBusyIndicator.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfNavigationDrawer/SfNavigationDrawer.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfProgressBar/SfProgressBar.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfTreeView/SfTreeView.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfInput/SfInput.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfScheduler/SfScheduler.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfAccordion/SfAccordion.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfChat/SfChat.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfGauge/SfGauge.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfMaps/SfMaps.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/PdfViewer/PdfViewer.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfRichTextBoxAdv/SfRichTextBoxAdv.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/SfSpreadsheet/SfSpreadsheet.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/Edit/Edit.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/Grid/Grid.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/Tools/Tools.xaml" />
+        <ResourceDictionary Source="/Syncfusion.Themes.FluentDark.WPF;component/Shared/Shared.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- FluentDark theme is now loaded directly via MergedDictionaries -->
+
     <!-- =============================================================================== -->
     <!-- BUS BUDDY CONSOLIDATED RESOURCE DICTIONARY - SYNCFUSION WPF V30.1.40 COMPATIBLE -->
     <!-- =============================================================================== -->
@@ -36,6 +70,9 @@
     <Color x:Key="SurfaceMedium">#252526</Color>
     <Color x:Key="SurfaceLight">#2D2D30</Color>
     <Color x:Key="SurfaceBorderColor">#323130</Color> <!-- Renamed from SurfaceBorder to avoid conflicts -->
+
+    <!-- Compatibility: Add SurfaceBorder for backward compatibility -->
+    <Color x:Key="SurfaceBorder">#323130</Color>
 
     <!-- 1.3 FUNCTIONAL COLORS -->
     <Color x:Key="FunctionalErrorRed">#E74856</Color>
@@ -107,6 +144,42 @@
     <SolidColorBrush x:Key="ContentForeground" Color="{StaticResource TextPrimary}"/>
     <SolidColorBrush x:Key="ContentBorder" Color="{StaticResource SurfaceBorderColor}"/>
 
+    <!-- =============================================================================== -->
+    <!-- SECTION 3: SYNCFUSION BUILT-IN THEME RESOURCE USAGE (30.1.40 COMPLIANT)      -->
+    <!-- =============================================================================== -->
+
+    <!-- 3.1 SYNCFUSION FLUENTDARK THEME BRUSHES -->
+    <!-- These reference Syncfusion's built-in theme resources for automatic theme consistency -->
+    <SolidColorBrush x:Key="SyncfusionPrimaryBackground" Color="{DynamicResource SyncfusionFluentDarkBackgroundColor}"/>
+    <SolidColorBrush x:Key="SyncfusionPrimaryForeground" Color="{DynamicResource SyncfusionFluentDarkForegroundColor}"/>
+    <SolidColorBrush x:Key="SyncfusionSecondaryBackground" Color="{DynamicResource SyncfusionFluentDarkSecondaryBackgroundColor}"/>
+    <SolidColorBrush x:Key="SyncfusionSecondaryForeground" Color="{DynamicResource SyncfusionFluentDarkSecondaryForegroundColor}"/>
+    <SolidColorBrush x:Key="SyncfusionAccentBrush" Color="{DynamicResource SyncfusionFluentDarkAccentColor}"/>
+    <SolidColorBrush x:Key="SyncfusionBorderBrush" Color="{DynamicResource SyncfusionFluentDarkBorderColor}"/>
+    <SolidColorBrush x:Key="SyncfusionHoverBrush" Color="{DynamicResource SyncfusionFluentDarkHoverColor}"/>
+    <SolidColorBrush x:Key="SyncfusionPressedBrush" Color="{DynamicResource SyncfusionFluentDarkPressedColor}"/>
+    <SolidColorBrush x:Key="SyncfusionSelectedBrush" Color="{DynamicResource SyncfusionFluentDarkSelectedColor}"/>
+    <SolidColorBrush x:Key="SyncfusionDisabledBrush" Color="{DynamicResource SyncfusionFluentDarkDisabledColor}"/>
+
+    <!-- 3.2 SYNCFUSION SEMANTIC THEME BRUSHES -->
+    <SolidColorBrush x:Key="SyncfusionSuccessBrush" Color="{DynamicResource SyncfusionFluentDarkSuccessColor}"/>
+    <SolidColorBrush x:Key="SyncfusionWarningBrush" Color="{DynamicResource SyncfusionFluentDarkWarningColor}"/>
+    <SolidColorBrush x:Key="SyncfusionErrorBrush" Color="{DynamicResource SyncfusionFluentDarkErrorColor}"/>
+    <SolidColorBrush x:Key="SyncfusionInfoBrush" Color="{DynamicResource SyncfusionFluentDarkInfoColor}"/>
+
+    <!-- 3.3 SYNCFUSION SURFACE THEME BRUSHES -->
+    <SolidColorBrush x:Key="SyncfusionSurfaceBrush" Color="{DynamicResource SyncfusionFluentDarkSurfaceColor}"/>
+    <SolidColorBrush x:Key="SyncfusionSurfaceVariantBrush" Color="{DynamicResource SyncfusionFluentDarkSurfaceVariantColor}"/>
+    <SolidColorBrush x:Key="SyncfusionOnSurfaceBrush" Color="{DynamicResource SyncfusionFluentDarkOnSurfaceColor}"/>
+    <SolidColorBrush x:Key="SyncfusionOnSurfaceVariantBrush" Color="{DynamicResource SyncfusionFluentDarkOnSurfaceVariantColor}"/>
+
+    <!-- 3.4 THEME-AWARE HYBRID BRUSHES (Best of Both Worlds) -->
+    <!-- These combine our brand colors with Syncfusion's theme awareness -->
+    <SolidColorBrush x:Key="BrandPrimaryWithTheme" Color="{StaticResource BrandPrimaryBlue}"/>
+    <SolidColorBrush x:Key="BrandSecondaryWithTheme" Color="{DynamicResource SyncfusionFluentDarkSecondaryBackgroundColor}"/>
+    <SolidColorBrush x:Key="BrandSurfaceWithTheme" Color="{DynamicResource SyncfusionFluentDarkSurfaceColor}"/>
+    <SolidColorBrush x:Key="BrandTextWithTheme" Color="{DynamicResource SyncfusionFluentDarkForegroundColor}"/>
+
     <!-- 2.9 FLUENT THEME COMPATIBILITY BRUSHES -->
     <SolidColorBrush x:Key="PrimaryBackground" Color="{StaticResource SurfaceDark}"/>
     <SolidColorBrush x:Key="PrimaryForeground" Color="{StaticResource TextPrimary}"/>
@@ -129,6 +202,12 @@
     <SolidColorBrush x:Key="SurfaceBackground" Color="{StaticResource SurfaceDark}"/>
     <SolidColorBrush x:Key="SurfaceForeground" Color="{StaticResource TextPrimary}"/>
 
+    <!-- 2.10 PROFESSIONAL THEME BRUSHES FOR DASHBOARD -->
+    <SolidColorBrush x:Key="ProfessionalTextPrimary" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="ProfessionalTextSecondary" Color="{StaticResource TextSecondary}"/>
+    <SolidColorBrush x:Key="ProfessionalSurfaceLight" Color="{StaticResource SurfaceLight}"/>
+    <SolidColorBrush x:Key="ProfessionalSurfaceDark" Color="{StaticResource SurfaceDark}"/>
+
     <!-- =============================================================================== -->
     <!-- SECTION 3: SYNCFUSION CONTROL STYLES - V30.1.40 COMPLIANT                       -->
     <!-- =============================================================================== -->
@@ -142,7 +221,7 @@
         <Setter Property="DisplayMode" Value="Expanded"/>
         <Setter Property="Position" Value="Left"/>
         <Setter Property="DrawerWidth" Value="250"/>
-        <Setter Property="DrawerHeight" Value="Auto"/>
+        <Setter Property="DrawerHeight" Value="NaN"/>
     </Style>
 
     <!-- 3.2 DOCKING MANAGER STYLES -->
@@ -194,14 +273,13 @@
         <Setter Property="Header" Value=""/>
     </Style>
 
-    <!-- 3.6 TEXT INPUT LAYOUT STYLES -->
-    <Style x:Key="TextInputLayoutStyle" TargetType="syncfusioninput:SfTextInputLayout">
-        <!-- Removed syncfusionskin:SfSkinManager.VisualStyle="FluentDark" -->
+    <!-- 3.6 STANDARD INPUT BORDER STYLES -->
+    <Style x:Key="StandardInputBorderStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="ContainerType" Value="Outlined"/>
-        <Setter Property="Padding" Value="8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="12,8"/>
     </Style>
 
     <!-- 3.7 SCHEDULER STYLES -->
@@ -605,6 +683,88 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="IconButtonAdvStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource NavigationButtonAdvStyle}" />
+
+    <!-- Missing Dashboard Button Styles -->
+    <Style x:Key="EmergencyButtonAdvStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource DangerButtonAdvStyle}" />
+    <Style x:Key="FleetSuccessButtonAdvStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource SuccessButtonAdvStyle}" />
+
+    <!-- Missing Dashboard Tile Styles -->
+    <Style x:Key="StatusIndicatorStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="PerformanceTileStyle" TargetType="Border" BasedOn="{StaticResource DashboardTileStyle}">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryLightBrush}"/>
+    </Style>
+
+    <!-- Missing Syncfusion Control Styles -->
+    <Style x:Key="BusBuddySfCircularProgressBarStyle" TargetType="syncfusion:SfCircularProgressBar">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="AnimationDuration" Value="0:0:1"/>
+        <Setter Property="ProgressColor" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="TrackColor" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="IndicatorInnerRadius" Value="0.7"/>
+        <Setter Property="IndicatorOuterRadius" Value="0.9"/>
+    </Style>
+
+    <Style x:Key="BusBuddySfLinearProgressBarStyle" TargetType="syncfusion:SfLinearProgressBar">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="AnimationDuration" Value="0:0:1"/>
+        <Setter Property="ProgressColor" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="TrackColor" Value="{StaticResource BorderBrush}"/>
+    </Style>
+
+    <Style x:Key="BusBuddySfChartStyle" TargetType="syncfusion:SfChart" BasedOn="{StaticResource ChartStyle}">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="8"/>
+        <Setter Property="Padding" Value="8"/>
+    </Style>
+
+    <Style x:Key="BusBuddyComboBoxAdvStyle" TargetType="syncfusion:ComboBoxAdv" BasedOn="{StaticResource StandardComboBoxStyle}">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource OnSurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style x:Key="BusBuddySecondaryButtonAdvStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource ButtonAdvBaseStyle}">
+        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource OnSurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <!-- Alias for compatibility -->
+    <Style x:Key="SecondaryButtonAdvStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource BusBuddySecondaryButtonAdvStyle}"/>
+
+    <Style x:Key="BusBuddyIconButtonAdvStyle" TargetType="syncfusion:ButtonAdv" BasedOn="{StaticResource IconButtonAdvStyle}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource OnSurfaceVariantBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="30"/>
+    </Style>
+
     <Style x:Key="StandardComboBoxStyle" TargetType="syncfusion:ComboBoxAdv">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="Foreground" Value="{StaticResource OnSurfaceBrush}" />

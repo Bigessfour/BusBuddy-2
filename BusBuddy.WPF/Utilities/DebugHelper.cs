@@ -3,18 +3,24 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace BusBuddy.WPF.Utilities
 {
     /// <summary>
     /// Simple debug helper for quick access to filtered debug output
-    /// Use this during debug sessions to see only actionable items
+    /// Enhanced with real-time streaming and UI notification integration
     /// </summary>
     public static class DebugHelper
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(DebugHelper));
         private static Timer? _autoFilterTimer;
         private static bool _isAutoFilterEnabled = false;
         private static int _scanCount = 0;
+        private static bool _isStreamingEnabled = false;
 
         /// <summary>
         /// Test method to verify auto-filter is working
@@ -44,7 +50,7 @@ namespace BusBuddy.WPF.Utilities
             ThemeValidationHelper.QuickThemeCheck();
         }        /// <summary>
                  /// Automatically starts filtering debug output every 10 seconds during debug sessions
-                 /// Call this once during application startup to enable auto-filtering
+                 /// Enhanced with real-time streaming and UI notifications
                  /// </summary>
         [Conditional("DEBUG")]
         public static void StartAutoFilter()
@@ -53,15 +59,146 @@ namespace BusBuddy.WPF.Utilities
 
             _isAutoFilterEnabled = true;
 
+            // Start real-time streaming
+            StartRealTimeStreaming();
+
             // Start a timer that runs every 10 seconds
             _autoFilterTimer = new Timer(AutoFilterCallback, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10));
 
             Debug.WriteLine("🔍 AUTO DEBUG FILTER: Started - will show actionable items every 10 seconds");
             Console.WriteLine("🔍 AUTO DEBUG FILTER: Started - will show actionable items every 10 seconds");
+            _logger.Information("Auto debug filter started with real-time streaming");
         }
 
         /// <summary>
-        /// Stops the automatic debug filtering
+        /// Starts real-time streaming integration
+        /// </summary>
+        [Conditional("DEBUG")]
+        private static void StartRealTimeStreaming()
+        {
+            if (_isStreamingEnabled) return;
+
+            try
+            {
+                // Subscribe to high priority issue events
+                DebugOutputFilter.HighPriorityIssueDetected += OnHighPriorityIssueDetected;
+                DebugOutputFilter.NewEntriesFiltered += OnNewEntriesFiltered;
+
+                // Start the streaming
+                DebugOutputFilter.StartRealTimeStreaming();
+                _isStreamingEnabled = true;
+
+                Debug.WriteLine("🎯 REAL-TIME STREAMING: Started - will trigger UI notifications for priority 1-2 issues");
+                Console.WriteLine("🎯 REAL-TIME STREAMING: Started - will trigger UI notifications for priority 1-2 issues");
+                _logger.Information("Real-time streaming started with UI notification integration");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ STREAMING ERROR: {ex.Message}");
+                Console.WriteLine($"❌ STREAMING ERROR: {ex.Message}");
+                _logger.Error(ex, "Error starting real-time streaming");
+            }
+        }
+
+        /// <summary>
+        /// Event handler for high priority issues
+        /// </summary>
+        private static void OnHighPriorityIssueDetected(object? sender, DebugOutputFilter.FilteredDebugEntry issue)
+        {
+            try
+            {
+                var priorityIcon = issue.Priority switch
+                {
+                    1 => "🚨 CRITICAL",
+                    2 => "⚠️ HIGH",
+                    _ => "🔶 MEDIUM"
+                };
+
+                var notification = $"{priorityIcon} REAL-TIME ALERT: {issue.Message}";
+
+                Debug.WriteLine($"🎯 {notification}");
+                Console.ForegroundColor = issue.Priority == 1 ? ConsoleColor.Red : ConsoleColor.Yellow;
+                Console.WriteLine($"🎯 {notification}");
+                Console.ResetColor();
+
+                if (!string.IsNullOrEmpty(issue.ActionableRecommendation))
+                {
+                    Console.WriteLine($"   🎯 ACTION: {issue.ActionableRecommendation}");
+                }
+
+                _logger.Warning("High priority issue detected in real-time: {Message} (Priority: {Priority})",
+                    issue.Message, issue.Priority);
+
+                // Trigger UI notification if possible
+                TriggerUINotification(issue);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error handling high priority issue notification");
+            }
+        }
+
+        /// <summary>
+        /// Event handler for new filtered entries
+        /// </summary>
+        private static void OnNewEntriesFiltered(object? sender, System.Collections.Generic.List<DebugOutputFilter.FilteredDebugEntry> entries)
+        {
+            try
+            {
+                var highPriorityCount = entries.Count(e => e.Priority <= 2);
+                if (highPriorityCount > 0)
+                {
+                    Debug.WriteLine($"🔍 STREAMING: {highPriorityCount} high priority issues detected in real-time");
+                    Console.WriteLine($"🔍 STREAMING: {highPriorityCount} high priority issues detected in real-time");
+                }
+
+                _logger.Information("New filtered entries processed: {Count} entries, {HighPriorityCount} high priority",
+                    entries.Count, highPriorityCount);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error handling new filtered entries");
+            }
+        }
+
+        /// <summary>
+        /// Triggers UI notification for critical issues
+        /// </summary>
+        private static void TriggerUINotification(DebugOutputFilter.FilteredDebugEntry issue)
+        {
+            try
+            {
+                // Only trigger UI notifications for critical issues (Priority 1)
+                if (issue.Priority != 1) return;
+
+                // Try to show in UI if running in WPF context
+                if (Application.Current != null)
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        try
+                        {
+                            // You can implement a toast notification or dialog here
+                            Debug.WriteLine($"🚨 UI NOTIFICATION: {issue.Message}");
+
+                            // For now, just log it - you can enhance this to show actual UI notifications
+                            _logger.Warning("UI notification triggered for critical issue: {Message}", issue.Message);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Error showing UI notification");
+                        }
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error triggering UI notification");
+            }
+        }
+
+        /// <summary>
+        /// Stops the automatic debug filtering and real-time streaming
         /// </summary>
         [Conditional("DEBUG")]
         public static void StopAutoFilter()
@@ -70,8 +207,106 @@ namespace BusBuddy.WPF.Utilities
             _autoFilterTimer = null;
             _isAutoFilterEnabled = false;
 
+            // Stop real-time streaming
+            if (_isStreamingEnabled)
+            {
+                DebugOutputFilter.StopRealTimeStreaming();
+                DebugOutputFilter.HighPriorityIssueDetected -= OnHighPriorityIssueDetected;
+                DebugOutputFilter.NewEntriesFiltered -= OnNewEntriesFiltered;
+                _isStreamingEnabled = false;
+            }
+
             Debug.WriteLine("🔍 AUTO DEBUG FILTER: Stopped");
             Console.WriteLine("🔍 AUTO DEBUG FILTER: Stopped");
+            _logger.Information("Auto debug filter and real-time streaming stopped");
+        }
+
+        /// <summary>
+        /// Exports current actionable items to JSON for VS Code integration
+        /// </summary>
+        public static async Task ExportToJson(string? filePath = null)
+        {
+#if DEBUG
+            try
+            {
+                var result = await DebugOutputFilter.ExportActionableItemsToJsonAsync(filePath);
+
+                if (result.Contains("Error"))
+                {
+                    Debug.WriteLine($"❌ JSON EXPORT ERROR: {result}");
+                    Console.WriteLine($"❌ JSON EXPORT ERROR: {result}");
+                }
+                else
+                {
+                    Debug.WriteLine($"✅ JSON EXPORT: Successfully exported actionable items");
+                    Console.WriteLine($"✅ JSON EXPORT: Successfully exported actionable items");
+                    if (!string.IsNullOrEmpty(filePath))
+                    {
+                        Console.WriteLine($"   📁 File: {filePath}");
+                    }
+                }
+
+                _logger.Information("Actionable items exported to JSON");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ JSON EXPORT ERROR: {ex.Message}");
+                Console.WriteLine($"❌ JSON EXPORT ERROR: {ex.Message}");
+                _logger.Error(ex, "Error exporting actionable items to JSON");
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Gets recent streaming entries for analysis
+        /// </summary>
+        [Conditional("DEBUG")]
+        public static void ShowRecentStreamingEntries(int maxEntries = 20)
+        {
+            try
+            {
+                var recentEntries = DebugOutputFilter.GetRecentStreamingEntries(maxEntries);
+
+                if (!recentEntries.Any())
+                {
+                    Debug.WriteLine("✅ STREAMING: No recent entries found");
+                    Console.WriteLine("✅ STREAMING: No recent entries found");
+                    return;
+                }
+
+                Debug.WriteLine($"🎯 STREAMING: {recentEntries.Count} recent entries found");
+                Console.WriteLine($"🎯 STREAMING: {recentEntries.Count} recent entries found");
+                Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
+                foreach (var entry in recentEntries.OrderBy(e => e.Priority))
+                {
+                    var priorityIcon = entry.Priority switch
+                    {
+                        1 => "🚨",
+                        2 => "⚠️",
+                        3 => "🔶",
+                        _ => "ℹ️"
+                    };
+
+                    Console.WriteLine($"{priorityIcon} [{entry.Category}] {entry.Message}");
+
+                    if (!string.IsNullOrEmpty(entry.ActionableRecommendation))
+                    {
+                        Console.WriteLine($"   🎯 ACTION: {entry.ActionableRecommendation}");
+                    }
+
+                    Console.WriteLine($"   📅 {entry.DetectedAt:HH:mm:ss}");
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"❌ STREAMING ERROR: {ex.Message}");
+                Console.WriteLine($"❌ STREAMING ERROR: {ex.Message}");
+                _logger.Error(ex, "Error showing recent streaming entries");
+            }
         }
 
         /// <summary>

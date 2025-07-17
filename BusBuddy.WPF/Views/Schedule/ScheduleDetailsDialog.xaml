@@ -46,7 +46,7 @@
 
         <Style x:Key="InfoSectionStyle" TargetType="Border">
             <Setter Property="Background" Value="{DynamicResource ProfessionalSurfaceLight}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource ProfessionalSurfaceBorder}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="16"/>
@@ -239,7 +239,7 @@
         <!-- Professional Action Buttons -->
                         <Border Grid.Row="2"
                                 Background="{DynamicResource ProfessionalSurfaceLight}"
-                                BorderBrush="{DynamicResource ProfessionalSurfaceBorder}"
+                                BorderBrush="{DynamicResource SurfaceBorderBrush}"
                                 BorderThickness="0,1,0,0"
                                 Padding="20,16">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -270,3 +270,4 @@
         </Border>
     </Grid>
 </Window>
+

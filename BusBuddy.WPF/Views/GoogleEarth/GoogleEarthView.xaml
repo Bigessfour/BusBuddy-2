@@ -106,7 +106,7 @@
             <!-- Control Panel -->
             <Border Grid.Column="0"
                     Background="{DynamicResource ProfessionalSurfaceLight}"
-                    BorderBrush="{DynamicResource ProfessionalSurfaceBorder}"
+                    BorderBrush="{DynamicResource SurfaceBorderBrush}"
                     BorderThickness="0,0,1,0">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               Padding="16">
@@ -242,7 +242,7 @@
             <!-- Map Display Area -->
             <Border Grid.Column="1"
                     Background="{DynamicResource ContentBackground}"
-                    BorderBrush="{DynamicResource ProfessionalSurfaceBorder}"
+                    BorderBrush="{DynamicResource SurfaceBorderBrush}"
                     BorderThickness="1"
                     Margin="0">
                 <Grid>
@@ -329,3 +329,4 @@
         </Grid>
     </Grid>
 </UserControl>
+

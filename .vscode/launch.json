@@ -2,21 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET WPF Launch (BusBuddy.WPF)",
+            "name": "Run and Debug BusBuddy.WPF",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.exe",
+            "preLaunchTask": "Build Solution",
+            "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
             "args": [],
             "cwd": "${workspaceFolder}/BusBuddy.WPF",
             "stopAtEntry": false,
-            "console": "internalConsole",
-            "windows": {
-                "program": "${workspaceFolder}\\BusBuddy.WPF\\bin\\Debug\\net8.0-windows\\BusBuddy.WPF.exe"
-            },
-            "justMyCode": false,
+            "console": "integratedTerminal",
+            "justMyCode": true,
             "symbolOptions": {
-                "searchPaths": [],
                 "searchMicrosoftSymbolServer": true,
                 "searchNuGetOrgSymbolServer": true
             }
@@ -25,7 +21,7 @@
             "name": "Debug Tests",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "Build Solution",
             "program": "dotnet",
             "args": [
                 "test",
@@ -40,7 +36,7 @@
             "name": "Debug Null Handling Tests",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "Build Solution",
             "program": "dotnet",
             "args": [
                 "test",
@@ -63,8 +59,8 @@
             "name": "Debug with Validation Enabled",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.exe",
+            "preLaunchTask": "Build Solution",
+            "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
             "args": [],
             "cwd": "${workspaceFolder}/BusBuddy.WPF",
             "env": {
@@ -77,11 +73,11 @@
     "compounds": [
         {
             "name": "Debug All",
-            "configurations": [".NET WPF Launch (BusBuddy.WPF)", "Debug Tests"]
+            "configurations": ["Run and Debug BusBuddy.WPF", "Debug Tests"]
         },
         {
             "name": "Debug App with Null Handling Tests",
-            "configurations": [".NET WPF Launch (BusBuddy.WPF)", "Debug Null Handling Tests"]
+            "configurations": ["Run and Debug BusBuddy.WPF", "Debug Null Handling Tests"]
         }
     ]
 }

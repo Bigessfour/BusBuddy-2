@@ -20,25 +20,25 @@
     <Application.Resources>
         <ResourceDictionary>
             <!--
-            ===============================================================================
-            SYNCFUSION FLUENTDARK THEME — PRIMARY WITH COMPREHENSIVE GLOBAL RESOURCES
-            ===============================================================================
-            Theme is applied via SfSkinManager.ApplicationTheme in App.xaml.cs
-            — Primary Theme: FluentDark (official Syncfusion dark theme)
-            — Advanced Features: RevealEffects, Animations, Ripple Effects
-            This loads the official Syncfusion theme resources automatically
-
-            IMPORTANT: All views must use FluentDark theme consistently by default
-            ===============================================================================
+            ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+            🎨 PURE SYNCFUSION 30.1.40 THEME ENVIRONMENT — FLUENTDARK PRIMARY WITH FLUENTLIGHT FALLBACK
+            ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+            ✅ PRIMARY THEME: FluentDark (Professional dark theme optimized for productivity)
+            ✅ FALLBACK THEME: FluentLight (Clean light theme for accessibility)
+            ✅ SKIN MANAGER: Configured in App.xaml.cs with ApplyStylesOnApplication = true
+            ✅ CONTROL THEMING: All Syncfusion controls automatically themed via SfSkinManager
+            ✅ RESOURCE OPTIMIZATION: Consolidated resource dictionary with essential styles only
+            ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
             -->
 
             <ResourceDictionary.MergedDictionaries>
-                <!-- Syncfusion FluentDark theme resources (loaded automatically by SfSkinManager) -->
-                <!-- FluentLight theme also available for switching -->
-                <!-- Phase 2: Syncfusion Base Resources for standardized patterns -->
-                <ResourceDictionary Source="Resources/Themes/SyncfusionBaseResources.xaml" />
-                <!-- Custom styles that use official Syncfusion FluentDark resource names -->
-                <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
+                <!-- 🎨 PURE SYNCFUSION THEME FOUNDATION -->
+                <!-- Theme application handled by SfSkinManager in App.xaml.cs -->
+                <!-- No explicit theme resource dictionaries needed here -->
+
+                <!-- 🎯 CONSOLIDATED BUSBUDDY RESOURCES -->
+                <!-- Contains all custom styles, brushes, and templates -->
+                <ResourceDictionary Source="Resources/BusBuddyResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- GLOBAL CONVERTERS -->
@@ -148,3 +148,4 @@
         </ResourceDictionary>
     </Application.Resources>
 </Application>
+

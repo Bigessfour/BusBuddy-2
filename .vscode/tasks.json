@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "BusBuddy.sln",
                 "--verbosity",
                 "minimal"
             ],
@@ -28,7 +28,7 @@
             "type": "process",
             "args": [
                 "restore",
-                "BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "BusBuddy.sln",
                 "--verbosity",
                 "minimal"
             ],
@@ -49,7 +49,7 @@
             "type": "process",
             "args": [
                 "build",
-                "BusBuddy.WPF/BusBuddy.WPF.csproj",
+                "BusBuddy.sln",
                 "--verbosity",
                 "minimal"
             ],
@@ -212,6 +212,124 @@
                 "Restore Packages",
                 "Build Solution",
                 "Run Application"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            }
+        },
+        {
+            "label": "Build and Start Debug Filter",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "dotnet build BusBuddy.sln --verbosity minimal; if ($LASTEXITCODE -eq 0) { Write-Host '✅ Build successful - Starting Debug Filter...'; dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj --no-build -- --start-debug-filter; } else { Write-Host '❌ Build failed - Debug Filter not started'; }"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                "$msCompile",
+                {
+                    "owner": "debug-filter",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^🚨\\s+CRITICAL.*:\\s+(.*)$",
+                        "message": 1
+                    }
+                },
+                {
+                    "owner": "debug-filter-high",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^⚠️\\s+HIGH.*:\\s+(.*)$",
+                        "message": 1
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Export Debug Issues to JSON",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj --no-build -- --export-debug-json --output-file logs/debug-issues-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Start Real-Time Debug Streaming",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Write-Host '🎯 Starting real-time debug streaming...' -ForegroundColor Cyan; dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj --no-build -- --start-streaming"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "owner": "realtime-debug",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^🎯\\s+REAL-TIME ALERT.*:\\s+(.*)$",
+                        "message": 1
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^🎯 Starting real-time debug streaming",
+                        "endsPattern": "^🎯 REAL-TIME STREAMING: Started"
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Build Solution with Enhanced Debug Output",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Build Solution",
+                "Start Real-Time Debug Streaming"
             ],
             "group": {
                 "kind": "build",

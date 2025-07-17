@@ -29,7 +29,6 @@
         xmlns:sf="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:sfinput="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.WPF"
-        xmlns:sfTextInputLayout="clr-namespace:Syncfusion.UI.Xaml.TextInputLayout;assembly=Syncfusion.SfTextInputLayout.WPF"
         xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
         mc:Ignorable="d"
         Title="{Binding DialogTitle}"
@@ -85,97 +84,72 @@
                     <TextBlock Text="Essential Information" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
                     <!-- Bus Number -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Bus Number *"
-                        HelperText="Required. The identifying number of the bus."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
-                        <TextBox Text="{Binding Bus.BusNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Bus Number *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.BusNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                 Style="{StaticResource ValidationErrorStyle}"
                                 MaxLength="20"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                        <TextBlock Grid.Row="2" Text="Required. The identifying number of the bus." FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
+                    </Grid>
 
                     <!-- Year -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Year *"
-                        HelperText="Required. Year the bus was manufactured."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <syncfusion:DoubleTextBox
                             Value="{Binding Bus.Year, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                             MinValue="1900"
                             MaxValue="2030"
                             NumberDecimalDigits="0"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Make -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Make *"
-                        HelperText="Required. The manufacturer of the bus."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <TextBox Text="{Binding Bus.Make, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="50"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Model -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Model *"
-                        HelperText="Required. The model of the bus."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <TextBox Text="{Binding Bus.Model, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="50"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Seating Capacity -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Seating Capacity *"
-                        HelperText="Required. Maximum number of passengers."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <syncfusion:DoubleTextBox Value="{Binding Bus.SeatingCapacity, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                MinValue="1"
                                                MaxValue="90"
                                                NumberDecimalDigits="0"
                                                Height="30"
                                                VerticalContentAlignment="Center"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- VIN Number -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="VIN Number *"
-                        HelperText="Required. Vehicle Identification Number."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <TextBox Text="{Binding Bus.VINNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="17"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- License Number -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="License Number *"
-                        HelperText="Required. License plate number."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <TextBox Text="{Binding Bus.LicenseNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="20"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
                     <!-- Notes -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Notes"
-                        HelperText="Optional notes about this bus."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <TextBox Text="{Binding Bus.Notes, UpdateSourceTrigger=PropertyChanged}"
                                  Height="100"
                                  TextWrapping="Wrap"
                                  AcceptsReturn="True"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
                 </StackPanel>
 
                 <!-- Right Column - Additional Fields -->
@@ -183,11 +157,7 @@
                     <TextBlock Text="Additional Information" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
                     <!-- Status -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Status *"
-                        HelperText="Current operational status of the bus."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <ComboBox SelectedItem="{Binding Bus.Status, UpdateSourceTrigger=PropertyChanged}">
                             <ComboBoxItem Content="Active"/>
                             <ComboBoxItem Content="Maintenance"/>
@@ -195,69 +165,45 @@
                             <ComboBoxItem Content="Reserved"/>
                             <ComboBoxItem Content="Retired"/>
                         </ComboBox>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Date Last Inspection -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Date Last Inspection"
-                        HelperText="Date of the most recent safety inspection."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <DatePicker SelectedDate="{Binding Bus.DateLastInspection, UpdateSourceTrigger=PropertyChanged}"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Current Odometer -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Current Odometer"
-                        HelperText="Current odometer reading in miles/kilometers."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <syncfusion:DoubleTextBox Value="{Binding Bus.CurrentOdometer, UpdateSourceTrigger=PropertyChanged}"
                                                MinValue="0"
                                                MaxValue="9999999"
                                                NumberDecimalDigits="0"
                                                Height="30"
                                                VerticalContentAlignment="Center"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Purchase Date -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Purchase Date"
-                        HelperText="Date when the bus was purchased."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <DatePicker SelectedDate="{Binding Bus.PurchaseDate, UpdateSourceTrigger=PropertyChanged}"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Purchase Price -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Purchase Price"
-                        HelperText="Purchase price of the bus."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <syncfusion:CurrencyTextBox Value="{Binding Bus.PurchasePrice, UpdateSourceTrigger=PropertyChanged}"
                                                MinValue="0"
                                                CurrencySymbol="$"
                                                Height="30"
                                                VerticalContentAlignment="Center"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Department -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Department"
-                        HelperText="Department responsible for this bus."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <TextBox Text="{Binding Bus.Department, UpdateSourceTrigger=PropertyChanged}"
                                  MaxLength="50"/>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
 
                     <!-- Fleet Type -->
-                    <sfTextInputLayout:SfTextInputLayout
-                        Hint="Fleet Type"
-                        HelperText="Type of fleet this bus belongs to."
-                        ContainerType="Outlined"
-                        Margin="0,5,0,10">
+                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                         <ComboBox Text="{Binding Bus.FleetType, UpdateSourceTrigger=PropertyChanged}"
                                   IsEditable="True">
                             <ComboBoxItem Content="Regular"/>
@@ -265,7 +211,7 @@
                             <ComboBoxItem Content="Activity"/>
                             <ComboBoxItem Content="Spare"/>
                         </ComboBox>
-                    </sfTextInputLayout:SfTextInputLayout>
+                    </Grid>
                 </StackPanel>
             </Grid>
         </ScrollViewer>
@@ -294,3 +240,5 @@
         </Border>
     </Grid>
 </Window>
+
+

@@ -74,7 +74,7 @@ namespace BusBuddy.WPF.Utilities
                 // Check for required theme resources
                 var requiredResources = new[]
                 {
-                    "SurfaceBackground", "SurfaceForeground", "ProfessionalSurfaceBorder",
+                    "SurfaceBackground", "SurfaceForeground", "SurfaceBorderBrush",
                     "PrimaryForeground", "PrimaryBorder", "TextPrimary", "TextSecondary",
                     "AccentBackground", "AccentForeground"
                 };

@@ -39,7 +39,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="AIMessageTemplate">
-            <Border Background="{DynamicResource ProfessionalSurfaceLight}"
+            <Border Background="{DynamicResource SurfaceVariantBrush}"
                     CornerRadius="12,12,12,4"
                     Padding="16,12"
                     Margin="16,4,80,4"
@@ -164,7 +164,7 @@
                 </ScrollViewer>
 
                 <!-- Typing Indicator -->
-                <Border Background="{DynamicResource ProfessionalSurfaceLight}"
+                <Border Background="{DynamicResource SurfaceVariantBrush}"
                         CornerRadius="12,12,12,4"
                         Padding="16,12"
                         Margin="16,4,80,16"
@@ -187,8 +187,8 @@
 
         <!-- Input Area -->
         <Border Grid.Row="2"
-                Background="{DynamicResource ProfessionalSurfaceLight}"
-                BorderBrush="{DynamicResource ProfessionalSurfaceBorder}"
+                Background="{DynamicResource SurfaceVariantBrush}"
+                BorderBrush="{DynamicResource SurfaceBorderBrush}"
                 BorderThickness="0,1,0,0"
                 Padding="24,16">
             <Grid>
@@ -198,10 +198,9 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Message Input -->
-                <syncfusion:SfTextInputLayout Grid.Column="0"
-                                              Hint="Type your message..."
-                                              Style="{StaticResource StandardTextInputLayoutStyle}"
-                                              Margin="0,0,16,0">
+                <Border Grid.Column="0"
+                        Style="{StaticResource StandardInputBorderStyle}"
+                        Margin="0,0,16,0">
                     <TextBox x:Name="MessageInput"
                              Text="{Binding CurrentMessage, UpdateSourceTrigger=PropertyChanged}"
                              FontSize="14"
@@ -214,7 +213,7 @@
                              Background="Transparent"
                              Foreground="{DynamicResource ContentForeground}"
                              KeyDown="MessageInput_KeyDown"/>
-                </syncfusion:SfTextInputLayout>
+                </Border>
 
                 <!-- Send Button -->
                 <syncfusion:ButtonAdv Grid.Column="1"
@@ -229,7 +228,7 @@
 
         <!-- Quick Actions Panel -->
         <Border Grid.Row="1"
-                Background="{DynamicResource ProfessionalSurfaceMedium}"
+                Background="{DynamicResource SurfaceBrush}"
                 CornerRadius="12"
                 Padding="16"
                 Margin="24"
@@ -271,3 +270,4 @@
         </Border>
     </Grid>
 </UserControl>
+

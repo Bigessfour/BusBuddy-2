@@ -30,7 +30,7 @@
         <!-- StatusIndicatorStyle, and PerformanceTileStyle are now global resources. -->
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource ProfessionalSurfaceMedium}">
+    <Grid Background="{DynamicResource SurfaceBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -1638,4 +1638,5 @@
         </Grid>
     </Grid>
 </UserControl>
+
 

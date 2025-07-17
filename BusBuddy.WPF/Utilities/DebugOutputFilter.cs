@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Serilog;
 using Serilog.Context;
 
@@ -11,10 +14,27 @@ namespace BusBuddy.WPF.Utilities
 {
     /// <summary>
     /// Utility class for filtering debug output and extracting actionable errors/warnings
+    /// Enhanced with real-time streaming capabilities using FileSystemWatcher
     /// </summary>
     public class DebugOutputFilter
     {
         private static readonly ILogger _logger = Log.ForContext<DebugOutputFilter>();
+        private static FileSystemWatcher? _logFileWatcher;
+        private static readonly object _lockObject = new object();
+        private static bool _isStreamingEnabled = false;
+        private static CancellationTokenSource? _cancellationTokenSource;
+        private static readonly List<FilteredDebugEntry> _recentEntries = new List<FilteredDebugEntry>();
+        private static readonly int _maxRecentEntries = 100;
+
+        /// <summary>
+        /// Event triggered when priority 1-2 issues are detected
+        /// </summary>
+        public static event EventHandler<FilteredDebugEntry>? HighPriorityIssueDetected;
+
+        /// <summary>
+        /// Event triggered when new filtered entries are available
+        /// </summary>
+        public static event EventHandler<List<FilteredDebugEntry>>? NewEntriesFiltered;
 
         /// <summary>
         /// Filter categories for debug output analysis
@@ -57,6 +77,11 @@ namespace BusBuddy.WPF.Utilities
             public string Context { get; set; } = string.Empty;
             public int Priority { get; set; } // 1 = Critical, 2 = High, 3 = Medium, 4 = Low
             public bool IsResolved { get; set; } = false;
+            public string Id { get; set; } = Guid.NewGuid().ToString();
+            public DateTime DetectedAt { get; set; } = DateTime.Now;
+            public string ThreadId { get; set; } = string.Empty;
+            public string ProcessId { get; set; } = string.Empty;
+            public Dictionary<string, string> ExtendedProperties { get; set; } = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -94,7 +119,23 @@ namespace BusBuddy.WPF.Utilities
                 new Regex(@"XamlParseException", RegexOptions.IgnoreCase),
                 new Regex(@"XAML.*error", RegexOptions.IgnoreCase),
                 new Regex(@"StaticResource.*not found", RegexOptions.IgnoreCase),
-                new Regex(@"binding.*error", RegexOptions.IgnoreCase)
+                new Regex(@"binding.*error", RegexOptions.IgnoreCase),
+                new Regex(@"BindingExpression path error", RegexOptions.IgnoreCase),
+                new Regex(@"Cannot find resource named", RegexOptions.IgnoreCase),
+                new Regex(@"System\.Windows\.Markup\.XamlParseException", RegexOptions.IgnoreCase),
+                new Regex(@"Cannot resolve all property references", RegexOptions.IgnoreCase),
+                new Regex(@"The name .* does not exist in the namespace", RegexOptions.IgnoreCase),
+                new Regex(@"Property .* was not found in type", RegexOptions.IgnoreCase),
+                new Regex(@"The property .* was not found on", RegexOptions.IgnoreCase),
+                new Regex(@"Cannot convert string .* to type", RegexOptions.IgnoreCase),
+                new Regex(@"TargetParameterCountException", RegexOptions.IgnoreCase),
+                new Regex(@"InvalidOperationException.*binding", RegexOptions.IgnoreCase),
+                new Regex(@"Binding.*failed", RegexOptions.IgnoreCase),
+                new Regex(@"Two-way binding requires Path or XPath", RegexOptions.IgnoreCase),
+                new Regex(@"Cannot find governing FrameworkElement", RegexOptions.IgnoreCase),
+                new Regex(@"DataContext.*null", RegexOptions.IgnoreCase),
+                new Regex(@"RelativeSource.*not found", RegexOptions.IgnoreCase),
+                new Regex(@"ElementName.*not found", RegexOptions.IgnoreCase)
             },
             [FilterCategory.SyncfusionIssues] = new List<Regex>
             {
@@ -193,6 +234,273 @@ namespace BusBuddy.WPF.Utilities
                 new Regex(@"Border.*color.*incorrect", RegexOptions.IgnoreCase)
             }
         };
+
+        /// <summary>
+        /// Starts real-time streaming of log files using FileSystemWatcher
+        /// </summary>
+        public static void StartRealTimeStreaming()
+        {
+            if (_isStreamingEnabled) return;
+
+            try
+            {
+                string solutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
+                                   ?? Directory.GetCurrentDirectory();
+                string logsDirectory = Path.Combine(solutionRoot, "logs");
+
+                if (!Directory.Exists(logsDirectory))
+                {
+                    Directory.CreateDirectory(logsDirectory);
+                }
+
+                _cancellationTokenSource = new CancellationTokenSource();
+                _logFileWatcher = new FileSystemWatcher(logsDirectory, "*.log")
+                {
+                    EnableRaisingEvents = true,
+                    IncludeSubdirectories = false,
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime | NotifyFilters.Size
+                };
+
+                _logFileWatcher.Changed += OnLogFileChanged;
+                _logFileWatcher.Created += OnLogFileCreated;
+                _logFileWatcher.Error += OnLogFileWatcherError;
+
+                _isStreamingEnabled = true;
+                _logger.Information("Real-time log streaming started for directory: {LogsDirectory}", logsDirectory);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to start real-time log streaming");
+            }
+        }
+
+        /// <summary>
+        /// Stops real-time streaming of log files
+        /// </summary>
+        public static void StopRealTimeStreaming()
+        {
+            if (!_isStreamingEnabled) return;
+
+            try
+            {
+                _cancellationTokenSource?.Cancel();
+                _logFileWatcher?.Dispose();
+                _logFileWatcher = null;
+                _isStreamingEnabled = false;
+                _logger.Information("Real-time log streaming stopped");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error stopping real-time log streaming");
+            }
+        }
+
+        /// <summary>
+        /// Event handler for log file changes
+        /// </summary>
+        private static async void OnLogFileChanged(object sender, FileSystemEventArgs e)
+        {
+            if (_cancellationTokenSource?.IsCancellationRequested == true) return;
+
+            try
+            {
+                await ProcessLogFileChangesAsync(e.FullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error processing log file changes for {FilePath}", e.FullPath);
+            }
+        }
+
+        /// <summary>
+        /// Event handler for new log file creation
+        /// </summary>
+        private static async void OnLogFileCreated(object sender, FileSystemEventArgs e)
+        {
+            if (_cancellationTokenSource?.IsCancellationRequested == true) return;
+
+            try
+            {
+                await ProcessLogFileChangesAsync(e.FullPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error processing new log file {FilePath}", e.FullPath);
+            }
+        }
+
+        /// <summary>
+        /// Event handler for file watcher errors
+        /// </summary>
+        private static void OnLogFileWatcherError(object sender, ErrorEventArgs e)
+        {
+            _logger.Error(e.GetException(), "FileSystemWatcher error occurred");
+        }
+
+        /// <summary>
+        /// Processes changes in log files and filters for actionable items
+        /// </summary>
+        private static async Task ProcessLogFileChangesAsync(string filePath)
+        {
+            if (_cancellationTokenSource?.IsCancellationRequested == true) return;
+
+            try
+            {
+                // Small delay to ensure file is fully written
+                await Task.Delay(100, _cancellationTokenSource?.Token ?? CancellationToken.None);
+
+                var newEntries = await FilterLogFileAsync(filePath, FilterCategory.All, true, true);
+
+                if (newEntries.Any())
+                {
+                    lock (_lockObject)
+                    {
+                        // Add new entries to recent entries collection
+                        _recentEntries.AddRange(newEntries);
+
+                        // Keep only the most recent entries
+                        if (_recentEntries.Count > _maxRecentEntries)
+                        {
+                            _recentEntries.RemoveRange(0, _recentEntries.Count - _maxRecentEntries);
+                        }
+                    }
+
+                    // Check for high priority issues
+                    var highPriorityIssues = newEntries.Where(e => e.Priority <= 2).ToList();
+                    foreach (var issue in highPriorityIssues)
+                    {
+                        HighPriorityIssueDetected?.Invoke(null, issue);
+                        _logger.Warning("High priority issue detected: {Message}", issue.Message);
+                    }
+
+                    // Notify about new entries
+                    NewEntriesFiltered?.Invoke(null, newEntries);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Expected when cancellation is requested
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error processing log file changes for {FilePath}", filePath);
+            }
+        }
+
+        /// <summary>
+        /// Gets recent entries from the streaming buffer
+        /// </summary>
+        public static List<FilteredDebugEntry> GetRecentStreamingEntries(int maxEntries = 50)
+        {
+            lock (_lockObject)
+            {
+                return _recentEntries.TakeLast(maxEntries).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Exports filtered results to JSON format for VS Code integration
+        /// </summary>
+        public static async Task<string> ExportToJsonAsync(List<FilteredDebugEntry> entries, string? filePath = null)
+        {
+            try
+            {
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                };
+
+                var exportData = new
+                {
+                    Metadata = new
+                    {
+                        GeneratedAt = DateTime.Now,
+                        TotalEntries = entries.Count,
+                        CriticalIssues = entries.Count(e => e.Priority == 1),
+                        HighPriorityIssues = entries.Count(e => e.Priority == 2),
+                        MediumPriorityIssues = entries.Count(e => e.Priority == 3),
+                        LowPriorityIssues = entries.Count(e => e.Priority == 4)
+                    },
+                    Entries = entries.OrderBy(e => e.Priority).ThenByDescending(e => e.DetectedAt)
+                };
+
+                var jsonString = JsonSerializer.Serialize(exportData, jsonOptions);
+
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    await File.WriteAllTextAsync(filePath, jsonString);
+                    _logger.Information("Debug entries exported to JSON file: {FilePath}", filePath);
+                }
+
+                return jsonString;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error exporting to JSON");
+                return JsonSerializer.Serialize(new { Error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Exports current actionable items to JSON for VS Code integration
+        /// </summary>
+        public static async Task<string> ExportActionableItemsToJsonAsync(string? filePath = null)
+        {
+            try
+            {
+                var actionableItems = await GetActionableItemsForJsonExportAsync();
+
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    string solutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
+                                       ?? Directory.GetCurrentDirectory();
+                    filePath = Path.Combine(solutionRoot, "logs", $"actionable-items-{DateTime.Now:yyyyMMdd-HHmmss}.json");
+                }
+
+                return await ExportToJsonAsync(actionableItems, filePath);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error exporting actionable items to JSON");
+                return JsonSerializer.Serialize(new { Error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Gets actionable items formatted for JSON export
+        /// </summary>
+        private static async Task<List<FilteredDebugEntry>> GetActionableItemsForJsonExportAsync()
+        {
+            var actionableErrors = await FilterDebugOutputAsync(FilterCategory.ActionableErrors, true, true, 20);
+            var actionableWarnings = await FilterDebugOutputAsync(FilterCategory.ActionableWarnings, true, true, 20);
+            var runtimeExceptions = await FilterDebugOutputAsync(FilterCategory.RuntimeExceptions, true, true, 10);
+            var xamlErrors = await FilterDebugOutputAsync(FilterCategory.XamlErrors, true, true, 15);
+            var sportsSchedulingErrors = await FilterDebugOutputAsync(FilterCategory.SportsSchedulingErrors, true, true, 10);
+            var uiThemeIssues = await FilterDebugOutputAsync(FilterCategory.UIThemeIssues, true, true, 15);
+            var resourceDictionaryErrors = await FilterDebugOutputAsync(FilterCategory.ResourceDictionaryErrors, true, true, 15);
+            var styleApplicationErrors = await FilterDebugOutputAsync(FilterCategory.StyleApplicationErrors, true, true, 15);
+
+            var allActionableItems = new List<FilteredDebugEntry>();
+            allActionableItems.AddRange(actionableErrors);
+            allActionableItems.AddRange(actionableWarnings);
+            allActionableItems.AddRange(runtimeExceptions);
+            allActionableItems.AddRange(xamlErrors);
+            allActionableItems.AddRange(sportsSchedulingErrors);
+            allActionableItems.AddRange(uiThemeIssues);
+            allActionableItems.AddRange(resourceDictionaryErrors);
+            allActionableItems.AddRange(styleApplicationErrors);
+
+            // Remove duplicates and sort by priority
+            return allActionableItems
+                .GroupBy(x => x.Message)
+                .Select(g => g.First())
+                .OrderBy(x => x.Priority)
+                .ThenByDescending(x => x.DetectedAt)
+                .Take(50)
+                .ToList();
+        }
 
         /// <summary>
         /// Quick debug filter - call this in debug mode to get only actionable items
@@ -488,7 +796,12 @@ namespace BusBuddy.WPF.Utilities
             bool includeContext,
             bool includeRecommendations)
         {
-            var entry = new FilteredDebugEntry();
+            var entry = new FilteredDebugEntry
+            {
+                DetectedAt = DateTime.Now,
+                ThreadId = Thread.CurrentThread.ManagedThreadId.ToString(),
+                ProcessId = Environment.ProcessId.ToString()
+            };
 
             // Extract timestamp
             var timestampMatch = Regex.Match(line, @"\[(.*?)\]");
@@ -537,7 +850,44 @@ namespace BusBuddy.WPF.Utilities
                 entry.StackTrace = allLines[lineIndex + 1];
             }
 
+            // Extract extended properties
+            ExtractExtendedProperties(line, entry);
+
             return entry;
+        }
+
+        /// <summary>
+        /// Extracts extended properties from log entry
+        /// </summary>
+        private static void ExtractExtendedProperties(string line, FilteredDebugEntry entry)
+        {
+            // Extract correlation ID if present
+            var correlationMatch = Regex.Match(line, @"CorrelationId[:\s]+([a-fA-F0-9\-]+)", RegexOptions.IgnoreCase);
+            if (correlationMatch.Success)
+            {
+                entry.ExtendedProperties["CorrelationId"] = correlationMatch.Groups[1].Value;
+            }
+
+            // Extract operation name if present
+            var operationMatch = Regex.Match(line, @"Operation[:\s]+([^\s\]]+)", RegexOptions.IgnoreCase);
+            if (operationMatch.Success)
+            {
+                entry.ExtendedProperties["Operation"] = operationMatch.Groups[1].Value;
+            }
+
+            // Extract component name if present
+            var componentMatch = Regex.Match(line, @"\[([A-Z][a-zA-Z]+)\]", RegexOptions.None);
+            if (componentMatch.Success)
+            {
+                entry.ExtendedProperties["Component"] = componentMatch.Groups[1].Value;
+            }
+
+            // Extract exception type if present
+            var exceptionMatch = Regex.Match(line, @"(System\.[a-zA-Z\.]+Exception)", RegexOptions.IgnoreCase);
+            if (exceptionMatch.Success)
+            {
+                entry.ExtendedProperties["ExceptionType"] = exceptionMatch.Groups[1].Value;
+            }
         }
 
         /// <summary>

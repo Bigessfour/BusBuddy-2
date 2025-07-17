@@ -87,7 +87,7 @@
 
                         <!-- Search and Filter Panel -->
                         <Border Background="{DynamicResource SurfaceBackground}"
-                                BorderBrush="{DynamicResource SurfaceBorder}"
+                                BorderBrush="{DynamicResource SurfaceBorderBrush}"
                                 BorderThickness="1"
                                 CornerRadius="4"
                                 Padding="12">
@@ -268,4 +268,5 @@
 
     </syncfusion:DockingManager>
 </UserControl>
+
 
