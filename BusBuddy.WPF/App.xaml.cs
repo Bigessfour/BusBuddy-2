@@ -25,6 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using System.Windows.Media;
 
 namespace BusBuddy.WPF;
 
@@ -285,25 +286,55 @@ public partial class App : Application
         _host.StartAsync().GetAwaiter().GetResult();
         base.OnStartup(e);
 
-        // Now that the host is started, Serilog should be initialized
-        // 🎨 CRITICAL: Ensure Syncfusion theme is properly applied before UI creation
+        // 🔍 AUTO DEBUG FILTER: Start automatic filtering in debug mode
+#if DEBUG
         try
         {
-            // Ensure SkinManager is ready for application-wide theming
+            BusBuddy.WPF.Utilities.DebugHelper.StartAutoFilter();
+            Log.Information("🔍 Debug auto-filter enabled for debug session");
+
+            // Test the filter is working (after 3 seconds delay)
+            var testTimer = new System.Threading.Timer(
+                callback: _ => BusBuddy.WPF.Utilities.DebugHelper.TestAutoFilter(),
+                state: null,
+                dueTime: TimeSpan.FromSeconds(3),
+                period: TimeSpan.FromMilliseconds(-1) // Run once
+            );
+        }
+        catch (Exception debugEx)
+        {
+            Log.Warning(debugEx, "🔍 Debug auto-filter failed to start");
+        }
+#endif
+
+        // Now that the host is started, Serilog should be initialized
+        // 🎨 CRITICAL: Initialize Syncfusion FluentDark theme with advanced features
+        try
+        {
+            // Set ApplyStylesOnApplication = true for global theme application
             SfSkinManager.ApplyStylesOnApplication = true;
 
-            // Verify FluentDark (Fluent Black) theme is set
-            if (SfSkinManager.ApplicationTheme?.ThemeName != "FluentDark")
+            // Register FluentDark theme with advanced configuration
+            SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings
             {
-                SfSkinManager.ApplicationTheme = new Theme("FluentDark");
-                Log.Information("🎨 FluentDark (Fluent Black) theme reapplied during startup");
-            }
+                PrimaryBackground = new SolidColorBrush(Color.FromRgb(0x1E, 0x1E, 0x1E)),
+                PrimaryForeground = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xFF)),
+                BodyFontSize = 14,
+                HeaderFontSize = 16,
+                SubHeaderFontSize = 15,
+                TitleFontSize = 18,
+                SubTitleFontSize = 16,
+                BodyAltFontSize = 13,
+                FontFamily = new FontFamily("Segoe UI")
+            });
 
-            // Ensure theme settings are registered
-            SfSkinManager.RegisterThemeSettings("FluentDark", new FluentDarkThemeSettings());
+            // Register FluentLight as fallback
             SfSkinManager.RegisterThemeSettings("FluentLight", new FluentLightThemeSettings());
 
-            Log.Information("🎨 Syncfusion FluentDark theme verified and ready (FluentLight available as fallback)");
+            // Apply FluentDark as the application theme
+            SfSkinManager.ApplicationTheme = new Theme("FluentDark");
+
+            Log.Information("🎨 Syncfusion FluentDark theme initialized with advanced features and FluentLight fallback");
         }
         catch (Exception themeEx)
         {
@@ -481,7 +512,13 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         this.DispatcherUnhandledException += OnDispatcherUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-        this.Exit += (s, ex) => Log.CloseAndFlush();
+        this.Exit += (s, ex) =>
+        {
+#if DEBUG
+            BusBuddy.WPF.Utilities.DebugHelper.StopAutoFilter();
+#endif
+            Log.CloseAndFlush();
+        };
 
         // Add configuration to DI container
         services.AddSingleton<IConfiguration>(configuration);

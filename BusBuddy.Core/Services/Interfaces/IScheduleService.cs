@@ -9,5 +9,9 @@ namespace BusBuddy.Core.Services.Interfaces
         Task AddScheduleAsync(Schedule schedule);
         Task UpdateScheduleAsync(Schedule schedule);
         Task DeleteScheduleAsync(int id);
+
+        // New methods for sports category filtering and trip derivation
+        Task<IEnumerable<Schedule>> GetSchedulesByCategoryAsync(string category);
+        void DeriveTripDetails(Schedule schedule);
     }
 }

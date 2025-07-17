@@ -1140,7 +1140,7 @@
     <!-- Surface Colors -->
     <SolidColorBrush x:Key="SurfaceBackground" Color="#1E1E1E" />
     <SolidColorBrush x:Key="SurfaceForeground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="SurfaceBorder" Color="#323130" />
+    <!-- SurfaceBorder is already defined as a Color resource above, used by ProfessionalSurfaceBorder -->
 
     <!-- Primary Colors -->
     <SolidColorBrush x:Key="PrimaryForeground" Color="#FFFFFF" />
@@ -1354,6 +1354,35 @@
                 </Setter>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <!-- Enhanced Content Control Style for MainWindow -->
+    <Style x:Key="EnhancedContentControlStyle" TargetType="ContentControl">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContentControl">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="0">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

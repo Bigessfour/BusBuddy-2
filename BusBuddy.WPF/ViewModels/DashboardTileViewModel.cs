@@ -4,6 +4,9 @@ using BusBuddy.WPF.ViewModels.Panels;
 using Syncfusion.Windows.Tools.Controls;
 using System.Runtime.CompilerServices;
 using BusBuddy.Core.Data.UnitOfWork;
+using BusBuddy.Core.Services.Interfaces;
+using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -254,6 +257,149 @@ namespace BusBuddy.WPF.ViewModels
             QuickMaintenanceCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Maintenance"));
             QuickFuelEntryCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Fuel"));
             QuickReportCommand = new BusBuddy.WPF.RelayCommand(_ => _navigationAction?.Invoke("Activity"));
+        }
+    }
+
+    /// <summary>
+    /// Sports trips dashboard tile for quick overview of upcoming sports events
+    /// </summary>
+    public class SportsTripsOverviewTileViewModel : DashboardTileViewModel
+    {
+        private static readonly ILogger Logger = Log.ForContext<SportsTripsOverviewTileViewModel>();
+        private readonly IScheduleService _scheduleService;
+
+        private int _upcomingVolleyballGames;
+        private int _upcomingFootballGames;
+        private int _upcomingJuniorHighGames;
+        private int _totalSportsTrips;
+        private int _awayGames;
+        private int _homeGames;
+        private string _nextGameInfo = "No upcoming games";
+
+        public int UpcomingVolleyballGames
+        {
+            get => _upcomingVolleyballGames;
+            set { _upcomingVolleyballGames = value; OnPropertyChanged(); }
+        }
+
+        public int UpcomingFootballGames
+        {
+            get => _upcomingFootballGames;
+            set { _upcomingFootballGames = value; OnPropertyChanged(); }
+        }
+
+        public int UpcomingJuniorHighGames
+        {
+            get => _upcomingJuniorHighGames;
+            set { _upcomingJuniorHighGames = value; OnPropertyChanged(); }
+        }
+
+        public int TotalSportsTrips
+        {
+            get => _totalSportsTrips;
+            set { _totalSportsTrips = value; OnPropertyChanged(); }
+        }
+
+        public int AwayGames
+        {
+            get => _awayGames;
+            set { _awayGames = value; OnPropertyChanged(); }
+        }
+
+        public int HomeGames
+        {
+            get => _homeGames;
+            set { _homeGames = value; OnPropertyChanged(); }
+        }
+
+        public string NextGameInfo
+        {
+            get => _nextGameInfo;
+            set { _nextGameInfo = value; OnPropertyChanged(); }
+        }
+
+        public SportsTripsOverviewTileViewModel(IScheduleService scheduleService)
+        {
+            _scheduleService = scheduleService;
+            Title = "Sports Trips Overview";
+            Priority = 3;
+
+            Logger.Information("SportsTripsOverviewTileViewModel initialized");
+        }
+
+        public override async Task RefreshTileAsync()
+        {
+            using (LogContext.PushProperty("Operation", "RefreshSportsTripsOverview"))
+            {
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                IsRefreshing = true;
+                Logger.Information("Starting to refresh sports trips overview");
+
+                try
+                {
+                    // Get all sports trips (exclude regular routes and activities)
+                    var allSportsTrips = await _scheduleService.GetSchedulesByCategoryAsync("Sports");
+                    var sportsTrips = allSportsTrips.Where(s => s.ScheduleDate >= DateTime.Today).ToList();
+
+                    // Calculate statistics
+                    TotalSportsTrips = sportsTrips.Count;
+                    AwayGames = sportsTrips.Count(s => s.IsAwayGame);
+                    HomeGames = sportsTrips.Count(s => s.IsHomeGame);
+
+                    // Category-specific counts
+                    UpcomingVolleyballGames = sportsTrips.Count(s =>
+                        s.SportsCategory?.Contains("Volleyball", StringComparison.OrdinalIgnoreCase) == true);
+                    UpcomingFootballGames = sportsTrips.Count(s =>
+                        s.SportsCategory?.Contains("Football", StringComparison.OrdinalIgnoreCase) == true);
+                    UpcomingJuniorHighGames = sportsTrips.Count(s =>
+                        s.SportsCategory?.Contains("Junior High", StringComparison.OrdinalIgnoreCase) == true);
+
+                    // Find next game
+                    var nextGame = sportsTrips
+                        .Where(s => s.ScheduleDate >= DateTime.Today)
+                        .OrderBy(s => s.ScheduleDate)
+                        .ThenBy(s => s.ScheduledTime)
+                        .FirstOrDefault();
+
+                    if (nextGame != null)
+                    {
+                        NextGameInfo = $"{nextGame.SportsCategory} vs {nextGame.Opponent} - {nextGame.ScheduleDate:MMM dd} at {nextGame.ScheduledTime:h\\:mm}";
+                        Logger.Debug("Next game found: {NextGameInfo}", NextGameInfo);
+                    }
+                    else
+                    {
+                        NextGameInfo = "No upcoming games";
+                        Logger.Debug("No upcoming games found");
+                    }
+
+                    LastUpdated = DateTime.Now;
+                    stopwatch.Stop();
+
+                    Logger.Information("Successfully refreshed sports trips overview in {ElapsedMs}ms. " +
+                        "Total: {TotalSportsTrips}, Away: {AwayGames}, Home: {HomeGames}, " +
+                        "Volleyball: {UpcomingVolleyballGames}, Football: {UpcomingFootballGames}, JH: {UpcomingJuniorHighGames}",
+                        stopwatch.ElapsedMilliseconds, TotalSportsTrips, AwayGames, HomeGames,
+                        UpcomingVolleyballGames, UpcomingFootballGames, UpcomingJuniorHighGames);
+                }
+                catch (Exception ex)
+                {
+                    stopwatch.Stop();
+                    Logger.Error(ex, "Error refreshing sports trips overview after {ElapsedMs}ms", stopwatch.ElapsedMilliseconds);
+
+                    // Fallback values if service is unavailable
+                    TotalSportsTrips = 0;
+                    AwayGames = 0;
+                    HomeGames = 0;
+                    UpcomingVolleyballGames = 0;
+                    UpcomingFootballGames = 0;
+                    UpcomingJuniorHighGames = 0;
+                    NextGameInfo = "Error loading data";
+                }
+                finally
+                {
+                    IsRefreshing = false;
+                }
+            }
         }
     }
 }

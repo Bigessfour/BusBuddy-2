@@ -764,6 +764,9 @@ public class BusBuddyDbContext : DbContext
 
     private void SeedData(ModelBuilder modelBuilder)
     {
+        // Use static dates to avoid migration conflicts
+        var seedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         // Seed sample buses
         modelBuilder.Entity<Bus>().HasData(
             new Bus
@@ -778,7 +781,8 @@ public class BusBuddyDbContext : DbContext
                 LicenseNumber = "TX123456",
                 Status = "Active",
                 PurchaseDate = new DateTime(2020, 8, 15),
-                PurchasePrice = 85000.00m
+                PurchasePrice = 85000.00m,
+                CreatedDate = seedDate
             },
             new Bus
             {
@@ -792,7 +796,8 @@ public class BusBuddyDbContext : DbContext
                 LicenseNumber = "TX654321",
                 Status = "Active",
                 PurchaseDate = new DateTime(2019, 7, 10),
-                PurchasePrice = 82000.00m
+                PurchasePrice = 82000.00m,
+                CreatedDate = seedDate
             }
         );
 
@@ -805,7 +810,8 @@ public class BusBuddyDbContext : DbContext
                 DriverPhone = "555-0123",
                 DriverEmail = "john.smith@school.edu",
                 DriversLicenceType = "CDL",
-                TrainingComplete = true
+                TrainingComplete = true,
+                CreatedDate = seedDate
             },
             new Driver
             {
@@ -814,7 +820,8 @@ public class BusBuddyDbContext : DbContext
                 DriverPhone = "555-0456",
                 DriverEmail = "mary.johnson@school.edu",
                 DriversLicenceType = "CDL",
-                TrainingComplete = true
+                TrainingComplete = true,
+                CreatedDate = seedDate
             }
         );
     }

@@ -1,0 +1,81 @@
+    <Reference Include="Syncfusion.Themes.Lime.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Lime.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Material3Dark.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Material3Dark.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Material3Light.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Material3Light.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.MaterialDark.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.MaterialDark.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.MaterialDarkBlue.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.MaterialDarkBlue.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.MaterialLight.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.MaterialLight.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.MaterialLightBlue.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.MaterialLightBlue.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Metro.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Metro.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2010Black.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2010Black.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2010Blue.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2010Blue.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2010Silver.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2010Silver.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2013DarkGray.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2013DarkGray.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2013LightGray.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2013LightGray.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2013White.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2013White.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2016Colorful.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2016Colorful.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2016DarkGray.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2016DarkGray.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2016White.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2016White.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2019Black.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2019Black.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2019Colorful.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2019Colorful.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2019DarkGray.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2019DarkGray.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2019HighContrast.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2019HighContrast.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2019HighContrastWhite.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2019HighContrastWhite.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Office2019White.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Office2019White.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.Saffron.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.Saffron.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.SystemTheme.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.SystemTheme.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.VisualStudio2013.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.VisualStudio2013.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Syncfusion.Themes.VisualStudio2015.WPF">
+      <HintPath>C:\Program Files (x86)\Syncfusion\Essential Studio\WPF\30.1.37\precompiledassemblies\net8.0\Syncfusion.Themes.VisualStudio2015.WPF.dll</HintPath>
+    </Reference>

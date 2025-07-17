@@ -44,6 +44,21 @@ namespace BusBuddy.WPF.ViewModels
         [ObservableProperty]
         private NavigationItem? _selectedNavigationItem;
 
+        [ObservableProperty]
+        private bool _isLoading;
+
+        [ObservableProperty]
+        private bool _isInitialLoading;
+
+        [ObservableProperty]
+        private string _currentViewTitle = "Dashboard";
+
+        [ObservableProperty]
+        private int _notificationCount = 0;
+
+        [ObservableProperty]
+        private bool _hasNotifications = false;
+
         /// <summary>
         /// Gets whether the application is running in debug mode
         /// </summary>
@@ -114,6 +129,14 @@ namespace BusBuddy.WPF.ViewModels
                     Tooltip = "Manage bus schedules and timetables"
                 },
                 new NavigationItem {
+                    Name = "Sports Scheduling",
+                    ViewModelName = "SportsSchedule",
+                    Icon = "🏐",
+                    Description = "Sports Trips & Events",
+                    Tooltip = "Manage sports trips, events, and activity schedules",
+                    IsNew = true
+                },
+                new NavigationItem {
                     Name = "Students",
                     ViewModelName = "Students",
                     Icon = "👨‍🎓",
@@ -174,7 +197,7 @@ namespace BusBuddy.WPF.ViewModels
         /// Navigate to a specific view model
         /// </summary>
         [RelayCommand]
-        private async Task NavigateTo(string viewModelName)
+        public async Task NavigateTo(string viewModelName)
         {
             _logger.Information("UI Navigation initiated to {ViewModelName} via button click", viewModelName);
 
@@ -200,6 +223,7 @@ namespace BusBuddy.WPF.ViewModels
                     "Drivers" => await _lazyViewModelService.GetViewModelAsync<DriverManagementViewModel>(),
                     "Routes" => await _lazyViewModelService.GetViewModelAsync<RouteManagementViewModel>(),
                     "Schedule" => await _lazyViewModelService.GetViewModelAsync<ScheduleManagementViewModel>(),
+                    "SportsSchedule" => await _lazyViewModelService.GetViewModelAsync<BusBuddy.WPF.ViewModels.ScheduleManagement.ScheduleViewModel>(),
                     "Students" => await _lazyViewModelService.GetViewModelAsync<StudentManagementViewModel>(),
                     "Maintenance" => await _lazyViewModelService.GetViewModelAsync<MaintenanceTrackingViewModel>(),
                     "Fuel" => await _lazyViewModelService.GetViewModelAsync<FuelManagementViewModel>(),
@@ -237,9 +261,23 @@ namespace BusBuddy.WPF.ViewModels
                 _logger.Error(ex, "Error navigating to {ViewModelName} after {ElapsedMs}ms", viewModelName, startTime.ElapsedMilliseconds);
                 CurrentViewModel = _loadingViewModel;
             }
-        }        /// <summary>
-                 /// Public method to navigate to Dashboard view - used by startup orchestration
-                 /// </summary>
+        }
+
+        /// <summary>
+        /// Command to navigate to a specific view based on NavigationItem
+        /// </summary>
+        [RelayCommand]
+        private async Task Navigate(NavigationItem navigationItem)
+        {
+            if (navigationItem != null)
+            {
+                await NavigateTo(navigationItem.ViewModelName);
+            }
+        }
+
+        /// <summary>
+        /// Public method to navigate to Dashboard view - used by startup orchestration
+        /// </summary>
         public async Task NavigateToDashboardAsync()
         {
             _logger.Information("UI Navigation to Dashboard initiated from startup orchestration");

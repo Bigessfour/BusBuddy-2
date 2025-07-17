@@ -17,7 +17,7 @@ namespace BusBuddy.Core.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -244,6 +244,9 @@ namespace BusBuddy.Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityScheduleId"));
 
+                    b.Property<int?>("ActivityId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -312,6 +315,8 @@ namespace BusBuddy.Core.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("ActivityScheduleId");
+
+                    b.HasIndex("ActivityId");
 
                     b.HasIndex("ScheduledDate")
                         .HasDatabaseName("IX_ActivitySchedule_Date");
@@ -500,7 +505,7 @@ namespace BusBuddy.Core.Migrations
                         {
                             VehicleId = 1,
                             BusNumber = "001",
-                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5562),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             GPSTracking = false,
                             LicenseNumber = "TX123456",
                             Make = "Blue Bird",
@@ -516,7 +521,7 @@ namespace BusBuddy.Core.Migrations
                         {
                             VehicleId = 2,
                             BusNumber = "002",
-                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5607),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             GPSTracking = false,
                             LicenseNumber = "TX654321",
                             Make = "Thomas Built",
@@ -690,7 +695,7 @@ namespace BusBuddy.Core.Migrations
                         new
                         {
                             DriverId = 1,
-                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5864),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DriverEmail = "john.smith@school.edu",
                             DriverName = "John Smith",
                             DriverPhone = "555-0123",
@@ -701,7 +706,7 @@ namespace BusBuddy.Core.Migrations
                         new
                         {
                             DriverId = 2,
-                            CreatedDate = new DateTime(2025, 7, 15, 10, 31, 40, 969, DateTimeKind.Utc).AddTicks(5878),
+                            CreatedDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DriverEmail = "mary.johnson@school.edu",
                             DriverName = "Mary Johnson",
                             DriverPhone = "555-0456",
@@ -1101,21 +1106,43 @@ namespace BusBuddy.Core.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<TimeSpan?>("DepartTime")
+                        .HasColumnType("time");
+
                     b.Property<DateTime>("DepartureTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DestinationTown")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("DriverId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Opponent")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("RouteId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("ScheduleDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("ScheduledTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("SportsCategory")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1389,6 +1416,84 @@ namespace BusBuddy.Core.Migrations
                     b.ToTable("Students", (string)null);
                 });
 
+            modelBuilder.Entity("BusBuddy.Core.Models.StudentSchedule", b =>
+                {
+                    b.Property<int>("StudentScheduleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentScheduleId"));
+
+                    b.Property<int?>("ActivityScheduleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AssignmentType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("");
+
+                    b.Property<bool>("Attended")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Confirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DropoffLocation")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PickupLocation")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ScheduleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("StudentScheduleId");
+
+                    b.HasIndex("ActivityScheduleId")
+                        .HasDatabaseName("IX_StudentSchedules_ActivityScheduleId");
+
+                    b.HasIndex("AssignmentType")
+                        .HasDatabaseName("IX_StudentSchedules_AssignmentType");
+
+                    b.HasIndex("ScheduleId")
+                        .HasDatabaseName("IX_StudentSchedules_ScheduleId");
+
+                    b.HasIndex("StudentId")
+                        .HasDatabaseName("IX_StudentSchedules_StudentId");
+
+                    b.HasIndex("StudentId", "ScheduleId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_StudentSchedules_StudentSchedule")
+                        .HasFilter("[ScheduleId] IS NOT NULL");
+
+                    b.ToTable("StudentSchedules", (string)null);
+                });
+
             modelBuilder.Entity("BusBuddy.Core.Models.Trips.TripEvent", b =>
                 {
                     b.Property<int>("TripEventId")
@@ -1550,6 +1655,10 @@ namespace BusBuddy.Core.Migrations
 
             modelBuilder.Entity("BusBuddy.Core.Models.ActivitySchedule", b =>
                 {
+                    b.HasOne("BusBuddy.Core.Models.Activity", null)
+                        .WithMany("ActivitySchedules")
+                        .HasForeignKey("ActivityId");
+
                     b.HasOne("BusBuddy.Core.Models.Driver", "ScheduledDriver")
                         .WithMany("ScheduledActivities")
                         .HasForeignKey("ScheduledDriverId")
@@ -1676,6 +1785,34 @@ namespace BusBuddy.Core.Migrations
                     b.Navigation("Route");
                 });
 
+            modelBuilder.Entity("BusBuddy.Core.Models.StudentSchedule", b =>
+                {
+                    b.HasOne("BusBuddy.Core.Models.ActivitySchedule", "ActivitySchedule")
+                        .WithMany("StudentSchedules")
+                        .HasForeignKey("ActivityScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("FK_StudentSchedules_ActivitySchedule");
+
+                    b.HasOne("BusBuddy.Core.Models.Schedule", "Schedule")
+                        .WithMany("StudentSchedules")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("FK_StudentSchedules_Schedule");
+
+                    b.HasOne("BusBuddy.Core.Models.Student", "Student")
+                        .WithMany("StudentSchedules")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_StudentSchedules_Student");
+
+                    b.Navigation("ActivitySchedule");
+
+                    b.Navigation("Schedule");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("BusBuddy.Core.Models.Trips.TripEvent", b =>
                 {
                     b.HasOne("BusBuddy.Core.Models.Driver", "Driver")
@@ -1701,6 +1838,16 @@ namespace BusBuddy.Core.Migrations
                     b.Navigation("Route");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.Activity", b =>
+                {
+                    b.Navigation("ActivitySchedules");
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.ActivitySchedule", b =>
+                {
+                    b.Navigation("StudentSchedules");
                 });
 
             modelBuilder.Entity("BusBuddy.Core.Models.Bus", b =>
@@ -1736,6 +1883,16 @@ namespace BusBuddy.Core.Migrations
             modelBuilder.Entity("BusBuddy.Core.Models.Route", b =>
                 {
                     b.Navigation("Schedules");
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.Schedule", b =>
+                {
+                    b.Navigation("StudentSchedules");
+                });
+
+            modelBuilder.Entity("BusBuddy.Core.Models.Student", b =>
+                {
+                    b.Navigation("StudentSchedules");
                 });
 #pragma warning restore 612, 618
         }

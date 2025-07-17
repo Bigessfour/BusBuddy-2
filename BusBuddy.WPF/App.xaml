@@ -15,29 +15,57 @@
              xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
              xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
              xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
-             xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule">
+             xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
+             xmlns:scheduleManagementViewModels="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement">
     <Application.Resources>
         <ResourceDictionary>
             <!--
             ===============================================================================
-            SYNCFUSION FLUENTDARK THEME — PRIMARY WITH FLUENTLIGHT FALLBACK
+            SYNCFUSION FLUENTDARK THEME — PRIMARY WITH COMPREHENSIVE GLOBAL RESOURCES
             ===============================================================================
             Theme is applied via SfSkinManager.ApplicationTheme in App.xaml.cs
-            - Primary Theme: FluentDark (official Syncfusion dark theme)
-            - Fallback Theme: FluentLight (available for theme switching)
+            — Primary Theme: FluentDark (official Syncfusion dark theme)
+            — Advanced Features: RevealEffects, Animations, Ripple Effects
             This loads the official Syncfusion theme resources automatically
 
             IMPORTANT: All views must use FluentDark theme consistently by default
-            Each control should have: syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-            Theme switching is available via ThemeService.ToggleTheme()
             ===============================================================================
             -->
+
             <ResourceDictionary.MergedDictionaries>
                 <!-- Syncfusion FluentDark theme resources (loaded automatically by SfSkinManager) -->
                 <!-- FluentLight theme also available for switching -->
                 <!-- Custom styles that use official Syncfusion FluentDark resource names -->
                 <ResourceDictionary Source="Resources/Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- GLOBAL CONVERTERS -->
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter" IsInverted="True" />
+
+            <!-- GLOBAL STYLES FOR ENHANCED CONTROLS -->
+            <Style x:Key="EnhancedNavigationDrawerStyle" TargetType="ContentControl">
+                <Setter Property="Background" Value="{DynamicResource SurfaceBackground}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="0"/>
+            </Style>
+
+            <Style x:Key="EnhancedContentControlStyle" TargetType="ContentControl">
+                <Setter Property="Background" Value="{DynamicResource SurfaceBackground}"/>
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+            </Style>
+
+            <!--
+            ===============================================================================
+            THEME USAGE GUIDELINES
+            ===============================================================================
+            Each control should have: syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+            Theme switching is available via ThemeService.ToggleTheme()
+            ===============================================================================
+            -->
 
             <!-- ===============================================================================
             VIEWMODEL TO VIEW MAPPING — MVVM PATTERN IMPLEMENTATION
@@ -62,6 +90,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type scheduleViewModels:ScheduleManagementViewModel}">
                 <schedule:ScheduleManagementView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type scheduleManagementViewModels:ScheduleViewModel}">
+                <schedule:ScheduleView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
                 <student:StudentManagementView />
@@ -89,7 +120,7 @@
             <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
 
             <!-- Missing Inverse Converter - Critical Fix -->
-            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter" IsInverted="True"/>
+            <!-- <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter2" IsInverted="True"/> -->
 
             <!-- Status and Data Converters -->
             <converters:ActiveStatusToColorConverter x:Key="ActiveStatusToColorConverter"/>
@@ -111,7 +142,7 @@
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
 
             <!-- Standard WPF converters as global resources -->
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <!-- Already defined above: <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/> -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>
