@@ -2,11 +2,11 @@
 <#
 .SYNOPSIS
     Bus Buddy Development Configuration for Novice Users
-    
+
 .DESCRIPTION
     Simplified PowerShell configuration that sets up the development environment
     with easy-to-use aliases and automatic path detection for novice developers.
-    
+
 .NOTES
     Author: Bus Buddy Development Team
     Version: 1.0
@@ -23,7 +23,7 @@ $script:BusBuddyConfig = @{
     ToolsPath = ""
     LogsPath = ""
     XamlPath = ""
-    
+
     # Development settings optimized for novices
     Settings = @{
         AutoBackup = $true
@@ -72,7 +72,7 @@ function Write-BusBuddyMessage {
         [string]$Message,
         [ValidateSet('Info', 'Success', 'Warning', 'Error', 'Step')]$Type = 'Info'
     )
-    
+
     $colors = @{
         'Info' = 'Cyan'
         'Success' = 'Green'
@@ -80,7 +80,7 @@ function Write-BusBuddyMessage {
         'Error' = 'Red'
         'Step' = 'Magenta'
     }
-    
+
     $icons = @{
         'Info' = '🔍'
         'Success' = '✅'
@@ -88,7 +88,7 @@ function Write-BusBuddyMessage {
         'Error' = '❌'
         'Step' = '📋'
     }
-    
+
     Write-Host "$($icons[$Type]) $Message" -ForegroundColor $colors[$Type]
 }
 
@@ -98,35 +98,35 @@ function Test-BusBuddyEnvironment {
         Validates the Bus Buddy development environment
     #>
     Write-BusBuddyMessage "Checking Bus Buddy development environment..." -Type 'Step'
-    
+
     $checks = @()
-    
+
     # Project structure
     if (Test-Path (Join-Path $script:BusBuddyConfig.ProjectRoot "BusBuddy.sln")) {
         $checks += @{ Name = "Solution file"; Status = "✅"; Color = "Green" }
     } else {
         $checks += @{ Name = "Solution file"; Status = "❌"; Color = "Red" }
     }
-    
+
     # Tools directory
     if (Test-Path $script:BusBuddyConfig.ToolsPath) {
         $checks += @{ Name = "Tools directory"; Status = "✅"; Color = "Green" }
     } else {
         $checks += @{ Name = "Tools directory"; Status = "❌"; Color = "Red" }
     }
-    
+
     # PowerShell version
     if ($PSVersionTable.PSVersion.Major -ge 7) {
         $checks += @{ Name = "PowerShell 7+"; Status = "✅"; Color = "Green" }
     } else {
         $checks += @{ Name = "PowerShell 7+"; Status = "⚠️"; Color = "Yellow" }
     }
-    
+
     # Display results
     foreach ($check in $checks) {
         Write-Host "  $($check.Status) $($check.Name)" -ForegroundColor $check.Color
     }
-    
+
     $failedChecks = $checks | Where-Object { $_.Status -eq "❌" }
     if ($failedChecks.Count -eq 0) {
         Write-BusBuddyMessage "Environment validation complete!" -Type 'Success'
@@ -152,22 +152,22 @@ function Invoke-BusBuddyXamlFormat {
         [switch]$ValidateOnly,
         [switch]$RemoveDeprecated
     )
-    
+
     Write-BusBuddyMessage "Starting XAML processing..." -Type 'Step'
-    
+
     $formatScript = Join-Path $script:BusBuddyConfig.ToolsPath "Scripts\Format-XamlFiles.ps1"
-    
+
     if (-not (Test-Path $formatScript)) {
         Write-BusBuddyMessage "XAML formatting script not found: $formatScript" -Type 'Error'
         return $false
     }
-    
+
     $arguments = @(
         "-Path", "`"$($script:BusBuddyConfig.ProjectRoot)`""
         "-BackupEnabled"
         "-Verbose"
     )
-    
+
     if ($ValidateOnly) {
         $arguments += "-Validate"
         Write-BusBuddyMessage "Running validation only..." -Type 'Info'
@@ -175,12 +175,12 @@ function Invoke-BusBuddyXamlFormat {
         $arguments += "-Format", "-Validate"
         Write-BusBuddyMessage "Formatting and validating XAML files..." -Type 'Info'
     }
-    
+
     if ($RemoveDeprecated) {
         $arguments += "-RemoveDeprecated"
         Write-BusBuddyMessage "Removing deprecated Syncfusion attributes..." -Type 'Info'
     }
-    
+
     try {
         & $formatScript @arguments
         Write-BusBuddyMessage "XAML processing completed successfully!" -Type 'Success'
@@ -207,25 +207,25 @@ function Start-BusBuddyDebugFilter {
         [ValidateRange(1,4)][int]$Priority = 2,
         [switch]$FileMode
     )
-    
+
     Write-BusBuddyMessage "Starting Bus Buddy debug filter..." -Type 'Step'
     Write-BusBuddyMessage "Focus: WPF Scheduling System" -Type 'Info'
     Write-BusBuddyMessage "Priority Level: $Priority and above" -Type 'Info'
-    
+
     $debugScript = Join-Path $script:BusBuddyConfig.ToolsPath "Scripts\test-debug-filter.ps1"
-    
+
     if (-not (Test-Path $debugScript)) {
         Write-BusBuddyMessage "Debug filter script not found: $debugScript" -Type 'Error'
         return $false
     }
-    
+
     $arguments = @(
         "-SchedulingFocus"
-        "-UINotifications" 
+        "-UINotifications"
         "-Priority", $Priority
         "-Verbose"
     )
-    
+
     if ($FileMode) {
         $arguments += "-Mode", "File"
         Write-BusBuddyMessage "Processing existing log files..." -Type 'Info'
@@ -234,7 +234,7 @@ function Start-BusBuddyDebugFilter {
         Write-BusBuddyMessage "Starting real-time monitoring..." -Type 'Info'
         Write-BusBuddyMessage "Press Ctrl+C to stop monitoring" -Type 'Warning'
     }
-    
+
     try {
         & $debugScript @arguments
     }
@@ -256,33 +256,33 @@ function Invoke-BusBuddyHealthCheck {
         - Project build status
     #>
     Write-BusBuddyMessage "🩺 Starting Bus Buddy Health Check..." -Type 'Step'
-    
+
     $results = @{
         Environment = $false
         XAML = $false
         Logs = $false
         Build = $false
     }
-    
+
     # 1. Environment check
     Write-BusBuddyMessage "Step 1: Environment validation" -Type 'Step'
     $results.Environment = Test-BusBuddyEnvironment
-    
+
     # 2. XAML validation
     Write-BusBuddyMessage "Step 2: XAML validation" -Type 'Step'
     $results.XAML = Invoke-BusBuddyXamlFormat -ValidateOnly
-    
+
     # 3. Log analysis
     Write-BusBuddyMessage "Step 3: Debug log analysis" -Type 'Step'
     $results.Logs = Start-BusBuddyDebugFilter -Priority 1 -FileMode
-    
+
     # 4. Build test (optional)
     Write-BusBuddyMessage "Step 4: Build validation" -Type 'Step'
     try {
         Push-Location $script:BusBuddyConfig.ProjectRoot
         $buildResult = dotnet build --verbosity quiet --no-restore 2>&1
         $results.Build = $LASTEXITCODE -eq 0
-        
+
         if ($results.Build) {
             Write-BusBuddyMessage "Build validation passed" -Type 'Success'
         } else {
@@ -296,11 +296,11 @@ function Invoke-BusBuddyHealthCheck {
     finally {
         Pop-Location
     }
-    
+
     # Summary
     Write-Host "`n" -NoNewline
     Write-BusBuddyMessage "🩺 Health Check Summary:" -Type 'Step'
-    
+
     $passed = 0
     foreach ($test in $results.Keys) {
         if ($results[$test]) {
@@ -310,9 +310,9 @@ function Invoke-BusBuddyHealthCheck {
             Write-Host "  ❌ $test" -ForegroundColor Red
         }
     }
-    
+
     $percentage = [math]::Round(($passed / $results.Count) * 100)
-    
+
     if ($percentage -eq 100) {
         Write-BusBuddyMessage "🎉 All health checks passed! ($percentage%)" -Type 'Success'
     } elseif ($percentage -ge 75) {
@@ -334,26 +334,26 @@ function Start-BusBuddyDevSession {
         - Debug filter activation
     #>
     Write-BusBuddyMessage "🚀 Starting Bus Buddy Development Session..." -Type 'Step'
-    
+
     # Step 1: Environment check
     if (-not (Test-BusBuddyEnvironment)) {
         Write-BusBuddyMessage "Environment check failed. Please fix issues before continuing." -Type 'Error'
         return
     }
-    
+
     # Step 2: XAML processing
     Write-BusBuddyMessage "Processing XAML files..." -Type 'Step'
     if (-not (Invoke-BusBuddyXamlFormat)) {
         Write-BusBuddyMessage "XAML processing failed. Check the errors above." -Type 'Error'
         return
     }
-    
+
     # Step 3: Build project
     Write-BusBuddyMessage "Building project..." -Type 'Step'
     try {
         Push-Location $script:BusBuddyConfig.ProjectRoot
         $buildOutput = dotnet build --verbosity minimal 2>&1
-        
+
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyMessage "Build successful!" -Type 'Success'
         } else {
@@ -365,11 +365,11 @@ function Start-BusBuddyDevSession {
     finally {
         Pop-Location
     }
-    
+
     # Step 4: Start debug monitoring
     Write-BusBuddyMessage "Starting debug monitoring..." -Type 'Step'
     Write-BusBuddyMessage "Development session is ready! Debug filter will monitor for issues." -Type 'Success'
-    
+
     Start-BusBuddyDebugFilter -Priority 2
 }
 
@@ -391,19 +391,19 @@ Set-Alias -Name "bb-logs" -Value { Set-Location $script:BusBuddyConfig.LogsPath 
 Set-Alias -Name "bb-tools" -Value { Set-Location $script:BusBuddyConfig.ToolsPath } -Description "Go to tools folder"
 
 # Quick action aliases
-Set-Alias -Name "bb-build" -Value { 
+Set-Alias -Name "bb-build" -Value {
     Push-Location $script:BusBuddyConfig.ProjectRoot
     dotnet build --verbosity minimal
     Pop-Location
 } -Description "Quick build"
 
-Set-Alias -Name "bb-clean" -Value { 
+Set-Alias -Name "bb-clean" -Value {
     Push-Location $script:BusBuddyConfig.ProjectRoot
     dotnet clean --verbosity minimal
     Pop-Location
 } -Description "Quick clean"
 
-Set-Alias -Name "bb-run" -Value { 
+Set-Alias -Name "bb-run" -Value {
     Push-Location $script:BusBuddyConfig.ProjectRoot
     dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
     Pop-Location
@@ -435,7 +435,14 @@ function Show-BusBuddyHelp {
   bb-run           Run the application
   bb-clean         Clean build artifacts
 
-📁 NAVIGATION:
+� PROBLEMS REVIEW (NEW!):
+  bb-problems      Review all project problems with solutions
+  bb-fix           Auto-fix common problems automatically
+  bb-summary       Quick problems summary and build status
+  bb-schedule-problems  Focus on scheduling-related issues
+  bb-report        Export detailed problems report to logs
+
+�📁 NAVIGATION:
   bb-root          Go to project root directory
   bb-logs          Go to logs folder
   bb-tools         Go to tools folder
@@ -446,7 +453,7 @@ function Show-BusBuddyHelp {
 
 💡 GETTING STARTED:
   1. Run 'bb-dev-start' to set up your development environment
-  2. Use 'bb-fix-xaml' before committing any XAML changes  
+  2. Use 'bb-fix-xaml' before committing any XAML changes
   3. Run 'bb-health' weekly to catch issues early
   4. Use 'bb-debug-start' when debugging scheduling features
 
@@ -454,6 +461,114 @@ function Show-BusBuddyHelp {
 
 "@ -ForegroundColor Cyan
 }
+
+# ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# PROBLEMS REVIEW INTEGRATION
+# ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+function Invoke-BusBuddyProblemsReview {
+    <#
+    .SYNOPSIS
+        Novice-friendly problems review for Bus Buddy project
+    #>
+    Write-BusBuddyMessage "Reviewing all Bus Buddy problems..." -Type 'Step'
+
+    $reviewScript = Join-Path $script:BusBuddyConfig.ToolsPath "Scripts\Review-Problems.ps1"
+    if (Test-Path $reviewScript) {
+        & $reviewScript -AnalyzeMode All -ShowSolutions
+    } else {
+        Write-BusBuddyMessage "Problems review script not found!" -Type 'Error'
+    }
+}
+
+function Invoke-BusBuddyAutoFix {
+    <#
+    .SYNOPSIS
+        Automatically fixes common Bus Buddy problems
+    #>
+    Write-BusBuddyMessage "Auto-fixing common problems..." -Type 'Step'
+
+    $reviewScript = Join-Path $script:BusBuddyConfig.ToolsPath "Scripts\Review-Problems.ps1"
+    if (Test-Path $reviewScript) {
+        & $reviewScript -AnalyzeMode All -AutoFix -ShowSolutions
+    } else {
+        Write-BusBuddyMessage "Problems review script not found!" -Type 'Error'
+    }
+}
+
+function Get-BusBuddyProblemsSummary {
+    <#
+    .SYNOPSIS
+        Gets a quick summary of current problems
+    #>
+    Write-BusBuddyMessage "Getting problems summary..." -Type 'Step'
+
+    $reviewScript = Join-Path $script:BusBuddyConfig.ToolsPath "Scripts\Review-Problems.ps1"
+    if (Test-Path $reviewScript) {
+        & $reviewScript -AnalyzeMode Summary
+    } else {
+        Write-BusBuddyMessage "Problems review script not found!" -Type 'Error'
+    }
+}
+
+function Get-BusBuddySchedulingProblems {
+    <#
+    .SYNOPSIS
+        Reviews problems specifically related to scheduling functionality
+    #>
+    Write-BusBuddyMessage "Reviewing scheduling-related problems..." -Type 'Step'
+
+    $reviewScript = Join-Path $script:BusBuddyConfig.ToolsPath "Scripts\Review-Problems.ps1"
+    if (Test-Path $reviewScript) {
+        & $reviewScript -AnalyzeMode All -SchedulingFocus -ShowSolutions
+    } else {
+        Write-BusBuddyMessage "Problems review script not found!" -Type 'Error'
+    }
+}
+
+function Export-BusBuddyProblemsReport {
+    <#
+    .SYNOPSIS
+        Exports a detailed problems report
+    #>
+    Write-BusBuddyMessage "Exporting problems report..." -Type 'Step'
+
+    $reviewScript = Join-Path $script:BusBuddyConfig.ToolsPath "Scripts\Review-Problems.ps1"
+    if (Test-Path $reviewScript) {
+        & $reviewScript -AnalyzeMode All -ExportReport -ShowSolutions
+    } else {
+        Write-BusBuddyMessage "Problems review script not found!" -Type 'Error'
+    }
+}
+
+# ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# ENHANCED ALIAS MANAGEMENT
+# ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+function Initialize-BusBuddyAliases {
+    <#
+    .SYNOPSIS
+        Sets up all novice-friendly aliases for Bus Buddy development
+    #>
+
+    # Basic aliases
+    Set-Alias -Name 'bb-help' -Value 'Show-BusBuddyHelp' -Scope Global -Force
+    Set-Alias -Name 'bb-check' -Value 'Test-BusBuddyEnvironment' -Scope Global -Force
+    Set-Alias -Name 'bb-fix-xaml' -Value 'Invoke-BusBuddyXamlFormat' -Scope Global -Force
+    Set-Alias -Name 'bb-check-xaml' -Value 'Invoke-BusBuddyXamlValidation' -Scope Global -Force
+
+    # Problems review aliases
+    Set-Alias -Name 'bb-problems' -Value 'Invoke-BusBuddyProblemsReview' -Scope Global -Force
+    Set-Alias -Name 'bb-fix' -Value 'Invoke-BusBuddyAutoFix' -Scope Global -Force
+    Set-Alias -Name 'bb-summary' -Value 'Get-BusBuddyProblemsSummary' -Scope Global -Force
+    Set-Alias -Name 'bb-schedule-problems' -Value 'Get-BusBuddySchedulingProblems' -Scope Global -Force
+    Set-Alias -Name 'bb-report' -Value 'Export-BusBuddyProblemsReport' -Scope Global -Force
+
+    Write-BusBuddyMessage "All aliases configured successfully!" -Type 'Success'
+}
+
+# Initialize aliases
+Initialize-BusBuddyAliases
 
 # Auto-display help on first load
 Show-BusBuddyHelp

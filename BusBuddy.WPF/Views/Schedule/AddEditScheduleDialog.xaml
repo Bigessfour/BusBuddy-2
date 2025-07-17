@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         ResizeMode="NoResize"
-        syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful">
+        >
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -50,7 +50,7 @@
                                      SelectedValuePath="RouteId"
                                      IsEditable="False"
                                      Margin="0,0,0,15"
-                                     syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                     />
 
                 <!-- Bus Selection -->
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Bus:"
@@ -62,7 +62,7 @@
                                      SelectedValuePath="VehicleId"
                                      IsEditable="False"
                                      Margin="0,0,0,15"
-                                     syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                     />
 
                 <!-- Driver Selection -->
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Driver:"
@@ -74,7 +74,7 @@
                                      SelectedValuePath="DriverId"
                                      IsEditable="False"
                                      Margin="0,0,0,15"
-                                     syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                     />
 
                 <!-- Schedule Date -->
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Schedule Date:"
@@ -82,7 +82,7 @@
                 <syncfusion:SfDatePicker Grid.Row="3" Grid.Column="1"
                                         Value="{Binding ScheduleDate, Mode=TwoWay}"
                                         Margin="0,0,0,15"
-                                        syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                        />
 
                 <!-- Departure Time -->
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Departure Time:"
@@ -90,7 +90,7 @@
                 <syncfusion:SfTimePicker Grid.Row="4" Grid.Column="1"
                                         Value="{Binding DepartureTime, Mode=TwoWay}"
                                         Margin="0,0,0,15"
-                                        syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                        />
 
                 <!-- Arrival Time -->
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="Arrival Time:"
@@ -98,7 +98,7 @@
                 <syncfusion:SfTimePicker Grid.Row="5" Grid.Column="1"
                                         Value="{Binding ArrivalTime, Mode=TwoWay}"
                                         Margin="0,0,0,15"
-                                        syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                        />
 
                 <!-- Status -->
                 <TextBlock Grid.Row="6" Grid.Column="0" Text="Status:"
@@ -108,7 +108,7 @@
                                      SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
                                      IsEditable="False"
                                      Margin="0,0,0,15"
-                                     syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                     />
 
                 <!-- Notes -->
                 <TextBlock Grid.Row="7" Grid.Column="0" Text="Notes:"
@@ -130,12 +130,13 @@
                                 Command="{Binding SaveCommand}"
                                 Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
                                 Margin="0,0,10,0"
-                                syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                />
             <syncfusion:ButtonAdv Content="Cancel"
                                 Click="CancelButton_Click"
                                 Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                />
         </StackPanel>
     </Grid>
 </Window>
+
 

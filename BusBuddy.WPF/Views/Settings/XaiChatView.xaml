@@ -8,7 +8,7 @@
              xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="400"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
 
     <!-- No UserControl.Resources needed - SfSkinManager handles theme automatically -->
 
@@ -42,10 +42,11 @@
                             Messages="{Binding Messages}"
                             Suggestions="{Binding Suggestions}"
                             ShowTypingIndicator="{Binding IsTyping}"
-                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                            
                             Background="{DynamicResource ContentBackground}"
                             Foreground="{DynamicResource ContentForeground}"
                             Margin="0"/>
     </Grid>
 </UserControl>
+
 

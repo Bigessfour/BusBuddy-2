@@ -1,0 +1,154 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                            🚀 BUSBUDDY PREMIUM LOADING EXPERIENCE 🚀                                                                                ║
+║                                                [ENHANCED LOADING VIEW]                                                                                                ║
+║  ✨ PREMIUM SYNCFUSION DESIGN: Advanced Syncfusion controls with FluentDark theme                                                                                     ║
+║  🎯 DIRECT THEME BRUSHES: Uses explicit FluentDark colors to prevent white screen                                                                                    ║
+║  🎭 MODERN ANIMATIONS: Storyboard animations with Syncfusion premium controls                                                                                        ║
+║  🏗️ DEPTH & SHADOWS: Layered design with modern visual depth effects                                                                                                 ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<UserControl x:Class="BusBuddy.WPF.Views.LoadingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters">
+
+    <UserControl.Resources>
+        <!-- CONVERTERS -->
+        <!-- BooleanToVisibilityInverseConverter is now global in App.xaml -->
+
+        <!-- PREMIUM LOADING ANIMATIONS -->
+        <Storyboard x:Key="FadeInAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="LoadingContainer"
+                           Storyboard.TargetProperty="Opacity"
+                           From="0.7" To="1.0" Duration="0:0:2"
+                           AutoReverse="True"/>
+        </Storyboard>
+
+        <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="GlowEllipse"
+                           Storyboard.TargetProperty="Opacity"
+                           From="0.2" To="0.8" Duration="0:0:1.5"
+                           AutoReverse="True"/>
+        </Storyboard>
+    </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
+            <BeginStoryboard Storyboard="{StaticResource PulseAnimation}"/>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <!-- MAIN LOADING EXPERIENCE -->
+    <Grid Background="{DynamicResource SurfaceBackground}">
+        <!-- BACKGROUND GLOW EFFECT -->
+        <Ellipse x:Name="GlowEllipse"
+                 Width="800" Height="800"
+                 Fill="{DynamicResource AccentBackground}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Opacity="0.3"/>
+
+        <!-- PREMIUM LOADING CONTAINER -->
+        <Border x:Name="LoadingContainer"
+                Background="{DynamicResource ContentBackground}"
+                CornerRadius="20"
+                Padding="60,50"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" Direction="270" ShadowDepth="10"
+                                BlurRadius="30" Opacity="0.5"/>
+            </Border.Effect>
+
+            <StackPanel>
+                <!-- PREMIUM APP BRANDING -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,40">
+                    <!-- ICON PLACEHOLDER - Could add custom icon here -->
+                    <Border Background="{DynamicResource PrimaryBackground}"
+                            CornerRadius="8" Width="48" Height="48" Margin="0,0,15,0">
+                        <TextBlock Text="🚌" FontSize="24" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+
+                    <!-- APP TITLE WITH PREMIUM TYPOGRAPHY -->
+                    <StackPanel>
+                        <TextBlock Text="BUS BUDDY"
+                                   FontSize="42" FontWeight="Bold"
+                                   Foreground="{DynamicResource ContentForeground}"
+                                   FontFamily="Segoe UI Light"/>
+                        <TextBlock Text="School Transportation Management"
+                                   FontSize="14" FontWeight="Normal"
+                                   Foreground="{DynamicResource ContentForeground}"
+                                   FontFamily="Segoe UI"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,5,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- SYNCFUSION PREMIUM LOADING INDICATORS -->
+
+                <!-- PRIMARY LOADING ANIMATION -->
+                <syncfusion:SfBusyIndicator IsBusy="True"
+                                           AnimationType="Gear"
+                                           Height="100" Width="100"
+                                           Foreground="{DynamicResource PrimaryBackground}"
+                                           Margin="0,0,0,30"
+                                           Style="{StaticResource LoadingIndicatorStyle}"/>
+
+                <!-- ADVANCED PROGRESS BAR -->
+                <StackPanel Margin="0,0,0,25">
+                    <TextBlock Text="{Binding Status}"
+                               FontSize="16" FontWeight="Medium"
+                               Foreground="{DynamicResource ContentForeground}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,15"/>
+
+                    <syncfusion:SfLinearProgressBar Width="400" Height="8"
+                                             Progress="{Binding ProgressPercentage}"
+                                             Foreground="{DynamicResource PrimaryBackground}"
+                                             Background="{DynamicResource ContentBackground}"
+                                             Style="{StaticResource StandardLinearProgressBarStyle}"IsIndeterminate="{Binding IsIndeterminate}"/>
+
+                    <!-- Progress Percentage Display -->
+                    <TextBlock Text="{Binding ProgressPercentage, StringFormat='{}{0}%'}"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBackground}"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"
+                               Visibility="{Binding IsIndeterminate, Converter={StaticResource BooleanToVisibilityInverseConverter}}"/>
+                </StackPanel>
+
+                <!-- SECONDARY PROGRESS INDICATOR -->
+                <syncfusion:SfLinearProgressBar IsIndeterminate="True"
+                                               Width="320" Height="3"
+                                               Foreground="{DynamicResource AccentBackground}"
+                                               Background="{DynamicResource ContentBackground}"
+                                               Margin="0,0,0,25"
+                                               Style="{StaticResource StandardLinearProgressBarStyle}"/>
+
+                <!-- STATUS INFORMATION -->
+                <StackPanel>
+                    <TextBlock Text="Loading Dashboard..."
+                               FontSize="14"
+                               Foreground="{DynamicResource ContentForeground}"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               Margin="0,0,0,8"/>
+
+                    <TextBlock Text="Please wait while we prepare your experience"
+                               FontSize="12"
+                               Foreground="{DynamicResource ContentForeground}"
+                               HorizontalAlignment="Center"
+                               FontFamily="Segoe UI"
+                               Opacity="0.7"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
+

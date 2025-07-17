@@ -178,10 +178,9 @@
       "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
       "icon": "terminal-powershell",
       "args": [
-        "-NoProfile",
         "-NoExit",
         "-Command",
-        "$PSVersionTable | Format-Table; Write-Host 'PowerShell Core 7.5.2 Enhanced Features Enabled' -ForegroundColor Green"
+        ". 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-PowerShell-Profile.ps1'; . 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-Advanced-Workflows.ps1'"
       ],
       "overrideName": true
     },
@@ -212,6 +211,20 @@
   "powershell.codeFormatting.autoCorrectAliases": true,
   "powershell.codeFormatting.useConstantStrings": true,
   "powershell.codeFormatting.useCorrectCasing": true,
+  "powershell.scriptAnalysis.enable": true,
+  "powershell.developer.enableConsoleRepl": true,
+  "powershell.developer.featureFlags": ["PSReadLine"],
+  "powershell.pester.useLegacyCodeLens": false,
+  "powershell.pester.outputVerbosity": "Normal",
+
+  // PowerShell 7.5.2 Advanced Features for Bus Buddy Development
+  "powershell.codeFormatting.preset": "OTBS",
+  "powershell.codeFormatting.openBraceOnSameLine": true,
+  "powershell.codeFormatting.newLineAfterCloseBrace": true,
+  "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
+  "powershell.codeFormatting.alignPropertyValuePairs": true,
+  "powershell.debugging.createTemporaryIntegratedConsole": false,
+  "powershell.integratedConsole.startInBackground": true,
 
   // PowerShell Core Performance Optimizations
   "powershell.integratedConsole.useLegacyReadLine": false,
@@ -260,24 +273,86 @@
   "dotnet.inlayHints.enableInlayHintsForOtherParameters": true,
   "dotnet.inlayHints.enableInlayHintsForParameters": true,
 
-  // DISABLE ALL TASK AUTOMATION AND SCRIPTS TO PREVENT CODE CORRUPTION
+  // 🎯 EXCLUSIVE TASK EXPLORER METHOD - All task management through Task Explorer ONLY
   "task.autoDetect": "off",
   "task.showDecorations": false,
   "task.problemMatchers.neverPrompt": true,
   "task.quickOpen.skip": true,
-  "powershell.scriptAnalysis.enable": false,
+  "task.saveBeforeRun": "always",
   "powershell.integratedConsole.showOnStartup": false,
+
+  // Disable competing task interfaces - Force Task Explorer as exclusive method
+  "workbench.view.extensions.enabled": false,
+  "workbench.commandPalette.experimental.suggestCommands": false,
+  "workbench.quickOpen.preserveInput": false,
+  "workbench.editor.enablePreview": false,
+
+  // Task Explorer exclusivity - disable VS Code native task features
+  "keyboard.dispatch": "keyCode",
+  "workbench.enableExperiments": false,
+
+  // 🎯 TASK EXPLORER EXCLUSIVE SETTINGS
+  "taskExplorer.enableTaskExplorer": true,
+  "taskExplorer.showHiddenFiles": false,
+  "taskExplorer.groupWithSeparator": true,
+  "taskExplorer.groupMaxLevel": 3,
+  "taskExplorer.groupSeparator": "-",
+  "taskExplorer.autoRefresh": true,
+  "taskExplorer.enabledTasks": {
+    "ant": false,
+    "gradle": false,
+    "grunt": false,
+    "gulp": false,
+    "make": false,
+    "npm": false,
+    "powershell": true,
+    "workspace": true,
+    "bash": false
+  },
+
+  // 🎨 WPF-SPECIFIC TASK EXPLORER ENHANCEMENTS
+  "taskExplorer.exclude": [
+    "**/node_modules/**",
+    "**/bin/**",
+    "**/obj/**",
+    "**/.vs/**",
+    "**/packages/**"
+  ],
+  "taskExplorer.enablePowershell": true,
+  "taskExplorer.enableWorkspace": true,
+  "taskExplorer.showLastTasks": true,
+  "taskExplorer.keepTermOnStop": false,
+
+  // 🎯 WPF XAML DEVELOPMENT ENHANCEMENTS
+  "xamlStyler.AttributesTolerance": 2,
+  "xamlStyler.KeepFirstAttributeOnSameLine": true,
+  "xamlStyler.MaxAttributeCharactersPerLine": 120,
+  "xamlStyler.MaxAttributesPerLine": 1,
+  "xamlStyler.NewlineExemptionElements": "RadialGradientBrush, GradientStop, LinearGradientBrush, ScaleTransform, SkewTransform, RotateTransform, TranslateTransform, Trigger, Condition, Setter",
+  "xamlStyler.SeparateByGroups": true,
+  "xamlStyler.AttributeIndentation": 0,
+  "xamlStyler.AttributeIndentationStyle": 0,
+  "xamlStyler.RemoveDesignTimeReferences": false,
+
+  // 🔧 POWERSHELL COMMAND PREVENTION SETTINGS
+  "powershell.developer.waitForSessionFileTimeoutSeconds": 240,
+  "powershell.developer.editorServicesLogLevel": "Information",
+  "powershell.developer.bundledModulesPath": "",
+
+  // 🔒 DISABLE COMPETING INTERFACES
+  "workbench.panel.defaultLocation": "bottom",
+  "workbench.panel.opensMaximized": "never",
+  "terminal.integrated.tabs.enabled": false,
+  "terminal.integrated.showExitAlert": false,
 
   // CONTROLLED COPILOT COMMAND POLICY - ESSENTIAL DOTNET COMMANDS ALLOWED
   "terminal.integrated.allowWorkspaceConfiguration": true,
   "terminal.integrated.automationProfile.windows": null,
-  "workbench.commandPalette.experimental.suggestCommands": false,
   "github.copilot.advanced.shellCommands": true,
   "github.copilot.terminal.executeCommands": true,
 
-  // BLOCK ALL SCRIPT FILES TO PREVENT EXECUTION
+  // 🚫 MODIFIED: Allow PowerShell scripts for Task Explorer but block others
   "files.exclude": {
-    "**/*.ps1": true,
     "**/*.bat": true,
     "**/*.cmd": true,
     "**/*.sh": true

@@ -1,0 +1,96 @@
+<Window x:Class="BusBuddy.WPF.Views.Schedule.ActivityScheduleReportDialog" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:syncfusion="http://schemas.syncfusion.com/wpf" xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF" mc:Ignorable="d" Title="Activity Schedule Reports" Height="600" Width="800" WindowStartupLocation="CenterOwner">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Activity Schedule Statistics" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" />
+        <!-- Date Range Selection -->
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Start Date:" VerticalAlignment="Center" Margin="0,0,5,0" />
+            <DatePicker Grid.Column="1" Name="StartDatePicker" Margin="0,0,15,0" />
+            <TextBlock Grid.Column="2" Text="End Date:" VerticalAlignment="Center" Margin="0,0,5,0" />
+            <DatePicker Grid.Column="3" Name="EndDatePicker" Margin="0,0,15,0" />
+            <Button Grid.Column="4" Content="Generate Reports" Name="GenerateButton" Padding="10,5" Click="GenerateButton_Click" />
+        </Grid>
+        <!-- Report Content -->
+        <TabControl Grid.Row="2" Name="ReportTabControl">
+            <TabItem Header="By Trip Type">
+                <syncfusion:SfChart Name="TripTypeChart" Header="Activity Schedules by Trip Type">
+                    <syncfusion:SfChart.PrimaryAxis>
+                        <syncfusion:CategoryAxis />
+                    </syncfusion:SfChart.PrimaryAxis>
+                    <syncfusion:SfChart.SecondaryAxis>
+                        <syncfusion:NumericalAxis />
+                    </syncfusion:SfChart.SecondaryAxis>
+                    <syncfusion:PieSeries Name="TripTypeSeries" XBindingPath="Key" YBindingPath="Value" EnableAnimation="True" ShowTooltip="True" ExplodeIndex="0">
+                        <syncfusion:PieSeries.AdornmentsInfo>
+                            <syncfusion:ChartAdornmentInfo ShowLabel="True" SegmentLabelContent="Percentage" />
+                        </syncfusion:PieSeries.AdornmentsInfo>
+                    </syncfusion:PieSeries>
+                </syncfusion:SfChart>
+            </TabItem>
+            <TabItem Header="By Driver">
+                <syncfusion:SfChart Name="DriverChart" Header="Activity Schedules by Driver">
+                    <syncfusion:SfChart.PrimaryAxis>
+                        <syncfusion:CategoryAxis />
+                    </syncfusion:SfChart.PrimaryAxis>
+                    <syncfusion:SfChart.SecondaryAxis>
+                        <syncfusion:NumericalAxis />
+                    </syncfusion:SfChart.SecondaryAxis>
+                    <syncfusion:ColumnSeries Name="DriverSeries" XBindingPath="Key" YBindingPath="Value" EnableAnimation="True" ShowTooltip="True" />
+                </syncfusion:SfChart>
+            </TabItem>
+            <TabItem Header="By Vehicle">
+                <syncfusion:SfChart Name="VehicleChart" Header="Activity Schedules by Vehicle">
+                    <syncfusion:SfChart.PrimaryAxis>
+                        <syncfusion:CategoryAxis />
+                    </syncfusion:SfChart.PrimaryAxis>
+                    <syncfusion:SfChart.SecondaryAxis>
+                        <syncfusion:NumericalAxis />
+                    </syncfusion:SfChart.SecondaryAxis>
+                    <syncfusion:ColumnSeries Name="VehicleSeries" XBindingPath="Key" YBindingPath="Value" EnableAnimation="True" ShowTooltip="True" />
+                </syncfusion:SfChart>
+            </TabItem>
+            <TabItem Header="By Status">
+                <syncfusion:SfChart Name="StatusChart" Header="Activity Schedules by Status">
+                    <syncfusion:SfChart.PrimaryAxis>
+                        <syncfusion:CategoryAxis />
+                    </syncfusion:SfChart.PrimaryAxis>
+                    <syncfusion:SfChart.SecondaryAxis>
+                        <syncfusion:NumericalAxis />
+                    </syncfusion:SfChart.SecondaryAxis>
+                    <syncfusion:DoughnutSeries Name="StatusSeries" XBindingPath="Key" YBindingPath="Value" EnableAnimation="True" ShowTooltip="True">
+                        <syncfusion:DoughnutSeries.AdornmentsInfo>
+                            <syncfusion:ChartAdornmentInfo ShowLabel="True" SegmentLabelContent="Percentage" />
+                        </syncfusion:DoughnutSeries.AdornmentsInfo>
+                    </syncfusion:DoughnutSeries>
+                </syncfusion:SfChart>
+            </TabItem>
+            <TabItem Header="Raw Data">
+                <DataGrid Name="StatsDataGrid" AutoGenerateColumns="False" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
+                        <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="*" />
+                        <DataGridTextColumn Header="Percentage" Binding="{Binding Percentage, StringFormat=\{0:P1\}}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+        <!-- Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button Content="Export Data" Name="ExportButton" Width="100" Height="30" Margin="0,0,10,0" Click="ExportButton_Click" />
+            <Button Content="Close" Name="CloseButton" IsCancel="True" Width="100" Height="30" />
+        </StackPanel>
+    </Grid>
+</Window>

@@ -462,6 +462,8 @@
     <!-- Text Resources -->
     <SolidColorBrush x:Key="TextPrimary" Color="{StaticResource BusBuddy.Text.Primary}"/>
     <SolidColorBrush x:Key="ContentForeground" Color="{StaticResource BusBuddy.Text.Primary}"/>
+    <SolidColorBrush x:Key="TextForeground" Color="{StaticResource BusBuddy.Text.Primary}"/>
+    <SolidColorBrush x:Key="ControlForeground" Color="{StaticResource BusBuddy.Text.Primary}"/>
 
     <!-- Professional Surface Colors -->
     <SolidColorBrush x:Key="ProfessionalSurfaceDark" Color="{StaticResource BusBuddy.Surface.Dark}"/>
@@ -619,6 +621,7 @@
         <Setter Property="Height" Value="20"/>
     </Style>
     <Style x:Key="LoadingIndicatorStyle" TargetType="syncfusion:SfBusyIndicator" BasedOn="{StaticResource BusBuddy.SfBusyIndicator}"/>
+    <Style x:Key="CircularProgressStyle" TargetType="syncfusion:SfCircularProgressBar" BasedOn="{StaticResource BusBuddy.SfCircularProgressBar}"/>
 
     <!-- Statistics and Data Display Styles -->
     <Style x:Key="StatCardStyle" TargetType="Border">

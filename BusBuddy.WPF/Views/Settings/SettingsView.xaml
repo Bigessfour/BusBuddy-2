@@ -12,7 +12,7 @@
 ║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
 ║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
 ║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
 ║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
 ║                                                                                                                                                                          ║
 ║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
@@ -38,7 +38,7 @@
              xmlns:buttons="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="600"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
 
     <!-- No local resources - ThemeTextConverter is now global in App.xaml -->
 
@@ -66,7 +66,7 @@
                          VerticalAlignment="Center"
                          FontSize="12"
                          Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                         />
             </StackPanel>
         </StackPanel>
 
@@ -83,7 +83,7 @@
                                    Width="250"
                                    HorizontalAlignment="Left"
                                    Style="{StaticResource BusBuddyComboBoxAdvStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                   />
         </StackPanel>
 
         <!-- Notification Settings -->
@@ -99,7 +99,7 @@
                                    Width="250"
                                    HorizontalAlignment="Left"
                                    Style="{StaticResource BusBuddyComboBoxAdvStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                   />
         </StackPanel>
 
         <!-- Action Buttons -->
@@ -109,21 +109,22 @@
                     Width="150" Height="35"
                     Margin="0,0,12,0"
                     Style="{StaticResource BusBuddyInfoButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    />
             <syncfusion:ButtonAdv Label="Save Settings"
                     Command="{Binding SaveSettingsCommand}"
                     Width="120" Height="35"
                     Margin="0,0,12,0"
                     Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    />
             <syncfusion:ButtonAdv Label="Reset Settings"
                     Command="{Binding ResetSettingsCommand}"
                     Width="120" Height="35"
                     Style="{StaticResource BusBuddyDangerButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                    />
         </StackPanel>
     </Grid>
 </UserControl>
+
 
 
 

@@ -97,7 +97,7 @@ public partial class App : Application
         // Note: Serilog is not yet initialized here, so using Debug.WriteLine for theme setup logging
         System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Starting Syncfusion theme configuration");
 
-        // Configure SfSkinManager for global theme application
+        // Configure SfSkinManager for global theme application with enhanced priority control
         try
         {
             System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ApplyStylesOnApplication = true");
@@ -106,7 +106,15 @@ public partial class App : Application
             System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ApplyThemeAsDefaultStyle = true");
             SfSkinManager.ApplyThemeAsDefaultStyle = true;
 
-            System.Diagnostics.Debug.WriteLine("✅ [APP CONSTRUCTOR] SfSkinManager configuration completed successfully");
+            // Set the theme using the recommended FluentTheme approach
+            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting theme using FluentTheme");
+            SfSkinManager.SetTheme(this, new FluentTheme("FluentDark") { ShowAcrylicBackground = true });
+
+            // Ensure ThemeName is set to FluentDark for consistent application
+            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ThemeName = FluentDark");
+            SfSkinManager.ThemeName = "FluentDark";
+
+            System.Diagnostics.Debug.WriteLine("✅ [APP CONSTRUCTOR] Enhanced SfSkinManager configuration completed successfully");
         }
         catch (Exception sfManagerEx)
         {
@@ -138,28 +146,28 @@ public partial class App : Application
             System.Diagnostics.Debug.WriteLine($"🎨 [APP CONSTRUCTOR] Theme detection exception details: {themeDetectionEx}");
         }
 
-        System.Diagnostics.Debug.WriteLine($"🎨 [APP CONSTRUCTOR] Applying theme: {preferredTheme}");
+        Log.Information($"🎨 [APP CONSTRUCTOR] Applying theme: {preferredTheme}");
         try
         {
-            // 🎯 APPLY PREFERRED THEME: Based on system preference or default
-            SfSkinManager.ApplicationTheme = new Theme(preferredTheme);
-            System.Diagnostics.Debug.WriteLine($"✅ [APP CONSTRUCTOR] THEME: {preferredTheme} applied successfully as primary theme");
+            // 🎯 APPLY PREFERRED THEME: Based on system preference or default using FluentTheme
+            SfSkinManager.SetTheme(this, new FluentTheme(preferredTheme) { ShowAcrylicBackground = true });
+            Log.Information($"✅ [APP CONSTRUCTOR] THEME: {preferredTheme} applied successfully as primary theme");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"⚠️ [APP CONSTRUCTOR] THEME: {preferredTheme} failed, applying FluentLight fallback: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"⚠️ [APP CONSTRUCTOR] Primary theme exception details: {ex}");
+            Log.Information($"⚠️ [APP CONSTRUCTOR] THEME: {preferredTheme} failed, applying FluentLight fallback: {ex.Message}");
+            Log.Information($"⚠️ [APP CONSTRUCTOR] Primary theme exception details: {ex}");
 
             try
             {
                 // 🔄 FALLBACK THEME: FluentLight (Clean light theme)
-                SfSkinManager.ApplicationTheme = new Theme("FluentLight");
-                System.Diagnostics.Debug.WriteLine("✅ [APP CONSTRUCTOR] THEME: FluentLight applied successfully as fallback theme");
+                SfSkinManager.SetTheme(this, new FluentTheme("FluentLight"));
+                Log.Information("✅ [APP CONSTRUCTOR] THEME: FluentLight applied successfully as fallback theme");
             }
             catch (Exception fallbackEx)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] THEME: Both primary and FluentLight failed: {fallbackEx.Message}");
-                System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] Fallback theme exception details: {fallbackEx}");
+                Log.Information($"❌ [APP CONSTRUCTOR] THEME: Both primary and FluentLight failed: {fallbackEx.Message}");
+                Log.Information($"❌ [APP CONSTRUCTOR] Fallback theme exception details: {fallbackEx}");
             }
         }
 
@@ -339,13 +347,94 @@ public partial class App : Application
 
         try
         {
-            // Note: Serilog may not be fully initialized yet, so we'll add logging after host startup
+            // Enhanced startup logging with try-catch for theme validation
             System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] OnStartup method entered at {DateTime.Now:O}");
             System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] Command line arguments count: {e.Args.Length}");
 
             if (e.Args.Length > 0)
             {
                 System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] Arguments: {string.Join(", ", e.Args)}");
+            }
+
+            // Enhanced theme setup with improved validation and priority
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Starting enhanced theme validation");
+
+                // Validate SfSkinManager configuration
+                var currentTheme = SfSkinManager.ApplicationTheme;
+                var stylesOnApp = SfSkinManager.ApplyStylesOnApplication;
+                var themeAsDefault = SfSkinManager.ApplyThemeAsDefaultStyle;
+                var themeName = SfSkinManager.ThemeName;
+
+                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] Current theme: {currentTheme?.ToString() ?? "NULL"}");
+                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] ThemeName: {themeName ?? "NULL"}");
+                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] ApplyStylesOnApplication: {stylesOnApp}");
+                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] ApplyThemeAsDefaultStyle: {themeAsDefault}");
+
+                // PRIORITY 1: Force enhanced theme settings BEFORE base.OnStartup for maximum propagation
+                SfSkinManager.ApplyStylesOnApplication = true;
+                SfSkinManager.ApplyThemeAsDefaultStyle = true;
+                SfSkinManager.ThemeName = "FluentDark";
+
+                // PRIORITY 2: Apply theme explicitly at the application level using FluentTheme (recommended approach)
+                SfSkinManager.SetTheme(this, new FluentTheme("FluentDark") { ShowAcrylicBackground = true });
+
+                // Now run base.OnStartup after comprehensive theme configuration
+                base.OnStartup(e);
+
+                // Verify theme is properly set
+                if (currentTheme == null || themeName != "FluentDark")
+                {
+                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Reinforcing FluentDark theme application");
+                    SfSkinManager.SetTheme(this, new FluentTheme("FluentDark") { ShowAcrylicBackground = true });
+                }
+
+                // Validate critical resources exist and add if missing
+                if (!Application.Current.Resources.Contains("ContentForeground"))
+                {
+                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Adding missing ContentForeground resource");
+                    Application.Current.Resources["ContentForeground"] = new SolidColorBrush(Colors.White);
+                }
+
+                if (!Application.Current.Resources.Contains("SurfaceBackground"))
+                {
+                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Adding missing SurfaceBackground resource");
+                    Application.Current.Resources["SurfaceBackground"] = new SolidColorBrush(Color.FromRgb(31, 31, 31));
+                }
+
+                if (!Application.Current.Resources.Contains("SurfaceBorderBrush"))
+                {
+                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Adding missing SurfaceBorderBrush resource");
+                    Application.Current.Resources["SurfaceBorderBrush"] = new SolidColorBrush(Color.FromRgb(51, 51, 51));
+                }
+
+                // Verify theme application after everything is initialized
+                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] Final theme verification - ThemeName: {SfSkinManager.ThemeName}, ApplicationTheme: {SfSkinManager.ApplicationTheme?.ToString() ?? "NULL"}");
+                System.Diagnostics.Debug.WriteLine("✅ [ONSTARTUP] Enhanced theme validation completed");
+            }
+            catch (Exception themeEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ [ONSTARTUP] Theme validation failed: {themeEx.Message}");
+
+                // Fallback theme setup
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("🔄 [ONSTARTUP] Applying fallback theme setup");
+                    SfSkinManager.ApplyStylesOnApplication = true;
+                    SfSkinManager.ApplyThemeAsDefaultStyle = true;
+                    SfSkinManager.ThemeName = "FluentLight";
+                    SfSkinManager.ApplicationTheme = new Theme("FluentLight");
+
+                    // Apply theme explicitly at the application level
+                    SfSkinManager.SetTheme(this, new Theme("FluentLight"));
+
+                    System.Diagnostics.Debug.WriteLine("✅ [ONSTARTUP] Fallback theme applied successfully");
+                }
+                catch (Exception fallbackEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"❌ [ONSTARTUP] Fallback theme failed: {fallbackEx.Message}");
+                }
             }
             // Handle command line arguments for debug functionality
             if (e.Args.Length > 0)

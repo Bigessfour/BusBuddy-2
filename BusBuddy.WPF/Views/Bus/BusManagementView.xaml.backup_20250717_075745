@@ -1,0 +1,226 @@
+<UserControl x:Class="BusBuddy.WPF.Views.Bus.BusManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance viewModels:BusManagementViewModel}">
+    <!-- Local resources removed - all converters now global in App.xaml -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Style="{StaticResource BusBuddyFormHeaderStyle}">
+            <TextBlock Text="🚌 Bus Management"
+                       Style="{StaticResource BusBuddyTileHeaderStyle}"/>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Row="1" Style="{StaticResource BusBuddyFormContentStyle}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Main Grid -->
+            <syncfusion:SfDataGrid Grid.Row="0"
+                           ItemsSource="{Binding Buses}"
+                           SelectedItem="{Binding SelectedBus, Mode=TwoWay}"
+                           Style="{StaticResource BusBuddySfDataGridStyle}"AutoGenerateColumns="False"
+                           AllowResizingColumns="True"
+                           AllowSorting="True"
+                           AllowFiltering="True"
+                           ColumnSizer="Star"
+                           SelectionMode="Single"
+                           SelectionUnit="Row"
+                           NavigationMode="Row"
+                           AllowEditing="False"
+                           ShowRowHeader="True"
+                           EnableDataVirtualization="True"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           RowHeight="40"
+                           HeaderRowHeight="45"
+                           SelectionChanged="DataGrid_SelectionChanged">
+            <syncfusion:SfDataGrid.Columns>
+                <syncfusion:GridTextColumn MappingName="BusNumber" HeaderText="Bus Number" Width="120" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+                <syncfusion:GridTextColumn MappingName="Year" HeaderText="Year" Width="80" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+                <syncfusion:GridTextColumn MappingName="Make" HeaderText="Make" Width="120" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+                <syncfusion:GridTextColumn MappingName="Model" HeaderText="Model" Width="120" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+                <syncfusion:GridTextColumn MappingName="SeatingCapacity" HeaderText="Capacity" Width="80" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+                <syncfusion:GridTextColumn MappingName="Status" HeaderText="Status" Width="100" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+                <syncfusion:GridDateTimeColumn MappingName="DateLastInspection" HeaderText="Last Inspection" Width="140"
+                                       Pattern="ShortDate" AllowSorting="True">
+                    <syncfusion:GridDateTimeColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridDateTimeColumn.HeaderStyle>
+                </syncfusion:GridDateTimeColumn>
+                <syncfusion:GridTextColumn MappingName="InspectionStatus" HeaderText="Inspection Status" Width="120" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+                <syncfusion:GridTextColumn MappingName="CurrentOdometer" HeaderText="Odometer" Width="100" AllowSorting="True">
+                    <syncfusion:GridTextColumn.HeaderStyle>
+                        <Style TargetType="syncfusion:GridHeaderCellControl">
+                            <EventSetter Event="MouseLeftButtonUp" Handler="OnHeaderClick"/>
+                        </Style>
+                    </syncfusion:GridTextColumn.HeaderStyle>
+                </syncfusion:GridTextColumn>
+            </syncfusion:SfDataGrid.Columns>
+        </syncfusion:SfDataGrid>
+
+        <!-- Pagination Controls -->
+        <Grid Grid.Row="2" Margin="0,10,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Records Info -->
+            <TextBlock Grid.Column="0" VerticalAlignment="Center" Foreground="{DynamicResource SecondaryForeground}">
+                <Run Text="Showing "/>
+                <Run Text="{Binding Buses.Count, Mode=OneWay}" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
+                <Run Text=" of "/>
+                <Run Text="{Binding TotalRecords, Mode=OneWay}" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
+                <Run Text=" records"/>
+            </TextBlock>
+
+            <!-- Page Navigation -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <syncfusion:ButtonAdv Command="{Binding FirstPageCommand}"
+                        Label="&#xE892;"
+                        FontFamily="Segoe MDL2 Assets"
+                        Width="40" Height="30"
+                        Margin="2,0"
+                        Style="{StaticResource BusBuddyIconButtonStyle}"
+                        ToolTip="First Page"/>
+                <syncfusion:ButtonAdv Command="{Binding PreviousPageCommand}"
+                        Label="&#xE76B;"
+                        FontFamily="Segoe MDL2 Assets"
+                        Width="40" Height="30"
+                        Margin="2,0"
+                        Style="{StaticResource BusBuddyIconButtonStyle}"
+                        ToolTip="Previous Page"/>
+
+                <!-- Page Number Display -->
+                <Border BorderBrush="{DynamicResource ContentBorder}"
+                        BorderThickness="1"
+                        Background="{DynamicResource SurfaceBackground}"
+                        Margin="5,0"
+                        Padding="8,0"
+                        VerticalAlignment="Center"
+                        CornerRadius="3">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Page " VerticalAlignment="Center" Foreground="{DynamicResource SecondaryForeground}"/>
+                        <TextBlock Text="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Center" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
+                        <TextBlock Text=" of " VerticalAlignment="Center" Foreground="{DynamicResource SecondaryForeground}"/>
+                        <TextBlock Text="{Binding TotalPages, Mode=OneWay}" VerticalAlignment="Center" Foreground="{DynamicResource ContentForeground}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+
+                <syncfusion:ButtonAdv Command="{Binding NextPageCommand}"
+                        Label="&#xE76C;"
+                        FontFamily="Segoe MDL2 Assets"
+                        Width="40" Height="30"
+                        Margin="2,0"
+                        Style="{StaticResource BusBuddyIconButtonStyle}"
+                        ToolTip="Next Page"/>
+                <syncfusion:ButtonAdv Command="{Binding LastPageCommand}"
+                        Label="&#xE893;"
+                        FontFamily="Segoe MDL2 Assets"
+                        Width="40" Height="30"
+                        Margin="2,0"
+                        Style="{StaticResource BusBuddyIconButtonStyle}"
+                        ToolTip="Last Page"/>
+
+                <!-- Page Size Selector -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                    <TextBlock Text="Show " VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{DynamicResource SecondaryForeground}"/>
+                    <syncfusion:ComboBoxAdv Width="65" Height="30"
+                              SelectedValue="{Binding PageSize, Mode=TwoWay}"
+                              Style="{StaticResource BusBuddyComboBoxAdvStyle}"SelectionChanged="PageSize_SelectionChanged">
+                        <syncfusion:ComboBoxItemAdv Content="10"/>
+                        <syncfusion:ComboBoxItemAdv Content="20"/>
+                        <syncfusion:ComboBoxItemAdv Content="50"/>
+                        <syncfusion:ComboBoxItemAdv Content="100"/>
+                    </syncfusion:ComboBoxAdv>
+                    <TextBlock Text="per page" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource SecondaryForeground}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+            <!-- Action Buttons Panel -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <syncfusion:ButtonAdv Label="➕ Add New Bus"
+                                Command="{Binding AddBusCommand}"
+                                Margin="5"
+                                Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"ToolTip="Add a new bus to the fleet"/>
+                <syncfusion:ButtonAdv Label="✏️ Edit Selected"
+                                Command="{Binding UpdateBusCommand}"
+                                Margin="5"
+                                Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"ToolTip="Edit the currently selected bus"/>
+                <syncfusion:ButtonAdv Label="🗑️ Delete"
+                                Command="{Binding DeleteBusCommand}"
+                                Margin="5"
+                                Style="{StaticResource BusBuddyButtonAdvStyle}"ToolTip="Delete the currently selected bus"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Loading Indicator -->
+        <syncfusion:SfBusyIndicator Grid.Row="0" Grid.RowSpan="2"
+                                    IsBusy="{Binding IsBusy}"
+                                    Style="{StaticResource BusBuddySfBusyIndicatorStyle}"AnimationType="DoubleCircle"
+                                    Background="Transparent"/>
+    </Grid>
+</UserControl>
+

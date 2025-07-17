@@ -95,10 +95,160 @@ This project is built **exclusively with WPF** to provide:
 - **SQL Server** - Enterprise database backend with WPF-optimized data access patterns
 - **Advanced MVVM Pattern** - Model-View-ViewModel architecture pattern specifically for WPF with INotifyPropertyChanged
 - **🎉 Serilog Structured Logging** - **100% complete migration** with enrichment, performance monitoring, and contextual error tracking
+- **🔥 PowerShell Core 7.5.2 Integration** - **Advanced development environment** with debug helper integration, workflow automation, and VS Code Task Explorer
 - **Microsoft Extensions** - Dependency Injection, Configuration management optimized for WPF applications
 - **XAML** - Declarative markup for rich WPF user interfaces with professional styling and theming
 - **Modern C# 12/.NET 8 Features** - Latest language features integrated with WPF development patterns
 - **Theme Management Service** - Dynamic theme switching between FluentDark and FluentLight with automatic fallback support
+
+## PowerShell Development Environment Integration (🆕 July 17, 2025)
+
+### **🔥 Advanced PowerShell Integration with Debug Helper Methods**
+
+Bus Buddy now includes a comprehensive PowerShell development environment that integrates directly with the application's debug helper methods from `App.xaml.cs`. This provides a seamless development workflow combining PowerShell automation, VS Code integration, and real-time debug monitoring.
+
+#### **Core PowerShell Features:**
+- **PowerShell Core 7.5.2** optimized for Bus Buddy development
+- **VS Code `code` command** with robust path detection and automatic fallback
+- **Task Explorer** configured as the exclusive task management interface
+- **Debug Helper integration** directly accessing `BusBuddy.WPF.Utilities.DebugHelper` methods
+- **Advanced workflow automation** for complete development session management
+
+#### **PowerShell Integration Files:**
+- **`BusBuddy-PowerShell-Profile.ps1`** - Core development functions and VS Code integration
+- **`BusBuddy-Advanced-Workflows.ps1`** - Advanced automation workflows and diagnostics
+- **`.vscode/settings.json`** - VS Code configuration with PowerShell terminal profiles
+
+#### **Available PowerShell Commands:**
+
+##### **VS Code Integration:**
+```powershell
+# Multiple aliases for VS Code operations
+code, vs, vscode, edit, edit-file    # Open files/folders in VS Code
+```
+
+##### **Bus Buddy Development:**
+```powershell
+bb-open          # Open Bus Buddy workspace in VS Code
+bb-build         # Build Bus Buddy solution with error reporting
+bb-run           # Run Bus Buddy WPF application
+```
+
+##### **Debug Helper Integration:**
+```powershell
+bb-debug-start   # Start debug filter (calls DebugHelper.StartAutoFilter())
+bb-debug-stream  # Start real-time debug streaming
+bb-debug-export  # Export debug issues to JSON for analysis
+bb-debug-test    # Test debug filter functionality
+bb-debug-recent  # Show recent streaming entries
+bb-health        # Run debug system health check
+bb-debug-run     # Build and run with debug filter enabled
+```
+
+##### **Advanced Workflow Automation:**
+```powershell
+bb-dev-session   # Complete development session startup
+bb-quick-test    # Automated clean, build, test cycle
+bb-diagnostic    # Comprehensive system diagnostics
+bb-report        # Export project report with debug data
+bb-watch-logs    # Real-time log file monitoring
+```
+
+#### **Debug System Integration:**
+
+The PowerShell environment provides direct access to Bus Buddy's debug helper methods:
+
+- **Real-time Streaming**: Integrates with `DebugOutputFilter.StartRealTimeStreaming()`
+- **Actionable Error Filtering**: Uses `DebugOutputFilter.GetActionableItemsAsync()`
+- **Health Monitoring**: Accesses `DebugHelper.HasCriticalIssues()` for system health
+- **JSON Export**: Exports debug data via `DebugHelper.ExportToJson()` for VS Code integration
+- **Performance Monitoring**: Leverages `StartupPerformanceMonitor` for development insights
+
+#### **VS Code Task Explorer Integration:**
+
+Task Explorer is configured as the **exclusive** task management interface:
+- **PowerShell profiles** automatically load on terminal startup
+- **Task definitions** integrate with PowerShell commands
+- **Keyboard shortcuts** for rapid task execution
+- **Background process management** for long-running debug operations
+
+#### **Quick Start:**
+
+1. **Load PowerShell Environment:**
+   ```powershell
+   # Load core profile
+   . ".\BusBuddy-PowerShell-Profile.ps1"
+
+   # Load advanced workflows
+   . ".\BusBuddy-Advanced-Workflows.ps1"
+   ```
+
+2. **Start Development Session:**
+   ```powershell
+   bb-dev-session  # Opens VS Code, builds solution, starts debug monitoring
+   ```
+
+3. **Run Quick Test Cycle:**
+   ```powershell
+   bb-quick-test   # Clean, build, test, validate
+   ```
+
+4. **View Available Commands:**
+   ```powershell
+   Show-TaskExplorerHelp  # Display all available commands
+   ```
+
+#### **Advanced Workflow Examples:**
+
+##### **Complete Development Session:**
+```powershell
+# Automated development environment setup
+bb-dev-session
+# → Opens workspace in VS Code
+# → Builds solution with error checking
+# → Runs health diagnostics
+# → Starts background debug monitoring
+```
+
+##### **Debug Monitoring:**
+```powershell
+# Start real-time debug streaming
+bb-debug-stream
+
+# Export debug data for analysis
+bb-debug-export "analysis-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+
+# Check system health
+bb-health
+```
+
+##### **Comprehensive Diagnostics:**
+```powershell
+# Run full system diagnostic
+bb-diagnostic
+# → Checks workspace structure
+# → Validates .NET environment
+# → Tests VS Code integration
+# → Runs build capability test
+# → Provides actionable recommendations
+```
+
+#### **Integration Benefits:**
+
+- **🔍 Real-time Debug Monitoring**: Live access to application debug streams
+- **⚡ Automated Workflows**: One-command development session setup
+- **🎯 Task Explorer Integration**: Seamless VS Code task management
+- **📊 Comprehensive Diagnostics**: Full development environment validation
+- **🚀 Performance Optimized**: Background processes and efficient resource usage
+- **🔧 Extensible Architecture**: Easy to add new commands and workflows
+
+#### **Development Environment Requirements:**
+- **PowerShell Core 7.5.2+** (recommended for optimal performance)
+- **VS Code** with Task Explorer extension
+- **Task Explorer Extension** for exclusive task management
+- **XAML Styler Extension** (optional, for WPF development)
+
+This PowerShell integration transforms Bus Buddy development into a streamlined, automated experience with direct access to the application's debug capabilities and comprehensive workflow automation.
 
 ## Getting Started
 
@@ -132,7 +282,19 @@ This project is built **exclusively with WPF** to provide:
    - **Syncfusion.Pdf.NET**: Enterprise-grade PDF generation for activity reports
    - **Automated Reporting**: System generates professional PDF reports with proper formatting
    - **Fallback Support**: Graceful error handling with alternative report formats
-7. Run database migrations:
+7. **PowerShell Development Environment Setup:**
+   - **PowerShell Core 7.5.2+**: Install for optimal development experience
+   - **Load Development Profiles**:
+     ```powershell
+     # Load core development functions
+     . ".\BusBuddy-PowerShell-Profile.ps1"
+
+     # Load advanced workflows
+     . ".\BusBuddy-Advanced-Workflows.ps1"
+     ```
+   - **VS Code Extensions**: Install Task Explorer for exclusive task management
+   - **Verify Integration**: Run `Show-TaskExplorerHelp` to see available commands
+8. Run database migrations:
    ```bash
    dotnet ef database update
    ```
@@ -152,13 +314,17 @@ Bus Buddy/
 │   ├── ViewModels/        # MVVM ViewModels with INotifyPropertyChanged
 │   ├── Controls/          # Custom WPF UserControls
 │   ├── Converters/        # WPF Value Converters for data binding
+│   ├── Utilities/         # Debug helpers and development utilities
 │   └── Resources/         # WPF Resources (Styles, Templates, Images)
 ├── BusBuddy.Core/         # Core business logic and services
 ├── Data/                  # Entity Framework DbContext and configurations
 ├── Models/                # Entity Framework entity models
 ├── Services/              # Business Logic Layer and data services
 ├── Migrations/            # EF Core database migrations
-└── Configuration/         # Application settings and configuration
+├── Configuration/         # Application settings and configuration
+├── .vscode/               # VS Code configuration and Task Explorer settings
+├── BusBuddy-PowerShell-Profile.ps1      # Core PowerShell development functions
+└── BusBuddy-Advanced-Workflows.ps1      # Advanced automation workflows
 ```
 
 ### Key Design Patterns
@@ -267,6 +433,26 @@ Theme settings are managed through `appsettings.json`:
 
 ## Usage
 
+### PowerShell Development Workflow
+1. **Start Development Session:**
+   ```powershell
+   bb-dev-session  # Opens VS Code, builds solution, starts debug monitoring
+   ```
+2. **Quick Development Cycle:**
+   ```powershell
+   bb-quick-test   # Clean, build, test, validate in automated sequence
+   ```
+3. **Debug Monitoring:**
+   ```powershell
+   bb-debug-start   # Start real-time debug filter
+   bb-health        # Check system health
+   bb-debug-export  # Export debug data for analysis
+   ```
+4. **View Available Commands:**
+   ```powershell
+   Show-TaskExplorerHelp  # Display all PowerShell integration commands
+   ```
+
 ### Bus Management
 1. Navigate to Bus Management from the dashboard
 2. View all buses in the fleet
@@ -369,9 +555,11 @@ For questions or support, please refer to the development documentation in `DEVE
 
 ---
 
-**Status**: ✅ **PRODUCTION READY - 100% COMPLETE** (July 16, 2025) - Pure WPF application with all 12 core modules implemented, professional PDF reporting system, and **100% Serilog migration completed July 15, 2025**. This enterprise-grade school bus management system is fully modernized with zero legacy dependencies and comprehensive structured logging infrastructure.
+**Status**: ✅ **PRODUCTION READY - 100% COMPLETE** (July 17, 2025) - Pure WPF application with all 12 core modules implemented, professional PDF reporting system, **100% Serilog migration completed July 15, 2025**, and **🔥 Advanced PowerShell Development Environment Integration completed July 17, 2025**. This enterprise-grade school bus management system is fully modernized with zero legacy dependencies, comprehensive structured logging infrastructure, and seamless PowerShell workflow automation.
 
 **Architecture Commitment**: This project maintains a 100% pure WPF architecture with no Windows Forms, WinForms, or legacy UI framework dependencies. All UI components use Syncfusion's professional WPF controls with FluentDark theming for a consistent, modern desktop experience.
+
+**Development Environment**: Complete PowerShell Core 7.5.2 integration provides automated workflows, debug helper method access, VS Code Task Explorer integration, and comprehensive development diagnostics for an optimal developer experience.
 
 **Logging Infrastructure**: Complete Serilog migration provides structured logging, performance monitoring, and enhanced error tracking across all 59 application files for superior debugging and monitoring capabilities.
 

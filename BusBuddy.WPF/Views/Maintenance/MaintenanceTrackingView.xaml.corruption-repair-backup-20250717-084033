@@ -1,0 +1,542 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                                                                                                          ║
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+║                                                                                                                                                                          ║
+║  📋 REQUIRED STANDARDS: This child form MUST follow the universal standards defined in:                                                                                ║
+║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
+║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
+║                                                                                                                                                                          ║
+║  🔧 MANDATORY IMPLEMENTATIONS:                                                                                                                                          ║
+║     ✅ UserControl Style: BusBuddyUserControlStyle                                                                                                                     ║
+║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
+║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
+║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
+║     ✅ Theme Application:on ALL Syncfusion controls                                                           ║
+║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
+║                                                                                                                                                                          ║
+║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
+║     • NEVER use standard WPF Button - use syncfusion:ButtonAdv                                                                                                        ║
+║     • NEVER use Content property on ButtonAdv - use Label property                                                                                                    ║
+║     • NEVER use "sf:" namespace prefix - use "syncfusion:" prefix                                                                                                     ║
+║     • ALWAYS apply FluentDark theme to maintain visual consistency                                                                                                     ║
+║     • ALWAYS reference baseline styles for consistent appearance                                                                                                       ║
+║                                                                                                                                                                          ║
+║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+║                                                                                                                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<UserControl x:Class="BusBuddy.WPF.Views.Maintenance.MaintenanceTrackingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;a ssembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:c hart="clr-namespace:Syncfusion.UI.Xaml.Charts;a ssembly=Syncfusion.SfChart.WPF"
+             xmlns:g auge="clr-namespace:Syncfusion.UI.Xaml.Gauges;a ssembly=Syncfusion.SfGauge.WPF"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             mc:I gnorable="d"
+             d:D esignHeight="800" d:D esignWidth="1200"
+             d:D ataContext="{d:DesignInstance viewModels:MaintenanceTrackingViewModel}" Loaded="UserControl_Loaded"
+             U nloaded="UserControl_Unloaded">
+    <UserControl.Resources>
+        <!-- BooleanToVisibilityConverter is now global in App.xaml -->
+        <!-- Use FluentDark theme brushes instead of hardcoded colors -->
+        <SolidColorBrush x:K ey="HighPriorityBrush" C olor="{StaticResource ErrorColor}"/>
+        <SolidColorBrush x:K ey="MediumPriorityBrush" C olor="{StaticResource WarningColor}"/>
+        <SolidColorBrush x:K ey="LowPriorityBrush" C olor="{StaticResource SuccessColor}"/>
+        <SolidColorBrush x:K ey="PendingStatusBrush" C olor="{StaticResource WarningColor}"/>
+        <SolidColorBrush x:K ey="CompletedStatusBrush" C olor="{StaticResource SuccessColor}"/>
+        <SolidColorBrush x:K ey="OverdueStatusBrush" C olor="{StaticResource ErrorColor}"/>
+    </UserControl.Resources>
+
+    <!-- Enhanced Maintenance Tracking with Syncfusion DockingManager -->
+    <syncfusion:DockingManager U seDocumentContainer="True"
+                              P ersistState="False"
+                              C ontainerMode="TDI"
+                              S tyle="{StaticResource BusBuddyDockingManagerStyle}" Background="{StaticResource ContentBackground}">
+
+        <!-- Maintenance Overview (Document) -->
+        <ContentControl syncfusion:DockingManager.H eader="Maintenance Overview"
+                       syncfusion:DockingManager.S tate="Document"
+                       syncfusion:DockingManager.C anSerialize="True">
+            <Grid M argin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Enhanced Header -->
+                <DockPanel Grid.R ow="0" M argin="0,0,0,20">
+                    <TextBlock T ext="🔧 Maintenance Tracking"
+                              S tyle="{StaticResource BusBuddyTileHeaderStyle}"
+                              DockPanel.D ock="Left"/>
+                    <StackPanel O rientation="Horizontal" DockPanel.D ock="Right">
+                        <syncfusion:ButtonAdv x:N ame="AddMaintenanceButton"
+                                            L abel="➕ New Maintenance"
+                                            C ommand="{Binding AddCommand}"
+                                            S tyle="{StaticResource BusBuddyPrimaryButtonAdvStyle}" Margin="5"
+                                            C lick="AddMaintenanceButton_Click"/>
+                        <syncfusion:ButtonAdv x:N ame="GenerateReportButton"
+                                            L abel="📊 Generate Report"
+                                            C ommand="{Binding ReportCommand}"
+                                            S tyle="{StaticResource BusBuddySecondaryButtonAdvStyle}" Margin="5"
+                                            C lick="GenerateReportButton_Click"/>
+                        <syncfusion:ButtonAdv x:N ame="RefreshMaintenanceButton"
+                                            L abel="🔄 Refresh"
+                                            S tyle="{StaticResource BusBuddySecondaryButtonAdvStyle}" Margin="5"
+                                            C lick="RefreshMaintenanceButton_Click"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- Enhanced Maintenance Metrics Dashboard -->
+                <UniformGrid Grid.R ow="1" C olumns="4" M argin="0,0,0,20">
+                    <!-- Pending Maintenance Tile -->
+                    <Border x:N ame="PendingMaintenanceTile"
+                           S tyle="{StaticResource BusBuddyDashboardTileStyle}"
+                           M ouseLeftButtonDown="MaintenanceTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock T ext="⏳ Pending" F ontSize="14" F ontWeight="SemiBold"
+                                          F oreground="{StaticResource WarningBrush}" DockPanel.D ock="Left"/>
+                                <Ellipse W idth="10" H eight="10" F ill="{StaticResource WarningBrush}" DockPanel.D ock="Right"
+                                        V erticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock T ext="{Binding PendingMaintenanceCount}"
+                                      F ontSize="28" F ontWeight="Bold"
+                                      F oreground="{StaticResource WarningBrush}"
+                                      H orizontalAlignment="Center"
+                                      M argin="0,10,0,5"/>
+                            <TextBlock T ext="Items" F ontSize="12"
+                                      F oreground="{StaticResource SecondaryForeground}"
+                                      H orizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Overdue Maintenance Tile -->
+                    <Border x:N ame="OverdueMaintenanceTile"
+                           S tyle="{StaticResource BusBuddyDashboardTileStyle}"
+                           M ouseLeftButtonDown="MaintenanceTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock T ext="🚨 Overdue" F ontSize="14" F ontWeight="SemiBold"
+                                          F oreground="{StaticResource ErrorBrush}" DockPanel.D ock="Left"/>
+                                <Ellipse W idth="10" H eight="10" F ill="{StaticResource ErrorBrush}" DockPanel.D ock="Right"
+                                        V erticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock T ext="{Binding OverdueMaintenanceCount}"
+                                      F ontSize="28" F ontWeight="Bold"
+                                      F oreground="{StaticResource ErrorBrush}"
+                                      H orizontalAlignment="Center"
+                                      M argin="0,10,0,5"/>
+                            <TextBlock T ext="Critical" F ontSize="12"
+                                      F oreground="{StaticResource SecondaryForeground}"
+                                      H orizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Completed This Month Tile -->
+                    <Border x:N ame="CompletedMaintenanceTile"
+                           S tyle="{StaticResource BusBuddyDashboardTileStyle}"
+                           M ouseLeftButtonDown="MaintenanceTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock T ext="✅ Completed" F ontSize="14" F ontWeight="SemiBold"
+                                          F oreground="{StaticResource SuccessBrush}" DockPanel.D ock="Left"/>
+                                <Ellipse W idth="10" H eight="10" F ill="{StaticResource SuccessBrush}" DockPanel.D ock="Right"
+                                        V erticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock T ext="{Binding CompletedMaintenanceCount}"
+                                      F ontSize="28" F ontWeight="Bold"
+                                      F oreground="{StaticResource SuccessBrush}"
+                                      H orizontalAlignment="Center"
+                                      M argin="0,10,0,5"/>
+                            <TextBlock T ext="This Month" F ontSize="12"
+                                      F oreground="{StaticResource SecondaryForeground}"
+                                      H orizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Cost Analysis Tile with Gauge -->
+                    <Border x:N ame="CostAnalysisTile"
+                           S tyle="{StaticResource BusBuddyDashboardTileStyle}"
+                           M ouseLeftButtonDown="MaintenanceTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock T ext="💰 Monthly Cost" F ontSize="14" F ontWeight="SemiBold"
+                                          F oreground="{StaticResource AccentBrush}" DockPanel.D ock="Left"/>
+                                <Ellipse W idth="10" H eight="10" F ill="{StaticResource AccentBrush}" DockPanel.D ock="Right"
+                                        V erticalAlignment="Center"/>
+                            </DockPanel>
+                            <Grid M argin="0,5,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition W idth="*"/>
+                                    <ColumnDefinition W idth="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.C olumn="0">
+                                    <TextBlock T ext="{Binding MonthlyMaintenanceCost, S tringFormat='{}{0:C0}'}"
+                                              F ontSize="18" F ontWeight="Bold"
+                                              F oreground="{StaticResource AccentBrush}"/>
+                                    <TextBlock T ext="Budget Usage:" F ontSize="10"
+                                              F oreground="{StaticResource SecondaryForeground}" M argin="0,5,0,0"/>
+                                    <syncfusion:SfLinearProgressBar P rogress="{Binding BudgetUsagePercentage}"
+                                                                   H eight="8"
+                                                                   B ackground="{StaticResource ContentBackground}"
+                                                                   F oreground="{StaticResource AccentBrush}" Minimum="0" M aximum="100"/>
+                                </StackPanel>
+                                <gauge:SfCircularGauge Grid.C olumn="1" W idth="50" H eight="50" M argin="5,0,0,0">
+                                    <gauge:SfCircularGauge.Scales>
+                                        <gauge:CircularScale S tartAngle="135" S weepAngle="270"
+                                                           S tartValue="0" E ndValue="100"
+                                                           S howTicks="False" S howLabels="False"
+                                                           R imStroke="{StaticResource BorderBrush}" R imStrokeThickness="4">
+                                            <gauge:CircularScale.Pointers>
+                                                <gauge:CircularPointer N eedlePointerType="Triangle"
+                                                                     P ointerCapStroke="{StaticResource AccentBrush}"
+                                                                     N eedlePointerStroke="{StaticResource AccentBrush}"
+                                                                     V alue="{Binding BudgetUsagePercentage}"/>
+                                            </gauge:CircularScale.Pointers>
+                                            <gauge:CircularScale.Ranges>
+                                                <gauge:CircularRange S tartValue="0" E ndValue="100"
+                                                                   S troke="{StaticResource AccentBrush}" S trokeThickness="4"/>
+                                            </gauge:CircularScale.Ranges>
+                                        </gauge:CircularScale>
+                                    </gauge:SfCircularGauge.Scales>
+                                </gauge:SfCircularGauge>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Enhanced Main Maintenance Grid -->
+                <syncfusion:SfDataGrid x:N ame="MaintenanceGrid"
+                                      Grid.R ow="2"
+                                      I temsSource="{Binding MaintenanceRecords}"
+                                      S electedItem="{Binding SelectedRecord, M ode=TwoWay}"
+                                      S tyle="{StaticResource BusBuddySfDataGridStyle}" Background="{StaticResource ContentBackground}"
+                                      F oreground="{StaticResource PrimaryForeground}"
+                                      B orderBrush="{StaticResource BorderBrush}"
+                                      A utoGenerateColumns="False"
+                                      A llowResizingColumns="True"
+                                      A llowSorting="True"
+                                      A llowFiltering="True"
+                                      A llowGrouping="True"
+                                      S howGroupDropArea="True"
+                                      C olumnSizer="Star"
+                                      S electionMode="Single"
+                                      N avigationMode="Row"
+                                      A llowEditing="False"
+                                      S howRowHeader="False"
+                                      B orderThickness="1"
+                                      G ridLinesVisibility="Both"
+                                      S electionChanged="MaintenanceGrid_SelectionChanged"
+                                      C ellTapped="MaintenanceGrid_CellTapped">
+                    <syncfusion:SfDataGrid.Columns>
+                        <!-- Enhanced Bus Column with Visual Indicator -->
+                        <syncfusion:GridTemplateColumn M appingName="BusNumber" H eaderText="Bus" W idth="100">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border B ackground="{StaticResource ContentBackground}" C ornerRadius="4" P adding="6,3" M argin="2">
+                                        <StackPanel O rientation="Horizontal">
+                                            <TextBlock T ext="🚌" F ontSize="12" V erticalAlignment="Center" M argin="0,0,4,0"/>
+                                            <TextBlock T ext="{Binding BusNumber}"
+                                                      F ontWeight="SemiBold" F ontSize="11"
+                                                      F oreground="{StaticResource PrimaryForeground}" V erticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
+                        <!-- Maintenance Type with Icon -->
+                        <syncfusion:GridTemplateColumn M appingName="MaintenanceType" H eaderText="Type" W idth="140">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel O rientation="Horizontal">
+                                        <TextBlock T ext="🔧" F ontSize="12" V erticalAlignment="Center" M argin="0,0,4,0"/>
+                                        <TextBlock T ext="{Binding MaintenanceType}"
+                                                  F ontSize="11" V erticalAlignment="Center"
+                                                  F oreground="{StaticResource PrimaryForeground}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
+                        <!-- Enhanced Date Columns -->
+                        <syncfusion:GridDateTimeColumn M appingName="ScheduledDate" H eaderText="Scheduled" W idth="100"
+                                                      P attern="ShortDate"/>
+                        <syncfusion:GridDateTimeColumn M appingName="CompletedDate" H eaderText="Completed" W idth="100"
+                                                      P attern="ShortDate"/>
+
+                        <!-- Odometer Reading -->
+                        <syncfusion:GridNumericColumn M appingName="OdometerReading" H eaderText="Odometer" W idth="100"
+                                                     N umberGroupSeparator=","/>
+
+                        <!-- Priority with Visual Indicator -->
+                        <syncfusion:GridTemplateColumn M appingName="Priority" H eaderText="Priority" W idth="90">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border B ackground="{StaticResource WarningBrush}"
+                                           C ornerRadius="3" P adding="6,2" M argin="1">
+                                        <TextBlock T ext="{Binding Priority}"
+                                                  F oreground="{StaticResource PrimaryForeground}"
+                                                  F ontSize="10" F ontWeight="SemiBold"
+                                                  H orizontalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
+                        <!-- Status with Visual Indicator -->
+                        <syncfusion:GridTemplateColumn M appingName="Status" H eaderText="Status" W idth="100">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border B ackground="{StaticResource WarningBrush}"
+                                           C ornerRadius="12" P adding="8,3" M argin="1">
+                                        <TextBlock T ext="{Binding Status}"
+                                                  F oreground="{StaticResource PrimaryForeground}"
+                                                  F ontSize="10" F ontWeight="SemiBold"
+                                                  H orizontalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
+                        <!-- Cost with Currency Formatting -->
+                        <syncfusion:GridCurrencyColumn M appingName="Cost" H eaderText="Cost" W idth="100"/>
+
+                        <!-- Vendor -->
+                        <syncfusion:GridTextColumn M appingName="Vendor" H eaderText="Vendor" W idth="120"/>
+
+                        <!-- Technician Assigned -->
+                        <syncfusion:GridTextColumn M appingName="AssignedTechnician" H eaderText="Technician" W idth="120"/>
+
+                        <!-- Notes with Truncation -->
+                        <syncfusion:GridTextColumn M appingName="Notes" H eaderText="Notes" W idth="200"
+                                                  T extWrapping="Wrap"/>
+                    </syncfusion:SfDataGrid.Columns>
+
+                    <!-- Context Menu -->
+                    <syncfusion:SfDataGrid.ContextMenu>
+                        <ContextMenu B ackground="{StaticResource ContentBackground}"
+                                     F oreground="{StaticResource PrimaryForeground}"
+                                     B orderBrush="{StaticResource BorderBrush}">
+                            <MenuItem H eader="📝 Edit Maintenance" C ommand="{Binding EditMaintenanceCommand}"
+                                     B ackground="{StaticResource ContentBackground}"
+                                     F oreground="{StaticResource PrimaryForeground}"/>
+                            <MenuItem H eader="✅ Mark Complete" C ommand="{Binding MarkCompleteCommand}"
+                                     B ackground="{StaticResource ContentBackground}"
+                                     F oreground="{StaticResource PrimaryForeground}"/>
+                            <MenuItem H eader="📋 Duplicate" C ommand="{Binding DuplicateMaintenanceCommand}"
+                                     B ackground="{StaticResource ContentBackground}"
+                                     F oreground="{StaticResource PrimaryForeground}"/>
+                            <Separator B ackground="{StaticResource BorderBrush}"/>
+                            <MenuItem H eader="📊 Generate Report" C ommand="{Binding GenerateItemReportCommand}"
+                                     B ackground="{StaticResource ContentBackground}"
+                                     F oreground="{StaticResource PrimaryForeground}"/>
+                            <MenuItem H eader="🔔 Set Reminder" C ommand="{Binding SetReminderCommand}"
+                                     B ackground="{StaticResource ContentBackground}"
+                                     F oreground="{StaticResource PrimaryForeground}"/>
+                            <Separator B ackground="{StaticResource BorderBrush}"/>
+                            <MenuItem H eader="🗑️ Delete" C ommand="{Binding DeleteMaintenanceCommand}"
+                                     B ackground="{StaticResource ContentBackground}"
+                                     F oreground="{StaticResource ErrorBrush}"/>
+                        </ContextMenu>
+                    </syncfusion:SfDataGrid.ContextMenu>
+                </syncfusion:SfDataGrid>
+            </Grid>
+        </ContentControl>
+
+        <!-- Maintenance Analytics (Docked Right) -->
+        <ContentControl syncfusion:DockingManager.H eader="Maintenance Analytics"
+                       syncfusion:DockingManager.S tate="Dock"
+                       syncfusion:DockingManager.S ideInDockedMode="Right"
+                       syncfusion:DockingManager.D esiredWidthInDockedMode="350"
+                       syncfusion:DockingManager.C anSerialize="True">
+            <ScrollViewer V erticalScrollBarVisibility="Auto" M argin="15"
+                         B ackground="{StaticResource ContentBackground}">
+                <StackPanel>
+                    <TextBlock T ext="📈 Analytics"
+                              S tyle="{StaticResource BusBuddyTileHeaderStyle}"
+                              M argin="0,0,0,20"/>
+
+                    <!-- Maintenance Trends Chart -->
+                    <Border B orderBrush="{StaticResource BorderBrush}"
+                          B orderThickness="1" C ornerRadius="6" M argin="0,0,0,20"
+                          S tyle="{StaticResource BusBuddyDashboardTileStyle}">
+                        <StackPanel M argin="15">
+                            <TextBlock T ext="Monthly Trends"
+                                      S tyle="{StaticResource BusBuddyTileContentStyle}"
+                                      M argin="0,0,0,10"/>
+                            <chart:SfChart x:N ame="MaintenanceTrendsChart"
+                                          H eight="200"
+                                          B ackground="Transparent"
+                                          F oreground="{StaticResource PrimaryForeground}"
+                                          M ouseLeftButtonDown="Chart_MouseLeftButtonDown">
+                                <chart:SfChart.PrimaryAxis>
+                                    <chart:CategoryAxis S howGridLines="False">
+                                                      <chart:CategoryAxis.LabelStyle>
+                                                          <chart:LabelStyle F oreground="{StaticResource SecondaryForeground}"/>
+                                                      </chart:CategoryAxis.LabelStyle>
+                                    </chart:CategoryAxis>
+                                </chart:SfChart.PrimaryAxis>
+                                <chart:SfChart.SecondaryAxis>
+                                    <chart:NumericalAxis S howGridLines="True">
+                                                       <chart:NumericalAxis.LabelStyle>
+                                                           <chart:LabelStyle F oreground="{StaticResource SecondaryForeground}"/>
+                                                       </chart:NumericalAxis.LabelStyle>
+                                    </chart:NumericalAxis>
+                                </chart:SfChart.SecondaryAxis>
+                                <chart:SfChart.Series>
+                                    <chart:ColumnSeries I temsSource="{Binding MaintenanceTrendsData}"
+                                                       X BindingPath="Month"
+                                                       Y BindingPath="Count"
+                                                       I nterior="{StaticResource AccentBrush}"/>
+                                </chart:SfChart.Series>
+                            </chart:SfChart>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Cost Distribution Chart -->
+                    <Border B orderBrush="{StaticResource BorderBrush}"
+                          B orderThickness="1" C ornerRadius="6" M argin="0,0,0,20"
+                          S tyle="{StaticResource BusBuddyDashboardTileStyle}">
+                        <StackPanel M argin="15">
+                            <TextBlock T ext="Cost Distribution"
+                                      S tyle="{StaticResource BusBuddyTileContentStyle}"
+                                      M argin="0,0,0,10"/>
+                            <chart:SfChart x:N ame="CostDistributionChart"
+                                          H eight="180"
+                                          B ackground="Transparent"
+                                          F oreground="{StaticResource PrimaryForeground}"
+                                          M ouseLeftButtonDown="Chart_MouseLeftButtonDown">
+                                <chart:PieSeries I temsSource="{Binding CostDistributionData}"
+                                               X BindingPath="Category"
+                                               Y BindingPath="Amount"
+                                               E xplodeIndex="0"
+                                               E xplodeRadius="5"
+                                               P alette="Custom">
+                                    <chart:PieSeries.ColorModel>
+                                        <chart:ChartColorModel>
+                                            <chart:ChartColorModel.CustomBrushes>
+                                                <SolidColorBrush C olor="{StaticResource AccentColor}"/>
+                                                <SolidColorBrush C olor="{StaticResource SuccessColor}"/>
+                                                <SolidColorBrush C olor="{StaticResource WarningColor}"/>
+                                                <SolidColorBrush C olor="{StaticResource ErrorColor}"/>
+                                                <SolidColorBrush C olor="{StaticResource SecondaryColor}"/>
+                                            </chart:ChartColorModel.CustomBrushes>
+                                        </chart:ChartColorModel>
+                                    </chart:PieSeries.ColorModel>
+                                </chart:PieSeries>
+                            </chart:SfChart>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Performance Metrics -->
+                    <Border B orderBrush="{StaticResource BorderBrush}"
+                          B orderThickness="1" C ornerRadius="6"
+                          S tyle="{StaticResource BusBuddyDashboardTileStyle}">
+                        <StackPanel M argin="15">
+                            <TextBlock T ext="Performance Metrics"
+                                      S tyle="{StaticResource BusBuddyTileContentStyle}"
+                                      M argin="0,0,0,15"/>
+
+                            <!-- Average Response Time -->
+                            <DockPanel M argin="0,0,0,10">
+                                <TextBlock T ext="Avg Response Time:" DockPanel.D ock="Left"
+                                          F oreground="{StaticResource SecondaryForeground}"
+                                          F ontSize="12"/>
+                                <TextBlock T ext="{Binding AverageResponseTime}" DockPanel.D ock="Right"
+                                          F ontWeight="SemiBold" F ontSize="12"
+                                          F oreground="{StaticResource SuccessBrush}"/>
+                            </DockPanel>
+
+                            <!-- Completion Rate -->
+                            <DockPanel M argin="0,0,0,10">
+                                <TextBlock T ext="Completion Rate:" DockPanel.D ock="Left"
+                                          F oreground="{StaticResource SecondaryForeground}"
+                                          F ontSize="12"/>
+                                <TextBlock T ext="{Binding CompletionRate, S tringFormat='{}{0:P0}'}" DockPanel.D ock="Right"
+                                          F ontWeight="SemiBold" F ontSize="12"
+                                          F oreground="{StaticResource WarningBrush}"/>
+                            </DockPanel>
+
+                            <!-- Budget Variance -->
+                            <DockPanel M argin="0,0,0,15">
+                                <TextBlock T ext="Budget Variance:" DockPanel.D ock="Left"
+                                          F oreground="{StaticResource SecondaryForeground}"
+                                          F ontSize="12"/>
+                                <TextBlock T ext="{Binding BudgetVariance, S tringFormat='{}{0:P1}'}" DockPanel.D ock="Right"
+                                          F ontWeight="SemiBold" F ontSize="12"
+                                          F oreground="{StaticResource AccentBrush}"/>
+                            </DockPanel>
+
+                            <!-- Performance Gauge -->
+                            <TextBlock T ext="Overall Performance:"
+                                      F oreground="{StaticResource SecondaryForeground}"
+                                      F ontSize="12" M argin="0,0,0,5"/>
+                            <gauge:SfCircularGauge W idth="100" H eight="100" H orizontalAlignment="Center" Background="Transparent">
+                                <gauge:SfCircularGauge.Scales>
+                                    <gauge:CircularScale S tartAngle="135" S weepAngle="270"
+                                                       S tartValue="0" E ndValue="100"
+                                                       I nterval="20" M inorTicksPerInterval="1"
+                                                       R imStroke="{StaticResource BorderBrush}"
+                                                       R imStrokeThickness="8"
+                                                       T ickStroke="{StaticResource SecondaryForeground}"
+                                                       T ickStrokeThickness="1"
+                                                       L abelStroke="{StaticResource SecondaryForeground}">
+                                        <gauge:CircularScale.Pointers>
+                                            <gauge:CircularPointer N eedlePointerType="Triangle"
+                                                                 P ointerCapStroke="{StaticResource SuccessBrush}"
+                                                                 N eedlePointerStroke="{StaticResource SuccessBrush}"
+                                                                 V alue="{Binding OverallPerformanceScore}"/>
+                                        </gauge:CircularScale.Pointers>
+                                        <gauge:CircularScale.Ranges>
+                                            <gauge:CircularRange S tartValue="0" E ndValue="40"
+                                                               S troke="{StaticResource ErrorBrush}" S trokeThickness="8"/>
+                                            <gauge:CircularRange S tartValue="40" E ndValue="70"
+                                                               S troke="{StaticResource WarningBrush}" S trokeThickness="8"/>
+                                            <gauge:CircularRange S tartValue="70" E ndValue="100"
+                                                               S troke="{StaticResource SuccessBrush}" S trokeThickness="8"/>
+                                        </gauge:CircularScale.Ranges>
+                                    </gauge:CircularScale>
+                                </gauge:SfCircularGauge.Scales>
+                                <gauge:SfCircularGauge.Annotations>
+                                    <gauge:GaugeAnnotation>
+                                        <gauge:GaugeAnnotation.Content>
+                                            <TextBlock T ext="{Binding OverallPerformanceScore, S tringFormat='{}{0:F0}%'}"
+                                                      F ontSize="14" F ontWeight="Bold"
+                                                      F oreground="{StaticResource SuccessBrush}"
+                                                      H orizontalAlignment="Center"
+                                                      V erticalAlignment="Center"/>
+                                        </gauge:GaugeAnnotation.Content>
+                                    </gauge:GaugeAnnotation>
+                                </gauge:SfCircularGauge.Annotations>
+                            </gauge:SfCircularGauge>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </ContentControl>
+
+        <!-- Loading Indicator -->
+        <syncfusion:SfBusyIndicator syncfusion:DockingManager.C anSerialize="False"
+                                    I sBusy="{Binding IsBusy}"
+                                    S tyle="{StaticResource BusBuddySfBusyIndicatorStyle}" AnimationType="DoubleCircle"
+                                    F oreground="{StaticResource AccentBrush}"
+                                    B ackground="{StaticResource ContentBackground}"
+                                    O pacity="0.9">
+            <syncfusion:SfBusyIndicator.Content>
+                <TextBlock T ext="Loading maintenance data..."
+                          F oreground="{StaticResource PrimaryForeground}"
+                          F ontSize="16"
+                          M argin="0,15,0,0"
+                          H orizontalAlignment="Center"/>
+            </syncfusion:SfBusyIndicator.Content>
+        </syncfusion:SfBusyIndicator>
+    </syncfusion:DockingManager>
+</UserControl>
+

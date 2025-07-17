@@ -50,14 +50,15 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
                 <syncfusion:ButtonAdv Label="Save" Command="{Binding SaveCommand}"
                                     Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    
                                     Margin="5"/>
                 <syncfusion:ButtonAdv Label="Cancel" Command="{Binding CancelCommand}"
                                     Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    
                                     Margin="5"/>
             </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>
+
 

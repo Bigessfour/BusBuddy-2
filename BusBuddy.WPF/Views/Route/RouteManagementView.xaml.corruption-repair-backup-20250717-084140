@@ -1,0 +1,603 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                                                                                                          ║
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+║                                                                                                                                                                          ║
+║  📋 REQUIRED STANDARDS: This child form MUST follow the universal standards defined in:                                                                                ║
+║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
+║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
+║                                                                                                                                                                          ║
+║  🔧 MANDATORY IMPLEMENTATIONS:                                                                                                                                          ║
+║     ✅ UserControl Style: BusBuddyUserControlStyle                                                                                                                     ║
+║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
+║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
+║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
+║     ✅ Theme Application:on ALL Syncfusion controls                                                           ║
+║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
+║                                                                                                                                                                          ║
+║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
+║     • NEVER use standard WPF Button - use syncfusion:ButtonAdv                                                                                                        ║
+║     • NEVER use Content property on ButtonAdv - use Label property                                                                                                    ║
+║     • NEVER use "sf:" namespace prefix - use "syncfusion:" prefix                                                                                                     ║
+║     • ALWAYS apply FluentDark theme to maintain visual consistency                                                                                                     ║
+║     • ALWAYS reference baseline styles for consistent appearance                                                                                                       ║
+║                                                                                                                                                                          ║
+║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+║                                                                                                                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<UserControl x:Class="BusBuddy.WPF.Views.Route.RouteManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;a ssembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:p rogressbar="clr-namespace:Syncfusion.UI.Xaml.ProgressBar;a ssembly=Syncfusion.SfProgressBar.WPF"
+             xmlns:sf="http://schemas.syncfusion.com/wpf"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             mc:I gnorable="d"
+             d:D esignHeight="450" d:D esignWidth="800"
+             d:D ataContext="{d:DesignInstance viewModels:RouteManagementViewModel}">
+
+    <UserControl.Resources>
+        <!-- BooleanToVisibilityConverter is now global in App.xaml - removed duplicate -->
+
+        <!-- Enhanced Route Status Templates -->
+        <DataTemplate x:K ey="RouteStatusTemplate">
+            <Border B ackground="{Binding IsActive, C onverter={StaticResource ActiveStatusToColorConverter}}"
+                    C ornerRadius="12" P adding="8,4" M argin="2">
+                <TextBlock T ext="{Binding IsActive, C onverter={StaticResource ActiveStatusToTextConverter}}"
+                          F oreground="White"
+                          F ontSize="11"
+                          F ontWeight="SemiBold"
+                          H orizontalAlignment="Center"/>
+            </Border>
+        </DataTemplate>
+
+        <!-- Route Assignment Template -->
+        <DataTemplate x:K ey="AssignmentTemplate">
+            <StackPanel O rientation="Horizontal">
+                <Border B ackground="#E3F2FD" C ornerRadius="4" P adding="6,3" M argin="0,0,4,0">
+                    <TextBlock T ext="{Binding BusNumber}" F ontSize="10" F ontWeight="SemiBold" F oreground="#1976D2"/>
+                </Border>
+                <TextBlock T ext="|" V erticalAlignment="Center" M argin="2,0" F oreground="#BDBDBD"/>
+                <Border B ackground="#F3E5F5" C ornerRadius="4" P adding="6,3" M argin="4,0,0,0">
+                    <TextBlock T ext="{Binding DriverName}" F ontSize="10" F ontWeight="SemiBold" F oreground="#7B1FA2"/>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!-- Enhanced Route Management with Syncfusion DockingManager -->
+    <syncfusion:DockingManager U seDocumentContainer="True"
+                           P ersistState="False"
+                           C ontainerMode="TDI"
+                           S tyle="{StaticResource BusBuddyDockingManagerStyle}" Background="{DynamicResource ContentBackground}">
+
+        <!-- Main Route Overview (Document) -->
+        <ContentControl syncfusion:DockingManager.H eader="Route Network Overview"
+                       syncfusion:DockingManager.S tate="Document"
+                       syncfusion:DockingManager.C anSerialize="True">
+            <Grid M argin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="*"/>
+                    <RowDefinition H eight="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Enhanced Header with Route Analytics -->
+                <Grid Grid.R ow="0" M argin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition W idth="*"/>
+                        <ColumnDefinition W idth="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.C olumn="0">
+                        <TextBlock T ext="Route Management" F ontSize="22" F ontWeight="Bold" M argin="0,0,0,10"/>                            <!-- Search and Filter Panel -->
+                            <StackPanel O rientation="Horizontal">
+                                <syncfusion:SfTextBoxExt x:N ame="RouteSearchBox"
+                                               W atermark="Search routes..."
+                                               W idth="250"
+                                               H eight="32" Background="{DynamicResource SurfaceBackground}"
+                                               F oreground="{DynamicResource PrimaryForeground}"
+                                               B orderBrush="{DynamicResource BorderBrush}"
+                                               M argin="0,0,10,0"/>                                <syncfusion:ButtonAdv L abel="🔍"
+                                              C ommand="{Binding SearchRoutesCommand}"
+                                              C ommandParameter="{Binding Text, E lementName=RouteSearchBox}"
+                                              S tyle="{StaticResource BusBuddyIconButtonAdvStyle}" Width="40" H eight="32"
+                                              M argin="0,0,10,0"/>
+                                <syncfusion:ComboBoxAdv I temsSource="{Binding AvailableRouteFilters}"
+                                            S electedItem="{Binding SelectedRouteFilter}"
+                                            D isplayMemberPath="Name"
+                                            D efaultText="Filter routes..."
+                                            S tyle="{StaticResource BusBuddyComboBoxAdvStyle}" Background="{DynamicResource SurfaceBackground}"
+                                            F oreground="{DynamicResource PrimaryForeground}"
+                                            B orderBrush="{DynamicResource BorderBrush}"
+                                            W idth="150" H eight="32"
+                                            M argin="0,0,10,0"/>
+                            <CheckBox C ontent="Show Inactive"
+                                      I sChecked="{Binding ShowInactiveRoutes}"
+                                      V erticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Route Statistics Dashboard -->
+                    <StackPanel Grid.C olumn="1" O rientation="Horizontal">
+                        <Border B ackground="#E8F5E8" C ornerRadius="8" P adding="12,8" M argin="5,0">
+                            <StackPanel>
+                                <TextBlock T ext="Active Routes" F ontSize="12" F oreground="#2E7D32"/>
+                                <TextBlock T ext="{Binding ActiveRouteCount}" F ontSize="20" F ontWeight="Bold" F oreground="#2E7D32"/>
+                            </StackPanel>
+                        </Border>
+                        <Border B ackground="#E3F2FD" C ornerRadius="8" P adding="12,8" M argin="5,0">
+                            <StackPanel>
+                                <TextBlock T ext="Total Coverage" F ontSize="12" F oreground="#1976D2"/>
+                                <TextBlock T ext="{Binding TotalCoveragePercentage, S tringFormat='{}{0:F1}%'}" F ontSize="20" F ontWeight="Bold" F oreground="#1976D2"/>
+                            </StackPanel>
+                        </Border>
+                        <Border B ackground="#FFF3E0" C ornerRadius="8" P adding="12,8" M argin="5,0">
+                            <StackPanel>
+                                <TextBlock T ext="Assignments" F ontSize="12" F oreground="#F57C00"/>
+                                <TextBlock T ext="{Binding AssignmentCompletionPercentage, S tringFormat='{}{0:F1}%'}" F ontSize="20" F ontWeight="Bold" F oreground="#F57C00"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Enhanced Hierarchical Route Grid with TreeGrid -->
+                <syncfusion:SfTreeGrid Grid.R ow="1"
+                               I temsSource="{Binding RouteHierarchy}"
+                               C hildPropertyName="Assignments"
+                               A utoGenerateColumns="False"
+                               A llowResizingColumns="True"
+                               A llowSorting="True"
+                               A llowFiltering="True"
+                               A llowEditing="True"
+                               C olumnSizer="Star"
+                               S electionMode="Single"
+                               N avigationMode="Row"
+                               S howRowHeader="True" Background="{DynamicResource ContentBackground}"
+                               F oreground="{DynamicResource PrimaryForeground}"
+                               B orderBrush="{DynamicResource BorderBrush}"
+                               B orderThickness="1"
+                               H orizontalAlignment="Stretch"
+                               V erticalAlignment="Stretch"
+                               E xpanderColumn="RouteName"
+                               A utoExpandMode="RootNodesExpanded">
+
+                    <syncfusion:SfTreeGrid.Columns>
+                        <!-- Route Name Column (Expandable) -->
+                        <syncfusion:TreeGridTextColumn M appingName="RouteName" H eaderText="Route Name" W idth="200"/>
+
+                        <!-- Route Description -->
+                        <syncfusion:TreeGridTextColumn M appingName="Description" H eaderText="Description" W idth="250"/>
+
+                        <!-- Active Status with Visual Indicator -->
+                        <syncfusion:TreeGridTemplateColumn M appingName="IsActive" H eaderText="Status" W idth="100">
+                            <syncfusion:TreeGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ContentPresenter C ontent="{Binding}" C ontentTemplate="{StaticResource RouteStatusTemplate}"/>
+                                </DataTemplate>
+                            </syncfusion:TreeGridTemplateColumn.CellTemplate>
+                        </syncfusion:TreeGridTemplateColumn>
+
+                        <!-- AM Assignment with Enhanced Display -->
+                        <syncfusion:TreeGridTemplateColumn M appingName="AMAssignment" H eaderText="AM Assignment" W idth="200">
+                            <syncfusion:TreeGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel O rientation="Horizontal">
+                                        <Border B ackground="{DynamicResource SuccessBackground}" O pacity="0.2" C ornerRadius="4" P adding="6,3" M argin="0,0,4,0"
+                                               V isibility="{Binding AMBusNumber, C onverter={StaticResource StringToVisibilityConverter}}">
+                                            <TextBlock T ext="{Binding AMBusNumber, S tringFormat='Bus {0}'}"
+                                                      F ontSize="10" F ontWeight="SemiBold" F oreground="{DynamicResource SuccessForeground}"/>
+                                        </Border>
+                                        <Border B ackground="{DynamicResource AccentBackground}" O pacity="0.2" C ornerRadius="4" P adding="6,3"
+                                               V isibility="{Binding AMDriverName, C onverter={StaticResource StringToVisibilityConverter}}">
+                                            <TextBlock T ext="{Binding AMDriverName}"
+                                                      F ontSize="10" F ontWeight="SemiBold" F oreground="{DynamicResource AccentForeground}"/>
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </syncfusion:TreeGridTemplateColumn.CellTemplate>
+                        </syncfusion:TreeGridTemplateColumn>
+
+                        <!-- PM Assignment with Enhanced Display -->
+                        <syncfusion:TreeGridTemplateColumn M appingName="PMAssignment" H eaderText="PM Assignment" W idth="200">
+                            <syncfusion:TreeGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel O rientation="Horizontal">
+                                        <Border B ackground="{DynamicResource AccentBackground}" O pacity="0.2" C ornerRadius="4" P adding="6,3" M argin="0,0,4,0"
+                                               V isibility="{Binding PMBusNumber, C onverter={StaticResource StringToVisibilityConverter}}">
+                                            <TextBlock T ext="{Binding PMBusNumber, S tringFormat='Bus {0}'}"
+                                                      F ontSize="10" F ontWeight="SemiBold" F oreground="{DynamicResource AccentForeground}"/>
+                                        </Border>
+                                        <Border B ackground="{DynamicResource WarningBackground}" O pacity="0.2" C ornerRadius="4" P adding="6,3"
+                                               V isibility="{Binding PMDriverName, C onverter={StaticResource StringToVisibilityConverter}}">
+                                            <TextBlock T ext="{Binding PMDriverName}"
+                                                      F ontSize="10" F ontWeight="SemiBold" F oreground="{DynamicResource WarningForeground}"/>
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </syncfusion:TreeGridTemplateColumn.CellTemplate>
+                        </syncfusion:TreeGridTemplateColumn>
+
+                        <!-- Route Efficiency -->
+                        <syncfusion:TreeGridTemplateColumn M appingName="Efficiency" H eaderText="Efficiency" W idth="120">
+                            <syncfusion:TreeGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel O rientation="Horizontal" V erticalAlignment="Center">
+                                        <progressbar:SfLinearProgressBar P rogress="{Binding EfficiencyScore}"
+                                                               S tyle="{StaticResource BusBuddySfLinearProgressBarStyle}" Minimum="0"
+                                                               M aximum="100"
+                                                               W idth="60"
+                                                               H eight="8"
+                                                               M argin="0,0,8,0"/>
+                                        <TextBlock T ext="{Binding EfficiencyScore, S tringFormat='{}{0:F0}%'}"
+                                                  F ontSize="11" F ontWeight="SemiBold"
+                                                  V erticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </syncfusion:TreeGridTemplateColumn.CellTemplate>
+                        </syncfusion:TreeGridTemplateColumn>
+
+                        <!-- Student Count -->
+                        <syncfusion:TreeGridNumericColumn M appingName="StudentCount" H eaderText="Students" W idth="80"/>
+
+                        <!-- Last Updated -->
+                        <syncfusion:TreeGridDateTimeColumn M appingName="LastUpdated" H eaderText="Last Updated" W idth="120" P attern="ShortDate"/>
+                    </syncfusion:SfTreeGrid.Columns>
+
+                    <!-- Remove hardcoded style -->
+                    <syncfusion:SfTreeGrid.Style>
+                        <Style T argetType="syncfusion:SfTreeGrid">
+                            <Setter P roperty=" Background" V alue="{DynamicResource ContentBackground}"/>
+                            <Setter P roperty="GridLinesVisibility" V alue="Both"/>
+                            <Setter P roperty="HeaderLinesVisibility" V alue="Both"/>
+                        </Style>
+                    </syncfusion:SfTreeGrid.Style>
+
+                    <!-- Context Menu for Route Operations -->
+                    <syncfusion:SfTreeGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem H eader="View Route Details" C ommand="{Binding ViewRouteDetailsCommand}"/>
+                            <MenuItem H eader="Edit Route" C ommand="{Binding EditRouteCommand}"/>
+                            <Separator/>
+                            <MenuItem H eader="Assign Resources" C ommand="{Binding AssignResourcesCommand}"/>
+                            <MenuItem H eader="Optimize Route" C ommand="{Binding OptimizeRouteCommand}"/>
+                            <Separator/>
+                            <MenuItem H eader="Duplicate Route" C ommand="{Binding DuplicateRouteCommand}"/>
+                            <MenuItem H eader="Export Route Data" C ommand="{Binding ExportRouteCommand}"/>
+                            <Separator/>
+                            <MenuItem H eader="Deactivate Route" C ommand="{Binding DeactivateRouteCommand}"
+                                     F oreground="Orange"/>
+                            <MenuItem H eader="Delete Route" C ommand="{Binding DeleteRouteCommand}"
+                                     F oreground="Red"/>
+                        </ContextMenu>
+                    </syncfusion:SfTreeGrid.ContextMenu>
+                </syncfusion:SfTreeGrid>
+
+                <!-- Enhanced Action Panel -->
+                <Grid Grid.R ow="2" M argin="0,15,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition W idth="*"/>
+                        <ColumnDefinition W idth="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Route Summary Information -->
+                    <StackPanel Grid.C olumn="0" O rientation="Horizontal" V erticalAlignment="Center">
+                        <TextBlock T ext="Showing" V erticalAlignment="Center" M argin="0,0,5,0"/>
+                        <TextBlock T ext="{Binding Routes.Count, M ode=OneWay}" F ontWeight="Bold" V erticalAlignment="Center"/>
+                        <TextBlock T ext="of" V erticalAlignment="Center" M argin="5,0"/>
+                        <TextBlock T ext="{Binding TotalRoutes, M ode=OneWay}" F ontWeight="Bold" V erticalAlignment="Center"/>
+                        <TextBlock T ext="routes" V erticalAlignment="Center" M argin="5,0,15,0"/>
+
+                        <!-- Assignment Status Indicator -->
+                        <Border B ackground="#E8F5E8" C ornerRadius="4" P adding="8,4" M argin="0,0,10,0">
+                            <TextBlock T ext="{Binding FullyAssignedCount, S tringFormat='{}{0} fully assigned'}"
+                                      F oreground="#2E7D32" F ontWeight="SemiBold"/>
+                        </Border>
+                        <Border B ackground="#FFF3E0" C ornerRadius="4" P adding="8,4">
+                            <TextBlock T ext="{Binding PartiallyAssignedCount, S tringFormat='{}{0} need assignment'}"
+                                      F oreground="#F57C00" F ontWeight="SemiBold"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Action Buttons with Enhanced Styling -->
+                    <StackPanel Grid.C olumn="1" O rientation="Horizontal">
+                        <syncfusion:ButtonAdv L abel="➕ Add Route"
+                                              C ommand="{Binding AddRouteCommand}"
+                                              S tyle="{StaticResource BusBuddyPrimaryButtonAdvStyle}" Width="120" H eight="36"
+                                              M argin="5,0"/>
+                        <syncfusion:ButtonAdv L abel="✏️ Edit"
+                                              C ommand="{Binding UpdateRouteCommand}"
+                                              C ommandParameter="{Binding SelectedRoute}"
+                                              S tyle="{StaticResource BusBuddySecondaryButtonAdvStyle}" Width="80" H eight="36"
+                                              M argin="5,0"/>
+                        <syncfusion:ButtonAdv L abel="🔄 Optimize"
+                                              C ommand="{Binding OptimizeAllRoutesCommand}"
+                                              S tyle="{StaticResource BusBuddyPrimaryButtonAdvStyle}" Width="100" H eight="36"
+                                              M argin="5,0"/>
+                        <syncfusion:ButtonAdv L abel="🔧 Tools"
+                                              S tyle="{StaticResource BusBuddySecondaryButtonAdvStyle}" Width="100" H eight="36"
+                                              M argin="5,0">
+                            <syncfusion:ButtonAdv.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem H eader="Auto-Assign Resources"
+                                             C ommand="{Binding AutoAssignResourcesCommand}"/>
+                                    <MenuItem H eader="Validate Assignments"
+                                             C ommand="{Binding ValidateAssignmentsCommand}"/>
+                                    <Separator/>
+                                    <MenuItem H eader="Import Routes"
+                                             C ommand="{Binding ImportRoutesCommand}"/>
+                                    <MenuItem H eader="Export Routes"
+                                             C ommand="{Binding ExportRoutesCommand}"/>
+                                </ContextMenu>
+                            </syncfusion:ButtonAdv.ContextMenu>
+                        </syncfusion:ButtonAdv>
+                        <syncfusion:ButtonAdv L abel="🗑️ Delete"
+                                              C ommand="{Binding DeleteRouteCommand}"
+                                              C ommandParameter="{Binding SelectedRoute}"
+                                              S tyle="{StaticResource BusBuddyDangerButtonAdvStyle}" Width="80" H eight="36"
+                                              M argin="5,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </ContentControl>
+
+        <!-- Resource Assignment Panel (Docked Right) -->
+        <ContentControl syncfusion:DockingManager.H eader="Resource Assignment"
+                       syncfusion:DockingManager.S tate="Dock"
+                       syncfusion:DockingManager.S ideInDockedMode="Right"
+                       syncfusion:DockingManager.D esiredWidthInDockedMode="400"
+                       syncfusion:DockingManager.C anSerialize="True">
+            <Grid M argin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="*"/>
+                    <RowDefinition H eight="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Assignment Header -->
+                <StackPanel Grid.R ow="0" M argin="0,0,0,15">
+                    <TextBlock T ext="Quick Assignment" F ontSize="16" F ontWeight="Bold" M argin="0,0,0,10"/>
+                    <TextBlock T ext="Drag and drop or use quick assign to manage route resources."
+                              F ontSize="12" F oreground="#666" T extWrapping="Wrap" M argin="0,0,0,10"/>
+                </StackPanel>
+
+                <!-- Quick Assignment Controls -->
+                <Grid Grid.R ow="1" M argin="0,0,0,15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition H eight="Auto"/>
+                        <RowDefinition H eight="Auto"/>
+                        <RowDefinition H eight="Auto"/>
+                        <RowDefinition H eight="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Route Selection -->
+                    <TextBlock Grid.R ow="0" T ext="Selected Route:" F ontWeight="SemiBold" M argin="0,0,0,5"/>
+                    <syncfusion:ComboBoxAdv Grid.R ow="1"
+                                        I temsSource="{Binding Routes}"
+                                        S electedItem="{Binding SelectedRouteForAssignment}"
+                                        D isplayMemberPath="RouteName"
+                                        D efaultText="Select a route..."
+                                        S tyle="{StaticResource BusBuddyComboBoxAdvStyle}" Background="{DynamicResource SurfaceBackground}"
+                                        F oreground="{DynamicResource PrimaryForeground}"
+                                        B orderBrush="{DynamicResource BorderBrush}"
+                                        H eight="32"
+                                        M argin="0,0,0,10"/>
+
+                    <!-- Time Period Selection -->
+                    <StackPanel Grid.R ow="2" O rientation="Horizontal" M argin="0,0,0,10">
+                        <RadioButton C ontent="AM" I sChecked="{Binding IsAMAssignment}" M argin="0,0,15,0"/>
+                        <RadioButton C ontent="PM" I sChecked="{Binding IsPMAssignment}"/>
+                    </StackPanel>
+
+                    <!-- Assignment Controls -->
+                    <Grid Grid.R ow="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition H eight="Auto"/>
+                            <RowDefinition H eight="Auto"/>
+                            <RowDefinition H eight="Auto"/>
+                            <RowDefinition H eight="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.R ow="0" T ext="Bus:" F ontWeight="SemiBold" M argin="0,0,0,5"/>
+                        <syncfusion:ComboBoxAdv Grid.R ow="1"
+                                            I temsSource="{Binding AvailableBuses}"
+                                            S electedItem="{Binding SelectedBusForAssignment}"
+                                            D isplayMemberPath="BusNumber"
+                                            D efaultText="Select bus..."
+                                            S tyle="{StaticResource BusBuddyComboBoxAdvStyle}" Background="{DynamicResource SurfaceBackground}"
+                                            F oreground="{DynamicResource PrimaryForeground}"
+                                            B orderBrush="{DynamicResource BorderBrush}"
+                                            H eight="32"
+                                            M argin="0,0,0,8"/>
+
+                        <TextBlock Grid.R ow="2" T ext="Driver:" F ontWeight="SemiBold" M argin="0,0,0,5"/>
+                        <syncfusion:ComboBoxAdv Grid.R ow="3"
+                                            I temsSource="{Binding AvailableDrivers}"
+                                            S electedItem="{Binding SelectedDriverForAssignment}"
+                                            D isplayMemberPath="FullName"
+                                            D efaultText="Select driver..."
+                                            S tyle="{StaticResource BusBuddyComboBoxAdvStyle}" Background="{StaticResource ContentBackground}"
+                                            F oreground="{StaticResource PrimaryForeground}"
+                                            B orderBrush="{StaticResource BorderBrush}"
+                                            H eight="32"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Available Resources -->
+                <TabControl Grid.R ow="2" B orderThickness="1" B orderBrush="#E0E0E0">
+                    <TabItem H eader="Available Buses">
+                        <ListBox I temsSource="{Binding UnassignedBuses}"
+                                    S electedItem="{Binding SelectedUnassignedBus}"
+                                    S electionMode="Single"
+                                    A llowDrop="True">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border B ackground="#E3F2FD" C ornerRadius="4" P adding="8,6" M argin="2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition W idth="Auto"/>
+                                                <ColumnDefinition W idth="*"/>
+                                                <ColumnDefinition W idth="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.C olumn="0" T ext="🚌" F ontSize="16" V erticalAlignment="Center" M argin="0,0,8,0"/>
+                                            <StackPanel Grid.C olumn="1">
+                                                <TextBlock T ext="{Binding BusNumber, S tringFormat='Bus #{0}'}" F ontWeight="SemiBold"/>
+                                                <TextBlock F ontSize="11" F oreground="#666">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding S tringFormat="{}{0} {1}">
+                                                            <Binding P ath="Make"/>
+                                                            <Binding P ath="Model"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <TextBlock Grid.C olumn="2" T ext="{Binding SeatingCapacity, S tringFormat='{}{0} seats'}"
+                                                      F ontSize="11" F oreground="#1976D2" V erticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </TabItem>
+
+                    <TabItem H eader="Available Drivers">
+                        <ListBox I temsSource="{Binding UnassignedDrivers}"
+                                    S electedItem="{Binding SelectedUnassignedDriver}"
+                                    S electionMode="Single"
+                                    A llowDrop="True">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border B ackground="#F3E5F5" C ornerRadius="4" P adding="8,6" M argin="2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition W idth="Auto"/>
+                                                <ColumnDefinition W idth="*"/>
+                                                <ColumnDefinition W idth="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.C olumn="0" T ext="👨‍💼" F ontSize="16" V erticalAlignment="Center" M argin="0,0,8,0"/>
+                                            <StackPanel Grid.C olumn="1">
+                                                <TextBlock T ext="{Binding FullName}" F ontWeight="SemiBold"/>
+                                                <TextBlock T ext="{Binding ContactPhone}" F ontSize="11" F oreground="#666"/>
+                                            </StackPanel>
+                                            <Ellipse Grid.C olumn="2" W idth="12" H eight="12"
+                                                   F ill="{Binding IsAvailable, C onverter={StaticResource AvailabilityToColorConverter}}"
+                                                   V erticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </TabItem>
+                </TabControl>
+
+                <!-- Assignment Actions -->
+                <StackPanel Grid.R ow="3" M argin="0,15,0,0">
+                    <syncfusion:ButtonAdv L abel="✅ Assign Selected"
+                                      C ommand="{Binding AssignResourcesCommand}"
+                                      S tyle="{StaticResource BusBuddyPrimaryButtonAdvStyle}" Height="36"
+                                      M argin="0,0,0,8"/>
+                    <syncfusion:ButtonAdv L abel="🔄 Auto-Assign All"
+                                      C ommand="{Binding AutoAssignAllCommand}"
+                                      S tyle="{StaticResource BusBuddySecondaryButtonAdvStyle}" Height="32"
+                                      M argin="0,0,0,8"/>
+                    <syncfusion:ButtonAdv L abel="❌ Clear Assignment"
+                                      C ommand="{Binding ClearAssignmentCommand}"
+                                      S tyle="{StaticResource BusBuddyDangerButtonAdvStyle}" Height="32"/>
+                </StackPanel>
+            </Grid>
+        </ContentControl>
+
+        <!-- Route Analytics (Document Tab) -->
+        <ContentControl syncfusion:DockingManager.H eader="Route Analytics"
+                       syncfusion:DockingManager.S tate="Document"
+                       syncfusion:DockingManager.C anSerialize="True">
+            <Grid M argin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="300"/>
+                    <RowDefinition H eight="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Analytics Header -->
+                <TextBlock Grid.R ow="0" T ext="Route Performance Analytics"
+                          F ontSize="18" F ontWeight="Bold" M argin="0,0,0,15"/>
+
+                <!-- Analytics Charts -->
+                <Grid Grid.R ow="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition W idth="*"/>
+                        <ColumnDefinition W idth="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Route Efficiency Chart -->
+                    <Border Grid.C olumn="0" B orderBrush="{StaticResource BorderBrush}" B orderThickness="1"
+                           C ornerRadius="6" M argin="0,0,10,0">
+                        <syncfusion:SfChart H eader="Route Efficiency Trends" Background="{StaticResource ContentBackground}"
+                                          F oreground="{StaticResource PrimaryForeground}"
+                                          M argin="15">
+                            <syncfusion:SfChart.PrimaryAxis>
+                                <syncfusion:CategoryAxis H eader="Routes"/>
+                            </syncfusion:SfChart.PrimaryAxis>
+                            <syncfusion:SfChart.SecondaryAxis>
+                                <syncfusion:NumericalAxis H eader="Efficiency %"/>
+                            </syncfusion:SfChart.SecondaryAxis>
+                            <syncfusion:ColumnSeries I temsSource="{Binding RouteEfficiencyData}"
+                                           X BindingPath="RouteName"
+                                           Y BindingPath="EfficiencyScore"
+                                           I nterior="{StaticResource AccentBrush}"/>
+                        </syncfusion:SfChart>
+                    </Border>
+
+                    <!-- Resource Utilization Pie Chart -->
+                    <Border Grid.C olumn="1" B orderBrush="{StaticResource BorderBrush}" B orderThickness="1"
+                           C ornerRadius="6" M argin="10,0,0,0">
+                        <syncfusion:SfChart H eader="Resource Utilization" Background="{StaticResource ContentBackground}"
+                                          F oreground="{StaticResource PrimaryForeground}"
+                                          M argin="15">
+                            <syncfusion:PieSeries I temsSource="{Binding ResourceUtilizationData}"
+                                        X BindingPath="Category"
+                                        Y BindingPath="Value"
+                                        E xplodeIndex="0"
+                                        E xplodeRadius="10"/>
+                        </syncfusion:SfChart>
+                    </Border>
+                </Grid>
+
+                <!-- Detailed Analytics Grid -->
+                <syncfusion:SfDataGrid Grid.R ow="2" M argin="0,15,0,0"
+                                   I temsSource="{Binding RouteAnalyticsData}"
+                                   S tyle="{StaticResource BusBuddySfDataGridStyle}" Background="{StaticResource ContentBackground}"
+                                   F oreground="{StaticResource PrimaryForeground}"
+                                   B orderBrush="{StaticResource BorderBrush}"
+                                   A utoGenerateColumns="False"
+                                   A llowSorting="True"
+                                   A llowFiltering="True"
+                                   S howRowHeader="False">
+                    <syncfusion:SfDataGrid.Columns>
+                        <syncfusion:GridTextColumn M appingName="RouteName" H eaderText="Route Name" W idth="150"/>
+                        <syncfusion:GridNumericColumn M appingName="EfficiencyScore" H eaderText="Efficiency %" W idth="100"/>
+                        <syncfusion:GridNumericColumn M appingName="StudentCount" H eaderText="Students" W idth="80"/>
+                        <syncfusion:GridNumericColumn M appingName="DistanceKm" H eaderText="Distance (km)" W idth="120"/>
+                        <syncfusion:GridNumericColumn M appingName="AverageTime" H eaderText="Avg Time (min)" W idth="120"/>
+                        <syncfusion:GridTextColumn M appingName="ResourceUtilization" H eaderText="Resource Usage" W idth="130"/>
+                        <syncfusion:GridDateTimeColumn M appingName="LastOptimized" H eaderText="Last Optimized" W idth="130" P attern="ShortDate"/>
+                    </syncfusion:SfDataGrid.Columns>
+                </syncfusion:SfDataGrid>
+            </Grid>
+        </ContentControl>
+
+        <!-- Loading Indicator -->
+        <syncfusion:SfBusyIndicator syncfusion:DockingManager.C anSerialize="False"
+                                I sBusy="{Binding IsBusy}"
+                                S tyle="{StaticResource BusBuddySfBusyIndicatorStyle}" AnimationType="DoubleCircle"
+                                F oreground="{StaticResource AccentBrush}"
+                                B ackground="Transparent"/>
+    </syncfusion:DockingManager>
+</UserControl>
+

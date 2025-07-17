@@ -116,7 +116,7 @@
                     <syncfusion:SfChart Grid.Row="1"
                                        Margin="0,5,0,0"
                                        Header=""
-                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                       >
                         <syncfusion:SfChart.PrimaryAxis>
                             <syncfusion:CategoryAxis Header="Grade"
                                                     FontSize="12"/>
@@ -156,7 +156,7 @@
                     <syncfusion:SfChart Grid.Row="1"
                                        Margin="0,5,0,0"
                                        Header=""
-                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                       >
                         <syncfusion:PieSeries ItemsSource="{Binding StatusDistribution}"
                                              XBindingPath="Status"
                                              YBindingPath="Count"
@@ -178,4 +178,5 @@
         </Grid>
     </Grid>
 </UserControl>
+
 

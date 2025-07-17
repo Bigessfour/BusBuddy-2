@@ -11,7 +11,7 @@
         Title="Activity Schedule Details"
         Height="600" Width="700"
         WindowStartupLocation="CenterOwner"
-        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+        >
 
     <Window.Resources>
         <Style TargetType="TextBlock" x:Key="FieldLabel">
@@ -103,7 +103,7 @@
                     <syncfusion:ButtonAdv Grid.Column="1" Label="Check Availability" Name="CheckDriverButton"
                             Margin="5,0,0,0" Padding="5,2"
                             Style="{StaticResource BusBuddyButtonAdvStyle}"
-                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                            />
                 </Grid>
 
                 <!-- Vehicle -->
@@ -119,7 +119,7 @@
                     <syncfusion:ButtonAdv Grid.Column="1" Label="Check Availability" Name="CheckVehicleButton"
                             Margin="5,0,0,0" Padding="5,2"
                             Style="{StaticResource BusBuddyButtonAdvStyle}"
-                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                            />
                 </Grid>
 
                 <!-- Riders -->
@@ -127,7 +127,7 @@
                 <syncfusion:IntegerTextBox Grid.Row="7" Grid.Column="1" Name="RidersUpDown"
                                           MinValue="0" MaxValue="100" Value="0"
                                           Margin="0,5"
-                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                          />
 
                 <!-- Requested By -->
                 <TextBlock Grid.Row="8" Grid.Column="0" Text="Requested By:" Style="{StaticResource FieldLabel}"/>
@@ -168,7 +168,7 @@
                 <syncfusion:ButtonAdv Grid.Row="0" Label="Check for Conflicts" Name="CheckConflictsButton"
                         HorizontalAlignment="Left" Padding="10,5"
                         Style="{StaticResource BusBuddyButtonAdvStyle}"
-                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                        />
 
                 <ItemsControl Grid.Row="1" Name="ConflictsItemsControl" Margin="0,10,0,0"
                               Visibility="Collapsed">
@@ -203,13 +203,14 @@
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
             <syncfusion:ButtonAdv Label="Save" Name="SaveButton" IsDefault="True"
                                 Style="{StaticResource BusBuddyButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                />
             <syncfusion:ButtonAdv Label="Cancel" Name="CancelButton" IsCancel="True"
                                 Style="{StaticResource BusBuddyButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                />
         </StackPanel>
     </Grid>
 </Window>
+
 
 
 

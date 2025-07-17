@@ -12,7 +12,7 @@
 ║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
 ║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
 ║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
 ║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
 ║                                                                                                                                                                          ║
 ║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
@@ -40,7 +40,7 @@
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance Type=viewModels:StudentListViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
 
     <Grid Style="{StaticResource BusBuddyFormContentStyle}">
         <Grid.RowDefinitions>
@@ -73,7 +73,7 @@
                                    Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                    Watermark="Search students by name, number, or route..."
                                    ShowClearButton="True"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   
                                    Background="{StaticResource ContentBackground}"
                                    Foreground="{StaticResource PrimaryForeground}"
                                    BorderBrush="{StaticResource BorderBrush}"
@@ -88,7 +88,7 @@
                                    DisplayMemberPath="."
                                    SelectedValuePath="."
                                    Style="{StaticResource StandardComboBoxStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   
                                    SelectedIndex="0">
             </syncfusion:ComboBoxAdv>
 
@@ -101,7 +101,7 @@
                                    DisplayMemberPath="RouteName"
                                    SelectedValuePath="RouteName"
                                    Style="{StaticResource StandardComboBoxStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   
                                    SelectedIndex="0">
             </syncfusion:ComboBoxAdv>
 
@@ -111,7 +111,7 @@
                                  Margin="0,0,10,0"
                                  Padding="8,4"
                                  Style="{StaticResource SecondaryButtonAdvStyle}"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                 
                                  ToolTip="Export filtered student list to CSV"
                                  Label="📊 Export"/>
 
@@ -121,7 +121,7 @@
                                  Margin="0,0,10,0"
                                  Padding="8,4"
                                  Style="{StaticResource SecondaryButtonAdvStyle}"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                 
                                  ToolTip="Print student list"
                                  Label="🖨️ Print"/>
 
@@ -129,7 +129,7 @@
             <syncfusion:ButtonAdv Grid.Column="5"
                                  Command="{Binding RefreshCommand}"
                                  Style="{StaticResource SecondaryButtonAdvStyle}"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                 
                                  ToolTip="Refresh student list"
                                  Label="⟳ Refresh"/>
         </Grid>
@@ -191,7 +191,7 @@
                                ItemsSource="{Binding FilteredStudents}"
                                SelectedItem="{Binding SelectedStudent, Mode=TwoWay}"
                                Style="{StaticResource StandardDataGridStyle}"
-                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                               
                                Background="{StaticResource ContentBackground}"
                                Foreground="{StaticResource PrimaryForeground}"
                                BorderBrush="{StaticResource BorderBrush}"
@@ -353,28 +353,28 @@
             <syncfusion:ButtonAdv Label="➕ Add Student"
                                  Command="{Binding AddStudentCommand}"
                                  Style="{StaticResource PrimaryButtonAdvStyle}"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                 
                                  Margin="5"
                                  ToolTip="Add a new student to the system"/>
 
             <syncfusion:ButtonAdv Label="✏️ Edit Selected"
                                  Command="{Binding EditStudentCommand}"
                                  Style="{StaticResource SecondaryButtonAdvStyle}"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                 
                                  Margin="5"
                                  ToolTip="Edit the selected student"/>
 
             <syncfusion:ButtonAdv Label="📋 Bulk Actions"
                                  Command="{Binding BulkActionsCommand}"
                                  Style="{StaticResource SecondaryButtonAdvStyle}"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                 
                                  Margin="5"
                                  ToolTip="Perform bulk actions on selected students"/>
 
             <syncfusion:ButtonAdv Label="📊 Reports"
                                  Command="{Binding ReportsCommand}"
                                  Style="{StaticResource InfoButtonAdvStyle}"
-                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                 
                                  Margin="5"
                                  ToolTip="Generate various student reports"/>
         </StackPanel>
@@ -383,7 +383,7 @@
         <syncfusion:SfBusyIndicator Grid.Row="0" Grid.RowSpan="5"
                                     IsBusy="{Binding IsBusy}"
                                     Style="{StaticResource LoadingIndicatorStyle}"
-                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    
                                     AnimationType="DoubleCircle"
                                     Foreground="{StaticResource AccentBrush}"
                                     Background="Transparent">
@@ -397,4 +397,5 @@
         </syncfusion:SfBusyIndicator>
     </Grid>
 </UserControl>
+
 

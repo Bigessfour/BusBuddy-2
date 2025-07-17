@@ -12,7 +12,7 @@
 ║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
 ║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
 ║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
 ║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
 ║                                                                                                                                                                          ║
 ║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
@@ -40,7 +40,7 @@
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance viewModels:MaintenanceTrackingViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+             
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded">
     <UserControl.Resources>
@@ -59,7 +59,7 @@
                               PersistState="False"
                               ContainerMode="TDI"
                               Style="{StaticResource BusBuddyDockingManagerStyle}"
-                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                              
                               Background="{StaticResource ContentBackground}">
 
         <!-- Maintenance Overview (Document) -->
@@ -83,20 +83,20 @@
                                             Label="➕ New Maintenance"
                                             Command="{Binding AddCommand}"
                                             Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                            
                                             Margin="5"
                                             Click="AddMaintenanceButton_Click"/>
                         <syncfusion:ButtonAdv x:Name="GenerateReportButton"
                                             Label="📊 Generate Report"
                                             Command="{Binding ReportCommand}"
                                             Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                            
                                             Margin="5"
                                             Click="GenerateReportButton_Click"/>
                         <syncfusion:ButtonAdv x:Name="RefreshMaintenanceButton"
                                             Label="🔄 Refresh"
                                             Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                            
                                             Margin="5"
                                             Click="RefreshMaintenanceButton_Click"/>
                     </StackPanel>
@@ -196,7 +196,7 @@
                                                                    Height="8"
                                                                    Background="{StaticResource ContentBackground}"
                                                                    Foreground="{StaticResource AccentBrush}"
-                                                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                                   
                                                                    Minimum="0" Maximum="100"/>
                                 </StackPanel>
                                 <gauge:SfCircularGauge Grid.Column="1" Width="50" Height="50" Margin="5,0,0,0">
@@ -229,7 +229,7 @@
                                       ItemsSource="{Binding MaintenanceRecords}"
                                       SelectedItem="{Binding SelectedRecord, Mode=TwoWay}"
                                       Style="{StaticResource BusBuddySfDataGridStyle}"
-                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                      
                                       Background="{StaticResource ContentBackground}"
                                       Foreground="{StaticResource PrimaryForeground}"
                                       BorderBrush="{StaticResource BorderBrush}"
@@ -390,7 +390,7 @@
                                           Background="Transparent"
                                           Foreground="{StaticResource PrimaryForeground}"
                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
-                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                          >
                                 <chart:SfChart.PrimaryAxis>
                                     <chart:CategoryAxis ShowGridLines="False">
                                                       <chart:CategoryAxis.LabelStyle>
@@ -428,7 +428,7 @@
                                           Background="Transparent"
                                           Foreground="{StaticResource PrimaryForeground}"
                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
-                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                          >
                                 <chart:PieSeries ItemsSource="{Binding CostDistributionData}"
                                                XBindingPath="Category"
                                                YBindingPath="Amount"
@@ -495,7 +495,7 @@
                                       Foreground="{StaticResource SecondaryForeground}"
                                       FontSize="12" Margin="0,0,0,5"/>
                             <gauge:SfCircularGauge Width="100" Height="100" HorizontalAlignment="Center"
-                                                  syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                  
                                                   Background="Transparent">
                                 <gauge:SfCircularGauge.Scales>
                                     <gauge:CircularScale StartAngle="135" SweepAngle="270"
@@ -544,7 +544,7 @@
         <syncfusion:SfBusyIndicator syncfusion:DockingManager.CanSerialize="False"
                                     IsBusy="{Binding IsBusy}"
                                     Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
-                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    
                                     AnimationType="DoubleCircle"
                                     Foreground="{StaticResource AccentBrush}"
                                     Background="{StaticResource ContentBackground}"
@@ -559,4 +559,5 @@
         </syncfusion:SfBusyIndicator>
     </syncfusion:DockingManager>
 </UserControl>
+
 

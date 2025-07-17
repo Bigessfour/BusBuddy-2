@@ -1,0 +1,252 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                                                                                                          ║
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+║                                                                                                                                                                          ║
+║  📋 REQUIRED STANDARDS: This child form MUST follow the universal standards defined in:                                                                                ║
+║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
+║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
+║                                                                                                                                                                          ║
+║  🔧 MANDATORY IMPLEMENTATIONS:                                                                                                                                          ║
+║     ✅ UserControl Style: BusBuddyUserControlStyle                                                                                                                     ║
+║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
+║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
+║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
+║     ✅ Theme Application:on ALL Syncfusion controls                                                           ║
+║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
+║                                                                                                                                                                          ║
+║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
+║     • NEVER use standard WPF Button - use syncfusion:ButtonAdv                                                                                                        ║
+║     • NEVER use Content property on ButtonAdv - use Label property                                                                                                    ║
+║     • NEVER use "sf:" namespace prefix - use "syncfusion:" prefix                                                                                                     ║
+║     • ALWAYS apply FluentDark theme to maintain visual consistency                                                                                                     ║
+║     • ALWAYS reference baseline styles for consistent appearance                                                                                                       ║
+║                                                                                                                                                                          ║
+║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+║                                                                                                                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<UserControl x:Class="BusBuddy.WPF.Views.Driver.DriverManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance viewModels:DriverManagementViewModel}">
+
+    <UserControl.Resources>
+        <!-- BooleanToVisibilityConverter is now global in App.xaml -->
+
+        <!-- License Status Color Converter for highlighting expiring licenses -->
+        <DataTemplate x:Key="LicenseStatusTemplate">
+            <Border Background="{Binding LicenseStatus, Converter={StaticResource LicenseStatusToColorConverter}}"
+                    CornerRadius="4" Padding="8,4">
+                <TextBlock Text="{Binding LicenseStatus}"
+                          Foreground="White"
+                          FontWeight="SemiBold"
+                          HorizontalAlignment="Center"/>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!-- Enhanced Driver Management with Syncfusion DockingManager -->
+    <syncfusion:DockingManager UseDocumentContainer="True"
+                               PersistState="False"
+                               ContainerMode="TDI"
+                               Style="{StaticResource BusBuddyDockingManagerStyle}">
+
+        <!-- Main Driver List Panel (Document) -->
+        <ContentControl syncfusion:DockingManager.Header="Driver Directory"
+                       syncfusion:DockingManager.State="Document"
+                       syncfusion:DockingManager.CanSerialize="True">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Enhanced Header with Search and Filters -->
+                <Grid Grid.Row="0" Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="🚗 Driver Management"
+                                   Style="{StaticResource BusBuddyTileHeaderStyle}"
+                                   Margin="0,0,0,10"/>
+
+                        <!-- Search and Filter Panel -->
+                        <Border Background="{DynamicResource SurfaceBackground}"
+                                BorderBrush="{DynamicResource SurfaceBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12">
+                            <StackPanel Orientation="Horizontal">
+                                <syncfusion:SfTextBoxExt x:Name="SearchBox"
+                                                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"Width="250"
+                                                      Height="32"
+                                                      Margin="0,0,10,0"/>
+                                <syncfusion:ButtonAdv Label="🔍 Search"
+                                                     Command="{Binding SearchDriversCommand}"
+                                                     CommandParameter="{Binding Text, ElementName=SearchBox}"
+                                                     Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"Margin="0,0,10,0"/>
+                                <syncfusion:ComboBoxAdv ItemsSource="{Binding AvailableStatuses}"
+                                                       SelectedItem="{Binding SelectedStatusFilter}"
+                                                       DisplayMemberPath="Name"
+                                                       Style="{StaticResource BusBuddyComboBoxAdvStyle}"Width="150" Height="32"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Quick Stats Panel -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
+                            <StackPanel>
+                                <TextBlock Text="Total Drivers"
+                                           Style="{StaticResource BusBuddyTileContentStyle}"/>
+                                <TextBlock Text="{Binding TotalDrivers}"
+                                           Style="{StaticResource BusBuddyTileValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource BusBuddyDashboardTileStyle}" Margin="5,0">
+                            <StackPanel>
+                                <TextBlock Text="License Expiring"
+                                           Style="{StaticResource BusBuddyTileContentStyle}"/>
+                                <TextBlock Text="{Binding LicenseExpiringCount}"
+                                           Style="{StaticResource BusBuddyTileValueStyle}"
+                                           Foreground="{StaticResource WarningBrush}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Enhanced Data Grid with Conditional Formatting -->
+                <syncfusion:SfDataGrid x:Name="driversGrid" Grid.Row="1"
+                               ItemsSource="{Binding Drivers}"
+                               SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
+                               Style="{StaticResource BusBuddySfDataGridStyle}"AutoGenerateColumns="False"
+                               AllowResizingColumns="True"
+                               AllowSorting="True"
+                               AllowFiltering="True"
+                               ColumnSizer="Star"
+                               SelectionMode="Single"
+                               SelectionUnit="Row"
+                               NavigationMode="Row"
+                               AllowEditing="False"
+                               ShowRowHeader="True"
+                               EnableDataVirtualization="True"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               RowHeight="40"
+                               HeaderRowHeight="45">
+
+                    <syncfusion:SfDataGrid.Columns>
+                        <syncfusion:GridTextColumn MappingName="FirstName" HeaderText="First Name" Width="120"/>
+                        <syncfusion:GridTextColumn MappingName="LastName" HeaderText="Last Name" Width="120"/>
+                        <syncfusion:GridTextColumn MappingName="ContactPhone" HeaderText="Phone" Width="130"/>
+                        <syncfusion:GridTextColumn MappingName="ContactEmail" HeaderText="Email" Width="200"/>
+                        <syncfusion:GridDateTimeColumn MappingName="HireDate" HeaderText="Hire Date" Width="120" Pattern="ShortDate"/>
+                        <syncfusion:GridDateTimeColumn MappingName="LicenseExpiryDate" HeaderText="License Expiry" Width="140" Pattern="ShortDate"/>
+                        <syncfusion:GridTextColumn MappingName="Status" HeaderText="Status" Width="100"/>
+                        <syncfusion:GridTextColumn MappingName="AvailableHours" HeaderText="Available Hours" Width="120"/>
+                    </syncfusion:SfDataGrid.Columns>
+
+                    <!-- Context Menu for Right-Click Actions -->
+                    <syncfusion:SfDataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="View Details" Command="{Binding ViewDriverDetailsCommand}"/>
+                            <MenuItem Header="Edit Driver" Command="{Binding EditDriverCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Schedule Assignment" Command="{Binding ScheduleAssignmentCommand}"/>
+                            <MenuItem Header="Generate Report" Command="{Binding GenerateDriverReportCommand}"/>
+                            <Separator/>
+                            <MenuItem Header="Delete Driver" Command="{Binding DeleteDriverCommand}"
+                                     Foreground="{StaticResource ErrorBrush}"/>
+                        </ContextMenu>
+                    </syncfusion:SfDataGrid.ContextMenu>
+                </syncfusion:SfDataGrid>
+
+                <!-- Enhanced Action Panel with Syncfusion Buttons -->
+                <Grid Grid.Row="2" Margin="0,15,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Driver Status Summary -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Showing"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,5,0"
+                                   Foreground="{DynamicResource SecondaryForeground}"/>
+                        <TextBlock Text="{Binding Drivers.Count, Mode=OneWay}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource ContentForeground}"/>
+                        <TextBlock Text="of"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0"
+                                   Foreground="{DynamicResource SecondaryForeground}"/>
+                        <TextBlock Text="{Binding TotalDrivers, Mode=OneWay}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource ContentForeground}"/>
+                        <TextBlock Text="drivers"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0,15,0"
+                                   Foreground="{DynamicResource SecondaryForeground}"/>
+
+                        <!-- License Alert Indicator -->
+                        <Border Background="{DynamicResource WarningBackground}"
+                                CornerRadius="4"
+                                Padding="8,4"
+                                Visibility="{Binding HasExpiringLicenses, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⚠️" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding LicenseExpiringCount, StringFormat='{}{0} licenses expiring soon'}"
+                                          Foreground="White"
+                                          FontWeight="SemiBold"
+                                          VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <syncfusion:ButtonAdv Label="➕ Add Driver"
+                                             Command="{Binding AddDriverCommand}"
+                                             Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"Margin="5"/>
+                        <syncfusion:ButtonAdv Label="✏️ Edit"
+                                             Command="{Binding UpdateDriverCommand}"
+                                             CommandParameter="{Binding SelectedDriver}"
+                                             Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"Margin="5"/>
+                        <syncfusion:ButtonAdv Label="🗑️ Delete"
+                                             Command="{Binding DeleteDriverCommand}"
+                                             CommandParameter="{Binding SelectedDriver}"
+                                             Style="{StaticResource BusBuddyButtonAdvStyle}"Margin="5"/>
+                        <syncfusion:ButtonAdv Label="📊 Reports"
+                                             Command="{Binding GenerateReportsCommand}"
+                                             Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"Margin="5"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </ContentControl>
+
+        <!-- Loading Indicator -->
+        <syncfusion:SfBusyIndicator Grid.RowSpan="3"
+                                    IsBusy="{Binding IsLoading}"
+                                    Style="{StaticResource BusBuddySfBusyIndicatorStyle}"AnimationType="DoubleCircle"
+                                    Background="Transparent"/>
+
+    </syncfusion:DockingManager>
+</UserControl>
+
+

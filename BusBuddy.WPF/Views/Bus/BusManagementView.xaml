@@ -9,7 +9,7 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:BusManagementViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
     <!-- Local resources removed - all converters now global in App.xaml -->
     <Grid>
         <Grid.RowDefinitions>
@@ -36,7 +36,7 @@
                            ItemsSource="{Binding Buses}"
                            SelectedItem="{Binding SelectedBus, Mode=TwoWay}"
                            Style="{StaticResource BusBuddySfDataGridStyle}"
-                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                           
                            AutoGenerateColumns="False"
                            AllowResizingColumns="True"
                            AllowSorting="True"
@@ -192,7 +192,7 @@
                     <syncfusion:ComboBoxAdv Width="65" Height="30"
                               SelectedValue="{Binding PageSize, Mode=TwoWay}"
                               Style="{StaticResource BusBuddyComboBoxAdvStyle}"
-                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                              
                               SelectionChanged="PageSize_SelectionChanged">
                         <syncfusion:ComboBoxItemAdv Content="10"/>
                         <syncfusion:ComboBoxItemAdv Content="20"/>
@@ -210,19 +210,19 @@
                                 Command="{Binding AddBusCommand}"
                                 Margin="5"
                                 Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                
                                 ToolTip="Add a new bus to the fleet"/>
                 <syncfusion:ButtonAdv Label="✏️ Edit Selected"
                                 Command="{Binding UpdateBusCommand}"
                                 Margin="5"
                                 Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                
                                 ToolTip="Edit the currently selected bus"/>
                 <syncfusion:ButtonAdv Label="🗑️ Delete"
                                 Command="{Binding DeleteBusCommand}"
                                 Margin="5"
                                 Style="{StaticResource BusBuddyButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                
                                 ToolTip="Delete the currently selected bus"/>
             </StackPanel>
         </Grid>
@@ -231,9 +231,10 @@
         <syncfusion:SfBusyIndicator Grid.Row="0" Grid.RowSpan="2"
                                     IsBusy="{Binding IsBusy}"
                                     Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
-                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    
                                     AnimationType="DoubleCircle"
                                     Background="Transparent"/>
     </Grid>
 </UserControl>
+
 

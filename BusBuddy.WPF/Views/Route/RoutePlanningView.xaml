@@ -12,7 +12,7 @@
 ║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
 ║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
 ║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
 ║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
 ║                                                                                                                                                                          ║
 ║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
@@ -86,13 +86,13 @@
                             Padding="12,6"
                             Margin="0,0,8,0"
                             Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                            
                             Cursor="Hand"/>
                     <syncfusion:ButtonAdv Label="Export Assignments"
                             Command="{Binding ExportAssignmentsCommand}"
                             Padding="12,6"
                             Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                            
                             Cursor="Hand"/>
                 </StackPanel>
             </Grid>
@@ -195,4 +195,5 @@
         </Grid>
     </Grid>
 </UserControl>
+
 

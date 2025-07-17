@@ -1,6 +1,79 @@
 {
     "version": "2.0.0",
+    "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+            "COPILOT_WORKFLOW_MODE": "STREAMLINED",
+            "TERMINAL_REUSE_POLICY": "SINGLE_DEDICATED",
+            "OUTPUT_CAPTURE_MODE": "SYNCHRONOUS",
+            "WORKFLOW_CONFIRMATION_REQUIRED": "true"
+        }
+    },
+    "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true,
+        "revealProblems": "onProblem"
+    },
     "tasks": [
+        {
+            "label": "🔍 Analyze PowerShell Scripts",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "Import-Module PSScriptAnalyzer; $report = @(); Get-ChildItem -Path '${workspaceFolder}' -Include '*.ps1' -Recurse | ForEach-Object { Write-Host \"Analyzing $($_.FullName)...\" -ForegroundColor Cyan; $results = Invoke-ScriptAnalyzer -Path $_.FullName; $report += $results }; Write-Host \"`nAnalysis Complete - Summary:\" -ForegroundColor Green; $report | Group-Object RuleName | Sort-Object Count -Descending | Format-Table @{Label='Rule';Expression={$_.Name}}, @{Label='Count';Expression={$_.Count}} -AutoSize; Write-Host \"`nTop files with issues:\" -ForegroundColor Yellow; $report | Group-Object ScriptName | Sort-Object Count -Descending | Select-Object -First 5 | Format-Table @{Label='Script';Expression={$_.Name}}, @{Label='Issues';Expression={$_.Count}} -AutoSize"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "powershell-analyzer",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^(.*)\\s+:\\s+(Warning|Error)\\s+(.*)$",
+                        "file": 1,
+                        "severity": 2,
+                        "message": 3
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🔧 Repair PowerShell Script Issues",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Repair-PSScriptAnalyzerIssues.ps1' -ScriptPath '${input:scriptPath}' -Fix"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
         {
             "label": "Clean Solution",
             "command": "dotnet",
@@ -378,16 +451,11 @@
                 {
                     "owner": "xaml-validator",
                     "fileLocation": "absolute",
-                    "pattern": [
-                        {
-                            "regexp": "^❌.*Validation failed for (.*)$",
-                            "file": 1
-                        },
-                        {
-                            "regexp": "^\\s*-\\s*(.*)$",
-                            "message": 1
-                        }
-                    ]
+                    "pattern": {
+                        "regexp": "^❌.*Validation failed for (.*):\\s*(.*)$",
+                        "file": 1,
+                        "message": 2
+                    }
                 }
             ],
             "options": {
@@ -557,6 +625,423 @@
                 "showReuseMessage": false,
                 "clear": true
             }
+        },
+        {
+            "label": "🔍 Review All Problems",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Review-Problems.ps1' -AnalyzeMode All -ShowSolutions"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "problems-review",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^❌\\s+(.*):(\\d+)\\s+-\\s+(.*)$",
+                        "file": 1,
+                        "line": 2,
+                        "message": 3
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🔧 Auto-Fix Problems",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Review-Problems.ps1' -AnalyzeMode All -AutoFix -ShowSolutions"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "auto-fix",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^✅\\s+Fixed:\\s+(.*)$",
+                        "message": 1
+                    }
+                },
+                {
+                    "owner": "auto-fix-failed",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^❌\\s+Failed to fix\\s+(.*):\\s+(.*)$",
+                        "file": 1,
+                        "message": 2
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🎯 Review Scheduling Problems",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Review-Problems.ps1' -AnalyzeMode All -SchedulingFocus -ShowSolutions"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "📊 Quick Problems Summary",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Review-Problems.ps1' -AnalyzeMode Summary"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "📄 Export Problems Report",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Review-Problems.ps1' -AnalyzeMode All -ExportReport -ShowSolutions"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🛠️ Tool Management - List Available Tools",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile", "-Command",
+                "& 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-PowerShell-Profile.ps1'; Get-AvailableTools -Detailed"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🧪 Tool Management - Test Tool Availability",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile", "-Command",
+                "& 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-PowerShell-Profile.ps1'; Test-ToolAvailability"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "📖 Tool Management - Show Help",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile", "-Command",
+                "& 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-PowerShell-Profile.ps1'; Show-ToolHelp"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🔄 Streamlined Build & Test",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Write-Host '🚀 STREAMLINED WORKFLOW: Starting build and validation...' -ForegroundColor Cyan; dotnet build BusBuddy.sln --verbosity minimal; if ($LASTEXITCODE -eq 0) { Write-Host '✅ Build successful - Ready for next step' -ForegroundColor Green; } else { Write-Host '❌ Build failed - Check output above' -ForegroundColor Red; }"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true,
+                "revealProblems": "onProblem"
+            },
+            "problemMatcher": ["$msCompile"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🔬 Enhanced Startup Debug - Isolated Testing",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Debug-Startup-Isolated.ps1' -Mode Isolated -EnableBreakpoints -ThemeValidation -DIAnalysis"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "startup-debug",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^❌.*\\[Error\\].*:\\s+(.*)$",
+                        "message": 1
+                    }
+                },
+                {
+                    "owner": "theme-validation",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^⚠️.*THEME.*:\\s+(.*)$",
+                        "message": 1
+                    }
+                },
+                {
+                    "owner": "di-analysis",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^❌.*DI setup failed.*:\\s+(.*)$",
+                        "message": 1
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🎯 Enhanced Startup Debug - Streaming Mode",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Debug-Startup-Isolated.ps1' -Mode Stream -ThemeValidation -DIAnalysis"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "owner": "streaming-debug",
+                    "fileLocation": "absolute",
+                    "pattern": {
+                        "regexp": "^\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\]\\s+❌\\s+\\[Error\\]\\s+(.*)$",
+                        "message": 1
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^🎯 STREAMING DEBUG: Starting real-time debug streaming",
+                        "endsPattern": "^Press Ctrl\\+C to stop streaming"
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "📊 Enhanced Startup Debug - Commit Analysis",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "& '${workspaceFolder}/Tools/Scripts/Debug-Startup-Isolated.ps1' -Mode CommitAnalysis -CommitHistory"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🎯 Streamlined Run Application",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-Command",
+                "Write-Host '🎯 STREAMLINED WORKFLOW: Starting application...' -ForegroundColor Cyan; dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj --verbosity minimal"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "base": "$msCompile",
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^🎯 STREAMLINED WORKFLOW:",
+                        "endsPattern": "^\\s*Application started\\.|^\\s*Now listening on:|^\\s*Hosting environment:"
+                    }
+                }
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🔍 Comprehensive Theme Validation",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "& { $ErrorActionPreference = 'Continue'; $Host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size(120, 9999); . '${workspaceFolder}/BusBuddy-PowerShell-Profile.ps1'; try { Invoke-ComprehensiveThemeValidation -Fix } catch { Write-Host 'Error: $_' -ForegroundColor Red; $_ | Format-List -Force } }"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "showReuseMessage": false,
+                "focus": true,
+                "echo": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "✨ Run Application with Theme Validation",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "& { $ErrorActionPreference = 'Continue'; $Host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size(120, 9999); . '${workspaceFolder}/BusBuddy-PowerShell-Profile.ps1'; try { Invoke-ComprehensiveThemeValidation -Fix -RunApp } catch { Write-Host 'Error: $_' -ForegroundColor Red; $_ | Format-List -Force } }"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true,
+                "showReuseMessage": false,
+                "focus": true,
+                "echo": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "scriptPath",
+            "type": "promptString",
+            "description": "Enter the path to the PowerShell script or directory to analyze and repair",
+            "default": "${workspaceFolder}/Tools/Scripts"
         }
     ]
 }

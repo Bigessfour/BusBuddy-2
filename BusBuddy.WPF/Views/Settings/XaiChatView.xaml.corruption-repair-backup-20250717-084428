@@ -1,0 +1,48 @@
+<UserControl x:Class="BusBuddy.WPF.Views.Settings.XaiChatView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionchat="clr-namespace:Syncfusion.UI.Xaml.Chat;a ssembly=Syncfusion.SfChat.WPF"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;a ssembly=Syncfusion.SfSkinManager.WPF"
+             mc:I gnorable="d"
+             d:D esignHeight="600" d:D esignWidth="400">
+
+    <!-- No UserControl.Resources needed - SfSkinManager handles theme automatically -->
+
+    <Grid B ackground="{DynamicResource ContentBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition H eight="Auto"/>
+            <RowDefinition H eight="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.R ow="0"
+                B ackground="{DynamicResource PrimaryBackground}"
+                P adding="16,12">
+            <StackPanel O rientation="Horizontal" H orizontalAlignment="Center">
+                <TextBlock T ext="🤖"
+                           F ontSize="18"
+                           M argin="0,0,8,0"
+                           V erticalAlignment="Center"/>
+                <TextBlock T ext="Bus Buddy AI Assistant"
+                           F ontSize="16"
+                           F ontWeight="SemiBold"
+                           F oreground="{DynamicResource PrimaryForeground}"
+                           V erticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Syncfusion AI AssistView -->
+        <syncfusionchat:SfAIAssistView Grid.R ow="1"
+                            x:N ame="AIAssistView"
+                            C urrentUser="{Binding CurrentUser}"
+                            M essages="{Binding Messages}"
+                            S uggestions="{Binding Suggestions}"
+                            S howTypingIndicator="{Binding IsTyping}" Background="{DynamicResource ContentBackground}"
+                            F oreground="{DynamicResource ContentForeground}"
+                            M argin="0"/>
+    </Grid>
+</UserControl>
+

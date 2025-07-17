@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="BusBuddy.WPF.Views.Schedule.ActivityScheduleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:BusBuddy.WPF.Views.Schedule"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:vm="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <Style TargetType="Button" x:Key="ActionButton">
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="MinWidth" Value="80"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="Activity Schedule Management"
+                   FontSize="20" FontWeight="Bold" Margin="10,10,10,20"/>
+
+        <!-- Filters -->
+        <Grid Grid.Row="1" Margin="10,0,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Start Date:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate}" Margin="0,0,10,0"/>
+
+            <TextBlock Grid.Column="2" Text="End Date:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" Margin="0,0,10,0"/>
+
+            <TextBlock Grid.Column="4" Text="Trip Type:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <ComboBox Grid.Column="5" Text="{Binding FilterTripType}" IsEditable="True" Margin="0,0,10,0">
+                <ComboBoxItem Content=""/>
+                <ComboBoxItem Content="Sports Trip"/>
+                <ComboBoxItem Content="Activity Trip"/>
+                <ComboBoxItem Content="Field Trip"/>
+                <ComboBoxItem Content="Special Event"/>
+            </ComboBox>
+
+            <Button Grid.Column="6" Content="Apply Filters" Command="{Binding FilterCommand}"
+                    Style="{StaticResource ActionButton}"/>
+        </Grid>
+
+        <!-- DataGrid -->
+        <syncfusion:SfDataGrid Grid.Row="2"
+                               Name="ActivityScheduleGrid"
+                               ItemsSource="{Binding ActivitySchedules}"
+                               SelectedItem="{Binding SelectedActivitySchedule, Mode=TwoWay}"
+                               AutoGenerateColumns="False"
+                               AllowFiltering="True"
+                               AllowResizingColumns="True"
+                               AllowSorting="True"
+                               ShowBusyIndicator="{Binding IsLoading}"Margin="10">
+            <syncfusion:SfDataGrid.Columns>
+                <syncfusion:GridTextColumn HeaderText="ID" MappingName="ActivityScheduleId" Width="60"/>
+                <syncfusion:GridDateTimeColumn HeaderText="Date" MappingName="ScheduledDate" Width="110"
+                                              DisplayBinding="{Binding ScheduledDate, StringFormat=\{0:MM/dd/yyyy\}}"/>
+                <syncfusion:GridTextColumn HeaderText="Trip Type" MappingName="TripType" Width="120"/>
+                <syncfusion:GridTextColumn HeaderText="Destination" MappingName="ScheduledDestination" Width="200"/>
+                <syncfusion:GridTextColumn HeaderText="Leave Time" MappingName="ScheduledLeaveTime" Width="100"
+                                          DisplayBinding="{Binding ScheduledLeaveTime, StringFormat=\{0:hh\\:mm\}}"/>
+                <syncfusion:GridTextColumn HeaderText="Event Time" MappingName="ScheduledEventTime" Width="100"
+                                          DisplayBinding="{Binding ScheduledEventTime, StringFormat=\{0:hh\\:mm\}}"/>
+                <syncfusion:GridTextColumn HeaderText="Driver" MappingName="ScheduledDriver.DriverName" Width="150"/>
+                <syncfusion:GridTextColumn HeaderText="Vehicle" MappingName="ScheduledVehicle.BusNumber" Width="100"/>
+                <syncfusion:GridTextColumn HeaderText="Requested By" MappingName="RequestedBy" Width="130"/>
+                <syncfusion:GridTextColumn HeaderText="Status" MappingName="Status" Width="100"/>
+                <syncfusion:GridNumericColumn HeaderText="Riders" MappingName="ScheduledRiders" Width="70"/>
+            </syncfusion:SfDataGrid.Columns>
+        </syncfusion:SfDataGrid>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Add" Command="{Binding AddActivityScheduleCommand}" Style="{StaticResource ActionButton}"/>
+            <Button Content="Edit" Command="{Binding EditActivityScheduleCommand}" Style="{StaticResource ActionButton}"/>
+            <Button Content="Delete" Command="{Binding DeleteActivityScheduleCommand}" Style="{StaticResource ActionButton}"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,0"/>
+            <Button Content="Confirm" Command="{Binding ConfirmActivityScheduleCommand}" Style="{StaticResource ActionButton}"/>
+            <Button Content="Cancel" Command="{Binding CancelActivityScheduleCommand}" Style="{StaticResource ActionButton}"/>
+            <Button Content="Complete" Command="{Binding CompleteActivityScheduleCommand}" Style="{StaticResource ActionButton}"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,0"/>
+            <Button Content="Reports" Command="{Binding ShowReportsCommand}" Style="{StaticResource ActionButton}"/>
+            <Button Content="Export to CSV" Command="{Binding ExportToCsvCommand}" Style="{StaticResource ActionButton}"/>
+            <Button Content="Refresh" Command="{Binding RefreshCommand}" Style="{StaticResource ActionButton}"/>
+        </StackPanel>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="4">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusMessage}"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</UserControl>
+

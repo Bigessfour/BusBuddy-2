@@ -16,7 +16,9 @@
              xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
              xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
              xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
-             xmlns:scheduleManagementViewModels="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement">
+             xmlns:scheduleManagementViewModels="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF">
     <Application.Resources>
         <ResourceDictionary>
             <!--
@@ -30,45 +32,50 @@
             ✅ RESOURCE OPTIMIZATION: Consolidated resource dictionary with essential styles only
             ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
             -->
-
             <ResourceDictionary.MergedDictionaries>
-                <!-- 🎨 PURE SYNCFUSION THEME FOUNDATION -->
-                <!-- Theme application handled by SfSkinManager in App.xaml.cs -->
-                <!-- No explicit theme resource dictionaries needed here -->
+                <!-- 🎨 SYNCFUSION THEME CONFIGURATION - USING SFSKINMANAGER (RECOMMENDED FOR FLUENT THEMES) -->
+                <syncfusionskin:SfSkinManager Theme="FluentDark" />
+                <!-- Custom theme overrides for BusBuddy -->
+                <ResourceDictionary Source="/BusBuddy.WPF;component/Resources/Themes/FluentDark.xaml" />
 
-                <!-- 🎯 CONSOLIDATED BUSBUDDY RESOURCES -->
-                <!-- Contains all custom styles, brushes, and templates -->
-                <ResourceDictionary Source="Resources/BusBuddyResourceDictionary.xaml" />
+                <!-- 🎯 CUSTOM STYLES AND RESOURCES -->
+                <!-- Custom Syncfusion styles and resources -->
+                <ResourceDictionary Source="pack://application:,,,/BusBuddy.WPF;component/Resources/SyncfusionV30_ResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
             <!-- GLOBAL CONVERTERS -->
-            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter" IsInverted="True" />
+
+            <!-- CRITICAL MISSING RESOURCES: Prevent fallback warnings -->
+            <SolidColorBrush x:Key="ContentForeground" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="TextForeground" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="ControlForeground" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" /> <!-- Alias for TextForeground -->
+            <SolidColorBrush x:Key="BackgroundBrush" Color="#1E1E1E" />
+            <SolidColorBrush x:Key="BackgroundNormalBrush" Color="#1E1E1E" />
+            <SolidColorBrush x:Key="SurfaceBackground" Color="#1E1E1E" />
+            <SolidColorBrush x:Key="SurfaceBorderBrush" Color="#323130" />
 
             <!-- GLOBAL STYLES FOR ENHANCED CONTROLS -->
             <Style x:Key="EnhancedNavigationDrawerStyle" TargetType="ContentControl">
-                <Setter Property="Background" Value="{DynamicResource SurfaceBackground}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0" />
             </Style>
-
             <Style x:Key="EnhancedContentControlStyle" TargetType="ContentControl">
-                <Setter Property="Background" Value="{DynamicResource SurfaceBackground}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Stretch" />
             </Style>
-
             <!--
             ===============================================================================
             THEME USAGE GUIDELINES
             ===============================================================================
-            Each control should have: syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
-            Theme switching is available via ThemeService.ToggleTheme()
+            Each control should have:Theme switching is available via ThemeService.ToggleTheme()
             ===============================================================================
             -->
-
             <!-- ===============================================================================
             VIEWMODEL TO VIEW MAPPING — MVVM PATTERN IMPLEMENTATION
             ===============================================================================
@@ -114,38 +121,31 @@
             <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
                 <views:StudentListView />
             </DataTemplate>
-
             <!-- Essential converters only - minimal resource dictionary -->
-            <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
-            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-            <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter"/>
-            <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
-
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter" />
+            <converters:ThemeTextConverter x:Key="ThemeTextConverter" />
             <!-- Missing Inverse Converter - Critical Fix -->
             <!-- <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter2" IsInverted="True"/> -->
-
             <!-- Status and Data Converters -->
-            <converters:ActiveStatusToColorConverter x:Key="ActiveStatusToColorConverter"/>
-            <converters:ActiveStatusToTextConverter x:Key="ActiveStatusToTextConverter"/>
-            <converters:EfficiencyToColorConverter x:Key="EfficiencyToColorConverter"/>
-            <converters:LicenseStatusToColorConverter x:Key="LicenseStatusToColorConverter"/>
-            <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
-            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
-            <converters:AvailabilityToColorConverter x:Key="AvailabilityToColorConverter"/>
-            <converters:LicenseExpiredConverter x:Key="LicenseExpiredConverter"/>
-            <converters:LicenseExpiringSoonConverter x:Key="LicenseExpiringSoonConverter"/>
-            <converters:DaysRemainingToColorConverter x:Key="DaysRemainingToColorConverter"/>
-
+            <converters:ActiveStatusToColorConverter x:Key="ActiveStatusToColorConverter" />
+            <converters:ActiveStatusToTextConverter x:Key="ActiveStatusToTextConverter" />
+            <converters:EfficiencyToColorConverter x:Key="EfficiencyToColorConverter" />
+            <converters:LicenseStatusToColorConverter x:Key="LicenseStatusToColorConverter" />
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter" />
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+            <converters:AvailabilityToColorConverter x:Key="AvailabilityToColorConverter" />
+            <converters:LicenseExpiredConverter x:Key="LicenseExpiredConverter" />
+            <converters:LicenseExpiringSoonConverter x:Key="LicenseExpiringSoonConverter" />
+            <converters:DaysRemainingToColorConverter x:Key="DaysRemainingToColorConverter" />
             <!-- Additional converters commonly used in views -->
-            <converters:ScheduleStatusToColorConverter x:Key="ScheduleStatusToColorConverter"/>
-
+            <converters:ScheduleStatusToColorConverter x:Key="ScheduleStatusToColorConverter" />
             <!-- CRITICAL: Add missing converters to prevent local definitions -->
-            <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>
-            <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
-
+            <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+            <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
             <!-- Standard WPF converters as global resources -->
             <!-- Already defined above: <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/> -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>
-

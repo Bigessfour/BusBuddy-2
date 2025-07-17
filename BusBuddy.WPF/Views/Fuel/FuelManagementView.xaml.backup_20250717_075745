@@ -1,0 +1,571 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                                                                                                          ║
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+║                                                                                                                                                                          ║
+║  📋 REQUIRED STANDARDS: This child form MUST follow the universal standards defined in:                                                                                ║
+║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
+║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
+║                                                                                                                                                                          ║
+║  🔧 MANDATORY IMPLEMENTATIONS:                                                                                                                                          ║
+║     ✅ UserControl Style: BusBuddyUserControlStyle                                                                                                                     ║
+║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
+║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
+║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
+║     ✅ Theme Application:on ALL Syncfusion controls                                                           ║
+║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
+║                                                                                                                                                                          ║
+║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
+║     • NEVER use standard WPF Button - use syncfusion:ButtonAdv                                                                                                        ║
+║     • NEVER use Content property on ButtonAdv - use Label property                                                                                                    ║
+║     • NEVER use "sf:" namespace prefix - use "syncfusion:" prefix                                                                                                     ║
+║     • ALWAYS apply FluentDark theme to maintain visual consistency                                                                                                     ║
+║     • ALWAYS reference baseline styles for consistent appearance                                                                                                       ║
+║                                                                                                                                                                          ║
+║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
+║                                                                                                                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<UserControl x:Class="BusBuddy.WPF.Views.Fuel.FuelManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             xmlns:chart="clr-namespace:Syncfusion.UI.Xaml.Charts;assembly=Syncfusion.SfChart.WPF"
+             xmlns:gauge="clr-namespace:Syncfusion.UI.Xaml.Gauges;assembly=Syncfusion.SfGauge.WPF"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             d:DataContext="{d:DesignInstance viewModels:FuelManagementViewModel}"Loaded="UserControl_Loaded"
+             Unloaded="UserControl_Unloaded">
+    <!-- Local resources removed - all converters now global in App.xaml -->
+
+    <!-- Enhanced Fuel Management with Syncfusion DockingManager -->
+    <syncfusion:DockingManager UseDocumentContainer="True"
+                              PersistState="False"
+                              ContainerMode="TDI"
+                              Style="{StaticResource BusBuddyDockingManagerStyle}"Background="{StaticResource ContentBackground}">
+
+        <!-- Fuel Overview Dashboard (Document) -->
+        <ContentControl syncfusion:DockingManager.Header="Fuel Overview"
+                       syncfusion:DockingManager.State="Document"
+                       syncfusion:DockingManager.CanSerialize="True">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Enhanced Header -->
+                <DockPanel Grid.Row="0" Margin="0,0,0,20">
+                    <TextBlock Text="⛽ Fuel Management Dashboard"
+                              Style="{StaticResource BusBuddyTileHeaderStyle}"
+                              DockPanel.Dock="Left"/>
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                        <syncfusion:ButtonAdv x:Name="AddFuelRecordButton"
+                                            Label="➕ New Fuel Record"
+                                            Command="{Binding AddCommand}"
+                                            Style="{StaticResource BusBuddyPrimaryButtonStyle}"Margin="5"
+                                            Click="AddFuelRecordButton_Click"/>
+                        <syncfusion:ButtonAdv x:Name="GenerateFuelReportButton"
+                                            Label="📊 Fuel Reports"
+                                            Command="{Binding ReportCommand}"
+                                            Style="{StaticResource BusBuddySecondaryButtonStyle}"Margin="5"
+                                            Click="GenerateFuelReportButton_Click"/>
+                        <syncfusion:ButtonAdv x:Name="FuelReconciliationButton"
+                                            Label="🔄 Reconciliation"
+                                            Command="{Binding ReconciliationCommand}"
+                                            Style="{StaticResource BusBuddySecondaryButtonStyle}"Margin="5"
+                                            Click="FuelReconciliationButton_Click"/>
+                        <syncfusion:ButtonAdv x:Name="RefreshFuelButton"
+                                            Label="🔄 Refresh"
+                                            Style="{StaticResource BusBuddySecondaryButtonStyle}"Margin="5"
+                                            Click="RefreshFuelButton_Click"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- Enhanced Fuel Metrics Dashboard -->
+                <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,20">
+                    <!-- Monthly Fuel Cost Tile -->
+                    <Border x:Name="MonthlyFuelCostTile"
+                           Style="{StaticResource BusBuddyDashboardTileStyle}"
+                           MouseLeftButtonDown="FuelTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="💰 Monthly Cost" FontSize="14" FontWeight="SemiBold"
+                                          Foreground="{StaticResource SuccessBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" DockPanel.Dock="Right"
+                                        VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Text="{Binding MonthlyFuelCost, StringFormat='{}{0:C0}'}"
+                                      FontSize="28" FontWeight="Bold"
+                                      Foreground="{StaticResource SuccessBrush}"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,10,0,5"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Budget:" FontSize="10"
+                                              Foreground="{StaticResource SecondaryForeground}"/>
+                                    <syncfusion:SfLinearProgressBar Progress="{Binding BudgetUsagePercentage}"
+                                                                   Height="6"
+                                                                   Background="{StaticResource ContentBackground}"
+                                                                   Foreground="{StaticResource SuccessBrush}"Minimum="0" Maximum="100"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="{Binding BudgetUsagePercentage, StringFormat='{}{0:F0}%'}"
+                                          FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}"
+                                          VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Average MPG Tile with Gauge -->
+                    <Border x:Name="AverageMPGTile"
+                           Style="{StaticResource BusBuddyDashboardTileStyle}"
+                           MouseLeftButtonDown="FuelTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="📊 Fleet MPG" FontSize="14" FontWeight="SemiBold"
+                                          Foreground="{StaticResource InfoBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource InfoBrush}" DockPanel.Dock="Right"
+                                        VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding AverageFleetMPG, StringFormat='{}{0:F1} MPG'}"
+                                              FontSize="18" FontWeight="Bold"
+                                              Foreground="{StaticResource InfoBrush}"/>
+                                    <TextBlock Text="Target: 8.5 MPG" FontSize="10"
+                                              Foreground="{StaticResource SecondaryForeground}" Margin="0,5,0,0"/>
+                                    <TextBlock Text="{Binding MPGTrend}" FontSize="10"
+                                              FontWeight="SemiBold" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <gauge:SfCircularGauge Grid.Column="1" Width="60" Height="60" Margin="5,0,0,0">
+                                    <gauge:SfCircularGauge.Scales>
+                                        <gauge:CircularScale StartAngle="135" SweepAngle="270"
+                                                           StartValue="0" EndValue="15"
+                                                           ShowTicks="False" ShowLabels="False"
+                                                           RimStroke="{StaticResource ContentBackground}" RimStrokeThickness="4">
+                                            <gauge:CircularScale.Pointers>
+                                                <gauge:CircularPointer NeedlePointerType="Triangle"
+                                                                     PointerCapStroke="{StaticResource InfoBrush}"
+                                                                     NeedlePointerStroke="{StaticResource InfoBrush}"
+                                                                     Value="{Binding AverageFleetMPG}"/>
+                                            </gauge:CircularScale.Pointers>
+                                            <gauge:CircularScale.Ranges>
+                                                <gauge:CircularRange StartValue="0" EndValue="6"
+                                                                   Stroke="{StaticResource ErrorBrush}" StrokeThickness="4"/>
+                                                <gauge:CircularRange StartValue="6" EndValue="10"
+                                                                   Stroke="{StaticResource WarningBrush}" StrokeThickness="4"/>
+                                                <gauge:CircularRange StartValue="10" EndValue="15"
+                                                                   Stroke="{StaticResource SuccessBrush}" StrokeThickness="4"/>
+                                            </gauge:CircularScale.Ranges>
+                                        </gauge:CircularScale>
+                                    </gauge:SfCircularGauge.Scales>
+                                </gauge:SfCircularGauge>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Total Gallons Consumed Tile -->
+                    <Border x:Name="TotalGallonsTile"
+                           Style="{StaticResource BusBuddyDashboardTileStyle}"
+                           MouseLeftButtonDown="FuelTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="⛽ Monthly Gallons" FontSize="14" FontWeight="SemiBold"
+                                          Foreground="{StaticResource WarningBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource WarningBrush}" DockPanel.Dock="Right"
+                                        VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Text="{Binding MonthlyGallonsConsumed, StringFormat='{}{0:N0}'}"
+                                      FontSize="28" FontWeight="Bold"
+                                      Foreground="{StaticResource WarningBrush}"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,10,0,5"/>
+                            <StackPanel>
+                                <TextBlock Text="gallons" FontSize="12"
+                                          Foreground="{StaticResource SecondaryForeground}"
+                                          HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding GallonsVsLastMonth}" FontSize="10"
+                                          FontWeight="SemiBold"
+                                          HorizontalAlignment="Center"
+                                          Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Cost Per Mile Efficiency Tile -->
+                    <Border x:Name="CostPerMileTile"
+                           Style="{StaticResource BusBuddyDashboardTileStyle}"
+                           MouseLeftButtonDown="FuelTile_MouseLeftButtonDown">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="💲 Cost Per Mile" FontSize="14" FontWeight="SemiBold"
+                                          Foreground="{DynamicResource PrimaryBrush}" DockPanel.Dock="Left"/>
+                                <Ellipse Width="10" Height="10" Fill="{DynamicResource PrimaryBrush}" DockPanel.Dock="Right"
+                                        VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Text="{Binding CostPerMile, StringFormat='{}{0:C2}'}"
+                                      FontSize="24" FontWeight="Bold"
+                                      Foreground="{DynamicResource PrimaryBrush}"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,10,0,5"/>
+                            <StackPanel>
+                                <TextBlock Text="per mile" FontSize="12"
+                                          Foreground="{StaticResource SecondaryForeground}"
+                                          HorizontalAlignment="Center"/>
+                                <Border Background="{DynamicResource PrimaryBrush}" CornerRadius="3" Padding="6,2"
+                                       HorizontalAlignment="Center" Margin="0,8,0,0">
+                                    <TextBlock Text="{Binding EfficiencyRating}"
+                                              Foreground="{StaticResource Foreground}" FontSize="10" FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Enhanced Fuel Records Grid -->
+                <syncfusion:SfDataGrid x:Name="FuelDataGrid"
+                                      Grid.Row="2"
+                                      ItemsSource="{Binding FuelRecords}"
+                                      SelectedItem="{Binding SelectedFuelRecord, Mode=TwoWay}"
+                                      AutoGenerateColumns="False"
+                                      AllowResizingColumns="True"
+                                      AllowSorting="True"
+                                      AllowFiltering="True"
+                                      AllowGrouping="True"
+                                      ShowGroupDropArea="True"
+                                      ColumnSizer="Star"
+                                      SelectionMode="Single"
+                                      NavigationMode="Row"
+                                      AllowEditing="False"
+                                      ShowRowHeader="False"
+                                      Style="{StaticResource BusBuddySfDataGridStyle}"SelectionChanged="FuelDataGrid_SelectionChanged"
+                                      CellTapped="FuelDataGrid_CellTapped"
+                                      BorderThickness="1"
+                                      BorderBrush="{StaticResource BorderBrush}">
+                    <syncfusion:SfDataGrid.Columns>
+                        <!-- Enhanced Date Column -->
+                        <syncfusion:GridDateTimeColumn MappingName="FuelDate" HeaderText="Date" Width="100"
+                                                      Pattern="ShortDate"/>
+
+                        <!-- Enhanced Bus Column with Visual Indicator -->
+                        <syncfusion:GridTemplateColumn MappingName="BusNumber" HeaderText="Bus" Width="80">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource InfoBrush}" CornerRadius="4" Padding="4,2" Margin="1">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="🚌" FontSize="10" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                                            <TextBlock Text="{Binding BusNumber}"
+                                                      FontWeight="SemiBold" FontSize="10"
+                                                      Foreground="{StaticResource InfoBrush}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
+                        <!-- Fuel Location -->
+                        <syncfusion:GridTextColumn MappingName="FuelLocation" HeaderText="Location" Width="120"/>
+
+                        <!-- Odometer Reading -->
+                        <syncfusion:GridNumericColumn MappingName="VehicleOdometerReading" HeaderText="Odometer" Width="100"
+                                                     NumberGroupSeparator=","/>
+
+                        <!-- Fuel Type with Icon -->
+                        <syncfusion:GridTemplateColumn MappingName="FuelType" HeaderText="Fuel Type" Width="100">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="⛽" FontSize="10" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                                        <TextBlock Text="{Binding FuelType}" FontSize="10" VerticalAlignment="Center"
+                                                  Foreground="{StaticResource Foreground}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
+                        <!-- Gallons with Formatting -->
+                        <syncfusion:GridNumericColumn MappingName="Gallons" HeaderText="Gallons" Width="90"
+                                                     NumberDecimalDigits="2"/>
+
+                        <!-- Price Per Gallon -->
+                        <syncfusion:GridCurrencyColumn MappingName="PricePerGallon" HeaderText="Price/Gal" Width="100"/>
+
+                        <!-- Total Cost -->
+                        <syncfusion:GridCurrencyColumn MappingName="TotalCost" HeaderText="Total Cost" Width="100"/>
+
+                        <!-- MPG Calculation (if available) -->
+                        <syncfusion:GridTemplateColumn MappingName="MPG" HeaderText="MPG" Width="80">
+                            <syncfusion:GridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource SuccessBrush}" CornerRadius="3" Padding="4,2" Margin="1">
+                                        <TextBlock Text="{Binding MPG, StringFormat='{}{0:F1}'}"
+                                                  FontSize="10" FontWeight="SemiBold"
+                                                  Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </syncfusion:GridTemplateColumn.CellTemplate>
+                        </syncfusion:GridTemplateColumn>
+
+                        <!-- Driver (if tracked) -->
+                        <syncfusion:GridTextColumn MappingName="DriverName" HeaderText="Driver" Width="120"/>
+
+                        <!-- Notes -->
+                        <syncfusion:GridTextColumn MappingName="Notes" HeaderText="Notes" Width="150"
+                                                  TextWrapping="Wrap"/>
+                    </syncfusion:SfDataGrid.Columns>
+
+                    <!-- Context Menu -->
+                    <syncfusion:SfDataGrid.ContextMenu>
+                        <ContextMenu Style="{StaticResource BusBuddyContextMenuStyle}">
+                            <MenuItem Header="📝 Edit Fuel Record" Command="{Binding EditCommand}"
+                                     Style="{StaticResource BusBuddyContextMenuItemStyle}"/>
+                            <MenuItem Header="📋 Duplicate Record" Command="{Binding DuplicateCommand}"
+                                     Style="{StaticResource BusBuddyContextMenuItemStyle}"/>
+                            <Separator Style="{StaticResource BusBuddyContextMenuSeparatorStyle}"/>
+                            <MenuItem Header="📊 MPG Analysis" Command="{Binding AnalyzeMPGCommand}"
+                                     Style="{StaticResource BusBuddyContextMenuItemStyle}"/>
+                            <MenuItem Header="💰 Cost Analysis" Command="{Binding AnalyzeCostCommand}"
+                                     Style="{StaticResource BusBuddyContextMenuItemStyle}"/>
+                            <Separator Style="{StaticResource BusBuddyContextMenuSeparatorStyle}"/>
+                            <MenuItem Header="🗑️ Delete" Command="{Binding DeleteCommand}"
+                                     Style="{StaticResource BusBuddyContextMenuItemStyle}"
+                                     Foreground="{StaticResource ErrorBrush}"/>
+                        </ContextMenu>
+                    </syncfusion:SfDataGrid.ContextMenu>
+                </syncfusion:SfDataGrid>
+            </Grid>
+        </ContentControl>
+
+        <!-- Fuel Analytics Charts (Docked Right) -->
+        <ContentControl syncfusion:DockingManager.Header="Fuel Analytics"
+                       syncfusion:DockingManager.State="Dock"
+                       syncfusion:DockingManager.SideInDockedMode="Right"
+                       syncfusion:DockingManager.DesiredWidthInDockedMode="400"
+                       syncfusion:DockingManager.CanSerialize="True">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15">
+                <StackPanel>
+                    <TextBlock Text="📈 Fuel Analytics" FontSize="16" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                    <!-- MPG Trends Chart -->
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
+                        <StackPanel Margin="15">
+                            <TextBlock Text="MPG Trends" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10"
+                                      Foreground="{StaticResource Foreground}"/>
+                            <chart:SfChart x:Name="MPGTrendsChart"
+                                          Height="200"Background="Transparent"
+                                          MouseLeftButtonDown="Chart_MouseLeftButtonDown">
+                                <chart:SfChart.PrimaryAxis>
+                                    <chart:DateTimeAxis ShowGridLines="False"
+                                                       LabelFormat="MMM"
+                                                       IntervalType="Months">
+                                                       <chart:DateTimeAxis.LabelStyle>
+                                                           <chart:LabelStyle Foreground="{StaticResource SecondaryForeground}"/>
+                                                       </chart:DateTimeAxis.LabelStyle>
+                                    </chart:DateTimeAxis>
+                                </chart:SfChart.PrimaryAxis>
+                                <chart:SfChart.SecondaryAxis>
+                                    <chart:NumericalAxis ShowGridLines="True"
+                                                        Header="Miles Per Gallon">
+                                                        <chart:NumericalAxis.HeaderStyle>
+                                                            <chart:LabelStyle Foreground="{StaticResource Foreground}"/>
+                                                        </chart:NumericalAxis.HeaderStyle>
+                                                        <chart:NumericalAxis.LabelStyle>
+                                                            <chart:LabelStyle Foreground="{StaticResource SecondaryForeground}"/>
+                                                        </chart:NumericalAxis.LabelStyle>
+                                    </chart:NumericalAxis>
+                                </chart:SfChart.SecondaryAxis>
+                                <chart:SfChart.Series>
+                                    <chart:SplineAreaSeries ItemsSource="{Binding MPGTrendsData}"
+                                                          XBindingPath="Period"
+                                                          YBindingPath="AverageMPG"
+                                                          StrokeThickness="3"
+                                                          Stroke="{StaticResource InfoBrush}">
+                                        <chart:SplineAreaSeries.Interior>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="{StaticResource InfoBrush}" Offset="0"/>
+                                                <GradientStop Color="{StaticResource InfoBrush}" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </chart:SplineAreaSeries.Interior>
+                                    </chart:SplineAreaSeries>
+                                </chart:SfChart.Series>
+                            </chart:SfChart>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Cost Analysis Chart -->
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
+                        <StackPanel Margin="15">
+                            <TextBlock Text="Monthly Cost Analysis" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10"
+                                      Foreground="{StaticResource Foreground}"/>
+                            <chart:SfChart x:Name="CostAnalysisChart"
+                                          Height="200"Background="Transparent"
+                                          MouseLeftButtonDown="Chart_MouseLeftButtonDown">
+                                <chart:SfChart.PrimaryAxis>
+                                    <chart:CategoryAxis ShowGridLines="False">
+                                        <chart:CategoryAxis.LabelStyle>
+                                            <Style TargetType="Label">
+                                                <Setter Property="Foreground" Value="{StaticResource SecondaryForeground}"/>
+                                            </Style>
+                                        </chart:CategoryAxis.LabelStyle>
+                                    </chart:CategoryAxis>
+                                </chart:SfChart.PrimaryAxis>
+                                <chart:SfChart.SecondaryAxis>
+                                    <chart:NumericalAxis ShowGridLines="True"
+                                                        Header="Cost ($)">
+                                        <chart:NumericalAxis.HeaderStyle>
+                                            <Style TargetType="Label">
+                                                <Setter Property="Foreground" Value="{StaticResource Foreground}"/>
+                                            </Style>
+                                        </chart:NumericalAxis.HeaderStyle>
+                                        <chart:NumericalAxis.LabelStyle>
+                                            <Style TargetType="Label">
+                                                <Setter Property="Foreground" Value="{StaticResource SecondaryForeground}"/>
+                                            </Style>
+                                        </chart:NumericalAxis.LabelStyle>
+                                    </chart:NumericalAxis>
+                                </chart:SfChart.SecondaryAxis>
+                                <chart:SfChart.Series>
+                                    <chart:ColumnSeries ItemsSource="{Binding MonthlyCostData}"
+                                                       XBindingPath="Month"
+                                                       YBindingPath="TotalCost">
+                                        <chart:ColumnSeries.Interior>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="{StaticResource SuccessBrush}" Offset="0"/>
+                                                <GradientStop Color="{StaticResource SuccessBrush}" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </chart:ColumnSeries.Interior>
+                                    </chart:ColumnSeries>
+                                </chart:SfChart.Series>
+                            </chart:SfChart>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Fuel Efficiency Distribution -->
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6" Margin="0,0,0,20">
+                        <StackPanel Margin="15">
+                            <TextBlock Text="Fleet Efficiency Distribution" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,10"
+                                      Foreground="{StaticResource Foreground}"/>
+                            <chart:SfChart x:Name="EfficiencyDistributionChart"
+                                          Height="180"Background="Transparent"
+                                          MouseLeftButtonDown="Chart_MouseLeftButtonDown">
+                                <chart:PieSeries ItemsSource="{Binding EfficiencyDistributionData}"
+                                               XBindingPath="EfficiencyCategory"
+                                               YBindingPath="BusCount"
+                                               ExplodeIndex="0"
+                                               Palette="FluentDark"
+                                               ExplodeRadius="8"/>
+                            </chart:SfChart>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Performance Summary -->
+                    <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="6">
+                        <StackPanel Margin="15">
+                            <TextBlock Text="Performance Summary" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,15"
+                                      Foreground="{StaticResource Foreground}"/>
+
+                            <!-- Best Performing Bus -->
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="🏆 Best MPG:" DockPanel.Dock="Left" FontSize="12"
+                                          Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="{Binding BestPerformingBus}" DockPanel.Dock="Right"
+                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource SuccessBrush}"/>
+                            </DockPanel>
+
+                            <!-- Most Efficient Route -->
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="🛣️ Most Efficient Route:" DockPanel.Dock="Left" FontSize="12"
+                                          Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="{Binding MostEfficientRoute}" DockPanel.Dock="Right"
+                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource InfoBrush}"/>
+                            </DockPanel>
+
+                            <!-- Potential Savings -->
+                            <DockPanel Margin="0,0,0,15">
+                                <TextBlock Text="💡 Potential Savings:" DockPanel.Dock="Left" FontSize="12"
+                                          Foreground="{StaticResource Foreground}"/>
+                                <TextBlock Text="{Binding PotentialSavings, StringFormat='{}{0:C0}/month'}" DockPanel.Dock="Right"
+                                          FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource WarningBrush}"/>
+                            </DockPanel>
+
+                            <!-- Efficiency Score Gauge -->
+                            <TextBlock Text="Fleet Efficiency Score:" FontSize="12" Margin="0,0,0,5"
+                                      Foreground="{StaticResource Foreground}"/>
+                            <gauge:SfCircularGauge Width="120" Height="120" HorizontalAlignment="Center">
+                                <gauge:SfCircularGauge.Scales>
+                                    <gauge:CircularScale StartAngle="135" SweepAngle="270"
+                                                       StartValue="0" EndValue="100"
+                                                       Interval="20" MinorTicksPerInterval="1"
+                                                       RimStroke="{StaticResource ContentBackground}" RimStrokeThickness="10"
+                                                       TickStroke="{StaticResource SecondaryForeground}" TickStrokeThickness="1"
+                                                       LabelStroke="{StaticResource Foreground}">
+                                        <gauge:CircularScale.Pointers>
+                                            <gauge:CircularPointer NeedlePointerType="Triangle"
+                                                                 PointerCapStroke="{StaticResource SuccessBrush}"
+                                                                 NeedlePointerStroke="{StaticResource SuccessBrush}"
+                                                                 Value="{Binding FleetEfficiencyScore}"/>
+                                        </gauge:CircularScale.Pointers>
+                                        <gauge:CircularScale.Ranges>
+                                            <gauge:CircularRange StartValue="0" EndValue="40"
+                                                               Stroke="{StaticResource ErrorBrush}" StrokeThickness="10"/>
+                                            <gauge:CircularRange StartValue="40" EndValue="70"
+                                                               Stroke="{StaticResource WarningBrush}" StrokeThickness="10"/>
+                                            <gauge:CircularRange StartValue="70" EndValue="100"
+                                                               Stroke="{StaticResource SuccessBrush}" StrokeThickness="10"/>
+                                        </gauge:CircularScale.Ranges>
+                                    </gauge:CircularScale>
+                                </gauge:SfCircularGauge.Scales>
+                                <gauge:SfCircularGauge.Annotations>
+                                    <gauge:GaugeAnnotation>
+                                        <gauge:GaugeAnnotation.Content>
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding FleetEfficiencyScore, StringFormat='{}{0:F0}%'}"
+                                                          FontSize="16" FontWeight="Bold"
+                                                          Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Efficiency" FontSize="10"
+                                                          Foreground="{StaticResource SecondaryForeground}" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </gauge:GaugeAnnotation.Content>
+                                    </gauge:GaugeAnnotation>
+                                </gauge:SfCircularGauge.Annotations>
+                            </gauge:SfCircularGauge>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </ContentControl>
+
+        <!-- Loading Indicator -->
+        <Border syncfusion:DockingManager.CanSerialize="False"
+                Background="{StaticResource OverlayBrush}"
+                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <syncfusion:SfBusyIndicator IsBusy="True"
+                                           AnimationType="DoubleCircle"
+                                           Foreground="{StaticResource Foreground}"
+                                           Style="{StaticResource BusBuddySfBusyIndicatorStyle}"Height="60"
+                                           Width="60"/>
+                <TextBlock Text="Loading fuel data..."
+                           Foreground="{StaticResource Foreground}"
+                           FontSize="16"
+                           Margin="0,15,0,0"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </syncfusion:DockingManager>
+</UserControl>
+

@@ -186,15 +186,16 @@
                     Width="100"
                     Margin="0,0,10,0"
                     Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     Click="CancelButton_Click"/>
             <syncfusion:ButtonAdv Label="Save"
                     Width="100"
                     Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     Click="SaveButton_Click"
                     IsEnabled="{Binding IsValid}"/>
         </StackPanel>
     </Grid>
 </Window>
+
 

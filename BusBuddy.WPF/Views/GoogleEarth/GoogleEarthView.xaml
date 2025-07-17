@@ -21,7 +21,7 @@
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance viewModels:GoogleEarthViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
 
     <Grid Background="{DynamicResource SurfaceBackground}">
         <Grid.RowDefinitions>
@@ -86,7 +86,7 @@
                                             Margin="16,0"
                                             SelectedIndex="0"
                                             SelectionChanged="MapLayerComboBox_SelectionChanged"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                            >
                         <syncfusion:ComboBoxItemAdv>Satellite</syncfusion:ComboBoxItemAdv>
                         <syncfusion:ComboBoxItemAdv>Terrain</syncfusion:ComboBoxItemAdv>
                         <syncfusion:ComboBoxItemAdv>Hybrid</syncfusion:ComboBoxItemAdv>
@@ -187,7 +187,7 @@
 
                                 <syncfusion:ComboBoxAdv SelectedIndex="1"
                                                         Style="{StaticResource StandardComboBoxStyle}"
-                                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                        >
                                     <syncfusion:ComboBoxItemAdv>5 seconds</syncfusion:ComboBoxItemAdv>
                                     <syncfusion:ComboBoxItemAdv>10 seconds</syncfusion:ComboBoxItemAdv>
                                     <syncfusion:ComboBoxItemAdv>30 seconds</syncfusion:ComboBoxItemAdv>
@@ -214,7 +214,7 @@
                                                        AutoGenerateColumns="False"
                                                        SelectionMode="Single"
                                                        SelectedItem="{Binding SelectedBus}"
-                                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                       >
                                     <syncfusion:SfDataGrid.Columns>
                                         <syncfusion:GridTextColumn HeaderText="Bus #"
                                                                    MappingName="BusNumber"
@@ -287,7 +287,7 @@
                                                         ViewboxHeight="50"
                                                         Style="{StaticResource LoadingIndicatorStyle}"
                                                         Background="#80000000"
-                                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                        >
                                 <syncfusion:SfBusyIndicator.Content>
                                     <Grid>
                                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -329,4 +329,5 @@
         </Grid>
     </Grid>
 </UserControl>
+
 

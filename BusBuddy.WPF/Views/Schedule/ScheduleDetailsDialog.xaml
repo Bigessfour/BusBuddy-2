@@ -10,7 +10,7 @@
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         ResizeMode="CanResize"
-        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+        
         Background="{DynamicResource ProfessionalSurfaceMedium}">
 
     <Window.Resources>
@@ -204,7 +204,7 @@
                                                  AcceptsReturn="True"
                                                  VerticalScrollBarVisibility="Auto"
                                                  IsReadOnly="True"
-                                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                 
                                                  Background="{DynamicResource ProfessionalSurfaceMedium}"
                                                  Foreground="{DynamicResource ProfessionalTextPrimary}"/>
                     </Border>
@@ -216,7 +216,7 @@
                                                MaxHeight="200"
                                                AutoGenerateColumns="False"
                                                IsReadOnly="True"
-                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                               
                                                Background="Transparent"
                                                Style="{StaticResource BusBuddySfDataGridStyle}">
                             <syncfusion:SfDataGrid.Columns>
@@ -246,7 +246,7 @@
                 <syncfusion:ButtonAdv Content="Edit Schedule"
                                       Command="{Binding EditScheduleCommand}"
                                       Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                      
                                       SmallIcon="Edit16.png"
                                       SizeMode="Normal"
                                       Margin="0,0,12,0"
@@ -254,7 +254,7 @@
                 <syncfusion:ButtonAdv Content="Generate PDF Report"
                                       Command="{Binding GenerateReportCommand}"
                                       Style="{StaticResource BusBuddySchoolBusButtonAdvStyle}"
-                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                      
                                       SmallIcon="Report16.png"
                                       SizeMode="Normal"
                                       Margin="0,0,12,0"
@@ -262,7 +262,7 @@
                 <syncfusion:ButtonAdv Content="Close"
                                       Click="CloseButton_Click"
                                       Style="{StaticResource BusBuddyButtonAdvStyle}"
-                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                      
                                       SmallIcon="Close16.png"
                                       SizeMode="Normal"
                                       Padding="16,10"/>
@@ -270,4 +270,5 @@
         </Border>
     </Grid>
 </Window>
+
 

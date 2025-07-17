@@ -12,7 +12,7 @@
 ║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
 ║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
 ║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
 ║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
 ║                                                                                                                                                                          ║
 ║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
@@ -38,7 +38,7 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance viewModels:DriverManagementViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
 
     <UserControl.Resources>
         <!-- BooleanToVisibilityConverter is now global in App.xaml -->
@@ -60,7 +60,7 @@
                                PersistState="False"
                                ContainerMode="TDI"
                                Style="{StaticResource BusBuddyDockingManagerStyle}"
-                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                               >
 
         <!-- Main Driver List Panel (Document) -->
         <ContentControl syncfusion:DockingManager.Header="Driver Directory"
@@ -94,7 +94,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <syncfusion:SfTextBoxExt x:Name="SearchBox"
                                                       Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                      
                                                       Width="250"
                                                       Height="32"
                                                       Margin="0,0,10,0"/>
@@ -102,13 +102,13 @@
                                                      Command="{Binding SearchDriversCommand}"
                                                      CommandParameter="{Binding Text, ElementName=SearchBox}"
                                                      Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                     
                                                      Margin="0,0,10,0"/>
                                 <syncfusion:ComboBoxAdv ItemsSource="{Binding AvailableStatuses}"
                                                        SelectedItem="{Binding SelectedStatusFilter}"
                                                        DisplayMemberPath="Name"
                                                        Style="{StaticResource BusBuddyComboBoxAdvStyle}"
-                                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                       
                                                        Width="150" Height="32"/>
                             </StackPanel>
                         </Border>
@@ -141,7 +141,7 @@
                                ItemsSource="{Binding Drivers}"
                                SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
                                Style="{StaticResource BusBuddySfDataGridStyle}"
-                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                               
                                AutoGenerateColumns="False"
                                AllowResizingColumns="True"
                                AllowSorting="True"
@@ -234,24 +234,24 @@
                         <syncfusion:ButtonAdv Label="➕ Add Driver"
                                              Command="{Binding AddDriverCommand}"
                                              Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             
                                              Margin="5"/>
                         <syncfusion:ButtonAdv Label="✏️ Edit"
                                              Command="{Binding UpdateDriverCommand}"
                                              CommandParameter="{Binding SelectedDriver}"
                                              Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             
                                              Margin="5"/>
                         <syncfusion:ButtonAdv Label="🗑️ Delete"
                                              Command="{Binding DeleteDriverCommand}"
                                              CommandParameter="{Binding SelectedDriver}"
                                              Style="{StaticResource BusBuddyButtonAdvStyle}"
-                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             
                                              Margin="5"/>
                         <syncfusion:ButtonAdv Label="📊 Reports"
                                              Command="{Binding GenerateReportsCommand}"
                                              Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                             
                                              Margin="5"/>
                     </StackPanel>
                 </Grid>
@@ -262,11 +262,12 @@
         <syncfusion:SfBusyIndicator Grid.RowSpan="3"
                                     IsBusy="{Binding IsLoading}"
                                     Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
-                                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                    
                                     AnimationType="DoubleCircle"
                                     Background="Transparent"/>
 
     </syncfusion:DockingManager>
 </UserControl>
+
 
 

@@ -30,15 +30,31 @@ Bus Buddy/
 └── Configuration/         # App settings/config
 ```
 
-## Key Patterns & Conventions
-- **MVVM**: All UI follows Model-View-ViewModel, no code-behind except event logging
-- **Dependency Injection**: All services/ViewModels registered in DI
-- **Strict Nullable Reference Types**: Warnings as errors, use `string?`, `object?`
-- **Logging**: Use `ILogger<T>` everywhere, log all user actions and errors
-- **Async/Await**: All data operations are async
-- **ObservableCollection<T>**: For all data-bound collections
-- **C# Naming**: PascalCase for public, camelCase for private/fields
-- **No Legacy UI**: No Windows Forms, WinForms, or web controls
+## Key Components & Architecture Details
+
+### Activity Schedule Management
+- **ActivityScheduleView.xaml**: Main CRUD interface with SfDataGrid for schedule listing and management buttons
+- **ActivityScheduleDialog.xaml**: Modal dialog for add/edit operations with Syncfusion input controls
+- **ActivityScheduleViewModel.cs**: MVVM ViewModel with proper async patterns, validation, and repository integration
+- **Repository Pattern**: Uses `IActivityScheduleRepository` extending `IRepository<ActivitySchedule>` for data access
+- **Validation**: Client-side validation with user-friendly error messages displayed in UI
+- **Logging**: Comprehensive Serilog structured logging for all operations and user interactions
+
+### MVVM Implementation Standards
+- **ViewModels**: Inherit from `ObservableObject` (CommunityToolkit.Mvvm)
+- **Properties**: Use `[ObservableProperty]` attribute for auto-generated properties
+- **Commands**: Use `[RelayCommand]` attribute for auto-generated commands with async support
+- **Constructor Pattern**: Fire-and-forget async loading using `Task.Run(() => { await LoadDataAsync(); })`
+- **Null Safety**: Proper null checks before service calls and data operations
+- **Error Handling**: Try-catch blocks with structured logging for all async operations
+
+### Repository & Data Access Patterns
+- **Generic Repository**: `IRepository<T>` provides common CRUD operations
+- **Specific Repositories**: Domain-specific repositories like `IActivityScheduleRepository` with specialized queries
+- **Unit of Work**: `IUnitOfWork` pattern for transaction management and repository coordination
+- **Method Usage**:
+  - `GetAllAsync()`, `AddAsync()`, `Update()`, `RemoveByIdAsync()` for CRUD operations
+  - `SaveChangesAsync()` through Unit of Work for transaction commits
 
 ## Syncfusion Components Used
 - **SfDataGrid**: Data display (students, logs, maintenance, etc.)
@@ -80,8 +96,31 @@ Bus Buddy/
 - **Fuel**: Real-time metrics, charts, gauges
 - **Student**: Enhanced data grids, search/filter
 - **Schedule**: Integrated SfScheduler, custom templates
+- **Activity Schedule Management**: Fully functional CRUD operations with ActivityScheduleView and ActivityScheduleDialog
 - **All panels**: Use real Syncfusion-based views, no placeholders
 - **Build/Run**: Fully automated, sequential, with visible output
+- **Status**: - **Status**: Current build is clean with no errors or warnings
+
+---
+**For Copilot/AI:**
+- Use this context for all code suggestions
+- Always prefer Syncfusion, MVVM, async, and logging
+- No legacy UI, no code-behind logic except event logging
+- All code must be .NET 8, WPF, and Syncfusion compliant
+- Follow the troubleshooting patterns documented above for common issues
+- Maintain the established architecture and patterns for consistency
+
+````
+
+## Recent Fixes Completed (July 17, 2025)
+- ✅ **XAML Spacing Property**: Removed unsupported `Spacing` property from StackPanel controls in ActivityScheduleDialog.xaml and ActivityScheduleView.xaml
+- ✅ **XAML Structure**: Fixed invalid XML structure by removing C# code fragments that were incorrectly placed after closing `</UserControl>` tags
+- ✅ **ActivityScheduleViewModel**: Completely restructured class with proper braces, method nesting, and MVVM patterns
+- ✅ **Repository Integration**: Fixed `IActivityScheduleRepository` usage with proper using statements and method calls
+- ✅ **Async Patterns**: Implemented proper fire-and-forget async loading in ViewModel constructor using `Task.Run()`
+- ✅ **Null Safety**: Added proper null checks in ActivityScheduleView.xaml.cs for DialogService calls
+- ✅ **Method Mapping**: Updated to use correct repository methods (`Update()`, `RemoveByIdAsync()`) instead of non-existent methods
+- ✅ **Logging**: Fixed Serilog structured logging calls with proper property formatting
 
 ## Documentation & Support
 - **README.md**: Full architecture, setup, and usage guide
@@ -90,9 +129,20 @@ Bus Buddy/
 - **DEVELOPMENT_SUMMARY.md**: Dev process and troubleshooting
 - **Syncfusion licensing**: See README and appsettings
 
----
-**For Copilot/AI:**
-- Use this context for all code suggestions
-- Always prefer Syncfusion, MVVM, async, and logging
-- No legacy UI, no code-behind logic except event logging
-- All code must be .NET 8, WPF, and Syncfusion compliant
+## Troubleshooting & Common Issues Resolved
+
+### XAML Compilation Errors
+- **MC3072 Spacing Property**: Remove `Spacing` attribute from StackPanel (not supported in standard WPF namespace)
+- **MC3000 Invalid XML**: Ensure no C# code exists after closing XML tags in XAML files
+- **InitializeComponent()**: Auto-generated method requires clean XAML structure and successful build
+
+### C# Compilation Errors
+- **CS1514/CS1513 Brace Errors**: Ensure proper class and method brace structure
+- **CS8604 Null Reference**: Add null checks before method calls, especially for casted objects
+- **Repository Method Errors**: Use correct method names from `IRepository<T>` interface
+- **Async Pattern Errors**: Use `Task.Run()` for fire-and-forget async in constructors
+
+### Build Process
+- **Clean → Restore → Build**: Always follow sequential process for reliable builds
+- **Verification**: Check for errors after each step before proceeding
+- **Status**: Current build is clean with no errors or warnings

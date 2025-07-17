@@ -9,7 +9,7 @@
              xmlns:vm="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000"
-             syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful">
+             >
     <UserControl.Resources>
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </UserControl.Resources>
@@ -51,7 +51,7 @@
             <ComboBox Grid.Column="1"
                       ItemsSource="{Binding SportsCategories}"
                       SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
-                      syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"
+                      
                       Height="30"
                       VerticalAlignment="Center"/>
 
@@ -74,7 +74,7 @@
             <syncfusion:SfBusyIndicator Grid.Column="3"
                                        IsBusy="{Binding IsFiltering}"
                                        AnimationType="SingleCircle"
-                                       syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"
+                                       
                                        Width="20" Height="20"
                                        Margin="10,0"/>
         </Grid>
@@ -84,24 +84,24 @@
             <syncfusion:ButtonAdv Content="Add Schedule"
                                 Command="{Binding AddScheduleCommand}"
                                 Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"
+                                
                                 Margin="0,0,10,0"/>
             <syncfusion:ButtonAdv Content="Edit Schedule"
                                 Command="{Binding EditScheduleCommand}"
                                 Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"
+                                
                                 IsEnabled="{Binding CanEditSchedule}"
                                 Margin="0,0,10,0"/>
             <syncfusion:ButtonAdv Content="Delete Schedule"
                                 Command="{Binding DeleteScheduleCommand}"
                                 Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"
+                                
                                 IsEnabled="{Binding CanDeleteSchedule}"
                                 Margin="0,0,10,0"/>
             <syncfusion:ButtonAdv Content="Refresh"
                                 Command="{Binding RefreshCommand}"
                                 Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                />
         </StackPanel>
 
         <!-- Main Content -->
@@ -110,7 +110,7 @@
             <syncfusion:SfBusyIndicator IsBusy="{Binding IsLoading}"
                                        AnimationType="DoubleCircle"
                                        Header="Loading schedules..."
-                                       syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"/>
+                                       />
 
             <!-- Data Grid -->
             <syncfusion:SfDataGrid x:Name="ScheduleGrid"
@@ -118,7 +118,7 @@
                                    AutoGenerateColumns="False"
                                    SelectionMode="Single"
                                    SelectedItem="{Binding SelectedSchedule, Mode=TwoWay}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="Office2019Colorful"
+                                   
                                    AllowEditing="False"
                                    AllowSorting="True"
                                    AllowFiltering="True"
@@ -174,4 +174,5 @@
         </StatusBar>
     </Grid>
 </UserControl>
+
 

@@ -47,7 +47,7 @@
         <TabControl Grid.Row="2" Name="ReportTabControl">
             <TabItem Header="By Trip Type">
                 <syncfusion:SfChart Name="TripTypeChart" Header="Activity Schedules by Trip Type"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                   >
                     <syncfusion:SfChart.PrimaryAxis>
                         <syncfusion:CategoryAxis/>
                     </syncfusion:SfChart.PrimaryAxis>
@@ -70,7 +70,7 @@
 
             <TabItem Header="By Driver">
                 <syncfusion:SfChart Name="DriverChart" Header="Activity Schedules by Driver"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                   >
                     <syncfusion:SfChart.PrimaryAxis>
                         <syncfusion:CategoryAxis/>
                     </syncfusion:SfChart.PrimaryAxis>
@@ -87,7 +87,7 @@
 
             <TabItem Header="By Vehicle">
                 <syncfusion:SfChart Name="VehicleChart" Header="Activity Schedules by Vehicle"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                   >
                     <syncfusion:SfChart.PrimaryAxis>
                         <syncfusion:CategoryAxis/>
                     </syncfusion:SfChart.PrimaryAxis>
@@ -104,7 +104,7 @@
 
             <TabItem Header="By Status">
                 <syncfusion:SfChart Name="StatusChart" Header="Activity Schedules by Status"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                   >
                     <syncfusion:SfChart.PrimaryAxis>
                         <syncfusion:CategoryAxis/>
                     </syncfusion:SfChart.PrimaryAxis>
@@ -155,4 +155,5 @@
         </StackPanel>
     </Grid>
 </Window>
+
 

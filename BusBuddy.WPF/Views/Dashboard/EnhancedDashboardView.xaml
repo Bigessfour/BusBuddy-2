@@ -602,7 +602,7 @@
                                                                         Progress="{Binding FleetActivePercentage}"
                                                                         Margin="5"
                                                                         Style="{DynamicResource BusBuddySfCircularProgressBarStyle}"
-                                                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                                        >
                                             <syncfusion:SfCircularProgressBar.Content>
                                                 <TextBlock Text="{Binding FleetActivePercentage, StringFormat='{}{0:F0}%'}" FontSize="12" FontWeight="Bold"
                                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -665,7 +665,7 @@
                                         </StackPanel>
 
                                         <!-- Syncfusion Radial Gauge for Route Coverage -->
-                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="60" Height="60" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="60" Height="60" Margin="10,0,0,0" >
                                             <syncfusion:SfCircularGauge.Scales>
                                                 <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
@@ -725,7 +725,7 @@
                                         </StackPanel>
 
                                         <!-- Syncfusion Circular Gauge for Performance -->
-                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="80" Height="80" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="80" Height="80" Margin="10,0,0,0" >
                                             <syncfusion:SfCircularGauge.Scales>
                                                 <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
@@ -794,7 +794,7 @@
                                                                         Width="55" Height="55"
                                                                         HorizontalAlignment="Center"
                                                                         Progress="{Binding MaintenanceCompletionPercentage}"
-                                                                        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                                                        
                                                                         FontSize="11"/>
                                     </Grid>
                                 </StackPanel>
@@ -831,12 +831,12 @@
                                             <syncfusion:SfLinearProgressBar Height="12"
                                                                            Progress="{Binding FuelBudgetUsedPercentage}"
                                                                            Style="{DynamicResource BusBuddySfLinearProgressBarStyle}"
-                                                                           syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                                                           />
                                         </StackPanel>
 
                                         <!-- Efficiency Meter -->
                                         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                                            <syncfusion:SfCircularGauge Width="40" Height="40" Margin="0,0,10,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                            <syncfusion:SfCircularGauge Width="40" Height="40" Margin="0,0,10,0" >
                                                 <syncfusion:SfCircularGauge.Scales>
                                                     <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                        StartValue="0" EndValue="10"
@@ -889,7 +889,7 @@
                                         </StackPanel>
 
                                         <!-- Syncfusion Circular Gauge for Attendance -->
-                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="70" Height="70" Margin="10,0,0,0" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                        <syncfusion:SfCircularGauge Grid.Column="1" Width="70" Height="70" Margin="10,0,0,0" >
                                             <syncfusion:SfCircularGauge.Scales>
                                                 <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                    StartValue="0" EndValue="100"
@@ -937,7 +937,7 @@
                                                               SelectedIndex="0"
                                                               SelectionChanged="AnalyticsFilterComboBox_SelectionChanged"
                                                               Style="{DynamicResource BusBuddyComboBoxAdvStyle}"
-                                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                              >
                                             <syncfusion:ComboBoxItemAdv Content="Last 7 Days"/>
                                             <syncfusion:ComboBoxItemAdv Content="Last 30 Days"/>
                                             <syncfusion:ComboBoxItemAdv Content="Last 3 Months"/>
@@ -949,7 +949,7 @@
                                                             Margin="10,0,0,0"
                                                             Click="RefreshAnalyticsButton_Click"
                                                             Style="{DynamicResource BusBuddySecondaryButtonAdvStyle}"
-                                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                                            />
                                     </StackPanel>
                                 </DockPanel>
 
@@ -968,7 +968,7 @@
                                                           Height="180"
                                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
                                                           Style="{DynamicResource BusBuddySfChartStyle}"
-                                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                          >
                                                 <syncfusion:SfChart.PrimaryAxis>
                                                     <syncfusion:CategoryAxis ShowGridLines="False"/>
                                                 </syncfusion:SfChart.PrimaryAxis>
@@ -1001,7 +1001,7 @@
                                                           Height="180"
                                                           MouseLeftButtonDown="Chart_MouseLeftButtonDown"
                                                           Style="{DynamicResource BusBuddySfChartStyle}"
-                                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                          >
                                                 <syncfusion:SfChart.PrimaryAxis>
                                                     <syncfusion:CategoryAxis ShowGridLines="False"/>
                                                 </syncfusion:SfChart.PrimaryAxis>
@@ -1035,7 +1035,7 @@
                                                 </Grid.RowDefinitions>
 
                                                 <!-- Advanced Syncfusion Circular Gauge -->
-                                                <syncfusion:SfCircularGauge Grid.Row="0" Width="150" Height="150" syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                <syncfusion:SfCircularGauge Grid.Row="0" Width="150" Height="150" >
                                                     <syncfusion:SfCircularGauge.Scales>
                                                         <syncfusion:CircularScale StartAngle="135" SweepAngle="270"
                                                                            StartValue="0" EndValue="100"
@@ -1254,7 +1254,7 @@
                                                    FontWeight="SemiBold"
                                                    Cursor="Hand"
                                                    Click="RefreshDataButton_Click"
-                                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                                   />
                                         </Border>
 
                                         <Border Background="#0078D4"
@@ -1269,7 +1269,7 @@
                                                    FontWeight="SemiBold"
                                                    Cursor="Hand"
                                                    Click="ViewReportsButton_Click"
-                                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                                   />
                                         </Border>
 
                                         <Border Background="#252526"
@@ -1284,7 +1284,7 @@
                                                    FontWeight="SemiBold"
                                                    Cursor="Hand"
                                                    Click="SettingsButton_Click"
-                                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                                   />
                                         </Border>
 
                                         <!-- System uptime indicator -->
@@ -1322,7 +1322,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                          />
 
             <!-- Driver Management Panel (Docked Left) -->
             <ContentControl x:Name="DriverManagement"
@@ -1333,7 +1333,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                          />
 
             <!-- Route Management Panel (Document Tab) -->
             <ContentControl x:Name="RouteManagement"
@@ -1342,7 +1342,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                          />
 
             <!-- Schedule Management Panel (Auto Hidden) -->
             <ContentControl x:Name="ScheduleManagement"
@@ -1352,7 +1352,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <Grid Margin="10">
                     <TextBlock Text="Schedule Management"
                              HorizontalAlignment="Center"
@@ -1371,7 +1371,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <Grid Margin="10">
                     <TextBlock Text="Student Management"
                              HorizontalAlignment="Center"
@@ -1390,7 +1390,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <Grid Margin="10">
                     <TextBlock Text="Maintenance Tracking"
                              HorizontalAlignment="Center"
@@ -1407,7 +1407,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <Grid Margin="10">
                     <TextBlock Text="Fuel Management"
                              HorizontalAlignment="Center"
@@ -1425,7 +1425,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <Grid Margin="10">
                     <TextBlock Text="Activity Logging"
                              HorizontalAlignment="Center"
@@ -1443,7 +1443,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <views:LoadingView DataContext="{Binding LoadingViewModel, FallbackValue={x:Null}}"
                                   Margin="10"
                                   HorizontalAlignment="Stretch"
@@ -1459,7 +1459,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -1534,7 +1534,7 @@
                                             Padding="8,4"
                                             FontSize="10"
                                             Margin="0,0,5,0"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                            />
                         <syncfusion:ButtonAdv Label="Route Info"
                                             Background="#FF8C00"
                                             Foreground="{DynamicResource Foreground}"
@@ -1543,7 +1543,7 @@
                                             Padding="8,4"
                                             FontSize="10"
                                             Margin="0,0,5,0"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                            />
                         <syncfusion:ButtonAdv Label="Maintenance"
                                             Background="#0078D4"
                                             Foreground="{DynamicResource Foreground}"
@@ -1551,7 +1551,7 @@
                                             CornerRadius="4"
                                             Padding="8,4"
                                             FontSize="10"
-                                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                            />
                     </StackPanel>
                 </Grid>
             </ContentControl>
@@ -1565,7 +1565,7 @@
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          >
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -1590,7 +1590,7 @@
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <syncfusion:ComboBoxAdv Width="120" Height="25" SelectedIndex="0" Margin="0,0,10,0"
                                                Style="{DynamicResource BusBuddyComboBoxAdvStyle}"
-                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                               >
                                     <syncfusion:ComboBoxItemAdv Content="Satellite"/>
                                     <syncfusion:ComboBoxItemAdv Content="Terrain"/>
                                     <syncfusion:ComboBoxItemAdv Content="Roadmap"/>
@@ -1598,7 +1598,7 @@
                                 </syncfusion:ComboBoxAdv>
                                 <syncfusion:ButtonAdv Label="🔄" Width="25" Height="25" ToolTip="Refresh Map"
                                                Style="{DynamicResource BusBuddyIconButtonAdvStyle}"
-                                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                               />
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -1635,5 +1635,6 @@
         </Grid>
     </Grid>
 </UserControl>
+
 
 

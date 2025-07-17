@@ -14,7 +14,7 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
-        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+        
         d:DataContext="{d:DesignInstance Type=viewModels:AdvancedSearchViewModel}">
 
     <Window.Resources>
@@ -195,6 +195,7 @@
         </StackPanel>
     </Grid>
 </Window>
+
 
 
 

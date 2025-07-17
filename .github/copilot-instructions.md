@@ -66,6 +66,43 @@ This file contains custom instructions for GitHub Copilot when working with this
 - **New Extensions**: Group by functionality in appropriate Extensions/ folder
 - **New Utilities**: Place in project-appropriate Utilities/ folder
 
+## Debug Helper Integration Patterns
+
+- **App.xaml.cs Integration**: The `DebugHelper` class in `BusBuddy.WPF.Utilities` provides debug functionality accessible via PowerShell
+- **Command Line Arguments**: Application supports debug arguments (`--start-debug-filter`, `--export-debug-json`, etc.)
+- **Real-time Filtering**: Use `DebugOutputFilter` for live debug output analysis and filtering
+- **Actionable Error Detection**: Implement `HasCriticalIssues()` and priority-based error categorization
+- **PowerShell Bridge**: All debug methods accessible via `bb-debug-*` PowerShell commands
+
+### Debug Helper Method Patterns
+- **Static Methods**: All debug helper methods are static and accessible without instantiation
+- **Conditional Compilation**: Use `[Conditional("DEBUG")]` for debug-only functionality
+- **Structured Output**: Debug output uses structured formatting with priority indicators
+- **Event Integration**: Subscribe to `HighPriorityIssueDetected` and `NewEntriesFiltered` events
+- **JSON Export**: Support exporting debug data to JSON for external tool integration
+
+### PowerShell Debug Command Patterns
+```powershell
+# Start debug filter
+bb-debug-start          # Calls DebugHelper.StartAutoFilter()
+
+# Export debug data
+bb-debug-export         # Calls DebugHelper.ExportToJson()
+
+# Health monitoring
+bb-health              # Calls DebugHelper.HealthCheck()
+
+# Test functionality
+bb-debug-test          # Calls DebugHelper.TestAutoFilter()
+```
+
+### Debug Output Standards
+- **Priority Levels**: Use 1 (Critical), 2 (High), 3 (Medium), 4 (Low) for issue classification
+- **Actionable Recommendations**: Include specific remediation steps for each detected issue
+- **Real-time Notifications**: Trigger UI notifications for Priority 1 (Critical) issues only
+- **Structured Data**: Use consistent JSON schema for debug data export
+- **Performance Impact**: Minimize performance overhead of debug monitoring in production builds
+
 ## Logging Standards (Serilog ONLY with Enrichments)
 
 - **ONLY use Serilog** for ALL logging throughout the application - no other logging methods
@@ -199,6 +236,103 @@ This file contains custom instructions for GitHub Copilot when working with this
 - **README Updates**: Keep README.md current with setup instructions and architecture overview
 - **Code Comments**: Include purpose-driven comments for complex business logic
 - **Architecture Documentation**: Document architectural decisions and patterns used
+
+### VS Code Settings Integration Patterns
+```json
+// PowerShell terminal configuration in .vscode/settings.json
+"terminal.integrated.profiles.windows": {
+  "PowerShell 7.5.2": {
+    "path": "pwsh.exe",
+    "args": ["-NoProfile", "-NoExit", "-Command",
+      "& 'C:\\path\\to\\BusBuddy-PowerShell-Profile.ps1';
+       & 'C:\\path\\to\\BusBuddy-Advanced-Workflows.ps1'"]
+  }
+}
+```
+
+### Task Explorer Configuration Standards
+- **Exclusive Interface**: Task Explorer is the ONLY approved method for running tasks
+- **No Direct Commands**: Avoid using direct terminal commands for builds/runs
+- **Profile Integration**: Tasks automatically have access to PowerShell profile functions
+- **Keyboard Shortcuts**: Configure `Ctrl+Shift+P` → "Task Explorer: Run Task" workflows
+- **Task Dependencies**: Configure tasks as independent, non-chaining operations
+
+### Command Integration Examples
+```powershell
+# Complete development session startup
+bb-dev-session          # Opens workspace, builds, starts debug monitoring
+
+# Quick test cycle
+bb-quick-test           # Clean, build, test, validate
+
+# Comprehensive system analysis
+bb-diagnostic           # Full environment and project health check
+
+# Export debug data for analysis
+bb-report               # Generate comprehensive project report
+```
+
+## PowerShell Development Environment Integration
+
+- **PowerShell Core 7.5.2**: Use PowerShell Core for all development scripting and task automation
+- **VS Code Integration**: Use robust `code` command integration with automatic VS Code/VS Code Insiders detection
+- **Task Explorer Exclusive**: Task Explorer is the ONLY method for task management - no direct terminal commands for builds
+- **Debug Helper Integration**: All `DebugHelper` methods from `App.xaml.cs` accessible via PowerShell commands
+
+### PowerShell Profile Standards
+- **Profile Location**: `BusBuddy-PowerShell-Profile.ps1` in project root for core functionality
+- **Advanced Workflows**: `BusBuddy-Advanced-Workflows.ps1` for comprehensive development automation
+- **Auto-Loading**: VS Code terminal profiles automatically load both PowerShell files
+- **Function Naming**: Use `Verb-BusBuddyNoun` pattern for all Bus Buddy specific functions
+- **Alias Standards**: Use `bb-` prefix for all Bus Buddy command aliases
+
+### Core PowerShell Commands
+- **VS Code Integration**: `code`, `vs`, `vscode`, `edit`, `edit-file` with robust path detection
+- **Basic Bus Buddy**: `bb-open`, `bb-build`, `bb-run` for fundamental operations
+- **Debug Integration**: `bb-debug-start`, `bb-debug-stream`, `bb-health`, `bb-debug-export`
+- **Advanced Workflows**: `bb-dev-session`, `bb-quick-test`, `bb-diagnostic`, `bb-report`
+
+### Debug System Integration
+- **DebugHelper Methods**: All static methods from `BusBuddy.WPF.Utilities.DebugHelper` accessible via PowerShell
+- **Real-time Streaming**: Use `DebugOutputFilter.StartRealTimeStreaming()` for live debug monitoring
+- **JSON Export**: Export actionable debug items for VS Code integration and analysis
+- **Command Line Arguments**: Support `--start-debug-filter`, `--export-debug-json`, `--start-streaming`
+- **Health Monitoring**: Automatic system health checks with `HasCriticalIssues()` detection
+
+### Advanced Workflow Standards
+- **Development Sessions**: Use `Start-BusBuddyDevSession` for complete environment setup
+- **Quick Testing**: Use `Start-BusBuddyQuickTest` for rapid build-test-validate cycles
+- **Comprehensive Diagnostics**: Use `Invoke-BusBuddyFullDiagnostic` for system health analysis
+- **Project Reporting**: Use `Export-BusBuddyProjectReport` for debug data and system status export
+- **Log Monitoring**: Use `Watch-BusBuddyLogs` for real-time log file monitoring
+
+### VS Code Configuration Integration
+- **Terminal Profiles**: Configure PowerShell 7.5.2 as default with profile auto-loading
+- **Task Explorer**: Use Task Explorer extension as exclusive task management interface
+- **Settings Integration**: PowerShell configuration in `.vscode/settings.json` with profile paths
+- **Command Integration**: Seamless `code` command functionality across all PowerShell sessions
+- **Extension Requirements**: XAML Styler and Task Explorer extensions for optimal workflow
+
+### Error Handling in PowerShell
+- **Structured Error Handling**: Use try-catch with meaningful error messages and logging
+- **Path Validation**: Always validate workspace and project paths before operations
+- **Exit Code Checking**: Check `$LASTEXITCODE` after all dotnet commands
+- **Fallback Mechanisms**: Provide fallback options when primary commands fail
+- **User Feedback**: Use color-coded console output for status, errors, and success messages
+
+### Performance and Optimization
+- **Background Jobs**: Use PowerShell jobs for long-running debug operations
+- **Lazy Loading**: Load advanced workflows only when needed
+- **Caching**: Cache frequently accessed paths and configuration data
+- **Minimal Dependencies**: Keep PowerShell profiles lightweight with fast loading times
+- **Concurrent Safety**: Ensure PowerShell functions work safely with multiple VS Code instances
+
+### Development Workflow Integration
+- **IDE Agnostic**: PowerShell functions work from any terminal, not just VS Code
+- **Cross-Session**: Functions available across all PowerShell sessions in the project
+- **State Management**: Maintain development session state across PowerShell restarts
+- **Documentation**: Use comprehensive help documentation with examples for all functions
+- **Version Control**: Include PowerShell profiles in version control for team consistency
 
 ## Development Workflow Standards
 

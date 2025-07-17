@@ -92,5 +92,29 @@
   {
     "key": "ctrl+shift+`",
     "command": "workbench.action.terminal.new"
+  },
+
+  // 🎯 TASK EXPLORER EXCLUSIVE KEYBINDINGS
+  {
+    "key": "ctrl+shift+t",
+    "command": "taskExplorer.refresh"
+  },
+  {
+    "key": "ctrl+alt+t",
+    "command": "workbench.view.extension.taskExplorer"
+  },
+
+  // 🚫 DISABLE COMPETING TASK SHORTCUTS
+  {
+    "key": "ctrl+shift+p",
+    "command": "-workbench.action.tasks.runTask"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "-workbench.action.quickOpen"
+  },
+  {
+    "key": "f1",
+    "command": "-workbench.action.showCommands"
   }
 ]

@@ -12,7 +12,7 @@
 ║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
 ║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
 ║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
 ║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
 ║                                                                                                                                                                          ║
 ║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
@@ -41,7 +41,7 @@
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance Type=viewModels:StudentManagementViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
     <!-- Local resources removed - all converters now global in App.xaml -->
 
     <Grid Style="{StaticResource BusBuddyFormContentStyle}">
@@ -77,7 +77,7 @@
                                    Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                    Watermark="Search students..."
                                    ShowClearButton="True"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   
                                    Background="{StaticResource ContentBackground}"
                                    Foreground="{StaticResource PrimaryForeground}"
                                    BorderBrush="{StaticResource BorderBrush}"
@@ -89,7 +89,7 @@
                                    Margin="0,0,10,0"
                                    SelectedValue="{Binding SelectedStatusFilter}"
                                    Style="{StaticResource BusBuddyComboBoxAdvStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   
                                    SelectedIndex="0">
                 <syncfusion:ComboBoxItemAdv Content="All Students"/>
                 <syncfusion:ComboBoxItemAdv Content="Active Students"/>
@@ -105,7 +105,7 @@
                                    DisplayMemberPath="."
                                    SelectedValuePath="."
                                    Style="{StaticResource BusBuddyComboBoxAdvStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   
                                    SelectedIndex="0">
             </syncfusion:ComboBoxAdv>
 
@@ -118,7 +118,7 @@
                                    DisplayMemberPath="."
                                    SelectedValuePath="."
                                    Style="{StaticResource BusBuddyComboBoxAdvStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                                   
                                    SelectedIndex="0">
             </syncfusion:ComboBoxAdv>
 
@@ -130,7 +130,7 @@
                           Margin="0,0,10,0"
                           Padding="8,4"
                           Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                          
                           ToolTip="Show/Hide Statistics"
                           Label="📊 Statistics"/>
 
@@ -140,7 +140,7 @@
                     Margin="0,0,10,0"
                     Padding="8,4"
                     Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     ToolTip="Advanced Search Options"
                     Label="🔍 Advanced"/>
 
@@ -151,7 +151,7 @@
                     Padding="8,4"
                     Visibility="{Binding AdvancedSearchCriteria, Converter={StaticResource ObjectToVisibilityConverter}}"
                     Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     ToolTip="Clear Advanced Search"
                     Label="❌ Clear Advanced"/>
 
@@ -159,7 +159,7 @@
             <syncfusion:ButtonAdv Grid.Column="7"
                     Command="{Binding RefreshCommand}"
                     Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     ToolTip="Refresh student list"
                     Label="⟳ Refresh"/>
         </Grid>
@@ -182,7 +182,7 @@
                               ItemsSource="{Binding FilteredStudents}"
                               SelectedItem="{Binding SelectedStudent, Mode=TwoWay}"
                               Style="{StaticResource BusBuddySfDataGridStyle}"
-                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                              
                               Background="{StaticResource ContentBackground}"
                               Foreground="{StaticResource PrimaryForeground}"
                               BorderBrush="{StaticResource BorderBrush}"
@@ -226,28 +226,28 @@
             <syncfusion:ButtonAdv Label="➕ Add New Student"
                     Command="{Binding AddStudentCommand}"
                     Style="{StaticResource BusBuddyPrimaryButtonStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     Margin="5"
                     ToolTip="Add a new student"/>
 
             <syncfusion:ButtonAdv Label="✏️ Edit Student"
                     Command="{Binding EditStudentCommand}"
                     Style="{StaticResource BusBuddySecondaryButtonStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     Margin="5"
                     ToolTip="Edit the selected student"/>
 
             <syncfusion:ButtonAdv Label="🚌 Assign Route"
                     Command="{Binding AssignRouteCommand}"
                     Style="{StaticResource BusBuddySecondaryButtonStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     Margin="5"
                     ToolTip="Assign a route to the selected student"/>
 
             <syncfusion:ButtonAdv Label="🗑️ Delete"
                     Command="{Binding DeleteStudentCommand}"
                     Style="{StaticResource BusBuddyDeleteButtonStyle}"
-                    syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                    
                     Margin="5"
                     ToolTip="Delete the selected student"/>
         </StackPanel>
@@ -256,7 +256,7 @@
         <syncfusion:SfBusyIndicator Grid.Row="0" Grid.RowSpan="5"
                               IsBusy="{Binding IsBusy}"
                               Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
-                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                              
                               AnimationType="DoubleCircle"
                               Foreground="{StaticResource AccentBrush}"
                               Background="Transparent">
@@ -281,6 +281,7 @@
         </Border>
     </Grid>
 </UserControl>
+
 
 
 

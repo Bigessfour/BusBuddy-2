@@ -1,0 +1,196 @@
+<?xml v ersion="1.0" e ncoding="utf-8"?>
+<Window x:Class="BusBuddy.WPF.Views.Maintenance.MaintenanceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;a ssembly=Syncfusion.SfSkinManager.WPF"
+        mc:I gnorable="d"
+        T itle="{Binding DialogTitle}"
+        H eight="650"
+        W idth="800"
+        WindowStartupLocation="CenterOwner">
+    <Grid M argin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition H eight="Auto"/>
+            <RowDefinition H eight="*"/>
+            <RowDefinition H eight="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock T ext="{Binding DialogTitle}"
+                   F ontSize="20"
+                   F ontWeight="Bold"
+                   M argin="0,0,0,20"/>
+
+        <ScrollViewer Grid.R ow="1" V erticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition W idth="Auto"/>
+                    <ColumnDefinition W idth="*"/>
+                    <ColumnDefinition W idth="Auto"/>
+                    <ColumnDefinition W idth="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                    <RowDefinition H eight="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Column 1 -->
+                <TextBlock Grid.R ow="0" Grid.C olumn="0" T ext="Bus:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <ComboBox Grid.R ow="0" Grid.C olumn="1"
+                          I temsSource="{Binding AvailableBuses}"
+                          S electedItem="{Binding SelectedBus}"
+                          D isplayMemberPath="BusNumber"
+                          M argin="0,5,20,5"/>
+
+                <TextBlock Grid.R ow="1" Grid.C olumn="0" T ext="Date:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <DatePicker Grid.R ow="1" Grid.C olumn="1"
+                            S electedDate="{Binding Maintenance.Date}"
+                            M argin="0,5,20,5"/>
+
+                <TextBlock Grid.R ow="2" Grid.C olumn="0" T ext="Odometer Reading:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <syncfusion:DoubleTextBox Grid.R ow="2" Grid.C olumn="1"
+                                           V alue="{Binding Maintenance.OdometerReading}"
+                                           M inValue="0"
+                                           M argin="0,5,20,5"/>
+
+                <TextBlock Grid.R ow="3" Grid.C olumn="0" T ext="Maintenance Type:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <ComboBox Grid.R ow="3" Grid.C olumn="1"
+                          I temsSource="{Binding MaintenanceTypes}"
+                          S electedItem="{Binding Maintenance.MaintenanceCompleted}"
+                          M argin="0,5,20,5"/>
+
+                <TextBlock Grid.R ow="4" Grid.C olumn="0" T ext="Vendor:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <TextBox Grid.R ow="4" Grid.C olumn="1"
+                         T ext="{Binding Maintenance.Vendor}"
+                         M argin="0,5,20,5"/>
+
+                <TextBlock Grid.R ow="5" Grid.C olumn="0" T ext="Repair Cost ($):" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <syncfusion:DoubleTextBox Grid.R ow="5" Grid.C olumn="1"
+                                           V alue="{Binding Maintenance.RepairCost}"
+                                           N umberDecimalDigits="2"
+                                           M inValue="0"
+                                           M argin="0,5,20,5"/>
+
+                <TextBlock Grid.R ow="6" Grid.C olumn="0" T ext="Status:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <ComboBox Grid.R ow="6" Grid.C olumn="1"
+                          I temsSource="{Binding StatusOptions}"
+                          S electedItem="{Binding Maintenance.Status}"
+                          M argin="0,5,20,5"/>
+
+                <!-- Column 2 -->
+                <TextBlock Grid.R ow="0" Grid.C olumn="2" T ext="Priority:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <ComboBox Grid.R ow="0" Grid.C olumn="3"
+                          I temsSource="{Binding PriorityOptions}"
+                          S electedItem="{Binding Maintenance.Priority}"
+                          M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="1" Grid.C olumn="2" T ext="Performed By:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <TextBox Grid.R ow="1" Grid.C olumn="3"
+                         T ext="{Binding Maintenance.PerformedBy}"
+                         M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="2" Grid.C olumn="2" T ext="Work Order #:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <TextBox Grid.R ow="2" Grid.C olumn="3"
+                         T ext="{Binding Maintenance.WorkOrderNumber}"
+                         M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="3" Grid.C olumn="2" T ext="Next Service Due:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <DatePicker Grid.R ow="3" Grid.C olumn="3"
+                            S electedDate="{Binding Maintenance.NextServiceDue}"
+                            M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="4" Grid.C olumn="2" T ext="Next Service Odometer:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <syncfusion:DoubleTextBox Grid.R ow="4" Grid.C olumn="3"
+                                           V alue="{Binding Maintenance.NextServiceOdometer}"
+                                           M inValue="0"
+                                           M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="5" Grid.C olumn="2" T ext="Labor Hours:" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <syncfusion:DoubleTextBox Grid.R ow="5" Grid.C olumn="3"
+                                           V alue="{Binding Maintenance.LaborHours}"
+                                           M inValue="0"
+                                           M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="6" Grid.C olumn="2" T ext="Labor Cost ($):" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <syncfusion:DoubleTextBox Grid.R ow="6" Grid.C olumn="3"
+                                           V alue="{Binding Maintenance.LaborCost}"
+                                           N umberDecimalDigits="2"
+                                           M inValue="0"
+                                           M argin="0,5,0,5"/>
+
+                <!-- Span both columns -->
+                <CheckBox Grid.R ow="7" Grid.C olumn="0" Grid.C olumnSpan="4"
+                          C ontent="Under Warranty"
+                          I sChecked="{Binding Maintenance.Warranty}"
+                          M argin="0,10,0,5"/>
+
+                <TextBlock Grid.R ow="8" Grid.C olumn="0" T ext="Warranty Expiry:" M argin="0,5,10,5" V erticalAlignment="Center"
+                           V isibility="{Binding Maintenance.Warranty, C onverter={StaticResource BooleanToVisibilityConverter}}"/>
+                <DatePicker Grid.R ow="8" Grid.C olumn="1"
+                            S electedDate="{Binding Maintenance.WarrantyExpiry}"
+                            M argin="0,5,20,5"
+                            V isibility="{Binding Maintenance.Warranty, C onverter={StaticResource BooleanToVisibilityConverter}}"/>
+
+                <TextBlock Grid.R ow="9" Grid.C olumn="0" T ext="Parts Used:" M argin="0,5,10,5" V erticalAlignment="Top"/>
+                <TextBox Grid.R ow="9" Grid.C olumn="1" Grid.C olumnSpan="3"
+                         T ext="{Binding Maintenance.PartsUsed}"
+                         H eight="60"
+                         T extWrapping="Wrap"
+                         A cceptsReturn="True"
+                         V erticalScrollBarVisibility="Auto"
+                         M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="10" Grid.C olumn="0" T ext="Parts Cost ($):" M argin="0,5,10,5" V erticalAlignment="Center"/>
+                <syncfusion:DoubleTextBox Grid.R ow="10" Grid.C olumn="1"
+                                           V alue="{Binding Maintenance.PartsCost}"
+                                           N umberDecimalDigits="2"
+                                           M inValue="0"
+                                           M argin="0,5,20,5"/>
+
+                <TextBlock Grid.R ow="11" Grid.C olumn="0" T ext="Notes:" M argin="0,5,10,5" V erticalAlignment="Top"/>
+                <TextBox Grid.R ow="11" Grid.C olumn="1" Grid.C olumnSpan="3"
+                         T ext="{Binding Maintenance.Notes}"
+                         H eight="80"
+                         T extWrapping="Wrap"
+                         A cceptsReturn="True"
+                         V erticalScrollBarVisibility="Auto"
+                         M argin="0,5,0,5"/>
+
+                <TextBlock Grid.R ow="12" Grid.C olumn="0" Grid.C olumnSpan="4"
+                           T ext="Total Cost: "
+                           F ontWeight="Bold"
+                           M argin="0,10,0,0">
+                    <Run T ext="{Binding Maintenance.TotalCost, S tringFormat=C2}"/>
+                </TextBlock>
+            </Grid>
+        </ScrollViewer>
+
+        <StackPanel Grid.R ow="2"
+                    O rientation="Horizontal"
+                    H orizontalAlignment="Right"
+                    M argin="0,20,0,0">
+            <syncfusion:ButtonAdv L abel="Cancel"
+                    W idth="100"
+                    M argin="0,0,10,0"
+                    S tyle="{StaticResource BusBuddySecondaryButtonAdvStyle}" Click="CancelButton_Click"/>
+            <syncfusion:ButtonAdv L abel="Save"
+                    W idth="100"
+                    S tyle="{StaticResource BusBuddyPrimaryButtonAdvStyle}" Click="SaveButton_Click"
+                    I sEnabled="{Binding IsValid}"/>
+        </StackPanel>
+    </Grid>
+</Window>
+

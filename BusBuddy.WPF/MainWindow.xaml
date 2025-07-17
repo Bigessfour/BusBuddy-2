@@ -1,13 +1,28 @@
 <!--
 ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-║                                                          🚌 BUSBUDDY MAIN WINDOW 🚌                                                                                    ║
-║                                                    [COMPREHENSIVE DASHBOARD SHELL]                                                                                    ║
-║  ✨ SYNCFUSION FLUENTDARK THEME: Professional dark theme with advanced controls                                                                                        ║
-║  🎯 NAVIGATION DRAWER: SfNavigationDrawer with SfListView for smooth navigation                                                                                       ║
-║  🎭 DOCKING MANAGER: SfDockingManager for advanced panel management                                                                                                   ║
-║  📊 LOADING OVERLAY: Integrated LoadingView with SfBusyIndicator                                                                                                      ║
-║  🌐 FULL SCREEN: WindowState="Maximized" with responsive design                                                                                                       ║
-╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+║                                                          🚌 BUSBUDDY MAIN WINDOW 🚌                                                          ║
+║                                                    [COMPREHENSIVE DASHBOARD SHELL]                                                             ║
+║═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
+║  ✨ SYNCFUSION FLUENTDARK THEME: Professional dark theme with advanced controls and enhanced startup validation                      ║
+║  🎯 NAVIGATION DRAWER: SfNavigationDrawer with SfListView for smooth navigation                                                   ║
+║  🎭 DOCKING MANAGER: SfDockingManager for advanced panel management                                                               ║
+║  📊 LOADING OVERLAY: Integrated LoadingView with SfBusyIndicator                                                                  ║
+║  🌐 FULL SCREEN: WindowState="Maximized" with responsive design                                                                   ║
+║  🔧 ENHANCED DEBUGGING: Comprehensive startup validation and theme resource verification                                           ║
+║═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
+║  SCAFFOLD STRUCTURE:                                                                                                              ║
+║  └── Window (Foundation Layer)                                                                                                    ║
+║      ├── Resources (Template Patterns)                                                                                           ║
+║      └── Grid (Layout Skeleton)                                                                                                  ║
+║          └── DockingManager (Framework Container)                                                                                ║
+║              ├── NavigationDrawer (Left Panel)                                                                                   ║
+║              ├── Dashboard (Document Center)                                                                                     ║
+║              ├── ContentControl (Dynamic Views)                                                                                  ║
+║              ├── HeaderToolbar (Top Panel)                                                                                       ║
+║              ├── PropertyPanel (Right Panel)                                                                                     ║
+║              ├── StatusBar (Bottom Panel)                                                                                        ║
+║              └── Overlays (BusyIndicator + Loading)                                                                              ║
+╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 -->
 <Window x:Class="BusBuddy.WPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -35,16 +50,21 @@
         xmlns:syncfusionnavigation="clr-namespace:Syncfusion.UI.Xaml.NavigationDrawer;assembly=Syncfusion.SfNavigationDrawer.WPF"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
         Title="Bus Buddy - Transportation Management System"
         WindowState="Maximized"
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen"
-        syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
         Background="{DynamicResource SurfaceBackground}"
         Foreground="{DynamicResource TextPrimary}"
-        Loaded="Window_Loaded"
-        d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
+        Loaded="Window_Loaded">
+    <Window.Style>
+        <Style TargetType="Window">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+    </Window.Style>
 
     <Window.Resources>
         <ResourceDictionary>
@@ -67,7 +87,6 @@
                                      Background="Transparent"
                                      Foreground="{DynamicResource TextPrimary}"
                                      BorderThickness="0"
-                                     syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                      AutomationProperties.Name="{Binding Name}"
                                      ToolTip="{Binding Description, FallbackValue='Navigate to section'}">
                     <syncfusion:ButtonAdv.Content>
@@ -101,8 +120,7 @@
                                   PersistState="True"
                                   DockFill="True"
                                   ContainerMode="TDI"
-                                  DockBehavior="VS2010"
-                                  syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                  DockBehavior="VS2010">
 
             <!-- NAVIGATION DRAWER PANEL (Left Docked) -->
             <syncfusionnavigation:SfNavigationDrawer x:Name="NavigationDrawer"
@@ -123,7 +141,6 @@
                                           ExpandedModeWidth="280"
                                           AutoChangeDisplayMode="False"
                                           ItemClicked="NavigationDrawer_ItemClicked"
-                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                           Background="{DynamicResource SurfaceBackground}">
 
                 <!-- PROPER NAVIGATION ITEMS - Using NavigationItem controls -->
@@ -221,7 +238,6 @@
                                                   syncfusiontools:DockingManager.CanSerialize="True"
                                                   syncfusiontools:DockingManager.CaptionToolTip="Main dashboard with fleet overview"
                                                   syncfusiontools:DockingManager.DockAbility="All"
-                                                  syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                                   DataContext="{Binding DashboardViewModel}"/>
 
             <!-- CONTENT CONTAINER FOR DYNAMIC VIEWS -->
@@ -233,7 +249,6 @@
                             syncfusiontools:DockingManager.CanSerialize="True"
                             syncfusiontools:DockingManager.CaptionToolTip="Current active view"
                             syncfusiontools:DockingManager.DockAbility="All"
-                            syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                             Content="{Binding CurrentViewModel}"
                             Visibility="Collapsed">
                 <ContentControl.Resources>
@@ -301,8 +316,7 @@
                                           Background="Transparent"
                                           BorderThickness="0"
                                           Click="MenuToggleButton_Click"
-                                          Margin="0,0,16,0"
-                                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                          Margin="0,0,16,0">
                         <Path Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
                               Fill="{DynamicResource ContentForeground}"
                               Width="18" Height="18"/>
@@ -328,8 +342,7 @@
                                                 Style="{StaticResource StandardComboBoxStyle}"
                                                 Margin="4,0"
                                                 SelectedIndex="2"
-                                                SelectionChanged="DisplayModeComboBox_SelectionChanged"
-                                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                SelectionChanged="DisplayModeComboBox_SelectionChanged">
                             <syncfusion:ComboBoxItemAdv>Default</syncfusion:ComboBoxItemAdv>
                             <syncfusion:ComboBoxItemAdv>Compact</syncfusion:ComboBoxItemAdv>
                             <syncfusion:ComboBoxItemAdv>Expanded</syncfusion:ComboBoxItemAdv>
@@ -340,8 +353,7 @@
                         <syncfusion:ButtonAdv Width="40" Height="40"
                                               Background="Transparent"
                                               BorderThickness="0"
-                                              Margin="4,0"
-                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                              Margin="4,0">
                             <Grid>
                                 <Path Data="M16,17H7V10.5C7,8 9,6 11.5,6C14,6 16,8 16,10.5M18,16V10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.14,4.86 5,7.43 5,10.5V16L3,18V19H20V18M11.5,22A2,2 0 0,0 13.5,20H9.5A2,2 0 0,0 11.5,22Z"
                                       Fill="{DynamicResource ContentForeground}"
@@ -368,8 +380,7 @@
                                               Style="{StaticResource IconButtonAdvStyle}"
                                               Background="Transparent"
                                               BorderThickness="0"
-                                              Margin="4,0"
-                                              syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                              Margin="4,0">
                             <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
                                   Fill="{DynamicResource ContentForeground}"
                                   Width="16" Height="16"/>
@@ -432,7 +443,7 @@
                                            FontSize="20"
                                            FontWeight="Bold"
                                            Foreground="{DynamicResource BrandPrimaryBrush}"/>
-                            </StackPanel>
+                          </StackPanel>
                         </Border>
 
                         <!-- Performance Metrics -->
@@ -447,9 +458,8 @@
                                            Margin="0,0,0,8"/>
                                 <syncfusion:SfCircularProgressBar Height="60"
                                                                  Width="60"
-                                                                 Style="{StaticResource LoadingIndicatorStyle}"
-                                                                 Progress="92"
-                                                                 syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                                                 Style="{StaticResource CircularProgressStyle}"
+                                                                 Progress="92">
                                     <syncfusion:SfCircularProgressBar.Content>
                                         <TextBlock Text="92%"
                                                    FontSize="12"
@@ -534,13 +544,12 @@
 
             <!-- BUSY INDICATOR OVERLAY -->
             <syncfusion:SfBusyIndicator x:Name="BusyIndicator"
-                                      Style="{StaticResource LoadingIndicatorStyle}"
+                                      Style="{StaticResource CustomBusyStyle}"
                                       IsBusy="{Binding IsLoading}"
                                       AnimationType="Gear"
                                       ViewboxWidth="50"
                                       ViewboxHeight="50"
                                       Background="#80000000"
-                                      syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                       Panel.ZIndex="1000"
                                       Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <syncfusion:SfBusyIndicator.Content>
@@ -559,7 +568,7 @@
 
         <!-- LOADING OVERLAY (Global) -->
         <views:LoadingView x:Name="LoadingOverlay"
-                          Visibility="{Binding IsInitialLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                          Visibility="{Binding IsInitialLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Grid>
 </Window>
+

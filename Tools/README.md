@@ -270,6 +270,6 @@ The tools integrate with VS Code's problem detection:
 
 ---
 
-**Version**: 1.0  
-**Focus**: WPF Scheduling, Syncfusion 30.1.40, Novice Developer Experience  
+**Version**: 1.0
+**Focus**: WPF Scheduling, Syncfusion 30.1.40, Novice Developer Experience
 **Last Updated**: July 17, 2025

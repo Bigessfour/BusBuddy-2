@@ -73,7 +73,7 @@
                                AllowResizingColumns="True"
                                AllowSorting="True"
                                ShowBusyIndicator="{Binding IsLoading}"
-                               syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
+                               
                                Margin="10">
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn HeaderText="ID" MappingName="ActivityScheduleId" Width="60"/>
@@ -116,4 +116,5 @@
         </StatusBar>
     </Grid>
 </UserControl>
+
 

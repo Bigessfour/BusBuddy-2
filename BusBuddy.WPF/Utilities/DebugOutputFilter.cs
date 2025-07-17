@@ -734,7 +734,15 @@ namespace BusBuddy.WPF.Utilities
                 if (!File.Exists(logFilePath))
                     return entries;
 
-                var lines = await File.ReadAllLinesAsync(logFilePath);
+                // Use FileShare.ReadWrite to allow reading while file is being written to
+                string[] lines;
+                using (var fileStream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = new StreamReader(fileStream))
+                {
+                    var content = await reader.ReadToEndAsync();
+                    lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+
                 var patterns = GetPatternsForCategory(category);
 
                 for (int i = 0; i < lines.Length; i++)

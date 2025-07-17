@@ -12,7 +12,7 @@
 ║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
 ║     ✅ Data Grid: Use syncfusion:SfDataGrid with BusBuddySfDataGridStyle                                                                                              ║
 ║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application: syncfusionskin:SfSkinManager.VisualStyle="FluentDark" on ALL Syncfusion controls                                                           ║
+║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
 ║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
 ║                                                                                                                                                                          ║
 ║  ⚠️  CRITICAL REMINDERS:                                                                                                                                               ║
@@ -38,7 +38,7 @@
              xmlns:editors="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="800"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             >
     <Grid Margin="16" Background="{StaticResource ContentBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -52,7 +52,7 @@
                                 Command="{Binding RefreshCommand}"
                                 Margin="0,0,10,0"
                                 Style="{StaticResource BusBuddySecondaryButtonStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                >
                 <syncfusion:ButtonAdv.ToolTip>
                     <ToolTip Content="Refresh the activity log data"
                             Style="{StaticResource BusBuddyToolTipStyle}"/>
@@ -63,7 +63,7 @@
                                 Command="{Binding ExportCommand}"
                                 Margin="0,0,10,0"
                                 Style="{StaticResource BusBuddySecondaryButtonStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                >
                 <syncfusion:ButtonAdv.ToolTip>
                     <ToolTip Content="Export the filtered activity logs to CSV"
                             Style="{StaticResource BusBuddyToolTipStyle}"/>
@@ -74,7 +74,7 @@
                                 Command="{Binding ClearFiltersCommand}"
                                 Margin="0,0,10,0"
                                 Style="{StaticResource BusBuddySecondaryButtonStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                >
                 <syncfusion:ButtonAdv.ToolTip>
                     <ToolTip Content="Reset all filters to default values"
                             Style="{StaticResource BusBuddyToolTipStyle}"/>
@@ -85,7 +85,7 @@
                                 Command="{Binding ViewDetailsCommand}"
                                 Margin="0,0,10,0"
                                 Style="{StaticResource BusBuddyPrimaryButtonStyle}"
-                                syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                >
                 <syncfusion:ButtonAdv.ToolTip>
                     <ToolTip Content="View detailed information for the selected log entry"
                             Style="{StaticResource BusBuddyToolTipStyle}"/>
@@ -114,7 +114,7 @@
                                    Grid.Column="1"
                                    Margin="0,0,15,0"
                                    Width="120"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                   />
 
             <TextBlock Text="End Date:"
                       VerticalAlignment="Center"
@@ -126,7 +126,7 @@
                                    Grid.Column="3"
                                    Margin="0,0,15,0"
                                    Width="120"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                   />
 
             <TextBlock Text="Search:"
                       VerticalAlignment="Center"
@@ -139,7 +139,7 @@
                                    Width="200"
                                    Padding="5,3"
                                    Style="{StaticResource BusBuddyTextBoxStyle}"
-                                   syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                   >
                 <syncfusion:SfTextBoxExt.ToolTip>
                     <ToolTip Content="Search in action, user, and details fields"
                             Style="{StaticResource BusBuddyToolTipStyle}"/>
@@ -157,7 +157,7 @@
                                   AllowFiltering="True"
                                   AllowSorting="True"
                                   Style="{StaticResource BusBuddySfDataGridStyle}"
-                                  syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                                  >
             <syncfusion:SfDataGrid.Columns>
                 <syncfusion:GridTextColumn MappingName="Id" HeaderText="ID" Width="60"/>
                 <syncfusion:GridDateTimeColumn MappingName="Timestamp"
@@ -206,9 +206,10 @@
                                          Width="50"
                                          Margin="0,10,0,0"
                                          Style="{StaticResource BusBuddySfBusyIndicatorStyle}"
-                                         syncfusionskin:SfSkinManager.VisualStyle="FluentDark"/>
+                                         />
             </StackPanel>
         </Border>
     </Grid>
 </UserControl>
+
 
