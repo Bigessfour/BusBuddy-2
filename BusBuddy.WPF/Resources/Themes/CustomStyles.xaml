@@ -3,12 +3,12 @@
                     xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
                     xmlns:syncfusiontools="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.WPF"
                     xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
-                    xmlns:syncfusionbarcode="clr-namespace:Syncfusion.UI.Xaml.Controls.Barcode;assembly=Syncfusion.SfBarcode.WPF"
                     xmlns:syncfusionpdfviewer="clr-namespace:Syncfusion.Windows.PdfViewer;assembly=Syncfusion.PdfViewer.WPF"
                     xmlns:syncfusionchat="clr-namespace:Syncfusion.UI.Xaml.Chat;assembly=Syncfusion.SfChat.WPF"
                     xmlns:syncfusionimageeditor="clr-namespace:Syncfusion.UI.Xaml.ImageEditor;assembly=Syncfusion.SfImageEditor.WPF"
                     xmlns:syncfusionkanban="clr-namespace:Syncfusion.UI.Xaml.Kanban;assembly=Syncfusion.SfKanban.WPF"
-                    xmlns:syncfusionmaps="clr-namespace:Syncfusion.UI.Xaml.Maps;assembly=Syncfusion.SfMaps.WPF">
+                    xmlns:syncfusionmaps="clr-namespace:Syncfusion.UI.Xaml.Maps;assembly=Syncfusion.SfMaps.WPF"
+                    xmlns:syncfusionedit="clr-namespace:Syncfusion.Windows.Edit;assembly=Syncfusion.Edit.WPF">
 
     <!-- =============================================================================== -->
     <!-- SYNCFUSION FLUENTDARK THEME — ENHANCED PROFESSIONAL IMPLEMENTATION -->
@@ -66,7 +66,7 @@
     <Color x:Key="SurfaceDark">#1E1E1E</Color>
     <Color x:Key="SurfaceMedium">#252526</Color>
     <Color x:Key="SurfaceLight">#2D2D30</Color>
-    <Color x:Key="SurfaceBorder">#323130</Color>
+    <Color x:Key="SurfaceBorder">#323130</Color> <!-- Re-added for ProfessionalSurfaceBorder -->
 
     <!-- Professional Text Colors (WCAG 2.1 AA Compliant) -->
     <Color x:Key="TextPrimary">#FFFFFF</Color>
@@ -579,12 +579,6 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <Style x:Key="BusBuddySfBarcodeStyle" TargetType="syncfusionbarcode:SfBarcode">
-        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
-    </Style>
-
     <Style x:Key="BusBuddySfImageEditorStyle" TargetType="syncfusionimageeditor:SfImageEditor">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
@@ -630,7 +624,7 @@
         <Setter Property="syncfusionskin:SfSkinManager.VisualStyle" Value="FluentDark" />
     </Style>
 
-    <Style x:Key="BusBuddyEditControlStyle" TargetType="syncfusion:EditControl">
+    <Style x:Key="BusBuddyEditControlStyle" TargetType="syncfusionedit:EditControl">
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ContentBorder}" />
@@ -1079,23 +1073,14 @@
     <!-- =============================================================================== -->
     <!-- LEGACY COMPATIBILITY RESOURCES (GRADUALLY REMOVE THESE) -->
     <!-- =============================================================================== -->
-    <!-- These are deprecated and provided only for backward compatibility -->
-    <!-- New code should use the official Syncfusion FluentDark resource names above -->
+    <!-- REMOVED: Duplicate brush definitions that conflict with SyncfusionBaseResources.xaml -->
+    <!-- These brushes are now defined in SyncfusionBaseResources.xaml to avoid conflicts -->
     <!-- =============================================================================== -->
 
-    <!-- Essential color brushes for custom dashboard components -->
-    <SolidColorBrush x:Key="WarningBrush" Color="#FF8C00" />
-    <SolidColorBrush x:Key="ErrorBrush" Color="#E74856" />
-    <SolidColorBrush x:Key="SuccessBrush" Color="#2ECC71" />
-    <SolidColorBrush x:Key="InfoBrush" Color="#0078D4" />
-    <SolidColorBrush x:Key="PrimaryBrush" Color="#0078D4" />
+    <!-- Custom brushes that are unique to this application -->
     <SolidColorBrush x:Key="HoverBackground" Color="#2D2D30" />
-    <SolidColorBrush x:Key="BorderBrush" Color="#323130" />
     <SolidColorBrush x:Key="PrimaryBackground" Color="#1E1E1E" />
     <SolidColorBrush x:Key="SecondaryForeground" Color="#CCCCCC" />
-    <SolidColorBrush x:Key="ContentForeground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="ContentBackground" Color="#252526" />
-    <SolidColorBrush x:Key="ContentBorder" Color="#323130" />
     <SolidColorBrush x:Key="SuccessBackground" Color="#2ECC71" />
 
     <!-- FluentDark theme aliases for backward compatibility -->
