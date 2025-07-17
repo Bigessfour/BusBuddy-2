@@ -954,6 +954,9 @@ public partial class App : Application
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
         services.AddScoped<BusBuddy.WPF.Services.StartupOptimizationService>();
 
+        // Register Navigation Service for centralized navigation management
+        services.AddSingleton<BusBuddy.WPF.Services.INavigationService, BusBuddy.WPF.Services.NavigationService>();
+
         // Register startup validation service for deployment readiness
         services.AddScoped<BusBuddy.WPF.Services.StartupValidationService>();
 

@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using BusBuddy.WPF.ViewModels;
+using BusBuddy.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Syncfusion.SfSkinManager;
@@ -18,6 +19,7 @@ namespace BusBuddy.WPF
     public partial class MainWindow : Window
     {
         private MainViewModel? _viewModel;
+        private INavigationService? _navigationService;
 
         public MainWindow()
         {
@@ -32,11 +34,19 @@ namespace BusBuddy.WPF
                 // Apply FluentDark theme consistently
                 ApplyFluentDarkTheme();
 
-                // Set DataContext to MainViewModel
+                // Set DataContext to MainViewModel and get NavigationService
                 if (Application.Current is App appInstance && appInstance.Services != null)
                 {
                     _viewModel = appInstance.Services.GetService<MainViewModel>();
+                    _navigationService = appInstance.Services.GetService<INavigationService>();
                     DataContext = _viewModel;
+                    
+                    // Subscribe to navigation events
+                    if (_navigationService != null)
+                    {
+                        _navigationService.NavigationChanged += OnNavigationChanged;
+                    }
+                    
                     Log.Information("MainWindow initialized with enhanced navigation drawer and FluentDark theme");
                 }
             }
@@ -88,18 +98,20 @@ namespace BusBuddy.WPF
                 // Set up docking manager event handlers
                 SetupDockingManager();
 
-                // Initialize the MainWindow with proper DataContext
-                if (_viewModel != null)
+                // Initialize with Dashboard using NavigationService
+                if (_navigationService != null)
                 {
-                    // Start with dashboard view
+                    _navigationService.NavigateTo("Dashboard");
+                }
+                else if (_viewModel != null)
+                {
+                    // Fallback to old method if NavigationService is not available
                     _viewModel.NavigateToDashboard();
-
-                    // Show dashboard initially
                     ShowDashboard();
                 }
                 else
                 {
-                    Log.Warning("MainViewModel is null during Window_Loaded");
+                    Log.Warning("Both NavigationService and MainViewModel are null during Window_Loaded");
                 }
             }
             catch (Exception ex)
@@ -170,58 +182,48 @@ namespace BusBuddy.WPF
                     var tag = navigationItem.Tag?.ToString();
                     Log.Information("Navigation item clicked: {Header} (Tag: {Tag})", header, tag);
 
-                    // Handle navigation based on the selected item
-                    if (_viewModel != null)
+                    // Use NavigationService for centralized navigation
+                    if (_navigationService != null && !string.IsNullOrEmpty(tag))
                     {
-                        switch (tag)
-                        {
-                            case "Dashboard":
-                                _viewModel.NavigateToDashboard();
-                                ShowDashboard();
-                                break;
-                            case "BusManagement":
-                                _ = _viewModel.NavigateTo("Buses");
-                                ShowContentContainer();
-                                break;
-                            case "DriverManagement":
-                                _ = _viewModel.NavigateTo("Drivers");
-                                ShowContentContainer();
-                                break;
-                            case "RouteManagement":
-                                _ = _viewModel.NavigateTo("Routes");
-                                ShowContentContainer();
-                                break;
-                            case "ScheduleManagement":
-                                _ = _viewModel.NavigateTo("Schedule");
-                                ShowContentContainer();
-                                break;
-                            case "StudentManagement":
-                                _ = _viewModel.NavigateTo("Students");
-                                ShowContentContainer();
-                                break;
-                            case "Maintenance":
-                                _ = _viewModel.NavigateTo("Maintenance");
-                                ShowContentContainer();
-                                break;
-                            case "FuelManagement":
-                                _ = _viewModel.NavigateTo("Fuel");
-                                ShowContentContainer();
-                                break;
-                            case "ActivityLog":
-                                _ = _viewModel.NavigateTo("Activity");
-                                ShowContentContainer();
-                                break;
-                            case "Settings":
-                                _ = _viewModel.NavigateTo("Settings");
-                                ShowContentContainer();
-                                break;
-                        }
+                        _navigationService.NavigateTo(tag);
                     }
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error handling navigation item click");
+            }
+        }
+
+        /// <summary>
+        /// Handle navigation changes from NavigationService
+        /// </summary>
+        private void OnNavigationChanged(object? sender, NavigationEventArgs e)
+        {
+            try
+            {
+                Log.Information("Navigation changed to: {ViewName}", e.ViewName);
+                
+                // Update the view model's current view
+                if (_viewModel != null && e.ViewModel != null)
+                {
+                    _viewModel.CurrentViewModel = e.ViewModel;
+                    _viewModel.CurrentViewTitle = e.ViewTitle;
+                }
+
+                // Update UI based on view
+                if (e.ViewName == "Dashboard")
+                {
+                    ShowDashboard();
+                }
+                else
+                {
+                    ShowContentContainer();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error handling navigation change");
             }
         }
 
@@ -381,6 +383,28 @@ namespace BusBuddy.WPF
             catch (Exception ex)
             {
                 Log.Error(ex, "Error handling window state change");
+            }
+        }
+
+        /// <summary>
+        /// Clean up resources and event subscriptions
+        /// </summary>
+        protected override void OnClosed(EventArgs e)
+        {
+            try
+            {
+                // Unsubscribe from navigation events
+                if (_navigationService != null)
+                {
+                    _navigationService.NavigationChanged -= OnNavigationChanged;
+                }
+
+                Log.Information("MainWindow closed successfully");
+                base.OnClosed(e);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error during MainWindow cleanup");
             }
         }
     }

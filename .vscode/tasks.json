@@ -33,7 +33,6 @@
                 "minimal"
             ],
             "group": "build",
-            "dependsOn": "Clean Solution",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -52,14 +51,12 @@
                 "build",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
                 "--verbosity",
-                "minimal",
-                "--no-restore"
+                "minimal"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn": "Restore Packages",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -97,12 +94,10 @@
                 "run",
                 "--project",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "--no-build",
                 "--verbosity",
                 "minimal"
             ],
             "group": "build",
-            "dependsOn": "Build Solution",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -134,12 +129,10 @@
                 "run",
                 "--project",
                 "BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "--no-build",
                 "--verbosity",
                 "detailed"
             ],
             "group": "build",
-            "dependsOn": "Build Solution",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -212,7 +205,7 @@
             }
         },
         {
-            "label": "Full Clean & Build & Run",
+            "label": "Full Clean & Build & Run (Sequential)",
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean Solution",
