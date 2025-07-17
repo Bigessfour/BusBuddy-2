@@ -94,12 +94,30 @@ public partial class App : Application
         // ✅ COMPLIANCE: 100% Syncfusion WPF 30.1.40 documentation alignment
         // ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+        // Note: Serilog is not yet initialized here, so using Debug.WriteLine for theme setup logging
+        System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Starting Syncfusion theme configuration");
+
         // Configure SfSkinManager for global theme application
-        SfSkinManager.ApplyStylesOnApplication = true;
-        SfSkinManager.ApplyThemeAsDefaultStyle = true;
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ApplyStylesOnApplication = true");
+            SfSkinManager.ApplyStylesOnApplication = true;
+
+            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ApplyThemeAsDefaultStyle = true");
+            SfSkinManager.ApplyThemeAsDefaultStyle = true;
+
+            System.Diagnostics.Debug.WriteLine("✅ [APP CONSTRUCTOR] SfSkinManager configuration completed successfully");
+        }
+        catch (Exception sfManagerEx)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] SfSkinManager configuration failed: {sfManagerEx.Message}");
+            System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] Exception details: {sfManagerEx}");
+        }
 
         // 🎯 OPTIONAL: Auto-detect system theme preference
         string preferredTheme = "FluentDark"; // Default to FluentDark
+        System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Starting system theme detection");
+
         try
         {
             // Check Windows system theme preference
@@ -107,36 +125,41 @@ public partial class App : Application
             if (systemTheme is int themeValue && themeValue == 1)
             {
                 preferredTheme = "FluentLight";
-                System.Diagnostics.Debug.WriteLine("🎨 SYSTEM THEME: Light theme detected, using FluentLight");
+                System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] SYSTEM THEME: Light theme detected, using FluentLight");
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("🎨 SYSTEM THEME: Dark theme detected, using FluentDark");
+                System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] SYSTEM THEME: Dark theme detected, using FluentDark");
             }
         }
         catch (Exception themeDetectionEx)
         {
-            System.Diagnostics.Debug.WriteLine($"🎨 SYSTEM THEME: Could not detect system theme, using FluentDark default: {themeDetectionEx.Message}");
+            System.Diagnostics.Debug.WriteLine($"🎨 [APP CONSTRUCTOR] SYSTEM THEME: Could not detect system theme, using FluentDark default: {themeDetectionEx.Message}");
+            System.Diagnostics.Debug.WriteLine($"🎨 [APP CONSTRUCTOR] Theme detection exception details: {themeDetectionEx}");
         }
 
+        System.Diagnostics.Debug.WriteLine($"🎨 [APP CONSTRUCTOR] Applying theme: {preferredTheme}");
         try
         {
             // 🎯 APPLY PREFERRED THEME: Based on system preference or default
             SfSkinManager.ApplicationTheme = new Theme(preferredTheme);
-            System.Diagnostics.Debug.WriteLine($"✅ THEME: {preferredTheme} applied successfully as primary theme");
+            System.Diagnostics.Debug.WriteLine($"✅ [APP CONSTRUCTOR] THEME: {preferredTheme} applied successfully as primary theme");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"⚠️ THEME: {preferredTheme} failed, applying FluentLight fallback: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"⚠️ [APP CONSTRUCTOR] THEME: {preferredTheme} failed, applying FluentLight fallback: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"⚠️ [APP CONSTRUCTOR] Primary theme exception details: {ex}");
+
             try
             {
                 // 🔄 FALLBACK THEME: FluentLight (Clean light theme)
                 SfSkinManager.ApplicationTheme = new Theme("FluentLight");
-                System.Diagnostics.Debug.WriteLine("✅ THEME: FluentLight applied successfully as fallback theme");
+                System.Diagnostics.Debug.WriteLine("✅ [APP CONSTRUCTOR] THEME: FluentLight applied successfully as fallback theme");
             }
             catch (Exception fallbackEx)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ THEME: Both primary and FluentLight failed: {fallbackEx.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] THEME: Both primary and FluentLight failed: {fallbackEx.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] Fallback theme exception details: {fallbackEx}");
             }
         }
 
@@ -312,78 +335,162 @@ public partial class App : Application
     }
     protected override void OnStartup(StartupEventArgs e)
     {
+        var startupStopwatch = Stopwatch.StartNew();
+
         try
         {
+            // Note: Serilog may not be fully initialized yet, so we'll add logging after host startup
+            System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] OnStartup method entered at {DateTime.Now:O}");
+            System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] Command line arguments count: {e.Args.Length}");
+
+            if (e.Args.Length > 0)
+            {
+                System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] Arguments: {string.Join(", ", e.Args)}");
+            }
             // Handle command line arguments for debug functionality
             if (e.Args.Length > 0)
             {
-                HandleCommandLineArgumentsAsync(e.Args).GetAwaiter().GetResult();
-                return; // Exit after handling command line arguments
-            }
-
-            // Start the generic host to initialize DI and logging before UI
-            _host.StartAsync().GetAwaiter().GetResult();
-            base.OnStartup(e);
-
-            // 🔍 AUTO DEBUG FILTER: Start automatic filtering in debug mode
-#if DEBUG
-            try
-            {
-                BusBuddy.WPF.Utilities.DebugHelper.StartAutoFilter();
-                Log.Information("🔍 Debug auto-filter enabled for debug session");
-
-                // Test the filter is working (after 3 seconds delay)
-                var testTimer = new System.Threading.Timer(
-                    callback: _ => BusBuddy.WPF.Utilities.DebugHelper.TestAutoFilter(),
-                    state: null,
-                    dueTime: TimeSpan.FromSeconds(3),
-                    period: TimeSpan.FromMilliseconds(-1) // Run once
-                );
-            }
-            catch (Exception debugEx)
-            {
-                Log.Warning(debugEx, "🔍 Debug auto-filter failed to start");
-            }
-#endif
-
-            // 🛠️ Temporarily disable custom resource dictionary loading to fix parsing issue
-            try
-            {
-                // Clear any existing resource dictionaries to start fresh
-                this.Resources.MergedDictionaries.Clear();
-
-                // Load resource dictionaries using standard WPF approach
-                var resourceDictionary = new ResourceDictionary();
-                resourceDictionary.Source = new Uri("Resources/BusBuddyResourceDictionary.xaml", UriKind.Relative);
-                this.Resources.MergedDictionaries.Add(resourceDictionary);
-
-                // Add critical diagnostic logging
-                Log.Information("🎨 Resource dictionaries loaded using standard WPF approach");
-
-                // Verify if critical keys exist in merged resources to identify potential issues
-                string[] criticalKeys = new string[] { "SurfaceBorder", "SurfaceBorderBrush", "SurfaceBorderColor" };
-                foreach (var key in criticalKeys)
+                using (LogContext.PushProperty("Operation", "CommandLineHandling"))
                 {
-                    if (this.Resources.Contains(key))
+                    try
                     {
-                        Log.Debug("✅ Critical resource key exists: {Key} ({Type})",
-                            key, this.Resources[key]?.GetType().Name ?? "Unknown");
+                        Log.Information("🔧 [STARTUP] Processing command line arguments: {Arguments}", string.Join(" ", e.Args));
+                        HandleCommandLineArgumentsAsync(e.Args).GetAwaiter().GetResult();
+                        Log.Information("🔧 [STARTUP] Command line arguments processed successfully");
+                        return; // Exit after handling command line arguments
                     }
-                    else
+                    catch (Exception cmdEx)
                     {
-                        Log.Warning("⚠️ Critical resource key missing: {Key}", key);
+                        Log.Error(cmdEx, "❌ [STARTUP] Failed to process command line arguments");
+                        throw;
                     }
                 }
             }
-            catch (Exception resourceEx)
+
+            Log.Information("🚀 [STARTUP] No command line arguments detected, proceeding with normal startup");
+
+            // Start the generic host to initialize DI and logging before UI
+            using (LogContext.PushProperty("Operation", "HostStartup"))
             {
-                Log.Error(resourceEx, "Error loading resource dictionaries");
+                try
+                {
+                    Log.Information("🏗️ [STARTUP] Starting generic host for DI and logging initialization");
+                    _host.StartAsync().GetAwaiter().GetResult();
+                    Log.Information("✅ [STARTUP] Generic host started successfully");
+                }
+                catch (Exception hostEx)
+                {
+                    Log.Fatal(hostEx, "❌ [STARTUP] Failed to start generic host");
+                    throw;
+                }
+            }
+
+            try
+            {
+                Log.Information("🏗️ [STARTUP] Calling base.OnStartup");
+                base.OnStartup(e);
+                Log.Debug("✅ [STARTUP] base.OnStartup completed successfully");
+            }
+            catch (Exception baseStartupEx)
+            {
+                Log.Error(baseStartupEx, "❌ [STARTUP] base.OnStartup failed");
+                throw;
+            }
+
+            // 🔍 AUTO DEBUG FILTER: Removed for clean debug experience
+            // Debug filter functionality is available via command line arguments:
+            // --start-debug-filter, --export-debug-json, --start-streaming
+#if DEBUG
+            Log.Information("🔍 [STARTUP] Debug mode active - Debug Helper available via command line arguments");
+            Log.Information("🔍 [STARTUP] Use '--start-debug-filter' command line argument to enable debug filtering");
+#endif
+
+            // 🎨 Resource dictionaries are already loaded via App.xaml — no manual loading needed
+            // The App.xaml properly references Resources/SyncfusionV30_ResourceDictionary.xaml
+            using (LogContext.PushProperty("Operation", "ResourceDictionaryValidation"))
+            {
+                try
+                {
+                    Log.Information("🎨 [STARTUP] Starting resource dictionary validation");
+                    Log.Debug("🎨 [STARTUP] App.xaml resource loading approach - using SfSkinManager only");
+
+                    // Add critical diagnostic logging
+                    Log.Information("🎨 [STARTUP] Resource dictionaries loaded via App.xaml configuration");
+
+                    // Log merged dictionary count
+                    var mergedDictCount = this.Resources?.MergedDictionaries?.Count ?? 0;
+                    Log.Information("🎨 [STARTUP] Total merged dictionaries: {Count}", mergedDictCount);
+
+                    // Verify if critical keys exist in merged resources to identify potential issues
+                    string[] criticalKeys = new string[] { "SurfaceBorder", "SurfaceBorderBrush", "SurfaceBorderColor" };
+                    int foundKeys = 0;
+                    int missingKeys = 0;
+
+                    foreach (var key in criticalKeys)
+                    {
+                        if (this.Resources?.Contains(key) == true)
+                        {
+                            foundKeys++;
+                            var resourceType = this.Resources[key]?.GetType().Name ?? "Unknown";
+                            Log.Debug("✅ [STARTUP] Critical resource key exists: {Key} ({Type})", key, resourceType);
+                        }
+                        else
+                        {
+                            missingKeys++;
+                            Log.Warning("⚠️ [STARTUP] Critical resource key missing: {Key}", key);
+                        }
+                    }
+
+                    Log.Information("🎨 [STARTUP] Resource validation summary: {FoundKeys} found, {MissingKeys} missing", foundKeys, missingKeys);
+
+                    // Log current theme information
+                    var currentTheme = SfSkinManager.ApplicationTheme?.ToString() ?? "Unknown";
+                    Log.Information("🎨 [STARTUP] Current SfSkinManager theme: {ThemeName}", currentTheme);
+
+                    Log.Information("✅ [STARTUP] Resource dictionary validation completed successfully");
+                }
+                catch (Exception resourceEx)
+                {
+                    Log.Error(resourceEx, "❌ [STARTUP] Error validating resource dictionaries");
+
+                    // Log additional diagnostic information
+                    try
+                    {
+                        var resourceCount = this.Resources?.Count ?? 0;
+                        var mergedCount = this.Resources?.MergedDictionaries?.Count ?? 0;
+                        Log.Error("❌ [STARTUP] Resource diagnostic - Total resources: {ResourceCount}, Merged dictionaries: {MergedCount}",
+                                 resourceCount, mergedCount);
+                    }
+                    catch (Exception diagnosticEx)
+                    {
+                        Log.Error(diagnosticEx, "❌ [STARTUP] Failed to gather resource diagnostic information");
+                    }
+                }
             }
 
             // Now that the host is started, Serilog should be initialized
             // 🎨 THEME CONFIRMATION: Theme already applied in constructor
             // SfSkinManager.ApplicationTheme is already set to FluentDark with FluentLight fallback
-            Log.Information("🎨 Syncfusion theme confirmed: FluentDark primary with FluentLight fallback ready");
+            using (LogContext.PushProperty("Operation", "ThemeConfirmation"))
+            {
+                try
+                {
+                    Log.Information("🎨 [STARTUP] Starting Syncfusion theme confirmation");
+
+                    var appliedTheme = SfSkinManager.ApplicationTheme?.ToString() ?? "Unknown";
+                    var applyStylesOnApp = SfSkinManager.ApplyStylesOnApplication;
+                    var applyThemeAsDefault = SfSkinManager.ApplyThemeAsDefaultStyle;
+
+                    Log.Information("🎨 [STARTUP] Theme Status - Applied: {AppliedTheme}, StylesOnApp: {StylesOnApp}, ThemeAsDefault: {ThemeAsDefault}",
+                                   appliedTheme, applyStylesOnApp, applyThemeAsDefault);
+
+                    Log.Information("🎨 [STARTUP] Syncfusion theme confirmed: FluentDark primary with FluentLight fallback ready");
+                }
+                catch (Exception themeEx)
+                {
+                    Log.Error(themeEx, "❌ [STARTUP] Error during theme confirmation");
+                }
+            }
 
             // Start performance monitoring
             var stopwatch = Stopwatch.StartNew();
@@ -558,9 +665,7 @@ public partial class App : Application
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
             this.Exit += (s, ex) =>
             {
-#if DEBUG
-                BusBuddy.WPF.Utilities.DebugHelper.StopAutoFilter();
-#endif
+                // Clean application shutdown - debug helper not automatically started
                 Log.CloseAndFlush();
             };
 
@@ -824,6 +929,28 @@ public partial class App : Application
 
                 // Log total time from the original stopwatch
                 stopwatch.Stop();
+                startupStopwatch.Stop();
+
+                using (LogContext.PushProperty("Operation", "StartupCompletion"))
+                {
+                    Log.Information("🎉 [STARTUP] Application startup sequence completed successfully");
+                    Log.Information("⏱️ [STARTUP] Total startup time: {ElapsedMs}ms", startupStopwatch.ElapsedMilliseconds);
+                    Log.Information("⏱️ [STARTUP] OnStartup method time: {OnStartupMs}ms", stopwatch.ElapsedMilliseconds);
+
+                    // Log final application state
+                    Log.Information("📊 [STARTUP] Final application state:");
+                    Log.Information("   🎨 Theme: {Theme}", SfSkinManager.ApplicationTheme?.ToString() ?? "Unknown");
+                    Log.Information("   📦 Resource dictionaries: {Count}", this.Resources?.MergedDictionaries?.Count ?? 0);
+                    Log.Information("   🔧 Debug mode: {IsDebug}",
+#if DEBUG
+                        true
+#else
+                        false
+#endif
+                    );
+                    Log.Information("✅ [STARTUP] Bus Buddy WPF application is ready for user interaction");
+                }
+
                 Log.Information("[STARTUP_PERF] Initial application startup completed in {ElapsedMs}ms",
                     stopwatch.ElapsedMilliseconds);
 
@@ -865,7 +992,35 @@ public partial class App : Application
         catch (Exception ex)
         {
             // Handle any exceptions that occur during the entire OnStartup method
-            Log.Fatal(ex, "[STARTUP] Fatal error during OnStartup method execution");
+            using (LogContext.PushProperty("Operation", "StartupFailure"))
+            {
+                startupStopwatch?.Stop();
+                Log.Fatal(ex, "❌ [STARTUP] Fatal error during OnStartup method execution after {ElapsedMs}ms",
+                         startupStopwatch?.ElapsedMilliseconds ?? 0);
+
+                // Log specific error context
+                Log.Fatal("❌ [STARTUP] Error details - Type: {ExceptionType}, Message: {Message}",
+                         ex.GetType().Name, ex.Message);
+
+                if (ex.InnerException != null)
+                {
+                    Log.Fatal("❌ [STARTUP] Inner exception - Type: {InnerType}, Message: {InnerMessage}",
+                             ex.InnerException.GetType().Name, ex.InnerException.Message);
+                }
+
+                // Log application state at failure
+                try
+                {
+                    Log.Fatal("❌ [STARTUP] Application state at failure:");
+                    Log.Fatal("   🎨 Theme status: {ThemeStatus}", SfSkinManager.ApplicationTheme?.ToString() ?? "Not set");
+                    Log.Fatal("   📦 Resource count: {ResourceCount}", this.Resources?.Count ?? 0);
+                    Log.Fatal("   🏗️ Host status: {HostStatus}", _host?.Services != null ? "Initialized" : "Not initialized");
+                }
+                catch (Exception stateEx)
+                {
+                    Log.Fatal(stateEx, "❌ [STARTUP] Failed to log application state during fatal error");
+                }
+            }
 
             // Show error message to user
             MessageBox.Show(

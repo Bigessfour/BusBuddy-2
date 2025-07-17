@@ -20,8 +20,7 @@
              xmlns:views="clr-namespace:BusBuddy.WPF.Views"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
-             d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}"
-             syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+             d:DataContext="{d:DesignInstance viewModels:DashboardViewModel}">
 
     <UserControl.Resources>
         <!-- DataTemplates have been moved to App.xaml for global availability -->
@@ -554,8 +553,7 @@
 
         <!-- Main Docking Manager for Secondary Panels -->
         <Grid Grid.Row="2">
-            <syncfusion:DockingManager x:Name="MainDockingManager"
-                                       syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+            <syncfusion:DockingManager x:Name="MainDockingManager">
 
             <!-- Dashboard Overview Panel (Document) -->
             <ContentControl x:Name="DashboardOverview"
@@ -563,8 +561,7 @@
                           syncfusion:DockingManager.State="Document"
                           syncfusion:DockingManager.CanSerialize="True"
                           HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          syncfusionskin:SfSkinManager.VisualStyle="FluentDark">
+                          VerticalAlignment="Stretch">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
                     <!-- Custom Tile Dashboard Implementation -->
                     <Grid>

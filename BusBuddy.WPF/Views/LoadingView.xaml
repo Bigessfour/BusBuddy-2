@@ -114,11 +114,10 @@
                                              Foreground="{DynamicResource PrimaryBackground}"
                                              Background="{DynamicResource ContentBackground}"
                                              Style="{StaticResource StandardLinearProgressBarStyle}"
-                                             syncfusionskin:SfSkinManager.VisualStyle="FluentDark"
                                              IsIndeterminate="{Binding IsIndeterminate}"/>
 
                     <!-- Progress Percentage Display -->
-                    <TextBlock Text="{Binding ProgressPercentage, StringFormat='{}{0}%'}"
+                    <TextBlock Text="{Binding ProgressPercentage, StringFormat={}{0}%}"
                                FontSize="12" FontWeight="SemiBold"
                                Foreground="{DynamicResource AccentBackground}"
                                HorizontalAlignment="Center"
