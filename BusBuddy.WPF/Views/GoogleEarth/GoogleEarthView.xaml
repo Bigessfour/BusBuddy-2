@@ -244,13 +244,15 @@
                     Background="{DynamicResource ContentBackground}"
                     BorderBrush="{DynamicResource SurfaceBorderBrush}"
                     BorderThickness="1"
-                    Margin="0">
+                    Margin="0"
+                    MinHeight="400">
                 <Grid>
                     <!-- Map Container -->
                     <Border x:Name="MapContainer"
                             Background="{DynamicResource SurfaceBackground}"
                             CornerRadius="8"
-                            Margin="16">
+                            Margin="16"
+                            MinHeight="400">
                         <Grid>
                             <!-- Placeholder for Google Earth integration -->
                             <Border Background="#FF1a1a1a"

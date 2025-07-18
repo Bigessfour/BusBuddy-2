@@ -551,9 +551,16 @@
             </Grid>
         </ScrollViewer>
 
-        <!-- Main Docking Manager for Secondary Panels -->
+        <!-- Main Docking Manager for Secondary Panels with Standardization -->
         <Grid Grid.Row="2">
-            <syncfusion:DockingManager x:Name="MainDockingManager">
+            <syncfusion:DockingManager x:Name="MainDockingManager"
+                                      Style="{StaticResource StandardDockingManagerStyle}"
+                                      UseDocumentContainer="True"
+                                      PersistState="True"
+                                      ContainerMode="TDI"
+                                      DockBehavior="VS2010"
+                                      EnableAutoAdjustment="True"
+                                      ShowTabItemsInTitleBar="True">
 
             <!-- Dashboard Overview Panel (Document) -->
             <ContentControl x:Name="DashboardOverview"
@@ -794,7 +801,7 @@
                                                                         Width="55" Height="55"
                                                                         HorizontalAlignment="Center"
                                                                         Progress="{Binding MaintenanceCompletionPercentage}"
-                                                                        
+
                                                                         FontSize="11"/>
                                     </Grid>
                                 </StackPanel>

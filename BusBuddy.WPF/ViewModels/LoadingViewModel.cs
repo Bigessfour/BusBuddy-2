@@ -10,6 +10,7 @@ namespace BusBuddy.WPF.ViewModels
     public class LoadingViewModel : BaseViewModel
     {
         private string _status = "Initializing...";
+        private string _progressMessage = "Starting Bus Buddy application...";
         private int _progressPercentage = 0;
         private bool _isIndeterminate = true;
         private bool _isComplete = false;
@@ -19,7 +20,7 @@ namespace BusBuddy.WPF.ViewModels
             using (LogContext.PushProperty("ViewModelType", nameof(LoadingViewModel)))
             using (LogContext.PushProperty("OperationType", "Construction"))
             {
-                Logger.Information("LoadingViewModel created");
+                Logger.Information("LoadingViewModel created with enhanced progress tracking");
             }
         }
 
@@ -37,6 +38,28 @@ namespace BusBuddy.WPF.ViewModels
                     using (LogContext.PushProperty("OperationType", "StatusChange"))
                     {
                         Logger.Debug("Loading status changed to: {Status}", value);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Detailed progress message for real-time updates
+        /// </summary>
+        public string ProgressMessage
+        {
+            get => _progressMessage;
+            set
+            {
+                if (_progressMessage != value)
+                {
+                    _progressMessage = value;
+                    OnPropertyChanged();
+
+                    using (LogContext.PushProperty("ViewModelType", nameof(LoadingViewModel)))
+                    using (LogContext.PushProperty("OperationType", "ProgressMessageChange"))
+                    {
+                        Logger.Debug("Progress message updated: {ProgressMessage}", value);
                     }
                 }
             }
@@ -113,6 +136,7 @@ namespace BusBuddy.WPF.ViewModels
             {
                 ProgressPercentage = 0;
                 Status = "Initializing...";
+                ProgressMessage = "Starting Bus Buddy application...";
                 IsIndeterminate = true;
                 _isComplete = false;
                 OnPropertyChanged(nameof(IsComplete));
@@ -127,8 +151,30 @@ namespace BusBuddy.WPF.ViewModels
         {
             ProgressPercentage = 100;
             Status = "Application ready!";
+            ProgressMessage = "Bus Buddy is ready for use";
             IsIndeterminate = false;
             InitializationCompleted?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Update both status and progress message with percentage
+        /// </summary>
+        public void UpdateProgress(string status, string progressMessage, int percentage)
+        {
+            Status = status;
+            ProgressMessage = progressMessage;
+            ProgressPercentage = percentage;
+            IsIndeterminate = false;
+        }
+
+        /// <summary>
+        /// Set indeterminate progress with detailed messages
+        /// </summary>
+        public void SetIndeterminateProgress(string status, string progressMessage)
+        {
+            Status = status;
+            ProgressMessage = progressMessage;
+            IsIndeterminate = true;
         }
     }
 }

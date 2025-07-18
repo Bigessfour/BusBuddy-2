@@ -113,32 +113,36 @@
 
     <!-- MAIN GRID CONTAINER -->
     <Grid Background="{DynamicResource SurfaceBackground}">
-        <!-- COMPREHENSIVE DOCKING MANAGER - Professional IDE-style Layout -->
+        <!-- COMPREHENSIVE DOCKING MANAGER - Professional IDE-style Layout with Standardization -->
         <syncfusiontools:DockingManager x:Name="MainDockingManager"
                                   Style="{StaticResource StandardDockingManagerStyle}"
                                   UseDocumentContainer="True"
                                   PersistState="True"
                                   DockFill="True"
                                   ContainerMode="TDI"
-                                  DockBehavior="VS2010">
+                                  DockBehavior="VS2010"
+                                  EnableAutoAdjustment="True"
+                                  ShowTabItemsInTitleBar="True">
 
-            <!-- NAVIGATION DRAWER PANEL (Left Docked) -->
+            <!-- NAVIGATION DRAWER PANEL (Left Docked with Standard Sizing) -->
             <syncfusionnavigation:SfNavigationDrawer x:Name="NavigationDrawer"
                                           Style="{StaticResource StandardNavigationDrawerStyle}"
                                           syncfusiontools:DockingManager.Header="🧭 Navigation"
                                           syncfusiontools:DockingManager.State="Dock"
                                           syncfusiontools:DockingManager.SideInDockedMode="Left"
-                                          syncfusiontools:DockingManager.DesiredWidthInDockedMode="280"
+                                          syncfusiontools:DockingManager.DesiredWidthInDockedMode="300"
                                           syncfusiontools:DockingManager.CanClose="False"
                                           syncfusiontools:DockingManager.CanFloat="True"
                                           syncfusiontools:DockingManager.CanSerialize="True"
                                           syncfusiontools:DockingManager.DockAbility="All"
+                                          MinWidth="200"
+                                          MaxWidth="600"
                                           IsOpen="True"
                                           Position="Left"
                                           DisplayMode="Expanded"
-                                          DrawerWidth="280"
+                                          DrawerWidth="300"
                                           CompactModeWidth="60"
-                                          ExpandedModeWidth="280"
+                                          ExpandedModeWidth="300"
                                           AutoChangeDisplayMode="False"
                                           ItemClicked="NavigationDrawer_ItemClicked"
                                           Background="{DynamicResource SurfaceBackground}">
@@ -286,7 +290,7 @@
                 </ContentControl.Resources>
             </ContentControl>
 
-            <!-- HEADER TOOLBAR (Top Docked) -->
+            <!-- HEADER TOOLBAR (Top Docked with Standard Sizing) -->
             <Border x:Name="HeaderToolbar"
                     syncfusiontools:DockingManager.Header="🔧 Toolbar"
                     syncfusiontools:DockingManager.State="Dock"
@@ -296,6 +300,8 @@
                     syncfusiontools:DockingManager.CanFloat="True"
                     syncfusiontools:DockingManager.CanSerialize="True"
                     syncfusiontools:DockingManager.DockAbility="All"
+                    MinHeight="32"
+                    MaxHeight="120"
                     Background="{DynamicResource SurfaceBackground}"
                     BorderBrush="{DynamicResource SurfaceBorderBrush}"
                     BorderThickness="0,0,0,1"
@@ -389,7 +395,7 @@
                 </Grid>
             </Border>
 
-            <!-- PROPERTY PANEL (Right Docked) -->
+            <!-- PROPERTY PANEL (Right Docked with Standard Sizing) -->
             <Border x:Name="PropertyPanel"
                     syncfusiontools:DockingManager.Header="🔧 Properties"
                     syncfusiontools:DockingManager.State="Dock"
@@ -400,6 +406,8 @@
                     syncfusiontools:DockingManager.CanSerialize="True"
                     syncfusiontools:DockingManager.DockAbility="All"
                     syncfusiontools:DockingManager.CaptionToolTip="System properties and configuration"
+                    MinWidth="200"
+                    MaxWidth="600"
                     Background="{DynamicResource SurfaceBackground}"
                     Padding="16">
 
@@ -473,7 +481,7 @@
                 </ScrollViewer>
             </Border>
 
-            <!-- STATUS BAR (Bottom Docked) -->
+            <!-- STATUS BAR (Bottom Docked with Standard Sizing) -->
             <Border x:Name="StatusBar"
                     syncfusiontools:DockingManager.Header="📊 Status"
                     syncfusiontools:DockingManager.State="Dock"
@@ -484,6 +492,8 @@
                     syncfusiontools:DockingManager.CanSerialize="True"
                     syncfusiontools:DockingManager.DockAbility="All"
                     syncfusiontools:DockingManager.CaptionToolTip="Application status and information"
+                    MinHeight="32"
+                    MaxHeight="120"
                     Background="{DynamicResource ProfessionalSurfaceDark}"
                     BorderBrush="{DynamicResource SurfaceBorderBrush}"
                     BorderThickness="0,1,0,0"

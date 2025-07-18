@@ -3,8 +3,10 @@ using System.Windows;
 using System.Windows.Controls;
 using BusBuddy.WPF.ViewModels;
 using BusBuddy.WPF.Services;
+using BusBuddy.WPF.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Context;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
 using Syncfusion.UI.Xaml.NavigationDrawer;
@@ -32,12 +34,14 @@ namespace BusBuddy.WPF.Views.Main
                 // This ensures FluentDark theme resources are available globally
                 try
                 {
-                    SfSkinManager.ApplyThemeAsDefaultStyle = true;
-                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] SfSkinManager.ApplyThemeAsDefaultStyle set to true");
+                    // Theme is managed centrally by OptimizedThemeService - no per-window configuration needed
+                    // Verify theme is available using fast cache check
+                    bool themeReady = BusBuddy.WPF.Services.OptimizedThemeService.IsResourceAvailable("ContentForeground");
+                    System.Diagnostics.Debug.WriteLine($"✅ [MAINWINDOW] Theme resources available: {themeReady}");
                 }
                 catch (Exception themeEx)
                 {
-                    System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Theme setup failed: {themeEx.Message}");
+                    System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Theme verification failed: {themeEx.Message}");
                     if (System.Diagnostics.Debugger.IsAttached)
                     {
                         System.Diagnostics.Debugger.Break();
@@ -70,17 +74,9 @@ namespace BusBuddy.WPF.Views.Main
                     throw;
                 }
 
-                // Additional safeguard: Ensure SfSkinManager.ApplyStylesOnApplication is set
-                try
-                {
-                    SfSkinManager.ApplyStylesOnApplication = true;
-                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] SfSkinManager.ApplyStylesOnApplication set to true");
-                }
-                catch (Exception styleEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"⚠️ [MAINWINDOW] Failed to set ApplyStylesOnApplication: {styleEx.Message}");
-                    // Log but continue - this is a fallback safeguard
-                }
+                // Additional safeguard: Theme is managed centrally by OptimizedThemeService
+                // No manual SfSkinManager calls needed per window
+                System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using centralized theme management from OptimizedThemeService");
 
                 // Theme is already applied globally via SfSkinManager in App.xaml.cs
                 // No need for window-specific theme application
@@ -196,30 +192,50 @@ namespace BusBuddy.WPF.Views.Main
         }
 
         /// <summary>
-        /// Setup docking manager event handlers
+        /// Setup docking manager event handlers with standardized configuration
         /// </summary>
         private void SetupDockingManager()
         {
-            try
+            using (LogContext.PushProperty("DockingManagerSetup", "MainWindow"))
             {
-                if (MainDockingManager != null)
+                try
                 {
-                    // According to Syncfusion documentation, use proper event handler signatures
-                    MainDockingManager.ActiveWindowChanged += MainDockingManager_ActiveWindowChanged;
-                    MainDockingManager.WindowClosing += MainDockingManager_WindowClosing;
+                    if (MainDockingManager != null)
+                    {
+                        // Apply standardized configuration using utility
+                        DockingManagerStandardization.ApplyStandardConfiguration(MainDockingManager, "MainWindow");
 
-                    // Set the document container mode - these are already set in XAML but ensure they're correct
-                    // MainDockingManager.ContainerMode = ContainerMode.TDI;
-                    // MainDockingManager.DockBehavior = DockBehavior.VS2010;
-                    MainDockingManager.UseDocumentContainer = true;
-                    MainDockingManager.PersistState = true;
+                        // Validate state persistence for performance
+                        DockingManagerStandardization.ValidateStatePersistence("BusBuddy");
 
-                    Log.Information("DockingManager configured successfully with TDI container mode");
+                        // Configure standard sizing for all panels
+                        if (NavigationDrawer != null)
+                        {
+                            DockingManagerStandardization.ConfigureStandardPanelSizing(NavigationDrawer, Dock.Left);
+                        }
+
+                        if (HeaderToolbar != null)
+                        {
+                            DockingManagerStandardization.ConfigureStandardPanelSizing(HeaderToolbar, Dock.Top);
+                        }
+
+                        if (PropertyPanel != null)
+                        {
+                            DockingManagerStandardization.ConfigureStandardPanelSizing(PropertyPanel, Dock.Right);
+                        }
+
+                        if (StatusBar != null)
+                        {
+                            DockingManagerStandardization.ConfigureStandardPanelSizing(StatusBar, Dock.Bottom, customHeight: 32);
+                        }
+
+                        Log.Information("DockingManager configured successfully with standardized TDI container mode and sizing");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error setting up DockingManager");
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error setting up standardized DockingManager");
+                }
             }
         }
 
@@ -360,7 +376,55 @@ namespace BusBuddy.WPF.Views.Main
             {
                 Log.Error(ex, "Error showing content container");
             }
-        }        /// <summary>
+        }
+
+        /// <summary>
+        /// Reset DockingManager to default standardized layout
+        /// </summary>
+        public void ResetToDefaultLayout()
+        {
+            using (LogContext.PushProperty("LayoutReset", "MainWindow"))
+            {
+                try
+                {
+                    Log.Information("Resetting MainWindow DockingManager to default standardized layout");
+
+                    if (MainDockingManager != null)
+                    {
+                        DockingManagerStandardization.ResetToStandardLayout(MainDockingManager);
+
+                        // Ensure critical panels are visible and properly positioned
+                        if (NavigationDrawer != null)
+                        {
+                            DockingManager.SetState(NavigationDrawer, DockState.Dock);
+                            DockingManager.SetSideInDockedMode(NavigationDrawer, Dock.Left);
+                            NavigationDrawer.Visibility = Visibility.Visible;
+                        }
+
+                        if (MainDashboardView != null)
+                        {
+                            DockingManager.SetState(MainDashboardView, DockState.Document);
+                            MainDashboardView.Visibility = Visibility.Visible;
+                        }
+
+                        if (HeaderToolbar != null)
+                        {
+                            DockingManager.SetState(HeaderToolbar, DockState.Dock);
+                            DockingManager.SetSideInDockedMode(HeaderToolbar, Dock.Top);
+                            HeaderToolbar.Visibility = Visibility.Visible;
+                        }
+
+                        Log.Information("Default layout reset completed successfully");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error resetting to default layout");
+                }
+            }
+        }
+
+        /// <summary>
                  /// Handle DockingManager active window changes
                  /// </summary>
         private void MainDockingManager_ActiveWindowChanged(object sender, DependencyPropertyChangedEventArgs e)

@@ -1,0 +1,210 @@
+<!--
+╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+║                                              🚀 OPTIMIZED XAI CHAT VIEW 🚀                                                       ║
+║                                         [PERFORMANCE-TUNED AI ASSISTANT CHAT]                                                     ║
+║  ✨ SYNCFUSION OPTIMIZATIONS: Using SfAIAssistView for native performance and theme integration                                   ║
+║  🎯 PERFORMANCE FEATURES: Lazy loading, debounced API calls, virtualized message rendering                                       ║
+║  🎭 STANDARDIZED SIZING: Fixed 400px sidebar width, responsive height management                                                  ║
+║  📊 SMART THROTTLING: Reactive Extensions debouncing for API call optimization                                                   ║
+║  🌐 OPTIMIZED UX: Minimal loading states, efficient message templates, background processing                                     ║
+╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+-->
+<UserControl x:Class="BusBuddy.WPF.Views.XAI.OptimizedXAIChatView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionchat="clr-namespace:Syncfusion.UI.Xaml.Chat;assembly=Syncfusion.SfChat.WPF"
+             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels.XAI"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="400"
+             MinWidth="400"
+             MaxWidth="400"
+             d:DataContext="{d:DesignInstance viewModels:OptimizedXAIChatViewModel}">
+
+    <UserControl.Resources>
+        <!-- Optimized chat styling for performance -->
+        <Style x:Key="OptimizedChatStyle" TargetType="syncfusionchat:SfAIAssistView">
+            <Setter Property="Background" Value="{DynamicResource ContentBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ContentForeground}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VirtualizationMode" Value="Standard"/> <!-- Performance optimization -->
+            <Setter Property="EnableVirtualization" Value="True"/>
+        </Style>
+
+        <!-- Lazy loading indicator style -->
+        <Style x:Key="LazyLoadingStyle" TargetType="syncfusion:SfBusyIndicator">
+            <Setter Property="AnimationType" Value="Dots"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Width" Value="60"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{DynamicResource ContentBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Compact Header - Optimized for 400px width -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource PrimaryBackground}"
+                Padding="12,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- AI Icon -->
+                <Border Grid.Column="0"
+                        Background="{DynamicResource AccentBackground}"
+                        Width="32" Height="32"
+                        CornerRadius="16"
+                        Margin="0,0,8,0">
+                    <TextBlock Text="🤖"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <!-- Title -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="XAI Assistant"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource PrimaryForeground}"/>
+                    <TextBlock Text="Bus Buddy AI"
+                               FontSize="10"
+                               Foreground="{DynamicResource PrimaryForeground}"
+                               Opacity="0.8"/>
+                </StackPanel>
+
+                <!-- Status Indicator -->
+                <Border Grid.Column="2"
+                        Background="{DynamicResource BrandFleetGreenBrush}"
+                        CornerRadius="12"
+                        Padding="8,4">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="6" Height="6"
+                                 Fill="{DynamicResource ProfessionalTextPrimary}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,4,0"/>
+                        <TextBlock Text="Online"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Optimized Chat Area with Performance Features -->
+        <Grid Grid.Row="1">
+            <!-- Main Chat Interface using Syncfusion SfAIAssistView for optimized performance -->
+            <syncfusionchat:SfAIAssistView x:Name="AIAssistView"
+                                          Style="{StaticResource OptimizedChatStyle}"
+                                          CurrentUser="{Binding CurrentUser}"
+                                          Messages="{Binding Messages}"
+                                          Suggestions="{Binding Suggestions}"
+                                          ShowTypingIndicator="{Binding IsTyping}"/>
+
+            <!-- Lazy Loading Overlay -->
+            <Border Background="{DynamicResource SurfaceVariantBrush}"
+                    Opacity="0.9"
+                    Visibility="{Binding IsLazyLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <syncfusion:SfBusyIndicator Style="{StaticResource LazyLoadingStyle}"
+                                               IsBusy="{Binding IsLazyLoading}"/>
+                    <TextBlock Text="Loading chat history..."
+                               FontSize="12"
+                               Foreground="{DynamicResource ContentForeground}"
+                               Margin="0,8,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Quick Actions Sidebar - Optimized for 400px width -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource SurfaceVariantBrush}"
+                BorderBrush="{DynamicResource SurfaceBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="12,8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Quick Actions Header -->
+                <TextBlock Grid.Row="0"
+                           Text="Quick Actions"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource ContentForeground}"
+                           Margin="0,0,0,8"/>
+
+                <!-- Quick Action Buttons - Compact Grid -->
+                <UniformGrid Grid.Row="1"
+                             Columns="2"
+                             Rows="2">
+                    <syncfusion:ButtonAdv Content="📊 Fleet"
+                                          Style="{StaticResource SecondaryButtonAdvStyle}"
+                                          Command="{Binding QuickFleetStatusCommand}"
+                                          FontSize="10"
+                                          Height="28"
+                                          Margin="2"/>
+
+                    <syncfusion:ButtonAdv Content="🚌 Find Bus"
+                                          Style="{StaticResource SecondaryButtonAdvStyle}"
+                                          Command="{Binding QuickFindBusCommand}"
+                                          FontSize="10"
+                                          Height="28"
+                                          Margin="2"/>
+
+                    <syncfusion:ButtonAdv Content="📍 Routes"
+                                          Style="{StaticResource SecondaryButtonAdvStyle}"
+                                          Command="{Binding QuickRouteInfoCommand}"
+                                          FontSize="10"
+                                          Height="28"
+                                          Margin="2"/>
+
+                    <syncfusion:ButtonAdv Content="⚠️ Emergency"
+                                          Style="{StaticResource EmergencyButtonAdvStyle}"
+                                          Command="{Binding QuickEmergencyCommand}"
+                                          FontSize="10"
+                                          Height="28"
+                                          Margin="2"/>
+                </UniformGrid>
+            </Grid>
+        </Border>
+
+        <!-- Performance Monitoring Overlay (Debug Mode Only) -->
+        <Border Grid.Row="1"
+                Background="Transparent"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="8"
+                Visibility="{Binding ShowPerformanceInfo, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Background="{DynamicResource SurfaceBrush}"
+                    CornerRadius="8"
+                    Padding="8,4"
+                    Opacity="0.8">
+                <StackPanel>
+                    <TextBlock Text="{Binding ApiCallCount, StringFormat='API Calls: {0}'}"
+                               FontSize="9"
+                               Foreground="{DynamicResource ContentForeground}"/>
+                    <TextBlock Text="{Binding LastResponseTime, StringFormat='Response: {0}ms'}"
+                               FontSize="9"
+                               Foreground="{DynamicResource ContentForeground}"/>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

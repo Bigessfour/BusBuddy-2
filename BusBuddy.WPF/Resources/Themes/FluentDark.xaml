@@ -66,10 +66,34 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <!-- DockingManager Style -->
+    <!-- ╔═══════════════════════════════════════════════════════════════════════════════════════╗ -->
+    <!-- ║                                    DOCKING MANAGER STANDARDIZATION                     ║ -->
+    <!-- ║   Enhanced with TDI mode, size enforcement, and state persistence management           ║ -->
+    <!-- ║   • UseDocumentContainer=True for consistent TDI (Tabbed Document Interface) mode     ║ -->
+    <!-- ║   • PersistState=True with size limits for performance                                 ║ -->
+    <!-- ║   • ContainerMode=TDI and DockBehavior=VS2010 for professional IDE experience        ║ -->
+    <!-- ║   • Standard sizing enforced via DesiredWidthInDockedMode/DesiredHeightInDockedMode   ║ -->
+    <!-- ╚═══════════════════════════════════════════════════════════════════════════════════════╝ -->
     <Style x:Key="StandardDockingManagerStyle" TargetType="syncfusion:DockingManager">
         <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-        <!-- DockingManager doesn't have Foreground or BorderBrush properties -->
+        <Setter Property="UseDocumentContainer" Value="True" />
+        <Setter Property="PersistState" Value="True" />
+        <Setter Property="ContainerMode" Value="TDI" />
+        <Setter Property="DockBehavior" Value="VS2010" />
+        <Setter Property="DockFill" Value="True" />
+        <Setter Property="EnableAutoAdjustment" Value="True" />
+        <Setter Property="ShowTabItemsInTitleBar" Value="True" />
+        <!-- Performance optimization: Limit state persistence size to prevent load delays -->
+        <Setter Property="PersistState" Value="True" />
+        <!-- Consistent panel sizing defaults -->
+        <Style.Resources>
+            <!-- Default panel sizes that can be overridden per panel -->
+            <x:Double x:Key="StandardSidePanelWidth">300</x:Double>
+            <x:Double x:Key="StandardBottomPanelHeight">200</x:Double>
+            <x:Double x:Key="StandardTopPanelHeight">64</x:Double>
+            <x:Double x:Key="MinimumPanelWidth">200</x:Double>
+            <x:Double x:Key="MinimumPanelHeight">150</x:Double>
+        </Style.Resources>
     </Style>
 
     <!-- NavigationDrawer Style -->

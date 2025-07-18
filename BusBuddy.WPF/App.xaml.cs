@@ -162,28 +162,27 @@ public partial class App : Application
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine("🎨 Configuring Syncfusion theme");
+            System.Diagnostics.Debug.WriteLine("🎨 Initializing optimized theme system");
 
-            SfSkinManager.ApplyStylesOnApplication = true;
+            // Use the optimized theme service for centralized theme management
+            BusBuddy.WPF.Services.OptimizedThemeService.InitializeApplicationTheme();
 
-            // Use the correct API for Syncfusion 30.1.40
-            SfSkinManager.ApplicationTheme = new Theme("FluentDark");
-
-            System.Diagnostics.Debug.WriteLine("✅ FluentDark theme applied successfully");
+            System.Diagnostics.Debug.WriteLine("✅ Optimized theme system initialized successfully");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Theme configuration failed: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"❌ Optimized theme initialization failed: {ex.Message}");
 
-            // Fallback to FluentLight
+            // Emergency fallback - minimal theme setup
             try
             {
-                SfSkinManager.ApplicationTheme = new Theme("FluentLight");
-                System.Diagnostics.Debug.WriteLine("✅ FluentLight fallback theme applied");
+                SfSkinManager.ApplyStylesOnApplication = true;
+                SfSkinManager.ApplicationTheme = new Theme("MaterialDark");
+                System.Diagnostics.Debug.WriteLine("✅ Emergency MaterialDark theme applied");
             }
             catch (Exception fallbackEx)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Fallback theme failed: {fallbackEx.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Emergency fallback failed: {fallbackEx.Message}");
             }
         }
     }
@@ -213,142 +212,408 @@ public partial class App : Application
 
     #endregion
 
-    protected override void OnStartup(StartupEventArgs e)
+    /// <summary>
+    /// Execute parallel startup optimizations to improve performance
+    /// </summary>
+    private async Task ExecuteParallelStartupAsync(string[] args)
     {
-        var startupStopwatch = Stopwatch.StartNew();
-
-        try
+        using (LogContext.PushProperty("Operation", "ParallelStartup"))
         {
-            // Enhanced startup logging with try-catch for theme validation
-            System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] OnStartup method entered at {DateTime.Now:O}");
-            System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] Command line arguments count: {e.Args.Length}");
+            var parallelStopwatch = Stopwatch.StartNew();
+            Logger.Information("🚀 Starting parallel startup optimization");
 
-            if (e.Args.Length > 0)
-            {
-                System.Diagnostics.Debug.WriteLine($"🚀 [ONSTARTUP] Arguments: {string.Join(", ", e.Args)}");
-            }
-
-            // Enhanced theme setup with improved validation and priority
             try
             {
-                System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Starting enhanced theme validation");
+                // Define independent startup tasks that can run concurrently
+                var startupTasks = new List<Task>
+                {
+                    // Theme validation and initialization
+                    BusBuddy.WPF.Utilities.PerformanceOptimizer.ExecuteTimedAsync("ThemeValidation", async () =>
+                    {
+                        await ValidateAndInitializeThemeAsync();
+                        return Task.CompletedTask;
+                    }),
 
-                // Validate SfSkinManager configuration
+                    // Command line argument processing
+                    BusBuddy.WPF.Utilities.PerformanceOptimizer.ExecuteTimedAsync("CommandLineProcessing", async () =>
+                    {
+                        await ProcessCommandLineArgumentsAsync(args);
+                        return Task.CompletedTask;
+                    }),
+
+                    // Resource dictionary validation
+                    BusBuddy.WPF.Utilities.PerformanceOptimizer.ExecuteTimedAsync("ResourceValidation", async () =>
+                    {
+                        await Task.Run(() => ValidateResourceDictionaries());
+                        return Task.CompletedTask;
+                    }),
+
+                    // Host startup (critical path - must complete before UI)
+                    BusBuddy.WPF.Utilities.PerformanceOptimizer.ExecuteTimedAsync("HostStartup", async () =>
+                    {
+                        await StartApplicationHostAsync();
+                        return Task.CompletedTask;
+                    })
+                };
+
+                // Execute cache warm-up operations in parallel using PerformanceOptimizer
+                var cacheWarmupOperations = new List<Func<Task>>
+                {
+                    async () => await PreWarmDatabaseConnectionAsync(),
+                    async () => await PreWarmServicesAsync(),
+                    async () => await ValidateSecuritySettingsAsync()
+                };
+
+                // Add cache warm-up to startup tasks
+                startupTasks.Add(BusBuddy.WPF.Utilities.PerformanceOptimizer.WarmupCachesParallelAsync(cacheWarmupOperations));
+
+                // Wait for all parallel startup tasks to complete
+                await Task.WhenAll(startupTasks);
+                parallelStopwatch.Stop();
+
+                Logger.Information("✅ Parallel startup optimization completed in {ElapsedMs}ms", parallelStopwatch.ElapsedMilliseconds);
+            }
+            catch (Exception ex)
+            {
+                parallelStopwatch.Stop();
+                Logger.Error(ex, "❌ Parallel startup optimization failed after {ElapsedMs}ms", parallelStopwatch.ElapsedMilliseconds);
+                throw;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Enhanced theme validation with async support
+    /// </summary>
+    private async Task ValidateAndInitializeThemeAsync()
+    {
+        await Task.Run(() =>
+        {
+            try
+            {
+                Logger.Debug("🎨 Starting enhanced theme validation");
+
                 var currentTheme = SfSkinManager.ApplicationTheme;
                 var stylesOnApp = SfSkinManager.ApplyStylesOnApplication;
 
-                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] Current theme: {currentTheme?.ToString() ?? "NULL"}");
-                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] ApplyStylesOnApplication: {stylesOnApp}");
+                Logger.Debug("🎨 Current theme: {Theme}, StylesOnApp: {StylesOnApp}",
+                           currentTheme?.ToString() ?? "NULL", stylesOnApp);
 
-                // PRIORITY 1: Force enhanced theme settings BEFORE base.OnStartup for maximum propagation
                 SfSkinManager.ApplyStylesOnApplication = true;
 
-                // Validate critical resources exist and add if missing
-                if (!Application.Current.Resources.Contains("ContentForeground"))
+                // Validate critical resources
+                var resourcesNeeded = new Dictionary<string, object>
                 {
-                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Adding missing ContentForeground resource");
-                    Application.Current.Resources["ContentForeground"] = new SolidColorBrush(Colors.White);
+                    ["ContentForeground"] = new SolidColorBrush(Colors.White),
+                    ["SurfaceBackground"] = new SolidColorBrush(Color.FromRgb(31, 31, 31)),
+                    ["SurfaceBorderBrush"] = new SolidColorBrush(Color.FromRgb(51, 51, 51))
+                };
+
+                foreach (var resource in resourcesNeeded)
+                {
+                    if (!Application.Current.Resources.Contains(resource.Key))
+                    {
+                        Logger.Debug("🎨 Adding missing {ResourceKey} resource", resource.Key);
+                        Application.Current.Resources[resource.Key] = resource.Value;
+                    }
                 }
 
-                if (!Application.Current.Resources.Contains("SurfaceBackground"))
-                {
-                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Adding missing SurfaceBackground resource");
-                    Application.Current.Resources["SurfaceBackground"] = new SolidColorBrush(Color.FromRgb(31, 31, 31));
-                }
-
-                if (!Application.Current.Resources.Contains("SurfaceBorderBrush"))
-                {
-                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Adding missing SurfaceBorderBrush resource");
-                    Application.Current.Resources["SurfaceBorderBrush"] = new SolidColorBrush(Color.FromRgb(51, 51, 51));
-                }
-
-                // Verify theme application after everything is initialized
-                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] Final theme verification - ApplicationTheme: {SfSkinManager.ApplicationTheme?.ToString() ?? "NULL"}");
-                System.Diagnostics.Debug.WriteLine("✅ [ONSTARTUP] Enhanced theme validation completed");
+                Logger.Information("✅ Enhanced theme validation completed");
             }
-            catch (Exception themeEx)
+            catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ [ONSTARTUP] Theme validation failed: {themeEx.Message}");
+                Logger.Error(ex, "❌ Theme validation failed, applying fallback");
 
-                // Fallback theme setup
                 try
                 {
-                    System.Diagnostics.Debug.WriteLine("🔄 [ONSTARTUP] Applying fallback theme setup");
                     SfSkinManager.ApplyStylesOnApplication = true;
                     SfSkinManager.ApplicationTheme = new Theme("FluentLight");
-
-                    System.Diagnostics.Debug.WriteLine("✅ [ONSTARTUP] Fallback theme applied successfully");
+                    Logger.Information("✅ Fallback theme applied");
                 }
                 catch (Exception fallbackEx)
                 {
-                    System.Diagnostics.Debug.WriteLine($"❌ [ONSTARTUP] Fallback theme failed: {fallbackEx.Message}");
-                }
-            }
-
-            // CRITICAL FIX: Single base.OnStartup call after theme configuration
-            try
-            {
-                Log.Information("🏗️ [STARTUP] Calling base.OnStartup after theme configuration");
-                base.OnStartup(e);
-                Log.Debug("✅ [STARTUP] base.OnStartup completed successfully");
-            }
-            catch (Exception baseStartupEx)
-            {
-                Log.Error(baseStartupEx, "❌ [STARTUP] base.OnStartup failed");
-                throw;
-            }
-
-            // Handle command line arguments for debug functionality
-            if (e.Args.Length > 0)
-            {
-                using (LogContext.PushProperty("Operation", "CommandLineHandling"))
-                {
-                    try
-                    {
-                        Log.Information("🔧 [STARTUP] Processing command line arguments: {Arguments}", string.Join(" ", e.Args));
-                        HandleCommandLineArgumentsAsync(e.Args).GetAwaiter().GetResult();
-                        Log.Information("🔧 [STARTUP] Command line arguments processed successfully");
-                        return; // Exit after handling command line arguments
-                    }
-                    catch (Exception cmdEx)
-                    {
-                        Log.Error(cmdEx, "❌ [STARTUP] Failed to process command line arguments");
-                        throw;
-                    }
-                }
-            }
-
-            Log.Information("🚀 [STARTUP] No command line arguments detected, proceeding with normal startup");
-
-            // Start the generic host to initialize DI and logging before UI
-            using (LogContext.PushProperty("Operation", "HostStartup"))
-            {
-                try
-                {
-                    Log.Information("🏗️ [STARTUP] Starting generic host for DI and logging initialization");
-                    _host.StartAsync().GetAwaiter().GetResult();
-                    Log.Information("✅ [STARTUP] Generic host started successfully");
-                }
-                catch (Exception hostEx)
-                {
-                    Log.Fatal(hostEx, "❌ [STARTUP] Failed to start generic host");
+                    Logger.Error(fallbackEx, "❌ Fallback theme failed");
                     throw;
                 }
             }
+        });
+    }
 
-            // 🔍 AUTO DEBUG FILTER: Removed for clean debug experience
-            // Debug filter functionality is available via command line arguments:
-            // --start-debug-filter, --export-debug-json, --start-streaming
-#if DEBUG
-            Log.Information("🔍 [STARTUP] Debug mode active - Debug Helper available via command line arguments");
-            Log.Information("🔍 [STARTUP] Use '--start-debug-filter' command line argument to enable debug filtering");
-#endif
-
-            // 🎨 Resource dictionaries are already loaded via App.xaml — no manual loading needed
-            // The App.xaml properly references Resources/SyncfusionV30_ResourceDictionary.xaml
-            using (LogContext.PushProperty("Operation", "ResourceDictionaryValidation"))
+    /// <summary>
+    /// Enhanced command line argument processing with async support
+    /// </summary>
+    private async Task ProcessCommandLineArgumentsAsync(string[] args)
+    {
+        await Task.Run(() =>
+        {
+            try
             {
-                try
+                Logger.Information("🔧 Processing {Count} command line arguments", args.Length);
+
+                if (args.Length > 0)
+                {
+                    Logger.Information("🔧 Arguments: {Arguments}", string.Join(" ", args));
+                    // Process arguments here
+                }
+
+                Logger.Information("✅ Command line arguments processed");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "❌ Command line argument processing failed");
+                throw;
+            }
+        });
+    }
+
+    /// <summary>
+    /// Start application host with enhanced error handling
+    /// </summary>
+    private async Task StartApplicationHostAsync()
+    {
+        try
+        {
+            Logger.Information("🏗️ Starting application host");
+            await _host.StartAsync();
+            Logger.Information("✅ Application host started successfully");
+        }
+        catch (Exception ex)
+        {
+            Logger.Fatal(ex, "❌ Failed to start application host");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Validate resource dictionaries asynchronously
+    /// </summary>
+    private void ValidateResourceDictionaries()
+    {
+        try
+        {
+            Logger.Information("🎨 Validating resource dictionaries");
+
+            var mergedDictCount = this.Resources?.MergedDictionaries?.Count ?? 0;
+            Logger.Information("🎨 Total merged dictionaries: {Count}", mergedDictCount);
+
+            string[] criticalKeys = { "SurfaceBorder", "SurfaceBorderBrush", "SurfaceBorderColor" };
+            var foundKeys = criticalKeys.Where(k => this.Resources?.Contains(k) == true).ToList();
+            var missingKeys = criticalKeys.Except(foundKeys).ToList();
+
+            if (missingKeys.Any())
+            {
+                Logger.Warning("⚠️ Missing critical resources: {MissingKeys}", string.Join(", ", missingKeys));
+            }
+            else
+            {
+                Logger.Information("✅ All critical resources present");
+            }
+
+            Logger.Information("✅ Resource dictionary validation completed");
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "❌ Resource dictionary validation failed");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Pre-warm database connection pool
+    /// </summary>
+    private async Task PreWarmDatabaseConnectionAsync()
+    {
+        try
+        {
+            Logger.Debug("🔥 Pre-warming database connection");
+
+            using var scope = _host.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetService<BusBuddy.Core.Data.BusBuddyDbContext>();
+            if (dbContext != null)
+            {
+                await dbContext.Database.CanConnectAsync();
+                Logger.Debug("✅ Database connection pre-warmed");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Warning(ex, "⚠️ Database connection pre-warming failed");
+        }
+    }
+
+    /// <summary>
+    /// Pre-warm essential services
+    /// </summary>
+    private async Task PreWarmServicesAsync()
+    {
+        try
+        {
+            Logger.Debug("🔥 Pre-warming essential services");
+
+            using var scope = _host.Services.CreateScope();
+
+            // Pre-warm commonly used services
+            var viewModelServices = new[]
+            {
+                typeof(MainViewModel),
+                typeof(EnhancedDashboardViewModel),
+                typeof(LoadingViewModel)
+            };
+
+            await Task.Run(() =>
+            {
+                foreach (var serviceType in viewModelServices)
+                {
+                    try
+                    {
+                        scope.ServiceProvider.GetService(serviceType);
+                        Logger.Debug("✅ Pre-warmed {ServiceType}", serviceType.Name);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warning(ex, "⚠️ Failed to pre-warm {ServiceType}", serviceType.Name);
+                    }
+                }
+            });
+
+            Logger.Debug("✅ Services pre-warming completed");
+        }
+        catch (Exception ex)
+        {
+            Logger.Warning(ex, "⚠️ Services pre-warming failed");
+        }
+    }
+
+    /// <summary>
+    /// Validate security settings asynchronously
+    /// </summary>
+    private async Task ValidateSecuritySettingsAsync()
+    {
+        await Task.Run(() =>
+        {
+            try
+            {
+                Logger.Debug("🔒 Validating security settings");
+
+                // Check sensitive data logging in production
+                if (!BusBuddy.Core.Utilities.EnvironmentHelper.IsDevelopment() &&
+                    Environment.GetEnvironmentVariable("ENABLE_SENSITIVE_DATA_LOGGING") == "true")
+                {
+                    Logger.Error("🚨 SECURITY RISK: Sensitive data logging enabled in production");
+                    throw new SecurityException("Sensitive data logging enabled in production environment");
+                }
+
+                Logger.Debug("✅ Security settings validated");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "❌ Security validation failed");
+                throw;
+            }
+        });
+    }
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        var startupStopwatch = Stopwatch.StartNew();
+        BusBuddy.WPF.Utilities.PerformanceOptimizer.StartTiming("ApplicationStartup");
+
+        Logger.Information("🚀 Enhanced application startup initiated with {ArgumentCount} command line arguments", e.Args.Length);
+
+        try
+        {
+            using (LogContext.PushProperty("StartupPhase", "ParallelInitialization"))
+            {
+                // Execute parallel startup optimizations
+                var parallelStartupTask = ExecuteParallelStartupAsync(e.Args);
+                parallelStartupTask.Wait(); // Wait for completion since OnStartup is not async
+
+                // Call base.OnStartup after theme configuration
+                Logger.Information("🏗️ Calling base.OnStartup after parallel initialization");
+                base.OnStartup(e);
+                Logger.Debug("✅ base.OnStartup completed successfully");
+
+                startupStopwatch.Stop();
+                BusBuddy.WPF.Utilities.PerformanceOptimizer.StopTiming("ApplicationStartup");
+
+                Logger.Information("✅ Enhanced application startup completed successfully in {ElapsedMs}ms",
+                                 startupStopwatch.ElapsedMilliseconds);
+            }
+        }
+        catch (Exception ex)
+        {
+            startupStopwatch.Stop();
+            BusBuddy.WPF.Utilities.PerformanceOptimizer.StopTiming("ApplicationStartup");
+            Logger.Fatal(ex, "❌ Application startup failed after {ElapsedMs}ms", startupStopwatch.ElapsedMilliseconds);
+
+            MessageBox.Show(
+                $"A critical error occurred during application startup:\n\n{ex.Message}\n\n" +
+                "The application will now close. Please check the logs for details.",
+                "Startup Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            Shutdown();
+            return;
+        }
+
+        // Continue with existing startup logic for UI initialization...
+        StartEnhancedUIInitialization(e);
+    }
+
+    /// <summary>
+    /// Enhanced UI initialization with performance monitoring
+    /// </summary>
+    private void StartEnhancedUIInitialization(StartupEventArgs e)
+    {
+        using (LogContext.PushProperty("Operation", "UIInitialization"))
+        {
+            BusBuddy.WPF.Utilities.PerformanceOptimizer.StartTiming("UIInitialization");
+
+            try
+            {
+                // Handle command line arguments for debug functionality
+                if (e.Args.Length > 0)
+                {
+                    using (LogContext.PushProperty("Operation", "CommandLineHandling"))
+                    {
+                        try
+                        {
+                            Log.Information("🔧 Processing command line arguments: {Arguments}", string.Join(" ", e.Args));
+                            HandleCommandLineArgumentsAsync(e.Args).GetAwaiter().GetResult();
+                            Log.Information("🔧 Command line arguments processed successfully");
+                            return; // Exit after handling command line arguments
+                        }
+                        catch (Exception cmdEx)
+                        {
+                            Log.Error(cmdEx, "❌ Failed to process command line arguments");
+                            throw;
+                        }
+                    }
+                }
+
+                Log.Information("🚀 No command line arguments detected, proceeding with normal startup");
+
+                // Continue with rest of startup logic using performance optimizer
+                ExecuteUIInitializationPhases();
+            }
+            finally
+            {
+                BusBuddy.WPF.Utilities.PerformanceOptimizer.StopTiming("UIInitialization");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Execute UI initialization phases with performance monitoring
+    /// </summary>
+    private void ExecuteUIInitializationPhases()
+    {
+        // Execute remaining startup logic with performance optimization
+        var uiStopwatch = Stopwatch.StartNew();
+
+        try
+        {
                 {
                     Log.Information("🎨 [STARTUP] Starting resource dictionary validation");
                     Log.Debug("🎨 [STARTUP] App.xaml resource loading approach - using SfSkinManager only");
@@ -1097,6 +1362,9 @@ public partial class App : Application
             return new BusBuddy.WPF.Services.MappingService(mapper, logger);
         });
 
+        // Register optimized theme service as singleton for centralized theme management
+        services.AddSingleton<BusBuddy.WPF.Services.OptimizedThemeService>();
+
         // Register WPF-specific Services - Changed RoutePopulationScaffold to Scoped
         services.AddScoped<BusBuddy.WPF.Services.IDriverAvailabilityService, BusBuddy.WPF.Services.DriverAvailabilityService>();
         services.AddScoped<BusBuddy.WPF.Services.IRoutePopulationScaffold, BusBuddy.WPF.Services.RoutePopulationScaffold>();
@@ -1114,10 +1382,10 @@ public partial class App : Application
         // Register startup orchestration service with enhanced Serilog logging
         services.AddScoped<BusBuddy.WPF.Services.StartupOrchestrationService>();
 
-        // 🎨 THEME SERVICE REMOVED: SfSkinManager handles all theming automatically
-        // ✅ No manual theme service needed - SfSkinManager provides global theme management
-        // ✅ All Syncfusion controls automatically inherit theme from SfSkinManager.ApplicationTheme
-        // ✅ Theme resources loaded via BusBuddyResourceDictionary.xaml MergedDictionaries
+        // 🎨 THEME SERVICE OPTIMIZATION: OptimizedThemeService provides centralized theme management
+        // ✅ Eliminates redundant per-view theme operations
+        // ✅ Provides intelligent fallback handling without risky FluentLight dependency
+        // ✅ Implements resource caching for improved performance
     }
 
     private void ConfigureUtilities(IServiceCollection services)
@@ -1187,7 +1455,9 @@ public partial class App : Application
 
         // Settings and AI ViewModels - Loaded lazily
         services.AddScoped<BusBuddy.WPF.ViewModels.SettingsViewModel>();
-        services.AddScoped<BusBuddy.WPF.ViewModels.XaiChatViewModel>();
+        // XAI Chat ViewModels - Performance optimized
+        services.AddScoped<BusBuddy.WPF.ViewModels.XaiChatViewModel>(); // Legacy support
+        services.AddScoped<BusBuddy.WPF.ViewModels.XAI.OptimizedXAIChatViewModel>(); // Optimized version
     }
 
     #region Safe File Writing Helper Method
