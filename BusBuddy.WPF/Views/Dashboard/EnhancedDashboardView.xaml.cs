@@ -154,14 +154,16 @@ namespace BusBuddy.WPF.Views.Dashboard
                 var dockingManager = FindName("MainDockingManager") as DockingManager;
                 if (dockingManager != null)
                 {
-                    // TODO: Fix event attachment for new Syncfusion version
-                    // dockingManager.ActiveWindowChanged -= DockingManager_ActiveWindowChanged;  // Detach event
+                    // FIXED: Detach the event handler properly
+                    dockingManager.ActiveWindowChanged -= DockingManager_ActiveWindowChanged;
                     dockingManager.SaveDockState();
+
+                    Logger.Information("✅ DockingManager events detached and layout saved successfully");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Cleanup error: {ex.Message}");
+                Logger.Error(ex, "Cleanup error: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -177,43 +179,47 @@ namespace BusBuddy.WPF.Views.Dashboard
                 var dockingManager = FindName("MainDockingManager") as DockingManager;
                 if (dockingManager != null)
                 {
-                    // TODO: Fix event attachment for new Syncfusion version
-                    // Attach ActiveWindowChanged event for logging and optimization
-                    // dockingManager.ActiveWindowChanged += DockingManager_ActiveWindowChanged;
+                    // FIXED: Use proper Syncfusion v30.1.40 event handler
+                    dockingManager.ActiveWindowChanged += DockingManager_ActiveWindowChanged;
 
                     // Load saved DockingManager layout state
                     dockingManager.LoadDockState();
+
+                    Logger.Information("✅ DockingManager events attached and layout loaded successfully");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Layout load error: {ex.Message}");
+                Logger.Error(ex, "Layout load error: {ErrorMessage}", ex.Message);
                 // Fallback: Use default layout
             }
         }
 
         /// <summary>
         /// Handle DockingManager active window changes for logging and potential optimizations
+        /// Updated for Syncfusion v30.1.40 compatibility
         /// </summary>
-        private void DockingManager_ActiveWindowChanged(object sender, EventArgs e)
+        private void DockingManager_ActiveWindowChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             try
             {
-                // TODO: Fix for new Syncfusion version - NewActiveWindow property no longer available
-                // var newWindowName = (e.NewActiveWindow as FrameworkElement)?.Name ?? "Unknown";
-                var newWindowName = "Unknown";
-                Logger.Information($"Active window changed to {newWindowName}");
+                // FIXED: Use proper DependencyPropertyChangedEventArgs for v30.1.40
+                var newActiveWindow = e.NewValue as FrameworkElement;
+                var newWindowName = newActiveWindow?.Name ?? "Unknown";
+
+                Logger.Information("🚀 DockingManager active window changed to: {WindowName}", newWindowName);
 
                 // Optional: Trigger specific refreshes based on active panel
                 var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
-                if (viewModel != null && newWindowName == "BusManagement")  // Example optimization
+                if (viewModel != null && newWindowName == "BusManagement")
                 {
                     // Could call a specific refresh, e.g., viewModel.BusManagementViewModel.RefreshAsync();
+                    Logger.Debug("🚌 Active panel optimization triggered for: {WindowName}", newWindowName);
                 }
             }
             catch (Exception ex)
             {
-                Logger.Warning(ex, "Error handling active window change");
+                Logger.Warning(ex, "Error handling active window change: {ErrorMessage}", ex.Message);
             }
         }
 

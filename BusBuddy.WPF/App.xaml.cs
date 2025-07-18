@@ -44,245 +44,21 @@ public partial class App : Application
 
     public App()
     {
-        // CRITICAL: Register Syncfusion license FIRST according to official documentation
-        // This must be done in App constructor before any Syncfusion controls are initialized
-        string? envLicenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
-        if (!string.IsNullOrWhiteSpace(envLicenseKey))
-        {
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(envLicenseKey);
-        }
-        else
-        {
-            // Fallback: try to load from appsettings.json if environment variable not found
-            try
-            {
-                var licenseConfig = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-                    .AddEnvironmentVariables()
-                    .Build();
+        // CRITICAL: Register Syncfusion license FIRST
+        RegisterSyncfusionLicense();
 
-                string? licenseKey = licenseConfig["Syncfusion:LicenseKey"] ??
-                                   licenseConfig["SyncfusionLicenseKey"];
+        // Configure theme early but simply
+        ConfigureSyncfusionTheme();
 
-                if (!string.IsNullOrWhiteSpace(licenseKey))
-                {
-                    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("WARNING: Syncfusion license key not found in environment variables or appsettings.json");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"ERROR: Failed to load Syncfusion license from appsettings.json: {ex.Message}");
-            }
-        }
-
-
-
-
-
-        // ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-        // 🎨 PURE SYNCFUSION 30.1.40 THEME CONFIGURATION — FLUENTDARK PRIMARY + FLUENTLIGHT FALLBACK
-        // ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-        // ✅ GLOBAL APPLICATION: All Syncfusion controls automatically themed via SfSkinManager
-        // ✅ AUTOMATIC FALLBACK: FluentLight applied if FluentDark fails
-        // ✅ PERFORMANCE: Single theme initialization, no runtime switching overhead
-        // ✅ CONSISTENCY: Unified theme across all views and controls via MergedDictionaries
-        // ✅ COMPLIANCE: 100% Syncfusion WPF 30.1.40 documentation alignment
-        // ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-        // Note: Serilog is not yet initialized here, so using Debug.WriteLine for theme setup logging
-        System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Starting Syncfusion theme configuration");
-
-        // Configure SfSkinManager for global theme application with enhanced priority control
-        try
-        {
-            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ApplyStylesOnApplication = true");
-            SfSkinManager.ApplyStylesOnApplication = true;
-
-            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ApplyThemeAsDefaultStyle = true");
-            SfSkinManager.ApplyThemeAsDefaultStyle = true;
-
-            // Set the theme using the recommended FluentTheme approach
-            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting theme using FluentTheme");
-            SfSkinManager.SetTheme(this, new FluentTheme("FluentDark") { ShowAcrylicBackground = true });
-
-            // Ensure ThemeName is set to FluentDark for consistent application
-            System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Setting SfSkinManager.ThemeName = FluentDark");
-            SfSkinManager.ThemeName = "FluentDark";
-
-            System.Diagnostics.Debug.WriteLine("✅ [APP CONSTRUCTOR] Enhanced SfSkinManager configuration completed successfully");
-        }
-        catch (Exception sfManagerEx)
-        {
-            System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] SfSkinManager configuration failed: {sfManagerEx.Message}");
-            System.Diagnostics.Debug.WriteLine($"❌ [APP CONSTRUCTOR] Exception details: {sfManagerEx}");
-        }
-
-        // 🎯 OPTIONAL: Auto-detect system theme preference
-        string preferredTheme = "FluentDark"; // Default to FluentDark
-        System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] Starting system theme detection");
-
-        try
-        {
-            // Check Windows system theme preference
-            var systemTheme = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme", 1);
-            if (systemTheme is int themeValue && themeValue == 1)
-            {
-                preferredTheme = "FluentLight";
-                System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] SYSTEM THEME: Light theme detected, using FluentLight");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("🎨 [APP CONSTRUCTOR] SYSTEM THEME: Dark theme detected, using FluentDark");
-            }
-        }
-        catch (Exception themeDetectionEx)
-        {
-            System.Diagnostics.Debug.WriteLine($"🎨 [APP CONSTRUCTOR] SYSTEM THEME: Could not detect system theme, using FluentDark default: {themeDetectionEx.Message}");
-            System.Diagnostics.Debug.WriteLine($"🎨 [APP CONSTRUCTOR] Theme detection exception details: {themeDetectionEx}");
-        }
-
-        Log.Information($"🎨 [APP CONSTRUCTOR] Applying theme: {preferredTheme}");
-        try
-        {
-            // 🎯 APPLY PREFERRED THEME: Based on system preference or default using FluentTheme
-            SfSkinManager.SetTheme(this, new FluentTheme(preferredTheme) { ShowAcrylicBackground = true });
-            Log.Information($"✅ [APP CONSTRUCTOR] THEME: {preferredTheme} applied successfully as primary theme");
-        }
-        catch (Exception ex)
-        {
-            Log.Information($"⚠️ [APP CONSTRUCTOR] THEME: {preferredTheme} failed, applying FluentLight fallback: {ex.Message}");
-            Log.Information($"⚠️ [APP CONSTRUCTOR] Primary theme exception details: {ex}");
-
-            try
-            {
-                // 🔄 FALLBACK THEME: FluentLight (Clean light theme)
-                SfSkinManager.SetTheme(this, new FluentTheme("FluentLight"));
-                Log.Information("✅ [APP CONSTRUCTOR] THEME: FluentLight applied successfully as fallback theme");
-            }
-            catch (Exception fallbackEx)
-            {
-                Log.Information($"❌ [APP CONSTRUCTOR] THEME: Both primary and FluentLight failed: {fallbackEx.Message}");
-                Log.Information($"❌ [APP CONSTRUCTOR] Fallback theme exception details: {fallbackEx}");
-            }
-        }
+        // Initialize basic error handling
+        InitializeGlobalExceptionHandling();
 
         // ✅ THEME RESOURCES: Automatically loaded via BusBuddyResourceDictionary.xaml MergedDictionaries
         // ✅ CONTROL THEMING: All Syncfusion controls automatically inherit FluentDark theme
         // ✅ NO MANUAL INTERVENTION: SfSkinManager handles all theme application automatically
 
-        // CRITICAL: Initialize error handling before anything else
-        try
-        {
-            // Dictionary to track repeated exceptions and prevent flood logging
-            var _exceptionOccurrences = new Dictionary<string, int>();
-            var _lastExceptionTime = new Dictionary<string, DateTime>();
-            const int MAX_EXCEPTION_OCCURRENCES = 5;
-            var EXCEPTION_TIMEOUT = TimeSpan.FromSeconds(30);
-
-            // Set up global exception handlers immediately with intelligent filtering
-            this.DispatcherUnhandledException += (sender, e) =>
-            {
-                var exception = e.Exception;
-                var message = exception.Message;
-                var stackTrace = exception.StackTrace ?? "";
-
-                // Create a unique key for this exception type and message
-                var exceptionKey = $"{exception.GetType().Name}|{message.Substring(0, Math.Min(message.Length, 100))}";
-
-                // Check if this exception has occurred too frequently
-                var currentTime = DateTime.Now;
-                if (_exceptionOccurrences.ContainsKey(exceptionKey))
-                {
-                    var lastTime = _lastExceptionTime.GetValueOrDefault(exceptionKey, DateTime.MinValue);
-                    if (currentTime - lastTime < EXCEPTION_TIMEOUT)
-                    {
-                        _exceptionOccurrences[exceptionKey]++;
-                        if (_exceptionOccurrences[exceptionKey] > MAX_EXCEPTION_OCCURRENCES)
-                        {
-                            // Rate limit this exception
-                            e.Handled = true;
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // Reset counter if timeout has passed
-                        _exceptionOccurrences[exceptionKey] = 1;
-                    }
-                }
-                else
-                {
-                    _exceptionOccurrences[exceptionKey] = 1;
-                }
-                _lastExceptionTime[exceptionKey] = currentTime;
-
-                // Enhanced exception categorization with actionable recommendations
-                var exceptionCategory = CategorizeException(exception);
-                var actionableRecommendation = GetActionableRecommendation(exception);
-
-                // Filter out known ButtonAdv style conflicts (already fixed)
-                if (message.Contains("ButtonAdv") && message.Contains("TargetType does not match"))
-                {
-                    System.Diagnostics.Debug.WriteLine($"🔧 FIXED: ButtonAdv style conflict (already converted) - {message}");
-                    e.Handled = true;
-                    return;
-                }
-
-                // Filter out resolved XAML style issues
-                if (message.Contains("Set property") && message.Contains("Style") && message.Contains("threw an exception"))
-                {
-                    System.Diagnostics.Debug.WriteLine($"🔧 RESOLVED: XAML style issue (ButtonAdv conversion applied) - {message}");
-                    e.Handled = true;
-                    return;
-                }
-
-                // Filter out BeginInit recursion issues
-                if (message.Contains("Cannot have nested BeginInit calls"))
-                {
-                    System.Diagnostics.Debug.WriteLine($"🔧 HANDLED: BeginInit recursion prevented - {message}");
-                    e.Handled = true;
-                    return;
-                }
-
-                // Enhanced logging with startup context and actionable insights
-                using (LogContext.PushProperty("ExceptionCategory", exceptionCategory))
-                using (LogContext.PushProperty("ActionableRecommendation", actionableRecommendation))
-                using (LogContext.PushProperty("IsStartupException", IsStartupPhase()))
-                using (LogContext.PushProperty("StartupPhase", GetCurrentStartupPhase()))
-                using (LogContext.PushProperty("ExceptionOccurrenceCount", _exceptionOccurrences[exceptionKey]))
-                {
-                    // Log actionable exceptions with enhanced context
-                    Log.Error(exception, "🚨 ACTIONABLE DISPATCHER EXCEPTION: {ExceptionType} - {Message} at {StackTraceLocation}",
-                        exception.GetType().Name, message, ExtractStackTraceLocation(stackTrace));
-
-                    // Additional startup-specific logging if during startup
-                    if (IsStartupPhase())
-                    {
-                        Log.Error("🚀 STARTUP_PERF: Exception during startup phase {StartupPhase} - {ActionableRecommendation}",
-                            GetCurrentStartupPhase(), actionableRecommendation);
-                    }
-                }
-
-                e.Handled = true; // Prevent crash
-            };
-
-            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
-            {
-                var exception = (Exception)e.ExceptionObject;
-                Log.Fatal(exception, "💥 CRITICAL APPLICATION DOMAIN EXCEPTION: {ExceptionType} - {Message}",
-                    exception.GetType().Name, exception.Message);
-                System.Diagnostics.Debug.WriteLine($"App Domain Exception: {exception.Message}");
-            };
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Error setting up exception handlers: {ex.Message}");
-        }
+        // CRITICAL: Initialize basic error handling first
+        InitializeGlobalExceptionHandling();
 
         // Initialize Serilog directly first (before host) with enrichment
         try
@@ -341,6 +117,101 @@ public partial class App : Application
             throw;
         }
     }
+
+    #region Helper Methods for Simplified Constructor
+
+    private void RegisterSyncfusionLicense()
+    {
+        try
+        {
+            string? envLicenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
+            if (!string.IsNullOrWhiteSpace(envLicenseKey))
+            {
+                Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(envLicenseKey);
+                System.Diagnostics.Debug.WriteLine("✅ Syncfusion license registered from environment variable");
+                return;
+            }
+
+            // Fallback: try to load from appsettings.json
+            var licenseConfig = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                .AddEnvironmentVariables()
+                .Build();
+
+            string? licenseKey = licenseConfig["Syncfusion:LicenseKey"] ?? licenseConfig["SyncfusionLicenseKey"];
+
+            if (!string.IsNullOrWhiteSpace(licenseKey))
+            {
+                Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+                System.Diagnostics.Debug.WriteLine("✅ Syncfusion license registered from appsettings.json");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("⚠️ WARNING: Syncfusion license key not found");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ ERROR: Failed to register Syncfusion license: {ex.Message}");
+        }
+    }
+
+    private void ConfigureSyncfusionTheme()
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("🎨 Configuring Syncfusion theme");
+
+            SfSkinManager.ApplyStylesOnApplication = true;
+
+            // Use the correct API for Syncfusion 30.1.40
+            SfSkinManager.ApplicationTheme = new Theme("FluentDark");
+
+            System.Diagnostics.Debug.WriteLine("✅ FluentDark theme applied successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"❌ Theme configuration failed: {ex.Message}");
+
+            // Fallback to FluentLight
+            try
+            {
+                SfSkinManager.ApplicationTheme = new Theme("FluentLight");
+                System.Diagnostics.Debug.WriteLine("✅ FluentLight fallback theme applied");
+            }
+            catch (Exception fallbackEx)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Fallback theme failed: {fallbackEx.Message}");
+            }
+        }
+    }
+
+    private void InitializeGlobalExceptionHandling()
+    {
+        try
+        {
+            // Set up basic exception handling that doesn't conflict with detailed handlers in OnStartup
+            this.DispatcherUnhandledException += (sender, e) =>
+            {
+                System.Diagnostics.Debug.WriteLine($"Basic UI Exception Handler: {e.Exception.Message}");
+                e.Handled = true; // Prevent crash
+            };
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                var exception = (Exception)e.ExceptionObject;
+                System.Diagnostics.Debug.WriteLine($"Basic Domain Exception Handler: {exception.Message}");
+            };
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error setting up basic exception handlers: {ex.Message}");
+        }
+    }
+
+    #endregion
+
     protected override void OnStartup(StartupEventArgs e)
     {
         var startupStopwatch = Stopwatch.StartNew();
@@ -364,31 +235,12 @@ public partial class App : Application
                 // Validate SfSkinManager configuration
                 var currentTheme = SfSkinManager.ApplicationTheme;
                 var stylesOnApp = SfSkinManager.ApplyStylesOnApplication;
-                var themeAsDefault = SfSkinManager.ApplyThemeAsDefaultStyle;
-                var themeName = SfSkinManager.ThemeName;
 
                 System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] Current theme: {currentTheme?.ToString() ?? "NULL"}");
-                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] ThemeName: {themeName ?? "NULL"}");
                 System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] ApplyStylesOnApplication: {stylesOnApp}");
-                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] ApplyThemeAsDefaultStyle: {themeAsDefault}");
 
                 // PRIORITY 1: Force enhanced theme settings BEFORE base.OnStartup for maximum propagation
                 SfSkinManager.ApplyStylesOnApplication = true;
-                SfSkinManager.ApplyThemeAsDefaultStyle = true;
-                SfSkinManager.ThemeName = "FluentDark";
-
-                // PRIORITY 2: Apply theme explicitly at the application level using FluentTheme (recommended approach)
-                SfSkinManager.SetTheme(this, new FluentTheme("FluentDark") { ShowAcrylicBackground = true });
-
-                // Now run base.OnStartup after comprehensive theme configuration
-                base.OnStartup(e);
-
-                // Verify theme is properly set
-                if (currentTheme == null || themeName != "FluentDark")
-                {
-                    System.Diagnostics.Debug.WriteLine("🎨 [ONSTARTUP] Reinforcing FluentDark theme application");
-                    SfSkinManager.SetTheme(this, new FluentTheme("FluentDark") { ShowAcrylicBackground = true });
-                }
 
                 // Validate critical resources exist and add if missing
                 if (!Application.Current.Resources.Contains("ContentForeground"))
@@ -410,7 +262,7 @@ public partial class App : Application
                 }
 
                 // Verify theme application after everything is initialized
-                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] Final theme verification - ThemeName: {SfSkinManager.ThemeName}, ApplicationTheme: {SfSkinManager.ApplicationTheme?.ToString() ?? "NULL"}");
+                System.Diagnostics.Debug.WriteLine($"🎨 [ONSTARTUP] Final theme verification - ApplicationTheme: {SfSkinManager.ApplicationTheme?.ToString() ?? "NULL"}");
                 System.Diagnostics.Debug.WriteLine("✅ [ONSTARTUP] Enhanced theme validation completed");
             }
             catch (Exception themeEx)
@@ -422,12 +274,7 @@ public partial class App : Application
                 {
                     System.Diagnostics.Debug.WriteLine("🔄 [ONSTARTUP] Applying fallback theme setup");
                     SfSkinManager.ApplyStylesOnApplication = true;
-                    SfSkinManager.ApplyThemeAsDefaultStyle = true;
-                    SfSkinManager.ThemeName = "FluentLight";
                     SfSkinManager.ApplicationTheme = new Theme("FluentLight");
-
-                    // Apply theme explicitly at the application level
-                    SfSkinManager.SetTheme(this, new Theme("FluentLight"));
 
                     System.Diagnostics.Debug.WriteLine("✅ [ONSTARTUP] Fallback theme applied successfully");
                 }
@@ -436,6 +283,20 @@ public partial class App : Application
                     System.Diagnostics.Debug.WriteLine($"❌ [ONSTARTUP] Fallback theme failed: {fallbackEx.Message}");
                 }
             }
+
+            // CRITICAL FIX: Single base.OnStartup call after theme configuration
+            try
+            {
+                Log.Information("🏗️ [STARTUP] Calling base.OnStartup after theme configuration");
+                base.OnStartup(e);
+                Log.Debug("✅ [STARTUP] base.OnStartup completed successfully");
+            }
+            catch (Exception baseStartupEx)
+            {
+                Log.Error(baseStartupEx, "❌ [STARTUP] base.OnStartup failed");
+                throw;
+            }
+
             // Handle command line arguments for debug functionality
             if (e.Args.Length > 0)
             {
@@ -472,18 +333,6 @@ public partial class App : Application
                     Log.Fatal(hostEx, "❌ [STARTUP] Failed to start generic host");
                     throw;
                 }
-            }
-
-            try
-            {
-                Log.Information("🏗️ [STARTUP] Calling base.OnStartup");
-                base.OnStartup(e);
-                Log.Debug("✅ [STARTUP] base.OnStartup completed successfully");
-            }
-            catch (Exception baseStartupEx)
-            {
-                Log.Error(baseStartupEx, "❌ [STARTUP] base.OnStartup failed");
-                throw;
             }
 
             // 🔍 AUTO DEBUG FILTER: Removed for clean debug experience
@@ -639,34 +488,12 @@ public partial class App : Application
 
             string appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
 
-            // Check for appsettings.json before loading configuration
-            if (!File.Exists(appSettingsPath))
-            {
-                MessageBox.Show(
-                    $"The configuration file 'appsettings.json' was not found at '{appSettingsPath}'.\n\n" +
-                    "Please ensure the file exists and is set to 'Copy if newer' in the project.",
-                    "Configuration File Missing",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                Shutdown();
-                return;
-            }
+            // Configuration and logging already handled by host builder
 
-            // Build configuration for Serilog and DI
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            // Determine the solution root directory
+            // Determine the solution root directory for logs
             string solutionRoot = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.Parent?.FullName
                                ?? Directory.GetCurrentDirectory();
-
-            // Centralize all logs in the logs directory
             string logsDirectory = Path.Combine(solutionRoot, "logs");
-            string buildLogPath = Path.Combine(logsDirectory, "build.log");
-            string runtimeLogPath = Path.Combine(logsDirectory, "busbuddy-.log");
-            string fallbackLogPath = Path.Combine(logsDirectory, "BusBuddy_fallback.log");
 
             // Ensure the logs directory exists
             if (!Directory.Exists(logsDirectory))
@@ -674,81 +501,21 @@ public partial class App : Application
                 Directory.CreateDirectory(logsDirectory);
             }
 
-            // Register logging with DI so Serilog can be injected — removed Microsoft.Extensions.Logging dependency
-            ServiceCollection services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
-
-            // Register Serilog as the primary logger without Microsoft logging wrapper
-            services.AddSerilog();
-
-            // Initialize Serilog for robust logging, with enrichers
-            try
-            {
-                // Create custom enrichers
-                var contextEnricher = new BusBuddyContextEnricher();
-                var dbEnricher = new DatabaseOperationEnricher();
-                var uiEnricher = new UIOperationEnricher();
-                var aggregationEnricher = new LogAggregationEnricher();
-                var startupExceptionEnricher = new StartupExceptionEnricher(); // Enhanced startup exception handling
-
-                // Create custom formatters
-                var condensedFormatter = new CondensedLogFormatter(includeProperties: true, showAggregatedOnly: false);
-                var consoleFormatter = new CondensedLogFormatter(includeProperties: false, showAggregatedOnly: true);
-
-                // Use consolidated Serilog configuration with enhanced enrichment capabilities
-                Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Information() // Reduce noise by starting at Information level
-                                                // Built-in enrichers with Serilog enrichment extensions
-                    .Enrich.FromLogContext()
-                    .Enrich.WithMachineName()
-                    .Enrich.WithThreadId()
-                    .Enrich.WithProcessId()
-                    .Enrich.WithProcessName()
-                    .Enrich.WithEnvironmentName()
-                    .Enrich.WithEnvironmentUserName()
-                    // Custom BusBuddy enrichers (order matters — aggregation should be last)
-                    .Enrich.With(contextEnricher)
-                    .Enrich.With(dbEnricher)
-                    .Enrich.With(uiEnricher)
-                    .Enrich.With(startupExceptionEnricher)
-                    .Enrich.With(aggregationEnricher)
-                    // CONSOLIDATED: Only 2 log files with smart filtering and safe concurrent access
-                    .WriteTo.File(condensedFormatter, Path.Combine(logsDirectory, "busbuddy-consolidated-.log"),
-                        rollingInterval: RollingInterval.Day,
-                        retainedFileCountLimit: 30,
-                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
-                        shared: true, // Enable shared access for concurrent processes
-                        flushToDiskInterval: TimeSpan.FromSeconds(1))
-                    .WriteTo.File(Path.Combine(logsDirectory, "busbuddy-errors-.log"),
-                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
-                        rollingInterval: RollingInterval.Day,
-                        retainedFileCountLimit: 30,
-                        shared: true, // Enable shared access for concurrent processes
-                        flushToDiskInterval: TimeSpan.FromSeconds(1),
-                        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{ThreadId}] [{LogCategory}] {Message:lj}{NewLine}    📊 {EventSignature} (Count: {EventOccurrenceCount}){NewLine}    🔍 {Properties:j}{NewLine}{Exception}")
-                    // Simplified console output with aggregation info
-                    .WriteTo.Console(consoleFormatter)
-                    .CreateLogger();
-
-                Log.Information("BusBuddy WPF application starting with pure Serilog and enrichment (Microsoft.Extensions.Logging removed). Build: {BuildTime}", DateTime.Now);
-                Log.Information("Enhanced Enrichers enabled: Context, Database, UI, StartupException, Aggregation, Machine, Thread, Process, Environment, EnvironmentUser");
-                Log.Information("Consolidated logging: 2 files (main + errors) with smart aggregation");
-                Log.Information("Logs directory: {LogsDirectory}", logsDirectory);
-                Log.Information("Enhanced structured logging with {EnricherCount} enrichers active (pure Serilog implementation)", 10);
-                Log.Information("🔧 Improved Error Handling: ButtonAdv style conflicts filtered, actionable errors prioritized");
-                Log.Information("📋 Log Lifecycle: 7-day retention for app logs, 30-day for actionable errors, auto-cleanup enabled");
-                Log.Information("🚀 Startup Exception Enrichment: Enhanced dispatcher exception handling with actionable recommendations");
-            }
-            catch (Exception serilogEx)
-            {
-                // Fallback: write to a basic log file if Serilog config fails
-                string fallbackMessage = $"[FATAL] [{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] Serilog init failed: {serilogEx}\n";
-                File.AppendAllText(fallbackLogPath, fallbackMessage);
-
-                // Also try to write to console for immediate feedback
-                Console.WriteLine($"SERILOG INIT FAILED: {serilogEx.Message}");
-            }
-
             // Enhanced global exception handlers for comprehensive error capture
+            // Remove basic handlers and replace with comprehensive ones
+            AppDomain.CurrentDomain.UnhandledException -= (sender, e) =>
+            {
+                var exception = (Exception)e.ExceptionObject;
+                System.Diagnostics.Debug.WriteLine($"Basic Domain Exception Handler: {exception.Message}");
+            };
+
+            this.DispatcherUnhandledException -= (sender, e) =>
+            {
+                System.Diagnostics.Debug.WriteLine($"Basic UI Exception Handler: {e.Exception.Message}");
+                e.Handled = true;
+            };
+
+            // Set up comprehensive exception handlers with detailed logging
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
@@ -757,15 +524,6 @@ public partial class App : Application
                 // Clean application shutdown - debug helper not automatically started
                 Log.CloseAndFlush();
             };
-
-            // Add configuration to DI container
-            services.AddSingleton<IConfiguration>(configuration);
-
-            // Setup DI
-            ConfigureServices(services, configuration);
-
-            // Set the Services property to the host's service provider for backward compatibility
-            Services = _host.Services;
 
             // 🔧 PROGRESS-AWARE STARTUP: Orchestrated startup sequence with LoadingView integration
             Log.Information("[STARTUP] Running orchestrated startup sequence with LoadingView progress indication");
@@ -1369,7 +1127,7 @@ public partial class App : Application
     private void ConfigureUtilities(IServiceCollection services)
     {
         // Register performance utilities
-        services.AddSingleton<BusBuddy.WPF.Utilities.BackgroundTaskManager>();
+        // services.AddSingleton<BusBuddy.WPF.Utilities.BackgroundTaskManager>(); // DISABLED: Class not found
 
         // Register database validation utilities
         services.AddScoped<BusBuddy.Core.Utilities.DatabaseValidator>();
@@ -1723,12 +1481,12 @@ public partial class App : Application
     /// <summary>
     /// Pre-warms caches in the background to improve performance of first access
     /// </summary>
-    private void PreWarmCaches(BackgroundTaskManager backgroundTaskManager, IServiceProvider serviceProvider)
+    private void PreWarmCaches(IServiceProvider serviceProvider)
     {
         Log.Information("[STARTUP] Starting cache pre-warming in background");
 
         // Start cache pre-warming with a short delay to let UI initialize first
-        backgroundTaskManager.RunLowPriorityTaskAsync(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -1796,7 +1554,7 @@ public partial class App : Application
             {
                 Log.Error(ex, "[STARTUP] Error during cache pre-warming: {ErrorMessage}", ex.Message);
             }
-        }, "CachePreWarming", 500);
+        });
     }
 
     #region Enhanced Exception Handling Helper Methods

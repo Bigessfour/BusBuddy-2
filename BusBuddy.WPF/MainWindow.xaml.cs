@@ -179,16 +179,9 @@ namespace BusBuddy.WPF
         {
             try
             {
-                // Ensure FluentDark theme is applied to this window
-                SfSkinManager.SetVisualStyle(this, VisualStyles.FluentDark);
-
-                // Register FluentDark theme settings
-                var fluentDarkSettings = new FluentDarkThemeSettings();
-                SfSkinManager.RegisterThemeSettings("FluentDark", fluentDarkSettings);
-
-                // Apply theme using Theme property
-                var fluentTheme = new Theme() { ThemeName = "FluentDark" };
-                SfSkinManager.SetTheme(this, fluentTheme);
+                // SfSkinManager.ApplicationTheme is already set globally in App.xaml.cs
+                // Only apply the theme to this specific window
+                SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
 
                 Log.Information("FluentDark theme applied successfully to MainWindow");
             }

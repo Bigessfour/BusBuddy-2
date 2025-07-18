@@ -23,23 +23,22 @@
         <ResourceDictionary>
             <!--
             ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-            🎨 PURE SYNCFUSION 30.1.40 THEME ENVIRONMENT — FLUENTDARK PRIMARY WITH FLUENTLIGHT FALLBACK
+            🎨 PURE SYNCFUSION 30.1.40 THEME ENVIRONMENT — SFSKINMANAGER HANDLES ALL THEMING
             ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-            ✅ PRIMARY THEME: FluentDark (Professional dark theme optimized for productivity)
-            ✅ FALLBACK THEME: FluentLight (Clean light theme for accessibility)
+            ✅ PRIMARY THEME: FluentDark (Applied via SfSkinManager in App.xaml.cs)
+            ✅ FALLBACK THEME: FluentLight (Applied via SfSkinManager in App.xaml.cs)
             ✅ SKIN MANAGER: Configured in App.xaml.cs with ApplyStylesOnApplication = true
             ✅ CONTROL THEMING: All Syncfusion controls automatically themed via SfSkinManager
-            ✅ RESOURCE OPTIMIZATION: Consolidated resource dictionary with essential styles only
+            ✅ NO MANUAL THEME LOADING: SfSkinManager provides all theme resources automatically
+            ✅ RESOURCE OPTIMIZATION: Only custom application styles in ResourceDictionary
             ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
             -->
             <ResourceDictionary.MergedDictionaries>
-                <!-- 🎨 SYNCFUSION THEME CONFIGURATION - USING SFSKINMANAGER (RECOMMENDED FOR FLUENT THEMES) -->
-                <syncfusionskin:SfSkinManager Theme="FluentDark" />
-                <!-- Custom theme overrides for BusBuddy -->
-                <ResourceDictionary Source="/BusBuddy.WPF;component/Resources/Themes/FluentDark.xaml" />
+                <!-- 🎨 SYNCFUSION THEME CONFIGURATION — SfSkinManager handles ALL theme loading automatically -->
+                <!-- ✅ NO MANUAL THEME DICTIONARIES: SfSkinManager provides all Syncfusion theme resources -->
 
-                <!-- 🎯 CUSTOM STYLES AND RESOURCES -->
-                <!-- Custom Syncfusion styles and resources -->
+                <!-- 🎯 CUSTOM STYLES AND RESOURCES ONLY -->
+                <!-- Custom application-specific styles and resources (non-theme) -->
                 <ResourceDictionary Source="pack://application:,,,/BusBuddy.WPF;component/Resources/SyncfusionV30_ResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!-- GLOBAL CONVERTERS -->

@@ -180,7 +180,7 @@
       "args": [
         "-NoExit",
         "-Command",
-        ". 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-PowerShell-Profile.ps1'; . 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-Advanced-Workflows.ps1'"
+        ". 'C:\\Users\\steve.mckitrick\\Desktop\\Bus Buddy\\BusBuddy-PowerShell-Profile.ps1'"
       ],
       "overrideName": true
     },
