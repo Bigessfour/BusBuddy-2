@@ -25,21 +25,30 @@ namespace BusBuddy.WPF.Views.GoogleEarth
 
         /// <summary>
         /// Handles map layer selection changes
+        /// FIXED: Added error handling for ChangeMapLayer failures
         /// </summary>
         private void MapLayerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DataContext is GoogleEarthViewModel viewModel && MapLayerComboBox.SelectedItem is Syncfusion.Windows.Tools.Controls.ComboBoxItemAdv selectedItem)
+            try
             {
-                var layerType = selectedItem.Content?.ToString();
-                if (!string.IsNullOrEmpty(layerType))
+                if (DataContext is GoogleEarthViewModel viewModel && MapLayerComboBox.SelectedItem is Syncfusion.Windows.Tools.Controls.ComboBoxItemAdv selectedItem)
                 {
-                    using (LogContext.PushProperty("UserInteraction", "MapLayerChange"))
-                    using (LogContext.PushProperty("LayerType", layerType))
+                    var layerType = selectedItem.Content?.ToString();
+                    if (!string.IsNullOrEmpty(layerType))
                     {
-                        viewModel.ChangeMapLayer(layerType);
-                        Logger.Information("Map layer changed to: {LayerType}", layerType);
+                        using (LogContext.PushProperty("UserInteraction", "MapLayerChange"))
+                        using (LogContext.PushProperty("LayerType", layerType))
+                        {
+                            viewModel.ChangeMapLayer(layerType);
+                            Logger.Information("Map layer changed to: {LayerType}", layerType);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Failed to change map layer: {ErrorMessage}", ex.Message);
+                // Optionally show user-friendly message
             }
         }
 

@@ -19,6 +19,7 @@ namespace BusBuddy.WPF.Views.XAI
         public XAIChatView()
         {
             InitializeComponent();
+            Unloaded += UserControl_Unloaded; // Subscribe to cleanup event
             Logger.Information("XAI Chat view initialized");
         }
 
@@ -59,15 +60,32 @@ namespace BusBuddy.WPF.Views.XAI
 
         /// <summary>
         /// Handles data context changes to wire up message collection events
+        /// FIXED: Properly unsubscribe from old view model events to prevent memory leaks
         /// </summary>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is XAIChatViewModel viewModel)
+            // Unsubscribe from old view model if it exists
+            if (e.OldValue is XAIChatViewModel oldViewModel)
+            {
+                oldViewModel.MessageAdded -= OnMessageAdded;
+                Logger.Debug("XAI Chat old view model disconnected");
+            }
+
+            // Subscribe to new view model if it exists
+            if (e.NewValue is XAIChatViewModel newViewModel)
             {
                 // Wire up events for auto-scrolling
-                viewModel.MessageAdded += (s, args) => Dispatcher.BeginInvoke(new Action(ScrollToBottom));
+                newViewModel.MessageAdded += OnMessageAdded;
                 Logger.Debug("XAI Chat view model connected");
             }
+        }
+
+        /// <summary>
+        /// Handle message added event for auto-scrolling
+        /// </summary>
+        private void OnMessageAdded(object? sender, EventArgs args)
+        {
+            Dispatcher.BeginInvoke(new Action(ScrollToBottom));
         }
 
         /// <summary>
@@ -77,6 +95,26 @@ namespace BusBuddy.WPF.Views.XAI
         {
             base.OnInitialized(e);
             DataContextChanged += OnDataContextChanged;
+        }
+
+        /// <summary>
+        /// Clean up event subscriptions when control is unloaded
+        /// </summary>
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (DataContext is XAIChatViewModel viewModel)
+                {
+                    viewModel.MessageAdded -= OnMessageAdded;
+                }
+                DataContextChanged -= OnDataContextChanged;
+                Logger.Debug("XAI Chat view cleaned up successfully");
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning(ex, "Error during XAI Chat view cleanup");
+            }
         }
     }
 
@@ -102,6 +140,7 @@ namespace BusBuddy.WPF.Views.XAI
                 };
             }
 
+            // STREAMLINED: Return base template for null or unknown items
             return base.SelectTemplate(item, container);
         }
     }

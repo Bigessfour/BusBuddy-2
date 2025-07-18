@@ -104,15 +104,25 @@ namespace BusBuddy.WPF.Views.Dashboard
         /// <summary>
         /// Initialize the 5-second refresh timer for real-time data updates
         /// as specified in the development plan
+        /// FIXED: Prevent timer leak risk by checking if timer already exists
         /// </summary>
         private void InitializeDataRefreshTimer()
         {
+            // CRITICAL FIX: Prevent multiple timers from being created
+            if (_dataRefreshTimer != null)
+            {
+                Logger.Debug("Data refresh timer already exists, skipping initialization");
+                return;
+            }
+
             _dataRefreshTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(REFRESH_INTERVAL_SECONDS)
             };
             _dataRefreshTimer.Tick += DataRefreshTimer_Tick;
             _dataRefreshTimer.Start();
+
+            Logger.Information("Data refresh timer initialized with {IntervalSeconds}s interval", REFRESH_INTERVAL_SECONDS);
         }
 
         /// <summary>
@@ -129,13 +139,14 @@ namespace BusBuddy.WPF.Views.Dashboard
                 {
                     // Call the lightweight refresh method
                     await viewModel.RefreshDashboardDataAsync();
-                    System.Diagnostics.Debug.WriteLine("Dashboard data refresh completed");
+                    // STREAMLINED: Reduced logging to Debug level for production performance
+                    Logger.Debug("Dashboard data refresh completed");
                 }
             }
             catch (Exception ex)
             {
                 // Log error but don't stop the timer
-                System.Diagnostics.Debug.WriteLine($"Dashboard refresh error: {ex.Message}");
+                Logger.Warning(ex, "Dashboard refresh error: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -365,58 +376,40 @@ namespace BusBuddy.WPF.Views.Dashboard
         {
             try
             {
-                Logger.Information("📊 UI Dashboard Syncfusion ButtonAdv clicked: View Reports button (converted from standard Button) - navigating to reports");
+                Logger.Information("📊 UI Dashboard View Reports clicked - navigating to reports");
 
-                var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
-                if (viewModel != null)
-                {
-                    // Navigate to reports view
-                    Logger.Information("UI Dashboard navigating to reports view");
-                    // TODO: Implement reports navigation when available
-                }
-                else
-                {
-                    Logger.Warning("UI Dashboard View Reports button clicked but ViewModel is null - potential binding issue");
-                }
+                // Use navigation service or simple navigation logic
+                Logger.Information("Reports navigation requested");
+                // TODO: Implement reports navigation when available
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "UI Dashboard View Reports button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard View Reports failed: {ErrorMessage}", ex.Message);
             }
         }
 
         /// <summary>
-        /// Handle Settings button click event - Enhanced with theme switcher
+        /// Handle Settings button click event
         /// </summary>
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Logger.Information("⚙️ UI Dashboard Syncfusion ButtonAdv clicked: Settings button (converted from standard Button) - opening theme settings");
+                Logger.Information("⚙️ UI Dashboard Settings clicked - opening settings");
 
-                // Open theme customization panel
+                // Show theme customization as the primary settings feature
                 ShowThemeCustomizationPanel();
 
-                var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
-                if (viewModel != null)
-                {
-                    Logger.Information("UI Dashboard navigating to settings view");
-                    // TODO: Implement settings navigation when available
-                }
-                else
-                {
-                    Logger.Warning("UI Dashboard Settings button clicked but ViewModel is null - potential binding issue");
-                }
+                Logger.Information("Settings navigation requested");
+                // TODO: Add additional settings navigation when available
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "UI Dashboard Settings button failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "UI Dashboard Settings failed: {ErrorMessage}", ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Show theme customization panel for dynamic theme switching
-        /// </summary>
+        }        /// <summary>
+                 /// Show theme customization panel for dynamic theme switching
+                 /// </summary>
         private void ShowThemeCustomizationPanel()
         {
             try
@@ -586,20 +579,15 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is Syncfusion.Windows.Tools.Controls.ComboBoxAdv comboBox)
                 {
                     var selectedItem = comboBox.SelectedItem?.ToString() ?? "Unknown";
-                    Logger.Information("🚌 UI Dashboard analytics filter changed: {FilterValue} - triggering data refresh", selectedItem);
+                    Logger.Debug("Analytics filter changed: {FilterValue}", selectedItem);
 
-                    // Trigger analytics refresh if needed
-                    var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
-                    if (viewModel != null)
-                    {
-                        // Could trigger specific analytics refresh based on filter
-                        Logger.Debug("🚌 UI Dashboard analytics filter applied successfully for {FilterValue}", selectedItem);
-                    }
+                    // Simple filter application - let refresh timer handle updates
+                    Logger.Information("Analytics filter applied: {FilterValue}", selectedItem);
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "🚌 UI Dashboard analytics filter selection failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Analytics filter selection failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -613,19 +601,15 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is FrameworkElement button)
                 {
                     var moduleName = button.Name ?? button.GetType().Name;
-                    Logger.Information("🚌 UI Dashboard module navigation: {ModuleName} clicked - initiating module switch", moduleName);
+                    Logger.Information("Module navigation: {ModuleName}", moduleName);
 
-                    var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
-                    if (viewModel != null)
-                    {
-                        // Could trigger module switching logic
-                        Logger.Information("🚌 UI Dashboard module navigation processed for {ModuleName}", moduleName);
-                    }
+                    // Simple navigation logging - actual navigation handled by main navigation service
+                    Logger.Information("Module navigation requested: {ModuleName}", moduleName);
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "🚌 UI Dashboard module navigation failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Module navigation failed: {ErrorMessage}", ex.Message);
             }
         }
 
@@ -639,18 +623,35 @@ namespace BusBuddy.WPF.Views.Dashboard
                 if (sender is Syncfusion.UI.Xaml.Charts.SfChart chart)
                 {
                     var chartName = chart.Name ?? "UnnamedChart";
-                    Logger.Information("UI Dashboard chart interaction: {ChartName} clicked at position ({X}, {Y})",
+                    Logger.Debug("Chart interaction: {ChartName} at ({X:F0}, {Y:F0})",
                         chartName, e.GetPosition(chart).X, e.GetPosition(chart).Y);
+
+                    // Simple chart interaction logging
+                    Logger.Information("Chart clicked: {ChartName}", chartName);
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "UI Dashboard chart interaction failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Chart interaction failed: {ErrorMessage}", ex.Message);
+            }
+        }        /// <summary>
+                 /// Override to capture any unhandled UI exceptions in the dashboard
+                 /// </summary>
+        protected override void OnPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            try
+            {
+                base.OnPreviewMouseLeftButtonDown(e);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Dashboard preview click handling failed: {ErrorMessage}", ex.Message);
             }
         }
 
         /// <summary>
         /// Handle dashboard tile clicks for navigation or detailed views
+        /// STREAMLINED: Simple tile interaction handling
         /// </summary>
         private void DashboardTile_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -658,79 +659,16 @@ namespace BusBuddy.WPF.Views.Dashboard
             {
                 if (sender is FrameworkElement tile)
                 {
-                    var tileName = tile.Name ?? "UnnamedTile";
-                    Logger.Information("UI Dashboard tile clicked: {TileName} - potential navigation trigger", tileName);
+                    var tileName = tile.Name ?? tile.Tag?.ToString() ?? "UnnamedTile";
+                    Logger.Debug("Dashboard tile clicked: {TileName}", tileName);
 
-                    // Could trigger navigation based on tile clicked
-                    var viewModel = this.DataContext as BusBuddy.WPF.ViewModels.DashboardViewModel;
-                    if (viewModel != null)
-                    {
-                        Logger.Debug("UI Dashboard tile interaction processed for {TileName}", tileName);
-                    }
+                    // Simple tile interaction logging - actual navigation handled elsewhere
+                    Logger.Information("Tile navigation requested: {TileName}", tileName);
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "UI Dashboard tile interaction failed: {ErrorMessage}", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Handle any control that fails to respond to commands or events
-        /// </summary>
-        private void Control_InteractionFailed(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is FrameworkElement control)
-                {
-                    var controlName = control.Name ?? control.GetType().Name;
-                    Logger.Warning("UI Dashboard control interaction failed to respond: {ControlName} - {ControlType}",
-                        controlName, control.GetType().Name);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "UI Dashboard control failure logging failed: {ErrorMessage}", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Handle Window_Loaded event for the main window
-        /// </summary>
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Logger.Information("EnhancedDashboardView window loaded event triggered");
-                // Additional window-specific initialization if needed
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Window_Loaded event failed: {ErrorMessage}", ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Override to capture any unhandled UI exceptions in the dashboard
-        /// </summary>
-        protected override void OnPreviewMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
-        {
-            try
-            {
-                // Log any clicks for debugging purposes
-                if (e.Source is FrameworkElement element)
-                {
-                    var elementName = element.Name ?? element.GetType().Name;
-                    Logger.Debug("UI Dashboard preview click on: {ElementName} ({ElementType})",
-                        elementName, element.GetType().Name);
-                }
-
-                base.OnPreviewMouseLeftButtonDown(e);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "UI Dashboard preview click handling failed: {ErrorMessage}", ex.Message);
+                Logger.Error(ex, "Dashboard tile interaction failed: {ErrorMessage}", ex.Message);
             }
         }
 

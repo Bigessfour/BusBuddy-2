@@ -11,7 +11,7 @@ using Syncfusion.UI.Xaml.NavigationDrawer;
 using Syncfusion.Windows.Tools.Controls;
 using Syncfusion.Windows.Tools;
 
-namespace BusBuddy.WPF
+namespace BusBuddy.WPF.Views.Main
 {
     /// <summary>
     /// Main Window for Bus Buddy Application with Enhanced Navigation Drawer and FluentDark Theme
@@ -82,20 +82,9 @@ namespace BusBuddy.WPF
                     // Log but continue - this is a fallback safeguard
                 }
 
-                // Apply FluentDark theme consistently with enhanced error handling
-                try
-                {
-                    ApplyFluentDarkTheme();
-                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Theme applied successfully");
-                }
-                catch (Exception themeApplyEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Theme application failed: {themeApplyEx.Message}");
-                    if (System.Diagnostics.Debugger.IsAttached)
-                    {
-                        System.Diagnostics.Debugger.Break();
-                    }
-                }
+                // Theme is already applied globally via SfSkinManager in App.xaml.cs
+                // No need for window-specific theme application
+                System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using global FluentDark theme from App.xaml.cs");
 
                 // Enhanced DI setup with detailed validation
                 try
@@ -173,25 +162,6 @@ namespace BusBuddy.WPF
         }
 
         /// <summary>
-        /// Apply FluentDark theme consistently across the application
-        /// </summary>
-        private void ApplyFluentDarkTheme()
-        {
-            try
-            {
-                // SfSkinManager.ApplicationTheme is already set globally in App.xaml.cs
-                // Only apply the theme to this specific window
-                SfSkinManager.SetTheme(this, new Theme() { ThemeName = "FluentDark" });
-
-                Log.Information("FluentDark theme applied successfully to MainWindow");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to apply FluentDark theme to MainWindow");
-            }
-        }
-
-        /// <summary>
         /// Window loaded event handler
         /// </summary>
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -199,9 +169,6 @@ namespace BusBuddy.WPF
             try
             {
                 Log.Information("MainWindow loaded successfully with enhanced navigation");
-
-                // Apply theme to all child controls
-                ApplyThemeToChildControls();
 
                 // Set up docking manager event handlers
                 SetupDockingManager();

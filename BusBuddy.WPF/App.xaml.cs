@@ -3,6 +3,7 @@ using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.WPF.Logging;
 using BusBuddy.WPF.Utilities;
 using BusBuddy.WPF.ViewModels;
+using BusBuddy.WPF.Views.Main;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -359,27 +360,19 @@ public partial class App : Application
                     var mergedDictCount = this.Resources?.MergedDictionaries?.Count ?? 0;
                     Log.Information("🎨 [STARTUP] Total merged dictionaries: {Count}", mergedDictCount);
 
-                    // Verify if critical keys exist in merged resources to identify potential issues
+                    // Verify critical resources efficiently
                     string[] criticalKeys = new string[] { "SurfaceBorder", "SurfaceBorderBrush", "SurfaceBorderColor" };
-                    int foundKeys = 0;
-                    int missingKeys = 0;
+                    var foundKeys = criticalKeys.Where(k => this.Resources?.Contains(k) == true).ToList();
+                    var missingKeys = criticalKeys.Except(foundKeys).ToList();
 
-                    foreach (var key in criticalKeys)
+                    if (missingKeys.Any())
                     {
-                        if (this.Resources?.Contains(key) == true)
-                        {
-                            foundKeys++;
-                            var resourceType = this.Resources[key]?.GetType().Name ?? "Unknown";
-                            Log.Debug("✅ [STARTUP] Critical resource key exists: {Key} ({Type})", key, resourceType);
-                        }
-                        else
-                        {
-                            missingKeys++;
-                            Log.Warning("⚠️ [STARTUP] Critical resource key missing: {Key}", key);
-                        }
+                        Log.Warning("⚠️ [STARTUP] Missing critical resources: {MissingKeys}", string.Join(", ", missingKeys));
                     }
-
-                    Log.Information("🎨 [STARTUP] Resource validation summary: {FoundKeys} found, {MissingKeys} missing", foundKeys, missingKeys);
+                    else
+                    {
+                        Log.Information("✅ [STARTUP] All critical resources present");
+                    }
 
                     // Log current theme information
                     var currentTheme = SfSkinManager.ApplicationTheme?.ToString() ?? "Unknown";
@@ -583,6 +576,9 @@ public partial class App : Application
                             // Use the synchronous version with background initialization
                             mainViewModel.NavigateToDashboard();
                             Log.Information("[STARTUP] ✅ Startup completed successfully — switched to Dashboard");
+
+                            // Start cache pre-warming after successful navigation
+                            PreWarmCaches();
                         });
                     }
                     else
@@ -1481,78 +1477,38 @@ public partial class App : Application
     /// <summary>
     /// Pre-warms caches in the background to improve performance of first access
     /// </summary>
-    private void PreWarmCaches(IServiceProvider serviceProvider)
+    private void PreWarmCaches()
     {
         Log.Information("[STARTUP] Starting cache pre-warming in background");
 
-        // Start cache pre-warming with a short delay to let UI initialize first
-        Task.Run(async () =>
+        // Use the existing cache pre-warming logic from OnStartup
+        // This method is now called after orchestration completion
+        _ = Task.Run(async () =>
         {
             try
             {
-                // Delay slightly to prioritize UI initialization
-                await Task.Delay(500);
+                await Task.Delay(500); // Brief delay for UI initialization
 
-                // Get caching and data services
-                var cacheService = serviceProvider.GetService<BusBuddy.Core.Services.IEnhancedCachingService>();
-                var busService = serviceProvider.GetService<BusBuddy.Core.Services.Interfaces.IBusService>();
-                var driverService = serviceProvider.GetService<BusBuddy.Core.Services.IDriverService>();
-                var routeService = serviceProvider.GetService<BusBuddy.Core.Services.IRouteService>();
-                var dashboardMetricsService = serviceProvider.GetService<BusBuddy.Core.Services.IDashboardMetricsService>();
+                using var scope = Services.CreateScope();
+                var busCacheService = scope.ServiceProvider.GetService<BusBuddy.Core.Services.IBusCachingService>();
 
-                if (cacheService == null)
+                if (busCacheService != null)
                 {
-                    Log.Warning("[STARTUP] Cache service not found - pre-warming skipped");
-                    return;
+                    Func<Task<List<BusBuddy.Core.Models.Bus>>> fetchBusesFunc = async () =>
+                    {
+                        using var freshScope = Services.CreateScope();
+                        var busService = freshScope.ServiceProvider.GetRequiredService<BusBuddy.Core.Services.Interfaces.IBusService>();
+                        var result = await busService.GetAllBusesAsync();
+                        return result.ToList();
+                    };
+
+                    await busCacheService.GetAllBusesAsync(fetchBusesFunc);
+                    Log.Information("[STARTUP] Cache pre-warming completed successfully");
                 }
-
-                // Start pre-warming tasks
-                var tasks = new List<Task>();
-
-                // Pre-warm dashboard metrics cache
-                if (dashboardMetricsService != null)
-                {
-                    tasks.Add(cacheService.GetDashboardMetricsAsync(async () =>
-                        await dashboardMetricsService.GetDashboardMetricsAsync()));
-                }
-
-                // Pre-warm bus data cache
-                if (busService != null)
-                {
-                    tasks.Add(cacheService.GetAllBusesAsync(async () =>
-                        await busService.GetAllBusesAsync()));
-                }
-
-                // Pre-warm driver data cache
-                if (driverService != null)
-                {
-                    tasks.Add(cacheService.GetAllDriversAsync(async () =>
-                        await driverService.GetAllDriversAsync()));
-                }
-
-                // Pre-warm route data cache
-                if (routeService != null)
-                {
-                    tasks.Add(cacheService.GetAllRoutesAsync(async () =>
-                        await routeService.GetAllActiveRoutesAsync()));
-                }
-
-                // Wait for all pre-warming tasks to complete
-                await Task.WhenAll(tasks);
-                Log.Information("[STARTUP] Cache pre-warming completed successfully");
-            }
-            catch (System.Data.SqlTypes.SqlNullValueException ex)
-            {
-                // Specific handling for SQL NULL value errors
-                Log.Warning(ex, "[STARTUP] SQL NULL value detected during cache pre-warming. This may indicate a data integrity issue: {ErrorMessage}", ex.Message);
-                // Continue application execution as this is non-critical
-
-                // Log a more user-friendly message for troubleshooting
-                Log.Information("[STARTUP] Cache pre-warming encountered non-critical errors but application will continue to function normally");
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "[STARTUP] Error during cache pre-warming: {ErrorMessage}", ex.Message);
+                Log.Error(ex, "[STARTUP] Cache pre-warming failed: {ErrorMessage}", ex.Message);
             }
         });
     }
