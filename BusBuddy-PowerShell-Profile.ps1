@@ -18,6 +18,27 @@ if (Test-Path $XamlToolkitPath) {
     Write-Host "🚌 Bus Buddy XAML Toolkit loaded" -ForegroundColor Green
 }
 
+# Import Advanced XAML Health Suite
+$HealthSuitePath = Join-Path $PSScriptRoot "Tools\Scripts\XAML-Health-Suite.ps1"
+if (Test-Path $HealthSuitePath) {
+    . $HealthSuitePath
+    Write-Host "🏥 Advanced XAML Health Suite loaded" -ForegroundColor Magenta
+}
+
+# Import Read-Only Analysis Tools
+$ReadOnlyToolsPath = Join-Path $PSScriptRoot "Tools\Scripts\Read-Only-Analysis-Tools.ps1"
+$ErrorAnalysisPath = Join-Path $PSScriptRoot "Tools\Scripts\Error-Analysis.ps1"
+
+if (Test-Path $ReadOnlyToolsPath) {
+    Import-Module $ReadOnlyToolsPath -Force
+    Write-Host "� Read-Only Analysis Tools loaded" -ForegroundColor Cyan
+}
+
+if (Test-Path $ErrorAnalysisPath) {
+    # Error analysis script available
+    Write-Host "📊 Error Analysis Tools available" -ForegroundColor Cyan
+}
+
 # Bus Buddy Project Helper Functions
 function bb-root {
     <#
@@ -190,13 +211,29 @@ Write-Host ""
 Write-Host "🚌 " -NoNewline -ForegroundColor Yellow
 Write-Host "Bus Buddy PowerShell Profile Loaded!" -ForegroundColor Cyan
 Write-Host "   • Use 'bb-xaml-help' for XAML analysis commands" -ForegroundColor Gray
+Write-Host "   • Use 'bb-xaml-edit' for structure-aware XAML editing" -ForegroundColor Gray
+Write-Host "   • Use 'bb-xaml-format' for safe XAML formatting" -ForegroundColor Gray
 Write-Host "   • Use 'bb-check' for quick project health check" -ForegroundColor Gray
+Write-Host "   • Use 'bb-health' for comprehensive XAML health analysis" -ForegroundColor Magenta
 Write-Host "   • Use 'bb-root' to navigate to project root" -ForegroundColor Gray
 Write-Host ""
+
+# XAML editing aliases
+Set-Alias -Name bb-xaml-edit -Value Invoke-XamlElementEdit
+Set-Alias -Name bb-xaml-add -Value Invoke-XamlElementInsertion
+Set-Alias -Name bb-xaml-attr -Value Invoke-XamlAttributeEdit
+Set-Alias -Name bb-xaml-validate -Value Invoke-XamlValidation
+Set-Alias -Name bb-xaml-format -Value Invoke-XamlFormatting
+
+# Quick XAML helpers
+function bb-xaml-button { param($File, $Parent = "//Grid", $Name = "MyButton", $Content = "Click Me") New-SyncfusionButton -XamlFilePath $File -ParentXPath $Parent -Name $Name -Content $Content }
+function bb-xaml-bind { param($File, $Element, $Property, $Path) Add-DataBinding -XamlFilePath $File -ElementXPath $Element -Property $Property -BindingPath $Path }
 
 # Tab completion for bb commands
 $bbCommands = @(
     'bb-xaml-analyze', 'bb-xaml-inspect', 'bb-xaml-structure', 'bb-xaml-validate', 'bb-xaml-report', 'bb-xaml-help',
+    'bb-xaml-edit', 'bb-xaml-add', 'bb-xaml-attr', 'bb-xaml-format', 'bb-xaml-button', 'bb-xaml-bind',
+    'bb-health', 'bb-quick-health', 'bb-null-check', 'bb-perf', 'bb-types', 'bb-bindings',
     'bb-root', 'bb-views', 'bb-resources', 'bb-tools', 'bb-logs', 'bb-check', 'bb-syntax'
 )
 
