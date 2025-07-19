@@ -438,4 +438,5 @@ function New-PowerShellParameterBlock {
 }
 
 # Export functions
-Export-ModuleMember -Function Edit-XamlElement, Add-XamlElement, Set-XamlAttribute, Test-XamlValidity, Format-XamlFile, Test-PowerShellSyntax, Test-PowerShellBestPractices, Format-PowerShellCode, New-PowerShellFunction, Test-PowerShellParameterSyntax, New-PowerShellParameterBlock
+# Note: Functions are available when script is dot-sourced
+# Available functions: Edit-XamlElement, Add-XamlElement, Set-XamlAttribute, Test-XamlValidity, Format-XamlFile, Test-PowerShellSyntax, Test-PowerShellBestPractices, Format-PowerShellCode, New-PowerShellFunction, Test-PowerShellParameterSyntax, New-PowerShellParameterBlock

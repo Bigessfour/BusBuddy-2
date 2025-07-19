@@ -207,26 +207,33 @@ Write-Host "   • Use 'bb-xaml-edit' for structure-aware XAML editing" -Foregro
 Write-Host "   • Use 'bb-xaml-format' for safe XAML formatting" -ForegroundColor Gray
 Write-Host "   • Use 'bb-check' for quick project health check" -ForegroundColor Gray
 Write-Host "   • Use 'bb-health' for comprehensive XAML health analysis" -ForegroundColor Magenta
+Write-Host "   • Use 'bb-script-analyze' to run PSScriptAnalyzer on scripts" -ForegroundColor Gray
+Write-Host "   • Use 'bb-export-diag' to export diagnostic data (ConvertTo-CliXml)" -ForegroundColor Gray
+Write-Host "   • Use 'bb-validate-syncfusion' to validate Syncfusion namespaces" -ForegroundColor Gray
 Write-Host "   • Use 'bb-root' to navigate to project root" -ForegroundColor Gray
 Write-Host ''
 
-# XAML editing aliases
+# PowerShell 7.5.2 optimized aliases for enhanced analysis
 Set-Alias -Name bb-xaml-edit -Value Invoke-XamlElementEdit
 Set-Alias -Name bb-xaml-add -Value Invoke-XamlElementInsertion
 Set-Alias -Name bb-xaml-attr -Value Invoke-XamlAttributeEdit
 Set-Alias -Name bb-xaml-validate -Value Invoke-XamlValidation
 Set-Alias -Name bb-xaml-format -Value Invoke-XamlFormatting
+Set-Alias -Name bb-script-analyze -Value Invoke-PowerShellScriptAnalyzer
+Set-Alias -Name bb-export-diag -Value Export-BusBuddyDiagnosticData
+Set-Alias -Name bb-validate-syncfusion -Value Validate-SyncfusionNamespaces
 
 # Quick XAML helpers
 function bb-xaml-button { param($File, $Parent = '//Grid', $Name = 'MyButton', $Content = 'Click Me') New-SyncfusionButton -XamlFilePath $File -ParentXPath $Parent -Name $Name -Content $Content }
 function bb-xaml-bind { param($File, $Element, $Property, $Path) Add-DataBinding -XamlFilePath $File -ElementXPath $Element -Property $Property -BindingPath $Path }
 
-# Tab completion for bb commands
+# Tab completion for bb commands - PowerShell 7.5.2 optimized
 $bbCommands = @(
     'bb-xaml-analyze', 'bb-xaml-inspect', 'bb-xaml-structure', 'bb-xaml-validate', 'bb-xaml-report', 'bb-xaml-help',
     'bb-xaml-edit', 'bb-xaml-add', 'bb-xaml-attr', 'bb-xaml-format', 'bb-xaml-button', 'bb-xaml-bind',
     'bb-health', 'bb-quick-health', 'bb-null-check', 'bb-perf', 'bb-types', 'bb-bindings',
-    'bb-root', 'bb-views', 'bb-resources', 'bb-tools', 'bb-logs', 'bb-check', 'bb-syntax'
+    'bb-root', 'bb-views', 'bb-resources', 'bb-tools', 'bb-logs', 'bb-check', 'bb-syntax',
+    'bb-script-analyze', 'bb-export-diag', 'bb-validate-syncfusion'
 )
 
 Register-ArgumentCompleter -CommandName $bbCommands -ParameterName Path -ScriptBlock {
@@ -235,14 +242,19 @@ Register-ArgumentCompleter -CommandName $bbCommands -ParameterName Path -ScriptB
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) { return @() }
 
-    # Get all XAML files and directories
-    $items = Get-ChildItem $projectRoot -Recurse | Where-Object {
+    # PowerShell 7.5.2 optimized - Use parallel processing for large directories
+    $items = Get-ChildItem $projectRoot -Recurse -ErrorAction SilentlyContinue | Where-Object {
         $_.Extension -eq '.xaml' -or $_.PSIsContainer
-    } | ForEach-Object {
-        $_.FullName.Replace("$projectRoot\", '')
-    } | Where-Object {
-        $_ -like "$wordToComplete*"
-    }
+    } | ForEach-Object -Parallel {
+        $item = $_
+        $projectRoot = $using:projectRoot
+        $wordToComplete = $using:wordToComplete
 
-    return $items | Sort-Object | Select-Object -First 20
+        $relativePath = $item.FullName.Replace("$projectRoot\", '')
+        if ($relativePath -like "$wordToComplete*") {
+            return $relativePath
+        }
+    } -ThrottleLimit 4 | Sort-Object | Select-Object -First 20
+
+    return $items
 }

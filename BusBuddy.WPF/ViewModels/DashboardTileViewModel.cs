@@ -94,6 +94,7 @@ namespace BusBuddy.WPF.ViewModels
     /// </summary>
     public class FleetStatusTileViewModel : DashboardTileViewModel
     {
+        private static readonly ILogger Logger = Log.ForContext<FleetStatusTileViewModel>();
         private readonly IUnitOfWork _unitOfWork;
         private int _activeBusCount;
         private int _maintenanceBusCount;
@@ -146,7 +147,7 @@ namespace BusBuddy.WPF.ViewModels
             catch (Exception ex)
             {
                 // Log error and fallback to default values
-                System.Diagnostics.Debug.WriteLine($"Error refreshing fleet status: {ex.Message}");
+                Logger.Error(ex, "Error refreshing fleet status in FleetStatusTileViewModel");
 
                 // Fallback values if database is unavailable
                 ActiveBusCount = 0;
@@ -165,6 +166,7 @@ namespace BusBuddy.WPF.ViewModels
     /// </summary>
     public class MaintenanceAlertsTileViewModel : DashboardTileViewModel
     {
+        private static readonly ILogger Logger = Log.ForContext<MaintenanceAlertsTileViewModel>();
         private readonly IUnitOfWork _unitOfWork;
         private int _criticalMaintenanceCount;
         private int _upcomingMaintenanceCount;
@@ -215,7 +217,7 @@ namespace BusBuddy.WPF.ViewModels
             catch (Exception ex)
             {
                 // Log error and fallback to default values
-                System.Diagnostics.Debug.WriteLine($"Error refreshing maintenance alerts: {ex.Message}");
+                Logger.Error(ex, "Error refreshing maintenance alerts in MaintenanceAlertsTileViewModel");
 
                 // Fallback values if database is unavailable
                 CriticalMaintenanceCount = 0;

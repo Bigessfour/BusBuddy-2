@@ -7,12 +7,12 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.WPF.ViewModels
 {
-    public class StudentDetailViewModel : INotifyPropertyChanged
+    public class StudentDetailViewModel : BaseViewModel
     {
-        private static readonly ILogger Logger = Log.ForContext<StudentDetailViewModel>();
         private readonly IUnitOfWork _unitOfWork;
         private readonly IStudentScheduleService _studentScheduleService;
         private readonly IScheduleService _scheduleService;
@@ -36,22 +36,14 @@ namespace BusBuddy.WPF.ViewModels
         public StudentSchedule? SelectedSchedule
         {
             get => _selectedSchedule;
-            set
-            {
-                _selectedSchedule = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _selectedSchedule, value);
         }
 
         private bool _isLoadingSchedules;
         public bool IsLoadingSchedules
         {
             get => _isLoadingSchedules;
-            set
-            {
-                _isLoadingSchedules = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _isLoadingSchedules, value);
         }
 
         public StudentDetailViewModel(BusBuddy.Core.Models.Student student, IUnitOfWork unitOfWork, IStudentScheduleService studentScheduleService, IScheduleService scheduleService)
@@ -150,16 +142,38 @@ namespace BusBuddy.WPF.ViewModels
 
         private async void SaveChanges(object? obj)
         {
-            if (Student.StudentId == 0)
+            using (LogContext.PushProperty("ViewModelType", nameof(StudentDetailViewModel)))
+            using (LogContext.PushProperty("OperationType", "SaveChanges"))
+            using (LogContext.PushProperty("StudentId", Student.StudentId))
             {
-                await _unitOfWork.Students.AddAsync(Student);
+                try
+                {
+                    Logger.Information("Saving student changes for {StudentName} (ID: {StudentId})",
+                        Student.StudentName, Student.StudentId);
+
+                    if (Student.StudentId == 0)
+                    {
+                        await _unitOfWork.Students.AddAsync(Student);
+                        Logger.Information("Added new student: {StudentName}", Student.StudentName);
+                    }
+                    else
+                    {
+                        _unitOfWork.Students.Update(Student);
+                        Logger.Information("Updated existing student: {StudentName} (ID: {StudentId})",
+                            Student.StudentName, Student.StudentId);
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    Logger.Information("Successfully saved student changes for {StudentName}", Student.StudentName);
+                    CloseAction?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to save student changes for {StudentName} (ID: {StudentId})",
+                        Student.StudentName, Student.StudentId);
+                    ErrorMessage = $"Failed to save student: {ex.Message}";
+                }
             }
-            else
-            {
-                _unitOfWork.Students.Update(Student);
-            }
-            await _unitOfWork.SaveChangesAsync();
-            CloseAction?.Invoke();
         }
 
         private async Task LoadStudentSchedulesAsync()
@@ -262,9 +276,5 @@ namespace BusBuddy.WPF.ViewModels
             // This would typically open a dialog to view schedule details
             // For now, it's a placeholder for future implementation
         }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

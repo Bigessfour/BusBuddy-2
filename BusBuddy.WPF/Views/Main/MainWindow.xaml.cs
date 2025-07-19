@@ -30,119 +30,122 @@ namespace BusBuddy.WPF.Views.Main
             try
             {
                 // Enhanced startup debugging with detailed logging
-                System.Diagnostics.Debug.WriteLine("🏗️ [MAINWINDOW] Constructor started");
+                using (LogContext.PushProperty("ViewType", nameof(MainWindow)))
+                using (LogContext.PushProperty("OperationType", "Constructor"))
+                {
+                    Logger.Information("MainWindow constructor started");
 
-                // CRITICAL: Set ApplyThemeAsDefaultStyle before InitializeComponent
-                // This ensures FluentDark theme resources are available globally
-                try
-                {
-                    // Theme is managed centrally by OptimizedThemeService - no per-window configuration needed
-                    // Verify theme is available using fast cache check
-                    bool themeReady = BusBuddy.WPF.Services.OptimizedThemeService.IsResourceAvailable("ContentForeground");
-                    System.Diagnostics.Debug.WriteLine($"✅ [MAINWINDOW] Theme resources available: {themeReady}");
-                }
-                catch (Exception themeEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Theme verification failed: {themeEx.Message}");
-                    if (System.Diagnostics.Debugger.IsAttached)
+                    // CRITICAL: Set ApplyThemeAsDefaultStyle before InitializeComponent
+                    // This ensures FluentDark theme resources are available globally
+                    try
                     {
-                        System.Diagnostics.Debugger.Break();
+                        // Theme is managed centrally by OptimizedThemeService - no per-window configuration needed
+                        // Verify theme is available using fast cache check
+                        bool themeReady = BusBuddy.WPF.Services.OptimizedThemeService.IsResourceAvailable("ContentForeground");
+                        Logger.Debug("Theme resources available: {ThemeReady}", themeReady);
                     }
-                }
-
-                // Enhanced InitializeComponent with breakpoint capability
-                try
-                {
-                    System.Diagnostics.Debug.WriteLine("🔄 [MAINWINDOW] Calling InitializeComponent");
-                    InitializeComponent();
-                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] InitializeComponent completed successfully");
-                }
-                catch (Exception initEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] InitializeComponent failed: {initEx.Message}");
-                    System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Exception details: {initEx}");
-
-                    // Enhanced debugging for XAML parsing issues
-                    if (initEx is System.Windows.Markup.XamlParseException xamlEx)
+                    catch (Exception themeEx)
                     {
-                        System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] XAML Parse Error - Line: {xamlEx.LineNumber}, Position: {xamlEx.LinePosition}");
-                        System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] XAML File: {xamlEx.BaseUri}");
-                    }
-
-                    if (System.Diagnostics.Debugger.IsAttached)
-                    {
-                        System.Diagnostics.Debugger.Break();
-                    }
-                    throw;
-                }
-
-                // Additional safeguard: Theme is managed centrally by OptimizedThemeService
-                // No manual SfSkinManager calls needed per window
-                System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using centralized theme management from OptimizedThemeService");
-
-                // Theme is already applied globally via SfSkinManager in App.xaml.cs
-                // No need for window-specific theme application
-                System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using global FluentDark theme from App.xaml.cs");
-
-                // Enhanced DI setup with detailed validation
-                try
-                {
-                    System.Diagnostics.Debug.WriteLine("🔄 [MAINWINDOW] Setting up dependency injection");
-
-                    if (Application.Current is App appInstance && appInstance.Services != null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] App instance and services available");
-
-                        _viewModel = appInstance.Services.GetService<MainViewModel>();
-                        _navigationService = appInstance.Services.GetService<INavigationService>();
-
-                        if (_viewModel != null)
-                        {
-                            DataContext = _viewModel;
-                            System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] MainViewModel set as DataContext");
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine("❌ [MAINWINDOW] MainViewModel is null");
-                            if (System.Diagnostics.Debugger.IsAttached)
-                            {
-                                System.Diagnostics.Debugger.Break();
-                            }
-                        }
-
-                        // Subscribe to navigation events with error handling
-                        if (_navigationService != null)
-                        {
-                            _navigationService.NavigationChanged += OnNavigationChanged;
-                            System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Navigation service event subscribed");
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine("⚠️ [MAINWINDOW] Navigation service is null");
-                        }
-
-                        Log.Information("MainWindow initialized with enhanced navigation drawer and FluentDark theme");
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("❌ [MAINWINDOW] App instance or services are null");
+                        Logger.Error(themeEx, "Theme verification failed");
                         if (System.Diagnostics.Debugger.IsAttached)
                         {
                             System.Diagnostics.Debugger.Break();
                         }
                     }
-                }
-                catch (Exception diEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] DI setup failed: {diEx.Message}");
-                    if (System.Diagnostics.Debugger.IsAttached)
-                    {
-                        System.Diagnostics.Debugger.Break();
-                    }
-                }
 
-                System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Constructor completed successfully");
-            }
+                    // Enhanced InitializeComponent with breakpoint capability
+                    try
+                    {
+                        System.Diagnostics.Debug.WriteLine("🔄 [MAINWINDOW] Calling InitializeComponent");
+                        InitializeComponent();
+                        System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] InitializeComponent completed successfully");
+                    }
+                    catch (Exception initEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] InitializeComponent failed: {initEx.Message}");
+                        System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Exception details: {initEx}");
+
+                        // Enhanced debugging for XAML parsing issues
+                        if (initEx is System.Windows.Markup.XamlParseException xamlEx)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] XAML Parse Error - Line: {xamlEx.LineNumber}, Position: {xamlEx.LinePosition}");
+                            System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] XAML File: {xamlEx.BaseUri}");
+                        }
+
+                        if (System.Diagnostics.Debugger.IsAttached)
+                        {
+                            System.Diagnostics.Debugger.Break();
+                        }
+                        throw;
+                    }
+
+                    // Additional safeguard: Theme is managed centrally by OptimizedThemeService
+                    // No manual SfSkinManager calls needed per window
+                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using centralized theme management from OptimizedThemeService");
+
+                    // Theme is already applied globally via SfSkinManager in App.xaml.cs
+                    // No need for window-specific theme application
+                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using global FluentDark theme from App.xaml.cs");
+
+                    // Enhanced DI setup with detailed validation
+                    try
+                    {
+                        System.Diagnostics.Debug.WriteLine("🔄 [MAINWINDOW] Setting up dependency injection");
+
+                        if (Application.Current is App appInstance && appInstance.Services != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] App instance and services available");
+
+                            _viewModel = appInstance.Services.GetService<MainViewModel>();
+                            _navigationService = appInstance.Services.GetService<INavigationService>();
+
+                            if (_viewModel != null)
+                            {
+                                DataContext = _viewModel;
+                                System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] MainViewModel set as DataContext");
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("❌ [MAINWINDOW] MainViewModel is null");
+                                if (System.Diagnostics.Debugger.IsAttached)
+                                {
+                                    System.Diagnostics.Debugger.Break();
+                                }
+                            }
+
+                            // Subscribe to navigation events with error handling
+                            if (_navigationService != null)
+                            {
+                                _navigationService.NavigationChanged += OnNavigationChanged;
+                                System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Navigation service event subscribed");
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("⚠️ [MAINWINDOW] Navigation service is null");
+                            }
+
+                            Log.Information("MainWindow initialized with enhanced navigation drawer and FluentDark theme");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("❌ [MAINWINDOW] App instance or services are null");
+                            if (System.Diagnostics.Debugger.IsAttached)
+                            {
+                                System.Diagnostics.Debugger.Break();
+                            }
+                        }
+                    }
+                    catch (Exception diEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] DI setup failed: {diEx.Message}");
+                        if (System.Diagnostics.Debugger.IsAttached)
+                        {
+                            System.Diagnostics.Debugger.Break();
+                        }
+                    }
+
+                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Constructor completed successfully");
+                }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Constructor failed: {ex.Message}");
@@ -555,8 +558,8 @@ namespace BusBuddy.WPF.Views.Main
         }
 
         /// <summary>
-                 /// Handle DockingManager active window changes
-                 /// </summary>
+        /// Handle DockingManager active window changes
+        /// </summary>
         private void MainDockingManager_ActiveWindowChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             try

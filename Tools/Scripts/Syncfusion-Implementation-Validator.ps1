@@ -445,4 +445,5 @@ function Test-SyncfusionProjectStructure {
 #endregion
 
 # Export all functions
-Export-ModuleMember -Function Test-SyncfusionImplementation, Test-XamlSyncfusionImplementation, Test-CSharpSyncfusionImplementation, Test-SyncfusionBestPractices, Get-SyncfusionThemeInfo, Test-SyncfusionProjectStructure
+# Note: Functions are available when script is dot-sourced
+# Available functions: Test-SyncfusionImplementation, Test-XamlSyncfusionImplementation, Test-CSharpSyncfusionImplementation, Test-SyncfusionBestPractices, Get-SyncfusionThemeInfo, Test-SyncfusionProjectStructure

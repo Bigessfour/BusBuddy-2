@@ -1,0 +1,48 @@
+{
+    "recommendations": [
+        // C# Development and Corruption Detection
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "josefpihrt-vscode.roslynator",
+
+        // XAML Development and Formatting
+        "ms-dotnettools.xaml",
+        "doggy8088.netcore-extension-pack",
+        "redhat.vscode-xml",
+
+        // PowerShell Development (Core 7.5.2)
+        "ms-vscode.powershell",
+
+        // Task Management (EXCLUSIVE METHOD)
+        "spmeesseman.vscode-taskexplorer",
+
+        // Enhanced Productivity
+        "ms-vscode.vscode-json",
+        "aaron-bond.better-comments",
+        "streetsidesoftware.code-spell-checker",
+
+        // Git and Version Control
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+
+        // Enhanced IntelliSense
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss"
+    ],
+    "unwantedRecommendations": [
+        // Block competing task runners
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "ms-vscode.vscode-typescript-tslint-plugin",
+
+        // Block legacy PowerShell
+        "ms-vscode.powershell-preview",
+
+        // Block competing XAML formatters
+        "DotJoshJohnson.xml",
+
+        // Block npm/node task runners
+        "eg2.vscode-npm-script"
+    ]
+}

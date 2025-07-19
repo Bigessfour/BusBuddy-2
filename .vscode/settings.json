@@ -75,11 +75,14 @@
   "search.followSymlinks": false,
   "search.smartCase": true,
 
-  // C# Strict Style Configuration - Show warnings but allow builds
+  // C# Strict Style Configuration - ENHANCED FOR CORRUPTION DETECTION
   "omnisharp.enableEditorConfigSupport": true,
   "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.useModernNet": true,
   "omnisharp.enableAsyncCompletion": true,
+  "omnisharp.analyzeOpenDocumentsOnly": false,
+  "omnisharp.enableDecompilationSupport": true,
+  "omnisharp.enableImportCompletion": true,
 
   // Enhanced C# IntelliSense with nullable focus
   "csharp.semanticHighlighting.enabled": true,
@@ -198,20 +201,20 @@
   "powershell.enableProfileLoading": false,
   "powershell.integratedConsole.forceClearScrollbackBuffer": true,
 
-  // PowerShell Core 7.5.2 Enhanced Features - NEW 7.5 CAPABILITIES
+  // PowerShell Core 7.5.2 Enhanced Features - ENHANCED FOR PS OPTIMIZATIONS
   "powershell.powerShellAdditionalExePaths": {
     "PowerShell Core 7.5.2": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
   },
   "powershell.enableReferencesCodeLens": true,
-  "powershell.analyzeOpenDocumentsOnly": true,
+  "powershell.analyzeOpenDocumentsOnly": false,
   "powershell.integratedConsole.suppressStartupBanner": true,
+  "powershell.scriptAnalysis.enable": true,
+  "powershell.scriptAnalysis.settingsPath": "${workspaceFolder}/PSScriptAnalyzerSettings.psd1",
 
-  // Enhanced PowerShell IntelliSense for Core 7.5.2
   "powershell.completion.completeInlinePlaceholders": true,
   "powershell.codeFormatting.autoCorrectAliases": true,
   "powershell.codeFormatting.useConstantStrings": true,
   "powershell.codeFormatting.useCorrectCasing": true,
-  "powershell.scriptAnalysis.enable": true,
   "powershell.developer.enableConsoleRepl": true,
   "powershell.developer.featureFlags": ["PSReadLine"],
   "powershell.pester.useLegacyCodeLens": false,
@@ -261,9 +264,19 @@
   "xml.validation.noGrammar": "hint",              // XAML without schema = hint not error
   "xml.validation.enabled": true,                 // Enable XAML validation
   "xml.format.enforceQuoteStyle": "preferred",    // Consistent XAML quotes
+  "xml.codeLens.enabled": true,                   // Enable XAML CodeLens
+  "xml.symbols.enabled": true,                    // Enable XAML symbols
+  "xml.validation.resolveExternalEntities": false, // Security for XAML
+  "xml.validation.namespaces.enabled": "onDemand", // Syncfusion namespace validation
 
-  // 🆕 C# PROBLEM FILTERING FOR SYNCFUSION
+  // 🆕 C# PROBLEM FILTERING FOR SYNCFUSION AND CORRUPTION DETECTION
   "csharp.maxProjectFileCountForDiagnosticAnalysis": 1000, // Handle large projects
+  "csharp.suppressBuildAssetsNotification": false,
+  "csharp.referencesCodeLens.enabled": true,
+  "csharp.testsCodeLens.enabled": true,
+  "csharp.format.enable": true,
+  "omnisharp.organizeImportsOnFormat": true,
+  "omnisharp.enableMsBuildLoadProjectsOnDemand": true,
 
   // Extension-specific settings for Syncfusion development
   "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
@@ -323,7 +336,7 @@
   "taskExplorer.showLastTasks": true,
   "taskExplorer.keepTermOnStop": false,
 
-  // 🎯 WPF XAML DEVELOPMENT ENHANCEMENTS
+  // 🎯 WPF XAML DEVELOPMENT ENHANCEMENTS WITH CORRUPTION DETECTION
   "xamlStyler.AttributesTolerance": 2,
   "xamlStyler.KeepFirstAttributeOnSameLine": true,
   "xamlStyler.MaxAttributeCharactersPerLine": 120,
@@ -333,6 +346,11 @@
   "xamlStyler.AttributeIndentation": 0,
   "xamlStyler.AttributeIndentationStyle": 0,
   "xamlStyler.RemoveDesignTimeReferences": false,
+  "xamlStyler.FormatMarkupExtension": true,
+  "xamlStyler.ReorderVSM": true,
+  "xamlStyler.ReorderGridChildren": true,
+  "xamlStyler.ReorderCanvasChildren": true,
+  "xamlStyler.ThicknessSeparator": ",",
 
   // 🔧 POWERSHELL COMMAND PREVENTION SETTINGS
   "powershell.developer.waitForSessionFileTimeoutSeconds": 240,
@@ -361,5 +379,49 @@
   // Warning handling policy - Address all warnings but don't treat as errors
   "csharp.suppressDotnetInstallWarnings": false,
   "csharp.suppressDotnetRestoreNotification": false,
-  "omnisharp.enableMsBuildLoadProjectsOnDemand": false
+
+  // 🛡️ ADVANCED CORRUPTION DETECTION AND FILE MONITORING
+  "files.watcherExclude": {
+    "**/bin/**": true,
+    "**/obj/**": true,
+    "**/.vs/**": true,
+    "**/packages/**": true,
+    "**/node_modules/**": true
+  },
+  "files.hotExit": "onExitAndWindowClose",
+  "files.enableTrash": true,
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
+  "files.insertFinalNewline": true,
+
+  // 🔍 ENHANCED SEARCH FOR CORRUPTION DETECTION
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "**/.vs": true,
+    "**/packages": true,
+    "**/node_modules": true,
+    "**/*.dll": true,
+    "**/*.exe": true,
+    "**/*.pdb": true
+  },
+  "search.useReplacePreview": true,
+  "search.showLineNumbers": true,
+  "search.maintainFileSearchCache": true,
+
+  // 🎯 SYNCFUSION-SPECIFIC VALIDATION PATTERNS
+  "emmet.includeLanguages": {
+    "xaml": "xml"
+  },
+  "emmet.excludeLanguages": [],
+  "emmet.triggerExpansionOnTab": false,
+
+  // 🔧 ADVANCED EDITOR VALIDATION FOR WPF/XAML
+  "editor.unicodeHighlight.allowedCharacters": {
+    "—": true,
+    "–": true
+  },
+  "editor.unicodeHighlight.includeStrings": true,
+  "editor.unicodeHighlight.includeComments": true,
+  "editor.unicodeHighlight.nonBasicASCII": false
 }

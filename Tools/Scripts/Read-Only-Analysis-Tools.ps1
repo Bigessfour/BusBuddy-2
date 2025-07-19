@@ -82,7 +82,7 @@ function Show-PowerShell75Capabilities {
 
 #region XAML Analysis Tools (READ-ONLY) - ENHANCED
 
-function Analyze-XamlStructure {
+function Get-XamlStructureAnalysis {
     <#
     .SYNOPSIS
     Analyzes XAML file structure and reports issues with advanced detection
@@ -172,19 +172,19 @@ function Analyze-XamlStructure {
         }
 
         # ENHANCED: Syncfusion-specific analysis
-        $syncfusionAnalysis = Analyze-SyncfusionUsage -Content $content -Lines $lines
+        $syncfusionAnalysis = Get-SyncfusionUsageAnalysis -Content $content -Lines $lines
         $analysis.Enhanced.SyncfusionIssues = $syncfusionAnalysis
         $analysis.Warnings += $syncfusionAnalysis | Where-Object { $_.Severity -eq 'Warning' } | ForEach-Object { $_.Message }
         $analysis.Errors += $syncfusionAnalysis | Where-Object { $_.Severity -eq 'Error' } | ForEach-Object { $_.Message }
 
         # ENHANCED: Binding expression analysis
-        $bindingAnalysis = Analyze-BindingExpressions -Content $content -Lines $lines
+        $bindingAnalysis = Get-BindingExpressionAnalysis -Content $content -Lines $lines
         $analysis.Enhanced.BindingIssues = $bindingAnalysis
         $analysis.Warnings += $bindingAnalysis | Where-Object { $_.Severity -eq 'Warning' } | ForEach-Object { $_.Message }
         $analysis.Errors += $bindingAnalysis | Where-Object { $_.Severity -eq 'Error' } | ForEach-Object { $_.Message }
 
         # ENHANCED: Attribute validation
-        $attributeIssues = Analyze-XamlAttributes -Xaml $xaml -Content $content
+        $attributeIssues = Get-XamlAttributeAnalysis -Xaml $xaml -Content $content
         $analysis.Enhanced.PreciseLocations += $attributeIssues
 
         # Set corruption risk based on findings
@@ -262,7 +262,7 @@ function Find-UnclosedXmlTags {
     return $issues
 }
 
-function Analyze-SyncfusionUsage {
+function Get-SyncfusionUsageAnalysis {
     param($Content, $Lines)
 
     $issues = @()
@@ -308,7 +308,7 @@ function Analyze-SyncfusionUsage {
     return $issues
 }
 
-function Analyze-BindingExpressions {
+function Get-BindingExpressionAnalysis {
     param($Content, $Lines)
 
     $issues = @()
@@ -359,7 +359,7 @@ function Analyze-BindingExpressions {
     return $issues
 }
 
-function Analyze-XamlAttributes {
+function Get-XamlAttributeAnalysis {
     param($Xaml, $Content)
 
     $issues = @()
@@ -486,7 +486,7 @@ function Get-XPath {
 
 #region PowerShell Analysis Tools (READ-ONLY)
 
-function Analyze-PowerShellSyntax {
+function Get-PowerShellSyntaxAnalysis {
     <#
     .SYNOPSIS
     Analyzes PowerShell syntax and reports detailed issues
@@ -657,7 +657,7 @@ function Get-LineContext {
 
 #region C# Analysis Tools (READ-ONLY) - ENHANCED
 
-function Analyze-CSharpSyntax {
+function Get-CSharpSyntaxAnalysis {
     <#
     .SYNOPSIS
     Analyzes C# syntax with cutting-edge structural issue detection
@@ -714,13 +714,13 @@ function Analyze-CSharpSyntax {
         $analysis.Enhanced.MethodBoundaries = Find-CSharpMethodBoundaries -Content $content -Lines $lines
 
         # ENHANCED: Class structure analysis
-        $analysis.Enhanced.ClassStructure = Analyze-CSharpClassStructure -Content $content -Lines $lines
+        $analysis.Enhanced.ClassStructure = Get-CSharpClassStructureAnalysis -Content $content -Lines $lines
 
         # ENHANCED: Using directive analysis
-        $analysis.Enhanced.UsingDirectives = Analyze-UsingDirectives -Content $content -Lines $lines
+        $analysis.Enhanced.UsingDirectives = Get-UsingDirectiveAnalysis -Content $content -Lines $lines
 
         # ENHANCED: Advanced brace analysis with context
-        $braceAnalysis = Analyze-CSharpBraces -Content $content -Lines $lines
+        $braceAnalysis = Get-CSharpBraceAnalysis -Content $content -Lines $lines
         $analysis.BraceAnalysis = $braceAnalysis.BraceAnalysis
         $analysis.Errors += $braceAnalysis.Errors
         $analysis.Enhanced.PreciseLocations += $braceAnalysis.PreciseLocations
@@ -812,7 +812,7 @@ function Find-CSharpMethodBoundaries {
     return $methods
 }
 
-function Analyze-CSharpClassStructure {
+function Get-CSharpClassStructureAnalysis {
     param($Content, $Lines)
 
     $classes = @()
@@ -834,7 +834,7 @@ function Analyze-CSharpClassStructure {
     return $classes
 }
 
-function Analyze-UsingDirectives {
+function Get-UsingDirectiveAnalysis {
     param($Content, $Lines)
 
     $usings = @()
@@ -867,7 +867,7 @@ function Analyze-UsingDirectives {
     }
 }
 
-function Analyze-CSharpBraces {
+function Get-CSharpBraceAnalysis {
     param($Content, $Lines)
 
     $braceStack = @()
@@ -1023,7 +1023,7 @@ function Find-CorruptedMethodSignatures {
 
 #region Project Analysis Tools (READ-ONLY) - ENHANCED
 
-function Analyze-ProjectErrors {
+function Get-ProjectErrorAnalysis {
     <#
     .SYNOPSIS
     Advanced project-wide error analysis with corruption detection
@@ -1065,7 +1065,7 @@ function Analyze-ProjectErrors {
     $psFiles = Get-ChildItem -Path $WorkspaceFolder -Filter '*.ps1' -Recurse
     foreach ($file in $psFiles) {
         try {
-            $psAnalysis = Analyze-PowerShellSyntax -FilePath $file.FullName
+            $psAnalysis = Get-PowerShellSyntaxAnalysis -FilePath $file.FullName
             if (-not $psAnalysis.IsValid) {
                 $analysis.Files[$file.FullName] = $psAnalysis
                 $analysis.Categories.PowerShell += $psAnalysis.Errors
@@ -1099,7 +1099,7 @@ function Analyze-ProjectErrors {
     $xamlFiles = Get-ChildItem -Path $WorkspaceFolder -Filter '*.xaml' -Recurse
     foreach ($file in $xamlFiles) {
         try {
-            $xamlAnalysis = Analyze-XamlStructure -FilePath $file.FullName
+            $xamlAnalysis = Get-XamlStructureAnalysis -FilePath $file.FullName
             if (-not $xamlAnalysis.IsValid) {
                 $analysis.Files[$file.FullName] = $xamlAnalysis
                 $analysis.Categories.XAML += $xamlAnalysis.Errors
@@ -1131,7 +1131,7 @@ function Analyze-ProjectErrors {
     }
     foreach ($file in $csFiles) {
         try {
-            $csAnalysis = Analyze-CSharpSyntax -FilePath $file.FullName
+            $csAnalysis = Get-CSharpSyntaxAnalysis -FilePath $file.FullName
             if (-not $csAnalysis.IsValid) {
                 $analysis.Files[$file.FullName] = $csAnalysis
                 $analysis.Categories.Compilation += $csAnalysis.Errors
@@ -1171,7 +1171,7 @@ function Analyze-ProjectErrors {
     $analysis.Enhanced.SystemicIssues = Find-SystemicIssues -Analysis $analysis
 
     # ENHANCED: Generate fix priorities
-    $analysis.Enhanced.FixPriorities = Generate-FixPriorities -Analysis $analysis
+    $analysis.Enhanced.FixPriorities = New-FixPriorityList -Analysis $analysis
 
     # ENHANCED: Set overall project health and corruption risk
     if ($analysis.Categories.Critical.Count -gt 0) {
@@ -1188,7 +1188,7 @@ function Analyze-ProjectErrors {
     }
 
     # ENHANCED: Generate recommended actions
-    $analysis.Enhanced.RecommendedActions = Generate-RecommendedActions -Analysis $analysis
+    $analysis.Enhanced.RecommendedActions = New-RecommendedActionList -Analysis $analysis
 
     return $analysis
 }
@@ -1229,7 +1229,7 @@ function Find-SystemicIssues {
     return $systemicIssues
 }
 
-function Generate-FixPriorities {
+function New-FixPriorityList {
     param($Analysis)
 
     $priorities = @()
@@ -1275,7 +1275,7 @@ function Generate-FixPriorities {
     return $priorities | Sort-Object Priority
 }
 
-function Generate-RecommendedActions {
+function New-RecommendedActionList {
     param($Analysis)
 
     $actions = @()
@@ -1312,7 +1312,7 @@ function Get-ProjectHealthReport {
         [string]$WorkspaceFolder = (Get-Location).Path
     )
 
-    $analysis = Analyze-ProjectErrors -WorkspaceFolder $WorkspaceFolder
+    $analysis = Get-ProjectErrorAnalysis -WorkspaceFolder $WorkspaceFolder
 
     $report = @{
         Timestamp           = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
@@ -1334,5 +1334,10 @@ function Get-ProjectHealthReport {
 
 #endregion
 
-# Export all read-only analysis functions for Claude Sonnet 4 - PowerShell 7.5 Enhanced
-Export-ModuleMember -Function Test-PowerShell75Compatibility, Show-PowerShell75Capabilities, Analyze-XamlStructure, Find-XamlElements, Analyze-PowerShellSyntax, Find-PowerShellPatterns, Analyze-CSharpSyntax, Analyze-ProjectErrors, Get-ProjectHealthReport, Find-UnclosedXmlTags, Analyze-SyncfusionUsage, Analyze-BindingExpressions, Find-CSharpMethodBoundaries, Analyze-CSharpClassStructure, Find-OrphanedCode, Find-CorruptedMethodSignatures
+# Note: Functions are available when script is dot-sourced
+# For PowerShell 7.5 Enhanced - Available functions:
+# Test-PowerShell75Compatibility, Show-PowerShell75Capabilities, Get-XamlStructureAnalysis,
+# Find-XamlElements, Get-PowerShellSyntaxAnalysis, Find-PowerShellPatterns, Get-CSharpSyntaxAnalysis,
+# Get-ProjectErrorAnalysis, Get-ProjectHealthReport, Find-UnclosedXmlTags, Get-SyncfusionUsageAnalysis,
+# Get-BindingExpressionAnalysis, Find-CSharpMethodBoundaries, Get-CSharpClassStructureAnalysis,
+# Find-OrphanedCode, Find-CorruptedMethodSignatures

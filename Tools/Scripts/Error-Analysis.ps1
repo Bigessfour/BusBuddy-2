@@ -1,4 +1,4 @@
-# Comprehensive Error Analysis for BusBuddy
+# Comprehensive Error Analysis for BusBuddy - PowerShell 7.5.2 Optimized
 # Uses READ-ONLY tools to detect and locate specific errors
 
 param(
@@ -7,17 +7,22 @@ param(
     [switch]$ScanAll
 )
 
-# Import our read-only analysis tools
-Import-Module "$PSScriptRoot\Read-Only-Analysis-Tools.ps1" -Force
+# Import our read-only analysis tools with error handling
+try {
+    Import-Module "$PSScriptRoot\Read-Only-Analysis-Tools.ps1" -Force -ErrorAction Stop
+} catch {
+    Write-Warning "Failed to load Read-Only-Analysis-Tools: $($_.Exception.Message)"
+    return
+}
 
 function Show-ErrorAnalysis {
     param($Analysis, $FilePath)
 
     Write-Host "`n📁 File: $FilePath" -ForegroundColor Cyan
-    Write-Host "=" * 80 -ForegroundColor Gray
+    Write-Host '=' * 80 -ForegroundColor Gray
 
     if ($Analysis.IsValid) {
-        Write-Host "✅ No issues detected" -ForegroundColor Green
+        Write-Host '✅ No issues detected' -ForegroundColor Green
         return
     }
 
@@ -55,14 +60,14 @@ function Show-ErrorAnalysis {
         Write-Host "  Closing braces: $($Analysis.BraceAnalysis.CloseBraces.Count)" -ForegroundColor White
 
         if ($Analysis.BraceAnalysis.UnmatchedOpening.Count -gt 0) {
-            Write-Host "  🚨 Unmatched opening braces:" -ForegroundColor Red
+            Write-Host '  🚨 Unmatched opening braces:' -ForegroundColor Red
             foreach ($brace in $Analysis.BraceAnalysis.UnmatchedOpening) {
                 Write-Host "    Line $($brace.Line): $($brace.Context)" -ForegroundColor Red
             }
         }
 
         if ($Analysis.BraceAnalysis.UnmatchedClosing.Count -gt 0) {
-            Write-Host "  🚨 Unmatched closing braces:" -ForegroundColor Red
+            Write-Host '  🚨 Unmatched closing braces:' -ForegroundColor Red
             foreach ($brace in $Analysis.BraceAnalysis.UnmatchedClosing) {
                 Write-Host "    Line $($brace.Line): $($brace.Context)" -ForegroundColor Red
             }
@@ -78,7 +83,7 @@ function Show-PatternAnalysis {
     }
 
     Write-Host "`n🔍 PATTERN ANALYSIS: $FilePath" -ForegroundColor Cyan
-    Write-Host "=" * 80 -ForegroundColor Gray
+    Write-Host '=' * 80 -ForegroundColor Gray
 
     $groupedPatterns = $Patterns | Group-Object Pattern
     foreach ($group in $groupedPatterns) {
@@ -88,7 +93,7 @@ function Show-PatternAnalysis {
             Write-Host "    Context: $($match.LineContent)" -ForegroundColor Gray
 
             if ($DetailedAnalysis) {
-                Write-Host "    Full context:" -ForegroundColor DarkGray
+                Write-Host '    Full context:' -ForegroundColor DarkGray
                 foreach ($contextLine in $match.Context) {
                     Write-Host "    $contextLine" -ForegroundColor DarkGray
                 }
@@ -103,8 +108,8 @@ function Test-SpecificFile {
     $extension = [System.IO.Path]::GetExtension($FilePath).ToLower()
 
     switch ($extension) {
-        ".ps1" {
-            Write-Host "🔍 Analyzing PowerShell file..." -ForegroundColor Cyan
+        '.ps1' {
+            Write-Host '🔍 Analyzing PowerShell file...' -ForegroundColor Cyan
             $analysis = Analyze-PowerShellSyntax -FilePath $FilePath
             Show-ErrorAnalysis -Analysis $analysis -FilePath $FilePath
 
@@ -114,8 +119,8 @@ function Test-SpecificFile {
             }
         }
 
-        ".xaml" {
-            Write-Host "🔍 Analyzing XAML file..." -ForegroundColor Cyan
+        '.xaml' {
+            Write-Host '🔍 Analyzing XAML file...' -ForegroundColor Cyan
             $analysis = Analyze-XamlStructure -FilePath $FilePath
             Show-ErrorAnalysis -Analysis $analysis -FilePath $FilePath
 
@@ -125,15 +130,15 @@ function Test-SpecificFile {
                     Write-Host "  Root: $($analysis.Structure.RootElement)" -ForegroundColor White
                     Write-Host "  Namespaces: $($analysis.Structure.Namespaces.Count)" -ForegroundColor White
                     foreach ($ns in $analysis.Structure.Namespaces) {
-                        $prefix = if ($ns.Prefix) { $ns.Prefix } else { "(default)" }
+                        $prefix = if ($ns.Prefix) { $ns.Prefix } else { '(default)' }
                         Write-Host "    $prefix -> $($ns.URI)" -ForegroundColor Gray
                     }
                 }
             }
         }
 
-        ".cs" {
-            Write-Host "🔍 Analyzing C# file..." -ForegroundColor Cyan
+        '.cs' {
+            Write-Host '🔍 Analyzing C# file...' -ForegroundColor Cyan
             $analysis = Analyze-CSharpSyntax -FilePath $FilePath
             Show-ErrorAnalysis -Analysis $analysis -FilePath $FilePath
         }
@@ -145,8 +150,8 @@ function Test-SpecificFile {
 }
 
 # Main execution
-Write-Host "🚀 BusBuddy Error Analysis Tool" -ForegroundColor Green
-Write-Host "=" * 50 -ForegroundColor Green
+Write-Host '🚀 BusBuddy Error Analysis Tool' -ForegroundColor Green
+Write-Host '=' * 50 -ForegroundColor Green
 
 if ($TargetFile) {
     if (Test-Path $TargetFile) {
@@ -155,12 +160,12 @@ if ($TargetFile) {
         Write-Error "File not found: $TargetFile"
     }
 } elseif ($ScanAll) {
-    Write-Host "🔍 Scanning entire project..." -ForegroundColor Cyan
+    Write-Host '🔍 Scanning entire project...' -ForegroundColor Cyan
     $projectAnalysis = Analyze-ProjectErrors -WorkspaceFolder (Get-Location).Path
 
     Write-Host "`n📊 PROJECT SUMMARY:" -ForegroundColor Green
-    Write-Host "Total Errors: $($projectAnalysis.TotalErrors)" -ForegroundColor $(if($projectAnalysis.TotalErrors -gt 0){'Red'}else{'Green'})
-    Write-Host "Total Warnings: $($projectAnalysis.TotalWarnings)" -ForegroundColor $(if($projectAnalysis.TotalWarnings -gt 0){'Yellow'}else{'Green'})
+    Write-Host "Total Errors: $($projectAnalysis.TotalErrors)" -ForegroundColor $(if ($projectAnalysis.TotalErrors -gt 0) { 'Red' }else { 'Green' })
+    Write-Host "Total Warnings: $($projectAnalysis.TotalWarnings)" -ForegroundColor $(if ($projectAnalysis.TotalWarnings -gt 0) { 'Yellow' }else { 'Green' })
 
     Write-Host "`n📂 BY CATEGORY:" -ForegroundColor Cyan
     Write-Host "PowerShell: $($projectAnalysis.Categories.PowerShell.Count) errors" -ForegroundColor White
@@ -173,10 +178,10 @@ if ($TargetFile) {
         }
     }
 } else {
-    Write-Host "Usage:" -ForegroundColor Yellow
+    Write-Host 'Usage:' -ForegroundColor Yellow
     Write-Host "  .\Error-Analysis.ps1 -TargetFile 'path\to\file.ps1'" -ForegroundColor White
-    Write-Host "  .\Error-Analysis.ps1 -ScanAll" -ForegroundColor White
-    Write-Host "  .\Error-Analysis.ps1 -ScanAll -DetailedAnalysis" -ForegroundColor White
+    Write-Host '  .\Error-Analysis.ps1 -ScanAll' -ForegroundColor White
+    Write-Host '  .\Error-Analysis.ps1 -ScanAll -DetailedAnalysis' -ForegroundColor White
 }
 
 Write-Host "`n✅ Analysis complete!" -ForegroundColor Green
