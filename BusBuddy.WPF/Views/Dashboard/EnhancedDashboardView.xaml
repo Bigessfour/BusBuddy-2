@@ -558,9 +558,7 @@
                                       UseDocumentContainer="True"
                                       PersistState="True"
                                       ContainerMode="TDI"
-                                      DockBehavior="VS2010"
-                                      EnableAutoAdjustment="True"
-                                      ShowTabItemsInTitleBar="True">
+                                      DockBehavior="VS2010">
 
             <!-- Dashboard Overview Panel (Document) -->
             <ContentControl x:Name="DashboardOverview"

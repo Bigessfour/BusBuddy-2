@@ -48,6 +48,7 @@
         xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         xmlns:syncfusiontools="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.WPF"
         xmlns:syncfusionnavigation="clr-namespace:Syncfusion.UI.Xaml.NavigationDrawer;assembly=Syncfusion.SfNavigationDrawer.WPF"
+        xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
@@ -68,6 +69,9 @@
 
     <Window.Resources>
         <ResourceDictionary>
+            <!-- Converters -->
+            <converters:StringEqualityConverter x:Key="StringEqualityConverter"/>
+
             <!-- NAVIGATION ITEM TEMPLATE -->
             <DataTemplate x:Key="NavigationItemTemplate">
                 <!--
@@ -113,16 +117,122 @@
 
     <!-- MAIN GRID CONTAINER -->
     <Grid Background="{DynamicResource SurfaceBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Menu Bar -->
+            <RowDefinition Height="*"/>    <!-- Docking Manager -->
+        </Grid.RowDefinitions>
+
+        <!-- ENHANCED MENU BAR for Traditional Menu Navigation -->
+        <Menu Grid.Row="0"
+              Background="{DynamicResource SurfaceBackground}"
+              BorderBrush="{DynamicResource SurfaceBorderBrush}"
+              BorderThickness="0,0,0,1"
+              Padding="8,4">
+
+            <!-- File Menu -->
+            <MenuItem Header="_File" Style="{StaticResource MenuItemStyle}">
+                <MenuItem Header="_New Bus..." Command="{Binding NavigateToCommand}" CommandParameter="BusManagement">
+                    <MenuItem.Icon>
+                        <Path Data="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15V3H9V5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6.01Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_New Route..." Command="{Binding NavigateToCommand}" CommandParameter="RouteManagement">
+                    <MenuItem.Icon>
+                        <Path Data="M20,10C22,12 22,16 20,18L18.5,16.5C19.9,15.1 19.9,12.9 18.5,11.5L20,10M4,10L5.5,11.5C4.1,12.9 4.1,15.1 5.5,16.5L4,18C2,16 2,12 4,10Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                <MenuItem Header="E_xit" Click="ExitMenuItem_Click">
+                    <MenuItem.Icon>
+                        <Path Data="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <!-- View Menu -->
+            <MenuItem Header="_View" Style="{StaticResource MenuItemStyle}">
+                <MenuItem Header="_Dashboard" Command="{Binding NavigateToCommand}" CommandParameter="Dashboard" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Dashboard}">
+                    <MenuItem.Icon>
+                        <Path Data="M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                <MenuItem Header="_Bus Management" Command="{Binding NavigateToCommand}" CommandParameter="BusManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=BusManagement}"/>
+                <MenuItem Header="_Driver Management" Command="{Binding NavigateToCommand}" CommandParameter="DriverManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=DriverManagement}"/>
+                <MenuItem Header="_Route Management" Command="{Binding NavigateToCommand}" CommandParameter="RouteManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=RouteManagement}"/>
+                <MenuItem Header="_Schedule Management" Command="{Binding NavigateToCommand}" CommandParameter="ScheduleManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ScheduleManagement}"/>
+                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                <MenuItem Header="S_tudent Management" Command="{Binding NavigateToCommand}" CommandParameter="StudentManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=StudentManagement}"/>
+                <MenuItem Header="_Maintenance" Command="{Binding NavigateToCommand}" CommandParameter="Maintenance" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Maintenance}"/>
+                <MenuItem Header="_Fuel Management" Command="{Binding NavigateToCommand}" CommandParameter="FuelManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=FuelManagement}"/>
+                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                <MenuItem Header="_Activity Log" Command="{Binding NavigateToCommand}" CommandParameter="ActivityLog" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ActivityLog}"/>
+            </MenuItem>
+
+            <!-- Tools Menu -->
+            <MenuItem Header="_Tools" Style="{StaticResource MenuItemStyle}">
+                <MenuItem Header="_XAI Chat Assistant" Command="{Binding NavigateToCommand}" CommandParameter="XAIChat">
+                    <MenuItem.Icon>
+                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Google Earth Integration" Command="{Binding NavigateToCommand}" CommandParameter="GoogleEarth">
+                    <MenuItem.Icon>
+                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                <MenuItem Header="_Reset Layout" Click="ResetLayoutMenuItem_Click">
+                    <MenuItem.Icon>
+                        <Path Data="M4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H16L12,22L8,18H4A2,2 0 0,1 2,16V4A2,2 0 0,1 4,2M4,4V16H8.83L12,19.17L15.17,16H20V4H4Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Settings" Command="{Binding NavigateToCommand}" CommandParameter="Settings">
+                    <MenuItem.Icon>
+                        <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+
+            <!-- Window Menu -->
+            <MenuItem Header="_Window" Style="{StaticResource MenuItemStyle}">
+                <MenuItem Header="_Cascade" Click="CascadeWindowsMenuItem_Click"/>
+                <MenuItem Header="_Tile Horizontally" Click="TileHorizontallyMenuItem_Click"/>
+                <MenuItem Header="_Tile Vertically" Click="TileVerticallyMenuItem_Click"/>
+                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                <MenuItem Header="_Close All Documents" Click="CloseAllDocumentsMenuItem_Click"/>
+                <MenuItem Header="_Reset to Default Layout" Click="ResetLayoutMenuItem_Click"/>
+            </MenuItem>
+
+            <!-- Help Menu -->
+            <MenuItem Header="_Help" Style="{StaticResource MenuItemStyle}">
+                <MenuItem Header="_About Bus Buddy" Click="AboutMenuItem_Click">
+                    <MenuItem.Icon>
+                        <Path Data="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
+                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
         <!-- COMPREHENSIVE DOCKING MANAGER - Professional IDE-style Layout with Standardization -->
         <syncfusiontools:DockingManager x:Name="MainDockingManager"
+                                  Grid.Row="1"
                                   Style="{StaticResource StandardDockingManagerStyle}"
                                   UseDocumentContainer="True"
                                   PersistState="True"
                                   DockFill="True"
                                   ContainerMode="TDI"
                                   DockBehavior="VS2010"
-                                  EnableAutoAdjustment="True"
-                                  ShowTabItemsInTitleBar="True">
+                                  ActiveWindowChanged="MainDockingManager_ActiveWindowChanged"
+                                  WindowClosing="MainDockingManager_WindowClosing">
 
             <!-- NAVIGATION DRAWER PANEL (Left Docked with Standard Sizing) -->
             <syncfusionnavigation:SfNavigationDrawer x:Name="NavigationDrawer"

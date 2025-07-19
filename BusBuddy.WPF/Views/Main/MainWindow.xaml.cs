@@ -22,6 +22,8 @@ namespace BusBuddy.WPF.Views.Main
     {
         private MainViewModel? _viewModel;
         private INavigationService? _navigationService;
+        private readonly Dictionary<string, UserControl> _cachedViews = new Dictionary<string, UserControl>();
+        private static readonly ILogger Logger = Log.ForContext<MainWindow>();
 
         public MainWindow()
         {
@@ -293,28 +295,156 @@ namespace BusBuddy.WPF.Views.Main
         {
             try
             {
-                Log.Information("Navigation changed to: {ViewName}", e.ViewName);
+                using (LogContext.PushProperty("Navigation", e.ViewName))
+                {
+                    Logger.Information("Navigation changed to: {ViewName}", e.ViewName);
 
-                // Update the view model's current view
-                if (_viewModel != null && e.ViewModel != null)
-                {
-                    _viewModel.CurrentViewModel = e.ViewModel;
-                    _viewModel.CurrentViewTitle = e.ViewTitle;
-                }
+                    // Update the view model's current view
+                    if (_viewModel != null && e.ViewModel != null)
+                    {
+                        _viewModel.CurrentViewModel = e.ViewModel;
+                        _viewModel.CurrentViewTitle = e.ViewTitle;
+                        _viewModel.CurrentViewName = e.ViewName; // Update for menu checkboxes
+                    }
 
-                // Update UI based on view
-                if (e.ViewName == "Dashboard")
-                {
-                    ShowDashboard();
-                }
-                else
-                {
-                    ShowContentContainer();
+                    // Create or activate view in DockingManager using optimized approach
+                    ActivateOrCreateViewInDockingManager(e.ViewName, e.ViewModel, e.ViewTitle);
                 }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error handling navigation change");
+                Logger.Error(ex, "Error handling navigation change");
+            }
+        }
+
+        /// <summary>
+        /// Optimized method to create or activate views in DockingManager with caching
+        /// </summary>
+        private void ActivateOrCreateViewInDockingManager(string viewName, object? viewModel, string viewTitle)
+        {
+            try
+            {
+                using (LogContext.PushProperty("ViewActivation", viewName))
+                {
+                    // Check if view already exists in DockingManager
+                    var existingView = FindViewInDockingManager(viewName);
+                    if (existingView != null)
+                    {
+                        // Activate existing view
+                        if (MainDockingManager != null)
+                        {
+                            MainDockingManager.ActivateWindow(existingView.Name);
+                            Logger.Information("Activated existing view: {ViewName}", viewName);
+                        }
+                        return;
+                    }
+
+                    // Create new view if it doesn't exist
+                    var newView = CreateViewForDockingManager(viewName, viewModel, viewTitle);
+                    if (newView != null && MainDockingManager != null)
+                    {
+                        // Add to DockingManager as Document
+                        DockingManager.SetState(newView, DockState.Document);
+                        DockingManager.SetCanClose(newView, true);
+                        DockingManager.SetCanFloat(newView, true);
+                        DockingManager.SetCanSerialize(newView, true);
+                        DockingManager.SetHeader(newView, viewTitle);
+
+                        // Add to children and activate
+                        MainDockingManager.Children.Add(newView);
+                        MainDockingManager.ActivateWindow(newView.Name);
+
+                        Logger.Information("Created and activated new view: {ViewName}", viewName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error activating or creating view: {ViewName}", viewName);
+            }
+        }
+
+        /// <summary>
+        /// Create a new view for the DockingManager with proper caching
+        /// </summary>
+        private UserControl? CreateViewForDockingManager(string viewName, object? viewModel, string viewTitle)
+        {
+            try
+            {
+                // Check cache first for performance
+                if (_cachedViews.TryGetValue(viewName, out var cachedView))
+                {
+                    // Update DataContext if view model is provided
+                    if (viewModel != null)
+                    {
+                        cachedView.DataContext = viewModel;
+                    }
+                    return cachedView;
+                }
+
+                // Create new view based on view name
+                UserControl? newView = viewName switch
+                {
+                    "Dashboard" => null, // Dashboard uses dedicated MainDashboardView
+                    "BusManagement" => new BusBuddy.WPF.Views.Bus.BusManagementView(),
+                    "DriverManagement" => new BusBuddy.WPF.Views.Driver.DriverManagementView(),
+                    "RouteManagement" => new BusBuddy.WPF.Views.Route.RouteManagementView(),
+                    "ScheduleManagement" => new BusBuddy.WPF.Views.Schedule.ScheduleManagementView(),
+                    "StudentManagement" => new BusBuddy.WPF.Views.Student.StudentManagementView(),
+                    "Maintenance" => new BusBuddy.WPF.Views.Maintenance.MaintenanceTrackingView(),
+                    "FuelManagement" => new BusBuddy.WPF.Views.Fuel.FuelManagementView(),
+                    "ActivityLog" => new BusBuddy.WPF.Views.Activity.ActivityLogView(),
+                    "Settings" => new BusBuddy.WPF.Views.Settings.SettingsView(),
+                    "XAIChat" => new BusBuddy.WPF.Views.XAI.XAIChatView(),
+                    "GoogleEarth" => new BusBuddy.WPF.Views.GoogleEarth.GoogleEarthView(),
+                    _ => null
+                };
+
+                if (newView != null)
+                {
+                    // Set properties for DockingManager
+                    newView.Name = $"{viewName}View";
+
+                    // Set DataContext if view model is provided
+                    if (viewModel != null)
+                    {
+                        newView.DataContext = viewModel;
+                    }
+
+                    // Cache the view for future use
+                    _cachedViews[viewName] = newView;
+
+                    Logger.Information("Created new view: {ViewName}", viewName);
+                }
+
+                return newView;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error creating view: {ViewName}", viewName);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Find existing view in DockingManager
+        /// </summary>
+        private FrameworkElement? FindViewInDockingManager(string viewName)
+        {
+            try
+            {
+                if (MainDockingManager?.Children != null)
+                {
+                    var expectedName = $"{viewName}View";
+                    return MainDockingManager.Children.OfType<FrameworkElement>()
+                        .FirstOrDefault(child => child.Name == expectedName);
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error finding view in DockingManager: {ViewName}", viewName);
+                return null;
             }
         }
 
@@ -538,13 +668,173 @@ namespace BusBuddy.WPF.Views.Main
                     _navigationService.NavigationChanged -= OnNavigationChanged;
                 }
 
-                Log.Information("MainWindow closed successfully");
+                // Clear cached views
+                _cachedViews.Clear();
+
+                Logger.Information("MainWindow closed successfully");
                 base.OnClosed(e);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error during MainWindow cleanup");
+                Logger.Error(ex, "Error during MainWindow cleanup");
             }
         }
+
+        #region Menu Event Handlers
+
+        /// <summary>
+        /// Handle Exit menu item click
+        /// </summary>
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("Exit menu item clicked");
+                Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error handling exit menu click");
+            }
+        }
+
+        /// <summary>
+        /// Handle Reset Layout menu item click
+        /// </summary>
+        private void ResetLayoutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("Reset layout menu item clicked");
+                ResetToDefaultLayout();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error handling reset layout menu click");
+            }
+        }
+
+        /// <summary>
+        /// Handle About menu item click
+        /// </summary>
+        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("About menu item clicked");
+                var aboutMessage = "Bus Buddy Transportation Management System\n\n" +
+                                 "Version 1.0\n" +
+                                 "Built with WPF and Syncfusion FluentDark Theme\n\n" +
+                                 "© 2025 Bus Buddy Development Team";
+
+                MessageBox.Show(aboutMessage, "About Bus Buddy", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error handling about menu click");
+            }
+        }
+
+        /// <summary>
+        /// Handle Cascade Windows menu item click
+        /// </summary>
+        private void CascadeWindowsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("Cascade windows menu item clicked");
+                if (MainDockingManager != null)
+                {
+                    // Use Syncfusion's built-in cascade functionality
+                    MainDockingManager.CascadeChildren();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error cascading windows");
+            }
+        }
+
+        /// <summary>
+        /// Handle Tile Horizontally menu item click
+        /// </summary>
+        private void TileHorizontallyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("Tile horizontally menu item clicked");
+                if (MainDockingManager != null)
+                {
+                    // Use Syncfusion's built-in tile functionality
+                    MainDockingManager.TileHorizontally();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error tiling windows horizontally");
+            }
+        }
+
+        /// <summary>
+        /// Handle Tile Vertically menu item click
+        /// </summary>
+        private void TileVerticallyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("Tile vertically menu item clicked");
+                if (MainDockingManager != null)
+                {
+                    // Use Syncfusion's built-in tile functionality
+                    MainDockingManager.TileVertically();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error tiling windows vertically");
+            }
+        }
+
+        /// <summary>
+        /// Handle Close All Documents menu item click
+        /// </summary>
+        private void CloseAllDocumentsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Logger.Information("Close all documents menu item clicked");
+                if (MainDockingManager != null)
+                {
+                    // Close all document tabs except Dashboard
+                    var documentsToClose = MainDockingManager.Children
+                        .OfType<FrameworkElement>()
+                        .Where(child => DockingManager.GetState(child) == DockState.Document
+                                       && child.Name != "MainDashboardView")
+                        .ToList();
+
+                    foreach (var document in documentsToClose)
+                    {
+                        MainDockingManager.Children.Remove(document);
+                        Logger.Information("Closed document: {DocumentName}", document.Name);
+                    }
+
+                    // Clear cache for closed views
+                    var keysToRemove = _cachedViews.Keys
+                        .Where(key => documentsToClose.Any(doc => doc.Name == $"{key}View"))
+                        .ToList();
+
+                    foreach (var key in keysToRemove)
+                    {
+                        _cachedViews.Remove(key);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error closing all documents");
+            }
+        }
+
+        #endregion
     }
 }

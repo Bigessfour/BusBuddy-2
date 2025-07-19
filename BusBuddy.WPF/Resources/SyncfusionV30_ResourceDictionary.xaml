@@ -449,6 +449,82 @@
         </Setter>
     </Style>
 
+    <!-- Menu Item Style for Main Menu Bar -->
+    <Style x:Key="MenuItemStyle" TargetType="MenuItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Text.Primary}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4"
+                            Padding="{TemplateBinding Padding}"
+                            Margin="{TemplateBinding Margin}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Icon -->
+                            <ContentPresenter Grid.Column="0"
+                                            ContentSource="Icon"
+                                            Margin="0,0,8,0"
+                                            VerticalAlignment="Center"/>
+
+                            <!-- Header Text -->
+                            <ContentPresenter Grid.Column="1"
+                                            ContentSource="Header"
+                                            VerticalAlignment="Center"/>
+
+                            <!-- Input Gesture Text -->
+                            <TextBlock Grid.Column="2"
+                                     Text="{TemplateBinding InputGestureText}"
+                                     Margin="16,0,0,0"
+                                     VerticalAlignment="Center"
+                                     Foreground="{StaticResource BusBuddy.Brush.Text.Secondary}"/>
+
+                            <!-- Submenu Arrow -->
+                            <Path Grid.Column="3"
+                                  Data="M0,0 L4,4 L0,8 Z"
+                                  Fill="{TemplateBinding Foreground}"
+                                  Margin="8,0,0,0"
+                                  VerticalAlignment="Center"
+                                  Visibility="{Binding HasItems, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Light}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Primary}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Text.Disabled}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Menu Separator Style -->
+    <Style x:Key="MenuSeparatorStyle" TargetType="Separator">
+        <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Border}"/>
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="8,4"/>
+    </Style>
+
     <!-- =============================================================================== -->
     <!-- SECTION 8: MISSING DYNAMIC RESOURCES FROM APP.XAML                           -->
     <!-- =============================================================================== -->

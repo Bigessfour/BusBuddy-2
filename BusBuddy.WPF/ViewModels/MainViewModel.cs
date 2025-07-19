@@ -59,6 +59,9 @@ namespace BusBuddy.WPF.ViewModels
         [ObservableProperty]
         private bool _hasNotifications = false;
 
+        [ObservableProperty]
+        private string _currentViewName = "Dashboard";
+
         /// <summary>
         /// Gets whether the application is running in debug mode
         /// </summary>
@@ -204,6 +207,9 @@ namespace BusBuddy.WPF.ViewModels
         {
             _logger.Information("UI Navigation initiated to {ViewModelName} via button click", viewModelName);
 
+            // Update current view name for menu checkboxes
+            CurrentViewName = viewModelName;
+
             // Use NavigationService if available, otherwise use legacy method
             if (_navigationService != null)
             {
@@ -239,6 +245,15 @@ namespace BusBuddy.WPF.ViewModels
 
             // Legacy navigation method (fallback)
             await NavigateToLegacy(viewModelName);
+        }
+
+        /// <summary>
+        /// Command for menu-based navigation with parameter
+        /// </summary>
+        [RelayCommand]
+        public async Task NavigateToCommand(string viewName)
+        {
+            await NavigateTo(viewName);
         }
 
         /// <summary>

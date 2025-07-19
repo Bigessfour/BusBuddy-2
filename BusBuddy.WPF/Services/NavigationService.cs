@@ -19,6 +19,7 @@ namespace BusBuddy.WPF.Services
         private readonly List<string> _navigationHistory;
         private object? _currentViewModel;
         private string _currentViewTitle;
+        private string _currentViewName;
 
         public NavigationService(IServiceProvider serviceProvider, ILogger<NavigationService> logger)
         {
@@ -26,6 +27,7 @@ namespace BusBuddy.WPF.Services
             _logger = logger;
             _navigationHistory = new List<string>();
             _currentViewTitle = "Bus Buddy Dashboard";
+            _currentViewName = "Dashboard";
         }
 
         public object? CurrentViewModel
@@ -44,6 +46,16 @@ namespace BusBuddy.WPF.Services
             private set
             {
                 _currentViewTitle = value;
+                OnNavigationChanged();
+            }
+        }
+
+        public string CurrentViewName
+        {
+            get => _currentViewName;
+            private set
+            {
+                _currentViewName = value;
                 OnNavigationChanged();
             }
         }
@@ -82,6 +94,7 @@ namespace BusBuddy.WPF.Services
                 // Update current state
                 CurrentViewModel = viewModel;
                 CurrentViewTitle = viewTitle;
+                CurrentViewName = viewName;
 
                 _logger.LogInformation("Successfully navigated to: {ViewName}", viewName);
             }
@@ -112,6 +125,7 @@ namespace BusBuddy.WPF.Services
 
                 CurrentViewModel = viewModel;
                 CurrentViewTitle = viewTitle;
+                CurrentViewName = previousViewName;
 
                 _logger.LogInformation("Successfully navigated back to: {ViewName}", previousViewName);
                 return true;
@@ -186,7 +200,7 @@ namespace BusBuddy.WPF.Services
         private void OnNavigationChanged()
         {
             NavigationChanged?.Invoke(this, new NavigationEventArgs(
-                _currentViewModel != null ? GetViewNameFromViewModel(_currentViewModel) : string.Empty,
+                _currentViewName ?? string.Empty,
                 null,
                 _currentViewModel,
                 _currentViewTitle));
