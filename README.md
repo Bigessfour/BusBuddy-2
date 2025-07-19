@@ -583,6 +583,203 @@ Theme settings are managed through `appsettings.json`:
 3. Manage route details and descriptions
 4. Track active/inactive routes
 
+---
+
+## IDE Environment & Development Setup
+
+Bus Buddy uses a comprehensive development environment optimized for WPF .NET 8 development with advanced PowerShell integration and error detection capabilities.
+
+### Primary Development Environment
+
+**VS Code Configuration:**
+- **Primary IDE**: Visual Studio Code with extensive GitHub Copilot integration
+- **Target Framework**: .NET 8.0 (net8.0-windows for WPF)
+- **PowerShell**: PowerShell Core 7.5.2 (exclusive terminal environment)
+- **Theme**: Optimized for Windows 11 development workflow
+
+### Essential VS Code Extensions
+
+While `extensions.json` is intentionally minimal to avoid dependency conflicts, the following extensions are recommended for optimal Bus Buddy development:
+
+**Core Development Extensions:**
+- **GitHub Copilot** - AI-powered code assistance (fully configured)
+- **C# Dev Kit** - Official Microsoft C# support
+- **XAML Styler** - XAML formatting and standardization
+- **Task Explorer** - Primary task management interface (exclusive)
+- **XML Tools** - XAML validation and formatting
+- **PowerShell** - PowerShell Core 7.5.2 integration
+
+**Debugging & Analysis Extensions:**
+- **C# Extensions** - Enhanced debugging capabilities
+- **GitLens** - Advanced Git integration
+- **Error Lens** - Inline error display
+- **Bracket Pair Colorizer** - Code structure visualization
+
+### PowerShell Error Detection System
+
+Bus Buddy includes a comprehensive PowerShell-based error detection and analysis system located in `Tools/Scripts/`:
+
+#### Primary Error Detection Tools
+
+**1. Error-Analysis.ps1** (183 lines)
+```powershell
+# Comprehensive error detection for PowerShell, C#, and XAML
+.\Tools\Scripts\Error-Analysis.ps1
+
+# Key Features:
+# - PowerShell syntax validation and best practices analysis
+# - C# compilation error detection and brace/bracket matching
+# - XAML syntax validation and structure analysis
+# - File type detection and targeted analysis
+```
+
+**2. Read-Only-Analysis-Tools.ps1** (1,339 lines)
+```powershell
+# Advanced read-only analysis with PowerShell 7.5 enhancements
+.\Tools\Scripts\Read-Only-Analysis-Tools.ps1
+
+# Key Features:
+# - PowerShell 7.5 compatibility testing
+# - AST (Abstract Syntax Tree) analysis
+# - Advanced script analysis capabilities
+# - Safe, non-destructive analysis methods
+```
+
+#### Error Detection Capabilities
+
+**PowerShell Analysis:**
+- Syntax validation and parsing error detection
+- Best practices compliance checking
+- PowerShell 7.5 compatibility verification
+- Performance and security analysis
+
+**C# Code Analysis:**
+- Compilation error detection
+- Brace and bracket matching validation
+- Namespace and using statement analysis
+- Method and class structure validation
+
+**XAML Analysis:**
+- XML syntax validation
+- Syncfusion control property validation
+- Theme consistency checking
+- Resource binding verification
+
+#### Usage Examples
+
+```powershell
+# Run comprehensive error analysis
+.\Tools\Scripts\Error-Analysis.ps1 -Path "BusBuddy.WPF" -Verbose
+
+# Test PowerShell 7.5 compatibility
+.\Tools\Scripts\Read-Only-Analysis-Tools.ps1 -TestCompatibility
+
+# Analyze specific file types
+.\Tools\Scripts\Error-Analysis.ps1 -FileType "XAML" -Path "Views"
+```
+
+### VS Code Configuration Highlights
+
+**Terminal Integration:**
+- **Exclusive PowerShell Core 7.5.2** environment
+- **Task Explorer Only** - No direct terminal task execution
+- **Profile Auto-Loading** - `BusBuddy-PowerShell-Profile.ps1` and `BusBuddy-Advanced-Workflows.ps1`
+- **GitHub Copilot Terminal** integration enabled
+
+**GitHub Copilot Optimization:**
+```json
+{
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": false,
+    "plaintext": false
+  },
+  "github.copilot.advanced": {
+    "debug.overrideEngine": "codex",
+    "debug.useNodeFetcher": true,
+    "debug.filterLogCategories": []
+  }
+}
+```
+
+**XAML Development Features:**
+```json
+{
+  "xamlStyler.AttributesTolerance": 2,
+  "xamlStyler.KeepFirstAttributeOnSameLine": true,
+  "xamlStyler.MaxAttributeCharactersPerLine": 120,
+  "xamlStyler.MaxAttributesPerLine": 1,
+  "xamlStyler.SeparateByGroups": true
+}
+```
+
+**C# Development Optimization:**
+```json
+{
+  "omnisharp.enableEditorConfigSupport": true,
+  "omnisharp.enableRoslynAnalyzers": true,
+  "omnisharp.useModernNet": true,
+  "omnisharp.enableAsyncCompletion": true
+}
+```
+
+### Debug Configuration
+
+**Launch Configurations:**
+- **Run and Debug BusBuddy.WPF** - Primary application debugging
+- **Debug Tests** - NUnit test debugging
+- **Debug Null Handling Tests** - Specific null safety validation
+- **Debug with Validation Enabled** - Enhanced database validation mode
+- **Attach to Process** - Runtime debugging capabilities
+
+**Key Debugging Features:**
+- Microsoft Symbol Server integration
+- NuGet symbol server support
+- Enhanced logging with Serilog integration
+- Real-time error detection and analysis
+- PowerShell-based diagnostic tools
+
+### Task Management
+
+**Task Explorer Exclusive Interface:**
+- **Clean Solution** - `dotnet clean BusBuddy.sln`
+- **Restore Packages** - `dotnet restore BusBuddy.sln`
+- **Build Solution** - `dotnet build BusBuddy.sln`
+- **Run Application** - `dotnet run --project BusBuddy.WPF`
+- **Streamlined Build & Test** - Automated workflow
+- **Format XAML Files** - Automated XAML standardization
+- **Validate XAML Files** - Comprehensive XAML validation
+
+**Task Configuration:**
+All tasks are configured as independent operations with minimal verbosity and proper working directory settings. Task Explorer provides the exclusive interface for task execution, preventing terminal command conflicts.
+
+### PowerShell Integration Features
+
+**Advanced Workflow Commands:**
+```powershell
+# Complete development session setup
+bb-dev-session          # Opens workspace, builds, starts monitoring
+
+# Quick build and test cycle
+bb-quick-test           # Clean, build, test, validate
+
+# Comprehensive system diagnostics
+bb-diagnostic           # Full health check and analysis
+
+# Debug data export
+bb-report               # Generate project analysis report
+```
+
+**Profile Integration:**
+- **Automatic Loading** - PowerShell profiles load on VS Code terminal startup
+- **Function Availability** - All Bus Buddy functions available in every session
+- **Cross-Session State** - Development state maintained across sessions
+- **IDE Integration** - Seamless `code` command support with VS Code/Insiders detection
+
+This comprehensive IDE environment ensures optimal development experience with advanced error detection, automated workflows, and seamless integration between VS Code, PowerShell, and the Bus Buddy application architecture.
+
+---
+
 ## Testing
 
 The project includes a test suite located in `BusBuddy.Tests/` with NUnit framework and comprehensive null handling tests. The test project is configured for .NET 8 with WPF support and includes:
