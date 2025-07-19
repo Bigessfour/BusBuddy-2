@@ -192,13 +192,13 @@
     }
   },
 
-  // PowerShell Core 7.5.2 specific settings
+  // PowerShell Core 7.5.2 specific settings - UPDATED FOR 7.5 FEATURES
   "powershell.powerShellDefaultVersion": "PowerShell (x64)",
   "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
   "powershell.enableProfileLoading": false,
   "powershell.integratedConsole.forceClearScrollbackBuffer": true,
 
-  // PowerShell Core 7.5.2 Enhanced Features
+  // PowerShell Core 7.5.2 Enhanced Features - NEW 7.5 CAPABILITIES
   "powershell.powerShellAdditionalExePaths": {
     "PowerShell Core 7.5.2": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
   },

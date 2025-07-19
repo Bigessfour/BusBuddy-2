@@ -36,10 +36,10 @@ function Test-XamlPerformance {
 
     foreach ($file in $xamlFiles) {
         $lines = Get-Content $file.FullName
-        
+
         for ($i = 0; $i -lt $lines.Count; $i++) {
             $line = $lines[$i]
-            
+
             # Check for non-virtualized lists
             if ($line -match '<(ListView|ListBox|DataGrid)' -and $line -notmatch 'VirtualizingStackPanel') {
                 $issue = [XamlPerformanceIssue]::new()
@@ -113,7 +113,7 @@ function Invoke-XamlPerformanceCheck {
     )
 
     Write-Host "⚡ Bus Buddy Performance Analyzer" -ForegroundColor Cyan
-    
+
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
         Write-Host "❌ Bus Buddy project root not found" -ForegroundColor Red
@@ -121,9 +121,9 @@ function Invoke-XamlPerformanceCheck {
     }
 
     $targetPath = if ([System.IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $projectRoot $Path }
-    
+
     $issues = Test-XamlPerformance -Path $targetPath
-    
+
     # Performance statistics
     $totalFiles = (Get-ChildItem $targetPath -Filter "*.xaml" -Recurse).Count
     $highIssues = ($issues | Where-Object { $_.Severity -eq "High" }).Count
@@ -143,10 +143,10 @@ function Invoke-XamlPerformanceCheck {
 
     # Group issues by type for better reporting
     $groupedIssues = $issues | Group-Object IssueType
-    
+
     foreach ($group in $groupedIssues) {
         Write-Host "`n🔍 $($group.Name) ($($group.Count) occurrences):" -ForegroundColor Magenta
-        
+
         foreach ($issue in $group.Group | Select-Object -First 3) {
             $fileName = Split-Path $issue.FilePath -Leaf
             Write-Host "   📄 $fileName (Line $($issue.LineNumber))" -ForegroundColor White
@@ -154,7 +154,7 @@ function Invoke-XamlPerformanceCheck {
             Write-Host "      💡 $($issue.Recommendation)" -ForegroundColor Green
             Write-Host "      📈 Impact: $($issue.ImpactLevel)" -ForegroundColor Cyan
         }
-        
+
         if ($group.Count -gt 3) {
             Write-Host "      ... and $($group.Count - 3) more similar issues" -ForegroundColor Gray
         }

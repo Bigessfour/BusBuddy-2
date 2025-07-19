@@ -107,6 +107,32 @@
             "options": {
                 "cwd": "${workspaceFolder}"
             }
+        },
+        {
+            "label": "🔍 Validate XAML Files",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "Import-Module '${workspaceFolder}/Tools/Scripts/XAML-Tools.ps1'; Get-ChildItem -Path '${workspaceFolder}' -Filter '*.xaml' -Recurse | ForEach-Object { Write-Host \"Validating: $($_.Name)\" -ForegroundColor Yellow; Test-XamlValidity -FilePath $_.FullName }"
+            ],
+            "group": "test",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "🎨 Format All XAML (Structure-Aware)",
+            "type": "shell",
+            "command": "pwsh",
+            "args": [
+                "-Command",
+                "Import-Module '${workspaceFolder}/Tools/Scripts/XAML-Tools.ps1'; Get-ChildItem -Path '${workspaceFolder}' -Filter '*.xaml' -Recurse | ForEach-Object { Write-Host \"Formatting: $($_.Name)\" -ForegroundColor Cyan; Format-XamlFile -FilePath $_.FullName }"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
     ]
 }

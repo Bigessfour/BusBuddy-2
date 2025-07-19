@@ -38,10 +38,10 @@ function Test-BindingHealth {
     foreach ($file in $xamlFiles) {
         $content = Get-Content $file.FullName -Raw
         $lines = Get-Content $file.FullName
-        
+
         for ($i = 0; $i -lt $lines.Count; $i++) {
             $line = $lines[$i]
-            
+
             # Check for missing DataContext
             if ($line -match '<(UserControl|Window|Page)' -and $content -notmatch 'DataContext') {
                 $issue = [XamlBindingIssue]::new()
@@ -176,7 +176,7 @@ function Invoke-BindingHealthCheck {
     )
 
     Write-Host "🔗 Bus Buddy Binding Health Monitor" -ForegroundColor Cyan
-    
+
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
         Write-Host "❌ Bus Buddy project root not found" -ForegroundColor Red
@@ -184,14 +184,14 @@ function Invoke-BindingHealthCheck {
     }
 
     $targetPath = if ([System.IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $projectRoot $Path }
-    
+
     $issues = Test-BindingHealth -Path $targetPath
-    
+
     # Health metrics
     $totalFiles = (Get-ChildItem $targetPath -Filter "*.xaml" -Recurse).Count
     $filesWithIssues = ($issues | Select-Object FilePath -Unique).Count
     $healthScore = [Math]::Round(((($totalFiles - $filesWithIssues) / $totalFiles) * 100), 1)
-    
+
     Write-Host "`n📊 Binding Health Report:" -ForegroundColor Yellow
     Write-Host "   Files Analyzed: $totalFiles" -ForegroundColor White
     Write-Host "   Files with Issues: $filesWithIssues" -ForegroundColor Red
@@ -213,7 +213,7 @@ function Invoke-BindingHealthCheck {
     Write-Host "   Maintainability (technical debt): $($maintainabilityIssues.Count)" -ForegroundColor Orange
 
     # Show top issues by severity
-    $prioritizedIssues = $issues | Sort-Object { 
+    $prioritizedIssues = $issues | Sort-Object {
         switch ($_.Severity) {
             "High" { 1 }
             "Medium" { 2 }
@@ -223,15 +223,15 @@ function Invoke-BindingHealthCheck {
 
     foreach ($group in $prioritizedIssues | Select-Object -First 5) {
         Write-Host "`n🔍 $($group.Name) ($($group.Count) occurrences):" -ForegroundColor Magenta
-        
+
         $topIssue = $group.Group | Select-Object -First 1
         $fileName = Split-Path $topIssue.FilePath -Leaf
-        
+
         Write-Host "   📄 Example: $fileName (Line $($topIssue.LineNumber))" -ForegroundColor White
         Write-Host "      Problem: $($topIssue.Problem)" -ForegroundColor Red
         Write-Host "      Solution: $($topIssue.Solution)" -ForegroundColor Green
         Write-Host "      Impact: $($topIssue.Impact)" -ForegroundColor Yellow
-        
+
         if ($group.Count -gt 1) {
             Write-Host "      ... and $($group.Count - 1) more similar issues" -ForegroundColor Gray
         }
@@ -250,11 +250,11 @@ function Invoke-BindingHealthCheck {
 
     if ($DeepAnalysis) {
         Write-Host "`n🔬 Deep Analysis Recommendations:" -ForegroundColor Cyan
-        
+
         # Analyze binding patterns
-        $bindingPatterns = $issues | Group-Object { Split-Path $_.FilePath -Leaf } | 
-            Where-Object { $_.Count -gt 3 } | 
-            Sort-Object Count -Descending | 
+        $bindingPatterns = $issues | Group-Object { Split-Path $_.FilePath -Leaf } |
+            Where-Object { $_.Count -gt 3 } |
+            Sort-Object Count -Descending |
             Select-Object -First 3
 
         if ($bindingPatterns) {
@@ -268,7 +268,7 @@ function Invoke-BindingHealthCheck {
         if ($criticalIssues.Count -gt ($totalFiles * 0.3)) {
             Write-Host "   🏗️ Consider architectural review - high critical issue ratio" -ForegroundColor Red
         }
-        
+
         if ($performanceIssues.Count -gt ($totalFiles * 0.5)) {
             Write-Host "   ⚡ Performance optimization recommended" -ForegroundColor Yellow
         }

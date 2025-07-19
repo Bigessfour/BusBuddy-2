@@ -1,27 +1,32 @@
 # Bus Buddy - Transportation Management System
 
-**✅ PRODUCTION READY - 100% COMPLETE (July 16, 2025)**
+**✅ PRODUCTION READY - 100% COMPLETE (July 19, 2025)**
 
 - **🎉 100% Complete Implementation** - All 12 core modules fully implemented and functional
 - **📄 Professional PDF Reports** - Syncfusion PDF-based report generation system
 - **100% Pure WPF Application** - Built exclusively with WPF (Windows Presentation Foundation) using Syncfusion's professional WPF UI component suite
 - **Zero Legacy Dependencies** - Completely modernized architecture with no Windows Forms, WinForms, or legacy UI frameworks
-- **.NET 8 (net8.0-windows)** - Latest .NET framework with cutting-edge WPF architecture patterns and performance optimizations
-- **Premium Syncfusion WPF Components** - Professional-grade UI controls including DataGrid, DockingManager, Charts, Ribbon, and FluentDark theming with FluentLight fallback
+- **.NET 8 (net8.0-windows)** - Latest .NET framework- **Navigation**: TabControl, TreeView, and menu controls with Windows11Light theming
+- **SfSkinManager**: Advanced theming system for unified visual experience with Windows11Light primary and FluentDark/FluentLight fallback
+- **PDF Generation**: Syncfusion.Pdf.NET for enterprise-grade PDF report generation
+- **Theme Management**: Dynamic theme switching between Windows11Light, FluentDark, and FluentLight with automatic fallback supporth cutting-edge WPF architecture patterns and performance optimizations
+- **Premium Syncfusion WPF Components** - Professional-grade UI controls including DataGrid, DockingManager, Charts, Ribbon, and Windows11Light theming with FluentDark/FluentLight themes
 - **Advanced MVVM Architecture** - Follows WPF best practices with ViewModels, Data Binding, Command patterns, and INotifyPropertyChanged implementations
-- **Modern WPF Theming** - Syncfusion FluentDark theme as primary with FluentLight switchable fallback applied consistently across all UI components
+- **Modern WPF Theming** - Windows11Light as primary theme with FluentDark/FluentLight fallback applied consistently across all UI components
 - **Syncfusion Licensing** - Properly handled via environment variable (`SYNCFUSION_LICENSE_KEY`) or `appsettings.json` fallback
-- **Enterprise-Ready** - Production-ready codebase with comprehensive error handling, WPF-specific logging, and extensive testing
+- **Enterprise-Ready** - Production-ready codebase with comprehensive error handling, WPF-specific logging, and debugging utilities
 - **🎉 Complete Serilog Migration** - **100% migration completed July 15, 2025** - All 59 application files now use Serilog with structured logging and enrichment
 
-[![CI/CD Pipeline](https://github.com/Bigessfour/BusBuddy_Syncfusion/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Bigessfour/BusBuddy_Syncfusion/actions/workflows/ci-cd.yml)
-[![codecov](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion/branch/master/graph/badge.svg)](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion)
+[![CI/CD Pipeline](https://github.com/Bigessfour/BusBuddy-WPF/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Bigessfour/BusBuddy-WPF/actions/workflows/ci-cd.yml)
+[![codecov](https://codecov.io/gh/Bigessfour/BusBuddy-WPF/branch/main/graph/badge.svg)](https://codecov.io/gh/Bigessfour/BusBuddy-WPF)
 [![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![Syncfusion](https://img.shields.io/badge/Syncfusion-30.1.40-orange.svg)](https://www.syncfusion.com/)
 
 A comprehensive school bus transportation management system built with **C# .NET 8 WPF** and **Syncfusion's professional WPF UI component suite**. This modern, pure WPF application leverages the latest in Microsoft's presentation framework technology to deliver a rich, responsive desktop experience with zero dependencies on legacy UI frameworks.
 
-**🏆 PRODUCTION READY STATUS - July 16, 2025**
+This enterprise-grade application features 12 complete modules including Dashboard, Bus/Driver/Route Management, Schedule Management, Student Management, Maintenance Tracking, Fuel Management, Activity Logging, Settings, and Professional PDF Reports. The application uses Windows11Light theming with FluentDark/FluentLight fallback themes and comprehensive PowerShell development environment integration.
+
+**🏆 PRODUCTION READY STATUS - July 19, 2025**
 - ✅ **All 12 Core Modules Complete** - Dashboard, Bus Management, Driver Management, Route Management, Schedule Management, Student Management, Maintenance Tracking, Fuel Management, Activity Logging, Student Lists, Settings, and PDF Reports
 - ✅ **Professional PDF Generation** - Syncfusion PDF-based reporting system with branded reports and fallback support
 - ✅ **Enterprise Architecture** - Clean MVVM with proper separation of concerns and dependency injection
@@ -32,7 +37,7 @@ A comprehensive school bus transportation management system built with **C# .NET
 
 This project is built **exclusively with WPF** to provide:
 - **Rich Desktop Experience**: Native Windows application with hardware-accelerated graphics and smooth animations
-- **Professional UI Components**: Leverages Syncfusion's mature WPF control suite with FluentDark theming and FluentLight fallback
+- **Professional UI Components**: Leverages Syncfusion's mature WPF control suite with Windows11Light theming and FluentDark/FluentLight fallback
 - **Powerful Data Binding**: Declarative XAML binding for real-time UI synchronization and responsive interfaces
 - **Pure MVVM Architecture**: Industry-standard pattern for maintainable desktop applications without legacy UI dependencies
 - **Scalable Performance**: Optimized for handling large datasets in transportation management with WPF virtualization
@@ -41,13 +46,13 @@ This project is built **exclusively with WPF** to provide:
 - **No Legacy Baggage**: Zero Windows Forms, WinForms, or other deprecated UI framework dependencies
 
 ## Key WPF Architecture Benefits
-- **Pure WPF Desktop UI**: Native Windows desktop application with hardware acceleration and modern FluentDark theming
+- **Pure WPF Desktop UI**: Native Windows desktop application with hardware acceleration and modern Windows11Light theming
 - **Advanced Data Binding**: Powerful XAML data binding with INotifyPropertyChanged for real-time UI updates
 - **Modern MVVM Pattern**: Clean separation of concerns with Model-View-ViewModel architecture (no code-behind dependencies)
 - **Premium Syncfusion WPF Components**: Professional UI controls optimized specifically for WPF desktop performance
 - **Responsive WPF Design**: Adaptive layouts using WPF's flexible layout system for different screen resolutions
 - **Native Windows Performance**: Direct Windows API integration through WPF for optimal performance
-- **Dual Theme Support**: FluentDark primary theme with FluentLight fallback for consistent professional appearance across all Syncfusion WPF controls
+- **Dual Theme Support**: Windows11Light primary theme with FluentDark/FluentLight fallback for consistent professional appearance across all Syncfusion WPF controls
 - **Zero Legacy Dependencies**: No Windows Forms, WinForms, or deprecated UI framework references
 
 ## Features
@@ -75,7 +80,7 @@ This project is built **exclusively with WPF** to provide:
 - ✅ **PDF Report Generation**: Professional PDF reporting with Syncfusion.Pdf.NET
 
 ### Core WPF Features
-- **Modern Syncfusion WPF Interface**: Professional desktop UI with rich controls and FluentDark theming (FluentLight fallback available)
+- **Modern Syncfusion WPF Interface**: Professional desktop UI with rich controls and Windows11Light theming (FluentDark/FluentLight fallback available)
 - **Pure MVVM Architecture**: Clean separation using ViewModels, Commands, and Data Binding (zero code-behind complexity)
 - **Advanced Database Integration**: Entity Framework Core with SQL Server for robust data management via WPF data binding
 - **Modern Dependency Injection**: .NET 8 dependency injection container for clean architecture without legacy dependencies
@@ -85,13 +90,13 @@ This project is built **exclusively with WPF** to provide:
 - **WPF-Native Exception Handling**: WPF-specific error handling with professional dialog presentation and user experience
 - **Professional PDF Generation**: Syncfusion.Pdf.NET integration for enterprise-grade reporting
 - **No Legacy UI Dependencies**: Completely free of Windows Forms, WinForms, or other deprecated UI frameworks
-- **Dynamic Theme Switching**: Toggle between FluentDark and FluentLight themes via ThemeService with automatic fallback
+- **Dynamic Theme Switching**: Toggle between Windows11Light, FluentDark, and FluentLight themes via ThemeService with automatic fallback
 
 ## Technology Stack
 - **.NET 8 Pure WPF Application** - Modern Windows Presentation Foundation desktop application (zero legacy UI dependencies)
-- **Syncfusion WPF Premium Components** - Professional-grade UI controls (DataGrid, DockingManager, Charts, Ribbon) with FluentDark primary theme and FluentLight fallback
+- **Syncfusion WPF Premium Components** - Professional-grade UI controls (DataGrid, DockingManager, Charts, Ribbon) with Windows11Light primary theme and FluentDark/FluentLight fallback
 - **Syncfusion.Pdf.NET 30.1.40** - Enterprise PDF generation library for professional reports
-- **Entity Framework Core 9.0.7** - Latest object-relational mapping for data access with WPF data binding support
+- **Entity Framework Core 8** - Modern object-relational mapping for data access with WPF data binding support
 - **SQL Server** - Enterprise database backend with WPF-optimized data access patterns
 - **Advanced MVVM Pattern** - Model-View-ViewModel architecture pattern specifically for WPF with INotifyPropertyChanged
 - **🎉 Serilog Structured Logging** - **100% complete migration** with enrichment, performance monitoring, and contextual error tracking
@@ -99,9 +104,9 @@ This project is built **exclusively with WPF** to provide:
 - **Microsoft Extensions** - Dependency Injection, Configuration management optimized for WPF applications
 - **XAML** - Declarative markup for rich WPF user interfaces with professional styling and theming
 - **Modern C# 12/.NET 8 Features** - Latest language features integrated with WPF development patterns
-- **Theme Management Service** - Dynamic theme switching between FluentDark and FluentLight with automatic fallback support
+- **Theme Management Service** - Dynamic theme switching between Windows11Light, FluentDark, and FluentLight with automatic fallback support
 
-## PowerShell Development Environment Integration (🆕 July 17, 2025)
+## PowerShell Development Environment Integration (🆕 July 19, 2025)
 
 ### **🔥 Advanced PowerShell Integration with Debug Helper Methods**
 
@@ -309,22 +314,128 @@ This PowerShell integration transforms Bus Buddy development into a streamlined,
 ### Project Structure
 ```
 Bus Buddy/
-├── BusBuddy.WPF/          # WPF UI Layer (XAML Views, ViewModels, Syncfusion Controls)
-│   ├── Views/             # WPF UserControls and Windows
-│   ├── ViewModels/        # MVVM ViewModels with INotifyPropertyChanged
-│   ├── Controls/          # Custom WPF UserControls
-│   ├── Converters/        # WPF Value Converters for data binding
-│   ├── Utilities/         # Debug helpers and development utilities
-│   └── Resources/         # WPF Resources (Styles, Templates, Images)
-├── BusBuddy.Core/         # Core business logic and services
-├── Data/                  # Entity Framework DbContext and configurations
-├── Models/                # Entity Framework entity models
-├── Services/              # Business Logic Layer and data services
-├── Migrations/            # EF Core database migrations
-├── Configuration/         # Application settings and configuration
-├── .vscode/               # VS Code configuration and Task Explorer settings
-├── BusBuddy-PowerShell-Profile.ps1      # Core PowerShell development functions
-└── BusBuddy-Advanced-Workflows.ps1      # Advanced automation workflows
+├── 📄 Configuration Files
+│   ├── .editorconfig
+│   ├── .env.template
+│   ├── .gitignore
+│   ├── appsettings.azure.json
+│   ├── appsettings.json
+│   ├── BusBuddy.sln
+│   ├── Directory.Build.props
+│   ├── Directory.Build.targets
+│   ├── global.json
+│   ├── nuget.config
+│   └── TempAssemblyFix.props
+│
+├── 📄 Project Files & Scripts
+│   ├── App_fresh.xaml.cs
+│   ├── BusBuddy-PowerShell-Profile.ps1  # Core PowerShell development functions
+│   ├── test-environment.ps1
+│   └── validate-deployment.ps1
+│
+├── 📄 Documentation
+│   ├── azure-setup-guide.md
+│   ├── AzureSetupGuide.md
+│   ├── CONTRIBUTING.md
+│   ├── LICENSE
+│   ├── README.md
+│   └── SECURITY.md
+│
+├── 📁 Version Control & IDE
+│   ├── .git/
+│   ├── .github/
+│   ├── .vs/
+│   └── .vscode/               # VS Code configuration and Task Explorer settings
+│
+├── 📁 BusBuddy.WPF/          # WPF UI Layer (XAML Views, ViewModels, Syncfusion Controls)
+│   ├── 📄 Core Files
+│   │   ├── App.xaml
+│   │   ├── App.xaml.cs
+│   │   ├── appsettings.json
+│   │   ├── BusBuddy.WPF.csproj
+│   │   ├── DebugConverter.cs
+│   │   ├── RelayCommand.cs
+│   │   └── WpfHostBuilder.cs
+│   │
+│   ├── 📁 Feature Areas
+│   │   ├── ViewModels/        # MVVM ViewModels with INotifyPropertyChanged
+│   │   │   ├── Activity/
+│   │   │   ├── Bus/
+│   │   │   ├── Dashboard/
+│   │   │   ├── Driver/
+│   │   │   ├── Fuel/
+│   │   │   ├── Maintenance/
+│   │   │   ├── Panels/
+│   │   │   ├── Route/
+│   │   │   ├── Schedule/
+│   │   │   ├── Settings/
+│   │   │   ├── Student/
+│   │   │   └── XAI/
+│   │   │
+│   │   └── Views/             # WPF UserControls and Windows
+│   │       ├── Activity/
+│   │       ├── Bus/
+│   │       ├── Dashboard/
+│   │       ├── Driver/
+│   │       ├── Fuel/
+│   │       ├── GoogleEarth/
+│   │       ├── Main/
+│   │       ├── Maintenance/
+│   │       ├── Route/
+│   │       ├── Schedule/
+│   │       ├── Settings/
+│   │       ├── Student/
+│   │       └── XAI/
+│   │
+│   └── 📁 Infrastructure
+│       ├── Assets/            # Static resources (images, fonts, icons)
+│       ├── Controls/          # Custom WPF UserControls
+│       ├── Converters/        # WPF Value Converters for data binding
+│       ├── Extensions/        # Extension methods and helpers
+│       ├── Logging/           # Logging configuration and enrichers
+│       ├── Mapping/           # Object mapping configurations
+│       ├── Models/            # UI-specific model classes and DTOs
+│       ├── Resources/         # WPF Resources (Styles, Templates, Images)
+│       ├── Services/          # UI services (Navigation, Dialog, etc.)
+│       ├── Utilities/         # Debug helpers and development utilities
+│       └── logs/              # Application log files
+│
+├── 📁 BusBuddy.Core/         # Core business logic and services
+│   ├── Configuration/        # Application settings and configuration
+│   ├── Data/                 # Entity Framework DbContext and configurations
+│   ├── Extensions/           # Core extension methods
+│   ├── Interceptors/         # EF interceptors and data access enhancements
+│   ├── Logging/              # Core logging functionality
+│   ├── Migrations/           # EF Core database migrations
+│   ├── Models/               # Entity Framework entity models
+│   ├── Services/             # Business Logic Layer and data services
+│   ├── Utilities/            # Core utility classes and helpers
+│   └── lib/                  # Third-party libraries (Syncfusion)
+│
+├── 📁 BusBuddy.Tests/        # Comprehensive test suite
+│   ├── ViewModels/           # ViewModel tests
+│   ├── ViewModels.MSTest/    # MSTest specific tests
+│   ├── TestResults/          # Test execution results
+│   └── 📄 Test Files
+│       ├── ComprehensiveNullHandlingTests.cs
+│       ├── DatabaseNullHandlingTests.cs
+│       ├── ImprovedNullHandlingTests.cs
+│       └── UnitTest1.cs
+│
+├── 📁 Documentation/         # Project documentation
+│   ├── DockingManager-Standardization-Guide.md
+│   ├── PowerShell-Script-Analyzer-Guide.md
+│   └── SyncfusionThemeValidation.md
+│
+├── 📁 Tools/Scripts/         # Development automation tools
+│   ├── BusBuddy-XAML-Toolkit.ps1
+│   ├── XAML-Quality-Inspector.ps1
+│   ├── XAML-Structure-Detective.ps1
+│   └── XAML-Syntax-Analyzer.ps1
+│
+├── 📁 logs/                  # Application and build logs
+├── 📁 Properties/            # Assembly information
+└── 📁 Services/              # Shared services and utilities
 ```
 
 ### Key Design Patterns
@@ -392,14 +503,14 @@ For detailed migration analysis and patterns, see: [SERILOG_MIGRATION_ANALYSIS.m
 
 ## Theme Management System
 
-### FluentDark Primary Theme with FluentLight Fallback
+### Windows11Light Primary Theme with FluentDark/FluentLight Fallback
 The application uses a sophisticated theme management system built on Syncfusion's official theming infrastructure:
 
-- **Primary Theme**: FluentDark (official Syncfusion dark theme)
-- **Fallback Theme**: FluentLight (available for theme switching)
+- **Primary Theme**: Windows11Light (official Syncfusion modern light theme)
+- **Fallback Themes**: FluentDark/FluentLight (available for theme switching)
 - **Dynamic Switching**: Toggle between themes using the ThemeService
-- **Automatic Fallback**: If FluentDark fails, automatically falls back to FluentLight
-- **Theme Validation**: Invalid theme requests automatically fall back to FluentDark
+- **Automatic Fallback**: If Windows11Light fails, automatically falls back to FluentDark/FluentLight
+- **Theme Validation**: Invalid theme requests automatically fall back to Windows11Light
 - **Comprehensive Logging**: All theme operations include detailed logging for troubleshooting
 
 ### Theme Service Features
@@ -408,9 +519,9 @@ The application uses a sophisticated theme management system built on Syncfusion
 public interface IThemeService
 {
     string CurrentTheme { get; }           // Current active theme
-    string[] AvailableThemes { get; }      // ["FluentDark", "FluentLight"]
-    string PrimaryTheme { get; }           // "FluentDark"
-    string FallbackTheme { get; }          // "FluentLight"
+    string[] AvailableThemes { get; }      // ["Windows11Light", "FluentDark", "FluentLight"]
+    string PrimaryTheme { get; }           // "Windows11Light"
+    string FallbackTheme { get; }          // "FluentDark"
     bool IsDarkTheme { get; }              // True if current theme is dark
     bool IsThemeSupported(string theme);   // Check if theme is available
     void ToggleTheme();                    // Switch between themes
@@ -424,8 +535,8 @@ Theme settings are managed through `appsettings.json`:
 ```json
 {
   "AppSettings": {
-    "Theme": "FluentDark",
-    "FallbackTheme": "FluentLight",
+    "Theme": "Windows11Light",
+    "FallbackTheme": "FluentDark",
     "AllowThemeSwitching": true
   }
 }
@@ -472,43 +583,23 @@ Theme settings are managed through `appsettings.json`:
 3. Manage route details and descriptions
 4. Track active/inactive routes
 
-## Testing and Code Coverage
+## Testing
 
-### Test Suite Overview
-This project includes comprehensive testing with automated code coverage reporting:
+The project includes a test suite located in `BusBuddy.Tests/` with NUnit framework and comprehensive null handling tests. The test project is configured for .NET 8 with WPF support and includes:
 
-- **Unit Tests**: Testing individual components and utilities
-- **Integration Tests**: Testing database interactions and service integrations
-- **Syncfusion Component Tests**: Specialized tests for UI components with freeze mitigation strategies
+- **Unit Tests**: Core business logic validation
+- **Null Handling Tests**: Comprehensive null safety testing
+- **Database Tests**: Data access layer validation
+- **Test Framework**: NUnit with FluentAssertions and Moq
 
-### Code Coverage
-- **Target Coverage**: 75% for project, 75% for patches
-- **Coverage Reports**: Automatically generated via Codecov on every PR and push
-- **Coverage Badge**: ![Coverage](https://codecov.io/gh/Bigessfour/BusBuddy_Syncfusion/branch/master/graph/badge.svg)
-
-### Running Tests Locally
+### Running Tests
 ```bash
 # Run all tests
 dotnet test
 
-# Run unit tests only
-dotnet test --filter "Category!=Integration"
-
-# Run integration tests only
-dotnet test --filter "Category=Integration"
-
-# Run tests with coverage
-dotnet test --collect:"XPlat Code Coverage"
+# Run with detailed output
+dotnet test --verbosity normal
 ```
-
-
-### Syncfusion WPF Component Testing
-Special considerations for testing Syncfusion WPF UI components:
-- **STA Threading**: WPF components require Single-Threaded Apartment model
-- **UI Thread Marshaling**: Proper dispatcher usage for WPF UI testing
-- **Resource Management**: Comprehensive cleanup of WPF resources and controls
-- **Timeout Protection**: Prevents test freezing in WPF component initialization
-- **Visual Tree Testing**: Testing WPF visual tree and data binding scenarios
 
 ## Syncfusion WPF Licensing Compliance
 
@@ -517,7 +608,7 @@ This application uses Syncfusion's professional WPF UI component suite and requi
 - **Modern License Registration**: Automatically handled at WPF application startup via environment variable or config file
 - **Legacy-Free Implementation**: All deprecated licensing code has been removed - modern WPF registration only
 - **Pure WPF Components**: Uses exclusively Syncfusion WPF controls (zero Windows Forms, WinForms, or web components)
-- **Office2019Colorful Theming**: Professional theming applied consistently across all components
+- **Windows11Light Theming**: Professional theming applied consistently across all components with FluentDark/FluentLight fallback
 - **WPF Compliance Documentation**: See [Syncfusion WPF Licensing Documentation](https://help.syncfusion.com/wpf/licensing/license-key)
 
 ### Syncfusion WPF Components Used
@@ -526,12 +617,12 @@ This application uses Syncfusion's professional WPF UI component suite and requi
 - **Charts**: Professional charting and visualization controls with WPF hardware acceleration
 - **Ribbon**: Modern ribbon interface components following Office design patterns
 - **Navigation**: TabControl, TreeView, and menu controls with FluentDark theming
-- **SfSkinManager**: Advanced theming system for unified visual experience with FluentDark primary and FluentLight fallback
+- **SfSkinManager**: Advanced theming system for unified visual experience with Windows11Light primary and FluentDark/FluentLight fallback
 - **PDF Generation**: Syncfusion.Pdf.NET for enterprise-grade PDF report generation
 - **Theme Management**: Dynamic theme switching between FluentDark and FluentLight with automatic fallback support
 
 
-For detailed testing documentation, see: [SYNCFUSION_TEST_FREEZE_MITIGATIONS.md](BusBuddy.Tests/SYNCFUSION_TEST_FREEZE_MITIGATIONS.md)
+For questions or support, please refer to the development documentation and the comprehensive PowerShell development environment for debugging utilities.
 
 ## Contributing
 1. Fork the repository
@@ -555,9 +646,9 @@ For questions or support, please refer to the development documentation in `DEVE
 
 ---
 
-**Status**: ✅ **PRODUCTION READY - 100% COMPLETE** (July 17, 2025) - Pure WPF application with all 12 core modules implemented, professional PDF reporting system, **100% Serilog migration completed July 15, 2025**, and **🔥 Advanced PowerShell Development Environment Integration completed July 17, 2025**. This enterprise-grade school bus management system is fully modernized with zero legacy dependencies, comprehensive structured logging infrastructure, and seamless PowerShell workflow automation.
+**Status**: ✅ **PRODUCTION READY - 100% COMPLETE** (July 19, 2025) - Pure WPF application with all 12 core modules implemented, professional PDF reporting system, **100% Serilog migration completed July 15, 2025**, and **🔥 Advanced PowerShell Development Environment Integration completed July 17, 2025**. This enterprise-grade school bus management system is fully modernized with zero legacy dependencies, comprehensive structured logging infrastructure, and seamless PowerShell workflow automation.
 
-**Architecture Commitment**: This project maintains a 100% pure WPF architecture with no Windows Forms, WinForms, or legacy UI framework dependencies. All UI components use Syncfusion's professional WPF controls with FluentDark theming for a consistent, modern desktop experience.
+**Architecture Commitment**: This project maintains a 100% pure WPF architecture with no Windows Forms, WinForms, or legacy UI framework dependencies. All UI components use Syncfusion's professional WPF controls with Windows11Light theming and FluentDark/FluentLight fallback themes for a consistent, modern desktop experience.
 
 **Development Environment**: Complete PowerShell Core 7.5.2 integration provides automated workflows, debug helper method access, VS Code Task Explorer integration, and comprehensive development diagnostics for an optimal developer experience.
 

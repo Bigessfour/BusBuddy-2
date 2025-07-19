@@ -34,8 +34,15 @@
             ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
             -->
             <ResourceDictionary.MergedDictionaries>
-                <!-- 🎨 SYNCFUSION THEME CONFIGURATION — SfSkinManager handles ALL theme loading automatically -->
-                <!-- ✅ NO MANUAL THEME DICTIONARIES: SfSkinManager provides all Syncfusion theme resources -->
+                <!-- 🎨 OPTIMIZED SYNCFUSION THEME CONFIGURATION -->
+                <!-- Theme resources are now loaded early via SfSkinManager BEFORE InitializeComponent() -->
+                <!-- This prevents XAML parse errors and resource corruption during startup -->
+
+                <!-- Windows11Light Theme Resource Dictionaries -->
+                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/SfDataGrid/SfDataGrid.xaml"/>
+                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/SfTabControl/SfTabControl.xaml"/>
+                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/DockingManager/DockingManager.xaml"/>
+                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/NavigationDrawer/NavigationDrawer.xaml"/>
 
                 <!-- 🎯 CUSTOM STYLES AND RESOURCES ONLY -->
                 <!-- Custom application-specific styles and resources (non-theme) -->

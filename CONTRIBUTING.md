@@ -36,9 +36,9 @@ Thank you for your interest in contributing to BusBuddy! This document provides 
 ### Testing
 - Write unit tests for business logic
 - Add integration tests for data access
-- Target 75%+ code coverage
+- Use NUnit framework with FluentAssertions
 - Test Syncfusion components with proper UI thread handling
-- See `SYNCFUSION_TEST_FREEZE_MITIGATIONS.md` for testing best practices
+- See the `BusBuddy.Tests/` project for existing test examples
 
 ### Database Changes
 - Use Entity Framework Core migrations for database changes
@@ -48,7 +48,7 @@ Thank you for your interest in contributing to BusBuddy! This document provides 
 
 ## Pull Request Process
 
-1. **Fork and Branch**: Create a feature branch from `master`
+1. **Fork and Branch**: Create a feature branch from `main`
 2. **Develop**: Make your changes following the guidelines above
 3. **Test**: Ensure all tests pass and add new tests for your changes
 4. **Commit**: Use clear, descriptive commit messages
@@ -68,7 +68,7 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 ### Pull Request Checklist
 - [ ] Code follows project style guidelines
 - [ ] Self-review completed
-- [ ] Tests added/updated and passing
+- [ ] Tests added/updated and validated with NUnit
 - [ ] Documentation updated if needed
 - [ ] No sensitive data committed
 - [ ] Syncfusion license compliance maintained

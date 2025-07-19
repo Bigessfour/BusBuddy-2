@@ -11,7 +11,7 @@
     Combines null safety, performance, type safety, and binding health analysis
     Based on research showing:
     - 72% of runtime errors from null dereferencing
-    - 30% of crashes from type mismatches  
+    - 30% of crashes from type mismatches
     - 40% of developers struggle with binding lifecycle
     - 70% load time reduction potential with optimization
 #>
@@ -20,7 +20,7 @@
 $scriptPath = $PSScriptRoot
 $tools = @(
     "XAML-Null-Safety-Analyzer.ps1",
-    "XAML-Performance-Analyzer.ps1", 
+    "XAML-Performance-Analyzer.ps1",
     "XAML-Type-Safety-Analyzer.ps1",
     "XAML-Binding-Health-Monitor.ps1"
 )
@@ -59,7 +59,7 @@ function Invoke-ComprehensiveXamlHealth {
 
     Write-Host "🏥 Bus Buddy Comprehensive XAML Health Analysis" -ForegroundColor Cyan
     Write-Host "=" * 60 -ForegroundColor Cyan
-    
+
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
         Write-Host "❌ Bus Buddy project root not found" -ForegroundColor Red
@@ -67,7 +67,7 @@ function Invoke-ComprehensiveXamlHealth {
     }
 
     $targetPath = if ([System.IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $projectRoot $Path }
-    
+
     if (-not (Test-Path $targetPath)) {
         Write-Host "❌ Path not found: $targetPath" -ForegroundColor Red
         return
@@ -75,7 +75,7 @@ function Invoke-ComprehensiveXamlHealth {
 
     $startTime = Get-Date
     $totalFiles = (Get-ChildItem $targetPath -Filter "*.xaml" -Recurse).Count
-    
+
     Write-Host "📁 Analyzing $totalFiles XAML files in: $targetPath" -ForegroundColor White
     Write-Host "🕒 Started at: $($startTime.ToString('HH:mm:ss'))" -ForegroundColor Gray
 
@@ -95,7 +95,7 @@ function Invoke-ComprehensiveXamlHealth {
         $nullIssues = Find-UnsafeBindings -Path $targetPath
         $healthResults.NullSafety.Issues = $nullIssues
         $healthResults.NullSafety.Score = [Math]::Max(0, 100 - ($nullIssues.Count * 5))
-        
+
         Write-Host "   Found $($nullIssues.Count) null safety issues" -ForegroundColor $(if ($nullIssues.Count -eq 0) { "Green" } else { "Yellow" })
         Write-Host "   Score: $($healthResults.NullSafety.Score)/100" -ForegroundColor $(if ($healthResults.NullSafety.Score -gt 80) { "Green" } elseif ($healthResults.NullSafety.Score -gt 60) { "Yellow" } else { "Red" })
     }
@@ -103,14 +103,14 @@ function Invoke-ComprehensiveXamlHealth {
         Write-Host "   ⚠️ Null safety analysis failed: $($_.Exception.Message)" -ForegroundColor Red
     }
 
-    # 2. Performance Analysis  
+    # 2. Performance Analysis
     Write-Host "`n⚡ Running Performance Analysis..." -ForegroundColor Yellow
     try {
         $perfIssues = Test-XamlPerformance -Path $targetPath
         $healthResults.Performance.Issues = $perfIssues
         $highPerfIssues = ($perfIssues | Where-Object { $_.Severity -eq "High" }).Count
         $healthResults.Performance.Score = [Math]::Max(0, 100 - ($highPerfIssues * 10) - (($perfIssues.Count - $highPerfIssues) * 3))
-        
+
         Write-Host "   Found $($perfIssues.Count) performance issues ($highPerfIssues high priority)" -ForegroundColor $(if ($perfIssues.Count -eq 0) { "Green" } else { "Yellow" })
         Write-Host "   Score: $($healthResults.Performance.Score)/100" -ForegroundColor $(if ($healthResults.Performance.Score -gt 80) { "Green" } elseif ($healthResults.Performance.Score -gt 60) { "Yellow" } else { "Red" })
     }
@@ -125,7 +125,7 @@ function Invoke-ComprehensiveXamlHealth {
         $healthResults.TypeSafety.Issues = $typeIssues
         $criticalTypeIssues = ($typeIssues | Where-Object { $_.Severity -eq "High" }).Count
         $healthResults.TypeSafety.Score = [Math]::Max(0, 100 - ($criticalTypeIssues * 15) - (($typeIssues.Count - $criticalTypeIssues) * 5))
-        
+
         Write-Host "   Found $($typeIssues.Count) type safety issues ($criticalTypeIssues critical)" -ForegroundColor $(if ($typeIssues.Count -eq 0) { "Green" } else { "Yellow" })
         Write-Host "   Score: $($healthResults.TypeSafety.Score)/100" -ForegroundColor $(if ($healthResults.TypeSafety.Score -gt 80) { "Green" } elseif ($healthResults.TypeSafety.Score -gt 60) { "Yellow" } else { "Red" })
     }
@@ -140,7 +140,7 @@ function Invoke-ComprehensiveXamlHealth {
         $healthResults.BindingHealth.Issues = $bindingIssues
         $criticalBindingIssues = ($bindingIssues | Where-Object { $_.Severity -eq "High" }).Count
         $healthResults.BindingHealth.Score = [Math]::Max(0, 100 - ($criticalBindingIssues * 12) - (($bindingIssues.Count - $criticalBindingIssues) * 4))
-        
+
         Write-Host "   Found $($bindingIssues.Count) binding issues ($criticalBindingIssues critical)" -ForegroundColor $(if ($bindingIssues.Count -eq 0) { "Green" } else { "Yellow" })
         Write-Host "   Score: $($healthResults.BindingHealth.Score)/100" -ForegroundColor $(if ($healthResults.BindingHealth.Score -gt 80) { "Green" } elseif ($healthResults.BindingHealth.Score -gt 60) { "Yellow" } else { "Red" })
     }
@@ -155,17 +155,17 @@ function Invoke-ComprehensiveXamlHealth {
     # Generate summary report
     $endTime = Get-Date
     $duration = $endTime - $startTime
-    
+
     Write-Host "`n" + "=" * 60 -ForegroundColor Cyan
     Write-Host "📊 XAML Health Summary Report" -ForegroundColor Cyan
     Write-Host "=" * 60 -ForegroundColor Cyan
-    
+
     Write-Host "`n🎯 Overall Health Score: $($healthResults.OverallScore)/100" -ForegroundColor $(
         if ($healthResults.OverallScore -gt 85) { "Green" }
         elseif ($healthResults.OverallScore -gt 70) { "Yellow" }
         else { "Red" }
     )
-    
+
     Write-Host "`n📋 Category Breakdown:" -ForegroundColor White
     Write-Host "   🛡️ Null Safety:     $($healthResults.NullSafety.Score)/100" -ForegroundColor $(if ($healthResults.NullSafety.Score -gt 80) { "Green" } elseif ($healthResults.NullSafety.Score -gt 60) { "Yellow" } else { "Red" })
     Write-Host "   ⚡ Performance:     $($healthResults.Performance.Score)/100" -ForegroundColor $(if ($healthResults.Performance.Score -gt 80) { "Green" } elseif ($healthResults.Performance.Score -gt 60) { "Yellow" } else { "Red" })
@@ -174,22 +174,22 @@ function Invoke-ComprehensiveXamlHealth {
 
     # Priority recommendations
     Write-Host "`n🎯 Priority Recommendations:" -ForegroundColor Yellow
-    
+
     if ($healthResults.TypeSafety.Score -lt 70) {
         Write-Host "   1. 🚨 Address type safety issues (prevents 30% of crashes)" -ForegroundColor Red
         $healthResults.Recommendations += "Critical: Fix type safety issues to prevent runtime crashes"
     }
-    
+
     if ($healthResults.NullSafety.Score -lt 70) {
         Write-Host "   2. 🛡️ Improve null safety (prevents 72% of runtime errors)" -ForegroundColor Red
         $healthResults.Recommendations += "Critical: Add null safety measures to prevent runtime errors"
     }
-    
+
     if ($healthResults.BindingHealth.Score -lt 70) {
         Write-Host "   3. 🔗 Fix binding issues (affects 40% of developers)" -ForegroundColor Yellow
         $healthResults.Recommendations += "Important: Resolve binding lifecycle issues"
     }
-    
+
     if ($healthResults.Performance.Score -lt 70) {
         Write-Host "   4. ⚡ Optimize performance (70% improvement potential)" -ForegroundColor Yellow
         $healthResults.Recommendations += "Performance: Implement virtualization and layout optimizations"
@@ -209,11 +209,11 @@ function Invoke-ComprehensiveXamlHealth {
         # Generate detailed reports
         $reportDir = Join-Path $projectRoot "logs\comprehensive-health-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
         New-Item -Path $reportDir -ItemType Directory -Force | Out-Null
-        
+
         $healthResults | ConvertTo-Json -Depth 5 | Out-File (Join-Path $reportDir "health-summary.json") -Encoding UTF8
-        
+
         Write-Host "`n💾 Detailed reports saved to: $reportDir" -ForegroundColor Green
-        
+
         # Individual analysis reports
         if ($healthResults.NullSafety.Issues.Count -gt 0) {
             bb-null-check -Path $Path
@@ -233,7 +233,7 @@ function Invoke-ComprehensiveXamlHealth {
         Write-Host "`n🔧 Fix Mode - Automated Suggestions:" -ForegroundColor Cyan
         Write-Host "   Use these commands for detailed analysis and fixes:" -ForegroundColor Gray
         Write-Host "   • bb-null-check -Path '$Path'" -ForegroundColor Green
-        Write-Host "   • bb-perf -Path '$Path'" -ForegroundColor Green  
+        Write-Host "   • bb-perf -Path '$Path'" -ForegroundColor Green
         Write-Host "   • bb-types -Path '$Path'" -ForegroundColor Green
         Write-Host "   • bb-bindings -Path '$Path'" -ForegroundColor Green
     }
@@ -251,7 +251,7 @@ function bb-quick-health {
         Quick XAML health check for Bus Buddy
     #>
     param([string]$Path = "BusBuddy.WPF\Views")
-    
+
     Invoke-ComprehensiveXamlHealth -Path $Path -Quick
 }
 

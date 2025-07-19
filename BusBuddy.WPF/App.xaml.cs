@@ -17,6 +17,7 @@ using Serilog.Core.Enrichers;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
 using Syncfusion.Themes.FluentLight.WPF;
+using Syncfusion.Themes.Windows11Light.WPF;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,8 +50,8 @@ public partial class App : Application
         // CRITICAL: Register Syncfusion license FIRST
         RegisterSyncfusionLicense();
 
-        // Configure theme early but simply
-        ConfigureSyncfusionTheme();
+        // OPTIMIZATION: Configure theme BEFORE InitializeComponent() to prevent corruption
+        ConfigureOptimizedSyncfusionTheme();
 
         // Initialize basic error handling
         InitializeGlobalExceptionHandling();
@@ -141,31 +142,35 @@ public partial class App : Application
         }
     }
 
-    private void ConfigureSyncfusionTheme()
+    private void ConfigureOptimizedSyncfusionTheme()
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine("🎨 Initializing optimized theme system");
+            System.Diagnostics.Debug.WriteLine("🎨 OPTIMIZED: Initializing theme system BEFORE InitializeComponent()");
 
-            // Use the optimized theme service for centralized theme management
-            BusBuddy.WPF.Services.OptimizedThemeService.InitializeApplicationTheme();
+            // CRITICAL: Set SfSkinManager properties FIRST to prevent resource corruption
+            SfSkinManager.ApplyThemeAsDefaultStyle = true;
+            SfSkinManager.ApplyStylesOnApplication = true;
 
-            System.Diagnostics.Debug.WriteLine("✅ Optimized theme system initialized successfully");
+            // Apply global theme early — Windows11Light as specified in requirements
+            SfSkinManager.ApplicationTheme = new Theme("Windows11Light");
+
+            System.Diagnostics.Debug.WriteLine("✅ OPTIMIZED: Windows11Light theme configured successfully");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"❌ Optimized theme initialization failed: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"❌ OPTIMIZED: Theme initialization failed: {ex.Message}");
 
-            // Emergency fallback - minimal theme setup
+            // Emergency fallback — try MaterialDark as backup
             try
             {
                 SfSkinManager.ApplyStylesOnApplication = true;
                 SfSkinManager.ApplicationTheme = new Theme("MaterialDark");
-                System.Diagnostics.Debug.WriteLine("✅ Emergency MaterialDark theme applied");
+                System.Diagnostics.Debug.WriteLine("✅ OPTIMIZED: Emergency MaterialDark theme applied");
             }
             catch (Exception fallbackEx)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ Emergency fallback failed: {fallbackEx.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ OPTIMIZED: Emergency fallback failed: {fallbackEx.Message}");
             }
         }
     }

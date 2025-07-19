@@ -55,15 +55,15 @@ function Test-XamlTypeSafety {
 
     foreach ($file in $xamlFiles) {
         $lines = Get-Content $file.FullName
-        
+
         for ($i = 0; $i -lt $lines.Count; $i++) {
             $line = $lines[$i]
-            
+
             # Check for numeric properties with string bindings
             if ($line -match '(Width|Height|FontSize|Opacity)="\{Binding\s+(\w+)') {
                 $property = $matches[1]
                 $bindingPath = $matches[2]
-                
+
                 # Check if binding path suggests non-numeric data
                 if ($bindingPath -match '(Name|Title|Description|Text)$') {
                     $issue = [XamlTypeSafetyIssue]::new()
@@ -83,7 +83,7 @@ function Test-XamlTypeSafety {
             if ($line -match '(IsEnabled|IsVisible|IsChecked)="\{Binding\s+(\w+)') {
                 $property = $matches[1]
                 $bindingPath = $matches[2]
-                
+
                 if ($bindingPath -notmatch '(Is|Can|Has|Should)' -and $line -notmatch 'Converter') {
                     $issue = [XamlTypeSafetyIssue]::new()
                     $issue.FilePath = $file.FullName
@@ -101,7 +101,7 @@ function Test-XamlTypeSafety {
             # Check for Visibility bindings without converter
             if ($line -match 'Visibility="\{Binding\s+(\w+)"' -and $line -notmatch 'Converter') {
                 $bindingPath = $matches[1]
-                
+
                 if ($bindingPath -notmatch 'Visibility$') {
                     $issue = [XamlTypeSafetyIssue]::new()
                     $issue.FilePath = $file.FullName
@@ -119,7 +119,7 @@ function Test-XamlTypeSafety {
             # Check for missing StringFormat on non-string properties
             if ($line -match 'Text="\{Binding\s+(\w+)"' -and $line -notmatch 'StringFormat') {
                 $bindingPath = $matches[1]
-                
+
                 if ($bindingPath -match '(Date|Time|Count|Amount|Price|Number)') {
                     $issue = [XamlTypeSafetyIssue]::new()
                     $issue.FilePath = $file.FullName
@@ -137,7 +137,7 @@ function Test-XamlTypeSafety {
             # Check for ItemsSource type safety
             if ($line -match 'ItemsSource="\{Binding\s+(\w+)"') {
                 $bindingPath = $matches[1]
-                
+
                 if ($bindingPath -notmatch '(Items|Collection|List)$' -and $bindingPath -notmatch 's$') {
                     $issue = [XamlTypeSafetyIssue]::new()
                     $issue.FilePath = $file.FullName
@@ -172,7 +172,7 @@ function Invoke-XamlTypeSafetyCheck {
     )
 
     Write-Host "🔒 Bus Buddy Type Safety Validator" -ForegroundColor Cyan
-    
+
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
         Write-Host "❌ Bus Buddy project root not found" -ForegroundColor Red
@@ -180,9 +180,9 @@ function Invoke-XamlTypeSafetyCheck {
     }
 
     $targetPath = if ([System.IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $projectRoot $Path }
-    
+
     $issues = Test-XamlTypeSafety -Path $targetPath
-    
+
     if ($issues.Count -eq 0) {
         Write-Host "✅ No type safety issues found!" -ForegroundColor Green
         return
@@ -200,7 +200,7 @@ function Invoke-XamlTypeSafetyCheck {
     Write-Host "   Low Priority: $lowIssues (formatting issues)" -ForegroundColor Green
 
     # Group by issue type
-    $groupedIssues = $issues | Group-Object IssueType | Sort-Object { 
+    $groupedIssues = $issues | Group-Object IssueType | Sort-Object {
         switch ($_.Name) {
             "TypeMismatch" { 1 }
             "VisibilityMismatch" { 2 }
@@ -213,15 +213,15 @@ function Invoke-XamlTypeSafetyCheck {
 
     foreach ($group in $groupedIssues) {
         Write-Host "`n🔍 $($group.Name) ($($group.Count) occurrences):" -ForegroundColor Magenta
-        
-        $priorityIssues = $group.Group | Sort-Object { 
+
+        $priorityIssues = $group.Group | Sort-Object {
             switch ($_.Severity) {
                 "High" { 1 }
                 "Medium" { 2 }
                 "Low" { 3 }
             }
         } | Select-Object -First 3
-        
+
         foreach ($issue in $priorityIssues) {
             $fileName = Split-Path $issue.FilePath -Leaf
             $severityColor = switch ($issue.Severity) {
@@ -229,14 +229,14 @@ function Invoke-XamlTypeSafetyCheck {
                 "Medium" { "Yellow" }
                 "Low" { "Green" }
             }
-            
+
             Write-Host "   📄 $fileName (Line $($issue.LineNumber)) " -ForegroundColor White -NoNewline
             Write-Host "[$($issue.Severity)]" -ForegroundColor $severityColor
             Write-Host "      Property: $($issue.PropertyName) (expects $($issue.ExpectedType))" -ForegroundColor Gray
             Write-Host "      Binding: $($issue.ActualBinding)" -ForegroundColor Gray
             Write-Host "      💡 $($issue.Recommendation)" -ForegroundColor Green
         }
-        
+
         if ($group.Count -gt 3) {
             Write-Host "      ... and $($group.Count - 3) more similar issues" -ForegroundColor Gray
         }

@@ -21,8 +21,7 @@ $ToolsPath = Join-Path $PSScriptRoot 'Tools\Scripts'
 
 if (Test-Path $ToolsPath) {
     . (Join-Path $ToolsPath 'XAML-Syntax-Analyzer.ps1')
-    . (Join-Path $ToolsPath 'XAML-Structure-Detective.ps1')
-    . (Join-Path $ToolsPath 'XAML-Quality-Inspector.ps1')
+    . (Join-Path $ToolsPath 'Read-Only-Analysis-Tools.ps1')
 }
 
 #region Bus Buddy XAML Analysis Functions
@@ -235,8 +234,15 @@ function bb-xaml-validate {
             $content = Get-Content $file.FullName -Raw
             $xml = [xml]$content
 
-            Write-Host '✅ ' -ForegroundColor Green -NoNewline
-            Write-Host (Split-Path $file.FullName -Leaf) -ForegroundColor White
+            # Validate XML structure
+            if ($xml -and $xml.DocumentElement) {
+                Write-Host '✅ ' -ForegroundColor Green -NoNewline
+                Write-Host (Split-Path $file.FullName -Leaf) -ForegroundColor White
+            } else {
+                Write-Host '❌ ' -ForegroundColor Red -NoNewline
+                Write-Host (Split-Path $file.FullName -Leaf) -ForegroundColor White
+                continue
+            }
 
             # Check for common Bus Buddy issues
             if ($content -match 'x:Name="[a-z]') {
@@ -468,7 +474,8 @@ function Test-XamlSyntax {
     try {
         $content = Get-Content $FilePath -Raw
         $xml = [xml]$content
-        return $true
+        # Validate the XML structure is well-formed
+        return ($xml -and $xml.DocumentElement)
     } catch {
         return $false
     }
