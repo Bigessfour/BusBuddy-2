@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     XAML Performance Analyzer for Bus Buddy
@@ -141,7 +141,7 @@ function Invoke-XamlPerformanceCheck {
         return
     }
 
-    # Group issues by type for better reporting
+    # Group-Object issues by type for better reporting
     $groupedIssues = $issues | Group-Object IssueType
 
     foreach ($group in $groupedIssues) {
@@ -155,8 +155,8 @@ function Invoke-XamlPerformanceCheck {
             Write-Host "      📈 Impact: $($issue.ImpactLevel)" -ForegroundColor Cyan
         }
 
-        if ($group.Count -gt 3) {
-            Write-Host "      ... and $($group.Count - 3) more similar issues" -ForegroundColor Gray
+        if ($Group.Count -gt 3) {
+            Write-Host "      ... and $($Group.Count - 3) more similar issues" -ForegroundColor Gray
         }
     }
 

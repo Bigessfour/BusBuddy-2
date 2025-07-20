@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     XAML Type Safety Analyzer for Bus Buddy
@@ -199,7 +199,7 @@ function Invoke-XamlTypeSafetyCheck {
     Write-Host "   Medium Priority: $mediumIssues (runtime errors)" -ForegroundColor Yellow
     Write-Host "   Low Priority: $lowIssues (formatting issues)" -ForegroundColor Green
 
-    # Group by issue type
+    # Group-Object by issue type
     $groupedIssues = $issues | Group-Object IssueType | Sort-Object {
         switch ($_.Name) {
             "TypeMismatch" { 1 }

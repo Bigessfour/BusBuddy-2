@@ -29,6 +29,8 @@ namespace BusBuddy.WPF.Views.GoogleEarth
             using (LogContext.PushProperty("PerformanceOptimizations", "Enabled"))
             {
                 InitializeComponent();
+                // Subscribe to Unloaded event for cleanup
+                this.Unloaded += OnViewUnloaded;
 
                 // Initialize debounce timer for layer changes
                 _layerChangeDebounceTimer = new Timer(OnLayerChangeDebounceElapsed, null, Timeout.Infinite, Timeout.Infinite);
@@ -236,29 +238,5 @@ namespace BusBuddy.WPF.Views.GoogleEarth
         /// <summary>
         /// Cleanup resources when the view is being disposed
         /// </summary>
-        protected override void OnUnloaded(System.Windows.RoutedEventArgs e)
-        {
-            using (LogContext.PushProperty("ViewLifecycle", "Cleanup"))
-            {
-                try
-                {
-                    Logger.Debug("Cleaning up GoogleEarthView resources");
-
-                    // Dispose of the debounce timer
-                    _layerChangeDebounceTimer?.Dispose();
-
-                    // Cleanup DataContext event handler
-                    DataContextChanged -= OnDataContextChanged;
-
-                    base.OnUnloaded(e);
-
-                    Logger.Debug("GoogleEarthView cleanup completed successfully");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, "Error during GoogleEarthView cleanup");
-                }
-            }
-        }
     }
 }

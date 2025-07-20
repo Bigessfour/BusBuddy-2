@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     XAML Null Safety Analyzer for Bus Buddy
@@ -144,7 +144,7 @@ function Test-SyncfusionNamespaces {
 }
 
 function Test-BusBuddyNullSafety {
-    [CmdletBinding()
+    [CmdletBinding()]
     param(
         [string]$Path = 'BusBuddy.WPF\Views'
     )
@@ -171,7 +171,7 @@ function Test-BusBuddyNullSafety {
 
     foreach ($issue in $issues) {
         $fileName = Split-Path $issue.FilePath -Leaf
-        Write-Information "`n📄 $fileName (Line $($issue.LineNumber))" -Tags 'XamlNullSafety' -InformationAction Continue
+        Write-Information "`n $fileName (Line $($issue.LineNumber))" -Tags 'XamlNullSafety' -InformationAction Continue
         Write-Error "   Issue: $($issue.IssueType)"
         Write-Information "   Current: $($issue.CurrentBinding)" -Tags 'XamlNullSafety' -InformationAction Continue
         Write-Information "   Suggest: $($issue.SaferAlternative)" -Tags 'XamlNullSafety' -InformationAction Continue

@@ -146,6 +146,7 @@ namespace BusBuddy.WPF.Views.Main
 
                     System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Constructor completed successfully");
                 }
+            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ [MAINWINDOW] Constructor failed: {ex.Message}");

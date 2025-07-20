@@ -28,8 +28,8 @@
       "args": [
         "test",
         "${workspaceFolder}/BusBuddy.Tests/BusBuddy.Tests.csproj",
-        "--filter",
-        "FullyQualifiedName~UnitTest1"
+        "--logger",
+        "console;verbosity=detailed"
       ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
@@ -85,6 +85,15 @@
       "createTemporaryIntegratedConsole": false
     },
     {
+      "name": "Debug PowerShell Profile Loading",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/persistent-profile-helper.ps1",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "createTemporaryIntegratedConsole": false
+    },
+    {
       "name": "Attach to Process",
       "type": "coreclr",
       "request": "attach",
@@ -103,7 +112,32 @@
         "ENABLE_DB_VALIDATION": "true",
         "VERBOSE_LOGGING": "true"
       },
-      "justMyCode": false
+      "justMyCode": false,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true
+      }
+    },
+    {
+      "name": "Run and Debug BusBuddy.WPF with Workflows",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "BB: Build Solution",
+      "postDebugTask": "Clean Solution",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true
+      },
+      "env": {
+        "BUSBUDDY_ADVANCED_WORKFLOWS": "true",
+        "BUSBUDDY_DEBUG_ENABLED": "true"
+      }
     }
   ],
   "compounds": [
@@ -134,6 +168,13 @@
         "Debug PowerShell Workflows",
         "Run and Debug BusBuddy.WPF",
         "Debug Tests with Coverage"
+      ]
+    },
+    {
+      "name": "Advanced Workflow Session",
+      "configurations": [
+        "Debug PowerShell Workflows",
+        "Run and Debug BusBuddy.WPF with Workflows"
       ]
     }
   ]

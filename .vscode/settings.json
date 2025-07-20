@@ -34,16 +34,38 @@
   "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.useModernNet": true,
   "omnisharp.maxProjectFileCountForDiagnosticAnalysis": 500,
-  "powershell.scriptAnalysis.enable": true,
+  "powershell.scriptAnalysis.enable": false,
   "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
   "powershell.scriptAnalysis.ruleSettings": {
     "PSUseApprovedVerbs": {
       "Enable": true,
       "Severity": "Error",
       "TreatAsError": true
+    },
+    "PSUseConsistentIndentation": {
+      "Enable": true,
+      "Kind": "space",
+      "PipelineIndentation": "IncreaseIndentationAfterEveryPipeline"
+    },
+    "PSUseConsistentWhitespace": {
+      "Enable": true,
+      "CheckInnerBrace": true,
+      "CheckOpenBrace": true,
+      "CheckOpenParen": true,
+      "CheckOperator": true,
+      "CheckPipe": true,
+      "CheckPipeForRedundantWhitespace": false,
+      "CheckSeparator": true,
+      "CheckParameter": false
     }
   },
+  "powershell.scriptAnalysis.excludePaths": [
+    "**/.vscode/**",
+    "**/Tools/Scripts/**"
+  ],
   "powershell.integratedConsole.showOnStartup": false,
+  "powershell.integratedConsole.suppressStartupBanner": true,
+  "powershell.analyzeOpenDocumentsOnly": true,
   "powershell.codeFormatting.preset": "OTBS",
   "powershell.codeFormatting.openBraceOnSameLine": true,
   "powershell.codeFormatting.newLineAfterOpenBrace": true,
@@ -69,7 +91,10 @@
   "powershell.buttons.showPanelMovementButtons": true,
   "powershell.developer.featureFlags": [
     "BreakAllInRunspace",
-    "PSReadLinePredictor"
+    "PSReadLinePredictor",
+    "PSScriptAnalyzer",
+    "CodeFolding",
+    "PSReadLineHistoryList"
   ],
   "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2",
   "terminal.integrated.profiles.windows": {
@@ -79,7 +104,7 @@
         "-NoProfile",
         "-NoExit",
         "-Command",
-        ". '${workspaceFolder}\\persistent-profile-helper.ps1'"
+        ". '${workspaceFolder}\\load-bus-buddy-profiles.ps1'"
       ],
       "icon": "terminal-powershell"
     },
@@ -89,7 +114,7 @@
         "-NoProfile",
         "-NoExit",
         "-Command",
-        "Start-Process pwsh.exe -ArgumentList '-NoProfile', '-NoExit', '-Command', \"`. '${workspaceFolder}\\persistent-profile-helper.ps1'\"\" -Verb RunAs"
+        "Start-Process pwsh.exe -ArgumentList '-NoProfile', '-NoExit', '-Command', \"`. '${workspaceFolder}\\load-bus-buddy-profiles.ps1'\"\" -Verb RunAs"
       ],
       "icon": "terminal-powershell"
     }

@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 # Quick test script to verify environment variables are properly configured
 
 Write-Host '🔍 Environment Variable Configuration Test' -ForegroundColor Green
@@ -13,7 +13,7 @@ $envVars = @{
     'DATABASE_CONNECTION_STRING' = $env:DATABASE_CONNECTION_STRING
 }
 
-foreach ($var in $envVars.GetEnumerator()) {
+ForEach-Object ($var in $envVars.GetEnumerator()) {
     if ($var.Value) {
         if ($var.Key -eq 'DATABASE_CONNECTION_STRING') {
             Write-Host "   ✓ $($var.Key): SET (length: $($var.Value.Length) chars)" -ForegroundColor Green

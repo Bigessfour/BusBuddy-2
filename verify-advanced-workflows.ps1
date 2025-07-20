@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Verify Bus Buddy Advanced Workflows Loading
@@ -53,7 +53,7 @@ $expectedCommands = @(
 $availableCommands = @()
 $missingCommands = @()
 
-foreach ($command in $expectedCommands) {
+ForEach-Object ($command in $expectedCommands) {
     if (Get-Command -Name $command -ErrorAction SilentlyContinue) {
         $availableCommands += $command
     } else {
@@ -67,14 +67,14 @@ Write-Host "  Commands found: $($availableCommands.Count) of $($expectedCommands
 
 if ($availableCommands.Count -gt 0) {
     Write-Host "`n✅ Available commands:" -ForegroundColor Green
-    foreach ($command in $availableCommands) {
+    ForEach-Object ($command in $availableCommands) {
         Write-Host "  • $command" -ForegroundColor Gray
     }
 }
 
 if ($missingCommands.Count -gt 0) {
     Write-Host "`n❌ Missing commands:" -ForegroundColor Red
-    foreach ($command in $missingCommands) {
+    ForEach-Object ($command in $missingCommands) {
         Write-Host "  • $command" -ForegroundColor Red
     }
 

@@ -248,15 +248,6 @@ namespace BusBuddy.WPF.ViewModels
         }
 
         /// <summary>
-        /// Command for menu-based navigation with parameter
-        /// </summary>
-        [RelayCommand]
-        public async Task NavigateToCommand(string viewName)
-        {
-            await NavigateTo(viewName);
-        }
-
-        /// <summary>
         /// Legacy navigation method for backward compatibility
         /// </summary>
         private async Task NavigateToLegacy(string viewModelName)

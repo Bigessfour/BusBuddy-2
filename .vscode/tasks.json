@@ -7,62 +7,6 @@
       "DOTNET_NOLOGO": "1"
     }
   },
-  "problemMatchers": [
-    {
-      "name": "busbuddy-csharp",
-      "owner": "busbuddy",
-      "fileLocation": "absolute",
-      "pattern": {
-        "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(\\w+):\\s+(.*)$",
-        "file": 1,
-        "line": 2,
-        "column": 3,
-        "severity": 4,
-        "code": 5,
-        "message": 6
-      }
-    },
-    {
-      "name": "busbuddy-xaml",
-      "owner": "busbuddy",
-      "fileLocation": "absolute",
-      "pattern": {
-        "regexp": "^.*?([^\\s]+\\.xaml)\\((\\d+),(\\d+)\\):\\s+(error|warning)\\s+(.*)$",
-        "file": 1,
-        "line": 2,
-        "column": 3,
-        "severity": 4,
-        "message": 5
-      }
-    },
-    {
-      "name": "busbuddy-powershell",
-      "owner": "busbuddy",
-      "fileLocation": "absolute",
-      "pattern": {
-        "regexp": "^.*At\\s+(.+?):(\\d+)\\s+char:(\\d+)(.*)$",
-        "file": 1,
-        "line": 2,
-        "column": 3,
-        "severity": "error",
-        "message": 4
-      }
-    },
-    {
-      "name": "busbuddy-serilog",
-      "owner": "busbuddy",
-      "fileLocation": "absolute",
-      "pattern": [
-        {
-          "regexp": "^\\[(.*)\\]\\s+(ERROR|WARN|INFO|DEBUG)\\s+-\\s+(.*)\\s+at\\s+(.*)\\s+in\\s+(.*):(\\d+)$",
-          "file": 5,
-          "line": 6,
-          "severity": 2,
-          "message": 3
-        }
-      ]
-    }
-  ],
   "tasks": [
     {
       "label": "Git Commit and Push",
@@ -112,7 +56,7 @@
       ],
       "group": "build",
       "problemMatcher": [
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
@@ -131,7 +75,7 @@
       ],
       "group": "build",
       "problemMatcher": [
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
@@ -155,18 +99,18 @@
         "isDefault": true
       },
       "problemMatcher": [
-        "$busbuddy-csharp",
-        "$busbuddy-xaml"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
         "panel": "shared",
         "clear": true
       },
-      "detail": "Build the solution",
       "dependsOn": [
         "Restore Packages"
-      ]
+      ],
+      "dependsOrder": "sequence",
+      "detail": "Build the solution"
     },
     {
       "label": "Run Tests",
@@ -182,7 +126,7 @@
         "isDefault": true
       },
       "problemMatcher": [
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
@@ -192,6 +136,7 @@
       "dependsOn": [
         "Build Solution"
       ],
+      "dependsOrder": "sequence",
       "detail": "Run all tests"
     },
     {
@@ -205,7 +150,7 @@
       ],
       "group": "build",
       "problemMatcher": [
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
@@ -215,6 +160,7 @@
       "dependsOn": [
         "Build Solution"
       ],
+      "dependsOrder": "sequence",
       "detail": "Launch the WPF app"
     },
     {
@@ -225,14 +171,18 @@
         "Build Solution",
         "Run Tests"
       ],
+      "dependsOrder": "sequence",
       "group": "build",
       "problemMatcher": [
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
         "panel": "shared",
         "clear": true
+      },
+      "runOptions": {
+        "reevaluateOnRerun": true
       },
       "detail": "Full cycle: clean, restore, build, test"
     },
@@ -242,9 +192,10 @@
         "Build Solution",
         "Run Tests"
       ],
+      "dependsOrder": "sequence",
       "group": "test",
       "problemMatcher": [
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
@@ -258,21 +209,49 @@
       "type": "shell",
       "command": "pwsh",
       "args": [
+        "-NoProfile",
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "${workspaceFolder}/.vscode/health-check.ps1"
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-health"
       ],
       "group": "test",
-      "problemMatcher": [
-        "$busbuddy-powershell"
-      ],
+      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "shared",
         "clear": true
       },
-      "detail": "Run health checks"
+      "detail": "Run health checks using advanced workflows"
+    },
+    {
+      "label": "Advanced Diagnostics",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-diagnostic"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "runOptions": {
+        "reevaluateOnRerun": true
+      },
+      "detail": "Comprehensive system analysis and reporting"
     },
     {
       "label": "Serilog Development Monitor",
@@ -285,14 +264,13 @@
         "${workspaceFolder}/.vscode/serilog-monitor.ps1"
       ],
       "group": "build",
-      "problemMatcher": [
-        "$msCompile"
-      ],
+      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "shared",
         "clear": true
       },
+      "isBackground": true,
       "detail": "Monitor Serilog during build"
     },
     {
@@ -307,7 +285,7 @@
       ],
       "group": "build",
       "problemMatcher": [
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",
@@ -317,6 +295,7 @@
       "dependsOn": [
         "Build Solution"
       ],
+      "dependsOrder": "sequence",
       "detail": "Publish for deployment"
     },
     {
@@ -362,6 +341,7 @@
       "dependsOn": [
         "Build Solution"
       ],
+      "dependsOrder": "sequence",
       "detail": "Run tests with code coverage analysis"
     },
     {
@@ -407,15 +387,348 @@
         "if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { Invoke-ScriptAnalyzer -Path '${workspaceFolder}' -Recurse -IncludeDefaultRules } else { Write-Host 'PSScriptAnalyzer not installed. Install with: Install-Module -Name PSScriptAnalyzer' -ForegroundColor Yellow }"
       ],
       "group": "test",
-      "problemMatcher": [
-        "$busbuddy-powershell"
-      ],
+      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "shared",
         "clear": true
       },
       "detail": "Analyze PowerShell scripts for best practices"
+    },
+    {
+      "label": "PowerShell Profile Analysis",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "Measure-Command { . '${workspaceFolder}\\load-bus-buddy-profiles.ps1' }; Get-Command bb-* | Measure-Object | Select-Object Count; Write-Host 'Profile loaded successfully' -ForegroundColor Green"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Analyze PowerShell profile loading performance and available commands"
+    },
+    {
+      "label": "PowerShell Script Security Scan",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { Get-ChildItem -Path '${workspaceFolder}' -Filter '*.ps1' -Recurse | ForEach-Object { Write-Host \"Scanning: $($_.Name)\" -ForegroundColor Cyan; Invoke-ScriptAnalyzer -Path $_.FullName -Severity 'Error' -IncludeRule 'PSAvoidUsingPlainTextForPassword', 'PSAvoidUsingConvertToSecureStringWithPlainText', 'PSUsePSCredentialType' } } else { Write-Host 'Install PSScriptAnalyzer for security analysis' -ForegroundColor Red }"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Security-focused analysis of PowerShell scripts"
+    },
+    {
+      "label": "BB: Start Development Session",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-dev-session"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "isBackground": true,
+      "detail": "Start a complete development session with comprehensive setup"
+    },
+    {
+      "label": "BB: Quick Test Cycle",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-quick-test"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "detail": "Quick build-test-validate cycle with performance monitoring"
+    },
+    {
+      "label": "BB: Run Application",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-run"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "detail": "Run the application using advanced PowerShell workflows"
+    },
+    {
+      "label": "BB: Build Solution",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-build"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "detail": "Build the solution using advanced PowerShell workflows"
+    },
+    {
+      "label": "BB: Test Solution",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-test"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "detail": "Run tests using advanced PowerShell workflows"
+    },
+    {
+      "label": "BB: Start Debug",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Quiet",
+        ";",
+        "bb-debug-start"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true,
+      "detail": "Start debug monitoring with advanced workflows"
+    },
+    {
+      "label": "Initialize PowerShell Profiles",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/load-bus-buddy-profiles.ps1",
+        "-Force"
+      ],
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "detail": "Force reload all PowerShell profiles"
+    },
+    {
+      "label": "Fix PowerShell Profile Loading",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "& { . ${workspaceFolder}/fix-profile-loading.ps1; Write-Host 'PowerShell profiles fixed and initialized' -ForegroundColor Green }"
+      ],
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "detail": "Fix profile loading issues and initialize profiles"
+    },
+    {
+      "label": "Fix PowerShell Code Issues",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host 'Fixing PowerShell Code Issues...' -ForegroundColor Cyan; try { $results = Invoke-ScriptAnalyzer -Path '.' -Recurse -Fix -Settings './PSScriptAnalyzerSettings.psd1' -ErrorAction Stop; Write-Host \"Fixed $($results.Count) auto-fixable issues\" -ForegroundColor Green } catch { Write-Host 'Auto-fix not supported, running analysis only...' -ForegroundColor Yellow }; Write-Host 'Running final analysis...' -ForegroundColor Yellow; $remaining = Invoke-ScriptAnalyzer -Path '.' -Recurse -Settings './PSScriptAnalyzerSettings.psd1' | Where-Object { $_.Severity -in @('Error', 'Warning') }; Write-Host \"Remaining issues: $($remaining.Count)\" -ForegroundColor $(if($remaining.Count -eq 0) {'Green'} else {'Red'}); if($remaining.Count -gt 0) { $remaining | Select-Object -First 10 | Format-Table -Property RuleName, Severity, ScriptName, Line -AutoSize }"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "detail": "Automatically fix PowerShell code issues using PSScriptAnalyzer"
+    },
+    {
+      "label": "Fix PowerShell Encoding",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/fix-ps-encoding.ps1"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "detail": "Fix UTF-8 BOM encoding for all PowerShell files"
+    },
+    {
+      "label": "PowerShell Code Quality Monitor",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "while ($true) { Clear-Host; Write-Host '=== PowerShell Code Quality Monitor ===' -ForegroundColor Cyan; $issues = Invoke-ScriptAnalyzer -Path '.' -Recurse | Where-Object { $_.Severity -in @('Error', 'Warning') }; Write-Host \"Total Issues: $($issues.Count)\" -ForegroundColor $(if($issues.Count -eq 0) {'Green'} else {'Yellow'}); $issues | Group-Object RuleName | Sort-Object Count -Descending | Select-Object -First 10 | Format-Table Name, Count; Start-Sleep 10 }"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true,
+      "detail": "Monitor PowerShell code quality in real-time"
+    },
+    {
+      "label": "Fix PowerShell Issues (Background)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host 'Starting PowerShell code fixes...' -ForegroundColor Cyan; Invoke-ScriptAnalyzer -Path '.' -Recurse -Fix -Settings './PSScriptAnalyzerSettings.psd1'; Write-Host 'Auto-fixes complete. Checking remaining issues...' -ForegroundColor Green; $remaining = Invoke-ScriptAnalyzer -Path '.' -Recurse | Where-Object { $_.Severity -in @('Error', 'Warning') }; Write-Host \"Remaining issues: $($remaining.Count)\" -ForegroundColor $(if($remaining.Count -eq 0) {'Green'} else {'Yellow'})"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true,
+      "detail": "Fix PowerShell code issues in background"
+    },
+    {
+      "label": "Monitor Build & Test",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "while ($true) { Write-Host '=== Build & Test Monitor ===' -ForegroundColor Cyan; dotnet build BusBuddy.sln --verbosity quiet; if ($LASTEXITCODE -eq 0) { Write-Host '✅ Build successful' -ForegroundColor Green; dotnet test BusBuddy.sln --no-build --verbosity quiet; if ($LASTEXITCODE -eq 0) { Write-Host '✅ Tests passed' -ForegroundColor Green } else { Write-Host '❌ Tests failed' -ForegroundColor Red } } else { Write-Host '❌ Build failed' -ForegroundColor Red }; Write-Host \"Last check: $(Get-Date -Format 'HH:mm:ss')\" -ForegroundColor Gray; Start-Sleep 30 }"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true,
+      "detail": "Monitor build and test status continuously"
+    },
+    {
+      "label": "PowerShell Security Monitor",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "while ($true) { Write-Host '=== Security Monitor ===' -ForegroundColor Red; $securityIssues = Invoke-ScriptAnalyzer -Path '.' -Recurse -IncludeRule 'PSAvoidUsingPlainTextForPassword', 'PSAvoidUsingConvertToSecureStringWithPlainText', 'PSUsePSCredentialType', 'PSAvoidUsingInvokeExpression' | Where-Object { $_.Severity -eq 'Error' }; if ($securityIssues.Count -eq 0) { Write-Host '✅ No security issues detected' -ForegroundColor Green } else { Write-Host \"⚠️ $($securityIssues.Count) security issues found\" -ForegroundColor Red; $securityIssues | Select-Object -First 5 | Format-Table RuleName, ScriptName, Line }; Start-Sleep 60 }"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "isBackground": true,
+      "detail": "Monitor PowerShell security issues continuously"
     }
   ]
 }

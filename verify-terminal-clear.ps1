@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Verify Terminal Clear Functionality
@@ -55,7 +55,7 @@ if ($clearHostExists) {
     Write-Host "`n📌 VS Code Terminal Actions:" -ForegroundColor Cyan
     Write-Host "1. Click the trash can icon in the terminal toolbar" -ForegroundColor Gray
     Write-Host "2. Press Ctrl+K in the terminal" -ForegroundColor Gray
-    Write-Host "3. Right-click in the terminal and select 'Clear'" -ForegroundColor Gray
+    Write-Host "3. Right-click in the terminal and Select-Object 'Clear'" -ForegroundColor Gray
 
     Write-Host "`n✅ Verification complete! Try the clear methods above." -ForegroundColor Green
 } else {

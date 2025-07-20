@@ -1,4 +1,4 @@
-# C# Corruption Detection Script for VS Code Task Integration
+﻿# C# Corruption Detection Script for VS Code Task Integration
 # This script is called by the "🔍 Full Project Validation Suite" task
 
 param(
@@ -15,7 +15,7 @@ try {
 
     Write-Host "📁 Found $($csFiles.Count) C# files to analyze..." -ForegroundColor White
 
-    foreach ($file in $csFiles) {
+    ForEach-Object ($file in $csFiles) {
         try {
             $content = Get-Content $file.FullName -Raw
             $fileName = $file.Name
@@ -24,7 +24,7 @@ try {
             # Check for WinForms references in WPF project
             if ($content -match 'using\s+System\.Windows\.Forms') {
                 $regexMatches = [regex]::Matches($content, 'using\s+System\.Windows\.Forms')
-                foreach ($match in $regexMatches) {
+                ForEach-Object ($match in $regexMatches) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber)`: WinForms reference in WPF project"
                     Write-Host "⚠️ $fileName($lineNumber)`: WinForms reference detected" -ForegroundColor Yellow
@@ -34,7 +34,7 @@ try {
             # Check for Console.WriteLine usage (should use Serilog)
             if ($content -match 'Console\.WriteLine') {
                 $regexMatches2 = [regex]::Matches($content, 'Console\.WriteLine')
-                foreach ($match in $regexMatches2) {
+                ForEach-Object ($match in $regexMatches2) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber)`: Console.WriteLine should use Serilog Logger"
                     Write-Host "⚠️ $fileName($lineNumber)`: Use Logger instead of Console.WriteLine" -ForegroundColor Yellow
@@ -44,7 +44,7 @@ try {
             # Check for Debug.WriteLine usage (should use Serilog)
             if ($content -match 'Debug\.WriteLine') {
                 $regexMatches3 = [regex]::Matches($content, 'Debug\.WriteLine')
-                foreach ($match in $regexMatches3) {
+                ForEach-Object ($match in $regexMatches3) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber)`: Debug.WriteLine should use Serilog Logger"
                     Write-Host "⚠️ $fileName($lineNumber)`: Use Logger.Debug() instead of Debug.WriteLine" -ForegroundColor Yellow
@@ -54,7 +54,7 @@ try {
             # Check for Trace.WriteLine usage (should use Serilog)
             if ($content -match 'Trace\.WriteLine') {
                 $regexMatches4 = [regex]::Matches($content, 'Trace\.WriteLine')
-                foreach ($match in $regexMatches4) {
+                ForEach-Object ($match in $regexMatches4) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber)`: Trace.WriteLine should use Serilog Logger"
                     Write-Host "⚠️ $fileName($lineNumber)`: Use Logger.Verbose() instead of Trace.WriteLine" -ForegroundColor Yellow
@@ -64,7 +64,7 @@ try {
             # Check for null-forgiving operator usage
             if ($content -match '\bnull!') {
                 $regexMatches5 = [regex]::Matches($content, '\bnull!')
-                foreach ($match in $regexMatches5) {
+                ForEach-Object ($match in $regexMatches5) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber)`: Null-forgiving operator usage detected"
                     Write-Host "⚠️ $fileName($lineNumber)`: Review null-forgiving operator usage" -ForegroundColor Yellow
@@ -74,7 +74,7 @@ try {
             # Check for auto-properties that could use ObservableProperty
             if ($content -match 'public\s+(?!class|interface|enum|struct|delegate)\w+\s+\w+\s*{\s*get;\s*set;\s*}' -and $content -notmatch '\[ObservableProperty\]') {
                 $regexMatches6 = [regex]::Matches($content, 'public\s+(?!class|interface|enum|struct|delegate)(\w+\s+\w+)\s*{\s*get;\s*set;\s*}')
-                foreach ($match in $regexMatches6) {
+                ForEach-Object ($match in $regexMatches6) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $propertyDeclaration = $match.Groups[1].Value
                     Write-Host "ℹ️ $fileName($lineNumber)`: Consider ObservableProperty for: $propertyDeclaration" -ForegroundColor Blue
@@ -84,7 +84,7 @@ try {
             # Check for missing async/await patterns
             if ($content -match '\bTask\b.*\{[^}]*\breturn\b[^;]*;[^}]*\}' -and $content -notmatch '\basync\b') {
                 $regexMatches7 = [regex]::Matches($content, '(\w+.*Task.*\{[^}]*return[^;]*;[^}]*\})')
-                foreach ($match in $regexMatches7) {
+                ForEach-Object ($match in $regexMatches7) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     Write-Host "ℹ️ $fileName($lineNumber)`: Consider async/await pattern for Task-returning method" -ForegroundColor Blue
                 }
@@ -93,7 +93,7 @@ try {
             # Check for hardcoded connection strings
             if ($content -match '(Server|Data Source|Initial Catalog|Integrated Security)=') {
                 $regexMatches8 = [regex]::Matches($content, '(Server|Data Source|Initial Catalog|Integrated Security)=')
-                foreach ($match in $regexMatches8) {
+                ForEach-Object ($match in $regexMatches8) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber)`: Potential hardcoded connection string detected"
                     Write-Host "⚠️ $fileName($lineNumber)`: Avoid hardcoded connection strings" -ForegroundColor Yellow
@@ -103,7 +103,7 @@ try {
             # Check for missing IDisposable implementation on classes with unmanaged resources
             if ($content -match '\bclass\s+\w+' -and $content -match '\b(FileStream|SqlConnection|HttpClient|Timer)\b' -and $content -notmatch '\bIDisposable\b') {
                 $classMatches = [regex]::Matches($content, '\bclass\s+(\w+)')
-                foreach ($match in $classMatches) {
+                ForEach-Object ($match in $classMatches) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $className = $match.Groups[1].Value
                     Write-Host "ℹ️ $fileName($lineNumber)`: Class '$className' may need IDisposable implementation" -ForegroundColor Blue
@@ -138,7 +138,7 @@ try {
                 }
             }
 
-            if ($issues.Where({$_ -match [regex]::Escape($relativePath)}).Count -eq 0) {
+            if ($issues.Where-Object({$_ -match [regex]::Escape($relativePath)}).Count -eq 0) {
                 Write-Host "✅ $fileName`: No corruption patterns detected" -ForegroundColor Green
             }
 
@@ -154,7 +154,7 @@ try {
     } else {
         Write-Host "🔧 Found $($issues.Count) potential C# issues:" -ForegroundColor Yellow
 
-        # Group issues by severity
+        # Group-Object issues by severity
         $criticalIssues = $issues | Where-Object { $_ -match "(connection string|WinForms reference)" }
         $warningIssues = $issues | Where-Object { $_ -match "(Console\.WriteLine|Debug\.WriteLine|Trace\.WriteLine|null!)" }
         $infoIssues = $issues | Where-Object { $_ -notmatch "(connection string|WinForms reference|Console\.WriteLine|Debug\.WriteLine|Trace\.WriteLine|null!)" }

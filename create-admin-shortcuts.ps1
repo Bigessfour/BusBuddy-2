@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Creates shortcuts for Bus Buddy scripts with administrator privileges
@@ -115,7 +115,7 @@ if ($StartMenuShortcuts -and -not (Test-Path $startMenuFolder)) {
 $createdShortcuts = 0
 
 # Create shortcuts for each script
-foreach ($script in $scriptsToShortcut) {
+ForEach-Object ($script in $scriptsToShortcut) {
     $scriptPath = Join-Path $projectRoot $script.Path
 
     # Skip if script doesn't exist

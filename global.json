@@ -1,7 +1,15 @@
 {
-  "projects": [ "BusBuddy.WPF" ],
+  "projects": [
+    "BusBuddy.Core",
+    "BusBuddy.WPF",
+    "BusBuddy.Tests"
+  ],
   "sdk": {
-    "version": "8.0.0",
-    "rollForward": "latestMinor"
+    "version": "8.0.412",
+    "rollForward": "latestPatch",
+    "allowPrerelease": false
+  },
+  "msbuild-sdks": {
+    "Microsoft.Build.Traversal": "3.4.0"
   }
 }

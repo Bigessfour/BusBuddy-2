@@ -1,4 +1,4 @@
-#Requires -Version 7.5.2
+﻿#Requires -Version 7.5.2
 <#
 .SYNOPSIS
     Complete VS Code, PowerShell 7.5.2, Git and GitHub Integration for Bus Buddy
@@ -226,7 +226,7 @@ if ($null -ne (Get-Command code -ErrorAction SilentlyContinue)) {
     Write-Host "Checking for required extensions..." -ForegroundColor Blue
     $installedExtensions = code --list-extensions
 
-    foreach ($extension in $requiredExtensions) {
+    ForEach-Object ($extension in $requiredExtensions) {
         if ($installedExtensions -contains $extension.id) {
             Write-Host "  ✓ $($extension.name) is already installed" -ForegroundColor Green
         } else {
@@ -271,7 +271,7 @@ if ($null -ne (Get-Command code -ErrorAction SilentlyContinue)) {
             }
 
             $settingsModified = $false
-            foreach ($key in $psSettingsToAdd.Keys) {
+            ForEach-Object ($key in $psSettingsToAdd.Keys) {
                 if (-not (Get-Member -InputObject $userSettings -Name $key -MemberType Properties)) {
                     $userSettings | Add-Member -MemberType NoteProperty -Name $key -Value $psSettingsToAdd[$key]
                     $settingsModified = $true

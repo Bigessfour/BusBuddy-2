@@ -1,4 +1,4 @@
-# XAML Corruption Detection Script for VS Code Task Integration
+﻿# XAML Corruption Detection Script for VS Code Task Integration
 # This script is called by the "🔍 Full Project Validation Suite" task
 
 param(
@@ -29,7 +29,7 @@ try {
 
     Write-Host "📁 Found $($xamlFiles.Count) XAML files to analyze..." -ForegroundColor White
 
-    foreach ($file in $xamlFiles) {
+    ForEach-Object ($file in $xamlFiles) {
         try {
             $content = Get-Content $file.FullName -Raw
             $fileName = $file.Name
@@ -38,7 +38,7 @@ try {
             # Check for double-dash corruption in XML comments
             if ($content -match '--(?!>)') {
                 $regexMatches = [regex]::Matches($content, '--(?!>)')
-                foreach ($match in $regexMatches) {
+                ForEach-Object ($match in $regexMatches) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber): Contains double-dash in XML comments"
                     Write-Host "⚠️ $fileName($lineNumber): Double-dash in XML comments" -ForegroundColor Yellow
@@ -48,7 +48,7 @@ try {
             # Check for empty elements that should be self-closed
             if ($content -match '<([^>/\s]+)[^>]*>\s*</\1>') {
                 $regexMatches2 = [regex]::Matches($content, '<([^>/\s]+)[^>]*>\s*</\1>')
-                foreach ($match in $regexMatches2) {
+                ForEach-Object ($match in $regexMatches2) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $elementName = $match.Groups[1].Value
                     $issues += "$relativePath($lineNumber): Empty element '$elementName' should be self-closed"
@@ -59,7 +59,7 @@ try {
             # Check for invalid x:Name format
             if ($content -match 'x:Name\s*=\s*"[^"]*[^A-Za-z0-9_][^"]*"') {
                 $regexMatches3 = [regex]::Matches($content, 'x:Name\s*=\s*"([^"]*[^A-Za-z0-9_][^"]*)"')
-                foreach ($match in $regexMatches3) {
+                ForEach-Object ($match in $regexMatches3) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $invalidName = $match.Groups[1].Value
                     $issues += "$relativePath($lineNumber): Invalid x:Name format: '$invalidName'"
@@ -70,7 +70,7 @@ try {
             # Check for malformed attribute syntax
             if ($content -match '\s[A-Za-z]+\s*=\s*[^"]') {
                 $regexMatches4 = [regex]::Matches($content, '\s([A-Za-z]+)\s*=\s*([^"\s>]+)')
-                foreach ($match in $regexMatches4) {
+                ForEach-Object ($match in $regexMatches4) {
                     if ($match.Groups[2].Value -notmatch '^(true|false|\d+)$') {
                         $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                         $attrName = $match.Groups[1].Value
@@ -117,7 +117,7 @@ try {
     } else {
         Write-Host "🔧 Found $($issues.Count) potential XAML issues:" -ForegroundColor Yellow
 
-        # Group issues by type for better reporting
+        # Group-Object issues by type for better reporting
         $errorIssues = $issues | Where-Object { $_ -match "(parsing error|XML parsing)" }
         $warningIssues = $issues | Where-Object { $_ -notmatch "(parsing error|XML parsing)" }
 

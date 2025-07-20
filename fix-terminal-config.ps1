@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 #Requires -RunAsAdministrator
 <#
 .SYNOPSIS
@@ -223,7 +223,7 @@ Set-Alias -Name bb-reload -Value Update-BusBuddyProfiles -Force -Scope Global
 return $true
 '@
 
-# Write the persistent helper script
+# Write-Output the persistent helper script
 try {
     Set-Content -Path $persistentHelperPath -Value $persistentHelperContent -Force
     Write-Host "✅ Created persistent profile helper: $persistentHelperPath" -ForegroundColor Green
@@ -348,7 +348,7 @@ function Test-BusBuddyCommands {
     )
 
     $missingCommands = @()
-    foreach ($command in $commands) {
+    ForEach-Object ($command in $commands) {
         if (-not (Get-Command $command -ErrorAction SilentlyContinue)) {
             $missingCommands += $command
         }
@@ -374,7 +374,7 @@ if ($commandCheck.Available) {
     Write-Host "✅ Bus Buddy commands are available" -ForegroundColor Green
 } else {
     Write-Host "❌ Some Bus Buddy commands are missing:" -ForegroundColor Red
-    foreach ($cmd in $commandCheck.Missing) {
+    ForEach-Object ($cmd in $commandCheck.Missing) {
         Write-Host "  • $cmd" -ForegroundColor Red
     }
 }

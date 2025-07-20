@@ -140,7 +140,7 @@ namespace BusBuddy.WPF.Extensions
         public static async Task<T> ExecuteLazyInitializationAsync<T>(
             string operationName,
             Func<T> immediateInit,
-            Func<Task> backgroundInit = null) where T : class
+            Func<Task>? backgroundInit = null) where T : class
         {
             using (LogContext.PushProperty("Pattern", "LazyInitialization"))
             using (LogContext.PushProperty("Operation", operationName))

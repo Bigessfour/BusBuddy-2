@@ -1,4 +1,4 @@
-# Syncfusion Namespace Validation Script for VS Code Task Integration
+﻿# Syncfusion Namespace Validation Script for VS Code Task Integration
 # This script is called by the "🔍 Full Project Validation Suite" task
 
 param(
@@ -51,7 +51,7 @@ if (Test-Path $syncfusionValidatorPath) {
         $xamlFiles = Get-ChildItem -Path $ProjectPath -Filter '*.xaml' -Recurse -ErrorAction SilentlyContinue
     }
 
-    foreach ($file in $xamlFiles) {
+    ForEach-Object ($file in $xamlFiles) {
         try {
             $content = Get-Content $file.FullName -Raw
             if ($content -notmatch 'xmlns:syncfusion=' -and ($content -match 'sf:' -or $content -match 'syncfusion:')) {

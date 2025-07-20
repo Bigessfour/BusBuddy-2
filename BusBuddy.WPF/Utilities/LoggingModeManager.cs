@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -15,7 +14,7 @@ namespace BusBuddy.WPF.Utilities
     /// </summary>
     public static class LoggingModeManager
     {
-        private static readonly ILogger Logger = Log.ForContext(typeof(LoggingModeManager));
+        private static readonly Serilog.ILogger Logger = Log.ForContext(typeof(LoggingModeManager));
         private static readonly ConcurrentDictionary<string, LoggingMode> _activeContexts = new();
         private static LoggingMode _globalMode = LoggingMode.Standard;
         private static bool _isInitialized = false;
@@ -475,7 +474,7 @@ namespace BusBuddy.WPF.Utilities
         /// </summary>
         public class ConditionalLogger<T>
         {
-            private readonly ILogger _logger;
+            private readonly Serilog.ILogger _logger;
             private readonly string? _contextId;
 
             public ConditionalLogger(string? contextId)

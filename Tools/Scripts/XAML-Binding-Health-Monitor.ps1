@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     XAML Binding Health Monitor for Bus Buddy
@@ -232,8 +232,8 @@ function Invoke-BindingHealthCheck {
         Write-Host "      Solution: $($topIssue.Solution)" -ForegroundColor Green
         Write-Host "      Impact: $($topIssue.Impact)" -ForegroundColor Yellow
 
-        if ($group.Count -gt 1) {
-            Write-Host "      ... and $($group.Count - 1) more similar issues" -ForegroundColor Gray
+        if ($Group.Count -gt 1) {
+            Write-Host "      ... and $($Group.Count - 1) more similar issues" -ForegroundColor Gray
         }
     }
 
@@ -254,13 +254,13 @@ function Invoke-BindingHealthCheck {
         # Analyze binding patterns
         $bindingPatterns = $issues | Group-Object { Split-Path $_.FilePath -Leaf } |
             Where-Object { $_.Count -gt 3 } |
-            Sort-Object Count -Descending |
-            Select-Object -First 3
+                Sort-Object Count -Descending |
+                    Select-Object -First 3
 
         if ($bindingPatterns) {
-            Write-Host "   📋 Files needing attention:" -ForegroundColor Yellow
+            Write-Host "    Files needing attention:" -ForegroundColor Yellow
             foreach ($pattern in $bindingPatterns) {
-                Write-Host "      • $($pattern.Name): $($pattern.Count) issues" -ForegroundColor Gray
+                Write-Host "       $($pattern.Name): $($pattern.Count) issues" -ForegroundColor Gray
             }
         }
 
@@ -277,17 +277,17 @@ function Invoke-BindingHealthCheck {
     if ($ExportReport) {
         $reportPath = Join-Path $projectRoot "logs\binding-health-report-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
         $report = @{
-            GeneratedAt = Get-Date
-            ProjectPath = $targetPath
+            GeneratedAt   = Get-Date
+            ProjectPath   = $targetPath
             HealthMetrics = @{
-                TotalFiles = $totalFiles
-                FilesWithIssues = $filesWithIssues
-                HealthScore = $healthScore
-                CriticalIssues = $criticalIssues.Count
-                PerformanceIssues = $performanceIssues.Count
+                TotalFiles            = $totalFiles
+                FilesWithIssues       = $filesWithIssues
+                HealthScore           = $healthScore
+                CriticalIssues        = $criticalIssues.Count
+                PerformanceIssues     = $performanceIssues.Count
                 MaintainabilityIssues = $maintainabilityIssues.Count
             }
-            Issues = $issues
+            Issues        = $issues
         }
         $report | ConvertTo-Json -Depth 4 | Out-File $reportPath -Encoding UTF8
         Write-Host "`n💾 Health report exported to: $reportPath" -ForegroundColor Green

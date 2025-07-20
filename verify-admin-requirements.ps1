@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Verifies administrator privileges requirements for Bus Buddy PowerShell workflows
@@ -107,7 +107,7 @@ $psScripts = Get-ChildItem -Path $projectRoot -Recurse -Filter "*.ps1" | Select-
 
 # Check each script for admin requirements
 $results = @()
-foreach ($script in $psScripts) {
+ForEach-Object ($script in $psScripts) {
     $relativePath = $script.Replace("$projectRoot\", "")
     Write-Host "  Checking $relativePath..." -ForegroundColor Gray
     $results += Test-AdminRequirement -FilePath $script
@@ -127,7 +127,7 @@ Write-Host "  • Scripts with implicit admin requirements: $($implicitRequired.
 # Display scripts requiring admin privileges
 if ($adminRequired.Count -gt 0) {
     Write-Host "`n📋 Scripts Requiring Administrator Privileges:" -ForegroundColor Green
-    foreach ($script in $adminRequired) {
+    ForEach-Object ($script in $adminRequired) {
         $relativePath = $script.Path.Replace("$projectRoot\", "")
         Write-Host "`n  📄 $relativePath" -ForegroundColor Yellow
 
@@ -139,7 +139,7 @@ if ($adminRequired.Count -gt 0) {
 
         if ($script.Operations.Count -gt 0) {
             Write-Host "    🔐 Administrative operations:" -ForegroundColor Cyan
-            foreach ($op in $script.Operations) {
+            ForEach-Object ($op in $script.Operations) {
                 Write-Host "      • $op" -ForegroundColor White
             }
         }
@@ -161,7 +161,7 @@ if ($GenerateDocumentation) {
     $docContent += "## Scripts Requiring Administrator Privileges`n"
 
     # Add each script's details
-    foreach ($script in $adminRequired) {
+    ForEach-Object ($script in $adminRequired) {
         $relativePath = $script.Path.Replace("$projectRoot\", "")
 
         $docContent += "`n### $relativePath`n`n"
@@ -170,7 +170,7 @@ if ($GenerateDocumentation) {
 
         if ($script.Operations.Count -gt 0) {
             $docContent += "`n#### Administrative Operations:`n`n"
-            foreach ($op in $script.Operations) {
+            ForEach-Object ($op in $script.Operations) {
                 $docContent += "- $op`n"
             }
         }
@@ -183,7 +183,7 @@ if ($GenerateDocumentation) {
 
 To run PowerShell scripts with administrator privileges:
 
-1. **Right-click PowerShell or VS Code** and select "Run as administrator"
+1. **Right-click PowerShell or VS Code** and Select-Object "Run as administrator"
 2. **From an existing PowerShell session**, use:
    ```powershell
    Start-Process pwsh -ArgumentList "-File", "path\to\script.ps1" -Verb RunAs
@@ -222,7 +222,7 @@ When adding new scripts to the Bus Buddy project:
 # Print scripts that need to be fixed
 if ($implicitRequired.Count -gt 0) {
     Write-Host "`n⚠️ Scripts Needing #Requires -RunAsAdministrator Directive:" -ForegroundColor Yellow
-    foreach ($script in $implicitRequired) {
+    ForEach-Object ($script in $implicitRequired) {
         $relativePath = $script.Path.Replace("$projectRoot\", "")
         Write-Host "  • $relativePath" -ForegroundColor White
     }

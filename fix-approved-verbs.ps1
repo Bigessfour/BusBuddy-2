@@ -1,4 +1,4 @@
-# Fix Approved Verbs in Bus Buddy PowerShell Files
+﻿# Fix Approved Verbs in Bus Buddy PowerShell Files
 # This script updates function names to use PowerShell approved verbs
 
 param(
@@ -103,7 +103,7 @@ $filesToProcess = @(
 
 Write-Host "`n📋 PROCESSING FILES:" -ForegroundColor Cyan
 
-foreach ($filePath in $filesToProcess) {
+ForEach-Object ($filePath in $filesToProcess) {
     if (-not (Test-Path $filePath)) {
         Write-Warning "File not found: $filePath"
         continue
@@ -116,7 +116,7 @@ foreach ($filePath in $filesToProcess) {
     $changesCount = 0
 
     # Update function definitions
-    foreach ($oldName in $functionMappings.Keys) {
+    ForEach-Object ($oldName in $functionMappings.Keys) {
         $newName = $functionMappings[$oldName]
 
         # Replace function definition
@@ -135,7 +135,7 @@ foreach ($filePath in $filesToProcess) {
         $aliasSection = "`n`n# Backward Compatibility Aliases`n"
 
         # Find functions that were changed in this file
-        foreach ($oldName in $functionMappings.Keys) {
+        ForEach-Object ($oldName in $functionMappings.Keys) {
             $newName = $functionMappings[$oldName]
             if ($originalContent -match "function\s+$([regex]::Escape($oldName))\s*\{") {
                 $aliasName = $aliasMappings[$newName]

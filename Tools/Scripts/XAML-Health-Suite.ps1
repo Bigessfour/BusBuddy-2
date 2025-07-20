@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Bus Buddy Advanced XAML Health Suite
@@ -46,7 +46,7 @@ function Invoke-ComprehensiveXamlHealth {
     .PARAMETER Full
         Run full comprehensive analysis with reports
     .PARAMETER FixMode
-        Suggest automated fixes where possible
+        Suggest automated fixes Where-Object possible
     .EXAMPLE
         Invoke-ComprehensiveXamlHealth
         Invoke-ComprehensiveXamlHealth -Path "Views\Dashboard" -Full

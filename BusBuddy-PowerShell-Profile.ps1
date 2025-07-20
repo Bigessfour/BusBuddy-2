@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Bus Buddy PowerShell Development Profile
@@ -190,7 +190,7 @@ function prompt {
         Write-Host $relativePath -NoNewline -ForegroundColor White
         Write-Host ' > ' -NoNewline -ForegroundColor Gray
     } else {
-        Write-Host 'PS ' -NoNewline -ForegroundColor Blue
+        Write-Host 'Get-Process ' -NoNewline -ForegroundColor Blue
         Write-Host $currentPath -NoNewline -ForegroundColor White
         Write-Host ' > ' -NoNewline -ForegroundColor Gray
     }
