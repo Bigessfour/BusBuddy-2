@@ -1,4 +1,6 @@
-# Build results (keep these ignored)
+# ===================================================
+# BUILD RESULTS
+# ===================================================
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -12,22 +14,42 @@ bld/
 [Bb]in/
 [Oo]bj/
 
-# Logs (keep selective logging exclusions)
+# ===================================================
+# LOGS AND DIAGNOSTICS
+# ===================================================
+# Marker files (allow these)
 logs/app_started.marker
 logs/application_started_successfully.marker
 logs/pre_dashboard_init.marker
-*.tlog
-*.log
 build-error-analysis.json
 
-# Large log files (explicitly exclude these)
-logs/busbuddy-errors*.log
-logs/busbuddy-consolidated*.log
-**/logs/*.log
-BusBuddy.WPF/logs/
-msbuild-*.log
-# Exclude any file over 100MB (GitHub limit)
-# Use Git LFS for large files if needed
+# Build logs
+*.tlog
+
+# ===================================================
+# POWERSHELL CONFIGURATION AND SCRIPTS
+# ===================================================
+# Exclude general PowerShell files
+*.ps1xml
+*profile*.ps1
+*.ps1.bak
+*.psm1.bak
+PowerShell_transcript.*.txt
+powershell_ise_transcript.*.txt
+
+# Include BusBuddy PowerShell scripts
+!BusBuddy-PowerShell-Profile.ps1
+!.vscode/BusBuddy-Advanced-Workflows.ps1
+!Tools/Scripts/*.ps1
+!PSScriptAnalyzerSettings.psd1
+
+# PowerShell session logs and diagnostic reports
+session-errors-*.json
+diagnostic-*.json
+test-results-*.json
+health-check-*.json
+system-diagnostic-*.json
+build-performance-*.json
 
 # Syncfusion Development Resources (Symbolic Links)
 Syncfusion-Samples/
@@ -91,7 +113,6 @@ StyleCopReport.xml
 *.tmp
 *.tmp_proj
 *_wpftmp.csproj
-*.log
 *.tlog
 *.vspscc
 *.vssscc
@@ -248,7 +269,25 @@ UpgradeLog*.XML
 UpgradeLog*.htm
 CConversionLog*
 
-# SQL Server files
+# ===================================================
+# GITHUB-SPECIFIC LARGE FILE HANDLING
+# ===================================================
+# GitHub enforces a strict file size limit of 100MB per file
+# Files approaching or exceeding this limit should use Git LFS
+# See: https://docs.github.com/en/repositories/working-with-files/managing-large-files
+
+# Large file patterns that should use Git LFS if needed
+*.psd             # Consider using Git LFS for Photoshop files
+*.ai              # Consider using Git LFS for Adobe Illustrator files
+*.pdf             # Consider using Git LFS for large PDF documents
+*.zip             # Avoid committing zip archives to git directly
+*.7z              # Avoid committing compressed archives
+*.mp4             # Consider using Git LFS for videos
+*.mov             # Consider using Git LFS for videos
+*.sqlite          # Consider using Git LFS for SQLite databases
+*.bak             # Consider using Git LFS for large backup files
+
+# Database files (LFS candidates if added to repo)
 *.mdf
 *.ldf
 *.ndf
@@ -366,12 +405,17 @@ FodyWeavers.xsd
 # Executables
 codecov.exe
 
-# VS Code files for those working on multiple tools
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# ===================================================
+# VS CODE CONFIGURATION - ALLOW FOR REVIEW
+# ===================================================
+# Allow all .vscode files to be committed
+# DO NOT use .vscode/* exclusion pattern
+
+# Only exclude specific user-specific VS Code files
+.vscode/ipch/
+.vscode/chrome/
+.vscode/*.code-snippets
+.vscode-test/
 *.code-workspace
 
 # Local History for Visual Studio Code
@@ -403,19 +447,49 @@ appsettings.Staging.json
 !appsettings.test.json
 !appsettings.azure.json
 
-# Test Results
+# ===================================================
+# TEST RESULTS AND COVERAGE
+# ===================================================
+# Test Results directories
 TestResults/
+coverage/
+test-output/
+CoverageReport/
 
-# Backup files created by editors
+# Generated test reports and coverage files
+*.trx
+*.html.coverage
+*.xml.coverage
+coverage.cobertura.xml
+coverage.opencover.xml
+lcov.info
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# ===================================================
+# EDITOR BACKUP FILES
+# ===================================================
 *.bak
 *.backup
 *~
 *.swp
 *.Designer.cs.backup
 
+# ===================================================
+# ENVIRONMENT AND SECRETS
+# ===================================================
 # Local environment files
 .env
 .env.local
+.env.*
 
 # API Keys and Secrets (NEVER commit these!)
 *.key
@@ -423,8 +497,6 @@ TestResults/
 *apikey*
 *api-key*
 *api_key*
-.env
-.env.*
 secrets.json
 appsettings.Production.json
 appsettings.Staging.json
@@ -461,7 +533,104 @@ bus-buddy-gee-key.json
 !global.json
 !package.json
 !.vscode/*.json
+!PSScriptAnalyzerSettings.psd1
+
+# PowerShell analysis and configuration
+*.ps1xml
+*profile*.ps1
+!BusBuddy-PowerShell-Profile.ps1
+!.vscode/BusBuddy-Advanced-Workflows.ps1
+!PSScriptAnalyzerSettings.psd1
+
+# Temporary PowerShell files
+*.ps1.bak
+*.psm1.bak
+PowerShell_transcript.*.txt
+powershell_ise_transcript.*.txt
 
 # Google Cloud credentials
 google-cloud-keyfile.json
 gcp-credentials.json
+
+# Orphaned files and reports
+orphaned-files-report-*.json
+*orphaned*.json
+
+# .NET 8 specific
+*.runtimeconfig.json
+*.deps.json
+*.dll.config
+
+# ===================================================
+# WPF AND XAML SPECIFIC
+# ===================================================
+# WPF specific temp files
+*.baml
+*.g.i.cs
+*.g.cs
+*_Content.g.cs
+*_MarkupCompile.cache
+*_MarkupCompile.lref
+*.xaml.g.cs
+
+# XAML Designer and Blend
+*.xaml.designer.cs.backup
+Expression Blend/
+*.blend
+
+# Syncfusion specific (keep license tracking but exclude logs)
+SyncfusionLogs/
+*.syncfusion.log
+Syncfusion.Licensing.Key.txt
+
+# Modern .NET publish artifacts
+publish/
+*.PublishSettings
+FolderProfile.pubxml.user
+
+# ===================================================
+# GITHUB ACTION AND WORKFLOW EXCEPTIONS
+# ===================================================
+# Never ignore GitHub workflow directories/files
+!.github/
+!.github/workflows/
+!.github/ISSUE_TEMPLATE/
+!.github/PULL_REQUEST_TEMPLATE.md
+!.github/CODEOWNERS
+!.github/dependabot.yml
+!.github/copilot-instructions.md
+
+# Important repository documentation
+!README.md
+!LICENSE
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+!SECURITY.md
+
+# ===================================================
+# FINAL LOG HANDLING (applies last)
+# ===================================================
+# General log exclusion (place at end to override earlier patterns)
+*.log
+
+# Important logs to include (these override the *.log exclusion)
+!logs/configuration-*.log
+!logs/startup-*.log
+!logs/health-*.log
+
+# ===================================================
+# GITHUB FILE SIZE LIMITS
+# ===================================================
+# GitHub has a strict file size limit of 100MB per file
+# Files larger than 50MB will trigger a warning
+# Files larger than 100MB will be rejected
+#
+# For large files, consider:
+# 1. Using Git LFS: https://git-lfs.github.com/
+# 2. Keeping large files in separate storage (Azure Blob, S3)
+# 3. Using .gitattributes to configure Git LFS for specific file types
+#
+# To setup Git LFS:
+# $ git lfs install
+# $ git lfs track "*.psd" "*.pdf" "*.zip"
+# $ git add .gitattributes

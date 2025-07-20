@@ -65,6 +65,26 @@
   ],
   "tasks": [
     {
+      "label": "PowerShell-Git-GitHub Alignment",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/align-git-github-ps752.ps1"
+      ],
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "detail": "Align PowerShell 7.5.2 with Git and GitHub"
+    },
+    {
       "label": "Clean Solution",
       "type": "shell",
       "command": "dotnet",
