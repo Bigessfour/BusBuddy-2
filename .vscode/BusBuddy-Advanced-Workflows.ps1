@@ -15,14 +15,29 @@
 .PARAMETER Quiet
     Suppress welcome message when dot-sourcing the script
 
+.PARAMETER Command
+    Ignored parameter for compatibility with external tools
+
 .EXAMPLE
     . .\BusBuddy-Advanced-Workflows.ps1 -Quiet
 #>
 
+[CmdletBinding()]
 param(
     [Parameter(Mandatory = $false)]
-    [switch]$Quiet
+    [switch]$Quiet,
+
+    [Parameter(Mandatory = $false, DontShow)]
+    [string]$Command,
+
+    [Parameter(ValueFromRemainingArguments = $true, DontShow)]
+    $RemainingArgs
 )
+
+# Check for global quiet flag if it exists (for compatibility with load-bus-buddy-profiles.ps1)
+if (-not $Quiet -and (Get-Variable -Name BusBuddyAdvancedWorkflowsQuiet -Scope Script -ErrorAction SilentlyContinue)) {
+    $Quiet = $Script:BusBuddyAdvancedWorkflowsQuiet
+}
 
 # Enhanced configuration with additional settings for improved functionality
 $Script:BusBuddyConfig = @{
@@ -360,7 +375,7 @@ function Invoke-DotnetCommand {
 }
 
 # Core Build Commands with enhanced functionality
-function bb-build {
+function Invoke-BusBuddyBuild {
     <#
     .SYNOPSIS
         Build the Bus Buddy solution with comprehensive validation and enhanced error handling
@@ -483,7 +498,7 @@ function bb-build {
     return $result.Success
 }
 
-function bb-clean {
+function Clear-BusBuddyBuild {
     <#
     .SYNOPSIS
         Clean the Bus Buddy solution with enhanced options
@@ -555,7 +570,7 @@ function bb-clean {
 
             # Clear NuGet cache if requested
             Write-Host '  Clearing NuGet cache...' -ForegroundColor Gray
-            $nugetResult = Invoke-DotnetCommand -Command 'nuget' -Args @('locals', 'all', '--clear') -SuccessMessage 'NuGet cache cleared' -FailureMessage 'NuGet cache clear failed' -Verbosity 'quiet'
+            Invoke-DotnetCommand -Command 'nuget' -Args @('locals', 'all', '--clear') -SuccessMessage 'NuGet cache cleared' -FailureMessage 'NuGet cache clear failed' -Verbosity 'quiet'
 
             Write-Host '✅ Deep clean completed' -ForegroundColor Green
         } catch {
@@ -569,7 +584,7 @@ function bb-clean {
     return $result.Success
 }
 
-function bb-test {
+function Invoke-BusBuddyTest {
     <#
     .SYNOPSIS
         Run tests for the Bus Buddy solution with comprehensive filtering and reporting
@@ -774,7 +789,7 @@ function bb-test {
     return $result.Success
 }
 
-function bb-restore {
+function Restore-BusBuddyPackages {
     <#
     .SYNOPSIS
         Restore NuGet packages with enhanced validation and diagnostics
@@ -867,7 +882,7 @@ function bb-restore {
     return $result.Success
 }
 
-function bb-publish {
+function Publish-BusBuddy {
     <#
     .SYNOPSIS
         Publish Bus Buddy application with Azure deployment options and comprehensive validation
@@ -1092,7 +1107,7 @@ function bb-publish {
     return $result.Success
 }
 
-function bb-run {
+function Start-BusBuddyApplication {
     <#
     .SYNOPSIS
         Run the Bus Buddy WPF application with comprehensive validation and debug support
@@ -1245,7 +1260,7 @@ function bb-run {
 }
 
 # Advanced Workflow Commands with enhanced functionality
-function bb-dev-session {
+function Start-BusBuddyDevSession {
     <#
     .SYNOPSIS
         Start a complete Bus Buddy development session with comprehensive setup and error aggregation
@@ -1514,14 +1529,14 @@ function bb-dev-session {
     Write-Host '  • bb-debug-start       - Enable debug monitoring' -ForegroundColor Gray
     Write-Host '  • bb-quick-test        - Quick build & test cycle' -ForegroundColor Gray
     Write-Host '  • bb-diagnostic        - Comprehensive system analysis' -ForegroundColor Gray
-    Write-Host '  • bb-publish           - Create deployment package' -ForegroundColor Gray
+    Write-Host '  • Publish-BusBuddy     - Create deployment package' -ForegroundColor Gray
 
     # Return success status based on critical errors
     $criticalErrors = $sessionErrors.Environment.Count + $sessionErrors.Build.Count
     return $criticalErrors -eq 0
 }
 
-function bb-quick-test {
+function Invoke-BusBuddyQuickTest {
     <#
     .SYNOPSIS
         Quick build-test-validate cycle with performance monitoring
@@ -1614,7 +1629,7 @@ function bb-quick-test {
     return $success
 }
 
-function bb-health {
+function Get-BusBuddyHealth {
     <#
     .SYNOPSIS
         Comprehensive health check with actionable recommendations
@@ -1789,7 +1804,7 @@ function bb-health {
 
         # Build performance test
         $buildStart = Get-Date
-        $buildTest = bb-build -Verbosity quiet
+        bb-build -Verbosity quiet | Out-Null
         $buildDuration = ((Get-Date) - $buildStart).TotalSeconds
 
         $healthReport.Performance.BuildTime = $buildDuration
@@ -1889,7 +1904,7 @@ function Test-DevelopmentEnvironment {
     return $validation
 }
 
-function bb-diagnostic {
+function Get-BusBuddyDiagnostic {
     <#
     .SYNOPSIS
         Comprehensive Bus Buddy system diagnostic with advanced analysis
@@ -2399,7 +2414,7 @@ function bb-diagnostic {
     return $diagnosticResults.Issues.Count -eq 0
 }
 
-function bb-report {
+function New-BusBuddyReport {
     <#
     .SYNOPSIS
         Generate comprehensive Bus Buddy project report with advanced analytics and PowerShell 7.5.2 job support
@@ -3271,7 +3286,7 @@ function ConvertTo-CsvReport {
 }
 
 # Debug Helper Integration Commands
-function bb-debug-start {
+function Start-BusBuddyDebug {
     <#
     .SYNOPSIS
         Start debug filter monitoring with actual implementation
@@ -3340,7 +3355,7 @@ function bb-debug-start {
     }
 }
 
-function bb-debug-export {
+function Export-BusBuddyDebug {
     <#
     .SYNOPSIS
         Export debug data from running application with actual implementation
@@ -3475,7 +3490,7 @@ function bb-debug-export {
 }
 
 # PowerShell Profile Integration
-function bb-reload {
+function Update-BusBuddyProfile {
     <#
     .SYNOPSIS
         Reload Bus Buddy PowerShell profiles
@@ -3536,8 +3551,11 @@ Set-Alias -Name 'vs' -Value 'code'
 Set-Alias -Name 'vscode' -Value 'code'
 Set-Alias -Name 'edit' -Value 'code'
 
-# Welcome message for advanced workflows
-if (-not $Quiet) {
+# Function to display welcome message
+function Show-BusBuddyAdvancedWorkflowsWelcome {
+    [CmdletBinding()]
+    param()
+
     Write-Host '🚀 Bus Buddy Advanced Workflows Loaded!' -ForegroundColor Green
     Write-Host '   Build Commands:' -ForegroundColor Gray
     Write-Host '     • bb-build       - Build solution with enhanced validation' -ForegroundColor Gray
@@ -3566,3 +3584,32 @@ if (-not $Quiet) {
     Write-Host '   • XAML validation integration' -ForegroundColor Gray
     Write-Host ''
 }
+
+# Export the function for external access
+Export-ModuleMember -Function Show-BusBuddyAdvancedWorkflowsWelcome -ErrorAction SilentlyContinue
+
+# Create an alias for the welcome function
+Set-Alias -Name bb-welcome -Value Show-BusBuddyAdvancedWorkflowsWelcome -Force -Scope Global
+
+# Show welcome message unless quiet mode is requested
+if (-not $Quiet) {
+    Show-BusBuddyAdvancedWorkflowsWelcome
+}
+
+
+# Backward Compatibility Aliases
+Set-Alias -Name 'bb-quick-test' -Value 'Invoke-BusBuddyQuickTest' -Force
+Set-Alias -Name 'bb-debug-export' -Value 'Export-BusBuddyDebug' -Force
+Set-Alias -Name 'bb-restore' -Value 'Restore-BusBuddyPackages' -Force
+Set-Alias -Name 'bb-dev-session' -Value 'Start-BusBuddyDevSession' -Force
+Set-Alias -Name 'bb-health' -Value 'Get-BusBuddyHealth' -Force
+Set-Alias -Name 'bb-build' -Value 'Invoke-BusBuddyBuild' -Force
+Set-Alias -Name 'bb-clean' -Value 'Clear-BusBuddyBuild' -Force
+Set-Alias -Name 'bb-run' -Value 'Start-BusBuddyApplication' -Force
+Set-Alias -Name 'bb-diagnostic' -Value 'Get-BusBuddyDiagnostic' -Force
+Set-Alias -Name 'bb-reload' -Value 'Update-BusBuddyProfile' -Force
+Set-Alias -Name 'bb-debug-start' -Value 'Start-BusBuddyDebug' -Force
+Set-Alias -Name 'bb-report' -Value 'New-BusBuddyReport' -Force
+Set-Alias -Name 'bb-test' -Value 'Invoke-BusBuddyTest' -Force
+Set-Alias -Name 'bb-publish' -Value 'Publish-BusBuddy' -Force
+

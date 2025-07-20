@@ -54,6 +54,10 @@ $functionMappings = @{
     'bb-xaml-button' = 'New-BusBuddyXamlButton'
     'bb-xaml-bind' = 'New-BusBuddyXamlBinding'
 
+    # Profile persistence functions
+    'Load-BusBuddyProfiles' = 'Import-BusBuddyProfiles'
+    'Reload-BusBuddyProfiles' = 'Update-BusBuddyProfiles'
+
     # Other functions that need fixing
     'Validate-SyncfusionNamespaces' = 'Test-SyncfusionNamespaces'
 }
@@ -84,14 +88,17 @@ $aliasMappings = @{
     'Export-BusBuddyDebug' = 'bb-debug-export'
     'New-BusBuddyXamlButton' = 'bb-xaml-button'
     'New-BusBuddyXamlBinding' = 'bb-xaml-bind'
+    'Import-BusBuddyProfiles' = 'Load-BusBuddyProfiles'
+    'Update-BusBuddyProfiles' = 'Reload-BusBuddyProfiles'
 }
 
 # Files to process
 $filesToProcess = @(
     'BusBuddy-PowerShell-Profile.ps1',
-    'BusBuddy-Advanced-Workflows.ps1',
+    '.vscode\BusBuddy-Advanced-Workflows.ps1',
     'Tools/Scripts/XAML-Health-Suite.ps1',
-    'Tools/Scripts/XAML-Null-Safety-Analyzer.ps1'
+    'Tools/Scripts/XAML-Null-Safety-Analyzer.ps1',
+    'persistent-profile-helper.ps1'
 )
 
 Write-Host "`n📋 PROCESSING FILES:" -ForegroundColor Cyan

@@ -256,7 +256,7 @@ function Invoke-ComprehensiveXamlHealth {
 Set-Alias -Name 'bb-health' -Value 'Invoke-ComprehensiveXamlHealth'
 
 # Quick health check function
-function bb-quick-health {
+function Test-BusBuddyQuickHealth {
     <#
     .SYNOPSIS
         Quick XAML health check for Bus Buddy
@@ -271,3 +271,8 @@ if ($MyInvocation.MyCommand.ModuleName) {
     # Note: Functions are available when script is dot-sourced
     # Available functions: Invoke-ComprehensiveXamlHealth (alias: bb-health), bb-quick-health
 }
+
+
+# Backward Compatibility Aliases
+Set-Alias -Name 'bb-quick-health' -Value 'Test-BusBuddyQuickHealth' -Force
+

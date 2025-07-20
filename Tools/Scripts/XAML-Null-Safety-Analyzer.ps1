@@ -96,7 +96,7 @@ function Find-UnsafeBindings {
     return $issues.ToArray()
 }
 
-function Validate-SyncfusionNamespaces {
+function Test-SyncfusionNamespaces {
     <#
     .SYNOPSIS
         PowerShell 7.5.2 optimized Syncfusion namespace validation
@@ -144,7 +144,7 @@ function Validate-SyncfusionNamespaces {
     }
 }
 
-function bb-null-check {
+function Test-BusBuddyNullSafety {
     <#
     .SYNOPSIS
         Bus Buddy null safety checker for XAML bindings
@@ -202,3 +202,8 @@ if (Get-Command Get-BusBuddyProjectRoot -ErrorAction SilentlyContinue) {
         return $null
     }
 }
+
+
+# Backward Compatibility Aliases
+Set-Alias -Name 'bb-null-check' -Value 'Test-BusBuddyNullSafety' -Force
+

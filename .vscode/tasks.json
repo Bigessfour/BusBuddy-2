@@ -65,6 +65,24 @@
   ],
   "tasks": [
     {
+      "label": "Git Commit and Push",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "Write-Host '🔄 Starting Git operations...' -ForegroundColor Cyan; git add .vscode/BusBuddy-Advanced-Workflows.ps1 load-bus-buddy-profiles.ps1; git commit -m 'Fix PowerShell profile loading and terminal integration'; git push origin main; Write-Host '✅ Changes pushed to GitHub' -ForegroundColor Green"
+      ],
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "detail": "Commit and push changes to GitHub"
+    },
+    {
       "label": "PowerShell-Git-GitHub Alignment",
       "type": "shell",
       "command": "pwsh",
@@ -240,8 +258,10 @@
       "type": "shell",
       "command": "pwsh",
       "args": [
-        "-Command",
-        "Set-Location '${workspaceFolder}'; . '.\\.vscode\\BusBuddy-Advanced-Workflows.ps1'; bb-health; bb-diagnostic"
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/.vscode/health-check.ps1"
       ],
       "group": "test",
       "problemMatcher": [
@@ -259,13 +279,14 @@
       "type": "shell",
       "command": "pwsh",
       "args": [
-        "-Command",
-        "Set-Location '${workspaceFolder}'; . '.\\.vscode\\BusBuddy-Advanced-Workflows.ps1'; bb-build | Where-Object { $_ -match 'Serilog|ERROR|WARN' }"
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/.vscode/serilog-monitor.ps1"
       ],
       "group": "build",
       "problemMatcher": [
-        "$busbuddy-serilog",
-        "$busbuddy-csharp"
+        "$msCompile"
       ],
       "presentation": {
         "reveal": "always",

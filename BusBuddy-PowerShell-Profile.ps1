@@ -1,4 +1,4 @@
-﻿#Requires -Version 7.0
+#Requires -Version 7.0
 <#
 .SYNOPSIS
     Bus Buddy PowerShell Development Profile
@@ -40,7 +40,7 @@ if (Test-Path $ErrorAnalysisPath) {
 }
 
 # Bus Buddy Project Helper Functions
-function bb-root {
+function Set-BusBuddyLocation {
     <#
     .SYNOPSIS
         Navigate to Bus Buddy project root
@@ -54,7 +54,7 @@ function bb-root {
     }
 }
 
-function bb-views {
+function Get-BusBuddyViews {
     <#
     .SYNOPSIS
         Navigate to Views directory
@@ -71,7 +71,7 @@ function bb-views {
     }
 }
 
-function bb-resources {
+function Get-BusBuddyResources {
     <#
     .SYNOPSIS
         Navigate to Resources directory
@@ -88,7 +88,7 @@ function bb-resources {
     }
 }
 
-function bb-tools {
+function Get-BusBuddyTools {
     <#
     .SYNOPSIS
         Navigate to Tools directory
@@ -105,7 +105,7 @@ function bb-tools {
     }
 }
 
-function bb-logs {
+function Get-BusBuddyLogs {
     <#
     .SYNOPSIS
         Open logs directory
@@ -123,7 +123,7 @@ function bb-logs {
 }
 
 # XAML Quick Actions
-function bb-check {
+function Test-BusBuddyHealth {
     <#
     .SYNOPSIS
         Quick health check of Bus Buddy XAML files
@@ -144,7 +144,7 @@ function bb-check {
     Write-Host '  bb-xaml-report' -ForegroundColor Gray
 }
 
-function bb-syntax {
+function Test-BusBuddySyntax {
     <#
     .SYNOPSIS
         Quick syntax check of current XAML file or directory
@@ -224,8 +224,8 @@ Set-Alias -Name bb-export-diag -Value Export-BusBuddyDiagnosticData
 Set-Alias -Name bb-validate-syncfusion -Value Validate-SyncfusionNamespaces
 
 # Quick XAML helpers
-function bb-xaml-button { param($File, $Parent = '//Grid', $Name = 'MyButton', $Content = 'Click Me') New-SyncfusionButton -XamlFilePath $File -ParentXPath $Parent -Name $Name -Content $Content }
-function bb-xaml-bind { param($File, $Element, $Property, $Path) Add-DataBinding -XamlFilePath $File -ElementXPath $Element -Property $Property -BindingPath $Path }
+function New-BusBuddyXamlButton { param($File, $Parent = '//Grid', $Name = 'MyButton', $Content = 'Click Me') New-SyncfusionButton -XamlFilePath $File -ParentXPath $Parent -Name $Name -Content $Content }
+function New-BusBuddyXamlBinding { param($File, $Element, $Property, $Path) Add-DataBinding -XamlFilePath $File -ElementXPath $Element -Property $Property -BindingPath $Path }
 
 # Tab completion for bb commands - PowerShell 7.5.2 optimized
 $bbCommands = @(
@@ -258,3 +258,16 @@ Register-ArgumentCompleter -CommandName $bbCommands -ParameterName Path -ScriptB
 
     return $items
 }
+
+
+# Backward Compatibility Aliases
+Set-Alias -Name 'bb-logs' -Value 'Get-BusBuddyLogs' -Force
+Set-Alias -Name 'bb-views' -Value 'Get-BusBuddyViews' -Force
+Set-Alias -Name 'bb-check' -Value 'Test-BusBuddyHealth' -Force
+Set-Alias -Name 'bb-resources' -Value 'Get-BusBuddyResources' -Force
+Set-Alias -Name 'bb-tools' -Value 'Get-BusBuddyTools' -Force
+Set-Alias -Name 'bb-syntax' -Value 'Test-BusBuddySyntax' -Force
+Set-Alias -Name 'bb-xaml-button' -Value 'New-BusBuddyXamlButton' -Force
+Set-Alias -Name 'bb-xaml-bind' -Value 'New-BusBuddyXamlBinding' -Force
+Set-Alias -Name 'bb-root' -Value 'Set-BusBuddyLocation' -Force
+

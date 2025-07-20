@@ -79,7 +79,17 @@
         "-NoProfile",
         "-NoExit",
         "-Command",
-        "& '${workspaceFolder}\\BusBuddy-PowerShell-Profile.ps1'; & '${workspaceFolder}\\.vscode\\BusBuddy-Advanced-Workflows.ps1'"
+        ". '${workspaceFolder}\\persistent-profile-helper.ps1'"
+      ],
+      "icon": "terminal-powershell"
+    },
+    "PowerShell Admin": {
+      "path": "pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-NoExit",
+        "-Command",
+        "Start-Process pwsh.exe -ArgumentList '-NoProfile', '-NoExit', '-Command', \"`. '${workspaceFolder}\\persistent-profile-helper.ps1'\"\" -Verb RunAs"
       ],
       "icon": "terminal-powershell"
     }
@@ -246,7 +256,7 @@
   "powershell.developer.bundledModulesPath": "",
   "powershell.promptToUpdatePowerShell": false,
   "powershell.developer.editorServicesLogLevel": "Information",
-  // Theme Configuration
-  "workbench.colorTheme": "Default Dark Modern", // Options: "Default Dark Modern", "GitHub Dark", "Monokai", "One Dark Pro"
-  "workbench.iconTheme": "vs-seti", // File icon theme
+  "workbench.colorTheme": "Default Dark Modern",
+  "workbench.iconTheme": "vs-seti",
+  "terminal.integrated.persistentSessionReviveProcess": "onExit"
 }
