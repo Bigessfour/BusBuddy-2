@@ -1010,6 +1010,15 @@
           "Syncfusion.Licensing": "30.1.40"
         }
       },
+      "Syncfusion.SfChat.WPF": {
+        "type": "Transitive",
+        "resolved": "30.1.40",
+        "contentHash": "8LaxaEZbjU4g/C5HMam4EAzuN7IwyUJ736DLRlyS+dfdJc/d1fxFCkf+1FMGM5rxSWJ2w70OWfvq/gm7DakeWQ==",
+        "dependencies": {
+          "Syncfusion.Licensing": "30.1.40",
+          "Syncfusion.Shared.WPF": "30.1.40"
+        }
+      },
       "Syncfusion.SfGauge.WPF": {
         "type": "Transitive",
         "resolved": "30.1.40",
@@ -1432,6 +1441,7 @@
           "Syncfusion.SfAccordion.WPF": "[30.1.40, )",
           "Syncfusion.SfBusyIndicator.WPF": "[30.1.40, )",
           "Syncfusion.SfChart.WPF": "[30.1.40, )",
+          "Syncfusion.SfChat.WPF": "[30.1.40, )",
           "Syncfusion.SfGauge.WPF": "[30.1.40, )",
           "Syncfusion.SfGrid.WPF": "[30.1.40, )",
           "Syncfusion.SfInput.WPF": "[30.1.40, )",

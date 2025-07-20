@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Syncfusion.Windows.Tools.Controls;
 using BusBuddy.WPF.ViewModels;
-using BusBuddy.WPF.Utilities; // Add for DockingManagerStandardization
+using BusBuddy.WPF.Utilities; // Utilities for dashboard operations
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Context;
@@ -33,16 +33,17 @@ namespace BusBuddy.WPF.Views.Dashboard
     /// - Standardized tile/panel sizing with fixed dimensions
     /// - Limited fallback attempts to 1 for faster error recovery
     /// </summary>
-    public partial class EnhancedDashboardView : UserControl
+    public partial class EnhancedDashboardView : UserControl, IDisposable
     {
         // Performance optimization: Replace DispatcherTimer with background Task + CancellationToken
         private CancellationTokenSource? _refreshCancellationSource;
         private Task? _backgroundRefreshTask;
         private const int REFRESH_INTERVAL_SECONDS = 5;
         private static readonly ILogger Logger = Log.ForContext<EnhancedDashboardView>();
-        private bool _isInitializing = false;
-        private int _fallbackAttempts = 0;
+        private bool _isInitializing;
+        private int _fallbackAttempts;
         private const int MAX_FALLBACK_ATTEMPTS = 1; // Reduced from 3 to 1 for faster error recovery
+        private bool _disposed;
 
         public EnhancedDashboardView()
         {
@@ -243,20 +244,29 @@ namespace BusBuddy.WPF.Views.Dashboard
                     var dockingManager = FindName("MainDockingManager") as DockingManager;
                     if (dockingManager != null)
                     {
-                        // Apply standardized configuration using utility
-                        DockingManagerStandardization.ApplyStandardConfiguration(dockingManager, "EnhancedDashboard");
+                        // Apply standard DockingManager configuration
+                        dockingManager.UseDocumentContainer = true;
+                        dockingManager.ContainerMode = DocumentContainerMode.TDI;
+                        dockingManager.DockFill = true;
+                        dockingManager.PersistState = true;
 
                         // Configure specific panels with standard sizing
                         var busManagementPanel = FindName("BusManagementPanel") as FrameworkElement;
                         if (busManagementPanel != null)
                         {
-                            DockingManagerStandardization.ConfigureStandardPanelSizing(busManagementPanel, Dock.Right, 350);
+                            DockingManager.SetSideInDockedMode(busManagementPanel, DockSide.Right);
+                            DockingManager.SetDesiredWidthInDockedMode(busManagementPanel, 350);
+                            DockingManager.SetCanClose(busManagementPanel, true);
+                            DockingManager.SetCanFloat(busManagementPanel, true);
                         }
 
                         var driverManagementPanel = FindName("DriverManagementPanel") as FrameworkElement;
                         if (driverManagementPanel != null)
                         {
-                            DockingManagerStandardization.ConfigureStandardPanelSizing(driverManagementPanel, Dock.Left);
+                            DockingManager.SetSideInDockedMode(driverManagementPanel, DockSide.Left);
+                            DockingManager.SetDesiredWidthInDockedMode(driverManagementPanel, 300);
+                            DockingManager.SetCanClose(driverManagementPanel, true);
+                            DockingManager.SetCanFloat(driverManagementPanel, true);
                         }
 
                         // Load saved DockingManager layout state (with fallback protection)
@@ -267,7 +277,14 @@ namespace BusBuddy.WPF.Views.Dashboard
                         catch (Exception layoutEx)
                         {
                             Logger.Warning(layoutEx, "Failed to load saved layout, using defaults");
-                            DockingManagerStandardization.ResetToStandardLayout(dockingManager);
+                            try
+                            {
+                                dockingManager.ResetState();
+                            }
+                            catch (Exception resetEx)
+                            {
+                                Logger.Warning(resetEx, "Failed to reset DockingManager state");
+                            }
                         }
 
                         Logger.Information("✅ Enhanced DockingManager with standardization applied successfully");
@@ -276,11 +293,18 @@ namespace BusBuddy.WPF.Views.Dashboard
                 catch (Exception ex)
                 {
                     Logger.Error(ex, "Enhanced dashboard layout setup error: {ErrorMessage}", ex.Message);
-                    // Fallback: Use default layout with standardization
+                    // Fallback: Use default layout with reset
                     var dockingManager = FindName("MainDockingManager") as DockingManager;
                     if (dockingManager != null)
                     {
-                        DockingManagerStandardization.ResetToStandardLayout(dockingManager);
+                        try
+                        {
+                            dockingManager.ResetState();
+                        }
+                        catch (Exception resetEx)
+                        {
+                            Logger.Warning(resetEx, "Failed to reset DockingManager state in fallback");
+                        }
                     }
                 }
             }
@@ -295,12 +319,19 @@ namespace BusBuddy.WPF.Views.Dashboard
             {
                 try
                 {
-                    Log.Information("Resetting Enhanced Dashboard DockingManager to default standardized layout");
+                    Log.Information("Resetting Enhanced Dashboard DockingManager to default layout");
 
                     var dockingManager = FindName("MainDockingManager") as DockingManager;
                     if (dockingManager != null)
                     {
-                        DockingManagerStandardization.ResetToStandardLayout(dockingManager);
+                        try
+                        {
+                            dockingManager.ResetState();
+                        }
+                        catch (Exception resetEx)
+                        {
+                            Logger.Warning(resetEx, "Failed to reset DockingManager state");
+                        }
 
                         // Ensure specific dashboard panels are properly configured
                         var dashboardOverview = FindName("DashboardOverview") as FrameworkElement;
@@ -313,14 +344,14 @@ namespace BusBuddy.WPF.Views.Dashboard
                         if (busManagementPanel != null)
                         {
                             DockingManager.SetState(busManagementPanel, DockState.Dock);
-                            DockingManager.SetSideInDockedMode(busManagementPanel, Dock.Right);
+                            DockingManager.SetSideInDockedMode(busManagementPanel, DockSide.Right);
                         }
 
                         var driverManagementPanel = FindName("DriverManagementPanel") as FrameworkElement;
                         if (driverManagementPanel != null)
                         {
                             DockingManager.SetState(driverManagementPanel, DockState.Dock);
-                            DockingManager.SetSideInDockedMode(driverManagementPanel, Dock.Left);
+                            DockingManager.SetSideInDockedMode(driverManagementPanel, DockSide.Left);
                         }
 
                         Log.Information("Enhanced Dashboard default layout reset completed successfully");
@@ -361,66 +392,7 @@ namespace BusBuddy.WPF.Views.Dashboard
             }
         }
 
-        /// <summary>
-        /// Reset layout to default configuration
-        /// Provides fallback mechanism as required
-        /// </summary>
-        public void ResetToDefaultLayout()
-        {
-            try
-            {
-                var dockingManager = FindName("MainDockingManager") as DockingManager;
-                if (dockingManager != null)
-                {
-                    // Reset all panels to their default states
-                    var dashboardOverview = FindName("DashboardOverview") as FrameworkElement;
-                    var busManagement = FindName("BusManagement") as FrameworkElement;
-                    var driverManagement = FindName("DriverManagement") as FrameworkElement;
-                    var routeManagement = FindName("RouteManagement") as FrameworkElement;
-                    var scheduleManagement = FindName("ScheduleManagement") as FrameworkElement;
-                    var studentManagement = FindName("StudentManagement") as FrameworkElement;
-                    var maintenanceTracking = FindName("MaintenanceTracking") as FrameworkElement;
-                    var fuelManagement = FindName("FuelManagement") as FrameworkElement;
-                    var activityLogging = FindName("ActivityLogging") as FrameworkElement;
 
-                    if (dashboardOverview != null)
-                        DockingManager.SetState(dashboardOverview, DockState.Document);
-                    if (busManagement != null)
-                    {
-                        DockingManager.SetState(busManagement, DockState.Dock);
-                        DockingManager.SetSideInDockedMode(busManagement, DockSide.Right);
-                    }
-                    if (driverManagement != null)
-                    {
-                        DockingManager.SetState(driverManagement, DockState.Dock);
-                        DockingManager.SetSideInDockedMode(driverManagement, DockSide.Left);
-                    }
-                    if (routeManagement != null)
-                        DockingManager.SetState(routeManagement, DockState.Document);
-                    if (scheduleManagement != null)
-                        DockingManager.SetState(scheduleManagement, DockState.AutoHidden);
-                    if (studentManagement != null)
-                    {
-                        DockingManager.SetState(studentManagement, DockState.Dock);
-                        DockingManager.SetSideInDockedMode(studentManagement, DockSide.Bottom);
-                    }
-                    if (maintenanceTracking != null)
-                    {
-                        DockingManager.SetState(maintenanceTracking, DockState.Dock);
-                        DockingManager.SetSideInDockedMode(maintenanceTracking, DockSide.Tabbed);
-                        DockingManager.SetTargetNameInDockedMode(maintenanceTracking, "StudentManagement");
-                    }
-                    if (fuelManagement != null)
-                        DockingManager.SetState(fuelManagement, DockState.Float);
-                    if (activityLogging != null)
-                        DockingManager.SetState(activityLogging, DockState.AutoHidden);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Reset layout error: {ex.Message}");
-            }
-        }
 
         /// <summary>
         /// Get current layout statistics for performance monitoring
@@ -877,6 +849,45 @@ namespace BusBuddy.WPF.Views.Dashboard
             catch (Exception ex)
             {
                 Logger.Fatal(ex, "Failed to show critical error message");
+            }
+        }
+
+        /// <summary>
+        /// Dispose pattern implementation
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Protected dispose method
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed && disposing)
+            {
+                try
+                {
+                    _refreshCancellationSource?.Cancel();
+                    _refreshCancellationSource?.Dispose();
+
+                    if (_backgroundRefreshTask != null && !_backgroundRefreshTask.IsCompleted)
+                    {
+                        _backgroundRefreshTask.Wait(TimeSpan.FromSeconds(2));
+                    }
+
+                    Logger.Debug("EnhancedDashboardView resources disposed successfully");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error during EnhancedDashboardView disposal");
+                }
+                finally
+                {
+                    _disposed = true;
+                }
             }
         }
     }

@@ -116,6 +116,47 @@ function Invoke-BusBuddyBuild {
     }
 }
 
+function Invoke-BusBuddyRestore {
+    <#
+    .SYNOPSIS
+        Restore NuGet packages for the Bus Buddy solution
+    #>
+    param(
+        [switch]$Force,
+        [switch]$NoCache,
+        [switch]$Verbose
+    )
+
+    $root = Get-BusBuddyProjectRoot
+    if (-not $root) {
+        Write-Host '❌ Bus Buddy project not found' -ForegroundColor Red
+        return $false
+    }
+
+    Push-Location $root
+
+    try {
+        $restoreArgs = @('restore', 'BusBuddy.sln')
+
+        if ($Force) { $restoreArgs += '--force' }
+        if ($NoCache) { $restoreArgs += '--no-cache' }
+        if ($Verbose) { $restoreArgs += '--verbosity', 'normal' }
+
+        Write-Host '📦 Restoring NuGet packages...' -ForegroundColor Cyan
+        $restoreResult = & dotnet @restoreArgs
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host '✅ Package restore completed successfully' -ForegroundColor Green
+            return $true
+        } else {
+            Write-Host '❌ Package restore failed' -ForegroundColor Red
+            return $false
+        }
+    } finally {
+        Pop-Location
+    }
+}
+
 function Invoke-BusBuddyRun {
     <#
     .SYNOPSIS
@@ -546,6 +587,7 @@ function Test-BusBuddySyntax {
 # ==== STREAMLINED LOCAL WORKFLOW ALIASES ====
 # Core build and run workflow
 Set-Alias -Name 'bb-build' -Value 'Invoke-BusBuddyBuild'
+Set-Alias -Name 'bb-restore' -Value 'Invoke-BusBuddyRestore'
 Set-Alias -Name 'bb-run' -Value 'Invoke-BusBuddyRun'
 Set-Alias -Name 'bb-test' -Value 'Invoke-BusBuddyTest'
 Set-Alias -Name 'bb-clean' -Value 'Invoke-BusBuddyClean'
@@ -597,6 +639,7 @@ Write-Host 'Bus Buddy PowerShell Profile Loaded!' -ForegroundColor Cyan
 Write-Host ''
 Write-Host '🚀 STREAMLINED WORKFLOW COMMANDS:' -ForegroundColor Green
 Write-Host "   • 'bb-build' - Build the solution quickly" -ForegroundColor Gray
+Write-Host "   • 'bb-restore' - Restore NuGet packages" -ForegroundColor Gray
 Write-Host "   • 'bb-run' - Run the WPF application" -ForegroundColor Gray
 Write-Host "   • 'bb-ui-cycle' - Complete UI iteration: validate → build → run" -ForegroundColor Gray
 Write-Host "   • 'bb-logs-tail -Follow' - Monitor app logs in real-time" -ForegroundColor Gray

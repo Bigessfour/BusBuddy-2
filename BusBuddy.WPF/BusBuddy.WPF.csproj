@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Strings\AppResources.resx">
-  <PackageReference Include="Syncfusion.SfChat.WPF" Version="30.1.40" />
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
       <PublicResXFileCodeGenerator>True</PublicResXFileCodeGenerator>
@@ -189,7 +188,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
 
-    <!-- 🎯 SYNCFUSION WPF 30.1.40 - ESSENTIAL PACKAGES ONLY -->
+    <!-- 🎯 SYNCFUSION WPF 30.1.40 - ESSENTIAL PACKAGES ONLY (Latest Available Version) -->
 
     <!-- CORE PACKAGES -->
     <PackageReference Include="Syncfusion.Licensing" Version="30.1.40" />
@@ -200,8 +199,6 @@
     <PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="30.1.40" />
 
     <!-- ESSENTIAL CONTROL PACKAGES -->
-  <!-- DockingManager is part of Tools.WPF package -->
-  <!-- Chat control package -->
     <PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.40" />
     <PackageReference Include="Syncfusion.Tools.WPF" Version="30.1.40" />
     <PackageReference Include="Syncfusion.SfInput.WPF" Version="30.1.40" />
@@ -213,6 +210,7 @@
     <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="30.1.40" />
 
     <!-- SPECIALIZED CONTROL PACKAGES -->
+    <PackageReference Include="Syncfusion.SfChat.WPF" Version="30.1.40" />
     <PackageReference Include="Syncfusion.SfRichTextBoxAdv.WPF" Version="30.1.40" />
     <PackageReference Include="Syncfusion.SfScheduler.WPF" Version="30.1.40" />
     <PackageReference Include="Syncfusion.SfGauge.WPF" Version="30.1.40" />

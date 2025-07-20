@@ -24,7 +24,6 @@
   "editor.suggest.showKeywords": false,
   "editor.suggest.showSnippets": false,
   "editor.suggest.showWords": false,
-  "editor.minimap.enabled": false,
   "editor.smoothScrolling": false,
   "editor.cursorBlinking": "solid",
   "editor.fontLigatures": false,
@@ -36,6 +35,13 @@
   "omnisharp.maxProjectFileCountForDiagnosticAnalysis": 500,
   "powershell.scriptAnalysis.enable": false,
   "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+  // =============================================================================
+  // POWERSHELL 7.5.2 EXTENSION CONFIGURATION (STEP 3 BEST PRACTICES)
+  // =============================================================================
+  "powershell.powerShellAdditionalExePaths": {
+    "PowerShell 7.5.2": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
+  },
+  "powershell.powerShellDefaultVersion": "PowerShell 7.5.2",
   "powershell.scriptAnalysis.ruleSettings": {
     "PSUseApprovedVerbs": {
       "Enable": true,
@@ -86,7 +92,7 @@
   "powershell.codeFormatting.autoCorrectAliases": true,
   "powershell.debugging.createTemporaryIntegratedConsole": false,
   "powershell.enableProfileLoading": true,
-  "powershell.powerShellExePath": "",
+  "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
   "powershell.buttons.showRunButtons": true,
   "powershell.buttons.showPanelMovementButtons": true,
   "powershell.developer.featureFlags": [
@@ -99,13 +105,18 @@
   "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2",
   "terminal.integrated.profiles.windows": {
     "PowerShell 7.5.2": {
-      "path": "pwsh.exe",
+      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
       "args": [
         "-NoProfile",
         "-NoExit",
-        "-Command",
-        ". '${workspaceFolder}\\load-bus-buddy-profiles.ps1'"
+        "-c",
+        "Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet } else { Write-Host 'Bus Buddy profiles not found' -ForegroundColor Yellow }"
       ],
+      "icon": "terminal-powershell"
+    },
+    "PowerShell 7 (Clean)": {
+      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "args": [],
       "icon": "terminal-powershell"
     },
     "PowerShell Admin": {
@@ -113,8 +124,8 @@
       "args": [
         "-NoProfile",
         "-NoExit",
-        "-Command",
-        "Start-Process pwsh.exe -ArgumentList '-NoProfile', '-NoExit', '-Command', \"`. '${workspaceFolder}\\load-bus-buddy-profiles.ps1'\"\" -Verb RunAs"
+        "-c",
+        "Start-Process pwsh.exe -ArgumentList '-NoProfile', '-NoExit', '-c', \"Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet }\" -Verb RunAs"
       ],
       "icon": "terminal-powershell"
     }
@@ -135,6 +146,9 @@
   "dotnet.inlayHints.enableInlayHintsForImplicitVariableTypes": true,
   "dotnet.inlayHints.enableInlayHintsForLambdaParameterTypes": true,
   "dotnet.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
+  // =============================================================================
+  // C# EXTENSION INTEGRATION FOR .NET PROJECTS
+  // =============================================================================
   "csharp.semanticHighlighting.enabled": true,
   "csharp.inlayHints.parameters.enabled": true,
   "csharp.inlayHints.parameters.forLiteralParameters": true,
@@ -180,7 +194,9 @@
     "editor.rulers": [
       120
     ],
-    "editor.detectIndentation": false
+    "editor.detectIndentation": false,
+    "files.encoding": "utf8bom",
+    "files.autoGuessEncoding": true
   },
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp",
@@ -283,5 +299,6 @@
   "powershell.developer.editorServicesLogLevel": "Information",
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.iconTheme": "vs-seti",
+  "workbench.editor.centeredLayout": false,
   "terminal.integrated.persistentSessionReviveProcess": "onExit"
 }

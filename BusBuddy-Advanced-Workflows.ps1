@@ -94,8 +94,7 @@ function Start-BusBuddyHotReload {
             while ($true) {
                 Start-Sleep -Seconds 1
             }
-        }
-        finally {
+        } finally {
             $watcher.EnableRaisingEvents = $false
             $watcher.Dispose()
 
@@ -103,8 +102,7 @@ function Start-BusBuddyHotReload {
                 Get-Job -Name "BusBuddyLogMonitor" -ErrorAction SilentlyContinue | Stop-Job | Remove-Job
             }
         }
-    }
-    finally {
+    } finally {
         Pop-Location
     }
 }
@@ -274,19 +272,19 @@ function Invoke-BusBuddyFullDiagnostic {
     Write-Host "===============================================" -ForegroundColor Blue
 
     $diagnosticData = [PSCustomObject]@{
-        Timestamp = Get-Date
-        ProjectRoot = Get-BusBuddyProjectRoot
-        Environment = @{
+        Timestamp       = Get-Date
+        ProjectRoot     = Get-BusBuddyProjectRoot
+        Environment     = @{
             PowerShellVersion = $PSVersionTable.PSVersion
-            DotNetVersion = (dotnet --version 2>$null)
-            OperatingSystem = [System.Environment]::OSVersion
-            MachineName = [System.Environment]::MachineName
+            DotNetVersion     = (dotnet --version 2>$null)
+            OperatingSystem   = [System.Environment]::OSVersion
+            MachineName       = [System.Environment]::MachineName
         }
-        ProjectHealth = @{}
-        BuildStatus = @{}
-        ThemeStatus = @{}
-        UIStatus = @{}
-        LogAnalysis = @{}
+        ProjectHealth   = @{}
+        BuildStatus     = @{}
+        ThemeStatus     = @{}
+        UIStatus        = @{}
+        LogAnalysis     = @{}
         Recommendations = @()
     }
 
@@ -295,12 +293,12 @@ function Invoke-BusBuddyFullDiagnostic {
     $root = $diagnosticData.ProjectRoot
     if ($root) {
         $diagnosticData.ProjectHealth = @{
-            SolutionFile = Test-Path (Join-Path $root "BusBuddy.sln")
-            WPFProject = Test-Path (Join-Path $root "BusBuddy.WPF/BusBuddy.WPF.csproj")
-            CoreProject = Test-Path (Join-Path $root "BusBuddy.Core/BusBuddy.Core.csproj")
-            TestsProject = Test-Path (Join-Path $root "BusBuddy.Tests/BusBuddy.Tests.csproj")
+            SolutionFile   = Test-Path (Join-Path $root "BusBuddy.sln")
+            WPFProject     = Test-Path (Join-Path $root "BusBuddy.WPF/BusBuddy.WPF.csproj")
+            CoreProject    = Test-Path (Join-Path $root "BusBuddy.Core/BusBuddy.Core.csproj")
+            TestsProject   = Test-Path (Join-Path $root "BusBuddy.Tests/BusBuddy.Tests.csproj")
             ToolsDirectory = Test-Path (Join-Path $root "Tools")
-            LogsDirectory = Test-Path (Join-Path $root "BusBuddy.WPF/logs")
+            LogsDirectory  = Test-Path (Join-Path $root "BusBuddy.WPF/logs")
         }
     }
 
@@ -311,8 +309,8 @@ function Invoke-BusBuddyFullDiagnostic {
     $buildDuration = (Get-Date) - $buildStart
 
     $diagnosticData.BuildStatus = @{
-        Success = $buildSuccess
-        Duration = $buildDuration.TotalSeconds
+        Success      = $buildSuccess
+        Duration     = $buildDuration.TotalSeconds
         LastExitCode = $LASTEXITCODE
     }
 
@@ -321,7 +319,7 @@ function Invoke-BusBuddyFullDiagnostic {
     $themeSuccess = Invoke-BusBuddyThemeCheck
     $diagnosticData.ThemeStatus = @{
         ValidationPassed = $themeSuccess
-        ThemeScript = Test-Path (Join-Path $root "Tools/Scripts/bb-theme-check.ps1")
+        ThemeScript      = Test-Path (Join-Path $root "Tools/Scripts/bb-theme-check.ps1")
     }
 
     # UI validation
@@ -334,19 +332,20 @@ function Invoke-BusBuddyFullDiagnostic {
     Write-Host "📖 Analyzing logs..." -ForegroundColor Cyan
     $logsPath = Join-Path $root "BusBuddy.WPF/logs"
     if (Test-Path $logsPath) {
-        $logFiles = Get-ChildItem $logsPath -Filter "*.log" | Sort-Object LastWriteTime -Descending
+        $logFiles = Get-ChildItem $logsPath -Filter "*.log" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending
+        $totalSize = if ($logFiles.Count -gt 0) { ($logFiles | Measure-Object Length -Sum).Sum } else { 0 }
         $diagnosticData.LogAnalysis = @{
             LogsDirectoryExists = $true
-            TotalLogFiles = $logFiles.Count
-            MostRecentLog = if ($logFiles.Count -gt 0) { $logFiles[0].Name } else { $null }
-            TotalLogSize = ($logFiles | Measure-Object Length -Sum).Sum
+            TotalLogFiles       = $logFiles.Count
+            MostRecentLog       = if ($logFiles.Count -gt 0) { $logFiles[0].Name } else { $null }
+            TotalLogSize        = $totalSize
         }
     } else {
         $diagnosticData.LogAnalysis = @{
             LogsDirectoryExists = $false
-            TotalLogFiles = 0
-            MostRecentLog = $null
-            TotalLogSize = 0
+            TotalLogFiles       = 0
+            MostRecentLog       = $null
+            TotalLogSize        = 0
         }
     }
 
@@ -377,9 +376,9 @@ function Invoke-BusBuddyFullDiagnostic {
     Write-Host "`n📊 DIAGNOSTIC SUMMARY" -ForegroundColor Blue
     Write-Host "====================" -ForegroundColor Blue
     Write-Host "Project Root: $($diagnosticData.ProjectRoot)" -ForegroundColor Gray
-    Write-Host "Build Status: $(if($buildSuccess) { '✅ Success' } else { '❌ Failed' })" -ForegroundColor $(if($buildSuccess) { 'Green' } else { 'Red' })
+    Write-Host "Build Status: $(if($buildSuccess) { '✅ Success' } else { '❌ Failed' })" -ForegroundColor $(if ($buildSuccess) { 'Green' } else { 'Red' })
     Write-Host "Build Duration: $([math]::Round($buildDuration.TotalSeconds, 2)) seconds" -ForegroundColor Gray
-    Write-Host "Theme Status: $(if($themeSuccess) { '✅ Consistent' } else { '⚠️ Issues Found' })" -ForegroundColor $(if($themeSuccess) { 'Green' } else { 'Yellow' })
+    Write-Host "Theme Status: $(if($themeSuccess) { '✅ Consistent' } else { '⚠️ Issues Found' })" -ForegroundColor $(if ($themeSuccess) { 'Green' } else { 'Yellow' })
     Write-Host "Log Files: $($diagnosticData.LogAnalysis.TotalLogFiles)" -ForegroundColor Gray
 
     Write-Host "`n🎯 RECOMMENDATIONS:" -ForegroundColor Yellow
@@ -422,13 +421,13 @@ function Export-BusBuddyProjectReport {
 
     # Add additional project analysis
     $report = [PSCustomObject]@{
-        ReportMetadata = @{
-            GeneratedAt = Get-Date
+        ReportMetadata      = @{
+            GeneratedAt   = Get-Date
             ReportVersion = "1.0"
-            Generator = "Bus Buddy Advanced Workflows"
+            Generator     = "Bus Buddy Advanced Workflows"
         }
-        Diagnostic = $diagnostic
-        ProjectFiles = @{}
+        Diagnostic          = $diagnostic
+        ProjectFiles        = @{}
         DevelopmentWorkflow = @{}
     }
 
@@ -437,12 +436,12 @@ function Export-BusBuddyProjectReport {
     $root = Get-BusBuddyProjectRoot
     if ($root) {
         $report.ProjectFiles = @{
-            XamlFiles = (Get-ChildItem $root -Filter "*.xaml" -Recurse).Count
-            CSharpFiles = (Get-ChildItem $root -Filter "*.cs" -Recurse).Count
+            XamlFiles         = (Get-ChildItem $root -Filter "*.xaml" -Recurse).Count
+            CSharpFiles       = (Get-ChildItem $root -Filter "*.cs" -Recurse).Count
             PowerShellScripts = (Get-ChildItem $root -Filter "*.ps1" -Recurse).Count
-            ResourceFiles = (Get-ChildItem $root -Path "*/Resources/*" -Recurse -ErrorAction SilentlyContinue).Count
-            ViewFiles = (Get-ChildItem $root -Path "*/Views/*" -Filter "*.xaml" -Recurse -ErrorAction SilentlyContinue).Count
-            ViewModelFiles = (Get-ChildItem $root -Path "*/ViewModels/*" -Filter "*.cs" -Recurse -ErrorAction SilentlyContinue).Count
+            ResourceFiles     = (Get-ChildItem $root -Path "*/Resources/*" -Recurse -ErrorAction SilentlyContinue).Count
+            ViewFiles         = (Get-ChildItem $root -Path "*/Views/*" -Filter "*.xaml" -Recurse -ErrorAction SilentlyContinue).Count
+            ViewModelFiles    = (Get-ChildItem $root -Path "*/ViewModels/*" -Filter "*.cs" -Recurse -ErrorAction SilentlyContinue).Count
         }
     }
 
@@ -455,12 +454,12 @@ function Export-BusBuddyProjectReport {
             "bb-logs-tail -Follow - Real-time error monitoring",
             "Start-BusBuddyDevSession - Full development session"
         )
-        AvailableAliases = @(
+        AvailableAliases    = @(
             "bb-build", "bb-run", "bb-clean", "bb-test",
             "bb-ui-cycle", "bb-theme-check", "bb-validate-ui",
             "bb-logs-tail", "bb-logs-errors", "bb-logs-ui"
         )
-        BackgroundJobs = (Get-Job | Where-Object { $_.Name -like "BusBuddy*" }).Count
+        BackgroundJobs      = (Get-Job | Where-Object { $_.Name -like "BusBuddy*" }).Count
     }
 
     # Export report

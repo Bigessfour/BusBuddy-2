@@ -208,34 +208,46 @@ namespace BusBuddy.WPF.Views.Main
                 {
                     if (MainDockingManager != null)
                     {
-                        // Apply standardized configuration using utility
-                        DockingManagerStandardization.ApplyStandardConfiguration(MainDockingManager, "MainWindow");
+                        // Apply standard DockingManager configuration
+                        MainDockingManager.UseDocumentContainer = true;
+                        MainDockingManager.ContainerMode = DocumentContainerMode.TDI;
+                        MainDockingManager.DockFill = true;
+                        MainDockingManager.PersistState = true;
 
-                        // Validate state persistence for performance
-                        DockingManagerStandardization.ValidateStatePersistence("BusBuddy");
-
-                        // Configure standard sizing for all panels
+                        // Configure standard sizing for all panels using proper DockSide enum
                         if (NavigationDrawer != null)
                         {
-                            DockingManagerStandardization.ConfigureStandardPanelSizing(NavigationDrawer, Dock.Left);
+                            DockingManager.SetSideInDockedMode(NavigationDrawer, DockSide.Left);
+                            DockingManager.SetDesiredWidthInDockedMode(NavigationDrawer, 300);
+                            DockingManager.SetCanClose(NavigationDrawer, true);
+                            DockingManager.SetCanFloat(NavigationDrawer, true);
                         }
 
                         if (HeaderToolbar != null)
                         {
-                            DockingManagerStandardization.ConfigureStandardPanelSizing(HeaderToolbar, Dock.Top);
+                            DockingManager.SetSideInDockedMode(HeaderToolbar, DockSide.Top);
+                            DockingManager.SetDesiredHeightInDockedMode(HeaderToolbar, 64);
+                            DockingManager.SetCanClose(HeaderToolbar, true);
+                            DockingManager.SetCanFloat(HeaderToolbar, true);
                         }
 
                         if (PropertyPanel != null)
                         {
-                            DockingManagerStandardization.ConfigureStandardPanelSizing(PropertyPanel, Dock.Right);
+                            DockingManager.SetSideInDockedMode(PropertyPanel, DockSide.Right);
+                            DockingManager.SetDesiredWidthInDockedMode(PropertyPanel, 300);
+                            DockingManager.SetCanClose(PropertyPanel, true);
+                            DockingManager.SetCanFloat(PropertyPanel, true);
                         }
 
                         if (StatusBar != null)
                         {
-                            DockingManagerStandardization.ConfigureStandardPanelSizing(StatusBar, Dock.Bottom, customHeight: 32);
+                            DockingManager.SetSideInDockedMode(StatusBar, DockSide.Bottom);
+                            DockingManager.SetDesiredHeightInDockedMode(StatusBar, 32);
+                            DockingManager.SetCanClose(StatusBar, true);
+                            DockingManager.SetCanFloat(StatusBar, true);
                         }
 
-                        Log.Information("DockingManager configured successfully with standardized TDI container mode and sizing");
+                        Log.Information("DockingManager configured successfully with standard TDI container mode and sizing");
                     }
                 }
                 catch (Exception ex)
@@ -397,9 +409,9 @@ namespace BusBuddy.WPF.Views.Main
                     "StudentManagement" => new BusBuddy.WPF.Views.Student.StudentManagementView(),
                     "Maintenance" => new BusBuddy.WPF.Views.Maintenance.MaintenanceTrackingView(),
                     "FuelManagement" => new BusBuddy.WPF.Views.Fuel.FuelManagementView(),
-                    "ActivityLog" => new BusBuddy.WPF.Views.Activity.ActivityLogView(),
+                    "ActivityLog" => new BusBuddy.WPF.Views.ActivityLogView(),
                     "Settings" => new BusBuddy.WPF.Views.Settings.SettingsView(),
-                    "XAIChat" => new BusBuddy.WPF.Views.XAI.XAIChatView(),
+                    "XAIChat" => new BusBuddy.WPF.Views.XAI.OptimizedXAIChatView(),
                     "GoogleEarth" => new BusBuddy.WPF.Views.GoogleEarth.GoogleEarthView(),
                     _ => null
                 };
@@ -525,13 +537,21 @@ namespace BusBuddy.WPF.Views.Main
 
                     if (MainDockingManager != null)
                     {
-                        DockingManagerStandardization.ResetToStandardLayout(MainDockingManager);
+                        // Reset to standard layout using Syncfusion's LoadDockState/ResetDockState
+                        try
+                        {
+                            MainDockingManager.ResetState();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warning(ex, "Failed to reset DockingManager state, applying manual reset");
+                        }
 
                         // Ensure critical panels are visible and properly positioned
                         if (NavigationDrawer != null)
                         {
                             DockingManager.SetState(NavigationDrawer, DockState.Dock);
-                            DockingManager.SetSideInDockedMode(NavigationDrawer, Dock.Left);
+                            DockingManager.SetSideInDockedMode(NavigationDrawer, DockSide.Left);
                             NavigationDrawer.Visibility = Visibility.Visible;
                         }
 
@@ -544,7 +564,7 @@ namespace BusBuddy.WPF.Views.Main
                         if (HeaderToolbar != null)
                         {
                             DockingManager.SetState(HeaderToolbar, DockState.Dock);
-                            DockingManager.SetSideInDockedMode(HeaderToolbar, Dock.Top);
+                            DockingManager.SetSideInDockedMode(HeaderToolbar, DockSide.Top);
                             HeaderToolbar.Visibility = Visibility.Visible;
                         }
 
@@ -559,15 +579,15 @@ namespace BusBuddy.WPF.Views.Main
         }
 
         /// <summary>
-        /// Handle DockingManager active window changes
+        /// Handle DockingManager active window changes - Proper Syncfusion API
         /// </summary>
         private void MainDockingManager_ActiveWindowChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             try
             {
-                // According to Syncfusion documentation, the event provides DependencyPropertyChangedEventArgs
-                var newActiveWindow = e.NewValue as FrameworkElement;
-                var windowName = newActiveWindow?.Name ?? "Unknown";
+                // Using proper Syncfusion DockingManager event args
+                var activeWindow = e.NewValue as FrameworkElement;
+                var windowName = activeWindow?.Name ?? "Unknown";
 
                 Log.Information("DockingManager active window changed to: {WindowName}", windowName);
 
@@ -584,9 +604,9 @@ namespace BusBuddy.WPF.Views.Main
         }
 
         /// <summary>
-        /// Handle DockingManager window closing events
+        /// Handle DockingManager window closing events - Proper Syncfusion API
         /// </summary>
-        private void MainDockingManager_WindowClosing(object sender, WindowClosingEventArgs e)
+        private void MainDockingManager_WindowClosing(object sender, CloseButtonEventArgs e)
         {
             try
             {
@@ -749,8 +769,16 @@ namespace BusBuddy.WPF.Views.Main
                 Logger.Information("Cascade windows menu item clicked");
                 if (MainDockingManager != null)
                 {
-                    // Use Syncfusion's built-in cascade functionality
-                    MainDockingManager.CascadeChildren();
+                    // Cascade functionality not available in current Syncfusion version
+                    // Alternative: Float all dockable windows
+                    foreach (FrameworkElement child in MainDockingManager.Children)
+                    {
+                        if (child != null && DockingManager.GetState(child) != DockState.Document)
+                        {
+                            DockingManager.SetState(child, DockState.Float);
+                        }
+                    }
+                    Logger.Information("Floated all dockable windows as cascade alternative");
                 }
             }
             catch (Exception ex)
@@ -769,8 +797,19 @@ namespace BusBuddy.WPF.Views.Main
                 Logger.Information("Tile horizontally menu item clicked");
                 if (MainDockingManager != null)
                 {
-                    // Use Syncfusion's built-in tile functionality
-                    MainDockingManager.TileHorizontally();
+                    // Tile functionality not available in current Syncfusion version
+                    // Alternative: Dock all windows to left/right sides
+                    bool dockLeft = true;
+                    foreach (FrameworkElement child in MainDockingManager.Children)
+                    {
+                        if (child != null && DockingManager.GetState(child) != DockState.Document)
+                        {
+                            DockingManager.SetState(child, DockState.Dock);
+                            DockingManager.SetSideInDockedMode(child, dockLeft ? DockSide.Left : DockSide.Right);
+                            dockLeft = !dockLeft;
+                        }
+                    }
+                    Logger.Information("Arranged windows horizontally as tile alternative");
                 }
             }
             catch (Exception ex)
@@ -789,13 +828,13 @@ namespace BusBuddy.WPF.Views.Main
                 Logger.Information("Tile vertically menu item clicked");
                 if (MainDockingManager != null)
                 {
-                    // Use Syncfusion's built-in tile functionality
-                    MainDockingManager.TileVertically();
+                    // Arrange docked panels vertically using native Syncfusion approach
+                    ArrangeDockedPanelsVertically();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error tiling windows vertically");
+                Logger.Error(ex, "Error arranging windows vertically");
             }
         }
 
@@ -836,6 +875,45 @@ namespace BusBuddy.WPF.Views.Main
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error closing all documents");
+            }
+        }
+
+        /// <summary>
+        /// Arrange docked panels vertically using native Syncfusion approach
+        /// </summary>
+        private void ArrangeDockedPanelsVertically()
+        {
+            try
+            {
+                // Get all docked child elements
+                var dockedElements = MainDockingManager?.Children
+                    .OfType<FrameworkElement>()
+                    .Where(child => DockingManager.GetState(child) == DockState.Dock)
+                    .ToList();
+
+                if (dockedElements == null || !dockedElements.Any())
+                {
+                    Logger.Information("No docked elements found to arrange vertically");
+                    return;
+                }
+
+                // Arrange elements with Top/Bottom positioning
+                for (int i = 0; i < dockedElements.Count; i++)
+                {
+                    var element = dockedElements[i];
+                    var side = i % 2 == 0 ? DockSide.Top : DockSide.Bottom;
+
+                    DockingManager.SetSideInDockedMode(element, side);
+                    DockingManager.SetDesiredHeightInDockedMode(element, 200); // Set reasonable height
+
+                    Logger.Information("Set {ElementName} to {Side}", element.Name, side);
+                }
+
+                Logger.Information("Arranged {Count} panels vertically", dockedElements.Count);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error arranging panels vertically");
             }
         }
 

@@ -33,7 +33,10 @@ namespace BusBuddy.WPF.Views.XAI
                     InitializeComponent();
 
                     // Set DataContext to optimized ViewModel
-                    this.DataContext = App.ServiceProvider.GetRequiredService<BusBuddy.WPF.ViewModels.XAI.OptimizedXAIChatViewModel>();
+                    if (Application.Current is App appInstance && appInstance.Services != null)
+                    {
+                        this.DataContext = appInstance.Services.GetRequiredService<BusBuddy.WPF.ViewModels.XAI.OptimizedXAIChatViewModel>();
+                    }
 
                     // Subscribe to events for performance monitoring
                     this.Loaded += OptimizedXAIChatView_Loaded;

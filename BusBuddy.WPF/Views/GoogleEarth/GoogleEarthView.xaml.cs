@@ -13,7 +13,7 @@ namespace BusBuddy.WPF.Views.GoogleEarth
     /// Google Earth integration for advanced geospatial mapping and route visualization
     /// Enhanced with debounced layer changes and optimized background processing
     /// </summary>
-    public partial class GoogleEarthView : UserControl
+    public partial class GoogleEarthView : UserControl, IDisposable
     {
         private static readonly ILogger Logger = Log.ForContext<GoogleEarthView>();
 
@@ -22,6 +22,7 @@ namespace BusBuddy.WPF.Views.GoogleEarth
         private string? _pendingLayerType;
         private readonly object _layerChangeLock = new object();
         private const int LayerChangeDebounceDelayMs = 500;
+        private bool _disposed = false;
 
         public GoogleEarthView()
         {
@@ -29,11 +30,12 @@ namespace BusBuddy.WPF.Views.GoogleEarth
             using (LogContext.PushProperty("PerformanceOptimizations", "Enabled"))
             {
                 InitializeComponent();
-                // Subscribe to Unloaded event for cleanup
-                this.Unloaded += OnViewUnloaded;
 
                 // Initialize debounce timer for layer changes
                 _layerChangeDebounceTimer = new Timer(OnLayerChangeDebounceElapsed, null, Timeout.Infinite, Timeout.Infinite);
+
+                // Subscribe to Unloaded event for cleanup
+                this.Unloaded += GoogleEarthView_Unloaded;
 
                 Logger.Information("Google Earth view initialized successfully with performance optimizations");
                 Logger.Debug("Layer change debouncing configured with {DelayMs}ms delay", LayerChangeDebounceDelayMs);
@@ -238,5 +240,47 @@ namespace BusBuddy.WPF.Views.GoogleEarth
         /// <summary>
         /// Cleanup resources when the view is being disposed
         /// </summary>
+        private void GoogleEarthView_Unloaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            using (LogContext.PushProperty("ViewLifecycle", "Unloaded"))
+            {
+                Logger.Debug("GoogleEarthView unloaded, disposing resources");
+                Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Dispose pattern implementation
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Protected dispose method
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed && disposing)
+            {
+                try
+                {
+                    _layerChangeDebounceTimer?.Dispose();
+                    DataContextChanged -= OnDataContextChanged;
+                    this.Unloaded -= GoogleEarthView_Unloaded;
+                    Logger.Debug("GoogleEarthView resources disposed successfully");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Error during GoogleEarthView disposal");
+                }
+                finally
+                {
+                    _disposed = true;
+                }
+            }
+        }
     }
 }

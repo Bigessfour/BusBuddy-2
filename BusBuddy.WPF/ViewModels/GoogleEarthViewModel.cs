@@ -37,8 +37,8 @@ namespace BusBuddy.WPF.ViewModels
                 ShowRoutesCommand = new AsyncRelayCommand(ShowRoutesAsync);
                 ShowSchoolsCommand = new AsyncRelayCommand(ShowSchoolsAsync);
                 TrackSelectedBusCommand = new AsyncRelayCommand(TrackSelectedBusAsync, () => SelectedBus != null);
-                ZoomInCommand = new RelayCommand(ZoomIn);
-                ZoomOutCommand = new RelayCommand(ZoomOut);
+                ZoomInCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(ZoomIn);
+                ZoomOutCommand = new CommunityToolkit.Mvvm.Input.RelayCommand(ZoomOut);
                 ResetViewCommand = new AsyncRelayCommand(ResetViewAsync);
 
                 // Initialize data

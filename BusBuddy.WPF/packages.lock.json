@@ -283,6 +283,16 @@
           "Syncfusion.Licensing": "30.1.40"
         }
       },
+      "Syncfusion.SfChat.WPF": {
+        "type": "Direct",
+        "requested": "[30.1.40, )",
+        "resolved": "30.1.40",
+        "contentHash": "8LaxaEZbjU4g/C5HMam4EAzuN7IwyUJ736DLRlyS+dfdJc/d1fxFCkf+1FMGM5rxSWJ2w70OWfvq/gm7DakeWQ==",
+        "dependencies": {
+          "Syncfusion.Licensing": "30.1.40",
+          "Syncfusion.Shared.WPF": "30.1.40"
+        }
+      },
       "Syncfusion.SfGauge.WPF": {
         "type": "Direct",
         "requested": "[30.1.40, )",

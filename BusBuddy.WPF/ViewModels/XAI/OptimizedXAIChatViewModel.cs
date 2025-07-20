@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Diagnostics;
 using Syncfusion.UI.Xaml.Chat;
@@ -55,8 +56,8 @@ namespace BusBuddy.WPF.ViewModels.XAI
             _chatService = chatService ?? throw new ArgumentNullException(nameof(chatService));
 
             // Initialize users
-            _currentUser = new Author { Name = "You", Avatar = "👤" };
-            _botUser = new Author { Name = "XAI Assistant", Avatar = "🤖" };
+            _currentUser = new Author { Name = "You" };
+            _botUser = new Author { Name = "XAI Assistant" };
 
             // Initialize collections with initial capacity for performance
             _messages = new ObservableCollection<object>();
@@ -213,6 +214,8 @@ namespace BusBuddy.WPF.ViewModels.XAI
         /// <summary>
         /// Handle message sending with debouncing
         /// </summary>
+        // TODO: Fix event args reference when Syncfusion chat namespace is resolved
+        /*
         public void OnMessageSending(MessageSendingEventArgs e)
         {
             try
@@ -231,19 +234,23 @@ namespace BusBuddy.WPF.ViewModels.XAI
                 Logger.Warning(ex, "Error during message sending preprocessing");
             }
         }
+        */
 
         /// <summary>
         /// Handle message sent event
         /// </summary>
+        /*
         public void OnMessageSent(MessageSentEventArgs e)
         {
             Logger.Debug("Message sent successfully, updating performance metrics");
             // Additional metrics can be tracked here
         }
+        */
 
         /// <summary>
         /// Handle suggestion tapped with optimized processing
         /// </summary>
+        /*
         public void OnSuggestionTapped(SuggestionTappedEventArgs e)
         {
             try
@@ -262,6 +269,7 @@ namespace BusBuddy.WPF.ViewModels.XAI
                 Logger.Warning(ex, "Error processing suggestion tap");
             }
         }
+        */
 
         /// <summary>
         /// Cleanup resources

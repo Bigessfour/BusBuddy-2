@@ -692,7 +692,7 @@ function Invoke-BusBuddyBuild {
             if ($referenceErrors) { $errorSummary.ReferenceErrors = $referenceErrors }
 
             if ($LogFile) {
-                Add-Content -Path $LogFile -Value ("[$(Get-Date)] ERROR: Build failed. Error summary: " + ($errorSummary | ConvertTo-Json -Compress))
+                Add-Content -Path $LogFile -Value ("[$(Get-Date)] ERROR: Build failed. Error summary: " + ($errorSummary | ConvertTo-Json -Depth 3 -Compress))
             }
             exit 1
         } else {
@@ -936,7 +936,7 @@ function Invoke-BusBuddyTest {
             if ($passedTests) { $errorSummary.PassedTests = $passedTests.Count }
 
             if ($LogFile) {
-                Add-Content -Path $LogFile -Value ("[$(Get-Date)] ERROR: Tests failed. Error summary: " + ($errorSummary | ConvertTo-Json -Compress))
+                Add-Content -Path $LogFile -Value ("[$(Get-Date)] ERROR: Tests failed. Error summary: " + ($errorSummary | ConvertTo-Json -Depth 3 -Compress))
             }
             exit 1
         }
@@ -1960,7 +1960,7 @@ function Get-BusBuddyHealth {
         # System resources
         Write-Host '💻 Checking system resources...' -ForegroundColor White
         try {
-            $availableMemory = (Get-WmiObject -Class Win32_OperatingSystem).FreePhysicalMemory / 1MB
+            $availableMemory = (Get-CimInstance -Class Win32_OperatingSystem).FreePhysicalMemory / 1MB
             if ($availableMemory -lt 1024) {
                 # Less than 1GB free
                 $healthReport.Warnings += "Low available memory: $([math]::Round($availableMemory, 0))MB"
@@ -2123,9 +2123,9 @@ function Get-BusBuddyHealth {
         # Enhanced System Information
         Write-Host '📊 Analyzing system information...' -ForegroundColor White
         try {
-            $os = Get-WmiObject -Class Win32_OperatingSystem
-            $cpu = Get-WmiObject -Class Win32_Processor | Select-Object -First 1
-            $memory = Get-WmiObject -Class Win32_ComputerSystem
+            $os = Get-CimInstance -Class Win32_OperatingSystem
+            $cpu = Get-CimInstance -Class Win32_Processor | Select-Object -First 1
+            $memory = Get-CimInstance -Class Win32_ComputerSystem
 
             $systemInfo = @{
                 PowerShellVersion = $PSVersionTable.PSVersion.ToString()
@@ -2728,11 +2728,11 @@ function Get-BusBuddyHealth {
             if ($Parallel -and $PSVersionTable.PSVersion.Major -ge 7 -and $PSVersionTable.PSVersion.Minor -ge 5) {
                 Write-Host '  ⚡ Using parallel environment analysis...' -ForegroundColor Gray
 
-                # PowerShell 7.5.2+ parallel processing
+                # PowerShell 7.5.2+ parallel processing with modern CIM cmdlets
                 $envTasks = @(
-                    { Get-WmiObject -Class Win32_OperatingSystem -ErrorAction SilentlyContinue },
-                    { Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1 },
-                    { Get-WmiObject -Class Win32_ComputerSystem -ErrorAction SilentlyContinue },
+                    { Get-CimInstance -Class Win32_OperatingSystem -ErrorAction SilentlyContinue },
+                    { Get-CimInstance -Class Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1 },
+                    { Get-CimInstance -Class Win32_ComputerSystem -ErrorAction SilentlyContinue },
                     { dotnet --version 2>$null },
                     { dotnet --info 2>$null | Select-String "Microsoft.NETCore.App" | Select-Object -First 1 }
                 )
@@ -2744,10 +2744,10 @@ function Get-BusBuddyHealth {
                 $dotnetVersion = $envResults[3]
                 $runtimeInfo = $envResults[4]
             } else {
-                # Sequential processing
-                $os = Get-WmiObject -Class Win32_OperatingSystem -ErrorAction SilentlyContinue
-                $cpu = Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1
-                $memory = Get-WmiObject -Class Win32_ComputerSystem -ErrorAction SilentlyContinue
+                # Sequential processing with modern CIM cmdlets
+                $os = Get-CimInstance -Class Win32_OperatingSystem -ErrorAction SilentlyContinue
+                $cpu = Get-CimInstance -Class Win32_Processor -ErrorAction SilentlyContinue | Select-Object -First 1
+                $memory = Get-CimInstance -Class Win32_ComputerSystem -ErrorAction SilentlyContinue
                 $dotnetVersion = dotnet --version 2>$null
                 $runtimeInfo = dotnet --info 2>$null | Select-String "Microsoft.NETCore.App" | Select-Object -First 1
             }

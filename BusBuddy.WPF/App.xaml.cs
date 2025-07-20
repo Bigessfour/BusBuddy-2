@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using Syncfusion.Licensing;
 using Syncfusion.SfSkinManager;
-using Syncfusion.Themes.FluentLight.WPF;
+using Syncfusion.Themes.FluentDark.WPF;
 using System;
 using System.IO;
 using System.Windows;
@@ -106,15 +106,29 @@ public partial class App : Application
     {
         try
         {
-            // Apply theme settings once, early in application lifecycle
+            // Apply FluentDark theme globally using proper SkinManager API
             SfSkinManager.ApplyStylesOnApplication = true;
             SfSkinManager.ApplyThemeAsDefaultStyle = true;
-            SfSkinManager.ApplicationTheme = new Theme("FluentLight");
-            Log.Debug("Syncfusion FluentLight theme configured");
+
+            // Set FluentDark theme - proper Syncfusion 30.1.40 API usage
+            SfSkinManager.ApplicationTheme = new Theme("FluentDark");
+
+            Log.Information("Syncfusion FluentDark theme configured successfully using SkinManager");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to configure Syncfusion theme");
+            Log.Error(ex, "Failed to configure Syncfusion FluentDark theme");
+
+            // Fallback to basic theme
+            try
+            {
+                SfSkinManager.ApplicationTheme = new Theme("FluentDark");
+                Log.Warning("Applied fallback FluentDark theme");
+            }
+            catch (Exception fallbackEx)
+            {
+                Log.Error(fallbackEx, "Fallback theme configuration also failed");
+            }
         }
     }
 
@@ -273,65 +287,75 @@ public partial class App : Application
 
         try
         {
-            // Check if types exist before registering
-            // These are added conditionally to allow compilation even when some types are missing
+            // 🎯 REGISTER ESSENTIAL CORE SERVICES
 
-            var vehicleRepoType = Type.GetType("BusBuddy.Core.Data.IVehicleRepository, BusBuddy.Core");
-            var vehicleRepoImplType = Type.GetType("BusBuddy.Core.Data.VehicleRepository, BusBuddy.Core");
-            if (vehicleRepoType != null && vehicleRepoImplType != null)
-            {
-                Log.Debug("Registering vehicle repository services");
-                // services.AddScoped(vehicleRepoType, vehicleRepoImplType);
-            }
+            // Core Business Services
+            services.AddScoped<BusBuddy.Core.Services.Interfaces.IBusService, BusBuddy.Core.Services.BusService>();
+            services.AddScoped<BusBuddy.Core.Services.IDriverService, BusBuddy.Core.Services.DriverService>();
+            services.AddScoped<BusBuddy.Core.Services.IRouteService, BusBuddy.Core.Services.RouteService>();
+            services.AddScoped<BusBuddy.Core.Services.IStudentService, BusBuddy.Core.Services.StudentService>();
+            services.AddScoped<BusBuddy.Core.Services.IMaintenanceService, BusBuddy.Core.Services.MaintenanceService>();
+            services.AddScoped<BusBuddy.Core.Services.IFuelService, BusBuddy.Core.Services.FuelService>();
+            services.AddScoped<BusBuddy.Core.Services.IActivityLogService, BusBuddy.Core.Services.ActivityLogService>();
+            services.AddScoped<BusBuddy.Core.Services.IDashboardMetricsService, BusBuddy.Core.Services.DashboardMetricsService>();
 
-            var busCachingServiceType = Type.GetType("BusBuddy.Core.Services.IBusCachingService, BusBuddy.Core");
-            var busCachingServiceImplType = Type.GetType("BusBuddy.Core.Services.BusCachingService, BusBuddy.Core");
-            if (busCachingServiceType != null && busCachingServiceImplType != null)
-            {
-                Log.Debug("Registering bus caching service");
-                // services.AddSingleton(busCachingServiceType, busCachingServiceImplType);
-            }
+            // Caching and Performance Services
+            services.AddSingleton<BusBuddy.Core.Services.IEnhancedCachingService, BusBuddy.Core.Services.EnhancedCachingService>();
+            services.AddSingleton<BusBuddy.Core.Services.IBusCachingService, BusBuddy.Core.Services.BusCachingService>();
 
-            var busServiceType = Type.GetType("BusBuddy.Core.Services.IBusService, BusBuddy.Core");
-            var busServiceImplType = Type.GetType("BusBuddy.Core.Services.BusService, BusBuddy.Core");
-            if (busServiceType != null && busServiceImplType != null)
-            {
-                Log.Debug("Registering bus service");
-                // services.AddScoped(busServiceType, busServiceImplType);
-            }
+            // 🎯 REGISTER WPF PRESENTATION SERVICES
 
+            services.AddSingleton<BusBuddy.WPF.Services.INavigationService, BusBuddy.WPF.Services.NavigationService>();
+            services.AddScoped<BusBuddy.WPF.Services.ILazyViewModelService, BusBuddy.WPF.Services.LazyViewModelService>();
+            services.AddScoped<BusBuddy.WPF.Services.StartupOrchestrationService>();
+
+            // 🎯 REGISTER CORE VIEWMODELS (Aligned with existing files)
+
+            // Main Application ViewModels
+            services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>();
+            services.AddScoped<LoadingViewModel>();
+            services.AddScoped<MainViewModel>();
+
+            // Management ViewModels (using correct namespaces from actual files)
+            services.AddTransient<BusBuddy.WPF.ViewModels.BusManagementViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.DriverManagementViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.RouteManagementViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.Schedule.ScheduleManagementViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.StudentManagementViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.ActivityLogViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.SettingsViewModel>();
+
+            // Student ViewModels
+            services.AddTransient<BusBuddy.WPF.ViewModels.StudentListViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.StudentDetailViewModel>();
+            services.AddTransient<BusBuddy.WPF.ViewModels.Student.StudentEditViewModel>();
+
+            // Schedule ViewModels
+            services.AddTransient<BusBuddy.WPF.ViewModels.ScheduleManagement.ScheduleViewModel>();
+
+            // Register AutoMapper
             var mappingProfileType = Type.GetType("BusBuddy.WPF.Mapping.MappingProfile, BusBuddy.WPF");
             if (mappingProfileType != null)
             {
-                Log.Debug("Registering AutoMapper profile");
-                // services.AddAutoMapper(mappingProfileType);
+                services.AddAutoMapper(mappingProfileType);
+                Log.Debug("AutoMapper profile registered");
             }
 
-            var navServiceType = Type.GetType("BusBuddy.WPF.Services.INavigationService, BusBuddy.WPF");
-            var navServiceImplType = Type.GetType("BusBuddy.WPF.Services.NavigationService, BusBuddy.WPF");
-            if (navServiceType != null && navServiceImplType != null)
-            {
-                Log.Debug("Registering navigation service");
-                // services.AddSingleton(navServiceType, navServiceImplType);
-            }
-
-            var startupOrchServiceType = Type.GetType("BusBuddy.WPF.Services.StartupOrchestrationService, BusBuddy.WPF");
-            if (startupOrchServiceType != null)
-            {
-                Log.Debug("Registering startup orchestration service");
-                // services.AddScoped(startupOrchServiceType);
-            }
-
+            // Register Utilities
             var dbValidatorType = Type.GetType("BusBuddy.WPF.Utilities.DatabaseValidator, BusBuddy.WPF");
             if (dbValidatorType != null)
             {
-                Log.Debug("Registering database validator");
-                // services.AddScoped(dbValidatorType);
+                services.AddScoped(dbValidatorType);
+                Log.Debug("Database validator registered");
             }
+
+            Log.Information("All essential services registered successfully for Syncfusion WPF 30.1.40 implementation");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error registering conditional services");
+            Log.Error(ex, "Error registering essential services");
         }
     }
 

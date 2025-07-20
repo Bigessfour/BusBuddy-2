@@ -411,8 +411,23 @@
     <!-- =============================================================================== -->
 
     <!-- Navigation and Docking Styles - Critical for MainWindow -->
-    <Style x:Key="StandardDockingManagerStyle" TargetType="syncfusion:DockingManager" BasedOn="{StaticResource BusBuddy.DockingManager}"/>
-    <Style x:Key="StandardNavigationDrawerStyle" TargetType="syncfusion:SfNavigationDrawer" BasedOn="{StaticResource BusBuddy.SfNavigationDrawer}"/>
+    <Style x:Key="StandardDockingManagerStyle" TargetType="syncfusion:DockingManager">
+        <Setter Property="UseDocumentContainer" Value="True"/>
+        <Setter Property="PersistState" Value="True"/>
+        <Setter Property="DockFill" Value="True"/>
+        <Setter Property="ContainerMode" Value="TDI"/>
+        <Setter Property="DockBehavior" Value="VS2010"/>
+        <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Dark}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BusBuddy.Brush.Surface.Border}"/>
+    </Style>
+
+    <Style x:Key="StandardNavigationDrawerStyle" TargetType="syncfusion:SfNavigationDrawer">
+        <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Dark}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BusBuddy.Brush.Surface.Border}"/>
+        <Setter Property="DrawerWidth" Value="300"/>
+        <Setter Property="CompactModeWidth" Value="60"/>
+        <Setter Property="ExpandedModeWidth" Value="300"/>
+    </Style>
 
     <!-- Navigation Item Style -->
     <Style x:Key="NavigationItemStyle" TargetType="syncfusion:NavigationItem">
@@ -424,10 +439,128 @@
         <Setter Property="Margin" Value="2"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="syncfusion:NavigationItem">
-                    <Border Background="{TemplateBinding Background}"
+    </Style>
+
+    <!-- Loading View Styles -->
+    <Style x:Key="LoadingIndicatorStyle" TargetType="syncfusion:SfBusyIndicator">
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Primary}"/>
+        <Setter Property="AnimationType" Value="Gear"/>
+        <Setter Property="IsBusy" Value="True"/>
+    </Style>
+
+    <Style x:Key="StandardLinearProgressBarStyle" TargetType="syncfusion:SfLinearProgressBar">
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Primary}"/>
+        <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Medium}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BusBuddy.Brush.Surface.Border}"/>
+        <Setter Property="Height" Value="4"/>
+        <Setter Property="CornerRadius" Value="2"/>
+    </Style>
+
+    <!-- ButtonAdv Styles for Navigation and Dashboard -->
+    <Style x:Key="IconButtonAdvStyle" TargetType="syncfusion:ButtonAdv">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Text.Primary}"/>
+        <Setter Property="SizeMode" Value="Normal"/>
+        <Setter Property="SmallIcon" Value="{x:Null}"/>
+        <Setter Property="LargeIcon" Value="{x:Null}"/>
+    </Style>
+
+    <!-- ComboBoxAdv Style -->
+    <Style x:Key="StandardComboBoxStyle" TargetType="syncfusion:ComboBoxAdv">
+        <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Medium}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BusBuddy.Brush.Surface.Border}"/>
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Text.Primary}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <!-- CircularProgressBar Style for Dashboard -->
+    <Style x:Key="CircularProgressStyle" TargetType="syncfusion:SfCircularProgressBar">
+        <Setter Property="ProgressColor" Value="{StaticResource BusBuddy.Brush.Primary}"/>
+        <Setter Property="TrackColor" Value="{StaticResource BusBuddy.Brush.Surface.Medium}"/>
+        <Setter Property="TrackThickness" Value="8"/>
+        <Setter Property="ProgressThickness" Value="8"/>
+    </Style>
+
+    <!-- BusyIndicator Custom Style -->
+    <Style x:Key="CustomBusyStyle" TargetType="syncfusion:SfBusyIndicator">
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Primary}"/>
+        <Setter Property="AnimationType" Value="Gear"/>
+        <Setter Property="ViewboxWidth" Value="50"/>
+        <Setter Property="ViewboxHeight" Value="50"/>
+    </Style>
+
+    <!-- Menu Styles for MainWindow -->
+    <Style x:Key="MenuItemStyle" TargetType="MenuItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Text.Primary}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Margin" Value="2,0"/>
+    </Style>
+
+    <Style x:Key="MenuSeparatorStyle" TargetType="Separator">
+        <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Border}"/>
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Margin" Value="8,2"/>
+    </Style>
+
+    <!-- Dashboard Specific Syncfusion Styles -->
+    <Style x:Key="BusBuddySfCircularProgressBarStyle" TargetType="syncfusion:SfCircularProgressBar">
+        <Setter Property="ProgressColor" Value="{StaticResource BusBuddy.Brush.Primary}"/>
+        <Setter Property="TrackColor" Value="{StaticResource BusBuddy.Brush.Surface.Medium}"/>
+        <Setter Property="TrackThickness" Value="6"/>
+        <Setter Property="ProgressThickness" Value="6"/>
+        <Setter Property="ShowProgressValue" Value="False"/>
+        <Setter Property="AnimationDuration" Value="0:0:1"/>
+    </Style>
+
+    <!-- SfCircularGauge Style for Dashboard -->
+    <Style x:Key="DashboardGaugeStyle" TargetType="syncfusion:SfCircularGauge">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- Dashboard Tile Styles - Non-Syncfusion but supporting controls -->
+    <Style x:Key="DashboardTileStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BusBuddy.Brush.Surface.Medium}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BusBuddy.Brush.Surface.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="16"/>
+        <Setter Property="Margin" Value="8"/>
+        <Setter Property="MinHeight" Value="120"/>
+    </Style>
+
+    <Style x:Key="TileHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Text.Primary}"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <Style x:Key="TileContentStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Text.Secondary}"/>
+        <Setter Property="Margin" Value="0,2"/>
+    </Style>
+
+    <Style x:Key="TileValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource BusBuddy.Brush.Primary}"/>
+        <Setter Property="Margin" Value="0,4"/>
+    </Style>
+
+    <Style x:Key="StatusIndicatorStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Height" Value="12"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+    </Style>
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="4"
