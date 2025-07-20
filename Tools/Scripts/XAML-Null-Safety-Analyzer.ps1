@@ -77,8 +77,7 @@ function Find-UnsafeBindings {
                     $fileIssues.Add($issue)
                 }
             }
-        }
-        catch {
+        } catch {
             # Log error but continue processing other files
             Write-Warning "Failed to process file $($file.FullName): $($_.Exception.Message)"
         }
@@ -145,22 +144,17 @@ function Test-SyncfusionNamespaces {
 }
 
 function Test-BusBuddyNullSafety {
-    <#
-    .SYNOPSIS
-        Bus Buddy null safety checker for XAML bindings
-    .EXAMPLE
-        bb-null-check
-        bb-null-check -Path "Views\Dashboard"
-    #>
+    [CmdletBinding()
     param(
         [string]$Path = 'BusBuddy.WPF\Views'
     )
 
-    Write-Host '🛡️ Bus Buddy Null Safety Analyzer' -ForegroundColor Cyan
+    # Replace Write-Host with proper streams
+    Write-Information '🛡️ Bus Buddy Null Safety Analyzer' -Tags 'XamlNullSafety' -InformationAction Continue
 
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
-        Write-Host '❌ Bus Buddy project root not found' -ForegroundColor Red
+        Write-Error '❌ Bus Buddy project root not found'
         return
     }
 
@@ -169,19 +163,19 @@ function Test-BusBuddyNullSafety {
     $issues = Find-UnsafeBindings -Path $targetPath
 
     if ($issues.Count -eq 0) {
-        Write-Host '✅ No null safety issues found!' -ForegroundColor Green
+        Write-Information '✅ No null safety issues found!' -Tags 'XamlNullSafety' -InformationAction Continue
         return
     }
 
-    Write-Host "⚠️ Found $($issues.Count) potential null safety issues:" -ForegroundColor Yellow
+    Write-Warning "⚠️ Found $($issues.Count) potential null safety issues:"
 
     foreach ($issue in $issues) {
         $fileName = Split-Path $issue.FilePath -Leaf
-        Write-Host "`n📄 $fileName (Line $($issue.LineNumber))" -ForegroundColor White
-        Write-Host "   Issue: $($issue.IssueType)" -ForegroundColor Red
-        Write-Host "   Current: $($issue.CurrentBinding)" -ForegroundColor Gray
-        Write-Host "   Suggest: $($issue.SaferAlternative)" -ForegroundColor Green
-        Write-Host "   Why: $($issue.Explanation)" -ForegroundColor Yellow
+        Write-Information "`n📄 $fileName (Line $($issue.LineNumber))" -Tags 'XamlNullSafety' -InformationAction Continue
+        Write-Error "   Issue: $($issue.IssueType)"
+        Write-Information "   Current: $($issue.CurrentBinding)" -Tags 'XamlNullSafety' -InformationAction Continue
+        Write-Information "   Suggest: $($issue.SaferAlternative)" -Tags 'XamlNullSafety' -InformationAction Continue
+        Write-Warning "   Why: $($issue.Explanation)"
     }
 }
 

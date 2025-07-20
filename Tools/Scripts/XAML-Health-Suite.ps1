@@ -60,8 +60,9 @@ function Invoke-ComprehensiveXamlHealth {
         [switch]$FixMode
     )
 
-    Write-Host '🏥 Bus Buddy Comprehensive XAML Health Analysis' -ForegroundColor Cyan
-    Write-Host '=' * 60 -ForegroundColor Cyan
+    # Use Write-Information instead of Write-Host for compatibility
+    Write-Information '🏥 Bus Buddy Comprehensive XAML Health Analysis' -Tags 'XamlHealth' -InformationAction Continue
+    Write-Information ('=' * 60) -Tags 'XamlHealth' -InformationAction Continue
 
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
@@ -79,8 +80,8 @@ function Invoke-ComprehensiveXamlHealth {
     $startTime = Get-Date
     $totalFiles = (Get-ChildItem $targetPath -Filter '*.xaml' -Recurse).Count
 
-    Write-Host "📁 Analyzing $totalFiles XAML files in: $targetPath" -ForegroundColor White
-    Write-Host "🕒 Started at: $($startTime.ToString('HH:mm:ss'))" -ForegroundColor Gray
+    Write-Information "📁 Analyzing $totalFiles XAML files in: $targetPath" -Tags 'XamlHealth' -InformationAction Continue
+    Write-Information "🕒 Started at: $($startTime.ToString('HH:mm:ss'))" -Tags 'XamlHealth' -InformationAction Continue
 
     # Health check results storage - PowerShell 7.5.2 optimized with strongly typed collections
     $healthResults = [PSCustomObject]@{
