@@ -374,21 +374,19 @@ namespace BusBuddy.WPF.Utilities
         {
             var config = ModeConfiguration.Modes[mode];
 
-            // Update DebugConfig based on the mode
-            if (typeof(DebugConfig).IsClass)
+#if DEBUG
+            // Update DebugConfig based on the mode (only available in DEBUG builds)
+            try
             {
-                try
-                {
-                    var debugConfigType = typeof(DebugConfig);
-                    debugConfigType.GetProperty("EnableVerboseLogging")?.SetValue(null, config.EnableUILogging);
-                    debugConfigType.GetProperty("EnablePerformanceTracking")?.SetValue(null, config.EnablePerformanceLogging);
-                    debugConfigType.GetProperty("EnableUITracking")?.SetValue(null, config.EnableUILogging);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warning(ex, "Failed to update DebugConfig for mode {Mode}", mode);
-                }
+                DebugConfig.EnableVerboseLogging = config.EnableUILogging;
+                DebugConfig.EnablePerformanceTracking = config.EnablePerformanceLogging;
+                DebugConfig.EnableUITracking = config.EnableUILogging;
             }
+            catch (Exception ex)
+            {
+                Logger.Warning(ex, "Failed to update DebugConfig for mode {Mode}", mode);
+            }
+#endif
 
             Logger.Debug("⚙️ Applied configuration for {Mode} mode: MinLevel={MinLevel}, UI={UI}, Perf={Perf}",
                 mode, config.MinimumLevel, config.EnableUILogging, config.EnablePerformanceLogging);

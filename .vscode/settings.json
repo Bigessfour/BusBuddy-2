@@ -1,4 +1,15 @@
 {
+  // =============================================================================
+  // VS CODE INSIDERS v1.103.0 OPTIMIZED CONFIGURATION
+  // Version: 1.103.0-insider (user setup)
+  // Commit: 3b2551cd990a02383190cc7670021ec6c30b86df
+  // Date: 2025-07-18T05:03:37.281Z
+  // Electron: 35.6.0, Chromium: 134.0.6998.205, Node.js: 22.15.1
+  // =============================================================================
+  // CORE INSIDERS FEATURES AND SETTINGS SYNC
+  "settingsSync.keybindingsPerPlatform": false,
+  "settingsSync.ignoredExtensions": [],
+  "settingsSync.ignoredSettings": [],
   "agentic.completenessPriority": true,
   "agentic.preferTerminalCommands": true,
   "agentic.avoidTaskSystemFallback": true,
@@ -33,108 +44,53 @@
   "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.useModernNet": true,
   "omnisharp.maxProjectFileCountForDiagnosticAnalysis": 500,
-  "powershell.scriptAnalysis.enable": false,
-  "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
   // =============================================================================
-  // POWERSHELL 7.5.2 EXTENSION CONFIGURATION (STEP 3 BEST PRACTICES)
+  // POWERSHELL 7.5.2 EXTENSION v2025.2.0 INTEGRATION (INSIDERS OPTIMIZED)
   // =============================================================================
   "powershell.powerShellAdditionalExePaths": {
     "PowerShell 7.5.2": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
   },
   "powershell.powerShellDefaultVersion": "PowerShell 7.5.2",
-  "powershell.scriptAnalysis.ruleSettings": {
-    "PSUseApprovedVerbs": {
-      "Enable": true,
-      "Severity": "Error",
-      "TreatAsError": true
-    },
-    "PSUseConsistentIndentation": {
-      "Enable": true,
-      "Kind": "space",
-      "PipelineIndentation": "IncreaseIndentationAfterEveryPipeline"
-    },
-    "PSUseConsistentWhitespace": {
-      "Enable": true,
-      "CheckInnerBrace": true,
-      "CheckOpenBrace": true,
-      "CheckOpenParen": true,
-      "CheckOperator": true,
-      "CheckPipe": true,
-      "CheckPipeForRedundantWhitespace": false,
-      "CheckSeparator": true,
-      "CheckParameter": false
-    }
-  },
-  "powershell.scriptAnalysis.excludePaths": [
-    "**/.vscode/**",
-    "**/Tools/Scripts/**"
-  ],
-  "powershell.integratedConsole.showOnStartup": false,
-  "powershell.integratedConsole.suppressStartupBanner": true,
-  "powershell.analyzeOpenDocumentsOnly": true,
-  "powershell.codeFormatting.preset": "OTBS",
-  "powershell.codeFormatting.openBraceOnSameLine": true,
-  "powershell.codeFormatting.newLineAfterOpenBrace": true,
-  "powershell.codeFormatting.newLineAfterCloseBrace": true,
-  "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationAfterEveryPipeline",
-  "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
-  "powershell.codeFormatting.whitespaceBeforeOpenParen": true,
-  "powershell.codeFormatting.whitespaceAroundOperator": true,
-  "powershell.codeFormatting.whitespaceAfterSeparator": true,
-  "powershell.codeFormatting.whitespaceBetweenParameters": false,
-  "powershell.codeFormatting.whitespaceInsideBrace": true,
-  "powershell.codeFormatting.addWhitespaceAroundPipe": true,
-  "powershell.codeFormatting.trimWhitespaceAroundPipe": false,
-  "powershell.codeFormatting.ignoreOneLineBlock": true,
-  "powershell.codeFormatting.alignPropertyValuePairs": true,
-  "powershell.codeFormatting.useConstantStrings": false,
-  "powershell.codeFormatting.useCorrectCasing": true,
-  "powershell.codeFormatting.autoCorrectAliases": true,
-  "powershell.debugging.createTemporaryIntegratedConsole": false,
-  "powershell.enableProfileLoading": true,
   "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+  "powershell.startAutomatically": true,
+  "powershell.enableProfileLoading": true,
+  "powershell.integratedConsole.showOnStartup": true,
+  "powershell.integratedConsole.suppressStartupBanner": false,
+  "powershell.integratedConsole.focusConsoleOnExecute": false,
+  "powershell.integratedConsole.useLegacyReadLine": false,
+  "powershell.integratedConsole.forceClearScrollbackBuffer": false,
+  "powershell.integratedConsole.executeInCurrentScope": true,
+  "powershell.analyzeOpenDocumentsOnly": true,
+  "powershell.debugging.createTemporaryIntegratedConsole": false,
+  "powershell.developer.editorServicesLogLevel": "Information",
+  "powershell.developer.waitForSessionFileTimeoutSeconds": 240,
   "powershell.buttons.showRunButtons": true,
   "powershell.buttons.showPanelMovementButtons": true,
-  "powershell.developer.featureFlags": [
-    "BreakAllInRunspace",
-    "PSReadLinePredictor",
-    "PSScriptAnalyzer",
-    "CodeFolding",
-    "PSReadLineHistoryList"
+  "powershell.promptToUpdatePowerShell": false,
+  "powershell.scriptAnalysis.enable": false,
+  "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+  // =============================================================================
+  // GITHUB ACTIONS EXTENSION CONFIGURATION (WORKFLOW VALIDATION)
+  // =============================================================================
+  "github-actions.workflows.pinned.refresh.enabled": true,
+  "github-actions.workflows.pinned.workflows": [
+    ".github/workflows/build-and-test.yml"
   ],
-  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2",
-  "terminal.integrated.profiles.windows": {
-    "PowerShell 7.5.2": {
-      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
-      "args": [
-        "-NoProfile",
-        "-NoExit",
-        "-c",
-        "Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet } else { Write-Host 'Bus Buddy profiles not found' -ForegroundColor Yellow }"
-      ],
-      "icon": "terminal-powershell"
-    },
-    "PowerShell 7 (Clean)": {
-      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
-      "args": [],
-      "icon": "terminal-powershell"
-    },
-    "PowerShell Admin": {
-      "path": "pwsh.exe",
-      "args": [
-        "-NoProfile",
-        "-NoExit",
-        "-c",
-        "Start-Process pwsh.exe -ArgumentList '-NoProfile', '-NoExit', '-c', \"Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet }\" -Verb RunAs"
-      ],
-      "icon": "terminal-powershell"
-    }
+  "github-actions.remote-name": "origin",
+  "github-actions.workflows.validation.enabled": true,
+  "github-actions.workflows.validation.strictSecretsSchema": false,
+  "github-actions.disable-expression-validation": true,
+  "yaml.validate": false,
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
   },
-  "workbench.startupEditor": "none",
-  "search.useGlobalIgnoreFiles": true,
-  "git.autorefresh": false,
-  "taskExplorer.enableTaskExplorer": true,
-  "task.autoDetect": "off",
+  "yaml.customTags": [
+    "!ENV scalar",
+    "!ENV sequence"
+  ],
+  // =============================================================================
+  // .NET AND OMNISHARP CONFIGURATION
+  // =============================================================================
   "dotnet.server.useOmnisharp": false,
   "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
   "dotnet.inlayHints.enableInlayHintsForParameters": true,
@@ -253,6 +209,20 @@
       "source.fixAll": "explicit"
     }
   },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.wordWrap": "off",
+    "editor.detectIndentation": false,
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    }
+  },
   "files.associations": {
     "*.ps1": "powershell",
     "*.psm1": "powershell",
@@ -262,6 +232,8 @@
     "*.csproj": "xml",
     "*.props": "xml",
     "*.targets": "xml",
+    "*.yml": "yaml",
+    "*.yaml": "yaml",
     "settings.json": "jsonc",
     "launch.json": "jsonc",
     "tasks.json": "jsonc",
@@ -294,9 +266,6 @@
   "csharp.inlayHints.enableInlayHintsForLambdaParameterTypes": true,
   "csharp.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
   "dotnet.codeLens.enableReferencesCodeLens": true,
-  "powershell.developer.bundledModulesPath": "",
-  "powershell.promptToUpdatePowerShell": false,
-  "powershell.developer.editorServicesLogLevel": "Information",
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.iconTheme": "vs-seti",
   "workbench.editor.centeredLayout": false,
