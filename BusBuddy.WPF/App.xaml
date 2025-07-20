@@ -1,68 +1,72 @@
-<Application x:Class="BusBuddy.WPF.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:BusBuddy.WPF"
-             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
-             xmlns:views="clr-namespace:BusBuddy.WPF.Views"
-             xmlns:bus="clr-namespace:BusBuddy.WPF.Views.Bus"
-             xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
-             xmlns:route="clr-namespace:BusBuddy.WPF.Views.Route"
-             xmlns:driver="clr-namespace:BusBuddy.WPF.Views.Driver"
-             xmlns:schedule="clr-namespace:BusBuddy.WPF.Views.Schedule"
-             xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
-             xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
-             xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
-             xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
-             xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
-             xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
-             xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
-             xmlns:scheduleManagementViewModels="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement"
-             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF">
+<Application
+    x:Class="BusBuddy.WPF.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
+    xmlns:bus="clr-namespace:BusBuddy.WPF.Views.Bus"
+    xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
+    xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
+    xmlns:driver="clr-namespace:BusBuddy.WPF.Views.Driver"
+    xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
+    xmlns:local="clr-namespace:BusBuddy.WPF"
+    xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
+    xmlns:route="clr-namespace:BusBuddy.WPF.Views.Route"
+    xmlns:schedule="clr-namespace:BusBuddy.WPF.Views.Schedule"
+    xmlns:scheduleManagementViewModels="clr-namespace:BusBuddy.WPF.ViewModels.ScheduleManagement"
+    xmlns:scheduleViewModels="clr-namespace:BusBuddy.WPF.ViewModels.Schedule"
+    xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
+    xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
+    xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+    xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+    xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+    xmlns:views="clr-namespace:BusBuddy.WPF.Views">
     <Application.Resources>
         <ResourceDictionary>
             <!--
-            ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-            🎨 PURE SYNCFUSION 30.1.40 THEME ENVIRONMENT — SFSKINMANAGER HANDLES ALL THEMING
-            ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-            ✅ PRIMARY THEME: FluentDark (Applied via SfSkinManager in App.xaml.cs)
-            ✅ FALLBACK THEME: FluentLight (Applied via SfSkinManager in App.xaml.cs)
-            ✅ SKIN MANAGER: Configured in App.xaml.cs with ApplyStylesOnApplication = true
-            ✅ CONTROL THEMING: All Syncfusion controls automatically themed via SfSkinManager
-            ✅ NO MANUAL THEME LOADING: SfSkinManager provides all theme resources automatically
-            ✅ RESOURCE OPTIMIZATION: Only custom application styles in ResourceDictionary
-            ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                🎨 PURE SYNCFUSION 30.1.40 THEME ENVIRONMENT — SFSKINMANAGER HANDLES ALL THEMING
+                ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+                ✅ PRIMARY THEME: FluentDark (Applied via SfSkinManager in App.xaml.cs)
+                ✅ FALLBACK THEME: FluentLight (Applied via SfSkinManager in App.xaml.cs)
+                ✅ SKIN MANAGER: Configured in App.xaml.cs with ApplyStylesOnApplication = true
+                ✅ CONTROL THEMING: All Syncfusion controls automatically themed via SfSkinManager
+                ✅ NO MANUAL THEME LOADING: SfSkinManager provides all theme resources automatically
+                ✅ RESOURCE OPTIMIZATION: Only custom application styles in ResourceDictionary
+                ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
             -->
             <ResourceDictionary.MergedDictionaries>
-                <!-- 🎨 OPTIMIZED SYNCFUSION THEME CONFIGURATION -->
-                <!-- Theme resources are now loaded early via SfSkinManager BEFORE InitializeComponent() -->
-                <!-- This prevents XAML parse errors and resource corruption during startup -->
+                <!--  🎨 OPTIMIZED SYNCFUSION THEME CONFIGURATION  -->
+                <!--  Theme resources are now loaded early via SfSkinManager BEFORE InitializeComponent()  -->
+                <!--  This prevents XAML parse errors and resource corruption during startup  -->
 
-                <!-- Windows11Light Theme Resource Dictionaries -->
-                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/SfDataGrid/SfDataGrid.xaml"/>
-                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/SfTabControl/SfTabControl.xaml"/>
-                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/DockingManager/DockingManager.xaml"/>
-                <ResourceDictionary Source="/Syncfusion.Themes.Windows11Light.Wpf;component/NavigationDrawer/NavigationDrawer.xaml"/>
+                <!--  🎯 SYNCFUSION V30.1.40 FLUENTDARK THEME RESOURCES — ALIGNED WITH APP.XAML.CS  -->
+                <!--  Theme automatically applied via SfSkinManager in App.xaml.cs — No manual theme loading required  -->
+                <!--  SfSkinManager.ApplicationTheme = new Theme("FluentDark") handles all theme resources  -->
+                <!--  Individual control themes are automatically resolved by SkinManager framework  -->
 
-                <!-- 🎯 CUSTOM STYLES AND RESOURCES ONLY -->
-                <!-- Custom application-specific styles and resources (non-theme) -->
-                <ResourceDictionary Source="pack://application:,,,/BusBuddy.WPF;component/Resources/SyncfusionV30_ResourceDictionary.xaml" />
+                <!--  NOTE: Manual theme resource loading removed to prevent conflicts with SfSkinManager  -->
+                <!--  All Syncfusion controls inherit FluentDark theme automatically via SkinManager API  -->
+
+                <!--  🎯 SYNCFUSION V30.1.40 VALIDATED RESOURCE DICTIONARY  -->
+                <!--  All properties verified for v30.1.40 compatibility — no unsupported properties  -->
+                <ResourceDictionary Source="pack://application:,,,/BusBuddy.WPF;component/Resources/SyncfusionV30_Validated_ResourceDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <!-- GLOBAL CONVERTERS -->
+            <!--  GLOBAL CONVERTERS  -->
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter" IsInverted="True" />
 
-            <!-- CRITICAL MISSING RESOURCES: Prevent fallback warnings -->
+            <!--  CRITICAL MISSING RESOURCES: Prevent fallback warnings  -->
             <SolidColorBrush x:Key="ContentForeground" Color="#FFFFFF" />
             <SolidColorBrush x:Key="TextForeground" Color="#FFFFFF" />
             <SolidColorBrush x:Key="ControlForeground" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" /> <!-- Alias for TextForeground -->
+            <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" />
+            <!--  Alias for TextForeground  -->
             <SolidColorBrush x:Key="BackgroundBrush" Color="#1E1E1E" />
             <SolidColorBrush x:Key="BackgroundNormalBrush" Color="#1E1E1E" />
             <SolidColorBrush x:Key="SurfaceBackground" Color="#1E1E1E" />
             <SolidColorBrush x:Key="SurfaceBorderBrush" Color="#323130" />
 
-            <!-- GLOBAL STYLES FOR ENHANCED CONTROLS -->
+            <!--  GLOBAL STYLES FOR ENHANCED CONTROLS  -->
             <Style x:Key="EnhancedNavigationDrawerStyle" TargetType="ContentControl">
                 <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
                 <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
@@ -76,18 +80,20 @@
                 <Setter Property="VerticalAlignment" Value="Stretch" />
             </Style>
             <!--
-            ===============================================================================
-            THEME USAGE GUIDELINES
-            ===============================================================================
-            Each control should have:Theme switching is available via ThemeService.ToggleTheme()
-            ===============================================================================
+                ===============================================================================
+                THEME USAGE GUIDELINES
+                ===============================================================================
+                Each control should have:Theme switching is available via ThemeService.ToggleTheme()
+                ===============================================================================
             -->
-            <!-- ===============================================================================
-            VIEWMODEL TO VIEW MAPPING — MVVM PATTERN IMPLEMENTATION
-            ===============================================================================
-            DataTemplates that map ViewModels to their corresponding Views
-            This enables proper MVVM view rendering instead of displaying ViewModel type names
-            =============================================================================== -->
+            <!--
+                ===============================================================================
+                VIEWMODEL TO VIEW MAPPING — MVVM PATTERN IMPLEMENTATION
+                ===============================================================================
+                DataTemplates that map ViewModels to their corresponding Views
+                This enables proper MVVM view rendering instead of displaying ViewModel type names
+                ===============================================================================
+            -->
             <DataTemplate DataType="{x:Type viewModels:LoadingViewModel}">
                 <views:LoadingView />
             </DataTemplate>
@@ -127,14 +133,14 @@
             <DataTemplate DataType="{x:Type viewModels:StudentListViewModel}">
                 <views:StudentListView />
             </DataTemplate>
-            <!-- Essential converters only - minimal resource dictionary -->
+            <!--  Essential converters only - minimal resource dictionary  -->
             <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
             <converters:BooleanToDeprecatedForegroundConverter x:Key="BooleanToDeprecatedForegroundConverter" />
             <converters:ThemeTextConverter x:Key="ThemeTextConverter" />
-            <!-- Missing Inverse Converter - Critical Fix -->
+            <!--  Missing Inverse Converter - Critical Fix  -->
             <!-- <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityInverseConverter2" IsInverted="True"/> -->
-            <!-- Status and Data Converters -->
+            <!--  Status and Data Converters  -->
             <converters:ActiveStatusToColorConverter x:Key="ActiveStatusToColorConverter" />
             <converters:ActiveStatusToTextConverter x:Key="ActiveStatusToTextConverter" />
             <converters:EfficiencyToColorConverter x:Key="EfficiencyToColorConverter" />
@@ -145,12 +151,12 @@
             <converters:LicenseExpiredConverter x:Key="LicenseExpiredConverter" />
             <converters:LicenseExpiringSoonConverter x:Key="LicenseExpiringSoonConverter" />
             <converters:DaysRemainingToColorConverter x:Key="DaysRemainingToColorConverter" />
-            <!-- Additional converters commonly used in views -->
+            <!--  Additional converters commonly used in views  -->
             <converters:ScheduleStatusToColorConverter x:Key="ScheduleStatusToColorConverter" />
-            <!-- CRITICAL: Add missing converters to prevent local definitions -->
+            <!--  CRITICAL: Add missing converters to prevent local definitions  -->
             <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
-            <!-- Standard WPF converters as global resources -->
+            <!--  Standard WPF converters as global resources  -->
             <!-- Already defined above: <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/> -->
         </ResourceDictionary>
     </Application.Resources>

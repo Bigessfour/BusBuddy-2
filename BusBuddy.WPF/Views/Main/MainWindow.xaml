@@ -1,694 +1,858 @@
 <!--
-╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-║                                                          🚌 BUSBUDDY MAIN WINDOW 🚌                                                          ║
-║                                                    [COMPREHENSIVE DASHBOARD SHELL]                                                             ║
-║═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
-║  ✨ SYNCFUSION FLUENTDARK THEME: Professional dark theme with advanced controls and enhanced startup validation                      ║
-║  🎯 NAVIGATION DRAWER: SfNavigationDrawer with SfListView for smooth navigation                                                   ║
-║  🎭 DOCKING MANAGER: SfDockingManager for advanced panel management                                                               ║
-║  📊 LOADING OVERLAY: Integrated LoadingView with SfBusyIndicator                                                                  ║
-║  🌐 FULL SCREEN: WindowState="Maximized" with responsive design                                                                   ║
-║  🔧 ENHANCED DEBUGGING: Comprehensive startup validation and theme resource verification                                           ║
-║═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
-║  SCAFFOLD STRUCTURE:                                                                                                              ║
-║  └── Window (Foundation Layer)                                                                                                    ║
-║      ├── Resources (Template Patterns)                                                                                           ║
-║      └── Grid (Layout Skeleton)                                                                                                  ║
-║          └── DockingManager (Framework Container)                                                                                ║
-║              ├── NavigationDrawer (Left Panel)                                                                                   ║
-║              ├── Dashboard (Document Center)                                                                                     ║
-║              ├── ContentControl (Dynamic Views)                                                                                  ║
-║              ├── HeaderToolbar (Top Panel)                                                                                       ║
-║              ├── PropertyPanel (Right Panel)                                                                                     ║
-║              ├── StatusBar (Bottom Panel)                                                                                        ║
-║              └── Overlays (BusyIndicator + Loading)                                                                              ║
-╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+  ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  ║                                                          🚌 BUSBUDDY MAIN WINDOW 🚌                                                          ║
+  ║                                                    [COMPREHENSIVE DASHBOARD SHELL]                                                             ║
+  ║═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
+  ║  ✨ SYNCFUSION FLUENTDARK THEME: Professional dark theme with advanced controls and enhanced startup validation                      ║
+  ║  🎯 NAVIGATION DRAWER: SfNavigationDrawer with SfListView for smooth navigation                                                   ║
+  ║  🎭 DOCKING MANAGER: SfDockingManager for advanced panel management                                                               ║
+  ║  📊 LOADING OVERLAY: Integrated LoadingView with SfBusyIndicator                                                                  ║
+  ║  🌐 FULL SCREEN: WindowState="Maximized" with responsive design                                                                   ║
+  ║  🔧 ENHANCED DEBUGGING: Comprehensive startup validation and theme resource verification                                           ║
+  ║═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════║
+  ║  SCAFFOLD STRUCTURE:                                                                                                              ║
+  ║  └── Window (Foundation Layer)                                                                                                    ║
+  ║      ├── Resources (Template Patterns)                                                                                           ║
+  ║      └── Grid (Layout Skeleton)                                                                                                  ║
+  ║          └── DockingManager (Framework Container)                                                                                ║
+  ║              ├── NavigationDrawer (Left Panel)                                                                                   ║
+  ║              ├── Dashboard (Document Center)                                                                                     ║
+  ║              ├── ContentControl (Dynamic Views)                                                                                  ║
+  ║              ├── HeaderToolbar (Top Panel)                                                                                       ║
+  ║              ├── PropertyPanel (Right Panel)                                                                                     ║
+  ║              ├── StatusBar (Bottom Panel)                                                                                        ║
+  ║              └── Overlays (BusyIndicator + Loading)                                                                              ║
+  ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 -->
-<Window x:Class="BusBuddy.WPF.Views.Main.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BusBuddy.WPF"
-        xmlns:views="clr-namespace:BusBuddy.WPF.Views"
-        xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
-        xmlns:bus="clr-namespace:BusBuddy.WPF.Views.Bus"
-        xmlns:driver="clr-namespace:BusBuddy.WPF.Views.Driver"
-        xmlns:route="clr-namespace:BusBuddy.WPF.Views.Route"
-        xmlns:schedule="clr-namespace:BusBuddy.WPF.Views.Schedule"
-        xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
-        xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
-        xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
-        xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
-        xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
-        xmlns:xai="clr-namespace:BusBuddy.WPF.Views.XAI"
-        xmlns:googleearth="clr-namespace:BusBuddy.WPF.Views.GoogleEarth"
-        xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
-        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
-        xmlns:syncfusiontools="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.WPF"
-        xmlns:syncfusionnavigation="clr-namespace:Syncfusion.UI.Xaml.NavigationDrawer;assembly=Syncfusion.SfNavigationDrawer.WPF"
-        xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
-        Title="Bus Buddy - Transportation Management System"
-        WindowState="Maximized"
-        WindowStyle="None"
-        ResizeMode="CanResizeWithGrip"
-        WindowStartupLocation="CenterScreen"
+<Window
+  x:Class="BusBuddy.WPF.Views.Main.MainWindow"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:activity="clr-namespace:BusBuddy.WPF.Views.Activity"
+  xmlns:bus="clr-namespace:BusBuddy.WPF.Views.Bus"
+  xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:dashboard="clr-namespace:BusBuddy.WPF.Views.Dashboard"
+  xmlns:driver="clr-namespace:BusBuddy.WPF.Views.Driver"
+  xmlns:fuel="clr-namespace:BusBuddy.WPF.Views.Fuel"
+  xmlns:googleearth="clr-namespace:BusBuddy.WPF.Views.GoogleEarth"
+  xmlns:local="clr-namespace:BusBuddy.WPF"
+  xmlns:maintenance="clr-namespace:BusBuddy.WPF.Views.Maintenance"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:route="clr-namespace:BusBuddy.WPF.Views.Route"
+  xmlns:schedule="clr-namespace:BusBuddy.WPF.Views.Schedule"
+  xmlns:settings="clr-namespace:BusBuddy.WPF.Views.Settings"
+  xmlns:student="clr-namespace:BusBuddy.WPF.Views.Student"
+  xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+  xmlns:syncfusionnavigation="clr-namespace:Syncfusion.UI.Xaml.NavigationDrawer;assembly=Syncfusion.SfNavigationDrawer.WPF"
+  xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+  xmlns:syncfusiontools="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.WPF"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib"
+  xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
+  xmlns:views="clr-namespace:BusBuddy.WPF.Views"
+  xmlns:xai="clr-namespace:BusBuddy.WPF.Views.XAI"
+  Title="Bus Buddy - Transportation Management System"
+  d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
+  Background="{DynamicResource SurfaceBackground}"
+  Foreground="{DynamicResource TextPrimary}"
+  Loaded="Window_Loaded"
+  ResizeMode="CanResizeWithGrip"
+  WindowStartupLocation="CenterScreen"
+  WindowState="Maximized"
+  WindowStyle="None"
+  mc:Ignorable="d">
+  <Window.Style>
+    <Style TargetType="Window">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+    </Style>
+  </Window.Style>
+
+  <Window.Resources>
+    <ResourceDictionary>
+      <!--  Converters  -->
+      <converters:StringEqualityConverter x:Key="StringEqualityConverter" />
+
+      <!--  NAVIGATION ITEM TEMPLATE  -->
+      <DataTemplate x:Key="NavigationItemTemplate">
+        <!--
+          ── NavigationItemTemplate — Syncfusion FluentDark Compliant —
+          ── Accessible, well-formed, and documented for maintainability —
+        -->
+        <syncfusion:ButtonAdv
+          x:Name="NavigationButton"
+          Margin="4,2"
+          Padding="16,12"
+          HorizontalAlignment="Stretch"
+          HorizontalContentAlignment="Left"
+          AutomationProperties.Name="{Binding Name}"
+          Background="Transparent"
+          BorderThickness="0"
+          Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+          CommandParameter="{Binding}"
+          Foreground="{DynamicResource TextPrimary}"
+          Label="{Binding Name}"
+          SizeMode="Normal"
+          Style="{StaticResource NavigationItemStyle}"
+          ToolTip="{Binding Description, FallbackValue='Navigate to section'}">
+          <syncfusion:ButtonAdv.Content>
+            <StackPanel Orientation="Horizontal">
+              <!--  Icon — visually distinguishes navigation item —  -->
+              <TextBlock
+                Margin="0,0,12,0"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI Emoji"
+                FontSize="16"
+                Foreground="{DynamicResource ContentForeground}"
+                Text="{Binding Icon}" />
+              <!--  Name — accessible label for navigation —  -->
+              <TextBlock
+                VerticalAlignment="Center"
+                FontSize="14"
+                FontWeight="Medium"
+                Foreground="{DynamicResource ContentForeground}"
+                Text="{Binding Name}" />
+            </StackPanel>
+          </syncfusion:ButtonAdv.Content>
+        </syncfusion:ButtonAdv>
+      </DataTemplate>
+    </ResourceDictionary>
+  </Window.Resources>
+
+  <!--  MAIN GRID CONTAINER  -->
+  <Grid Background="{DynamicResource SurfaceBackground}">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <!--  Menu Bar  -->
+      <RowDefinition Height="*" />
+      <!--  Docking Manager  -->
+    </Grid.RowDefinitions>
+
+    <!--  ENHANCED MENU BAR for Traditional Menu Navigation  -->
+    <Menu
+      Grid.Row="0"
+      Padding="8,4"
+      Background="{DynamicResource SurfaceBackground}"
+      BorderBrush="{DynamicResource SurfaceBorderBrush}"
+      BorderThickness="0,0,0,1">
+
+      <!--  File Menu  -->
+      <MenuItem Header="_File" Style="{StaticResource MenuItemStyle}">
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="BusManagement"
+          Header="_New Bus...">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15V3H9V5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6.01Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="RouteManagement"
+          Header="_New Route...">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M20,10C22,12 22,16 20,18L18.5,16.5C19.9,15.1 19.9,12.9 18.5,11.5L20,10M4,10L5.5,11.5C4.1,12.9 4.1,15.1 5.5,16.5L4,18C2,16 2,12 4,10Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <Separator Style="{StaticResource MenuSeparatorStyle}" />
+        <MenuItem Click="ExitMenuItem_Click" Header="E_xit">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+      </MenuItem>
+
+      <!--  View Menu  -->
+      <MenuItem Header="_View" Style="{StaticResource MenuItemStyle}">
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="Dashboard"
+          Header="_Dashboard"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Dashboard}">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <Separator Style="{StaticResource MenuSeparatorStyle}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="BusManagement"
+          Header="_Bus Management"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=BusManagement}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="DriverManagement"
+          Header="_Driver Management"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=DriverManagement}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="RouteManagement"
+          Header="_Route Management"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=RouteManagement}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="ScheduleManagement"
+          Header="_Schedule Management"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ScheduleManagement}" />
+        <Separator Style="{StaticResource MenuSeparatorStyle}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="StudentManagement"
+          Header="S_tudent Management"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=StudentManagement}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="Maintenance"
+          Header="_Maintenance"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Maintenance}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="FuelManagement"
+          Header="_Fuel Management"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=FuelManagement}" />
+        <Separator Style="{StaticResource MenuSeparatorStyle}" />
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="ActivityLog"
+          Header="_Activity Log"
+          IsCheckable="True"
+          IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ActivityLog}" />
+      </MenuItem>
+
+      <!--  Tools Menu  -->
+      <MenuItem Header="_Tools" Style="{StaticResource MenuItemStyle}">
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="XAIChat"
+          Header="_XAI Chat Assistant">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="GoogleEarth"
+          Header="_Google Earth Integration">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <Separator Style="{StaticResource MenuSeparatorStyle}" />
+        <MenuItem Click="ResetLayoutMenuItem_Click" Header="_Reset Layout">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H16L12,22L8,18H4A2,2 0 0,1 2,16V4A2,2 0 0,1 4,2M4,4V16H8.83L12,19.17L15.17,16H20V4H4Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem
+          Command="{Binding NavigateToCommand}"
+          CommandParameter="Settings"
+          Header="_Settings">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+      </MenuItem>
+
+      <!--  Window Menu  -->
+      <MenuItem Header="_Window" Style="{StaticResource MenuItemStyle}">
+        <MenuItem Click="CascadeWindowsMenuItem_Click" Header="_Cascade" />
+        <MenuItem Click="TileHorizontallyMenuItem_Click" Header="_Tile Horizontally" />
+        <MenuItem Click="TileVerticallyMenuItem_Click" Header="_Tile Vertically" />
+        <Separator Style="{StaticResource MenuSeparatorStyle}" />
+        <MenuItem Click="CloseAllDocumentsMenuItem_Click" Header="_Close All Documents" />
+        <MenuItem Click="ResetLayoutMenuItem_Click" Header="_Reset to Default Layout" />
+      </MenuItem>
+
+      <!--  Help Menu  -->
+      <MenuItem Header="_Help" Style="{StaticResource MenuItemStyle}">
+        <MenuItem Click="AboutMenuItem_Click" Header="_About Bus Buddy">
+          <MenuItem.Icon>
+            <Path
+              Width="16"
+              Height="16"
+              Data="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </MenuItem.Icon>
+        </MenuItem>
+      </MenuItem>
+    </Menu>
+    <!--  COMPREHENSIVE DOCKING MANAGER - Professional IDE-style Layout with Standardization  -->
+    <syncfusiontools:DockingManager
+      x:Name="MainDockingManager"
+      Grid.Row="1"
+      ActiveWindowChanged="MainDockingManager_ActiveWindowChanged"
+      ContainerMode="TDI"
+      DockBehavior="VS2010"
+      DockFill="True"
+      PersistState="True"
+      Style="{StaticResource StandardDockingManagerStyle}"
+      UseDocumentContainer="True"
+      WindowClosing="MainDockingManager_WindowClosing">
+
+      <!--  NAVIGATION DRAWER PANEL (Left Docked with Standard Sizing)  -->
+      <syncfusionnavigation:SfNavigationDrawer
+        x:Name="NavigationDrawer"
+        MinWidth="200"
+        MaxWidth="600"
+        syncfusiontools:DockingManager.CanClose="False"
+        syncfusiontools:DockingManager.CanFloat="True"
+        syncfusiontools:DockingManager.CanSerialize="True"
+        syncfusiontools:DockingManager.DesiredWidthInDockedMode="300"
+        syncfusiontools:DockingManager.DockAbility="All"
+        syncfusiontools:DockingManager.Header="🧭 Navigation"
+        syncfusiontools:DockingManager.SideInDockedMode="Left"
+        syncfusiontools:DockingManager.State="Dock"
+        AutoChangeDisplayMode="False"
         Background="{DynamicResource SurfaceBackground}"
-        Foreground="{DynamicResource TextPrimary}"
-        Loaded="Window_Loaded">
-    <Window.Style>
-        <Style TargetType="Window">
-            <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
-        </Style>
-    </Window.Style>
+        CompactModeWidth="60"
+        DisplayMode="Expanded"
+        DrawerWidth="300"
+        ExpandedModeWidth="300"
+        IsOpen="True"
+        ItemClicked="NavigationDrawer_ItemClicked"
+        Position="Left"
+        Style="{StaticResource StandardNavigationDrawerStyle}">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <!-- Converters -->
-            <converters:StringEqualityConverter x:Key="StringEqualityConverter"/>
+        <!--  PROPER NAVIGATION ITEMS - Using NavigationItem controls  -->
+        <syncfusionnavigation:NavigationItem
+          Header="Dashboard"
+          IsSelected="True"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="Dashboard">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-            <!-- NAVIGATION ITEM TEMPLATE -->
-            <DataTemplate x:Key="NavigationItemTemplate">
-                <!--
-                ── NavigationItemTemplate — Syncfusion FluentDark Compliant —
-                ── Accessible, well-formed, and documented for maintainability —
-                -->
-                <syncfusion:ButtonAdv x:Name="NavigationButton"
-                                     Label="{Binding Name}"
-                                     Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                     CommandParameter="{Binding}"
-                                     SizeMode="Normal"
-                                     HorizontalAlignment="Stretch"
-                                     HorizontalContentAlignment="Left"
-                                     Margin="4,2"
-                                     Padding="16,12"
-                                     Style="{StaticResource NavigationItemStyle}"
-                                     Background="Transparent"
-                                     Foreground="{DynamicResource TextPrimary}"
-                                     BorderThickness="0"
-                                     AutomationProperties.Name="{Binding Name}"
-                                     ToolTip="{Binding Description, FallbackValue='Navigate to section'}">
-                    <syncfusion:ButtonAdv.Content>
-                        <StackPanel Orientation="Horizontal">
-                            <!-- Icon — visually distinguishes navigation item — -->
-                            <TextBlock Text="{Binding Icon}"
-                                       FontSize="16"
-                                       FontFamily="Segoe UI Emoji"
-                                       Margin="0,0,12,0"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource ContentForeground}"/>
-                            <!-- Name — accessible label for navigation — -->
-                            <TextBlock Text="{Binding Name}"
-                                       FontSize="14"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource ContentForeground}"/>
-                        </StackPanel>
-                    </syncfusion:ButtonAdv.Content>
-                </syncfusion:ButtonAdv>
-            </DataTemplate>
-        </ResourceDictionary>
-    </Window.Resources>
+        <syncfusionnavigation:NavigationItem
+          Header="Bus Management"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="BusManagement">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15V3H9V5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6.01M6.5,7H17.5L19,12H5L6.5,7M7.5,13A1.5,1.5 0 0,1 9,14.5A1.5,1.5 0 0,1 7.5,16A1.5,1.5 0 0,1 6,14.5A1.5,1.5 0 0,1 7.5,13M16.5,13A1.5,1.5 0 0,1 18,14.5A1.5,1.5 0 0,1 16.5,16A1.5,1.5 0 0,1 15,14.5A1.5,1.5 0 0,1 16.5,13Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-    <!-- MAIN GRID CONTAINER -->
-    <Grid Background="{DynamicResource SurfaceBackground}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Menu Bar -->
-            <RowDefinition Height="*"/>    <!-- Docking Manager -->
-        </Grid.RowDefinitions>
+        <syncfusionnavigation:NavigationItem
+          Header="Driver Management"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="DriverManagement">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-        <!-- ENHANCED MENU BAR for Traditional Menu Navigation -->
-        <Menu Grid.Row="0"
-              Background="{DynamicResource SurfaceBackground}"
-              BorderBrush="{DynamicResource SurfaceBorderBrush}"
-              BorderThickness="0,0,0,1"
-              Padding="8,4">
+        <syncfusionnavigation:NavigationItem
+          Header="Route Management"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="RouteManagement">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M20,10C22,12 22,16 20,18L18.5,16.5C19.9,15.1 19.9,12.9 18.5,11.5L20,10M4,10L5.5,11.5C4.1,12.9 4.1,15.1 5.5,16.5L4,18C2,16 2,12 4,10M15,10L16.5,11.5C17.9,12.9 17.9,15.1 16.5,16.5L15,18C13,16 13,12 15,10M9,10L10.5,11.5C11.9,12.9 11.9,15.1 10.5,16.5L9,18C7,16 7,12 9,10M12,13A1,1 0 0,1 13,14A1,1 0 0,1 12,15A1,1 0 0,1 11,14A1,1 0 0,1 12,13Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-            <!-- File Menu -->
-            <MenuItem Header="_File" Style="{StaticResource MenuItemStyle}">
-                <MenuItem Header="_New Bus..." Command="{Binding NavigateToCommand}" CommandParameter="BusManagement">
-                    <MenuItem.Icon>
-                        <Path Data="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15V3H9V5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6.01Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="_New Route..." Command="{Binding NavigateToCommand}" CommandParameter="RouteManagement">
-                    <MenuItem.Icon>
-                        <Path Data="M20,10C22,12 22,16 20,18L18.5,16.5C19.9,15.1 19.9,12.9 18.5,11.5L20,10M4,10L5.5,11.5C4.1,12.9 4.1,15.1 5.5,16.5L4,18C2,16 2,12 4,10Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
-                <MenuItem Header="E_xit" Click="ExitMenuItem_Click">
-                    <MenuItem.Icon>
-                        <Path Data="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
+        <syncfusionnavigation:NavigationItem
+          Header="Schedule Management"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="ScheduleManagement">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M7,10H9V12H7V10M15,10H17V12H15V10M11,10H13V12H11V10M7,14H9V16H7V14M15,14H17V16H15V14M11,14H13V16H11V14Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-            <!-- View Menu -->
-            <MenuItem Header="_View" Style="{StaticResource MenuItemStyle}">
-                <MenuItem Header="_Dashboard" Command="{Binding NavigateToCommand}" CommandParameter="Dashboard" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Dashboard}">
-                    <MenuItem.Icon>
-                        <Path Data="M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
-                <MenuItem Header="_Bus Management" Command="{Binding NavigateToCommand}" CommandParameter="BusManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=BusManagement}"/>
-                <MenuItem Header="_Driver Management" Command="{Binding NavigateToCommand}" CommandParameter="DriverManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=DriverManagement}"/>
-                <MenuItem Header="_Route Management" Command="{Binding NavigateToCommand}" CommandParameter="RouteManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=RouteManagement}"/>
-                <MenuItem Header="_Schedule Management" Command="{Binding NavigateToCommand}" CommandParameter="ScheduleManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ScheduleManagement}"/>
-                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
-                <MenuItem Header="S_tudent Management" Command="{Binding NavigateToCommand}" CommandParameter="StudentManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=StudentManagement}"/>
-                <MenuItem Header="_Maintenance" Command="{Binding NavigateToCommand}" CommandParameter="Maintenance" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Maintenance}"/>
-                <MenuItem Header="_Fuel Management" Command="{Binding NavigateToCommand}" CommandParameter="FuelManagement" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=FuelManagement}"/>
-                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
-                <MenuItem Header="_Activity Log" Command="{Binding NavigateToCommand}" CommandParameter="ActivityLog" IsCheckable="True" IsChecked="{Binding CurrentViewName, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ActivityLog}"/>
-            </MenuItem>
+        <syncfusionnavigation:NavigationItem
+          Header="Student Management"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="StudentManagement">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-            <!-- Tools Menu -->
-            <MenuItem Header="_Tools" Style="{StaticResource MenuItemStyle}">
-                <MenuItem Header="_XAI Chat Assistant" Command="{Binding NavigateToCommand}" CommandParameter="XAIChat">
-                    <MenuItem.Icon>
-                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="_Google Earth Integration" Command="{Binding NavigateToCommand}" CommandParameter="GoogleEarth">
-                    <MenuItem.Icon>
-                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
-                <MenuItem Header="_Reset Layout" Click="ResetLayoutMenuItem_Click">
-                    <MenuItem.Icon>
-                        <Path Data="M4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H16L12,22L8,18H4A2,2 0 0,1 2,16V4A2,2 0 0,1 4,2M4,4V16H8.83L12,19.17L15.17,16H20V4H4Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Header="_Settings" Command="{Binding NavigateToCommand}" CommandParameter="Settings">
-                    <MenuItem.Icon>
-                        <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
+        <syncfusionnavigation:NavigationItem
+          Header="Maintenance"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="Maintenance">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-            <!-- Window Menu -->
-            <MenuItem Header="_Window" Style="{StaticResource MenuItemStyle}">
-                <MenuItem Header="_Cascade" Click="CascadeWindowsMenuItem_Click"/>
-                <MenuItem Header="_Tile Horizontally" Click="TileHorizontallyMenuItem_Click"/>
-                <MenuItem Header="_Tile Vertically" Click="TileVerticallyMenuItem_Click"/>
-                <Separator Style="{StaticResource MenuSeparatorStyle}"/>
-                <MenuItem Header="_Close All Documents" Click="CloseAllDocumentsMenuItem_Click"/>
-                <MenuItem Header="_Reset to Default Layout" Click="ResetLayoutMenuItem_Click"/>
-            </MenuItem>
+        <syncfusionnavigation:NavigationItem
+          Header="Fuel Management"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="FuelManagement">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M14,2H10A2,2 0 0,0 8,4V16A2,2 0 0,0 10,18H14A2,2 0 0,0 16,16V4A2,2 0 0,0 14,2M14,16H10V4H14V16M19,6V18A2,2 0 0,1 17,20H7A2,2 0 0,1 5,18V6H7V18H17V6H19Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-            <!-- Help Menu -->
-            <MenuItem Header="_Help" Style="{StaticResource MenuItemStyle}">
-                <MenuItem Header="_About Bus Buddy" Click="AboutMenuItem_Click">
-                    <MenuItem.Icon>
-                        <Path Data="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
-                              Fill="{DynamicResource ContentForeground}" Width="16" Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
-        </Menu>
-        <!-- COMPREHENSIVE DOCKING MANAGER - Professional IDE-style Layout with Standardization -->
-        <syncfusiontools:DockingManager x:Name="MainDockingManager"
-                                  Grid.Row="1"
-                                  Style="{StaticResource StandardDockingManagerStyle}"
-                                  UseDocumentContainer="True"
-                                  PersistState="True"
-                                  DockFill="True"
-                                  ContainerMode="TDI"
-                                  DockBehavior="VS2010"
-                                  ActiveWindowChanged="MainDockingManager_ActiveWindowChanged"
-                                  WindowClosing="MainDockingManager_WindowClosing">
+        <syncfusionnavigation:NavigationItem
+          Header="Activity Log"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="ActivityLog">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-            <!-- NAVIGATION DRAWER PANEL (Left Docked with Standard Sizing) -->
-            <syncfusionnavigation:SfNavigationDrawer x:Name="NavigationDrawer"
-                                          Style="{StaticResource StandardNavigationDrawerStyle}"
-                                          syncfusiontools:DockingManager.Header="🧭 Navigation"
-                                          syncfusiontools:DockingManager.State="Dock"
-                                          syncfusiontools:DockingManager.SideInDockedMode="Left"
-                                          syncfusiontools:DockingManager.DesiredWidthInDockedMode="300"
-                                          syncfusiontools:DockingManager.CanClose="False"
-                                          syncfusiontools:DockingManager.CanFloat="True"
-                                          syncfusiontools:DockingManager.CanSerialize="True"
-                                          syncfusiontools:DockingManager.DockAbility="All"
-                                          MinWidth="200"
-                                          MaxWidth="600"
-                                          IsOpen="True"
-                                          Position="Left"
-                                          DisplayMode="Expanded"
-                                          DrawerWidth="300"
-                                          CompactModeWidth="60"
-                                          ExpandedModeWidth="300"
-                                          AutoChangeDisplayMode="False"
-                                          ItemClicked="NavigationDrawer_ItemClicked"
-                                          Background="{DynamicResource SurfaceBackground}">
+        <syncfusionnavigation:NavigationItem
+          Header="XAI Chat"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="XAIChat">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,7.5A1.5,1.5 0 0,1 9.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,7.5M12,17.23C10.25,17.23 8.71,16.5 7.81,15.42L9.23,14C9.68,14.72 10.75,15.23 12,15.23C13.25,15.23 14.32,14.72 14.77,14L16.19,15.42C15.29,16.5 13.75,17.23 12,17.23M16,10.5A1.5,1.5 0 0,1 14.5,9A1.5,1.5 0 0,1 16,7.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 16,10.5Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-                <!-- PROPER NAVIGATION ITEMS - Using NavigationItem controls -->
-                <syncfusionnavigation:NavigationItem Header="Dashboard" Tag="Dashboard" IsSelected="True" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M3,4H7V8H3V4M9,5V7H21V5H9M3,10H7V14H3V10M9,11V13H21V11H9M3,16H7V20H3V16M9,17V19H21V17H9"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+        <syncfusionnavigation:NavigationItem
+          Header="Google Earth"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="GoogleEarth">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
 
-                <syncfusionnavigation:NavigationItem Header="Bus Management" Tag="BusManagement" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15V3H9V5H6.5C5.84,5 5.28,5.42 5.08,6.01L3,12V20A1,1 0 0,0 4,21H5A1,1 0 0,0 6,20V19H18V20A1,1 0 0,0 19,21H20A1,1 0 0,0 21,20V12L18.92,6.01M6.5,7H17.5L19,12H5L6.5,7M7.5,13A1.5,1.5 0 0,1 9,14.5A1.5,1.5 0 0,1 7.5,16A1.5,1.5 0 0,1 6,14.5A1.5,1.5 0 0,1 7.5,13M16.5,13A1.5,1.5 0 0,1 18,14.5A1.5,1.5 0 0,1 16.5,16A1.5,1.5 0 0,1 15,14.5A1.5,1.5 0 0,1 16.5,13Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+        <syncfusionnavigation:NavigationItem
+          Header="Settings"
+          Style="{StaticResource NavigationItemStyle}"
+          Tag="Settings">
+          <syncfusionnavigation:NavigationItem.Icon>
+            <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" Fill="{DynamicResource ContentForeground}" />
+          </syncfusionnavigation:NavigationItem.Icon>
+        </syncfusionnavigation:NavigationItem>
+      </syncfusionnavigation:SfNavigationDrawer>
 
-                <syncfusionnavigation:NavigationItem Header="Driver Management" Tag="DriverManagement" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+      <!--  MAIN DASHBOARD DOCUMENT (Document Container)  -->
+      <dashboard:EnhancedDashboardView
+        x:Name="MainDashboardView"
+        syncfusiontools:DockingManager.CanClose="False"
+        syncfusiontools:DockingManager.CanFloat="True"
+        syncfusiontools:DockingManager.CanSerialize="True"
+        syncfusiontools:DockingManager.CaptionToolTip="Main dashboard with fleet overview"
+        syncfusiontools:DockingManager.DockAbility="All"
+        syncfusiontools:DockingManager.Header="🚌 Bus Buddy Dashboard"
+        syncfusiontools:DockingManager.State="Document"
+        DataContext="{Binding DashboardViewModel}" />
 
-                <syncfusionnavigation:NavigationItem Header="Route Management" Tag="RouteManagement" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M20,10C22,12 22,16 20,18L18.5,16.5C19.9,15.1 19.9,12.9 18.5,11.5L20,10M4,10L5.5,11.5C4.1,12.9 4.1,15.1 5.5,16.5L4,18C2,16 2,12 4,10M15,10L16.5,11.5C17.9,12.9 17.9,15.1 16.5,16.5L15,18C13,16 13,12 15,10M9,10L10.5,11.5C11.9,12.9 11.9,15.1 10.5,16.5L9,18C7,16 7,12 9,10M12,13A1,1 0 0,1 13,14A1,1 0 0,1 12,15A1,1 0 0,1 11,14A1,1 0 0,1 12,13Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+      <!--  CONTENT CONTAINER FOR DYNAMIC VIEWS  -->
+      <ContentControl
+        x:Name="ContentContainer"
+        syncfusiontools:DockingManager.CanClose="False"
+        syncfusiontools:DockingManager.CanFloat="True"
+        syncfusiontools:DockingManager.CanSerialize="True"
+        syncfusiontools:DockingManager.CaptionToolTip="Current active view"
+        syncfusiontools:DockingManager.DockAbility="All"
+        syncfusiontools:DockingManager.Header="{Binding CurrentViewTitle, FallbackValue='Bus Buddy'}"
+        syncfusiontools:DockingManager.State="Document"
+        Content="{Binding CurrentViewModel}"
+        Visibility="Collapsed">
+        <ContentControl.Resources>
+          <!--  Data Templates for Different ViewModels  -->
+          <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
+            <bus:BusManagementView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:DriverManagementViewModel}">
+            <driver:DriverManagementView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
+            <route:RouteManagementView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
+            <student:StudentManagementView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
+            <maintenance:MaintenanceTrackingView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
+            <fuel:FuelManagementView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
+            <views:ActivityLogView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+            <settings:SettingsView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:XaiChatViewModel}">
+            <xai:OptimizedXAIChatView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type viewModels:GoogleEarthViewModel}">
+            <googleearth:GoogleEarthView />
+          </DataTemplate>
+        </ContentControl.Resources>
+      </ContentControl>
 
-                <syncfusionnavigation:NavigationItem Header="Schedule Management" Tag="ScheduleManagement" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M7,10H9V12H7V10M15,10H17V12H15V10M11,10H13V12H11V10M7,14H9V16H7V14M15,14H17V16H15V14M11,14H13V16H11V14Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+      <!--  HEADER TOOLBAR (Top Docked with Standard Sizing)  -->
+      <Border
+        x:Name="HeaderToolbar"
+        MinHeight="32"
+        MaxHeight="120"
+        Padding="16,0"
+        syncfusiontools:DockingManager.CanClose="False"
+        syncfusiontools:DockingManager.CanFloat="True"
+        syncfusiontools:DockingManager.CanSerialize="True"
+        syncfusiontools:DockingManager.DesiredHeightInDockedMode="64"
+        syncfusiontools:DockingManager.DockAbility="All"
+        syncfusiontools:DockingManager.Header="🔧 Toolbar"
+        syncfusiontools:DockingManager.SideInDockedMode="Top"
+        syncfusiontools:DockingManager.State="Dock"
+        Background="{DynamicResource SurfaceBackground}"
+        BorderBrush="{DynamicResource SurfaceBorderBrush}"
+        BorderThickness="0,0,0,1">
 
-                <syncfusionnavigation:NavigationItem Header="Student Management" Tag="StudentManagement" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
 
-                <syncfusionnavigation:NavigationItem Header="Maintenance" Tag="Maintenance" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+          <!--  LEFT SIDE - MENU BUTTON  -->
+          <syncfusion:ButtonAdv
+            x:Name="MenuToggleButton"
+            Grid.Column="0"
+            Width="40"
+            Height="40"
+            Margin="0,0,16,0"
+            Background="Transparent"
+            BorderThickness="0"
+            Click="MenuToggleButton_Click"
+            Style="{StaticResource IconButtonAdvStyle}">
+            <Path
+              Width="18"
+              Height="18"
+              Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
+              Fill="{DynamicResource ContentForeground}" />
+          </syncfusion:ButtonAdv>
 
-                <syncfusionnavigation:NavigationItem Header="Fuel Management" Tag="FuelManagement" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M14,2H10A2,2 0 0,0 8,4V16A2,2 0 0,0 10,18H14A2,2 0 0,0 16,16V4A2,2 0 0,0 14,2M14,16H10V4H14V16M19,6V18A2,2 0 0,1 17,20H7A2,2 0 0,1 5,18V6H7V18H17V6H19Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+          <!--  CENTER - TITLE  -->
+          <TextBlock
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            FontSize="18"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource ContentForeground}"
+            Text="{Binding CurrentViewTitle, FallbackValue='Bus Buddy Dashboard'}" />
 
-                <syncfusionnavigation:NavigationItem Header="Activity Log" Tag="ActivityLog" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+          <!--  RIGHT SIDE - ACTION BUTTONS  -->
+          <StackPanel
+            Grid.Column="2"
+            VerticalAlignment="Center"
+            Orientation="Horizontal">
 
-                <syncfusionnavigation:NavigationItem Header="XAI Chat" Tag="XAIChat" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M8,7.5A1.5,1.5 0 0,1 9.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,7.5M12,17.23C10.25,17.23 8.71,16.5 7.81,15.42L9.23,14C9.68,14.72 10.75,15.23 12,15.23C13.25,15.23 14.32,14.72 14.77,14L16.19,15.42C15.29,16.5 13.75,17.23 12,17.23M16,10.5A1.5,1.5 0 0,1 14.5,9A1.5,1.5 0 0,1 16,7.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 16,10.5Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+            <!--  DISPLAY MODE SELECTOR  -->
+            <syncfusion:ComboBoxAdv
+              x:Name="DisplayModeComboBox"
+              Width="120"
+              Height="32"
+              Margin="4,0"
+              SelectedIndex="2"
+              SelectionChanged="DisplayModeComboBox_SelectionChanged"
+              Style="{StaticResource StandardComboBoxStyle}">
+              <syncfusion:ComboBoxItemAdv>Default</syncfusion:ComboBoxItemAdv>
+              <syncfusion:ComboBoxItemAdv>Compact</syncfusion:ComboBoxItemAdv>
+              <syncfusion:ComboBoxItemAdv>Expanded</syncfusion:ComboBoxItemAdv>
+              <syncfusion:ComboBoxItemAdv>Auto</syncfusion:ComboBoxItemAdv>
+            </syncfusion:ComboBoxAdv>
 
-                <syncfusionnavigation:NavigationItem Header="Google Earth" Tag="GoogleEarth" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
+            <!--  NOTIFICATIONS  -->
+            <syncfusion:ButtonAdv
+              Width="40"
+              Height="40"
+              Margin="4,0"
+              Background="Transparent"
+              BorderThickness="0">
+              <Grid>
+                <Path
+                  Width="16"
+                  Height="16"
+                  Data="M16,17H7V10.5C7,8 9,6 11.5,6C14,6 16,8 16,10.5M18,16V10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.14,4.86 5,7.43 5,10.5V16L3,18V19H20V18M11.5,22A2,2 0 0,0 13.5,20H9.5A2,2 0 0,0 11.5,22Z"
+                  Fill="{DynamicResource ContentForeground}" />
+                <Border
+                  x:Name="NotificationBadge"
+                  Width="16"
+                  Height="16"
+                  Margin="0,-4,-4,0"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Background="#FF4444"
+                  CornerRadius="8"
+                  Visibility="{Binding HasNotifications, Converter={StaticResource BooleanToVisibilityConverter}}">
+                  <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="10"
+                    Foreground="White"
+                    Text="{Binding NotificationCount}" />
+                </Border>
+              </Grid>
+            </syncfusion:ButtonAdv>
 
-                <syncfusionnavigation:NavigationItem Header="Settings" Tag="Settings" Style="{StaticResource NavigationItemStyle}">
-                    <syncfusionnavigation:NavigationItem.Icon>
-                        <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
-                              Fill="{DynamicResource ContentForeground}"/>
-                    </syncfusionnavigation:NavigationItem.Icon>
-                </syncfusionnavigation:NavigationItem>
-            </syncfusionnavigation:SfNavigationDrawer>
+            <!--  SETTINGS  -->
+            <syncfusion:ButtonAdv
+              Width="40"
+              Height="40"
+              Margin="4,0"
+              Background="Transparent"
+              BorderThickness="0"
+              Style="{StaticResource IconButtonAdvStyle}">
+              <Path
+                Width="16"
+                Height="16"
+                Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                Fill="{DynamicResource ContentForeground}" />
+            </syncfusion:ButtonAdv>
+          </StackPanel>
+        </Grid>
+      </Border>
 
-            <!-- MAIN DASHBOARD DOCUMENT (Document Container) -->
-            <dashboard:EnhancedDashboardView x:Name="MainDashboardView"
-                                                  syncfusiontools:DockingManager.Header="🚌 Bus Buddy Dashboard"
-                                                  syncfusiontools:DockingManager.State="Document"
-                                                  syncfusiontools:DockingManager.CanClose="False"
-                                                  syncfusiontools:DockingManager.CanFloat="True"
-                                                  syncfusiontools:DockingManager.CanSerialize="True"
-                                                  syncfusiontools:DockingManager.CaptionToolTip="Main dashboard with fleet overview"
-                                                  syncfusiontools:DockingManager.DockAbility="All"
-                                                  DataContext="{Binding DashboardViewModel}"/>
+      <!--  PROPERTY PANEL (Right Docked with Standard Sizing)  -->
+      <Border
+        x:Name="PropertyPanel"
+        MinWidth="200"
+        MaxWidth="600"
+        Padding="16"
+        syncfusiontools:DockingManager.CanClose="True"
+        syncfusiontools:DockingManager.CanFloat="True"
+        syncfusiontools:DockingManager.CanSerialize="True"
+        syncfusiontools:DockingManager.CaptionToolTip="System properties and configuration"
+        syncfusiontools:DockingManager.DesiredWidthInDockedMode="300"
+        syncfusiontools:DockingManager.DockAbility="All"
+        syncfusiontools:DockingManager.Header="🔧 Properties"
+        syncfusiontools:DockingManager.SideInDockedMode="Right"
+        syncfusiontools:DockingManager.State="Dock"
+        Background="{DynamicResource SurfaceBackground}">
 
-            <!-- CONTENT CONTAINER FOR DYNAMIC VIEWS -->
-            <ContentControl x:Name="ContentContainer"
-                            syncfusiontools:DockingManager.Header="{Binding CurrentViewTitle, FallbackValue='Bus Buddy'}"
-                            syncfusiontools:DockingManager.State="Document"
-                            syncfusiontools:DockingManager.CanClose="False"
-                            syncfusiontools:DockingManager.CanFloat="True"
-                            syncfusiontools:DockingManager.CanSerialize="True"
-                            syncfusiontools:DockingManager.CaptionToolTip="Current active view"
-                            syncfusiontools:DockingManager.DockAbility="All"
-                            Content="{Binding CurrentViewModel}"
-                            Visibility="Collapsed">
-                <ContentControl.Resources>
-                    <!-- Data Templates for Different ViewModels -->
-                    <DataTemplate DataType="{x:Type viewModels:BusManagementViewModel}">
-                        <bus:BusManagementView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:DriverManagementViewModel}">
-                        <driver:DriverManagementView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:RouteManagementViewModel}">
-                        <route:RouteManagementView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:StudentManagementViewModel}">
-                        <student:StudentManagementView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:MaintenanceTrackingViewModel}">
-                        <maintenance:MaintenanceTrackingView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:FuelManagementViewModel}">
-                        <fuel:FuelManagementView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:ActivityLogViewModel}">
-                        <views:ActivityLogView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
-                        <settings:SettingsView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:XAIChatViewModel}">
-                        <xai:XAIChatView/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:GoogleEarthViewModel}">
-                        <googleearth:GoogleEarthView/>
-                    </DataTemplate>
-                </ContentControl.Resources>
-            </ContentControl>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel>
+            <TextBlock
+              Margin="0,0,0,16"
+              FontSize="16"
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource ContentForeground}"
+              Text="System Properties" />
 
-            <!-- HEADER TOOLBAR (Top Docked with Standard Sizing) -->
-            <Border x:Name="HeaderToolbar"
-                    syncfusiontools:DockingManager.Header="🔧 Toolbar"
-                    syncfusiontools:DockingManager.State="Dock"
-                    syncfusiontools:DockingManager.SideInDockedMode="Top"
-                    syncfusiontools:DockingManager.DesiredHeightInDockedMode="64"
-                    syncfusiontools:DockingManager.CanClose="False"
-                    syncfusiontools:DockingManager.CanFloat="True"
-                    syncfusiontools:DockingManager.CanSerialize="True"
-                    syncfusiontools:DockingManager.DockAbility="All"
-                    MinHeight="32"
-                    MaxHeight="120"
-                    Background="{DynamicResource SurfaceBackground}"
-                    BorderBrush="{DynamicResource SurfaceBorderBrush}"
-                    BorderThickness="0,0,0,1"
-                    Padding="16,0">
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- LEFT SIDE - MENU BUTTON -->
-                    <syncfusion:ButtonAdv x:Name="MenuToggleButton"
-                                          Grid.Column="0"
-                                          Width="40" Height="40"
-                                          Style="{StaticResource IconButtonAdvStyle}"
-                                          Background="Transparent"
-                                          BorderThickness="0"
-                                          Click="MenuToggleButton_Click"
-                                          Margin="0,0,16,0">
-                        <Path Data="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"
-                              Fill="{DynamicResource ContentForeground}"
-                              Width="18" Height="18"/>
-                    </syncfusion:ButtonAdv>
-
-                    <!-- CENTER - TITLE -->
-                    <TextBlock Grid.Column="1"
-                              Text="{Binding CurrentViewTitle, FallbackValue='Bus Buddy Dashboard'}"
-                              FontSize="18"
-                              FontWeight="SemiBold"
-                              Foreground="{DynamicResource ContentForeground}"
-                              VerticalAlignment="Center"/>
-
-                    <!-- RIGHT SIDE - ACTION BUTTONS -->
-                    <StackPanel Grid.Column="2"
-                               Orientation="Horizontal"
-                               VerticalAlignment="Center">
-
-                        <!-- DISPLAY MODE SELECTOR -->
-                        <syncfusion:ComboBoxAdv x:Name="DisplayModeComboBox"
-                                                Width="120"
-                                                Height="32"
-                                                Style="{StaticResource StandardComboBoxStyle}"
-                                                Margin="4,0"
-                                                SelectedIndex="2"
-                                                SelectionChanged="DisplayModeComboBox_SelectionChanged">
-                            <syncfusion:ComboBoxItemAdv>Default</syncfusion:ComboBoxItemAdv>
-                            <syncfusion:ComboBoxItemAdv>Compact</syncfusion:ComboBoxItemAdv>
-                            <syncfusion:ComboBoxItemAdv>Expanded</syncfusion:ComboBoxItemAdv>
-                            <syncfusion:ComboBoxItemAdv>Auto</syncfusion:ComboBoxItemAdv>
-                        </syncfusion:ComboBoxAdv>
-
-                        <!-- NOTIFICATIONS -->
-                        <syncfusion:ButtonAdv Width="40" Height="40"
-                                              Background="Transparent"
-                                              BorderThickness="0"
-                                              Margin="4,0">
-                            <Grid>
-                                <Path Data="M16,17H7V10.5C7,8 9,6 11.5,6C14,6 16,8 16,10.5M18,16V10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.14,4.86 5,7.43 5,10.5V16L3,18V19H20V18M11.5,22A2,2 0 0,0 13.5,20H9.5A2,2 0 0,0 11.5,22Z"
-                                      Fill="{DynamicResource ContentForeground}"
-                                      Width="16" Height="16"/>
-                                <Border x:Name="NotificationBadge"
-                                       Background="#FF4444"
-                                       CornerRadius="8"
-                                       Width="16" Height="16"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Top"
-                                       Margin="0,-4,-4,0"
-                                       Visibility="{Binding HasNotifications, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <TextBlock Text="{Binding NotificationCount}"
-                                              FontSize="10"
-                                              Foreground="White"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-                        </syncfusion:ButtonAdv>
-
-                        <!-- SETTINGS -->
-                        <syncfusion:ButtonAdv Width="40" Height="40"
-                                              Style="{StaticResource IconButtonAdvStyle}"
-                                              Background="Transparent"
-                                              BorderThickness="0"
-                                              Margin="4,0">
-                            <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
-                                  Fill="{DynamicResource ContentForeground}"
-                                  Width="16" Height="16"/>
-                        </syncfusion:ButtonAdv>
-                    </StackPanel>
-                </Grid>
+            <!--  System Status  -->
+            <Border
+              Margin="0,0,0,12"
+              Padding="12"
+              Background="{DynamicResource ProfessionalSurfaceDark}"
+              CornerRadius="8">
+              <StackPanel>
+                <TextBlock
+                  Margin="0,0,0,8"
+                  FontSize="14"
+                  FontWeight="SemiBold"
+                  Foreground="{DynamicResource ContentForeground}"
+                  Text="System Status" />
+                <TextBlock
+                  FontSize="12"
+                  Foreground="{DynamicResource BrandFleetGreenBrush}"
+                  Text="All systems operational" />
+              </StackPanel>
             </Border>
 
-            <!-- PROPERTY PANEL (Right Docked with Standard Sizing) -->
-            <Border x:Name="PropertyPanel"
-                    syncfusiontools:DockingManager.Header="🔧 Properties"
-                    syncfusiontools:DockingManager.State="Dock"
-                    syncfusiontools:DockingManager.SideInDockedMode="Right"
-                    syncfusiontools:DockingManager.DesiredWidthInDockedMode="300"
-                    syncfusiontools:DockingManager.CanClose="True"
-                    syncfusiontools:DockingManager.CanFloat="True"
-                    syncfusiontools:DockingManager.CanSerialize="True"
-                    syncfusiontools:DockingManager.DockAbility="All"
-                    syncfusiontools:DockingManager.CaptionToolTip="System properties and configuration"
-                    MinWidth="200"
-                    MaxWidth="600"
-                    Background="{DynamicResource SurfaceBackground}"
-                    Padding="16">
-
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="System Properties"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource ContentForeground}"
-                                   Margin="0,0,0,16"/>
-
-                        <!-- System Status -->
-                        <Border Background="{DynamicResource ProfessionalSurfaceDark}"
-                                CornerRadius="8"
-                                Padding="12"
-                                Margin="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="System Status"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource ContentForeground}"
-                                           Margin="0,0,0,8"/>
-                                <TextBlock Text="All systems operational"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource BrandFleetGreenBrush}"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Active Buses -->
-                        <Border Background="{DynamicResource ProfessionalSurfaceDark}"
-                                CornerRadius="8"
-                                Padding="12"
-                                Margin="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="Active Buses"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource ContentForeground}"
-                                           Margin="0,0,0,8"/>
-                                <TextBlock Text="{Binding ActiveBuses, FallbackValue='24'}"
-                                           FontSize="20"
-                                           FontWeight="Bold"
-                                           Foreground="{DynamicResource BrandPrimaryBrush}"/>
-                          </StackPanel>
-                        </Border>
-
-                        <!-- Performance Metrics -->
-                        <Border Background="{DynamicResource ProfessionalSurfaceDark}"
-                                CornerRadius="8"
-                                Padding="12">
-                            <StackPanel>
-                                <TextBlock Text="Performance"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource ContentForeground}"
-                                           Margin="0,0,0,8"/>
-                                <syncfusion:SfCircularProgressBar Height="60"
-                                                                 Width="60"
-                                                                 Style="{StaticResource CircularProgressStyle}"
-                                                                 Progress="92">
-                                    <syncfusion:SfCircularProgressBar.Content>
-                                        <TextBlock Text="92%"
-                                                   FontSize="12"
-                                                   FontWeight="Bold"
-                                                   HorizontalAlignment="Center"/>
-                                    </syncfusion:SfCircularProgressBar.Content>
-                                </syncfusion:SfCircularProgressBar>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
+            <!--  Active Buses  -->
+            <Border
+              Margin="0,0,0,12"
+              Padding="12"
+              Background="{DynamicResource ProfessionalSurfaceDark}"
+              CornerRadius="8">
+              <StackPanel>
+                <TextBlock
+                  Margin="0,0,0,8"
+                  FontSize="14"
+                  FontWeight="SemiBold"
+                  Foreground="{DynamicResource ContentForeground}"
+                  Text="Active Buses" />
+                <TextBlock
+                  FontSize="20"
+                  FontWeight="Bold"
+                  Foreground="{DynamicResource BrandPrimaryBrush}"
+                  Text="{Binding ActiveBuses, FallbackValue='24'}" />
+              </StackPanel>
             </Border>
 
-            <!-- STATUS BAR (Bottom Docked with Standard Sizing) -->
-            <Border x:Name="StatusBar"
-                    syncfusiontools:DockingManager.Header="📊 Status"
-                    syncfusiontools:DockingManager.State="Dock"
-                    syncfusiontools:DockingManager.SideInDockedMode="Bottom"
-                    syncfusiontools:DockingManager.DesiredHeightInDockedMode="32"
-                    syncfusiontools:DockingManager.CanClose="True"
-                    syncfusiontools:DockingManager.CanFloat="True"
-                    syncfusiontools:DockingManager.CanSerialize="True"
-                    syncfusiontools:DockingManager.DockAbility="All"
-                    syncfusiontools:DockingManager.CaptionToolTip="Application status and information"
-                    MinHeight="32"
-                    MaxHeight="120"
-                    Background="{DynamicResource ProfessionalSurfaceDark}"
-                    BorderBrush="{DynamicResource SurfaceBorderBrush}"
-                    BorderThickness="0,1,0,0"
-                    Padding="16,6">
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Status Message -->
-                    <TextBlock Grid.Column="0"
-                               Text="Ready - All systems operational"
-                               FontSize="12"
-                               Foreground="{DynamicResource ContentForeground}"
-                               VerticalAlignment="Center"/>
-
-                    <!-- System Performance -->
-                    <StackPanel Grid.Column="1"
-                               Orientation="Horizontal"
-                               VerticalAlignment="Center"
-                               Margin="16,0">
-                        <TextBlock Text="Performance:"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource ContentForeground}"
-                                   Margin="0,0,4,0"/>
-                        <TextBlock Text="92%"
-                                   FontSize="12"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource BrandFleetGreenBrush}"/>
-                    </StackPanel>
-
-                    <!-- Active Connections -->
-                    <StackPanel Grid.Column="2"
-                               Orientation="Horizontal"
-                               VerticalAlignment="Center"
-                               Margin="16,0">
-                        <Ellipse Width="8" Height="8"
-                                 Fill="{DynamicResource BrandFleetGreenBrush}"
-                                 VerticalAlignment="Center"
-                                 Margin="0,0,4,0"/>
-                        <TextBlock Text="Connected"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource ContentForeground}"/>
-                    </StackPanel>
-
-                    <!-- Current Time -->
-                    <TextBlock Grid.Column="3"
-                               Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{}{0:HH:mm:ss}'}"
-                               FontSize="12"
-                               Foreground="{DynamicResource ContentForeground}"
-                               VerticalAlignment="Center"/>
-                </Grid>
+            <!--  Performance Metrics  -->
+            <Border
+              Padding="12"
+              Background="{DynamicResource ProfessionalSurfaceDark}"
+              CornerRadius="8">
+              <StackPanel>
+                <TextBlock
+                  Margin="0,0,0,8"
+                  FontSize="14"
+                  FontWeight="SemiBold"
+                  Foreground="{DynamicResource ContentForeground}"
+                  Text="Performance" />
+                <syncfusion:SfCircularProgressBar
+                  Width="60"
+                  Height="60"
+                  Progress="92"
+                  Style="{StaticResource CircularProgressStyle}">
+                  <syncfusion:SfCircularProgressBar.Content>
+                    <TextBlock
+                      HorizontalAlignment="Center"
+                      FontSize="12"
+                      FontWeight="Bold"
+                      Text="92%" />
+                  </syncfusion:SfCircularProgressBar.Content>
+                </syncfusion:SfCircularProgressBar>
+              </StackPanel>
             </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
 
-            <!-- BUSY INDICATOR OVERLAY -->
-            <syncfusion:SfBusyIndicator x:Name="BusyIndicator"
-                                      Style="{StaticResource CustomBusyStyle}"
-                                      IsBusy="{Binding IsLoading}"
-                                      AnimationType="Gear"
-                                      ViewboxWidth="50"
-                                      ViewboxHeight="50"
-                                      Background="#80000000"
-                                      Panel.ZIndex="1000"
-                                      Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <syncfusion:SfBusyIndicator.Content>
-                    <Grid>
-                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="Loading..."
-                                      FontSize="16"
-                                      Foreground="White"
-                                      HorizontalAlignment="Center"
-                                      Margin="0,16,0,0"/>
-                        </StackPanel>
-                    </Grid>
-                </syncfusion:SfBusyIndicator.Content>
-            </syncfusion:SfBusyIndicator>
-        </syncfusiontools:DockingManager>
+      <!--  STATUS BAR (Bottom Docked with Standard Sizing)  -->
+      <Border
+        x:Name="StatusBar"
+        MinHeight="32"
+        MaxHeight="120"
+        Padding="16,6"
+        syncfusiontools:DockingManager.CanClose="True"
+        syncfusiontools:DockingManager.CanFloat="True"
+        syncfusiontools:DockingManager.CanSerialize="True"
+        syncfusiontools:DockingManager.CaptionToolTip="Application status and information"
+        syncfusiontools:DockingManager.DesiredHeightInDockedMode="32"
+        syncfusiontools:DockingManager.DockAbility="All"
+        syncfusiontools:DockingManager.Header="📊 Status"
+        syncfusiontools:DockingManager.SideInDockedMode="Bottom"
+        syncfusiontools:DockingManager.State="Dock"
+        Background="{DynamicResource ProfessionalSurfaceDark}"
+        BorderBrush="{DynamicResource SurfaceBorderBrush}"
+        BorderThickness="0,1,0,0">
 
-        <!-- LOADING OVERLAY (Global) -->
-        <views:LoadingView x:Name="LoadingOverlay"
-                          Visibility="{Binding IsInitialLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-    </Grid>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+
+          <!--  Status Message  -->
+          <TextBlock
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            FontSize="12"
+            Foreground="{DynamicResource ContentForeground}"
+            Text="Ready - All systems operational" />
+
+          <!--  System Performance  -->
+          <StackPanel
+            Grid.Column="1"
+            Margin="16,0"
+            VerticalAlignment="Center"
+            Orientation="Horizontal">
+            <TextBlock
+              Margin="0,0,4,0"
+              FontSize="12"
+              Foreground="{DynamicResource ContentForeground}"
+              Text="Performance:" />
+            <TextBlock
+              FontSize="12"
+              FontWeight="SemiBold"
+              Foreground="{DynamicResource BrandFleetGreenBrush}"
+              Text="92%" />
+          </StackPanel>
+
+          <!--  Active Connections  -->
+          <StackPanel
+            Grid.Column="2"
+            Margin="16,0"
+            VerticalAlignment="Center"
+            Orientation="Horizontal">
+            <Ellipse
+              Width="8"
+              Height="8"
+              Margin="0,0,4,0"
+              VerticalAlignment="Center"
+              Fill="{DynamicResource BrandFleetGreenBrush}" />
+            <TextBlock
+              FontSize="12"
+              Foreground="{DynamicResource ContentForeground}"
+              Text="Connected" />
+          </StackPanel>
+
+          <!--  Current Time  -->
+          <TextBlock
+            Grid.Column="3"
+            VerticalAlignment="Center"
+            FontSize="12"
+            Foreground="{DynamicResource ContentForeground}"
+            Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{}{0:HH:mm:ss}'}" />
+        </Grid>
+      </Border>
+
+      <!--  BUSY INDICATOR OVERLAY  -->
+      <syncfusion:SfBusyIndicator
+        x:Name="BusyIndicator"
+        Panel.ZIndex="1000"
+        AnimationType="Gear"
+        Background="#80000000"
+        IsBusy="{Binding IsLoading}"
+        Style="{StaticResource CustomBusyStyle}"
+        ViewboxHeight="50"
+        ViewboxWidth="50"
+        Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+        <syncfusion:SfBusyIndicator.Content>
+          <Grid>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+              <TextBlock
+                Margin="0,16,0,0"
+                HorizontalAlignment="Center"
+                FontSize="16"
+                Foreground="White"
+                Text="Loading..." />
+            </StackPanel>
+          </Grid>
+        </syncfusion:SfBusyIndicator.Content>
+      </syncfusion:SfBusyIndicator>
+    </syncfusiontools:DockingManager>
+
+    <!--  LOADING OVERLAY (Global)  -->
+    <views:LoadingView x:Name="LoadingOverlay" Visibility="{Binding IsInitialLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+  </Grid>
 </Window>
-

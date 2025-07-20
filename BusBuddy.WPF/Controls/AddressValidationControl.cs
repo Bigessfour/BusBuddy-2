@@ -22,12 +22,12 @@ namespace BusBuddy.WPF.Controls
         private string _state = string.Empty;
         private string _zip = string.Empty;
         private string _normalizedAddress = string.Empty;
-        private bool _isValidated = false;
-        private bool _isValidating = false;
+        private bool _isValidated;
+        private bool _isValidating;
         private ObservableCollection<string> _nearbyBusStops = new ObservableCollection<string>();
         private string? _selectedBusStop;
         private string _validationMessage = string.Empty;
-        private bool _showValidationMessage = false;
+        private bool _showValidationMessage;
         private double _distanceToBusStop = -1;
 
         // These public properties match the dependency properties

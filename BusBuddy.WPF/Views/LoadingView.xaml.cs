@@ -139,13 +139,16 @@ namespace BusBuddy.WPF.Views
 
                 if (Application.Current is App app && app.Services != null)
                 {
-                    // Example: Pre-warm theme service if needed
-                    var themeService = app.Services.GetService<BusBuddy.WPF.Services.OptimizedThemeService>();
-                    if (themeService != null)
+                    // Validate theme health during loading using direct resource checks
+                    try
                     {
-                        // Validate theme health during loading
-                        bool themeHealthy = BusBuddy.WPF.Services.OptimizedThemeService.ValidateThemeHealth();
+                        var themeResource = Application.Current.TryFindResource("ContentForeground");
+                        bool themeHealthy = themeResource != null;
                         Logger.Debug("Theme health validation during preload: {IsHealthy}", themeHealthy);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warning(ex, "Theme validation during preload failed");
                     }
 
                     // Could add other preload operations here like:

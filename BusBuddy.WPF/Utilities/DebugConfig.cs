@@ -10,8 +10,8 @@ namespace BusBuddy.WPF.Utilities
     {
         public static bool EnableVerboseLogging { get; set; } = true;
         public static bool EnablePerformanceTracking { get; set; } = true;
-        public static bool EnableDataStateLogging { get; set; } = false; // Can be overwhelming
-        public static bool EnableUITracking { get; set; } = false;
+        public static bool EnableDataStateLogging { get; set; } // Can be overwhelming
+        public static bool EnableUITracking { get; set; }
         public static bool EnableStudentDebugLogging { get; set; } = true;
         public static bool EnableRouteAssignmentLogging { get; set; } = true;
 

@@ -12,8 +12,8 @@ namespace BusBuddy.WPF.Models
         private string _message = string.Empty;
         private ChatMessageType _messageType = ChatMessageType.User;
         private DateTime _timestamp = DateTime.Now;
-        private bool _isDelivered = false;
-        private bool _isRead = false;
+        private bool _isDelivered;
+        private bool _isRead;
 
         /// <summary>
         /// The message content

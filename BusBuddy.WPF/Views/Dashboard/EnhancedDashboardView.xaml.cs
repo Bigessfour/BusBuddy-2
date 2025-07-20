@@ -29,7 +29,7 @@ namespace BusBuddy.WPF.Views.Dashboard
     /// <summary>
     /// 🚀 OPTIMIZED DASHBOARD VIEW - Performance-tuned with background refresh and standardized sizing
     /// - Moved data refresh from UI thread to background Task for better performance
-    /// - Removed redundant theme verification (relies on global OptimizedThemeService)
+    /// - Removed redundant theme verification (relies on global SfSkinManager)
     /// - Standardized tile/panel sizing with fixed dimensions
     /// - Limited fallback attempts to 1 for faster error recovery
     /// </summary>
@@ -66,7 +66,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                 {
                     Logger.Information("EnhancedDashboardView initialization started");
 
-                    // Theme is managed centrally by OptimizedThemeService - no per-view verification needed
+                    // Theme is managed centrally by SfSkinManager - no per-view verification needed
                     Logger.Information("🚀 EnhancedDashboardView: PRIMARY dashboard optimized with background refresh and centralized theme management");
 
                     // Initialize the XAML - will be resolved during build
@@ -286,6 +286,9 @@ namespace BusBuddy.WPF.Views.Dashboard
                                 Logger.Warning(resetEx, "Failed to reset DockingManager state");
                             }
                         }
+
+                        // Attach the ActiveWindowChanged event handler
+                        dockingManager.ActiveWindowChanged += DockingManager_ActiveWindowChanged;
 
                         Logger.Information("✅ Enhanced DockingManager with standardization applied successfully");
                     }
@@ -566,7 +569,7 @@ namespace BusBuddy.WPF.Views.Dashboard
                     button.Click += (s, e) =>
                     {
                         // Use centralized theme service - redundant theme switching removed
-                        Logger.Information("Theme switching handled by OptimizedThemeService");
+                        Logger.Information("Theme switching handled by SfSkinManager");
                         themeWindow.Close();
                     };
 
@@ -599,7 +602,7 @@ namespace BusBuddy.WPF.Views.Dashboard
 
         /// <summary>
         /// Performance optimization: Removed redundant theme application method
-        /// Theme management is handled by centralized OptimizedThemeService
+        /// Theme management is handled by centralized SfSkinManager
         /// </summary>
 
         /// <summary>

@@ -12,10 +12,10 @@ namespace BusBuddy.WPF.Models
         private string _busNumber = string.Empty;
         private string _routeNumber = string.Empty;
         private string _status = string.Empty;
-        private double _latitude = 0.0;
-        private double _longitude = 0.0;
-        private double _heading = 0.0;
-        private double _speed = 0.0;
+        private double _latitude;
+        private double _longitude;
+        private double _heading;
+        private double _speed;
         private DateTime _lastUpdate = DateTime.Now;
         private string _driver = string.Empty;
 

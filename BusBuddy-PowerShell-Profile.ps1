@@ -32,6 +32,13 @@ if (Test-Path $AdvancedWorkflowsPath) {
     Write-Host '🚀 Advanced Development Workflows loaded' -ForegroundColor Blue
 }
 
+# Import GitHub Automation
+$GitHubAutomationPath = Join-Path $PSScriptRoot 'BusBuddy-GitHub-Automation.ps1'
+if (Test-Path $GitHubAutomationPath) {
+    . $GitHubAutomationPath
+    Write-Host '🔗 GitHub Automation loaded' -ForegroundColor Magenta
+}
+
 # Import Read-Only Analysis Tools
 $ReadOnlyToolsPath = Join-Path $PSScriptRoot 'Tools\Scripts\Read-Only-Analysis-Tools.ps1'
 $ErrorAnalysisPath = Join-Path $PSScriptRoot 'Tools\Scripts\Error-Analysis.ps1'
@@ -701,6 +708,75 @@ Register-ArgumentCompleter -CommandName $bbCommands -ParameterName Path -ScriptB
     } -ThrottleLimit 4 | Sort-Object | Select-Object -First 20
 
     return $items
+}
+
+# ============================================================================
+# GitHub Actions Integration Functions
+# ============================================================================
+
+function bb-github-trigger {
+    <#
+    .SYNOPSIS
+        Triggers GitHub Actions workflow and monitors completion
+    #>
+    & "$PSScriptRoot\GitHub-Actions-Monitor.ps1" -TriggerWorkflow -AutoFix
+}
+
+function bb-github-monitor {
+    <#
+    .SYNOPSIS
+        Monitors the latest GitHub Actions workflow
+    #>
+    & "$PSScriptRoot\GitHub-Actions-Monitor.ps1" -MonitorLatest -AnalyzeFailures
+}
+
+function bb-github-report {
+    <#
+    .SYNOPSIS
+        Generates comprehensive GitHub Actions analysis report
+    #>
+    & "$PSScriptRoot\GitHub-Actions-Monitor.ps1" -MonitorLatest -AnalyzeFailures -GenerateReport
+}
+
+function bb-codecov-setup {
+    <#
+    .SYNOPSIS
+        Helps set up Codecov integration
+    #>
+    & "$PSScriptRoot\Setup-CodecovToken.ps1" -ShowInstructions -OpenBrowser
+}
+
+function bb-ci-pipeline {
+    <#
+    .SYNOPSIS
+        Complete CI/CD pipeline: commit, push, monitor, and fix issues
+    #>
+    param(
+        [string]$CommitMessage = "Auto commit via CI pipeline - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    )
+
+    Write-Host "🚀 Starting Bus Buddy CI/CD Pipeline..." -ForegroundColor Cyan
+
+    # Stage and commit changes
+    git add -A
+    if ($LASTEXITCODE -eq 0) {
+        git commit -m $CommitMessage
+        if ($LASTEXITCODE -eq 0) {
+            git push origin main
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "✅ Changes pushed successfully" -ForegroundColor Green
+
+                # Monitor workflow
+                & "$PSScriptRoot\GitHub-Actions-Monitor.ps1" -MonitorLatest -AutoFix -GenerateReport
+            } else {
+                Write-Host "❌ Failed to push changes" -ForegroundColor Red
+            }
+        } else {
+            Write-Host "❌ Failed to commit changes" -ForegroundColor Red
+        }
+    } else {
+        Write-Host "❌ Failed to stage changes" -ForegroundColor Red
+    }
 }
 
 

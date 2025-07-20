@@ -13,16 +13,14 @@ namespace BusBuddy.WPF.Converters
         /// <summary>
         /// Gets or sets a value indicating whether the conversion should be inverted.
         /// </summary>
-        public bool IsInverted { get; set; } = false;
-
-        /// <summary>
-        /// Converts a Boolean value to a Visibility value.
-        /// </summary>
-        /// <param name="value">The Boolean value to convert.</param>
-        /// <param name="targetType">The type of the binding target property.</param>
-        /// <param name="parameter">The converter parameter to use.</param>
-        /// <param name="culture">The culture to use in the converter.</param>
-        /// <returns>Visibility.Visible if value is true; otherwise Visibility.Collapsed.</returns>
+        public bool IsInverted { get; set; }        /// <summary>
+                                                    /// Converts a Boolean value to a Visibility value.
+                                                    /// </summary>
+                                                    /// <param name="value">The Boolean value to convert.</param>
+                                                    /// <param name="targetType">The type of the binding target property.</param>
+                                                    /// <param name="parameter">The converter parameter to use.</param>
+                                                    /// <param name="culture">The culture to use in the converter.</param>
+                                                    /// <returns>Visibility.Visible if value is true; otherwise Visibility.Collapsed.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool boolValue)

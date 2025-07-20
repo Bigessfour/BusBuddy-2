@@ -18,9 +18,9 @@ namespace BusBuddy.WPF.Utilities
     {
         private static readonly ILogger _logger = Log.ForContext(typeof(DebugHelper));
         private static Timer? _autoFilterTimer;
-        private static bool _isAutoFilterEnabled = false;
-        private static int _scanCount = 0;
-        private static bool _isStreamingEnabled = false;
+        private static bool _isAutoFilterEnabled;
+        private static int _scanCount;
+        private static bool _isStreamingEnabled;
 
         /// <summary>
         /// Test method to verify auto-filter is working

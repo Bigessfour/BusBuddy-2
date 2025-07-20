@@ -13,9 +13,10 @@ namespace BusBuddy.WPF.Views.Schedule
     /// Interaction logic for ScheduleDetailsDialog.xaml
     /// Displays detailed information about a selected schedule with professional BusBuddy theming
     /// </summary>
-    public partial class ScheduleDetailsDialog : Window
+    public partial class ScheduleDetailsDialog : Window, IDisposable
     {
         private readonly ScheduleDetailsViewModel _viewModel;
+        private bool _disposed;
 
         /// <summary>
         /// Initializes a new instance of the ScheduleDetailsDialog class
@@ -57,9 +58,31 @@ namespace BusBuddy.WPF.Views.Schedule
         /// <param name="e">The event arguments</param>
         protected override void OnClosed(EventArgs e)
         {
-            // Clean up the view model
-            _viewModel?.Dispose();
+            // Clean up resources
+            Dispose();
             base.OnClosed(e);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        /// <param name="disposing">true if disposing managed resources</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed && disposing)
+            {
+                _viewModel?.Dispose();
+                _disposed = true;
+            }
         }
     }
 }

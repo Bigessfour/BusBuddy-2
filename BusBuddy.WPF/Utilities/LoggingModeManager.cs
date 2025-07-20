@@ -17,7 +17,7 @@ namespace BusBuddy.WPF.Utilities
         private static readonly Serilog.ILogger Logger = Log.ForContext(typeof(LoggingModeManager));
         private static readonly ConcurrentDictionary<string, LoggingMode> _activeContexts = new();
         private static LoggingMode _globalMode = LoggingMode.Standard;
-        private static bool _isInitialized = false;
+        private static bool _isInitialized;
 
         // Performance counters
         private static readonly ConcurrentDictionary<string, long> _operationCounts = new();

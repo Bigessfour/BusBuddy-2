@@ -13,8 +13,8 @@ namespace BusBuddy.WPF.Services
     public class GoogleEarthService : IGoogleEarthService
     {
         private static readonly ILogger Logger = Log.ForContext<GoogleEarthService>();
-        private bool _isInitialized = false;
-        private bool _isLiveTrackingActive = false;
+        private bool _isInitialized;
+        private bool _isLiveTrackingActive;
         private string _currentMapLayer = "Satellite";
         private double _currentZoom = 12.0;
 

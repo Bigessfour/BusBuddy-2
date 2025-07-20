@@ -39,9 +39,10 @@ namespace BusBuddy.WPF.Views.Main
                     // This ensures FluentDark theme resources are available globally
                     try
                     {
-                        // Theme is managed centrally by OptimizedThemeService - no per-window configuration needed
-                        // Verify theme is available using fast cache check
-                        bool themeReady = BusBuddy.WPF.Services.OptimizedThemeService.IsResourceAvailable("ContentForeground");
+                        // Theme is managed centrally by SfSkinManager - no per-window configuration needed
+                        // Verify theme is available using resource check
+                        var themeResource = Application.Current.TryFindResource("ContentForeground");
+                        bool themeReady = themeResource != null;
                         Logger.Debug("Theme resources available: {ThemeReady}", themeReady);
                     }
                     catch (Exception themeEx)
@@ -79,9 +80,9 @@ namespace BusBuddy.WPF.Views.Main
                         throw;
                     }
 
-                    // Additional safeguard: Theme is managed centrally by OptimizedThemeService
+                    // Additional safeguard: Theme is managed centrally by SfSkinManager
                     // No manual SfSkinManager calls needed per window
-                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using centralized theme management from OptimizedThemeService");
+                    System.Diagnostics.Debug.WriteLine("✅ [MAINWINDOW] Using centralized theme management from SfSkinManager");
 
                     // Theme is already applied globally via SfSkinManager in App.xaml.cs
                     // No need for window-specific theme application
@@ -606,7 +607,7 @@ namespace BusBuddy.WPF.Views.Main
         /// <summary>
         /// Handle DockingManager window closing events - Proper Syncfusion API
         /// </summary>
-        private void MainDockingManager_WindowClosing(object sender, CloseButtonEventArgs e)
+        private void MainDockingManager_WindowClosing(object sender, WindowClosingEventArgs e)
         {
             try
             {

@@ -16,12 +16,12 @@ namespace BusBuddy.WPF.Utilities
     /// Utility class for filtering debug output and extracting actionable errors/warnings
     /// Enhanced with real-time streaming capabilities using FileSystemWatcher
     /// </summary>
-    public class DebugOutputFilter
+    public static class DebugOutputFilter
     {
-        private static readonly ILogger _logger = Log.ForContext<DebugOutputFilter>();
+        private static readonly ILogger _logger = Log.ForContext("SourceContext", "BusBuddy.WPF.Utilities.DebugOutputFilter");
         private static FileSystemWatcher? _logFileWatcher;
         private static readonly object _lockObject = new object();
-        private static bool _isStreamingEnabled = false;
+        private static bool _isStreamingEnabled;
         private static CancellationTokenSource? _cancellationTokenSource;
         private static readonly List<FilteredDebugEntry> _recentEntries = new List<FilteredDebugEntry>();
         private static readonly int _maxRecentEntries = 100;
@@ -76,7 +76,7 @@ namespace BusBuddy.WPF.Utilities
             public string ActionableRecommendation { get; set; } = string.Empty;
             public string Context { get; set; } = string.Empty;
             public int Priority { get; set; } // 1 = Critical, 2 = High, 3 = Medium, 4 = Low
-            public bool IsResolved { get; set; } = false;
+            public bool IsResolved { get; set; }
             public string Id { get; set; } = Guid.NewGuid().ToString();
             public DateTime DetectedAt { get; set; } = DateTime.Now;
             public string ThreadId { get; set; } = string.Empty;
