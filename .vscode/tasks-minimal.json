@@ -1,5 +1,12 @@
 {
   "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "env": {
+      "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+      "DOTNET_NOLOGO": "1"
+    }
+  },
   "tasks": [
     {
       "label": "Build",
@@ -7,7 +14,9 @@
       "command": "dotnet",
       "args": [
         "build",
-        "BusBuddy.sln"
+        "BusBuddy.sln",
+        "--verbosity",
+        "minimal"
       ],
       "group": {
         "kind": "build",
@@ -16,6 +25,11 @@
       "problemMatcher": [
         "$msCompile"
       ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
       "detail": "Build the Bus Buddy solution"
     },
     {
@@ -31,6 +45,15 @@
       "problemMatcher": [
         "$msCompile"
       ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      },
+      "dependsOn": [
+        "Build"
+      ],
       "detail": "Build and run the WPF application"
     },
     {
@@ -45,6 +68,11 @@
       ],
       "group": "test",
       "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
       "detail": "Validate Syncfusion UI implementation and XAML health"
     },
     {
@@ -59,6 +87,11 @@
       ],
       "group": "test",
       "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
       "detail": "Check Syncfusion theme consistency and resource validation"
     }
   ]
