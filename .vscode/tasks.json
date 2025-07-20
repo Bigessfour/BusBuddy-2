@@ -1,294 +1,380 @@
 {
-    "version": "2.0.0",
-    "options": {
-        "cwd": "${workspaceFolder}",
-        "env": {
-            "COPILOT_WORKFLOW_MODE": "STREAMLINED"
-        }
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "env": {
+      "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+      "DOTNET_NOLOGO": "1"
+    }
+  },
+  "problemMatchers": [
+    {
+      "name": "busbuddy-csharp",
+      "owner": "busbuddy",
+      "fileLocation": "absolute",
+      "pattern": {
+        "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(\\w+):\\s+(.*)$",
+        "file": 1,
+        "line": 2,
+        "column": 3,
+        "severity": 4,
+        "code": 5,
+        "message": 6
+      }
     },
-    "presentation": {
-        "echo": true,
+    {
+      "name": "busbuddy-xaml",
+      "owner": "busbuddy",
+      "fileLocation": "absolute",
+      "pattern": {
+        "regexp": "^.*?([^\\s]+\\.xaml)\\((\\d+),(\\d+)\\):\\s+(error|warning)\\s+(.*)$",
+        "file": 1,
+        "line": 2,
+        "column": 3,
+        "severity": 4,
+        "message": 5
+      }
+    },
+    {
+      "name": "busbuddy-powershell",
+      "owner": "busbuddy",
+      "fileLocation": "absolute",
+      "pattern": {
+        "regexp": "^.*At\\s+(.+?):(\\d+)\\s+char:(\\d+)(.*)$",
+        "file": 1,
+        "line": 2,
+        "column": 3,
+        "severity": "error",
+        "message": 4
+      }
+    },
+    {
+      "name": "busbuddy-serilog",
+      "owner": "busbuddy",
+      "fileLocation": "absolute",
+      "pattern": [
+        {
+          "regexp": "^\\[(.*)\\]\\s+(ERROR|WARN|INFO|DEBUG)\\s+-\\s+(.*)\\s+at\\s+(.*)\\s+in\\s+(.*):(\\d+)$",
+          "file": 5,
+          "line": 6,
+          "severity": 2,
+          "message": 3
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "label": "Clean Solution",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "clean",
+        "BusBuddy.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
         "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
+        "panel": "shared",
         "clear": true
+      },
+      "detail": "Clean build artifacts"
     },
-    "tasks": [
-        {
-            "label": "Clean Solution",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "clean",
-                "BusBuddy.sln",
-                "--verbosity",
-                "minimal"
-            ],
-            "group": "build",
-            "problemMatcher": ["$msCompile"]
-        },
-        {
-            "label": "Restore Packages",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "restore",
-                "BusBuddy.sln",
-                "--verbosity",
-                "minimal"
-            ],
-            "group": "build",
-            "problemMatcher": ["$msCompile"]
-        },
-        {
-            "label": "Build Solution",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "BusBuddy.sln",
-                "--verbosity",
-                "minimal"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": ["$msCompile"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "Run Application",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "run",
-                "--project",
-                "BusBuddy.WPF/BusBuddy.WPF.csproj",
-                "--verbosity",
-                "minimal"
-            ],
-            "group": "build",
-            "isBackground": true,
-            "problemMatcher": ["$msCompile"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🔄 Streamlined Build & Test",
-            "type": "shell",
-            "command": "powershell",
-            "args": [
-                "-Command",
-                "Write-Host '🚀 STREAMLINED WORKFLOW: Starting build and validation...' -ForegroundColor Cyan; dotnet build BusBuddy.sln --verbosity minimal; if ($LASTEXITCODE -eq 0) { Write-Host '✅ Build successful - Ready for next step' -ForegroundColor Green; } else { Write-Host '❌ Build failed - Check output above' -ForegroundColor Red; }"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": ["$msCompile"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🔧 Format XAML Files",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "& '${workspaceFolder}/Tools/Scripts/Format-XamlFiles.ps1' -Path '${workspaceFolder}' -Format"
-            ],
-            "group": "build",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🔍 Validate XAML Files",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Import-Module '${workspaceFolder}/Tools/Scripts/XAML-Tools.ps1'; Get-ChildItem -Path '${workspaceFolder}' -Filter '*.xaml' -Recurse | ForEach-Object { Write-Host \"Validating: $($_.Name)\" -ForegroundColor Yellow; Test-XamlValidity -FilePath $_.FullName }"
-            ],
-            "group": "test",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🎨 Format All XAML (Structure-Aware)",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Import-Module '${workspaceFolder}/Tools/Scripts/XAML-Tools.ps1'; Get-ChildItem -Path '${workspaceFolder}' -Filter '*.xaml' -Recurse | ForEach-Object { Write-Host \"Formatting: $($_.Name)\" -ForegroundColor Cyan; Format-XamlFile -FilePath $_.FullName }"
-            ],
-            "group": "build",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🔍 Validate Syncfusion Namespaces",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🔍 SYNCFUSION VALIDATION: Checking XAML files for missing namespaces...' -ForegroundColor Cyan; $missingNamespaces = @(); Get-ChildItem -Path '${workspaceFolder}\\BusBuddy.WPF\\Views' -Filter '*.xaml' -Recurse | ForEach-Object { $content = Get-Content $_.FullName -Raw; if ($content -notmatch 'xmlns:syncfusion=' -and ($content -match 'sf:' -or $content -match 'syncfusion:')) { $missingNamespaces += $_.Name; Write-Host \"❌ Missing Syncfusion namespace: $($_.Name)\" -ForegroundColor Red } else { Write-Host \"✅ Valid: $($_.Name)\" -ForegroundColor Green } }; if ($missingNamespaces.Count -eq 0) { Write-Host '🎉 All XAML files have proper Syncfusion namespaces!' -ForegroundColor Green; exit 0 } else { Write-Host \"⚠️ Found $($missingNamespaces.Count) files with missing Syncfusion namespaces\" -ForegroundColor Yellow; exit 1 }"
-            ],
-            "group": "test",
-            "problemMatcher": [],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": false
-            },
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🛠️ Comprehensive XAML Corruption Check",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🛠️ COMPREHENSIVE CORRUPTION CHECK: Analyzing XAML files...' -ForegroundColor Cyan; $issues = @(); Get-ChildItem -Path '${workspaceFolder}' -Filter '*.xaml' -Recurse | ForEach-Object { $content = Get-Content $_.FullName -Raw; $fileName = $_.Name; if ($content -match '--(?!>)') { $issues += \"$fileName: Contains double-dash in comments\"; Write-Host \"⚠️ $fileName: Double-dash in XML comments\" -ForegroundColor Yellow } if ($content -match '<[^>]*[^/]>\\s*</[^>]*>') { $issues += \"$fileName: Empty elements not self-closed\"; Write-Host \"⚠️ $fileName: Empty elements should be self-closed\" -ForegroundColor Yellow } if ($content -match 'x:Name\\s*=\\s*\"[^\"]*[^A-Za-z0-9_][^\"]*\"') { $issues += \"$fileName: Invalid x:Name format\"; Write-Host \"⚠️ $fileName: Invalid x:Name format\" -ForegroundColor Yellow } if ($content -match '\\sxmlns:(?!xml|x=)\\w+\\s*=\\s*\"[^\"]*\"(?![^<]*/>)' -and $content -notmatch 'xmlns:syncfusion=') { Write-Host \"✅ $fileName: Custom namespaces detected\" -ForegroundColor Green } }; if ($issues.Count -eq 0) { Write-Host '🎉 No XAML corruption detected!' -ForegroundColor Green } else { Write-Host \"🔧 Found $($issues.Count) potential issues. Review and fix before proceeding.\" -ForegroundColor Yellow; $issues | ForEach-Object { Write-Host \"  - $_\" -ForegroundColor Red } }"
-            ],
-            "group": "test",
-            "problemMatcher": [],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🎯 Advanced C# Corruption Detection",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🎯 C# CORRUPTION DETECTION: Analyzing source files...' -ForegroundColor Cyan; $issues = @(); Get-ChildItem -Path '${workspaceFolder}' -Filter '*.cs' -Recurse | Where-Object { $_.FullName -notmatch '\\\\(bin|obj|packages)\\\\' } | ForEach-Object { $content = Get-Content $_.FullName -Raw; $fileName = $_.Name; if ($content -match 'using\\s+System\\.Windows\\.Forms') { $issues += \"$fileName: WinForms reference in WPF project\"; Write-Host \"⚠️ $fileName: WinForms reference detected\" -ForegroundColor Yellow } if ($content -match 'Console\\.WriteLine') { $issues += \"$fileName: Console.WriteLine should use Serilog\"; Write-Host \"⚠️ $fileName: Use Logger instead of Console.WriteLine\" -ForegroundColor Yellow } if ($content -match '\\bnull!') { $issues += \"$fileName: Null-forgiving operator usage\"; Write-Host \"⚠️ $fileName: Review null-forgiving operator usage\" -ForegroundColor Yellow } if ($content -match 'public\\s+(?!class|interface|enum|struct|delegate)\\w+\\s+\\w+\\s*{\\s*get;\\s*set;\\s*}' -and $content -notmatch '\\[ObservableProperty\\]') { Write-Host \"ℹ️ $fileName: Consider ObservableProperty for auto-properties\" -ForegroundColor Blue } }; if ($issues.Count -eq 0) { Write-Host '🎉 No C# corruption patterns detected!' -ForegroundColor Green } else { Write-Host \"🔧 Found $($issues.Count) potential C# issues. Review coding standards.\" -ForegroundColor Yellow; $issues | ForEach-Object { Write-Host \"  - $_\" -ForegroundColor Red } }"
-            ],
-            "group": "test",
-            "problemMatcher": [],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🔍 Full Project Validation Suite",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🔍 FULL PROJECT VALIDATION: Running comprehensive checks...' -ForegroundColor Cyan; Write-Host 'Step 1: Validating Syncfusion namespaces...' -ForegroundColor White; & '${workspaceFolder}/.vscode/validate-syncfusion.ps1'; Write-Host 'Step 2: Checking XAML corruption...' -ForegroundColor White; & '${workspaceFolder}/.vscode/validate-xaml.ps1'; Write-Host 'Step 3: Analyzing C# patterns...' -ForegroundColor White; & '${workspaceFolder}/.vscode/validate-csharp.ps1'; Write-Host '✅ Validation suite completed!' -ForegroundColor Green"
-            ],
-            "group": "test",
-            "problemMatcher": ["$msCompile"],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "dependsOrder": "sequence"
-        },
-        {
-            "label": "⚡ Build and Wait for Completion",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🚀 Starting build process...' -ForegroundColor Cyan; $startTime = Get-Date; dotnet build BusBuddy.sln --verbosity minimal --nologo; $exitCode = $LASTEXITCODE; $duration = ((Get-Date) - $startTime).TotalSeconds; if ($exitCode -eq 0) { Write-Host \"✅ Build completed successfully in $([math]::Round($duration, 2)) seconds\" -ForegroundColor Green; } else { Write-Host \"❌ Build failed with exit code $exitCode after $([math]::Round($duration, 2)) seconds\" -ForegroundColor Red; } Write-Host '📊 Build process finished.' -ForegroundColor White; exit $exitCode"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": ["$msCompile"],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🧪 Test and Wait for Completion",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🧪 Starting test execution...' -ForegroundColor Cyan; $startTime = Get-Date; dotnet test BusBuddy.sln --verbosity minimal --nologo --no-build; $exitCode = $LASTEXITCODE; $duration = ((Get-Date) - $startTime).TotalSeconds; if ($exitCode -eq 0) { Write-Host \"✅ Tests completed successfully in $([math]::Round($duration, 2)) seconds\" -ForegroundColor Green; } else { Write-Host \"❌ Tests failed with exit code $exitCode after $([math]::Round($duration, 2)) seconds\" -ForegroundColor Red; } Write-Host '📊 Test execution finished.' -ForegroundColor White; exit $exitCode"
-            ],
-            "group": "test",
-            "problemMatcher": ["$msCompile"],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🔧 Clean and Wait for Completion",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🔧 Starting clean process...' -ForegroundColor Cyan; $startTime = Get-Date; dotnet clean BusBuddy.sln --verbosity minimal --nologo; $exitCode = $LASTEXITCODE; $duration = ((Get-Date) - $startTime).TotalSeconds; if ($exitCode -eq 0) { Write-Host \"✅ Clean completed successfully in $([math]::Round($duration, 2)) seconds\" -ForegroundColor Green; } else { Write-Host \"❌ Clean failed with exit code $exitCode after $([math]::Round($duration, 2)) seconds\" -ForegroundColor Red; } Write-Host '📊 Clean process finished.' -ForegroundColor White; exit $exitCode"
-            ],
-            "group": "build",
-            "problemMatcher": ["$msCompile"],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        },
-        {
-            "label": "🔄 Complete Build Cycle with Wait",
-            "type": "shell",
-            "command": "pwsh",
-            "args": [
-                "-Command",
-                "Write-Host '🔄 Starting complete build cycle...' -ForegroundColor Cyan; $totalStart = Get-Date; Write-Host '📋 Step 1/3: Cleaning...' -ForegroundColor White; dotnet clean BusBuddy.sln --verbosity minimal --nologo; if ($LASTEXITCODE -ne 0) { Write-Host '❌ Clean failed!' -ForegroundColor Red; exit $LASTEXITCODE } Write-Host '📦 Step 2/3: Restoring packages...' -ForegroundColor White; dotnet restore BusBuddy.sln --verbosity minimal --nologo; if ($LASTEXITCODE -ne 0) { Write-Host '❌ Restore failed!' -ForegroundColor Red; exit $LASTEXITCODE } Write-Host '🔨 Step 3/3: Building...' -ForegroundColor White; dotnet build BusBuddy.sln --verbosity minimal --nologo; if ($LASTEXITCODE -ne 0) { Write-Host '❌ Build failed!' -ForegroundColor Red; exit $LASTEXITCODE } $totalDuration = ((Get-Date) - $totalStart).TotalSeconds; Write-Host \"✅ Complete build cycle finished successfully in $([math]::Round($totalDuration, 2)) seconds\" -ForegroundColor Green; exit 0"
-            ],
-            "group": "build",
-            "problemMatcher": ["$msCompile"],
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "showReuseMessage": false,
-                "clear": true
-            },
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        }
-    ]
+    {
+      "label": "Restore Packages",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "restore",
+        "BusBuddy.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Restore NuGet packages"
+    },
+    {
+      "label": "Build Solution",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "BusBuddy.sln",
+        "--verbosity",
+        "minimal"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$busbuddy-csharp",
+        "$busbuddy-xaml"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Build the solution",
+      "dependsOn": [
+        "Restore Packages"
+      ]
+    },
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "test",
+        "BusBuddy.sln",
+        "--no-build"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "dependsOn": [
+        "Build Solution"
+      ],
+      "detail": "Run all tests"
+    },
+    {
+      "label": "Run Application",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "BusBuddy.WPF/BusBuddy.WPF.csproj"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "dependsOn": [
+        "Build Solution"
+      ],
+      "detail": "Launch the WPF app"
+    },
+    {
+      "label": "Complete Development Cycle",
+      "dependsOn": [
+        "Clean Solution",
+        "Restore Packages",
+        "Build Solution",
+        "Run Tests"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Full cycle: clean, restore, build, test"
+    },
+    {
+      "label": "Quick Build & Test",
+      "dependsOn": [
+        "Build Solution",
+        "Run Tests"
+      ],
+      "group": "test",
+      "problemMatcher": [
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Quick build and test"
+    },
+    {
+      "label": "Health Check & Diagnostics",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "Set-Location '${workspaceFolder}'; . '.\\.vscode\\BusBuddy-Advanced-Workflows.ps1'; bb-health; bb-diagnostic"
+      ],
+      "group": "test",
+      "problemMatcher": [
+        "$busbuddy-powershell"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Run health checks"
+    },
+    {
+      "label": "Serilog Development Monitor",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "Set-Location '${workspaceFolder}'; . '.\\.vscode\\BusBuddy-Advanced-Workflows.ps1'; bb-build | Where-Object { $_ -match 'Serilog|ERROR|WARN' }"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$busbuddy-serilog",
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Monitor Serilog during build"
+    },
+    {
+      "label": "Publish Application",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "publish",
+        "BusBuddy.WPF/BusBuddy.WPF.csproj",
+        "--configuration",
+        "Release"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$busbuddy-csharp"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "dependsOn": [
+        "Build Solution"
+      ],
+      "detail": "Publish for deployment"
+    },
+    {
+      "label": "Format Code",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "format",
+        "BusBuddy.sln"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Format code using dotnet format"
+    },
+    {
+      "label": "Run Tests with Coverage",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "test",
+        "BusBuddy.sln",
+        "--settings",
+        "testsettings.runsettings",
+        "--collect",
+        "XPlat Code Coverage",
+        "--results-directory",
+        "./TestResults"
+      ],
+      "group": "test",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "dependsOn": [
+        "Build Solution"
+      ],
+      "detail": "Run tests with code coverage analysis"
+    },
+    {
+      "label": "Generate Coverage Report",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "if (Test-Path './TestResults') { $latestCoverage = Get-ChildItem './TestResults' -Recurse -Filter 'coverage.cobertura.xml' | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if ($latestCoverage) { Write-Host \"Coverage report found: $($latestCoverage.FullName)\" -ForegroundColor Green; if (Get-Command reportgenerator -ErrorAction SilentlyContinue) { reportgenerator \"-reports:$($latestCoverage.FullName)\" '-targetdir:./TestResults/CoverageReport' '-reporttypes:Html'; Write-Host 'HTML coverage report generated in ./TestResults/CoverageReport' -ForegroundColor Green } else { Write-Host 'Install ReportGenerator: dotnet tool install -g dotnet-reportgenerator-globaltool' -ForegroundColor Yellow } } else { Write-Host 'No coverage files found. Run tests with coverage first.' -ForegroundColor Red } } else { Write-Host 'TestResults directory not found. Run tests with coverage first.' -ForegroundColor Red }"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Generate HTML coverage report from test results"
+    },
+    {
+      "label": "Clean Test Results",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "if (Test-Path './TestResults') { Remove-Item './TestResults' -Recurse -Force; Write-Host 'Test results cleaned' -ForegroundColor Green } else { Write-Host 'No test results to clean' -ForegroundColor Yellow }"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Clean test results and coverage data"
+    },
+    {
+      "label": "Analyze PowerShell Scripts",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-Command",
+        "if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { Invoke-ScriptAnalyzer -Path '${workspaceFolder}' -Recurse -IncludeDefaultRules } else { Write-Host 'PSScriptAnalyzer not installed. Install with: Install-Module -Name PSScriptAnalyzer' -ForegroundColor Yellow }"
+      ],
+      "group": "test",
+      "problemMatcher": [
+        "$busbuddy-powershell"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "detail": "Analyze PowerShell scripts for best practices"
+    }
+  ]
 }

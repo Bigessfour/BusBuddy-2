@@ -10,9 +10,9 @@ namespace BusBuddy.Core.Utilities
     /// Console utility to immediately fix NULL values in the database
     /// Run this to resolve SqlNullValueException errors
     /// </summary>
-    public class DatabaseNullFixUtility
+    public static class DatabaseNullFixUtility
     {
-        private static readonly ILogger Logger = Log.ForContext<DatabaseNullFixUtility>();
+        private static readonly ILogger Logger = Log.ForContext(typeof(DatabaseNullFixUtility));
 
         public static async Task Main(string[] args)
         {

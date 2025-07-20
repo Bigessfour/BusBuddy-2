@@ -1,83 +1,140 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Run and Debug BusBuddy.WPF",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build Solution",
-            "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/BusBuddy.WPF",
-            "stopAtEntry": false,
-            "console": "integratedTerminal",
-            "justMyCode": true,
-            "symbolOptions": {
-                "searchMicrosoftSymbolServer": true,
-                "searchNuGetOrgSymbolServer": true
-            }
-        },
-        {
-            "name": "Debug Tests",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build Solution",
-            "program": "dotnet",
-            "args": [
-                "test",
-                "${workspaceFolder}/BusBuddy.Tests/BusBuddy.Tests.csproj",
-                "--filter", "FullyQualifiedName~UnitTest1"
-            ],
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "justMyCode": false
-        },
-        {
-            "name": "Debug Null Handling Tests",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build Solution",
-            "program": "dotnet",
-            "args": [
-                "test",
-                "${workspaceFolder}/BusBuddy.Tests/BusBuddy.Tests.csproj",
-                "--filter", "FullyQualifiedName~DatabaseNullHandlingTests",
-                "--logger", "console;verbosity=detailed"
-            ],
-            "cwd": "${workspaceFolder}",
-            "console": "internalConsole",
-            "justMyCode": false
-        },
-        {
-            "name": "Attach to Process",
-            "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
-        },
-
-        {
-            "name": "Debug with Validation Enabled",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "Build Solution",
-            "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/BusBuddy.WPF",
-            "env": {
-                "ENABLE_DB_VALIDATION": "true",
-                "VERBOSE_LOGGING": "true"
-            },
-            "justMyCode": false
-        }
-    ],
-    "compounds": [
-        {
-            "name": "Debug All",
-            "configurations": ["Run and Debug BusBuddy.WPF", "Debug Tests"]
-        },
-        {
-            "name": "Debug App with Null Handling Tests",
-            "configurations": ["Run and Debug BusBuddy.WPF", "Debug Null Handling Tests"]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run and Debug BusBuddy.WPF",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build Solution",
+      "postDebugTask": "Clean Solution",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true
+      }
+    },
+    {
+      "name": "Debug Tests",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build Solution",
+      "postDebugTask": "Clean Solution",
+      "program": "dotnet",
+      "args": [
+        "test",
+        "${workspaceFolder}/BusBuddy.Tests/BusBuddy.Tests.csproj",
+        "--filter",
+        "FullyQualifiedName~UnitTest1"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": false
+    },
+    {
+      "name": "Debug Null Handling Tests",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build Solution",
+      "postDebugTask": "Clean Solution",
+      "program": "dotnet",
+      "args": [
+        "test",
+        "${workspaceFolder}/BusBuddy.Tests/BusBuddy.Tests.csproj",
+        "--filter",
+        "FullyQualifiedName~DatabaseNullHandlingTests",
+        "--logger",
+        "console;verbosity=detailed"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": false
+    },
+    {
+      "name": "Debug Tests with Coverage",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build Solution",
+      "postDebugTask": "Clean Solution",
+      "program": "dotnet",
+      "args": [
+        "test",
+        "${workspaceFolder}/BusBuddy.Tests/BusBuddy.Tests.csproj",
+        "--settings",
+        "testsettings.runsettings",
+        "--collect",
+        "XPlat Code Coverage",
+        "--logger",
+        "console;verbosity=detailed"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": false
+    },
+    {
+      "name": "Debug PowerShell Workflows",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/.vscode/BusBuddy-Advanced-Workflows.ps1",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "createTemporaryIntegratedConsole": false
+    },
+    {
+      "name": "Attach to Process",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    },
+    {
+      "name": "Debug with Validation Enabled",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build Solution",
+      "postDebugTask": "Clean Solution",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "env": {
+        "ENABLE_DB_VALIDATION": "true",
+        "VERBOSE_LOGGING": "true"
+      },
+      "justMyCode": false
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug All",
+      "configurations": [
+        "Run and Debug BusBuddy.WPF",
+        "Debug Tests"
+      ]
+    },
+    {
+      "name": "Debug App with Null Handling Tests",
+      "configurations": [
+        "Run and Debug BusBuddy.WPF",
+        "Debug Null Handling Tests"
+      ]
+    },
+    {
+      "name": "Debug with Coverage Analysis",
+      "configurations": [
+        "Run and Debug BusBuddy.WPF",
+        "Debug Tests with Coverage"
+      ]
+    },
+    {
+      "name": "Full Development Debug Session",
+      "configurations": [
+        "Debug PowerShell Workflows",
+        "Run and Debug BusBuddy.WPF",
+        "Debug Tests with Coverage"
+      ]
+    }
+  ]
 }

@@ -218,6 +218,20 @@ bb-debug-test          # Calls DebugHelper.TestAutoFilter()
 
 ## Syncfusion Integration Standards
 
+- **Version 30.1.40**: This project uses Syncfusion Essential Studio for WPF version 30.1.40
+- **Official Documentation**: [Syncfusion WPF Documentation](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf)
+- **Theme Documentation**: [FluentDark Theme Guide](https://help.syncfusion.com/wpf/themes/fluent-dark-theme)
+- **Control References**: [WPF Control Gallery](https://help.syncfusion.com/wpf/control-gallery)
+- **Migration Guides**: [Version Migration Documentation](https://help.syncfusion.com/wpf/upgrade-guide)
+
+### Control-Specific Documentation Links
+- **DockingManager**: [DockingManager Documentation](https://help.syncfusion.com/wpf/docking/getting-started)
+- **NavigationDrawer**: [NavigationDrawer Documentation](https://help.syncfusion.com/wpf/navigation-drawer/getting-started)
+- **SfDataGrid**: [DataGrid Documentation](https://help.syncfusion.com/wpf/datagrid/getting-started)
+- **SfChart**: [Chart Documentation](https://help.syncfusion.com/wpf/charts/getting-started)
+- **RibbonControl**: [Ribbon Documentation](https://help.syncfusion.com/wpf/ribbon/getting-started)
+
+### Implementation Standards
 - **Theme Consistency**: Use FluentDark/FluentLight themes consistently across all Syncfusion controls
 - **Assembly Management**: Reference precompiled .NET 8.0 assemblies with proper HintPath configurations
 - **Control Standards**: Follow established patterns for DockingManager, NavigationDrawer, and other controls
@@ -225,6 +239,14 @@ bb-debug-test          # Calls DebugHelper.TestAutoFilter()
 - **Validation Utilities**: Use `SyncfusionValidationUtility` for runtime validation of control properties
 - **DateTime Patterns**: Use validated DateTimePattern values to prevent runtime errors
 - **Performance Optimization**: Use appropriate control settings for optimal performance
+
+### License Management
+- **License Registration**: Always register Syncfusion license in App constructor before UI initialization
+  ```csharp
+  Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");
+  ```
+- **Environment Variables**: Store license keys in environment variables for security
+- **Development Builds**: Use community license for development, commercial license for production
 
 ## Documentation Standards
 
@@ -320,12 +342,33 @@ bb-report               # Generate comprehensive project report
 - **Fallback Mechanisms**: Provide fallback options when primary commands fail
 - **User Feedback**: Use color-coded console output for status, errors, and success messages
 
+### PowerShell 7.5.2 Specific Features and Patterns
+- **Parallel Processing**: Use `ForEach-Object -Parallel` for concurrent operations (max 5 threads default)
+  ```powershell
+  $files | ForEach-Object -Parallel { dotnet build $_ } -ThrottleLimit 3
+  ```
+- **Ternary Operators**: Leverage `condition ? true_value : false_value` syntax for concise conditionals
+- **Pipeline Chain Operators**: Use `&&` and `||` for conditional pipeline execution
+  ```powershell
+  dotnet build && dotnet test || Write-Error "Build or test failed"
+  ```
+- **Null Conditional Operators**: Use `?.` and `?[]` for safe property/array access
+- **String Interpolation**: Use `$()` within double quotes for complex expressions
+- **Error Handling**: Leverage `$?` automatic variable for last command success status
+- **JSON Cmdlets**: Use native `ConvertTo-Json` and `ConvertFrom-Json` with `-Depth` parameter
+- **Cross-Platform Paths**: Use `Join-Path` and `Resolve-Path` for platform-agnostic path handling
+- **Module Management**: Use `Import-Module -Force` for development module reloading
+- **Background Jobs**: Use `Start-ThreadJob` for lightweight background tasks over `Start-Job`
+
 ### Performance and Optimization
 - **Background Jobs**: Use PowerShell jobs for long-running debug operations
 - **Lazy Loading**: Load advanced workflows only when needed
 - **Caching**: Cache frequently accessed paths and configuration data
 - **Minimal Dependencies**: Keep PowerShell profiles lightweight with fast loading times
 - **Concurrent Safety**: Ensure PowerShell functions work safely with multiple VS Code instances
+- **Parallel Execution**: Use PowerShell 7.5.2 parallel features for concurrent builds and tests
+- **Memory Management**: Use `[System.GC]::Collect()` sparingly and only when necessary
+- **Stream Processing**: Use pipeline streaming for large data sets to reduce memory footprint
 
 ### Development Workflow Integration
 - **IDE Agnostic**: PowerShell functions work from any terminal, not just VS Code
@@ -372,5 +415,128 @@ bb-report               # Generate comprehensive project report
 - **Service Layer Design**: Keep services focused and follow single responsibility principle
 - **Error Recovery**: Implement graceful error recovery where possible
 - **Monitoring**: Include appropriate monitoring and telemetry for production systems
+
+## Troubleshooting Guide
+
+### Common PowerShell Errors and Solutions
+
+#### Execution Policy Errors
+```powershell
+# Error: Execution policy does not allow this script to run
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+#### Module Import Failures
+```powershell
+# Error: Module not found or cannot be imported
+Import-Module -Name ModuleName -Force -Verbose
+Get-Module -ListAvailable | Where-Object { $_.Name -like "*ModuleName*" }
+```
+
+#### Path Resolution Issues
+```powershell
+# Error: Path not found or cannot be resolved
+Test-Path -Path $variablePath -PathType Container
+Resolve-Path -Path $relativePath -ErrorAction SilentlyContinue
+```
+
+#### Parallel Execution Errors
+```powershell
+# Error: Parallel execution throttling or timeout
+$files | ForEach-Object -Parallel {
+    $using:function
+} -ThrottleLimit 2 -TimeoutSeconds 30
+```
+
+#### JSON Conversion Issues
+```powershell
+# Error: JSON depth exceeded or invalid JSON
+ConvertTo-Json -InputObject $data -Depth 10 -Compress
+ConvertFrom-Json -InputObject $jsonString -ErrorAction Stop
+```
+
+### Common Build and Development Issues
+
+#### NuGet Package Restore Failures
+- **Solution**: Clear NuGet cache and restore packages
+  ```powershell
+  dotnet nuget locals all --clear
+  dotnet restore --force --no-cache
+  ```
+
+#### Entity Framework Migration Issues
+- **Solution**: Validate database connection and reset migrations if needed
+  ```powershell
+  dotnet ef database drop --force
+  dotnet ef database update
+  ```
+
+#### Syncfusion License Errors
+- **Solution**: Verify license registration and environment variables
+  ```csharp
+  // Ensure license is registered before any Syncfusion control initialization
+  Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+  ```
+
+#### XAML Compilation Errors
+- **Solution**: Check namespace declarations and control references
+  ```xml
+  xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+  ```
+
+#### Debug Output Filter Issues
+- **Solution**: Restart debug filter and validate configuration
+  ```powershell
+  bb-debug-start -Force
+  bb-health -Verbose
+  ```
+
+### Performance Troubleshooting
+
+#### High Memory Usage
+- **Monitor**: Use `bb-diagnostic` to check memory consumption patterns
+- **Solution**: Implement proper disposal patterns and weak references
+- **Tools**: Use dotMemory or PerfView for detailed analysis
+
+#### Slow UI Response
+- **Monitor**: Check UI thread blocking and async operation completion
+- **Solution**: Move long-running operations to background threads
+- **Validation**: Use `BaseViewModel.ExecuteCommandAsync()` patterns
+
+#### Database Connection Issues
+- **Monitor**: Enable EF Core logging and connection resilience metrics
+- **Solution**: Use `DatabaseOperationExtensions.SafeQueryAsync()` patterns
+- **Recovery**: Implement retry policies and circuit breaker patterns
+
+### Development Environment Issues
+
+#### VS Code Task Failures
+- **Solution**: Use Task Explorer exclusively, avoid direct terminal commands
+- **Validation**: Check task configuration in `.vscode/tasks.json`
+- **Debugging**: Use `bb-diagnostic` to validate environment setup
+
+#### PowerShell Profile Loading Issues
+- **Solution**: Validate profile paths and execution policies
+  ```powershell
+  Test-Path -Path $PROFILE.CurrentUserAllHosts
+  Get-ExecutionPolicy -List
+  ```
+
+#### Extension Compatibility Problems
+- **Required Extensions**: XAML Styler, Task Explorer, PowerShell
+- **Solution**: Update extensions and validate compatibility with VS Code version
+- **Alternative**: Use VS Code Insiders for latest extension support
+
+### Logging and Monitoring Issues
+
+#### Serilog Configuration Problems
+- **Solution**: Validate logger configuration and enricher setup
+- **Check**: Ensure `Log.ForContext<ClassName>()` pattern usage
+- **Debug**: Enable self-logging in Serilog configuration
+
+#### Missing Log Entries
+- **Solution**: Verify log level configuration and output sinks
+- **Check**: Ensure structured logging patterns with message templates
+- **Validation**: Use `Logger.Information()` instead of `Console.WriteLine()`
 
 These instructions help maintain consistent code quality, architecture, and development practices throughout the project.

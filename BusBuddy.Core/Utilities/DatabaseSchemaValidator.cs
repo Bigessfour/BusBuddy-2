@@ -379,10 +379,12 @@ namespace BusBuddy.Core.Utilities
 
         private static void ExecuteNonQuery(SqlConnection connection, string sql)
         {
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities - This method is used for schema validation with predefined SQL
             using (var command = new SqlCommand(sql, connection))
             {
                 command.ExecuteNonQuery();
             }
+#pragma warning restore CA2100
         }
     }
 }

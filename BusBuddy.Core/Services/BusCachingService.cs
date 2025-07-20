@@ -7,11 +7,12 @@ namespace BusBuddy.Core.Services
     /// <summary>
     /// Service to cache bus entity data and reduce redundant database queries
     /// </summary>
-    public class BusCachingService : IBusCachingService
+    public class BusCachingService : IBusCachingService, IDisposable
     {
         private readonly IMemoryCache _cache;
         private static readonly ILogger Logger = Log.ForContext<BusCachingService>();
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private bool _disposed;
 
         // Cache keys
         private const string ALL_BUSES_KEY = "AllBuses";
@@ -156,6 +157,27 @@ namespace BusBuddy.Core.Services
         {
             Logger.Information("Invalidating all bus caches");
             _cache.Remove(ALL_BUSES_KEY);
+        }
+
+        /// <summary>
+        /// Dispose of resources
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Protected dispose method
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed && disposing)
+            {
+                _semaphore?.Dispose();
+                _disposed = true;
+            }
         }
     }
 
