@@ -1,0 +1,16 @@
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\bin\Debug\net8.0-windows\appsettings.json
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.deps.json
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.runtimeconfig.json
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.pdb
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.csproj.AssemblyReference.cache
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.AssemblyInfoInputs.cache
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.AssemblyInfo.cs
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.csproj.CoreCompileInputs.cache
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.sourcelink.json
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.dll
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\refint\BusBuddy.Core.dll
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.pdb
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\BusBuddy.Core.genruntimeconfig.cache
+c:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\obj\Debug\net8.0-windows\ref\BusBuddy.Core.dll
