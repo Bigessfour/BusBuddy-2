@@ -634,3 +634,20 @@ FolderProfile.pubxml.user
 # $ git lfs install
 # $ git lfs track "*.psd" "*.pdf" "*.zip"
 # $ git add .gitattributes
+
+# ===================================================
+# LARGE SYNCFUSION FILES EXCLUSIONS
+# ===================================================
+# Exclude large Syncfusion documentation and template files
+libs/*/Utilities/Extensions/**/*.vsix
+libs/*/Documentation/*.pdf
+SF Documentation/*.pdf
+**/Syncfusion*Template*Studio*.vsix
+**/syncfusion-windowsforms-part*.pdf
+
+# Exclude other large binary files
+*.iso
+*.dmg
+*.exe.config
+build-artifacts/
+large-files/
