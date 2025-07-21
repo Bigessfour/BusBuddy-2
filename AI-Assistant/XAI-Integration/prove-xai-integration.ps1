@@ -47,8 +47,8 @@ try {
         Write-Host "TEST 2: AI Development Assistant Integration" -ForegroundColor Yellow
         Write-Host "=============================================" -ForegroundColor Gray
 
-        # Source the AI assistant from the Core directory
-        . ".\AI-Assistant\Core\ai-development-assistant.ps1" -AIMode $true -InteractiveMode $false
+        # Source the AI assistant
+        . ".\ai-development-assistant.ps1" -AIMode $true -InteractiveMode $false
 
         Write-Host "✅ AI Development Assistant loaded!" -ForegroundColor Green
         Write-Host ""
