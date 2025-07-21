@@ -287,6 +287,21 @@ CConversionLog*
 *.sqlite          # Consider using Git LFS for SQLite databases
 *.bak             # Consider using Git LFS for large backup files
 
+# Syncfusion Documentation and Large Files (NEVER commit these!)
+SF Documentation/
+libs/*/Utilities/Extensions/VS*/
+*.vsix            # Visual Studio extensions are large
+syncfusion-*.pdf  # Syncfusion documentation PDFs
+**/syncfusion-windowsforms-*.pdf
+
+# Files larger than 50MB should never be committed directly
+# Use Git LFS if these file types are absolutely necessary
+*.iso
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
 # Database files (LFS candidates if added to repo)
 *.mdf
 *.ldf
