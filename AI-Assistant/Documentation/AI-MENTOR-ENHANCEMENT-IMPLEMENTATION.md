@@ -80,7 +80,7 @@ Export-BusBuddyAIExamples        # Generate usage examples
 ### Step 1: Configure XAI Integration
 ```powershell
 # Set your XAI API key
-$env:XAI_API_KEY = "your-xai-api-key-here"
+$env:XAI_API_KEY = "YOUR_ACTUAL_XAI_API_KEY"
 
 # Test integration
 Initialize-XAIIntegration

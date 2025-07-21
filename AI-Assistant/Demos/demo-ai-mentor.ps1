@@ -4,8 +4,12 @@
 Write-Host "🧠 AI MENTOR DEMONSTRATION - Real BusBuddy Tasks" -ForegroundColor Cyan
 Write-Host "=================================================" -ForegroundColor Gray
 
-# Set up environment
-$env:XAI_API_KEY = "xai-krzXJQrAhHMxXdhlw86aXCBEKlcCngGPjoJEschedhh4Lkuam9A6wWwNyZQG1gMsAYz4L50s38PAegQ8"
+# Set up environment - API key should be set externally
+if (-not $env:XAI_API_KEY) {
+    Write-Host "⚠️ XAI_API_KEY environment variable not set" -ForegroundColor Yellow
+    Write-Host "💡 Set it with: & '.\AI-Assistant\XAI-Integration\activate-xai-key.ps1'" -ForegroundColor Cyan
+    exit 1
+}
 
 # Load AI assistant quietly
 . ".\ai-development-assistant.ps1" -AIMode $true -InteractiveMode $false -AutoFix $false
