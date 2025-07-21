@@ -530,6 +530,69 @@ azure-connection-string.txt
 **/prove-*api*.ps1
 **/test-*api*.ps1
 
+# ===================================================
+# AI TOOLS AND XAI INTEGRATION - COMPLETE EXCLUSION
+# ===================================================
+# Block ALL AI-related directories and files to prevent XAI key leaks
+AI-Assistant/
+XAI-Integration/
+**/AI-Assistant/**
+**/XAI-Integration/**
+
+# AI tool executables and configurations
+*ai-assistant*
+*xai-*
+*grok-*
+*openai-*
+*anthropic-*
+*claude-*
+
+# AI API keys and tokens (comprehensive patterns)
+*xai_api_key*
+*XAI_API_KEY*
+*grok*key*
+*grok*token*
+*ai*token*
+*ai*secret*
+*.ai-key
+*.xai-key
+*-ai-key.*
+*-xai-key.*
+
+# AI configuration files
+ai-config.*
+xai-config.*
+grok-config.*
+*ai-settings*
+*xai-settings*
+.airc
+.xairc
+
+# AI demo and test files
+**/demo-ai-*
+**/test-ai-*
+**/prove-ai-*
+**/ai-demo*
+**/ai-test*
+demo-*ai*.ps1
+test-*ai*.ps1
+prove-*ai*.ps1
+
+# AI batch files and scripts
+*ai*.bat
+*xai*.bat
+*grok*.bat
+ai-*.ps1
+xai-*.ps1
+grok-*.ps1
+
+# AI documentation that might contain keys
+*AI*.md
+*XAI*.md
+*GROK*.md
+AI-*.md
+XAI-*.md
+
 # Configuration files with secrets
 config.json
 local.settings.json
@@ -670,3 +733,45 @@ SF Documentation/*.pdf
 *.exe.config
 build-artifacts/
 large-files/
+
+# ===================================================
+# FINAL AI SECURITY LOCKDOWN
+# ===================================================
+# Absolute prevention of AI tools and XAI keys in repository
+# This section overrides any previous inclusion patterns
+
+# Complete AI directory exclusion (no exceptions)
+AI-Assistant/
+XAI-Integration/
+ai-tools/
+xai-tools/
+grok-tools/
+
+# All AI-related file patterns (comprehensive)
+**/AI-*
+**/XAI-*
+**/ai-*
+**/xai-*
+**/grok-*
+**/*ai*key*
+**/*xai*key*
+**/*grok*key*
+**/*ai*token*
+**/*xai*token*
+**/*grok*token*
+
+# Environment files that might contain AI keys
+.env.ai
+.env.xai
+.env.grok
+*ai.env
+*xai.env
+*grok.env
+
+# Never commit any AI integration files
+*-ai-integration.*
+*-xai-integration.*
+*-grok-integration.*
+ai-integration-*
+xai-integration-*
+grok-integration-*
