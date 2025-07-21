@@ -432,7 +432,8 @@
         "build",
         "BusBuddy.sln",
         "--verbosity",
-        "normal"
+        "minimal",
+        "--nologo"
       ],
       "options": {
         "cwd": "${workspaceFolder}",
@@ -458,7 +459,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "detail": "Build using Command Prompt to avoid PowerShell path issues"
+      "detail": "Clean build output - minimal verbosity, shows only errors/warnings/summary"
     },
     {
       "label": "Direct: Run Application (CMD)",
@@ -774,28 +775,37 @@
       "detail": "Fixed: Clean solution using correct PowerShell -Command syntax"
     },
     {
-      "label": "PS Fixed: Restore Packages",
+      "label": "📦 Restore Packages (Status Report)",
       "type": "shell",
-      "command": "pwsh",
+      "command": "dotnet",
       "args": [
-        "-ExecutionPolicy",
-        "Bypass",
-        "-Command",
-        "Write-Host 'Restoring NuGet packages...' -ForegroundColor Yellow; dotnet restore BusBuddy.sln && Write-Host 'Restore completed successfully' -ForegroundColor Green || Write-Host 'Restore failed' -ForegroundColor Red"
+        "restore",
+        "BusBuddy.sln",
+        "--verbosity",
+        "normal",
+        "--nologo",
+        "--force"
       ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "cmd.exe",
+          "args": [
+            "/c"
+          ]
+        }
+      },
       "group": "build",
-      "problemMatcher": [
-        "$msCompile"
-      ],
+      "problemMatcher": [],
       "presentation": {
         "echo": true,
         "reveal": "always",
         "focus": false,
         "panel": "shared",
         "showReuseMessage": true,
-        "clear": false
+        "clear": true
       },
-      "detail": "Fixed: Restore packages using correct PowerShell -Command syntax"
+      "detail": "📦 Restore packages only - shows package sources, restore performance, cache hits, and dependency status"
     },
     // =============================================================================
     // GITHUB ACTIONS INTEGRATION TASKS
@@ -939,6 +949,84 @@
         "clear": true
       },
       "detail": "Comprehensive analysis of the failed GitHub Actions workflow run with logs and artifacts"
+    },
+    {
+      "label": "🧹 Clean Solution (Summary Only)",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "clean",
+        "BusBuddy.sln",
+        "--verbosity",
+        "minimal",
+        "--nologo"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "cmd.exe",
+          "args": [
+            "/c"
+          ]
+        }
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "🧹 Clean solution only - removes build artifacts and shows clean status"
+    },
+    {
+      "label": "🎯 Smart Build Intelligence",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".\\smart-build-intelligence.ps1"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "🎯 Comprehensive build intelligence with actionable insights and metrics"
+    },
+    {
+      "label": "🚀 Smart Runtime Intelligence",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".\\smart-runtime-intelligence.ps1"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "🚀 Advanced runtime monitoring with Serilog streaming, health checks, and debug intelligence"
     }
   ]
 }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj": {}
+    "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
-      "version": "1.0.0-dev",
+    "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
+      "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj",
+        "projectUniqueName": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj",
         "projectName": "BusBuddy.Core",
-        "projectPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj",
+        "projectPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj",
         "packagesPath": "C:\\Users\\steve.mckitrick\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\obj\\",
+        "outputPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -156,14 +156,14 @@
         }
       }
     },
-    "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj": {
-      "version": "1.0.0-dev",
+    "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj": {
+      "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj",
+        "projectUniqueName": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj",
         "projectName": "BusBuddy.Tests",
-        "projectPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj",
+        "projectPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj",
         "packagesPath": "C:\\Users\\steve.mckitrick\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\obj\\",
+        "outputPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -187,11 +187,11 @@
           "net8.0-windows7.0": {
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
-                "projectPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj"
+              "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
+                "projectPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj"
               },
-              "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj": {
-                "projectPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj"
+              "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj": {
+                "projectPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj"
               }
             }
           }
@@ -258,14 +258,14 @@
         }
       }
     },
-    "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj": {
-      "version": "1.0.0-dev",
+    "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj": {
+      "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj",
+        "projectUniqueName": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj",
         "projectName": "BusBuddy.WPF",
-        "projectPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj",
+        "projectPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj",
         "packagesPath": "C:\\Users\\steve.mckitrick\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\obj\\",
+        "outputPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -289,8 +289,8 @@
           "net8.0-windows7.0": {
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
-                "projectPath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj"
+              "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
+                "projectPath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj"
               }
             }
           }

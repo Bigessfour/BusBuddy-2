@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wpHbZtj/Shw=",
+  "dgSpecHash": "BLo2Xr7UTSM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj",
+  "projectFilePath": "c:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\steve.mckitrick\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\steve.mckitrick\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

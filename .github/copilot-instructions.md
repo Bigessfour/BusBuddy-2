@@ -1,8 +1,79 @@
-# GitHub Copilot Custom Instructions
+# GitHub Copilot Custom Instructions - Phase 1 Focused
 
 This file contains custom instructions for GitHub Copilot when working with this repository.
 
-## XML and XAML Formatting Rules
+## 🎯 **PHASE 1 PRIORITY OVERRIDE**
+
+**CRITICAL: All instructions below are SECONDARY to Phase 1 Core Goals**
+
+### **Phase 1 Mission (30 Minutes)**
+- **PRIMARY GOAL**: MainWindow → Dashboard → 3 Core Views (Drivers, Vehicles, Activity Schedule) with real-world data
+- **FUNCTIONAL OVER PERFECT**: Get it working first, optimize later
+- **NO COMPREHENSIVE REWRITES**: Fix specific issues, build incrementally
+- **PRESERVE EXISTING WORK**: Enhance and repair rather than replace
+
+### **Phase 1 Development Standards**
+- ✅ **Build without errors** - Priority #1
+- ✅ **Basic data display** - ListView/DataGrid sufficient for now
+- ✅ **Real transportation data** - 15-20 drivers, 10-15 vehicles, 25-30 activities
+- ⚠️ **Defer to Phase 2**: Advanced MVVM, comprehensive testing, performance optimization
+- ⚠️ **Defer to Phase 2**: Advanced styling, complex validation, external integrations
+
+### **Enhanced Task Monitoring Standards**
+- **Enhanced Task Monitor**: Use `enhanced-task-monitor-fixed.ps1` for ALL builds/runs
+- **Output Capture**: All task output saved to timestamped log files in `logs/` directory
+- **Real-time Feedback**: Show build/run progress with comprehensive error capture
+- **Process Completion Detection**: Wait for process completion and capture full output
+- **Incremental Fixes**: Use captured output to make targeted repairs, not rewrites
+
+### **Phase 1 Task Monitoring Commands**
+```powershell
+# Test the enhanced task monitor
+pwsh -ExecutionPolicy Bypass -File "enhanced-task-monitor-fixed.ps1" -TaskName "Build Test" -Command "dotnet" -Arguments "build","BusBuddy.sln" -WaitForCompletion -CaptureOutput -ShowRealTime
+
+# Use the helper functions
+& "enhanced-task-monitor-fixed.ps1"; Start-BusBuddyTask -TaskType Build
+& "enhanced-task-monitor-fixed.ps1"; Start-BusBuddyTask -TaskType Run
+& "enhanced-task-monitor-fixed.ps1"; Start-BusBuddyTask -TaskType Health
+```
+
+### **Phase 1 Problem Resolution Approach**
+- **Incremental fixes first** - Always attempt targeted edits before complete rebuilds
+- **Assess corruption level** - Check actual errors and their scope before deciding approach
+- **User consultation** - Let the user decide on complete overhauls vs. targeted fixes
+- **Error analysis** - Identify root causes (missing methods, property name mismatches, duplicates)
+- **Minimal viable fix** - Use the smallest change that resolves the issue
+- **Escalation path**:
+  1. First: Targeted edits for specific errors
+  2. Second: Consult user if issues appear complex
+  3. Last resort: Complete rebuild only with user approval
+
+---
+
+## Error Handling and Resilience Standards - Phase 1 Simplified
+
+### **Phase 1 Error Handling (Keep It Simple)**
+- ✅ **Basic Try/Catch**: Simple exception handling around data operations
+- ✅ **User Messages**: Basic MessageBox.Show() for user feedback
+- ✅ **Log to Console**: Simple Console.WriteLine for debugging (upgrade to Serilog later)
+- ⚠️ **Defer**: Complex resilience patterns, retry logic, circuit breakers
+
+### **Phase 1 Error Pattern**
+```csharp
+try
+{
+    // Data operation
+    var data = await context.Drivers.ToListAsync();
+    return data;
+}
+catch (Exception ex)
+{
+    // Simple error handling for Phase 1
+    Console.WriteLine($"Error loading drivers: {ex.Message}");
+    MessageBox.Show($"Error loading drivers: {ex.Message}");
+    return new List<Driver>();
+}
+```
 
 - In XML/XAML comments, always replace double-dash (`--`) with em dash (`—`)
 - Ensure no XML comment ends with a dash character (`-`) by adding a space or period if needed
@@ -123,39 +194,86 @@ bb-debug-test          # Calls DebugHelper.TestAutoFilter()
 - **No Debug.WriteLine**: Replace any Debug.WriteLine with Logger.Debug() calls
 - **No Trace.WriteLine**: Replace any Trace.WriteLine with Logger.Verbose() calls
 
-## Architecture Standards
+## Architecture Standards - Phase 1 Simplified
 
-- **MVVM Pattern**: Maintain strict MVVM separation with ViewModels inheriting from `BaseViewModel` or `ObservableObject`
-- **Dependency Injection**: Use constructor injection for all services, register in `App.xaml.cs` using `ConfigureServices`
-- **Service Layer**: Keep business logic in service classes, ViewModels should orchestrate services
-- **Navigation Service**: Use centralized `INavigationService` for all view navigation
-- **Async/Await**: Use async patterns for all I/O operations, UI updates, and long-running tasks
-- **Error Handling**: Implement comprehensive error handling with user-friendly messages and logging
-- **Service Registration**: Use dedicated `ConfigureServices` methods for clean DI configuration
-- **Startup Orchestration**: Use `StartupOrchestrationService` for complex initialization sequences
+### **Phase 1 Architecture (Minimum Viable)**
+- ✅ **Basic MVVM**: Simple ViewModels with INotifyPropertyChanged, defer advanced patterns
+- ✅ **Direct Data Access**: Simple Entity Framework queries, defer complex repositories
+- ✅ **Basic Navigation**: Simple Frame.Navigate() calls, defer advanced navigation service
+- ✅ **Essential Error Handling**: Try/catch on data operations, defer comprehensive patterns
+- ⚠️ **Defer**: Complex dependency injection, advanced async patterns, comprehensive validation
 
-## MVVM Implementation Standards
+### **Phase 1 Quick Patterns**
+```csharp
+// Quick ViewModel pattern for Phase 1
+public class DriversViewModel : INotifyPropertyChanged
+{
+    public ObservableCollection<Driver> Drivers { get; set; } = new();
 
-- **ViewModels**: Inherit from `BaseViewModel` or use `ObservableObject` from CommunityToolkit.Mvvm
-- **Commands**: Use `RelayCommand` for simple commands, `AsyncRelayCommand` for async operations
-- **Property Binding**: Use `[ObservableProperty]` attribute for auto-generated properties
-- **Command Attributes**: Use `[RelayCommand]` attribute for auto-generated commands
-- **Property Notifications**: Use `OnPropertyChanged()` for manual property change notifications
-- **Validation**: Implement `IDataErrorInfo` or `ObservableValidator` for data validation
-- **Data Loading**: Use `BaseViewModel.LoadDataAsync()` for consistent data loading patterns
-- **Command Execution**: Use `BaseViewModel.ExecuteCommandAsync()` for consistent command patterns
-- **User Interaction Logging**: Use `BaseViewModel.LogUserInteraction()` for user action tracking
+    public async Task LoadDriversAsync()
+    {
+        try
+        {
+            using var context = new BusBuddyContext();
+            var drivers = await context.Drivers.ToListAsync();
+            Drivers.Clear();
+            foreach(var driver in drivers) Drivers.Add(driver);
+        }
+        catch (Exception ex)
+        {
+            // Basic error handling for Phase 1
+            MessageBox.Show($"Error loading drivers: {ex.Message}");
+        }
+    }
+}
 
-## Database and Entity Framework Standards
+// Quick navigation pattern for Phase 1
+private void NavigateToDrivers() => ContentFrame.Navigate(new DriversView());
+```
 
-- **DbContext Configuration**: Use `AddEnhancedDatabase()` extension method for resilient database setup
-- **Connection Resilience**: Always configure retry policies and circuit breakers
-- **Safe Operations**: Use `DatabaseOperationExtensions.SafeQueryAsync()` for resilient queries
-- **Entity Validation**: Use `ValidateEntity()` extension method before saves
-- **Exception Handling**: Handle `SqlException` and `InvalidCastException` with specific patterns
-- **Startup Validation**: Use `DatabaseValidationService` for schema and health checks
-- **Migration Management**: Use `DatabaseMigrationService` for controlled schema updates
-- **Performance Monitoring**: Log all database operations with timing and error context
+## MVVM Implementation Standards - Phase 1 Focused
+
+### **Phase 1 MVVM (Keep It Simple)**
+- ✅ **Basic ViewModels**: Implement INotifyPropertyChanged manually for now
+- ✅ **Simple Commands**: Use basic RelayCommand, defer advanced command patterns
+- ✅ **Direct Binding**: Basic two-way binding, defer complex converters
+- ✅ **Observable Collections**: Use ObservableCollection<T> for lists
+- ⚠️ **Defer**: Advanced MVVM frameworks, complex validation, sophisticated patterns
+
+### **Phase 1 Data Binding**
+```xml
+<!-- Simple data binding for Phase 1 -->
+<DataGrid ItemsSource="{Binding Drivers}" AutoGenerateColumns="True" />
+<TextBox Text="{Binding SelectedDriver.Name, Mode=TwoWay}" />
+```
+
+## Database and Entity Framework Standards - Phase 1 Simplified
+
+### **Phase 1 Database (Direct and Simple)**
+- ✅ **Basic DbContext**: Simple context with DbSet properties
+- ✅ **Direct Queries**: Basic LINQ queries, defer complex repositories
+- ✅ **Simple Migrations**: Basic EF migrations, defer complex schema management
+- ✅ **Basic Connection**: Simple connection string, defer advanced resilience
+- ⚠️ **Defer**: Advanced patterns, connection pooling, complex error handling
+
+### **Phase 1 Database Pattern**
+```csharp
+// Simple context for Phase 1
+public class BusBuddyContext : DbContext
+{
+    public DbSet<Driver> Drivers { get; set; }
+    public DbSet<Vehicle> Vehicles { get; set; }
+    public DbSet<Activity> Activities { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("Data Source=BusBuddy.db");
+    }
+}
+
+// Simple query pattern for Phase 1
+var drivers = await context.Drivers.ToListAsync();
+```
 
 ## Error Handling and Resilience Standards
 
