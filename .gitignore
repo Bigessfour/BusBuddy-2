@@ -508,8 +508,12 @@ azure-connection-string.txt
 
 # Specific API key patterns
 *xai*key*
+*api*key*
 *syncfusion*key*
 *license*key*
+# Prevent hardcoded keys in any file
+**/prove-*api*.ps1
+**/test-*api*.ps1
 
 # Configuration files with secrets
 config.json
