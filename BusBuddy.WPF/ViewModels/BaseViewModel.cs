@@ -1,7 +1,7 @@
+using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Serilog;
 using Serilog.Context;
-using System.Runtime.CompilerServices;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -14,7 +14,7 @@ namespace BusBuddy.WPF.ViewModels
             set => SetProperty(ref _isLoading, value);
         }
 
-        private string? _errorMessage = null;
+        private string? _errorMessage;
         public string? ErrorMessage
         {
             get => _errorMessage;

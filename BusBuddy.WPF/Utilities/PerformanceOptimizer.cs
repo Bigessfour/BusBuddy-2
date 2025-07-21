@@ -220,7 +220,7 @@ namespace BusBuddy.WPF.Utilities
                 var results = new List<TimeSpan>();
                 var failures = 0;
 
-                var semaphore = new SemaphoreSlim(Environment.ProcessorCount); // Limit concurrency
+                using var semaphore = new SemaphoreSlim(Environment.ProcessorCount); // Limit concurrency
 
                 var tasks = Enumerable.Range(0, iterations).Select(async i =>
                 {

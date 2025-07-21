@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
-      "version": "1.0.0",
+      "version": "1.0.0-dev",
       "restore": {
         "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj",
         "projectName": "BusBuddy.Core",
@@ -157,7 +157,7 @@
       }
     },
     "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj": {
-      "version": "1.0.0",
+      "version": "1.0.0-dev",
       "restore": {
         "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj",
         "projectName": "BusBuddy.WPF",

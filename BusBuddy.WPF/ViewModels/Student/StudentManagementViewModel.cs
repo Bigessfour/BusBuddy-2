@@ -4,17 +4,18 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
+using BusBuddy.WPF.Controls;
+using BusBuddy.WPF.Models;
 using BusBuddy.WPF.Utilities;
 using BusBuddy.WPF.ViewModels.Student;
-using BusBuddy.WPF.Controls;
-using StudentViews = BusBuddy.WPF.Views.Student;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using Serilog.Context;
+using StudentViews = BusBuddy.WPF.Views.Student;
 
 // Disable async method without await operator warnings
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously

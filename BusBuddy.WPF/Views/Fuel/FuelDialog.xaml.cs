@@ -20,9 +20,9 @@ namespace BusBuddy.WPF.Views.Fuel
         private readonly IBusService _busService;
         private CoreModels.Fuel _fuel;
         private CoreModels.Bus? _selectedBus;
-        private bool _isValid = false;
+        private bool _isValid;
         private double _mpg;
-        private bool _isUpdatingCost = false;
+        private bool _isUpdatingCost;
 
         // Observable collections for ComboBox options
         public ObservableCollection<CoreModels.Bus> AvailableBuses { get; } = new ObservableCollection<CoreModels.Bus>();

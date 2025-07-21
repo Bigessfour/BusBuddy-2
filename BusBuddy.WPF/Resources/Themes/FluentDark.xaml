@@ -15,55 +15,88 @@
     -->
 
     <!-- Base Colors -->
-    <SolidColorBrush x:Key="ContentForeground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="SurfaceBackground" Color="#1F1F1F" />
-    <SolidColorBrush x:Key="SurfaceBorderBrush" Color="#444444" />
-    <SolidColorBrush x:Key="ProfessionalSurfaceDark" Color="#2A2A2A" />
+    <SolidColorBrush x:Key="ContentForeground"
+                     Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SurfaceBackground"
+                     Color="#1F1F1F"/>
+    <SolidColorBrush x:Key="SurfaceBorderBrush"
+                     Color="#444444"/>
+    <SolidColorBrush x:Key="ProfessionalSurfaceDark"
+                     Color="#2A2A2A"/>
 
     <!-- Brand Colors -->
-    <SolidColorBrush x:Key="BrandPrimaryBrush" Color="#3A86FF" />
-    <SolidColorBrush x:Key="BrandSecondaryBrush" Color="#8338EC" />
-    <SolidColorBrush x:Key="BrandFleetGreenBrush" Color="#38B000" />
-    <SolidColorBrush x:Key="BrandWarningBrush" Color="#FF9F1C" />
-    <SolidColorBrush x:Key="BrandAlertBrush" Color="#FF0A54" />
+    <SolidColorBrush x:Key="BrandPrimaryBrush"
+                     Color="#3A86FF"/>
+    <SolidColorBrush x:Key="BrandSecondaryBrush"
+                     Color="#8338EC"/>
+    <SolidColorBrush x:Key="BrandFleetGreenBrush"
+                     Color="#38B000"/>
+    <SolidColorBrush x:Key="BrandWarningBrush"
+                     Color="#FF9F1C"/>
+    <SolidColorBrush x:Key="BrandAlertBrush"
+                     Color="#FF0A54"/>
 
     <!-- Button Styles -->
-    <Style x:Key="NavigationItemStyle" TargetType="syncfusion:ButtonAdv">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="16,12" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Style x:Key="NavigationItemStyle"
+           TargetType="syncfusion:ButtonAdv">
+        <Setter Property="Background"
+                Value="Transparent"/>
+        <Setter Property="Foreground"
+                Value="{DynamicResource ContentForeground}"/>
+        <Setter Property="BorderThickness"
+                Value="0"/>
+        <Setter Property="Padding"
+                Value="16,12"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left"/>
         <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource ProfessionalSurfaceDark}" />
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource ProfessionalSurfaceDark}"/>
             </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{DynamicResource BrandPrimaryBrush}" />
-                <Setter Property="Foreground" Value="White" />
+            <Trigger Property="IsPressed"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource BrandPrimaryBrush}"/>
+                <Setter Property="Foreground"
+                        Value="White"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="IconButtonAdvStyle" TargetType="syncfusion:ButtonAdv">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Width" Value="40" />
-        <Setter Property="Height" Value="40" />
+    <Style x:Key="IconButtonAdvStyle"
+           TargetType="syncfusion:ButtonAdv">
+        <Setter Property="Background"
+                Value="Transparent"/>
+        <Setter Property="BorderThickness"
+                Value="0"/>
+        <Setter Property="Width"
+                Value="40"/>
+        <Setter Property="Height"
+                Value="40"/>
         <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource ProfessionalSurfaceDark}" />
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource ProfessionalSurfaceDark}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <!-- ComboBox Style -->
-    <Style x:Key="StandardComboBoxStyle" TargetType="syncfusion:ComboBoxAdv">
-        <Setter Property="Background" Value="{DynamicResource ProfessionalSurfaceDark}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
+    <Style x:Key="StandardComboBoxStyle"
+           TargetType="ComboBox">
+        <Setter Property="Background"
+                Value="{DynamicResource ProfessionalSurfaceDark}"/>
+        <Setter Property="Foreground"
+                Value="{DynamicResource ContentForeground}"/>
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource SurfaceBorderBrush}"/>
+        <Setter Property="BorderThickness"
+                Value="1"/>
     </Style>
 
     <!-- ╔═══════════════════════════════════════════════════════════════════════════════════════╗ -->
@@ -74,41 +107,63 @@
     <!-- ║   • ContainerMode=TDI and DockBehavior=VS2010 for professional IDE experience        ║ -->
     <!-- ║   • Standard sizing enforced via DesiredWidthInDockedMode/DesiredHeightInDockedMode   ║ -->
     <!-- ╚═══════════════════════════════════════════════════════════════════════════════════════╝ -->
-    <Style x:Key="StandardDockingManagerStyle" TargetType="syncfusion:DockingManager">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-        <Setter Property="UseDocumentContainer" Value="True" />
-        <Setter Property="PersistState" Value="True" />
-        <Setter Property="ContainerMode" Value="TDI" />
-        <Setter Property="DockBehavior" Value="VS2010" />
-        <Setter Property="DockFill" Value="True" />
+    <Style x:Key="StandardDockingManagerStyle"
+           TargetType="syncfusion:DockingManager">
+        <Setter Property="Background"
+                Value="{DynamicResource SurfaceBackground}"/>
+        <Setter Property="UseDocumentContainer"
+                Value="True"/>
+        <Setter Property="PersistState"
+                Value="True"/>
+        <Setter Property="ContainerMode"
+                Value="TDI"/>
+        <Setter Property="DockBehavior"
+                Value="VS2010"/>
+        <Setter Property="DockFill"
+                Value="True"/>
     </Style>
 
     <!-- NavigationDrawer Style -->
-    <Style x:Key="StandardNavigationDrawerStyle" TargetType="syncfusion:SfNavigationDrawer">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceBorderBrush}" />
+    <Style x:Key="StandardNavigationDrawerStyle"
+           TargetType="syncfusion:SfNavigationDrawer">
+        <Setter Property="Background"
+                Value="{DynamicResource SurfaceBackground}"/>
+        <Setter Property="Foreground"
+                Value="{DynamicResource ContentForeground}"/>
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource SurfaceBorderBrush}"/>
     </Style>
 
     <!-- CircularProgressBar Style -->
-    <Style x:Key="CircularProgressStyle" TargetType="syncfusion:SfCircularProgressBar">
-        <Setter Property="TrackColor" Value="#444444" />
-        <Setter Property="ProgressColor" Value="{DynamicResource BrandFleetGreenBrush}" />
+    <Style x:Key="CircularProgressStyle"
+           TargetType="syncfusion:SfCircularProgressBar">
+        <Setter Property="TrackColor"
+                Value="#444444"/>
+        <Setter Property="ProgressColor"
+                Value="{DynamicResource BrandFleetGreenBrush}"/>
         <!-- RangeColor property not found on SfCircularProgressBar -->
     </Style>
 
     <!-- Loading Indicator Style -->
-    <Style x:Key="LoadingIndicatorStyle" TargetType="syncfusion:SfBusyIndicator">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-        <Setter Property="Foreground" Value="White" />
-        <Setter Property="AnimationType" Value="Gear" />
+    <Style x:Key="LoadingIndicatorStyle"
+           TargetType="syncfusion:SfBusyIndicator">
+        <Setter Property="Background"
+                Value="{DynamicResource SurfaceBackground}"/>
+        <Setter Property="Foreground"
+                Value="White"/>
+        <Setter Property="AnimationType"
+                Value="Gear"/>
     </Style>
 
     <!-- Custom Busy Indicator Style -->
-    <Style x:Key="CustomBusyStyle" TargetType="syncfusion:SfBusyIndicator">
-        <Setter Property="AnimationType" Value="Gear" />
-        <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
-        <Setter Property="Foreground" Value="{DynamicResource ContentForeground}" />
+    <Style x:Key="CustomBusyStyle"
+           TargetType="syncfusion:SfBusyIndicator">
+        <Setter Property="AnimationType"
+                Value="Gear"/>
+        <Setter Property="Background"
+                Value="{DynamicResource SurfaceBackground}"/>
+        <Setter Property="Foreground"
+                Value="{DynamicResource ContentForeground}"/>
     </Style>
 
 </ResourceDictionary>

@@ -1,17 +1,17 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Media;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;
 using Serilog;
 using Syncfusion.UI.Xaml.Scheduler;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System;
-using System.Windows.Media;
 
 namespace BusBuddy.WPF.Services;
 
 /// <summary>
-/// Custom Schedule Data Provider for Bus Buddy
+/// Custom Schedule Data Provider for BusBuddy
 /// Integrates Activity entities with Syncfusion SfScheduler
 /// </summary>
 public class BusBuddyScheduleDataProvider

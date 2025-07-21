@@ -4,10 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using BusBuddy.Core.Models;
+using BusBuddy.WPF.Models;
+using BusBuddy.WPF.Views.Student;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using BusBuddy.Core.Models;
-using BusBuddy.WPF.Views.Student;
 
 namespace BusBuddy.WPF.ViewModels.Student
 {
@@ -191,32 +192,5 @@ namespace BusBuddy.WPF.ViewModels.Student
         }
 
         #endregion
-    }
-
-    public enum FilterStatus
-    {
-        All,
-        Active,
-        Inactive,
-        Yes,
-        No,
-        WithRoute,
-        WithoutRoute
-    }
-
-    public class SearchCriteria
-    {
-        public string StudentName { get; set; } = string.Empty;
-        public string StudentNumber { get; set; } = string.Empty;
-        public string? Grade { get; set; }
-        public string? School { get; set; }
-        public FilterStatus ActiveStatus { get; set; }
-        public FilterStatus SpecialNeedsStatus { get; set; }
-        public string? AMRoute { get; set; }
-        public string? PMRoute { get; set; }
-        public string BusStop { get; set; } = string.Empty;
-        public FilterStatus RouteAssignmentStatus { get; set; }
-        public string City { get; set; } = string.Empty;
-        public string Zip { get; set; } = string.Empty;
     }
 }

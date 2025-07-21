@@ -1,15 +1,15 @@
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace BusBuddy.WPF.Utilities
 {
     /// <summary>
-    /// Manages logging overhead and performance modes for Bus Buddy development cycles
+    /// Manages logging overhead and performance modes for BusBuddy development cycles
     /// Provides toggleable "light" modes to minimize performance impact during quick iterations
     /// </summary>
     public static class LoggingModeManager

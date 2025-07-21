@@ -1,9 +1,9 @@
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Serilog;
 using Serilog.Context;
-using System.Threading.Tasks;
-using System;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -11,9 +11,9 @@ namespace BusBuddy.WPF.ViewModels
     {
         private string _status = "Initializing...";
         private string _progressMessage = "Starting Bus Buddy application...";
-        private int _progressPercentage = 0;
+        private int _progressPercentage;
         private bool _isIndeterminate = true;
-        private bool _isComplete = false;
+        private bool _isComplete;
 
         public LoadingViewModel()
         {

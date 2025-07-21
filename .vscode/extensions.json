@@ -8,14 +8,15 @@
     "josefpihrt-vscode.roslynator",
     // XAML Development and Formatting
     "ms-dotnettools.xaml",
+    "noesistechnologies.noesisgui-tools",
     "doggy8088.netcore-extension-pack",
     "redhat.vscode-xml",
     "rogalmic.vscode-xml-complete",
     // Testing and Test Explorer
     "ms-vscode.test-adapter-converter",
-    // PowerShell Development (v2025.6.1 — Latest)
+    // PowerShell Development (v2025.2.0 — Latest Stable)
     "ms-vscode.powershell",
-    // Advanced PowerShell Tools
+    // Advanced PowerShell Tools (Preview for bleeding edge features)
     "ms-vscode.powershell-preview",
     // Syncfusion Development Support
     "syncfusioninc.maui-vscode-extensions",

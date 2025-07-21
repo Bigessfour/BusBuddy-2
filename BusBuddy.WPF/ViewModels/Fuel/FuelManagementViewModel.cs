@@ -1,14 +1,16 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
+using BusBuddy.WPF.ViewModels.Fuel;
 using BusBuddy.WPF.Views.Fuel;
 using Serilog;
 using Serilog.Context;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
-using System.Windows;
+using FuelModel = BusBuddy.Core.Models.Fuel;
 
 // Disable async method without await operator warnings
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -20,8 +22,8 @@ namespace BusBuddy.WPF.ViewModels
         private readonly IFuelService _fuelService;
         private readonly IBusService _busService;
 
-        private ObservableCollection<Fuel> _fuelRecords = new();
-        public ObservableCollection<Fuel> FuelRecords
+        private ObservableCollection<FuelModel> _fuelRecords = new();
+        public ObservableCollection<FuelModel> FuelRecords
         {
             get => _fuelRecords;
             set => SetProperty(ref _fuelRecords, value);
@@ -34,8 +36,8 @@ namespace BusBuddy.WPF.ViewModels
             set => SetProperty(ref _fuelTrends, value);
         }
 
-        private Fuel? _selectedFuelRecord;
-        public Fuel? SelectedFuelRecord
+        private FuelModel? _selectedFuelRecord;
+        public FuelModel? SelectedFuelRecord
         {
             get => _selectedFuelRecord;
             set
@@ -128,7 +130,7 @@ namespace BusBuddy.WPF.ViewModels
                         return;
                     }
 
-                    var newFuel = new Fuel
+                    var newFuel = new FuelModel
                     {
                         FuelDate = DateTime.Now,
                         FuelLocation = "Key Pumps",
@@ -162,7 +164,10 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task EditFuelRecordAsync()
         {
-            if (SelectedFuelRecord == null) return;
+            if (SelectedFuelRecord == null)
+            {
+                return;
+            }
 
             await ExecuteCommandAsync(async () =>
             {
@@ -176,7 +181,7 @@ namespace BusBuddy.WPF.ViewModels
                     Logger.Information("Editing fuel record with ID {FuelId}", SelectedFuelRecord.FuelId);
 
                     // Create a copy to edit
-                    var recordToEdit = new Fuel
+                    var recordToEdit = new FuelModel
                     {
                         FuelId = SelectedFuelRecord.FuelId,
                         FuelDate = SelectedFuelRecord.FuelDate,
@@ -219,7 +224,10 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task DeleteFuelRecordAsync()
         {
-            if (SelectedFuelRecord == null) return;
+            if (SelectedFuelRecord == null)
+            {
+                return;
+            }
 
             await ExecuteCommandAsync(async () =>
             {
@@ -301,9 +309,14 @@ namespace BusBuddy.WPF.ViewModels
                             {
                                 var bus = await _busService.GetBusByIdAsync(record.VehicleFueledId);
                                 if (bus != null)
+                                {
                                     busNumber = bus.BusNumber;
+                                }
                             }
-                            catch { /* Ignore errors and use default */ }
+                            catch
+                            {
+                                /* Ignore errors and use default */
+                            }
 
                             writer.WriteLine(
                                 $"{record.FuelId}," +
@@ -369,7 +382,7 @@ namespace BusBuddy.WPF.ViewModels
 
                     FuelTrends.Clear();
                     // Simple trend: average MPG per month
-                    var grouped = new System.Linq.EnumerableQuery<Fuel>(FuelRecords)
+                    var grouped = FuelRecords
                         .GroupBy(f => new { f.FuelDate.Year, f.FuelDate.Month })
                         .Select(g => new FuelTrendPoint
                         {
@@ -377,7 +390,9 @@ namespace BusBuddy.WPF.ViewModels
                             AvgMPG = g.Average(f => f.Gallons.HasValue && f.Gallons > 0 ? (f.VehicleOdometerReading / (double)f.Gallons.Value) : 0)
                         });
                     foreach (var pt in grouped)
+                    {
                         FuelTrends.Add(pt);
+                    }
 
                     Logger.Information("Calculated {TrendPointCount} fuel trend points", FuelTrends.Count);
                 }
@@ -392,11 +407,5 @@ namespace BusBuddy.WPF.ViewModels
         }
 
         // BaseViewModel already provides PropertyChanged functionality
-    }
-
-    public class FuelTrendPoint
-    {
-        public DateTime Period { get; set; }
-        public double AvgMPG { get; set; }
     }
 }

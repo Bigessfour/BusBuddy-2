@@ -1,12 +1,12 @@
 using System.ComponentModel;
-using System.Windows.Input;
-using BusBuddy.WPF.ViewModels.Panels;
-using Syncfusion.Windows.Tools.Controls;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.Core.Services.Interfaces;
+using BusBuddy.WPF.ViewModels.Panels;
 using Serilog;
 using Serilog.Context;
+using Syncfusion.Windows.Tools.Controls;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -18,8 +18,8 @@ namespace BusBuddy.WPF.ViewModels
         private string? _title;
         private object? _content;
         private string _state = "Normal";
-        private int _priority = 0;
-        private bool _isRefreshing = false;
+        private int _priority;
+        private bool _isRefreshing;
         private DateTime _lastUpdated = DateTime.Now;
 
         public string? Title

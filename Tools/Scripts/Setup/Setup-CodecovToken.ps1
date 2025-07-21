@@ -1,9 +1,9 @@
 # Setup-CodecovToken.ps1
-# Bus Buddy - Codecov Integration Setup Script
+# BusBuddy - Codecov Integration Setup Script
 
 <#
 .SYNOPSIS
-    Helps set up Codecov integration for Bus Buddy repository
+    Helps set up Codecov integration for BusBuddy repository
 
 .DESCRIPTION
     This script provides guidance and automation for setting up Codecov integration

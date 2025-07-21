@@ -29,7 +29,7 @@ try {
 
     Write-Host "📁 Found $($xamlFiles.Count) XAML files to analyze..." -ForegroundColor White
 
-    ForEach-Object ($file in $xamlFiles) {
+    foreach ($file in $xamlFiles) {
         try {
             $content = Get-Content $file.FullName -Raw
             $fileName = $file.Name
@@ -38,7 +38,7 @@ try {
             # Check for double-dash corruption in XML comments
             if ($content -match '--(?!>)') {
                 $regexMatches = [regex]::Matches($content, '--(?!>)')
-                ForEach-Object ($match in $regexMatches) {
+                foreach ($match in $regexMatches) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $issues += "$relativePath($lineNumber): Contains double-dash in XML comments"
                     Write-Host "⚠️ $fileName($lineNumber): Double-dash in XML comments" -ForegroundColor Yellow
@@ -48,7 +48,7 @@ try {
             # Check for empty elements that should be self-closed
             if ($content -match '<([^>/\s]+)[^>]*>\s*</\1>') {
                 $regexMatches2 = [regex]::Matches($content, '<([^>/\s]+)[^>]*>\s*</\1>')
-                ForEach-Object ($match in $regexMatches2) {
+                foreach ($match in $regexMatches2) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $elementName = $match.Groups[1].Value
                     $issues += "$relativePath($lineNumber): Empty element '$elementName' should be self-closed"
@@ -59,7 +59,7 @@ try {
             # Check for invalid x:Name format
             if ($content -match 'x:Name\s*=\s*"[^"]*[^A-Za-z0-9_][^"]*"') {
                 $regexMatches3 = [regex]::Matches($content, 'x:Name\s*=\s*"([^"]*[^A-Za-z0-9_][^"]*)"')
-                ForEach-Object ($match in $regexMatches3) {
+                foreach ($match in $regexMatches3) {
                     $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                     $invalidName = $match.Groups[1].Value
                     $issues += "$relativePath($lineNumber): Invalid x:Name format: '$invalidName'"
@@ -70,7 +70,7 @@ try {
             # Check for malformed attribute syntax
             if ($content -match '\s[A-Za-z]+\s*=\s*[^"]') {
                 $regexMatches4 = [regex]::Matches($content, '\s([A-Za-z]+)\s*=\s*([^"\s>]+)')
-                ForEach-Object ($match in $regexMatches4) {
+                foreach ($match in $regexMatches4) {
                     if ($match.Groups[2].Value -notmatch '^(true|false|\d+)$') {
                         $lineNumber = ($content.Substring(0, $match.Index) -split "`n").Count
                         $attrName = $match.Groups[1].Value
@@ -85,7 +85,8 @@ try {
             try {
                 $null = [xml]$content
                 Write-Host "✅ $fileName`: Well-formed XML" -ForegroundColor Green
-            } catch {
+            }
+            catch {
                 $issues += "$relativePath`: XML parsing error: $($_.Exception.Message)"
                 Write-Host "❌ $fileName`: XML parsing error: $($_.Exception.Message)" -ForegroundColor Red
             }
@@ -100,12 +101,14 @@ try {
                             Write-Host "🔍 $fileName`: $_" -ForegroundColor Magenta
                         }
                     }
-                } catch {
+                }
+                catch {
                     # Advanced tools not fully available, continue with basic checks
                 }
             }
 
-        } catch {
+        }
+        catch {
             $issues += "$($file.Name): Analysis error: $($_.Exception.Message)"
             Write-Host "❌ $($file.Name): Analysis error: $($_.Exception.Message)" -ForegroundColor Red
         }
@@ -114,7 +117,8 @@ try {
     # Output summary
     if ($issues.Count -eq 0) {
         Write-Host '🎉 No XAML corruption detected!' -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "🔧 Found $($issues.Count) potential XAML issues:" -ForegroundColor Yellow
 
         # Group-Object issues by type for better reporting
@@ -135,12 +139,14 @@ try {
         if ($errorIssues.Count -gt 0) {
             Write-Host "`n💡 Fix XML parsing errors before proceeding with development." -ForegroundColor Cyan
             exit 1
-        } else {
+        }
+        else {
             Write-Host "`n💡 Review and fix warnings to improve code quality." -ForegroundColor Cyan
         }
     }
 
-} catch {
+}
+catch {
     Write-Host "❌ XAML corruption check failed: $_" -ForegroundColor Red
     exit 1
 }

@@ -1,3 +1,9 @@
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
@@ -5,14 +11,8 @@ using BusBuddy.WPF.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using Syncfusion.UI.Xaml.Scheduler;
-using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Text;
-using System.IO;
 using Serilog;
+using Syncfusion.UI.Xaml.Scheduler;
 
 namespace BusBuddy.WPF.ViewModels.Schedule
 {
@@ -409,8 +409,8 @@ namespace BusBuddy.WPF.ViewModels.Schedule
 
                 try
                 {
-                    // Create and show the schedule details dialog with proper DI
-                    var detailsDialog = new Views.Schedule.ScheduleDetailsDialog(SelectedSchedule, _serviceProvider);
+                    // Create and show the schedule details dialog with proper DI and disposal
+                    using var detailsDialog = new Views.Schedule.ScheduleDetailsDialog(SelectedSchedule, _serviceProvider);
                     detailsDialog.Owner = System.Windows.Application.Current.MainWindow;
                     detailsDialog.ShowDialog();
                 }

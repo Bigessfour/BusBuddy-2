@@ -1,7 +1,7 @@
+using System.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System.Data;
 
 namespace BusBuddy.Core.Utilities;
 
@@ -13,8 +13,7 @@ public class DatabaseResilienceService
 {
     private static readonly ILogger Logger = Log.ForContext<DatabaseResilienceService>();
     private readonly TimeSpan _circuitBreakerTimeout = TimeSpan.FromMinutes(5);
-    private DateTime _lastFailureTime = DateTime.MinValue;
-    private int _consecutiveFailures = 0;
+    private DateTime _lastFailureTime = DateTime.MinValue; private int _consecutiveFailures;
     private const int MaxConsecutiveFailures = 3;
 
     public DatabaseResilienceService()

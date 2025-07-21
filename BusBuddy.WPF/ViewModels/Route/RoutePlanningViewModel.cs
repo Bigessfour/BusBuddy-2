@@ -1,9 +1,9 @@
-using BusBuddy.Core.Models;
-using BusBuddy.WPF.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using BusBuddy.Core.Models;
+using BusBuddy.WPF.Services;
 
 namespace BusBuddy.WPF.ViewModels
 {
@@ -52,10 +52,14 @@ namespace BusBuddy.WPF.ViewModels
             var routes = await _routePopulationScaffold.GetOptimizedRoutesAsync();
             Routes.Clear();
             foreach (var route in routes)
+            {
                 Routes.Add(route);
+            }
             OptimizedRoutes.Clear();
             foreach (var route in routes)
+            {
                 OptimizedRoutes.Add(route);
+            }
             OnPropertyChanged(nameof(Routes));
             OnPropertyChanged(nameof(OptimizedRoutes));
         }
@@ -65,7 +69,9 @@ namespace BusBuddy.WPF.ViewModels
             var optimized = await _routePopulationScaffold.GetOptimizedRoutesAsync();
             OptimizedRoutes.Clear();
             foreach (var route in optimized)
+            {
                 OptimizedRoutes.Add(route);
+            }
             OnPropertyChanged(nameof(OptimizedRoutes));
         }
 

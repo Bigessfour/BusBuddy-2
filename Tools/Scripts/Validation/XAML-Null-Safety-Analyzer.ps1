@@ -1,7 +1,7 @@
 ﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
-    XAML Null Safety Analyzer for Bus Buddy
+    XAML Null Safety Analyzer for BusBuddy
 
 .DESCRIPTION
     Analyzes XAML bindings for null reference vulnerabilities and suggests safer alternatives.
@@ -154,7 +154,7 @@ function Test-BusBuddyNullSafety {
 
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
-        Write-Error '❌ Bus Buddy project root not found'
+        Write-Error '❌ BusBuddy project root not found'
         return
     }
 
@@ -179,7 +179,7 @@ function Test-BusBuddyNullSafety {
     }
 }
 
-# Import Bus Buddy project helper if available
+# Import BusBuddy project helper if available
 if (Get-Command Get-BusBuddyProjectRoot -ErrorAction SilentlyContinue) {
     # Already available
 } else {

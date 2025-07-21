@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
+using BusBuddy.WPF.Models;
 using BusBuddy.WPF.ViewModels.Student;
 
 namespace BusBuddy.WPF.Converters

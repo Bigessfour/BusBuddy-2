@@ -10,10 +10,6 @@
     <UseWPF>true</UseWPF>
     <UserSecretsId>ff9695ed-d3b1-41ee-b7bc-9731b55a8757</UserSecretsId>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-
-    <!-- Enable NuGet Package Locking for reproducible builds -->
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 
   <ItemGroup>
@@ -104,6 +100,9 @@
     <Compile Update="Views\Student\AssignRouteDialog.xaml.cs">
       <DependentUpon>AssignRouteDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\Schedule\ScheduleDetailsDialog.xaml.cs">
+      <DependentUpon>ScheduleDetailsDialog.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -158,6 +157,9 @@
     <Page Update="Views\StudentListView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\Schedule\ScheduleDetailsDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
@@ -208,6 +210,9 @@
     <PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="30.1.40" />
     <PackageReference Include="Syncfusion.SfProgressBar.WPF" Version="30.1.40" />
     <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="30.1.40" />
+
+    <!-- BUTTON AND COMBOBOX CONTROLS (included in SfInput.WPF) -->
+    <!-- SfButton and SfComboBox are included in Syncfusion.SfInput.WPF package -->
 
     <!-- SPECIALIZED CONTROL PACKAGES -->
     <PackageReference Include="Syncfusion.SfChat.WPF" Version="30.1.40" />

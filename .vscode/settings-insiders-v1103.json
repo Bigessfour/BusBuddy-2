@@ -57,9 +57,9 @@
   // =============================================================================
   // TERMINAL INTEGRATION (INSIDERS v1.103.0 FEATURES)
   // =============================================================================
-  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2 (Bus Buddy)",
+  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2 (BusBuddy)",
   "terminal.integrated.profiles.windows": {
-    "PowerShell 7.5.2 (Bus Buddy)": {
+    "PowerShell 7.5.2 (BusBuddy)": {
       "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
       "args": [
         "-NoExit",

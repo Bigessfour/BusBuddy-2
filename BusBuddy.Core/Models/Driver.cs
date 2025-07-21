@@ -21,7 +21,7 @@ public class Driver : INotifyPropertyChanged
     private string? _state;
     private string? _zip;
     private string _driversLicenceType = string.Empty;
-    private bool _trainingComplete = false;
+    private bool _trainingComplete;
     private string _status = "Active";
 
     [Key]

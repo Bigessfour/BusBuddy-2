@@ -1,7 +1,7 @@
 ﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
-    XAML Performance Analyzer for Bus Buddy
+    XAML Performance Analyzer for BusBuddy
 
 .DESCRIPTION
     Analyzes XAML for performance bottlenecks and suggests optimizations.
@@ -101,7 +101,7 @@ function Test-XamlPerformance {
 function Invoke-XamlPerformanceCheck {
     <#
     .SYNOPSIS
-        Bus Buddy XAML performance analyzer
+        BusBuddy XAML performance analyzer
     .EXAMPLE
         Invoke-XamlPerformanceCheck
         Invoke-XamlPerformanceCheck -Path "Views\Dashboard" -ShowMetrics
@@ -116,7 +116,7 @@ function Invoke-XamlPerformanceCheck {
 
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
-        Write-Host "❌ Bus Buddy project root not found" -ForegroundColor Red
+        Write-Host "❌ BusBuddy project root not found" -ForegroundColor Red
         return
     }
 
@@ -174,7 +174,7 @@ function Invoke-XamlPerformanceCheck {
     }
 }
 
-# Import Bus Buddy project helper if available
+# Import BusBuddy project helper if available
 if (-not (Get-Command Get-BusBuddyProjectRoot -ErrorAction SilentlyContinue)) {
     function Get-BusBuddyProjectRoot {
         $currentPath = $PWD.Path

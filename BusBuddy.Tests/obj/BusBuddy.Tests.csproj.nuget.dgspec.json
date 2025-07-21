@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj": {
-      "version": "1.0.0",
+      "version": "1.0.0-dev",
       "restore": {
         "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Core\\BusBuddy.Core.csproj",
         "projectName": "BusBuddy.Core",
@@ -157,7 +157,7 @@
       }
     },
     "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj": {
-      "version": "1.0.0",
+      "version": "1.0.0-dev",
       "restore": {
         "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.Tests\\BusBuddy.Tests.csproj",
         "projectName": "BusBuddy.Tests",
@@ -222,10 +222,6 @@
               "target": "Package",
               "version": "[17.14.1, )"
             },
-            "Moq": {
-              "target": "Package",
-              "version": "[4.20.72, )"
-            },
             "NUnit": {
               "target": "Package",
               "version": "[3.14.0, )"
@@ -237,12 +233,6 @@
             "NUnit3TestAdapter": {
               "target": "Package",
               "version": "[4.5.0, )"
-            },
-            "coverlet.collector": {
-              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[6.0.4, )"
             }
           },
           "imports": [
@@ -269,7 +259,7 @@
       }
     },
     "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj": {
-      "version": "1.0.0",
+      "version": "1.0.0-dev",
       "restore": {
         "projectUniqueName": "C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy\\BusBuddy.WPF\\BusBuddy.WPF.csproj",
         "projectName": "BusBuddy.WPF",

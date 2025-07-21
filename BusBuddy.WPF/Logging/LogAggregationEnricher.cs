@@ -1,10 +1,10 @@
-using Serilog.Core;
-using Serilog.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace BusBuddy.WPF.Logging
 {
@@ -15,7 +15,6 @@ namespace BusBuddy.WPF.Logging
     public class LogAggregationEnricher : ILogEventEnricher
     {
         private static readonly ConcurrentDictionary<string, LogEventGroup> _eventGroups = new();
-        private static readonly Timer _aggregationTimer;
         private static readonly object _lockObject = new object();
 
         // Configuration for aggregation behavior
@@ -23,13 +22,10 @@ namespace BusBuddy.WPF.Logging
         private const int MAX_SIMILAR_EVENTS = 3;
         private const int CLEANUP_INTERVAL_SECONDS = 30;
 
-        static LogAggregationEnricher()
-        {
-            // Timer to periodically clean up old event groups
-            _aggregationTimer = new Timer(CleanupExpiredGroups, null,
-                TimeSpan.FromSeconds(CLEANUP_INTERVAL_SECONDS),
-                TimeSpan.FromSeconds(CLEANUP_INTERVAL_SECONDS));
-        }
+        // Timer to periodically clean up old event groups
+        private static readonly Timer _aggregationTimer = new Timer(CleanupExpiredGroups, null,
+            TimeSpan.FromSeconds(CLEANUP_INTERVAL_SECONDS),
+            TimeSpan.FromSeconds(CLEANUP_INTERVAL_SECONDS));
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
@@ -105,11 +101,15 @@ namespace BusBuddy.WPF.Logging
         {
             // Don't aggregate startup events (they're important to see individually)
             if (messageTemplate.Contains("STARTUP", StringComparison.OrdinalIgnoreCase))
+            {
                 return false;
+            }
 
             // Don't aggregate error events (always show errors)
             if (eventGroup.Level >= LogEventLevel.Warning)
+            {
                 return false;
+            }
 
             // Aggregate if we've seen this event multiple times within the window
             var timeSinceFirst = DateTimeOffset.Now - eventGroup.FirstOccurrence;
@@ -120,30 +120,48 @@ namespace BusBuddy.WPF.Logging
         private static string GetAggregationReason(LogEventGroup eventGroup)
         {
             if (eventGroup.Count > MAX_SIMILAR_EVENTS * 2)
+            {
                 return "HighFrequency";
+            }
             else if (eventGroup.Count > MAX_SIMILAR_EVENTS)
+            {
                 return "RepeatedEvent";
+            }
             else
+            {
                 return "SimilarPattern";
+            }
         }
 
         private static string CategorizeLogEvent(string messageTemplate)
         {
             if (messageTemplate.Contains("STARTUP", StringComparison.OrdinalIgnoreCase))
+            {
                 return "Startup";
+            }
             else if (messageTemplate.Contains("UI", StringComparison.OrdinalIgnoreCase) ||
                      messageTemplate.Contains("View", StringComparison.OrdinalIgnoreCase))
+            {
                 return "UserInterface";
+            }
             else if (messageTemplate.Contains("Database", StringComparison.OrdinalIgnoreCase) ||
                      messageTemplate.Contains("SQL", StringComparison.OrdinalIgnoreCase))
+            {
                 return "Database";
+            }
             else if (messageTemplate.Contains("cache", StringComparison.OrdinalIgnoreCase))
+            {
                 return "Caching";
+            }
             else if (messageTemplate.Contains("ms", StringComparison.OrdinalIgnoreCase) ||
                      messageTemplate.Contains("performance", StringComparison.OrdinalIgnoreCase))
+            {
                 return "Performance";
+            }
             else
+            {
                 return "General";
+            }
         }
 
         private static string CreateCondensedSummary(LogEventGroup eventGroup, string messageTemplate)

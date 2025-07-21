@@ -1,8 +1,8 @@
-using Serilog;
-using Syncfusion.SfSkinManager;
 using System;
 using System.Linq;
 using System.Windows;
+using Serilog;
+using Syncfusion.SfSkinManager;
 
 namespace BusBuddy.WPF.Services
 {
@@ -62,7 +62,8 @@ namespace BusBuddy.WPF.Services
 
                 // CRITICAL: Set global theme FIRST before applying to individual windows
                 SfSkinManager.ApplyThemeAsDefaultStyle = true;
-                SfSkinManager.ApplicationTheme = new Theme(themeName);
+                using var globalTheme = new Theme(themeName);
+                SfSkinManager.ApplicationTheme = globalTheme;
 
                 // Update current theme
                 _currentTheme = themeName;
@@ -70,17 +71,20 @@ namespace BusBuddy.WPF.Services
                 // Apply theme to ALL windows in the application
                 if (Application.Current != null)
                 {
+                    // Create theme once and reuse to avoid multiple disposals
+                    using var theme = new Theme(themeName);
+
                     // Apply to main window EXPLICITLY
                     if (Application.Current.MainWindow != null)
                     {
-                        SfSkinManager.SetTheme(Application.Current.MainWindow, new Theme(themeName));
+                        SfSkinManager.SetTheme(Application.Current.MainWindow, theme);
                         Logger.Debug("[DEBUG] ThemeService.ApplyTheme: Applied theme to MainWindow");
                     }
 
                     // Apply to ALL other windows (including popups, dialogs, etc.)
                     foreach (Window window in Application.Current.Windows)
                     {
-                        SfSkinManager.SetTheme(window, new Theme(themeName));
+                        SfSkinManager.SetTheme(window, theme);
                         Logger.Debug("[DEBUG] ThemeService.ApplyTheme: Applied theme to window: {WindowType}", window.GetType().Name);
                     }
 
@@ -133,7 +137,10 @@ namespace BusBuddy.WPF.Services
         /// </summary>
         private void RefreshVisualTree(DependencyObject parent)
         {
-            if (parent == null) return;
+            if (parent == null)
+            {
+                return;
+            }
 
             // Refresh the current element
             if (parent is FrameworkElement element)
@@ -201,7 +208,8 @@ namespace BusBuddy.WPF.Services
 
                 // Set global defaults for all Syncfusion controls
                 SfSkinManager.ApplyThemeAsDefaultStyle = true;
-                SfSkinManager.ApplicationTheme = new Theme(_currentTheme);
+                using var initTheme = new Theme(_currentTheme);
+                SfSkinManager.ApplicationTheme = initTheme;
 
                 // Ensure both primary and fallback themes are registered
                 try

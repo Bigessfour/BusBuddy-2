@@ -1,22 +1,22 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using BusBuddy.WPF.ViewModels;
 using BusBuddy.WPF.Services;
 using BusBuddy.WPF.Utilities;
+using BusBuddy.WPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Context;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
 using Syncfusion.UI.Xaml.NavigationDrawer;
-using Syncfusion.Windows.Tools.Controls;
 using Syncfusion.Windows.Tools;
+using Syncfusion.Windows.Tools.Controls;
 
 namespace BusBuddy.WPF.Views.Main
 {
     /// <summary>
-    /// Main Window for Bus Buddy Application with Enhanced Navigation Drawer and FluentDark Theme
+    /// Main Window for BusBuddy Application with Enhanced Navigation Drawer and FluentDark Theme
     /// </summary>
     public partial class MainWindow : Window
     {

@@ -1,15 +1,15 @@
 // Services/BusBuddyAIReportingService.cs
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Serilog;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace BusBuddy.Core.Services
 {
     /// <summary>
-    /// Advanced AI Reporting Service for Bus Buddy with caching, context awareness, and performance monitoring
+    /// Advanced AI Reporting Service for BusBuddy with caching, context awareness, and performance monitoring
     /// Implements all expert recommendations from xAI API consultation
     /// </summary>
     public class BusBuddyAIReportingService

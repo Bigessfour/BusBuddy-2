@@ -1,21 +1,21 @@
-using BusBuddy.WPF.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
-using Syncfusion.UI.Xaml.Grid;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using BusBuddy.Core.Models;
+using BusBuddy.WPF.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Context;
-using BusBuddy.Core.Models;
+using Syncfusion.UI.Xaml.Grid;
 
 namespace BusBuddy.WPF.Views.Bus
 {
     public partial class BusManagementView : UserControl
     {
         private static readonly ILogger Logger = Log.ForContext<BusManagementView>();
-        private bool _isInitialized = false;
+        private bool _isInitialized;
 
         // Define a static method to check if InitializeComponent exists
         private static readonly bool _initializeComponentExists =

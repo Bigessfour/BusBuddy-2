@@ -1,16 +1,16 @@
 using System;
 using System.Windows.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using BusBuddy.WPF.ViewModels.ScheduleManagement;
 using BusBuddy.WPF;
+using BusBuddy.WPF.ViewModels.ScheduleManagement;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Context;
 
 namespace BusBuddy.WPF.Views.Schedule
 {
     /// <summary>
-    /// Interaction logic for ScheduleView.xaml
-    /// Sports Trips & Routes Schedule Management View
+    /// Interaction logic for ScheduleView.xaml —
+    /// Sports Trips and Routes Schedule Management View
     /// </summary>
     public partial class ScheduleView : UserControl
     {

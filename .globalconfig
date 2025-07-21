@@ -190,7 +190,5 @@ dotnet_diagnostic.SA1503.severity = error       # Braces should not be omitted
 dotnet_diagnostic.SA0001.severity = none        # XML comment analysis disabled for generated code
 dotnet_diagnostic.CS1591.severity = none        # Missing XML comment for publicly visible type or member
 
-# Test project exclusions (applied via Directory.Build.props in test projects)
-[**/Tests/**/*.cs]
-dotnet_diagnostic.SA1600.severity = none        # Elements should be documented (relaxed for tests)
-dotnet_diagnostic.CA1707.severity = none        # Remove underscores from member names (relaxed for test methods)
+# Test project exclusions are handled via Directory.Build.props in test projects
+# Note: Global config sections must use absolute paths, so test exclusions are moved to Directory.Build.props

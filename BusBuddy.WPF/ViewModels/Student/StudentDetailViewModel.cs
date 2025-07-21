@@ -1,11 +1,11 @@
-using BusBuddy.Core.Data.UnitOfWork;
-using BusBuddy.Core.Models;
-using BusBuddy.Core.Services.Interfaces;
-using BusBuddy.WPF;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using BusBuddy.Core.Data.UnitOfWork;
+using BusBuddy.Core.Models;
+using BusBuddy.Core.Services.Interfaces;
+using BusBuddy.WPF;
 using Serilog;
 using Serilog.Context;
 

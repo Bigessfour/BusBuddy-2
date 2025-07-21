@@ -1,10 +1,15 @@
+using System;
+using System.IO;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Threading;
+using AutoMapper;
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Data.UnitOfWork;
 using BusBuddy.WPF.Logging;
 using BusBuddy.WPF.Utilities;
 using BusBuddy.WPF.ViewModels;
 using BusBuddy.WPF.Views.Main;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +18,7 @@ using Serilog;
 using Syncfusion.Licensing;
 using Syncfusion.SfSkinManager;
 using Syncfusion.Themes.FluentDark.WPF;
-using System;
-using System.IO;
-using System.Windows;
-using System.Windows.Threading;
+using Syncfusion.Themes.FluentLight.WPF;
 
 namespace BusBuddy.WPF;
 
@@ -25,7 +27,7 @@ namespace BusBuddy.WPF;
 /// </summary>
 public partial class App : Application
 {
-    private IHost _host;
+    private IHost _host = null!;
 
     /// <summary>
     /// Gets the service provider for the application.
@@ -34,38 +36,8 @@ public partial class App : Application
 
     public App()
     {
-        // Register Syncfusion license
-        RegisterSyncfusionLicense();
-
-        // Configure theme
-        ConfigureSyncfusionTheme();
-
-        // Build host
-        _host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((context, config) =>
-            {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            })
-            .UseSerilog((context, services, configuration) =>
-            {
-                configuration
-                    .ReadFrom.Configuration(context.Configuration)
-                    .Enrich.FromLogContext()
-                    .WriteTo.Console()
-                    .WriteTo.File("logs/application-.log",
-                        rollingInterval: RollingInterval.Day,
-                        shared: true,
-                        flushToDiskInterval: TimeSpan.FromSeconds(1));
-            })
-            .ConfigureServices((context, services) =>
-            {
-                ConfigureServices(services, context.Configuration);
-            })
-            .Build();
-        Services = _host.Services;
-
-        Log.Information("Host built successfully");
+        // Constructor intentionally left empty for better startup performance.
+        // Heavy initialization moved to OnStartup.
     }
 
     private void RegisterSyncfusionLicense()
@@ -106,35 +78,99 @@ public partial class App : Application
     {
         try
         {
-            // Apply FluentDark theme globally using proper SkinManager API
+            // Register custom FluentDark theme settings (Official API)
+            var fluentDarkSettings = new FluentDarkThemeSettings()
+            {
+                PrimaryBackground = new SolidColorBrush(Color.FromRgb(30, 30, 30)), // BusBuddy dark theme
+                PrimaryForeground = new SolidColorBrush(Colors.White),
+                BodyFontSize = 14,
+                HeaderFontSize = 16,
+                SubHeaderFontSize = 15,
+                TitleFontSize = 18,
+                SubTitleFontSize = 16,
+                BodyAltFontSize = 13,
+                FontFamily = new FontFamily("Segoe UI")
+            };
+            SfSkinManager.RegisterThemeSettings("FluentDark", fluentDarkSettings);
+
+            // Register custom FluentLight theme settings (Official API)
+            var fluentLightSettings = new FluentLightThemeSettings()
+            {
+                PrimaryBackground = new SolidColorBrush(Colors.White),
+                PrimaryForeground = new SolidColorBrush(Colors.Black),
+                BodyFontSize = 14,
+                HeaderFontSize = 16,
+                SubHeaderFontSize = 15,
+                TitleFontSize = 18,
+                SubTitleFontSize = 16,
+                BodyAltFontSize = 13,
+                FontFamily = new FontFamily("Segoe UI")
+            };
+            SfSkinManager.RegisterThemeSettings("FluentLight", fluentLightSettings);
+
+            // Apply FluentDark theme globally using official SkinManager API
             SfSkinManager.ApplyStylesOnApplication = true;
             SfSkinManager.ApplyThemeAsDefaultStyle = true;
 
-            // Set FluentDark theme - proper Syncfusion 30.1.40 API usage
+            // Set FluentDark theme as default - proper Syncfusion 30.1.40 API usage
             SfSkinManager.ApplicationTheme = new Theme("FluentDark");
 
-            Log.Information("Syncfusion FluentDark theme configured successfully using SkinManager");
+            Log.Information("✅ Syncfusion themes configured with custom settings and official API compliance");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to configure Syncfusion FluentDark theme");
+            Log.Error(ex, "❌ Failed to configure Syncfusion themes with custom settings");
 
-            // Fallback to basic theme
+            // Fallback to basic theme configuration
             try
             {
+                SfSkinManager.ApplyStylesOnApplication = true;
+                SfSkinManager.ApplyThemeAsDefaultStyle = true;
                 SfSkinManager.ApplicationTheme = new Theme("FluentDark");
-                Log.Warning("Applied fallback FluentDark theme");
+                Log.Warning("⚠️ Applied fallback FluentDark theme without custom settings");
             }
             catch (Exception fallbackEx)
             {
-                Log.Error(fallbackEx, "Fallback theme configuration also failed");
+                Log.Error(fallbackEx, "❌ Fallback theme configuration also failed");
             }
         }
     }
-
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Register Syncfusion license
+        RegisterSyncfusionLicense();
+
+        // Configure theme
+        ConfigureSyncfusionTheme();
+
+        // Build host
+        _host = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            })
+            .UseSerilog((context, services, configuration) =>
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console()
+                    .WriteTo.File("logs/application-.log",
+                        rollingInterval: RollingInterval.Day,
+                        shared: true,
+                        flushToDiskInterval: TimeSpan.FromSeconds(1));
+            })
+            .ConfigureServices((context, services) =>
+            {
+                ConfigureServices(services, context.Configuration);
+            })
+            .Build();
+        Services = _host.Services;
+
+        Log.Information("Host built successfully");
 
         // Set up exception handlers
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;

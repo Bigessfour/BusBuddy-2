@@ -1,5 +1,5 @@
 {
-  // =============================================================================
+  // =========================================================================if (Test-Path '.\loSet-Location -LiteralPath '${workspaceFolder}'; if (Test-Path '.\load-bus-buddy-profile.ps1') { & '.\load-bus-buddy-profile.ps1'; Write-Host '🚌 BusBuddy Development Environment Loaded!' -ForegroundColor Green; Write-Host 'Available commands: bb-build, bb-run, bb-test, bb-health, bb-diagnostic' -ForegroundColor Cyan } else { Write-Host '⚠️ BusBuddy profiles not found' -ForegroundColor Yellow }d-bus-buddy-profile.ps1') { & '.\load-bus-buddy-profile.ps1' -Quiet; Write-Host '🚌 BusBuddy PowerShell 7.5.2 Environment Ready!' -ForegroundColor Green } else { Write-Host '⚠️ BusBuddy profiles not found in current directory' -ForegroundColor Yellow }===
   // VS CODE INSIDERS v1.103.0 OPTIMIZED CONFIGURATION
   // Version: 1.103.0-insider (user setup)
   // Commit: 3b2551cd990a02383190cc7670021ec6c30b86df
@@ -70,6 +70,42 @@
   "powershell.scriptAnalysis.enable": false,
   "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
   // =============================================================================
+  // TERMINAL PROFILES (POWERSHELL 7.5.2 OPTIMIZED)
+  // =============================================================================
+  "terminal.integrated.profiles.windows": {
+    "PowerShell 7.5.2": {
+      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-NoExit",
+        "-Command",
+        "if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '🚌 BusBuddy PowerShell 7.5.2 Environment Ready!' -ForegroundColor Green } else { Write-Host '⚠️ BusBuddy profiles not found in current directory' -ForegroundColor Yellow }"
+      ],
+      "icon": "terminal-powershell",
+      "color": "terminal.ansiBlue"
+    },
+    "PowerShell 7.5.2 (Clean)": {
+      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "args": [
+        "-NoProfile"
+      ],
+      "icon": "terminal-powershell",
+      "color": "terminal.ansiCyan"
+    },
+    "PowerShell 7.5.2 (BusBuddy Development)": {
+      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-NoExit",
+        "-Command",
+        "Set-Location -LiteralPath '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1'; Write-Host '🚌 BusBuddy Development Environment Loaded!' -ForegroundColor Green; Write-Host 'Available commands: bb-build, bb-run, bb-test, bb-health, bb-diagnostic' -ForegroundColor Cyan } else { Write-Host '⚠️ BusBuddy profiles not found' -ForegroundColor Yellow }"
+      ],
+      "icon": "gear",
+      "color": "terminal.ansiGreen"
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2",
+  // =============================================================================
   // GITHUB ACTIONS EXTENSION CONFIGURATION (WORKFLOW VALIDATION)
   // =============================================================================
   "github-actions.workflows.pinned.refresh.enabled": true,
@@ -131,6 +167,19 @@
   "xaml.validation.syntaxValidation": true,
   "xaml.validation.schemaValidation": true,
   "xaml.validation.namespaceValidation": true,
+  // =============================================================================
+  // NOESIS XAML TOOLS CONFIGURATION
+  // =============================================================================
+  "noesisXAML.enablePreview": true,
+  "noesisXAML.enableColorDecorators": true,
+  "noesisXAML.enableDiagnostics": true,
+  "noesisXAML.enableCompletion": true,
+  "noesisXAML.enableHover": true,
+  "noesisXAML.enableGoToDefinition": true,
+  "noesisXAML.enableFindReferences": true,
+  "noesisXAML.enableRename": true,
+  "noesisXAML.enableCodeActions": true,
+  "noesisXAML.enableSemanticHighlighting": true,
   "json.validate.enable": true,
   "json.format.enable": true,
   "json.format.keepLines": false,
@@ -171,7 +220,7 @@
     }
   },
   "[xaml]": {
-    "editor.defaultFormatter": "dabbinavo.xamlstyler",
+    "editor.defaultFormatter": "ms-dotnettools.csharp",
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
     "editor.insertSpaces": true,

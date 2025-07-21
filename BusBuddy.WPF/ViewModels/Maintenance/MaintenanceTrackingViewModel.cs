@@ -1,13 +1,13 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.Views.Maintenance;
 using Serilog;
 using Serilog.Context;
-using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Windows;
 
 // Disable async method without await operator warnings
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -78,12 +78,16 @@ namespace BusBuddy.WPF.ViewModels
                     MaintenanceRecords.Clear();
                     var records = await _maintenanceService.GetAllMaintenanceRecordsAsync();
                     foreach (var record in records)
+                    {
                         MaintenanceRecords.Add(record);
+                    }
 
                     AvailableBuses.Clear();
                     var buses = await _busService.GetAllBusesAsync();
                     foreach (var bus in buses)
+                    {
                         AvailableBuses.Add(bus);
+                    }
 
                     Logger.Information("Loaded {RecordCount} maintenance records and {BusCount} buses",
                         MaintenanceRecords.Count, AvailableBuses.Count);
@@ -96,7 +100,10 @@ namespace BusBuddy.WPF.ViewModels
             try
             {
                 var firstBus = AvailableBuses.Count > 0 ? AvailableBuses[0] : null;
-                if (firstBus == null) return;
+                if (firstBus == null)
+                {
+                    return;
+                }
 
                 var newRecord = new Maintenance
                 {
@@ -131,7 +138,10 @@ namespace BusBuddy.WPF.ViewModels
 
         private async Task EditRecordAsync()
         {
-            if (SelectedRecord == null) return;
+            if (SelectedRecord == null)
+            {
+                return;
+            }
 
             try
             {
@@ -190,7 +200,10 @@ namespace BusBuddy.WPF.ViewModels
         }
         private async Task DeleteRecordAsync()
         {
-            if (SelectedRecord == null) return;
+            if (SelectedRecord == null)
+            {
+                return;
+            }
 
             try
             {
