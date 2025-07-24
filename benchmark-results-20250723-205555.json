@@ -1,0 +1,66 @@
+{
+  "ParallelResults": [
+    {
+      "ItemCount": 50,
+      "SequentialMs": 880.0,
+      "ParallelMs": 249.0,
+      "Speedup": 3.53,
+      "Efficiency": "29.4%",
+      "ThreadsUsed": 12
+    },
+    {
+      "ItemCount": 100,
+      "SequentialMs": 1695.0,
+      "ParallelMs": 332.0,
+      "Speedup": 5.11,
+      "Efficiency": "42.6%",
+      "ThreadsUsed": 12
+    },
+    {
+      "ItemCount": 200,
+      "SequentialMs": 3382.0,
+      "ParallelMs": 583.0,
+      "Speedup": 5.8,
+      "Efficiency": "48.3%",
+      "ThreadsUsed": 12
+    },
+    {
+      "ItemCount": 500,
+      "SequentialMs": 8397.0,
+      "ParallelMs": 1299.0,
+      "Speedup": 6.46,
+      "Efficiency": "53.8%",
+      "ThreadsUsed": 12
+    }
+  ],
+  "ProfileLoadTime": 1209.0851,
+  "PowerShellVersion": {
+    "Major": 7,
+    "Minor": 6,
+    "Patch": 0,
+    "PreReleaseLabel": "preview.4",
+    "BuildLabel": null
+  },
+  "BuildTimes": [],
+  "Timestamp": "2025-07-23T20:55:55.420212-06:00",
+  "SystemInfo": {
+    "ProcessorCount": 12,
+    "BusBuddyTargetFramework": "net8.0",
+    "IsNet8Plus": false,
+    "DotNetVersion": ".NET 10.0.0-preview.2.25163.2",
+    "PowerShellVersion": {
+      "Major": 7,
+      "Minor": 6,
+      "Patch": 0,
+      "PreReleaseLabel": "preview.4",
+      "BuildLabel": null
+    },
+    "IsCore": true,
+    "LogicalProcessors": 12,
+    "HyperthreadingEnabled": true,
+    "MaxParallelism": 12,
+    "IsNet9Plus": false,
+    "IsNet8": false,
+    "Is76Plus": true
+  }
+}

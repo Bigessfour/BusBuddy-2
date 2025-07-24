@@ -27,6 +27,29 @@ build-error-analysis.json
 *.tlog
 
 # ===================================================
+# DEVELOPMENT TOOLS AND AUTOMATION
+# ===================================================
+# Allow important development automation files
+!check-admin.bat
+!run-admin-optimization.bat
+!run-dell-optimization.ps1
+!start-admin-optimization.ps1
+!fix-execution-policy.ps1
+!QUICK-START.md
+!Documentation/HOME-COMPUTER-SETUP-GUIDE.md
+!Documentation/PROGRESS-TRACKING-GUIDE.md
+
+# Benchmark and performance testing
+!benchmark-*.ps1
+!benchmark-results-*.json
+
+# Test settings and configurations
+!testsettings.runsettings.xml
+
+# VS Code development configurations
+!.vscode/powershell-problem-matcher.json
+
+# ===================================================
 # POWERSHELL CONFIGURATION AND SCRIPTS
 # ===================================================
 # Exclude general PowerShell files
@@ -42,6 +65,20 @@ powershell_ise_transcript.*.txt
 !.vscode/BusBuddy-Advanced-Workflows.ps1
 !Tools/Scripts/*.ps1
 !PSScriptAnalyzerSettings.psd1
+!PowerShell-Compatibility-Wrapper.psm1
+!PowerShell-Session-Persistence.ps1
+!PowerShell-ExecutionPolicy-Fix-Guide.md
+!POWERSHELL-PROFILE-GUIDE.md
+!steve-happiness-tracker.ps1
+!benchmark-*.ps1
+!test-*.ps1
+!validate-*.ps1
+!optimize-*.ps1
+!Load-AdminFunctions.ps1
+
+# Exclude PowerShell session transcripts and sensitive admin files
+EMERGENCY_*.ps1
+IMMEDIATE_*.ps1
 
 # PowerShell session logs and diagnostic reports
 session-errors-*.json
@@ -735,13 +772,34 @@ build-artifacts/
 large-files/
 
 # ===================================================
-# FINAL AI SECURITY LOCKDOWN
+# AI-ASSISTANT PRIVATE TOOL EXCLUSION
+# ===================================================
+# Keep AI-Assistant tool private - not ready for public GitHub community
+AI-Assistant/
+**/AI-Assistant/**
+AI-Assistant.*
+
+# AI-Assistant related files and outputs
+ai-assistant.*
+*ai-assistant*
+start-ai-busbuddy.*
+smart-build-intelligence*
+smart-runtime-intelligence*
+syncfusion-api-analyzer*
+
+# Private development notes (remove before public release)
+PRIVATE-REPO-CLEANUP-NOTES.md
+*PRIVATE*.md
+*private*.md
+
+# NOTE: Before making repository public, remove AI-Assistant
+# references from README.md (lines containing "AI-Assistant")# ===================================================
+# FINAL AI SECURITY LOCKDOWN & PHD MENTOR SYSTEM
 # ===================================================
 # Absolute prevention of AI tools and XAI keys in repository
 # This section overrides any previous inclusion patterns
 
 # Complete AI directory exclusion (no exceptions)
-AI-Assistant/
 XAI-Integration/
 ai-tools/
 xai-tools/
@@ -775,3 +833,26 @@ grok-tools/
 ai-integration-*
 xai-integration-*
 grok-integration-*
+
+# PhD Mentor System Files - ALLOW THESE SPECIFIC FILES
+# These are safe to track as they contain no hardcoded keys
+!unlock-phd-mentor.ps1
+!phd-mentor-helper.ps1
+!FUTURE-AI-AGENTS-PhD-MENTOR-GUIDE.md
+
+# PhD Mentor Generated Files - EXCLUDE THESE
+phd-mentor-response-*.txt
+phd-mentor-access.log
+phd-mentor-error.log
+
+# Additional XAI Service Files in BusBuddy.Core and BusBuddy.WPF
+# Allow these as they are part of the application architecture
+!BusBuddy.Core/Configuration/XAIDocumentationSettings.cs
+!BusBuddy.Core/Services/*XAI*.cs
+!BusBuddy.WPF/Services/*XAI*.cs
+!BusBuddy.WPF/Services/XAI/
+!BusBuddy.WPF/ViewModels/**/XAI*
+!BusBuddy.WPF/Views/XAI/
+
+# Steve Happiness Tracker - ALLOW
+!steve-happiness-tracker.ps1
