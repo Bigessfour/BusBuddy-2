@@ -738,6 +738,51 @@ FolderProfile.pubxml.user
 !logs/health-*.log
 
 # ===================================================
+# GITHUB FILE SIZE LIMITS & BINARY PROTECTION
+# ===================================================
+# GitHub has a strict file size limit of 100MB per file
+# Files larger than 50MB will trigger a warning
+# Files larger than 100MB will be rejected
+
+# Large binary files that should never be committed
+*.dll
+*.exe
+*.msi
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+*.bz2
+*.iso
+*.dmg
+*.pkg
+*.deb
+*.rpm
+
+# Syncfusion binaries (can be very large)
+**/Syncfusion*.dll
+**/syncfusion*.dll
+Syncfusion*/
+syncfusion*/
+
+# .NET runtime and framework files
+**/Microsoft.*.dll
+**/System.*.dll
+**/netstandard*.dll
+**/mscorlib*.dll
+
+# For large files, consider:
+# 1. Using Git LFS: https://git-lfs.github.com/
+# 2. Keeping large files in separate storage (Azure Blob, S3)
+# 3. Using .gitattributes to configure Git LFS for specific file types
+#
+# To setup Git LFS:
+# $ git lfs install
+# $ git lfs track "*.psd" "*.pdf" "*.zip"
+# $ git add .gitattributes
+
+# ===================================================
 # GITHUB FILE SIZE LIMITS
 # ===================================================
 # GitHub has a strict file size limit of 100MB per file
