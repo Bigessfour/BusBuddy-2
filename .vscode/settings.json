@@ -1,15 +1,8 @@
 {
-  // =========================================================================if (Test-Path '.\loSet-Location -LiteralPath '${workspaceFolder}'; if (Test-Path '.\load-bus-buddy-profile.ps1') { & '.\load-bus-buddy-profile.ps1'; Write-Host '🚌 BusBuddy Development Environment Loaded!' -ForegroundColor Green; Write-Host 'Available commands: bb-build, bb-run, bb-test, bb-health, bb-diagnostic' -ForegroundColor Cyan } else { Write-Host '⚠️ BusBuddy profiles not found' -ForegroundColor Yellow }d-bus-buddy-profile.ps1') { & '.\load-bus-buddy-profile.ps1' -Quiet; Write-Host '🚌 BusBuddy PowerShell 7.5.2 Environment Ready!' -ForegroundColor Green } else { Write-Host '⚠️ BusBuddy profiles not found in current directory' -ForegroundColor Yellow }===
-  // VS CODE INSIDERS v1.103.0 OPTIMIZED CONFIGURATION
-  // Version: 1.103.0-insider (user setup)
-  // Commit: 3b2551cd990a02383190cc7670021ec6c30b86df
-  // Date: 2025-07-18T05:03:37.281Z
-  // Electron: 35.6.0, Chromium: 134.0.6998.205, Node.js: 22.15.1
-  // =============================================================================
-  // CORE INSIDERS FEATURES AND SETTINGS SYNC
   "settingsSync.keybindingsPerPlatform": false,
   "settingsSync.ignoredExtensions": [],
   "settingsSync.ignoredSettings": [],
+  // 🤖 AI-ASSISTANT FIRST POLICY - READ .vscode/instructions.md
   "agentic.completenessPriority": true,
   "agentic.preferTerminalCommands": true,
   "agentic.avoidTaskSystemFallback": true,
@@ -19,6 +12,7 @@
   "agentic.addressAllWarnings": true,
   "agentic.warningsNotErrors": true,
   "agentic.fixWarningMessages": true,
+  "agentic.aiAssistantFirst": true,
   "files.watcherExclude": {
     "**/bin/**": true,
     "**/obj/**": true,
@@ -44,9 +38,6 @@
   "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.useModernNet": true,
   "omnisharp.maxProjectFileCountForDiagnosticAnalysis": 500,
-  // =============================================================================
-  // POWERSHELL 7.5.2 EXTENSION v2025.2.0 INTEGRATION (INSIDERS OPTIMIZED)
-  // =============================================================================
   "powershell.powerShellAdditionalExePaths": {
     "PowerShell 7.5.2": "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
   },
@@ -60,29 +51,47 @@
   "powershell.integratedConsole.useLegacyReadLine": false,
   "powershell.integratedConsole.forceClearScrollbackBuffer": false,
   "powershell.integratedConsole.executeInCurrentScope": true,
-  "powershell.analyzeOpenDocumentsOnly": true,
+  "powershell.analyzeOpenDocumentsOnly": false,
   "powershell.debugging.createTemporaryIntegratedConsole": false,
   "powershell.developer.editorServicesLogLevel": "Information",
   "powershell.developer.waitForSessionFileTimeoutSeconds": 240,
   "powershell.buttons.showRunButtons": true,
   "powershell.buttons.showPanelMovementButtons": true,
   "powershell.promptToUpdatePowerShell": false,
-  "powershell.scriptAnalysis.enable": false,
+  "powershell.scriptAnalysis.enable": true,
   "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
-  // =============================================================================
-  // TERMINAL PROFILES (POWERSHELL 7.5.2 OPTIMIZED)
-  // =============================================================================
+  "powershell.scriptAnalysis.enableReferencesCodeLens": false,
+  "powershell.scriptAnalysis.enableDiagnosticSuppression": true,
+  "powershell.scriptAnalysis.excludePatterns": [
+    "**/*.Tests.ps1",
+    "**/bin/**",
+    "**/obj/**",
+    "**/AI-Assistant/Demos/**"
+  ],
+  "powershell.codeFormatting.preset": "None",
+  "powershell.codeFormatting.alignPropertyValuePairs": false,
+  "powershell.codeFormatting.autoCorrectAliases": false,
+  "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": false,
+  "powershell.codeFormatting.trimWhitespaceAroundPipe": false,
+  "powershell.codeFormatting.useConstantStrings": false,
+  "powershell.codeFormatting.useCorrectCasing": false,
+  "powershell.enableReferencesCodeLens": false,
+  "powershell.pester.codeLens": false,
+  "powershell.errorAction": "Continue",
+  "powershell.warningAction": "Continue",
+  "powershell.informationAction": "SilentlyContinue",
+  "powershell.verboseAction": "SilentlyContinue",
+  "powershell.debugAction": "SilentlyContinue",
   "terminal.integrated.profiles.windows": {
-    "PowerShell 7.5.2": {
+    "PowerShell 7.5.2 (BusBuddy)": {
       "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
       "args": [
-        "-NoProfile",
         "-NoExit",
-        "-Command",
-        "if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '🚌 BusBuddy PowerShell 7.5.2 Environment Ready!' -ForegroundColor Green } else { Write-Host '⚠️ BusBuddy profiles not found in current directory' -ForegroundColor Yellow }"
+        "-File",
+        "${workspaceFolder}\\BusBuddy-PowerShell-Profile-7.5.2.ps1"
       ],
       "icon": "terminal-powershell",
-      "color": "terminal.ansiBlue"
+      "color": "terminal.ansiGreen"
     },
     "PowerShell 7.5.2 (Clean)": {
       "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
@@ -91,23 +100,12 @@
       ],
       "icon": "terminal-powershell",
       "color": "terminal.ansiCyan"
-    },
-    "PowerShell 7.5.2 (BusBuddy Development)": {
-      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
-      "args": [
-        "-NoProfile",
-        "-NoExit",
-        "-Command",
-        "Set-Location -LiteralPath '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1'; Write-Host '🚌 BusBuddy Development Environment Loaded!' -ForegroundColor Green; Write-Host 'Available commands: bb-build, bb-run, bb-test, bb-health, bb-diagnostic' -ForegroundColor Cyan } else { Write-Host '⚠️ BusBuddy profiles not found' -ForegroundColor Yellow }"
-      ],
-      "icon": "gear",
-      "color": "terminal.ansiGreen"
     }
   },
-  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2",
-  // =============================================================================
-  // GITHUB ACTIONS EXTENSION CONFIGURATION (WORKFLOW VALIDATION)
-  // =============================================================================
+  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2 (BusBuddy)",
+  "terminal.integrated.env.windows": {
+    "BUSBUDDY_AI_MODE": "enabled"
+  },
   "github-actions.workflows.pinned.refresh.enabled": true,
   "github-actions.workflows.pinned.workflows": [
     ".github/workflows/build-and-test.yml"
@@ -124,11 +122,12 @@
     "!ENV scalar",
     "!ENV sequence"
   ],
-  // =============================================================================
-  // .NET AND OMNISHARP CONFIGURATION
-  // =============================================================================
   "dotnet.server.useOmnisharp": false,
+  "dotnet.server.crashReporting.enabled": true,
   "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+  "dotnet.completion.showNameCompletionSuggestions": true,
+  "dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "openFiles",
+  "dotnet.backgroundAnalysis.compilerDiagnosticsScope": "openFiles",
   "dotnet.inlayHints.enableInlayHintsForParameters": true,
   "dotnet.inlayHints.enableInlayHintsForLiteralParameters": true,
   "dotnet.inlayHints.enableInlayHintsForIndexerParameters": true,
@@ -138,9 +137,9 @@
   "dotnet.inlayHints.enableInlayHintsForImplicitVariableTypes": true,
   "dotnet.inlayHints.enableInlayHintsForLambdaParameterTypes": true,
   "dotnet.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
-  // =============================================================================
-  // C# EXTENSION INTEGRATION FOR .NET PROJECTS
-  // =============================================================================
+  "dotnet.inlayHints.suppressInlayHintsForParametersThatDifferOnlyBySuffix": true,
+  "dotnet.inlayHints.suppressInlayHintsForParametersThatMatchMethodIntent": true,
+  "dotnet.inlayHints.suppressInlayHintsForParametersThatMatchArgumentName": true,
   "csharp.semanticHighlighting.enabled": true,
   "csharp.inlayHints.parameters.enabled": true,
   "csharp.inlayHints.parameters.forLiteralParameters": true,
@@ -167,9 +166,6 @@
   "xaml.validation.syntaxValidation": true,
   "xaml.validation.schemaValidation": true,
   "xaml.validation.namespaceValidation": true,
-  // =============================================================================
-  // NOESIS XAML TOOLS CONFIGURATION
-  // =============================================================================
   "noesisXAML.enablePreview": true,
   "noesisXAML.enableColorDecorators": true,
   "noesisXAML.enableDiagnostics": true,
@@ -180,6 +176,20 @@
   "noesisXAML.enableRename": true,
   "noesisXAML.enableCodeActions": true,
   "noesisXAML.enableSemanticHighlighting": true,
+  "xml.fileAssociations": [
+    {
+      "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/Format.xsd",
+      "pattern": "**/*.Format.ps1xml"
+    },
+    {
+      "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/Types.xsd",
+      "pattern": "**/*.Types.ps1xml"
+    },
+    {
+      "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/src/Schemas/PowerShellConfiguration.xsd",
+      "pattern": "**/powershell.config.json"
+    }
+  ],
   "json.validate.enable": true,
   "json.format.enable": true,
   "json.format.keepLines": false,
@@ -307,16 +317,22 @@
   "editor.showDeprecated": true,
   "problems.autoReveal": true,
   "editor.lightbulb.enabled": "on",
-  "dotnet.inlayHints.suppressInlayHintsForParametersThatDifferOnlyBySuffix": true,
-  "dotnet.inlayHints.suppressInlayHintsForParametersThatMatchMethodIntent": true,
-  "dotnet.inlayHints.suppressInlayHintsForParametersThatMatchArgumentName": true,
-  "csharp.inlayHints.enableInlayHintsForTypes": true,
-  "csharp.inlayHints.enableInlayHintsForImplicitVariableTypes": true,
-  "csharp.inlayHints.enableInlayHintsForLambdaParameterTypes": true,
   "csharp.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
   "dotnet.codeLens.enableReferencesCodeLens": true,
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.iconTheme": "vs-seti",
   "workbench.editor.centeredLayout": false,
-  "terminal.integrated.persistentSessionReviveProcess": "onExit"
+  "terminal.integrated.persistentSessionReviveProcess": "onExit",
+  "workbench.reduceMotion": "on",
+  "workbench.list.smoothScrolling": false,
+  "editor.experimental.asyncTokenization": true,
+  "typescript.suggest.enabled": false,
+  "javascript.suggest.enabled": false,
+  "editor.semanticTokenColorCustomizations": {
+    "enabled": true,
+    "rules": {
+      "*.readonly": "#4FC1FF",
+      "parameter.readonly": "#4FC1FF"
+    }
+  }
 }

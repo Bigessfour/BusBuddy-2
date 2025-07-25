@@ -1,7 +1,22 @@
 {
-    "folders": [
-        {
-            "path": "."
-        }
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": []
+  },
+  "settings": {
+    "cSpell.words": [
+      "BUSBUDDY",
+      "DEBLOATING",
+      "Hyperthreading",
+      "MVVM",
+      "Serilog",
+      "setactive",
+      "SMBIOSBIOS",
+      "Syncfusion"
     ]
+  }
 }

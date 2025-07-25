@@ -17,7 +17,12 @@
     // PowerShell Development (v2025.2.0 — Latest Stable)
     "ms-vscode.powershell",
     // Advanced PowerShell Tools (Preview for bleeding edge features)
+    // CRITICAL: Provides enhanced PS7.5 syntax highlighting, ternary operators, null conditionals
+    // and modern PowerShell 7.5.2 language features (2025 updates)
     "ms-vscode.powershell-preview",
+    // AI-Native Development (BusBuddy's AI-first approach)
+    "github.copilot",
+    "github.copilot-chat",
     // Syncfusion Development Support
     "syncfusioninc.maui-vscode-extensions",
     // Task Management (EXCLUSIVE METHOD)
@@ -39,6 +44,8 @@
     // Block competing task runners
     "formulahendry.auto-close-tag",
     "formulahendry.auto-rename-tag",
+    // CRITICAL: Block TypeScript linting to prevent conflicts with PSScriptAnalyzer
+    // Prevents linting conflicts with PowerShell 7.5.2 syntax analysis
     "ms-vscode.vscode-typescript-tslint-plugin",
     // Block competing XAML formatters
     "DotJoshJohnson.xml",

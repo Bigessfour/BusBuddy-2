@@ -2921,6 +2921,37 @@
             Generate mock AI responses based on user input
             </summary>
         </member>
+        <member name="T:BusBuddy.WPF.Services.XAIChatServiceAdapter">
+            <summary>
+            Adapter service that wraps OptimizedXAIService to implement IXAIChatService
+            This provides a consistent interface while leveraging the performance-optimized core service
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.Services.XAIChatServiceAdapter.GetResponseAsync(System.String)">
+            <summary>
+            Get an AI response to a user message using the optimized service
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.Services.XAIChatServiceAdapter.IsAvailableAsync">
+            <summary>
+            Check if the AI service is available
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.Services.XAIChatServiceAdapter.InitializeAsync">
+            <summary>
+            Initialize the AI service (delegated to OptimizedXAIService)
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.Services.XAIChatServiceAdapter.GetTokenUsageAsync">
+            <summary>
+            Get token usage information from the optimized service
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.Services.XAIChatServiceAdapter.ClearCacheAsync">
+            <summary>
+            Clear the cache in the optimized service
+            </summary>
+        </member>
         <member name="T:BusBuddy.WPF.ViewModels.Activity.ActivityScheduleViewModel">
             <inheritdoc/>
             <inheritdoc/>
@@ -4354,6 +4385,88 @@
         </member>
         <member name="P:BusBuddy.WPF.ViewModels.StudentManagementViewModel.AssignRouteCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:BusBuddy.WPF.ViewModels.StudentManagementViewModel.AssignRouteAsync"/>.</summary>
+        </member>
+        <member name="T:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel">
+            <summary>
+            ViewModel for managing vehicles/buses in Phase 1
+            Provides CRUD operations and fleet status monitoring
+            </summary>
+            <inheritdoc/>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.LoadVehiclesAsync">
+            <summary>
+            Load all vehicles from the service
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.AddVehicleAsync">
+            <summary>
+            Add a new vehicle
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.UpdateVehicleAsync">
+            <summary>
+            Update selected vehicle
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.DeleteVehicleAsync">
+            <summary>
+            Delete selected vehicle
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.SearchVehiclesAsync">
+            <summary>
+            Search vehicles by text
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.RefreshAsync">
+            <summary>
+            Refresh the vehicle list
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.CanAddVehicle">
+            <summary>
+            Check if a vehicle can be added
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.CanUpdateVehicle">
+            <summary>
+            Check if a vehicle can be updated
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.CanDeleteVehicle">
+            <summary>
+            Check if a vehicle can be deleted
+            </summary>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.GetFleetSummary">
+            <summary>
+            Get vehicle fleet summary for dashboard
+            </summary>
+        </member>
+        <member name="P:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.Vehicles">
+            <inheritdoc cref="F:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel._vehicles"/>
+        </member>
+        <member name="P:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.SelectedVehicle">
+            <inheritdoc cref="F:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel._selectedVehicle"/>
+        </member>
+        <member name="P:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.SearchText">
+            <inheritdoc cref="F:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel._searchText"/>
+        </member>
+        <member name="P:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.IsLoading">
+            <inheritdoc cref="F:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel._isLoading"/>
+        </member>
+        <member name="P:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.StatusMessage">
+            <inheritdoc cref="F:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel._statusMessage"/>
+        </member>
+        <member name="M:BusBuddy.WPF.ViewModels.Vehicle.VehicleManagementViewModel.OnSelectedVehicleChanged(BusBuddy.Core.Models.Bus)">
+            <summary>
+            Property change notification for selected vehicle
+            </summary>
+        </member>
+        <member name="T:BusBuddy.WPF.ViewModels.Vehicle.VehicleFleetSummary">
+            <summary>
+            Summary data for vehicle fleet dashboard
+            </summary>
         </member>
         <member name="T:BusBuddy.WPF.ViewModels.XAI.OptimizedXAIChatViewModel">
             <summary>
@@ -5806,6 +5919,15 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.DropoffLocation">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "DropoffLocation" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Vehicles">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Vehicles" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedVehicle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedVehicle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
+        </member>
         <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
             <summary>
             A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
@@ -6156,6 +6278,15 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.DropoffLocation">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "DropoffLocation" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Vehicles">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Vehicles" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedVehicle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedVehicle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
         </member>
         <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__ObservableValidatorExtensions">
             <summary>

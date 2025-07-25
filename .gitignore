@@ -26,6 +26,18 @@ build-error-analysis.json
 # Build logs
 *.tlog
 
+# Temporary log files
+logs/health-check.log
+logs/theme-check-report-*.json
+
+# PowerShell session logs and diagnostic reports
+session-errors-*.json
+diagnostic-*.json
+test-results-*.json
+health-check-*.json
+system-diagnostic-*.json
+build-performance-*.json
+
 # ===================================================
 # DEVELOPMENT TOOLS AND AUTOMATION
 # ===================================================
@@ -48,6 +60,32 @@ build-error-analysis.json
 
 # VS Code development configurations
 !.vscode/powershell-problem-matcher.json
+
+# ===================================================
+# CODING STANDARDS AND DOCUMENTATION
+# ===================================================
+# Allow all standards documentation and configuration
+!Standards/
+!Standards/**/*.md
+!CODING-STANDARDS-HIERARCHY.md
+!BusBuddy-Practical.ruleset
+!BusBuddy.ruleset
+!OPTIMIZATION-EDUCATION.md
+
+# Development and diagnostic scripts
+!cleanup-legacy-files.ps1
+!debug-app-startup.ps1
+!fix-analyzer-warnings.ps1
+!phase1-completion-verification.ps1
+!run-comprehensive-pipeline.ps1
+!run-with-logging.ps1
+!Intel-Hybrid-Performance-Optimizer.ps1
+
+# Project tracking and rewards
+!steve-rewards.json
+
+# VS Code backup files (keep for reference)
+!.vscode/*.backup-*
 
 # ===================================================
 # POWERSHELL CONFIGURATION AND SCRIPTS

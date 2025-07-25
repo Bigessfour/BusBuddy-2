@@ -13,9 +13,14 @@
       "stopAtEntry": false,
       "console": "integratedTerminal",
       "justMyCode": true,
+      "env": {
+        "BUSBUDDY_DEBUG_ENABLED": "true",
+        "SYNCFUSION_DEBUG": "true"
+      },
       "symbolOptions": {
         "searchMicrosoftSymbolServer": true,
-        "searchNuGetOrgSymbolServer": true
+        "searchNuGetOrgSymbolServer": true,
+        "requireExactSource": false
       }
     },
     {
@@ -33,7 +38,10 @@
       ],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
-      "justMyCode": false
+      "justMyCode": false,
+      "env": {
+        "BUSBUDDY_DEBUG_ENABLED": "true"
+      }
     },
     {
       "name": "Debug Null Handling Tests",
@@ -79,7 +87,7 @@
       "name": "Debug PowerShell Workflows",
       "type": "PowerShell",
       "request": "launch",
-      "script": "${workspaceFolder}/.vscode/BusBuddy-Advanced-Workflows.ps1",
+      "script": "${workspaceFolder}/AI-Assistant/Core/start-ai-busbuddy.ps1",
       "args": [],
       "cwd": "${workspaceFolder}",
       "createTemporaryIntegratedConsole": false
@@ -115,7 +123,8 @@
       "justMyCode": false,
       "symbolOptions": {
         "searchMicrosoftSymbolServer": true,
-        "searchNuGetOrgSymbolServer": true
+        "searchNuGetOrgSymbolServer": true,
+        "requireExactSource": false
       }
     },
     {
@@ -132,10 +141,27 @@
       "justMyCode": true,
       "symbolOptions": {
         "searchMicrosoftSymbolServer": true,
-        "searchNuGetOrgSymbolServer": true
+        "searchNuGetOrgSymbolServer": true,
+        "requireExactSource": false
       },
       "env": {
         "BUSBUDDY_ADVANCED_WORKFLOWS": "true",
+        "BUSBUDDY_DEBUG_ENABLED": "true"
+      }
+    },
+    {
+      "name": "GitHub: Analyze Workflow Run",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/Tools/Scripts/GitHub/GitHub-Actions-Monitor.ps1",
+      "args": [
+        "-MonitorLatest",
+        "-AnalyzeFailures",
+        "-GenerateReport"
+      ],
+      "cwd": "${workspaceFolder}",
+      "createTemporaryIntegratedConsole": false,
+      "env": {
         "BUSBUDDY_DEBUG_ENABLED": "true"
       }
     }
@@ -175,6 +201,13 @@
       "configurations": [
         "Debug PowerShell Workflows",
         "Run and Debug BusBuddy.WPF with Workflows"
+      ]
+    },
+    {
+      "name": "BusBuddy Full CI Debug",
+      "configurations": [
+        "Run and Debug BusBuddy.WPF with Workflows",
+        "GitHub: Analyze Workflow Run"
       ]
     }
   ]

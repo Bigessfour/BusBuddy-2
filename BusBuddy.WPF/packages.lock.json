@@ -27,6 +27,18 @@
         "resolved": "8.4.0",
         "contentHash": "tqVU8yc/ADO9oiTRyTnwhFN68hCwvkliMierptWOudIAvWY1mWCh5VFh+guwHJmpMwfg0J0rY+yyd5Oy7ty9Uw=="
       },
+      "Microsoft.EntityFrameworkCore": {
+        "type": "Direct",
+        "requested": "[9.0.7, )",
+        "resolved": "9.0.7",
+        "contentHash": "PbD0q5ax15r91jD4TN7xbDCjldZSz4JfpYN4ZZjAkWeUyROkV92Ydg0O2/1keFA+2u3KPsDkJMmBKv2zQ06ZVg==",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Abstractions": "9.0.7",
+          "Microsoft.EntityFrameworkCore.Analyzers": "9.0.7",
+          "Microsoft.Extensions.Caching.Memory": "9.0.7",
+          "Microsoft.Extensions.Logging": "9.0.7"
+        }
+      },
       "Microsoft.EntityFrameworkCore.SqlServer": {
         "type": "Direct",
         "requested": "[9.0.7, )",
@@ -58,6 +70,15 @@
         "contentHash": "oxGR51+w5cXm5B9gU6XwpAB2sTiyPSmZm7hjvv0rzRnmL5o/KZzE103AuQj7sK26OBupjVzU/bZxDWvvU4nhEg==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
+          "Microsoft.Extensions.Primitives": "9.0.7"
+        }
+      },
+      "Microsoft.Extensions.Configuration.Abstractions": {
+        "type": "Direct",
+        "requested": "[9.0.7, )",
+        "resolved": "9.0.7",
+        "contentHash": "lut/kiVvNsQ120VERMUYSFhpXPpKjjql+giy03LesASPBBcC0o6+aoFdzJH9GaYpFTQ3fGVhVjKjvJDoAW5/IQ==",
+        "dependencies": {
           "Microsoft.Extensions.Primitives": "9.0.7"
         }
       },
@@ -124,21 +145,17 @@
           "Microsoft.Extensions.Options": "9.0.7"
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions": {
-        "type": "Direct",
-        "requested": "[9.0.7, )",
-        "resolved": "9.0.7",
-        "contentHash": "sMM6NEAdUTE/elJ2wqjOi0iBWqZmSyaTByLF9e8XHv6DRJFFnOe0N+s8Uc6C91E4SboQCfLswaBIZ+9ZXA98AA==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "System.Diagnostics.DiagnosticSource": "9.0.7"
-        }
-      },
       "Microsoft.Web.WebView2": {
         "type": "Direct",
         "requested": "[1.0.3351.48, )",
         "resolved": "1.0.3351.48",
         "contentHash": "UIzXdl3x3H2MX2es7+BHYT3pLkLoT7090omqla9S3MQQCma0slwiY+CXBM6x0LmdLTpksoQ6XUqOAXrtxjtklQ=="
+      },
+      "Microsoft.Xaml.Behaviors.Wpf": {
+        "type": "Direct",
+        "requested": "[1.1.135, )",
+        "resolved": "1.1.135",
+        "contentHash": "r8qBEXmQfORso2+MVHnt8PSH4761zJ0SIxgQTSEDVLU97EN2FZdG6/ZCYUPhQy+OrPKgnpYBCAs3PS6Bs7wRsg=="
       },
       "Serilog": {
         "type": "Direct",
@@ -171,6 +188,19 @@
         "contentHash": "C7BK25a1rhUyr+Tp+1BYcVlBJq7M2VCHlIgnwoIUVJcicM9jYcvQK18+OeHiXw7uLPSjqWxJIp1EfaZ/RGmEwA==",
         "dependencies": {
           "Serilog": "4.0.0"
+        }
+      },
+      "Serilog.Extensions.Hosting": {
+        "type": "Direct",
+        "requested": "[9.0.0, )",
+        "resolved": "9.0.0",
+        "contentHash": "u2TRxuxbjvTAldQn7uaAwePkWxTHIqlgjelekBtilAGL5sYyF3+65NWctN4UrwwGLsDC7c3Vz3HnOlu+PcoxXg==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "9.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
+          "Serilog": "4.2.0",
+          "Serilog.Extensions.Logging": "9.0.0"
         }
       },
       "Serilog.Extensions.Logging": {
@@ -343,16 +373,6 @@
           "Syncfusion.Licensing": "30.1.40"
         }
       },
-      "Syncfusion.SfProgressBar.WPF": {
-        "type": "Direct",
-        "requested": "[30.1.40, )",
-        "resolved": "30.1.40",
-        "contentHash": "i2lu8RTKUQqjc9ABTqwfeqq7rxFkzLzFwOZFppMGJVhySHAWt4Z5fnloheqKy3Ya+rY7oIbBy1Ig33qircOFeQ==",
-        "dependencies": {
-          "Syncfusion.Licensing": "30.1.40",
-          "Syncfusion.Shared.WPF": "30.1.40"
-        }
-      },
       "Syncfusion.SfRichTextBoxAdv.WPF": {
         "type": "Direct",
         "requested": "[30.1.40, )",
@@ -429,16 +449,6 @@
         "requested": "[30.1.40, )",
         "resolved": "30.1.40",
         "contentHash": "h4qwHJBW9Qe0M9gVzsq4/jiFscAHD50SaVezQj6A21rs4MAw1CkS77wzN68g+xqrqgGiTxxCiwHsUSTBvYlTXA==",
-        "dependencies": {
-          "Syncfusion.Licensing": "30.1.40",
-          "Syncfusion.SfSkinManager.WPF": "30.1.40"
-        }
-      },
-      "Syncfusion.Themes.FluentLight.WPF": {
-        "type": "Direct",
-        "requested": "[30.1.40, )",
-        "resolved": "30.1.40",
-        "contentHash": "ZPkb01VOil540RXU+x3Bp88by/Pj3NmKgYYMQ3s2aPBMhiXIm4fAKDuuFp/fScyloKECBa6QylV0b4lVmsiqMg==",
         "dependencies": {
           "Syncfusion.Licensing": "30.1.40",
           "Syncfusion.SfSkinManager.WPF": "30.1.40"
@@ -637,17 +647,6 @@
         "resolved": "6.0.2",
         "contentHash": "f+pRODTWX7Y67jXO3T5S2dIPZ9qMJNySjlZT/TKmWVNWe19N8jcWmHaqHnnchaq3gxEKv1SWVY5EFzOD06l41w=="
       },
-      "Microsoft.EntityFrameworkCore": {
-        "type": "Transitive",
-        "resolved": "9.0.7",
-        "contentHash": "PbD0q5ax15r91jD4TN7xbDCjldZSz4JfpYN4ZZjAkWeUyROkV92Ydg0O2/1keFA+2u3KPsDkJMmBKv2zQ06ZVg==",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore.Abstractions": "9.0.7",
-          "Microsoft.EntityFrameworkCore.Analyzers": "9.0.7",
-          "Microsoft.Extensions.Caching.Memory": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7"
-        }
-      },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",
         "resolved": "9.0.7",
@@ -716,14 +715,6 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
           "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
           "Microsoft.Extensions.Options": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7"
-        }
-      },
-      "Microsoft.Extensions.Configuration.Abstractions": {
-        "type": "Transitive",
-        "resolved": "9.0.7",
-        "contentHash": "lut/kiVvNsQ120VERMUYSFhpXPpKjjql+giy03LesASPBBcC0o6+aoFdzJH9GaYpFTQ3fGVhVjKjvJDoAW5/IQ==",
-        "dependencies": {
           "Microsoft.Extensions.Primitives": "9.0.7"
         }
       },
@@ -856,6 +847,15 @@
           "Microsoft.Extensions.Logging": "9.0.7",
           "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
           "Microsoft.Extensions.Options": "9.0.7"
+        }
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Transitive",
+        "resolved": "9.0.7",
+        "contentHash": "sMM6NEAdUTE/elJ2wqjOi0iBWqZmSyaTByLF9e8XHv6DRJFFnOe0N+s8Uc6C91E4SboQCfLswaBIZ+9ZXA98AA==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
+          "System.Diagnostics.DiagnosticSource": "9.0.7"
         }
       },
       "Microsoft.Extensions.Logging.Configuration": {
@@ -1028,18 +1028,6 @@
         "type": "Transitive",
         "resolved": "13.0.3",
         "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
-      },
-      "Serilog.Extensions.Hosting": {
-        "type": "Transitive",
-        "resolved": "9.0.0",
-        "contentHash": "u2TRxuxbjvTAldQn7uaAwePkWxTHIqlgjelekBtilAGL5sYyF3+65NWctN4UrwwGLsDC7c3Vz3HnOlu+PcoxXg==",
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.0",
-          "Microsoft.Extensions.Hosting.Abstractions": "9.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
-          "Serilog": "4.2.0",
-          "Serilog.Extensions.Logging": "9.0.0"
-        }
       },
       "Syncfusion.Compression.Base": {
         "type": "Transitive",
@@ -1348,16 +1336,27 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "[9.0.7, )",
           "Microsoft.EntityFrameworkCore.Tools": "[9.0.7, )",
           "Microsoft.Extensions.Configuration": "[9.0.7, )",
+          "Microsoft.Extensions.Configuration.Abstractions": "[9.0.7, )",
           "Microsoft.Extensions.Configuration.Json": "[9.0.7, )",
           "Microsoft.Extensions.DependencyInjection": "[9.0.7, )",
           "Microsoft.Extensions.Hosting": "[9.0.7, )",
           "Microsoft.Extensions.Http": "[9.0.7, )",
           "Microsoft.Extensions.Logging": "[9.0.7, )",
+          "Microsoft.Xaml.Behaviors.Wpf": "[1.1.135, )",
           "Serilog": "[4.3.0, )",
           "Serilog.Extensions.Hosting": "[9.0.0, )",
           "Serilog.Sinks.Console": "[6.0.0, )",
           "Serilog.Sinks.File": "[7.0.0, )",
-          "Syncfusion.Pdf.NET": "[30.1.40, )"
+          "Syncfusion.Licensing": "[30.1.40, )",
+          "Syncfusion.Pdf.NET": "[30.1.40, )",
+          "Syncfusion.SfBusyIndicator.WPF": "[30.1.40, )",
+          "Syncfusion.SfChart.WPF": "[30.1.40, )",
+          "Syncfusion.SfGrid.WPF": "[30.1.40, )",
+          "Syncfusion.SfInput.WPF": "[30.1.40, )",
+          "Syncfusion.SfSkinManager.WPF": "[30.1.40, )",
+          "Syncfusion.Shared.WPF": "[30.1.40, )",
+          "Syncfusion.Themes.FluentDark.WPF": "[30.1.40, )",
+          "Syncfusion.Tools.WPF": "[30.1.40, )"
         }
       }
     }

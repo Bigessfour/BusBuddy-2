@@ -349,6 +349,77 @@
             Interface for the Vehicle repository with specialized methods
             </summary>
         </member>
+        <member name="T:BusBuddy.Core.Data.SeedDataService">
+            <summary>
+            Service for seeding real-world transportation data into BusBuddy database
+            Provides infrastructure for importing, validating, and managing seed data
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Data.SeedDataService.AnalyzeDataStructureAsync">
+            <summary>
+            Analyzes current data structure requirements for real-world data integration
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Data.SeedDataService.PrepareForRealWorldDataAsync">
+            <summary>
+            Prepares database for real-world data seeding
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Data.SeedDataService.SeedRealWorldDataAsync(System.String)">
+            <summary>
+            Seeds real-world transportation data from provided JSON file
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Data.SeedDataService.SeedSampleDataAsync">
+            <summary>
+            Seeds sample transportation data for development and testing
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.DataStructureAnalysis">
+            <summary>
+            Analysis of data structure requirements for real-world transportation data
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.DriverRequirements">
+            <summary>
+            Requirements analysis for driver data structure
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.VehicleRequirements">
+            <summary>
+            Requirements analysis for vehicle data structure
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.ActivityScheduleRequirements">
+            <summary>
+            Requirements analysis for activity schedule data structure
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.SeedDataResult">
+            <summary>
+            Result of data seeding operation
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.RealWorldTransportationData">
+            <summary>
+            Real-world transportation data structure for JSON import
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.RealWorldDriver">
+            <summary>
+            Real-world driver data structure
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.RealWorldVehicle">
+            <summary>
+            Real-world vehicle data structure
+            </summary>
+        </member>
+        <member name="T:BusBuddy.Core.Data.RealWorldActivity">
+            <summary>
+            Real-world activity/trip data structure
+            </summary>
+        </member>
         <member name="T:BusBuddy.Core.Data.UnitOfWork.IUnitOfWork">
             <summary>
             Unit of Work interface for managing transactions and coordinating repositories
@@ -1702,6 +1773,16 @@
             Seed sample drivers for development/testing
             </summary>
         </member>
+        <member name="M:BusBuddy.Core.Services.ISeedDataService.SeedBusesAsync(System.Int32)">
+            <summary>
+            Seed sample buses for development/testing
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.ISeedDataService.SeedActivitiesAsync(System.Int32)">
+            <summary>
+            Seed sample activities for development/testing
+            </summary>
+        </member>
         <member name="M:BusBuddy.Core.Services.ISeedDataService.SeedAllAsync">
             <summary>
             Seed all development data
@@ -1955,7 +2036,7 @@
         </member>
         <member name="M:BusBuddy.Core.Services.OptimizedXAIService.StreamResponseAsync(System.String)">
             <summary>
-            Stream large responses for better user experience
+            Stream large responses for better user experience with enhanced token validation
             </summary>
         </member>
         <member name="F:BusBuddy.Core.Services.OptimizedXAIService._totalRequests">
@@ -1971,6 +2052,37 @@
         <member name="M:BusBuddy.Core.Services.OptimizedXAIService.EstimateTokens(System.String)">
             <summary>
             Estimate token count for budget management
+            </summary>
+            <summary>
+            Enhanced token estimation using tokenizer patterns optimized for Grok models
+            Based on XAI documentation recommendations for accurate token counting
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.OptimizedXAIService.TokenizeText(System.String)">
+            <summary>
+            Tokenizes text using patterns optimized for Grok model tokenizer
+            Implements subword tokenization similar to GPT-style tokenizers
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.OptimizedXAIService.SplitWordOnPunctuation(System.String,System.Char[])">
+            <summary>
+            Splits a word on punctuation marks, treating each punctuation as a separate token
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.OptimizedXAIService.ApplySubwordTokenization(System.String)">
+            <summary>
+            Applies subword tokenization similar to Byte-Pair Encoding (BPE)
+            Optimized for Grok model tokenizer behavior
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.OptimizedXAIService.IsVowel(System.Char)">
+            <summary>
+            Helper method to identify vowels for better subword tokenization
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.OptimizedXAIService.ValidateTokenCount(System.Int32,System.Boolean)">
+            <summary>
+            Validates token count against XAI model limits and provides optimization suggestions
             </summary>
         </member>
         <member name="M:BusBuddy.Core.Services.OptimizedXAIService.GetCachedOrExecuteAsync(System.String)">
@@ -2066,6 +2178,16 @@
         <member name="M:BusBuddy.Core.Services.SeedDataService.SeedDriversAsync(System.Int32)">
             <summary>
             Seed sample drivers for development/testing
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.SeedDataService.SeedBusesAsync(System.Int32)">
+            <summary>
+            Seed sample buses for development/testing
+            </summary>
+        </member>
+        <member name="M:BusBuddy.Core.Services.SeedDataService.SeedActivitiesAsync(System.Int32)">
+            <summary>
+            Seed sample activities for development/testing
             </summary>
         </member>
         <member name="M:BusBuddy.Core.Services.SeedDataService.SeedAllAsync">

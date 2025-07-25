@@ -132,7 +132,7 @@
 
   <ItemGroup>
     <!-- WPF-Specific Packages (Beyond Directory.Build.props) -->
-    <PackageReference Include="Syncfusion.SfChart.WPF" Version="$(SyncfusionVersion)" />
+    <!-- Syncfusion.SfChart.WPF is already included in Directory.Build.props -->
     <PackageReference Include="Syncfusion.SfNavigationDrawer.WPF" Version="$(SyncfusionVersion)" />
     <!-- Removed duplicates: SfBusyIndicator and SfProgressBar are in Directory.Build.props -->
     <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="$(SyncfusionVersion)" />

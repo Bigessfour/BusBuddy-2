@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="BusBuddy Practical Rules" Description="Industry best practices for single-user WPF application" ToolsVersion="16.0">
+
+  <!-- ========================================== -->
+  <!-- INDUSTRY CRITICAL RULES (Non-negotiable) -->
+  <!-- ========================================== -->
+
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+    <!-- Null Safety - INDUSTRY REQUIREMENT for .NET 8 -->
+    <Rule Id="CS8600" Action="Warning" /> <!-- Converting null literal -->
+    <Rule Id="CS8601" Action="Warning" /> <!-- Possible null reference assignment -->
+    <Rule Id="CS8602" Action="Warning" /> <!-- Dereference of possibly null reference -->
+    <Rule Id="CS8618" Action="Warning" /> <!-- Non-nullable field must contain non-null value -->
+
+    <!-- Performance - INDUSTRY CRITICAL -->
+    <Rule Id="CA1827" Action="Warning" /> <!-- Use Count/Length instead of Any() -->
+    <Rule Id="CA1829" Action="Warning" /> <!-- Use Length/Count instead of Count() -->
+    <Rule Id="CA2007" Action="Info" /> <!-- ConfigureAwait(false) - suggestion not error -->
+
+    <!-- Resource Management - INDUSTRY REQUIREMENT -->
+    <Rule Id="CA2000" Action="Warning" /> <!-- Dispose objects before losing scope -->
+    <Rule Id="CA1816" Action="Warning" /> <!-- Dispose methods should call SuppressFinalize -->
+
+    <!-- Code Quality - INDUSTRY BASELINE -->
+    <Rule Id="CA1031" Action="Info" /> <!-- Do not catch general exception types -->
+    <Rule Id="CA1062" Action="Info" /> <!-- Validate arguments of public methods -->
+  </Rules>
+
+  <!-- ========================================== -->
+  <!-- WPF INDUSTRY STANDARDS (Practical) -->
+  <!-- ========================================== -->
+
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+    <!-- WPF Designer compatibility -->
+    <Rule Id="CA1303" Action="None" /> <!-- Localization not required for single-user -->
+    <Rule Id="CA1304" Action="None" /> <!-- CultureInfo not critical for desktop -->
+    <Rule Id="CA1305" Action="None" /> <!-- IFormatProvider not critical for desktop -->
+
+    <!-- Practical exceptions for single-user desktop -->
+    <Rule Id="CA1707" Action="None" /> <!-- Underscores allowed in test methods -->
+    <Rule Id="CA1819" Action="None" /> <!-- Arrays in properties (Syncfusion compatibility) -->
+  </Rules>
+
+  <!-- ========================================== -->
+  <!-- MODERN C# FEATURES (Industry Expectations) -->
+  <!-- ========================================== -->
+
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+    <!-- C# 12 Features - Industry expects modern syntax -->
+    <Rule Id="IDE0007" Action="Info" /> <!-- Use var when type is obvious -->
+    <Rule Id="IDE0011" Action="Info" /> <!-- Add braces -->
+    <Rule Id="IDE0019" Action="Info" /> <!-- Use pattern matching -->
+    <Rule Id="IDE0021" Action="Info" /> <!-- Use expression body for constructors -->
+    <Rule Id="IDE0022" Action="Info" /> <!-- Use expression body for methods -->
+    <Rule Id="IDE0025" Action="Info" /> <!-- Use expression body for properties -->
+  </Rules>
+
+  <!-- ========================================== -->
+  <!-- SYNCFUSION COMPATIBILITY -->
+  <!-- ========================================== -->
+
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+    <!-- Allow Syncfusion patterns -->
+    <Rule Id="CA1010" Action="None" /> <!-- Collections generic interface (Syncfusion has custom collections) -->
+    <Rule Id="CA1822" Action="None" /> <!-- Mark members as static (Syncfusion event handlers) -->
+    <Rule Id="CA1033" Action="None" /> <!-- Interface methods should be callable (Syncfusion interfaces) -->
+  </Rules>
+
+</RuleSet>
