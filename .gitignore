@@ -1,5 +1,5 @@
 # ===================================================
-# BUILD RESULTS
+# BUILD RESULTS AND ARTIFACTS
 # ===================================================
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -14,21 +14,58 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+# Visual Studio/MSBuild
+*.user
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+packages.lock.json
+
 # ===================================================
 # LOGS AND DIAGNOSTICS
 # ===================================================
-# Marker files (allow these)
-logs/app_started.marker
-logs/application_started_successfully.marker
-logs/pre_dashboard_init.marker
-build-error-analysis.json
+# Marker files (allow these specific ones)
+!logs/app_started.marker
+!logs/application_started_successfully.marker
+!logs/pre_dashboard_init.marker
+!build-error-analysis.json
+
+# All log files (comprehensive exclusion)
+*.log
+logs/*.log
+logs/build-run-pipeline-*.log
+logs/msbuild-*.log
+logs/health-check.log
+logs/theme-check-report-*.json
 
 # Build logs
 *.tlog
+*.ilog
 
-# Temporary log files
+# Temporary log files (size optimization)
 logs/health-check.log
 logs/theme-check-report-*.json
+logs/*.tmp
+logs/*.temp
+logs/size-analysis-*.json
+logs/repository-analysis-*.json
 
 # PowerShell session logs and diagnostic reports
 session-errors-*.json
@@ -37,6 +74,14 @@ test-results-*.json
 health-check-*.json
 system-diagnostic-*.json
 build-performance-*.json
+repo-size-*.json
+
+# CI/CD artifacts and large temporary files
+*.artifact
+*.backup
+*.cache
+temp-*
+tmp-*
 
 # ===================================================
 # DEVELOPMENT TOOLS AND AUTOMATION
