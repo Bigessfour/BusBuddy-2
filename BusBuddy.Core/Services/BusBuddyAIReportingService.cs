@@ -110,7 +110,7 @@ namespace BusBuddy.Core.Services
                     };
 
                     var jsonContent = JsonSerializer.Serialize(requestPayload);
-                    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                    using var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                     _httpClient.DefaultRequestHeaders.Clear();
                     _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");

@@ -199,23 +199,23 @@ namespace BusBuddy.Core.Services
         /// </summary>
         private async Task<string> DownloadGeoJsonFromDriveAsync(string fileId, string accessToken)
         {
-
             try
             {
-                var driveService = new Google.Apis.Drive.v3.DriveService(new Google.Apis.Services.BaseClientService.Initializer
+                using (var driveService = new Google.Apis.Drive.v3.DriveService(new Google.Apis.Services.BaseClientService.Initializer
                 {
                     HttpClientInitializer = null, // We use raw HTTP for this download
                     ApplicationName = "BusBuddy"
-                });
-
-                // Use HttpClient with Bearer token for direct download
-                using var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                var downloadUrl = $"https://www.googleapis.com/drive/v3/files/{fileId}?alt=media";
-                var response = await httpClient.GetAsync(downloadUrl);
-                response.EnsureSuccessStatusCode();
-                var geoJson = await response.Content.ReadAsStringAsync();
-                return geoJson;
+                }))
+                {
+                    // Use HttpClient with Bearer token for direct download
+                    using var httpClient = new HttpClient();
+                    httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+                    var downloadUrl = $"https://www.googleapis.com/drive/v3/files/{fileId}?alt=media";
+                    var response = await httpClient.GetAsync(downloadUrl);
+                    response.EnsureSuccessStatusCode();
+                    var geoJson = await response.Content.ReadAsStringAsync();
+                    return geoJson;
+                }
             }
             catch (Exception ex)
             {

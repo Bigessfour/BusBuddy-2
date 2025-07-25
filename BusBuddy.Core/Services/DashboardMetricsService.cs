@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Data;
-using BusBuddy.Core.Data.UnitOfWork;
-using BusBuddy.Core.Data;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using BusBuddy.Core.Data;
+using BusBuddy.Core.Data.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace BusBuddy.Core.Services
 {
@@ -22,7 +22,7 @@ namespace BusBuddy.Core.Services
         private readonly IServiceProvider _serviceProvider;
         private static readonly ILogger Logger = Log.ForContext<DashboardMetricsService>();
         private readonly SemaphoreSlim _semaphore = new(1, 1);
-        private bool _disposed = false;
+        private bool _disposed;
 
         public DashboardMetricsService(IServiceProvider serviceProvider)
         {

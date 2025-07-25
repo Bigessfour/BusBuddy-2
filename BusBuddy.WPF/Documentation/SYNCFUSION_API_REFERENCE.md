@@ -642,150 +642,60 @@ public static class SyncfusionThemeValidator
 ## 📋 **COMMON XAML COMPILATION ERRORS & SOLUTIONS**
 
 ### **Error: 'The name "syncfusion" does not exist in the namespace'**
-**Solution**: Add proper namespace declaration
-```xml
-<!-- MISSING: Syncfusion namespace -->
-<UserControl xmlns:syncfusion="http://schemas.syncfusion.com/wpf">
-
-<!-- ADD: Proper namespace with assembly reference -->
-<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:syncfusion="http://schemas.syncfusion.com/wpf">
-```
+**Solution**:
+- Ensure every XAML file using Syncfusion controls includes:
+  `xmlns:syncfusion="http://schemas.syncfusion.com/wpf"`
+- For specialized controls, add the documented namespace (see "Standard XAML Namespace Declarations" above).
+- All Syncfusion controls require this namespace, regardless of theme or style.
 
 ### **Error: 'ButtonAdv' was not found**
-**Solution**: Verify assembly reference and namespace
-```xml
-<!-- VERIFY: Assembly reference in .csproj -->
-<PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.40" />
-
-<!-- VERIFY: Namespace declaration -->
-xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-
-<!-- USAGE: Control declaration -->
-<syncfusion:ButtonAdv Label="Click Me" />
-```
+**Solution**:
+- Confirm `<PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.40" />` is present in your `.csproj`.
+- Ensure the `xmlns:syncfusion` namespace is declared in your XAML.
+- Use the control as `<syncfusion:ButtonAdv ... />`.
 
 ### **Error: 'SfTextBoxExt' was not found**
-**Solution**: Use specific namespace for input controls
-```xml
-<!-- REQUIRED: Specific input namespace -->
-xmlns:sfinput="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.WPF"
-
-<!-- USAGE: Input control -->
-<sfinput:SfTextBoxExt Text="{Binding Value}" />
-```
+**Solution**:
+- Add the input namespace:
+  `xmlns:sfinput="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.WPF"`
+- Use the control as `<sfinput:SfTextBoxExt ... />`.
 
 ### **Error: Design-time errors with Syncfusion controls**
-**Solution**: Add design-time ViewModel support
-```xml
-<!-- ADD: Design-time data context -->
-<UserControl xmlns:vm="clr-namespace:BusBuddy.WPF.ViewModels.DesignTime"
-             d:DataContext="{d:DesignInstance Type=vm:DesignTimeViewModel, IsDesignTimeCreatable=True}">
-```
+**Solution**:
+- Add a design-time ViewModel and set `d:DataContext` for XAML designer support.
+- Example:
+  `<UserControl ... d:DataContext="{d:DesignInstance Type=vm:DesignTimeViewModel, IsDesignTimeCreatable=True}">`
+
+### **Error: Theme or style not applied**
+**Solution**:
+- All theming is handled globally via `SfSkinManager.ApplicationTheme` in `App.xaml.cs`.
+- Do **not** manually merge theme ResourceDictionaries for Syncfusion controls.
+- If a control does not appear themed, ensure:
+  - `SfSkinManager.ApplyStylesOnApplication = true;`
+  - `SfSkinManager.ApplyThemeAsDefaultStyle = true;`
+  - `SfSkinManager.ApplicationTheme = new Theme("FluentDark");` (or "FluentLight")
+- See [Syncfusion Theme Documentation](https://help.syncfusion.com/wpf/themes/skin-manager).
+
+### **Error: ResourceDictionary or StaticResource not found**
+**Solution**:
+- Only define global resources (e.g., brushes, converters) in `App.xaml` or a single shared ResourceDictionary.
+- Do not duplicate style keys across multiple dictionaries.
+- For Syncfusion styles, rely on the theme assemblies and global theme manager.
+
+### **Error: 'The property ... was not found on ...'**
+**Solution**:
+- Use only documented properties for each Syncfusion control (see "Core Control Definitions" above).
+- For example, `SfDataGrid` does **not** support `ShowCheckBox` (use `GridCheckBoxColumn` instead).
 
 ---
 
 ## 🎯 **BUSBUDDY-SPECIFIC IMPLEMENTATION PATTERNS**
 
-### **Standard UserControl Template**
-```xml
-<!--
-╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║   🏫 BUSBUDDY [VIEW_NAME] - SYNCFUSION FLUENTDARK COMPLIANT                                                        ║
-║   • Assembly Dependencies: [List assemblies used]                                                                 ║
-║   • Syncfusion Controls: [List SF controls used]                                                                 ║
-║   • Theme: FluentDark with FluentLight fallback                                                                   ║
-╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
--->
-<UserControl x:Class="BusBuddy.WPF.Views.[Area].[ViewName]"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:BusBuddy.WPF.ViewModels.[Area]"
-             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:sfinput="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.WPF"
-             mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="900"
-             d:DataContext="{d:DesignInstance Type=vm:[ViewModelName], IsDesignTimeCreatable=True}"
-             Loaded="UserControl_Loaded">
-
-    <!-- Resources -->
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:key="BooleanToVisibilityConverter"/>
-    </UserControl.Resources>
-
-    <!-- Layout: Standard 3-row grid -->
-    <Grid Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>   <!-- Title -->
-            <RowDefinition Height="*"/>      <!-- Content -->
-            <RowDefinition Height="Auto"/>   <!-- Actions -->
-        </Grid.RowDefinitions>
-
-        <!-- Title Section -->
-        <TextBlock Grid.Row="0"
-                   Text="[View Title]"
-                   FontSize="24"
-                   FontWeight="Bold"
-                   Margin="0,0,0,16"/>
-
-        <!-- Content Section -->
-        <Grid Grid.Row="1" Margin="0,0,0,16">
-            <!-- Main content here -->
-        </Grid>
-
-        <!-- Action Buttons Section -->
-        <StackPanel Grid.Row="2"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <!-- Action buttons here -->
-        </StackPanel>
-    </Grid>
-</UserControl>
-```
-
-### **Standard Code-Behind Template**
-```csharp
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Syncfusion.SfSkinManager;
-using System;
-using System.Windows;
-using System.Windows.Controls;
-
-namespace BusBuddy.WPF.Views.[Area]
-{
-    /// <summary>
-    /// Interaction logic for [ViewName].xaml
-    /// Implements standard BusBuddy view patterns with Syncfusion FluentDark theme.
-    /// </summary>
-    public partial class [ViewName] : UserControl
-    {
-        private static readonly ILogger Logger = Log.ForContext<[ViewName]>();
-
-        public [ViewName]()
-        {
-            InitializeComponent();
-            Logger.Debug("Initialized {ViewName}", nameof([ViewName]));
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            ApplyTheme();
-        }
-
-        private void ApplyTheme()
-        {
-            if (!SyncfusionThemeValidator.ApplyThemeWithValidation(this, "FluentDark"))
-            {
-                Logger.Warning("Theme application failed for {ViewName}", nameof([ViewName]));
-            }
-        }
-    }
-}
-```
+- All Syncfusion controls must use the `syncfusion` namespace.
+- All theme and style application is handled globally via `SfSkinManager.ApplicationTheme` in `App.xaml.cs`.
+- Only define custom styles/resources in `App.xaml` or a single shared ResourceDictionary.
+- Do not manually merge Syncfusion theme dictionaries—let the NuGet package and SkinManager handle this.
+- Use only properties and methods documented for Syncfusion WPF 30.1.40.
 
 ---
 
@@ -798,6 +708,96 @@ namespace BusBuddy.WPF.Views.[Area]
 - [ ] Test design-time data context functionality
 
 ### **Development Checklist**
+- [ ] All UserControls follow standard 3-row grid layout
+- [ ] Theme application code in `UserControl_Loaded` event
+- [ ] Design-time ViewModel created for XAML designer support
+- [ ] Accessibility properties added to interactive controls
+- [ ] Error handling for theme application failures
+
+### **Quality Assurance Checklist**
+- [ ] XAML compiles without errors or warnings
+- [ ] Design-time support works in Visual Studio designer
+- [ ] Runtime theme switching functions correctly
+- [ ] All controls respond to FluentDark/FluentLight themes
+- [ ] Assembly loading validation passes in debug builds
+
+### **Deployment Checklist**
+- [ ] All Syncfusion assemblies included in output directory
+- [ ] License validation passes without dialog boxes
+- [ ] Theme resources properly embedded in application
+- [ ] Performance monitoring shows acceptable load times
+
+---
+
+## 📖 **ADDITIONAL RESOURCES**
+
+### **Official Documentation Links**
+- [Syncfusion WPF Documentation](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf)
+- [Control Dependencies Reference](https://help.syncfusion.com/wpf/control-dependencies)
+- [SfSkinManager Documentation](https://help.syncfusion.com/wpf/themes/skin-manager)
+- [API Reference](https://help.syncfusion.com/cr/wpf/Syncfusion.html)
+
+### **BusBuddy Implementation Guidelines**
+- Refer to `BUSBUDDY_DEVELOPMENT_STANDARDS.md` for comprehensive development patterns
+- Use PowerShell commands (`bb-health`, `bb-diagnostic`) for environment validation
+- Follow established Serilog logging patterns with structured context
+- Integrate with existing dependency injection container in `App.xaml.cs`
+
+---
+
+## 🔄 **DEVELOPMENT WORKFLOW INTEGRATION**
+
+### **Morning Development Routine**
+```powershell
+# Start each development session with:
+bb-health                    # Check overall system health
+bb-diagnostic               # Identify any environment issues
+Export-BusBuddyProgress     # Update progress tracking
+
+# Review daily targets from progress matrix above
+# Focus on current phase priorities
+# Update task status as work progresses
+```
+
+### **End-of-Day Progress Update**
+```powershell
+# Before ending development session:
+Test-BusBuddyBuildHealth    # Ensure build remains healthy
+Export-BusBuddyProgress     # Document day's progress
+
+# Manually update this document:
+# 1. Change status symbols (🔴 → 🟡 → ✅)
+# 2. Update completion percentages
+# 3. Add notes about blockers or discoveries
+# 4. Queue next day's priorities
+```
+
+### **Status Symbol Legend**
+- ✅ **Complete**: Implementation finished and tested
+- 🟡 **In Progress**: Currently being worked on
+- 🔴 **Not Started**: Waiting to be implemented
+- ⚠️ **Blocked**: Cannot proceed due to dependencies
+- 🔄 **Testing**: Implementation complete, under validation
+
+### **Priority Indicators**
+- 🔴 **Critical**: Blocking other work, must complete first
+- 🟡 **Medium**: Important but can be deferred briefly
+- 🟢 **Low**: Nice to have, complete when time allows
+
+### **Integration with Existing Commands**
+- **bb-health**: Validates current environment against this reference
+- **bb-diagnostic**: Comprehensive analysis including progress assessment
+- **bb-debug-export**: Exports current state for progress tracking
+- **bb-ci-pipeline**: Includes progress validation in CI/CD workflow
+
+### **Weekly Review Process**
+Every Friday, review and update:
+1. **Completion Metrics**: Update percentages based on actual progress
+2. **Risk Assessment**: Identify new risks or resolved concerns
+3. **Next Week Planning**: Queue priorities based on current phase
+4. **Documentation Sync**: Ensure this reference stays current
+
+This tracking system ensures continuous visibility into development progress while integrating seamlessly with your existing PowerShell workflow and development standards.
 - [ ] All UserControls follow standard 3-row grid layout
 - [ ] Theme application code in `UserControl_Loaded` event
 - [ ] Design-time ViewModel created for XAML designer support

@@ -16,8 +16,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="800">
+             mc:Ignorable="d">
     <UserControl.Resources>
         <!-- All styles now defined globally in CustomStyles.xaml -->
         <!-- This prevents duplicate definitions and resource conflicts -->

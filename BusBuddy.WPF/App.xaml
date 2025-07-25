@@ -1,34 +1,21 @@
 <Application x:Class="BusBuddy.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="Views/Main/MainWindow.xaml">
+             xmlns:local="clr-namespace:BusBuddy.WPF">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Ensure our custom MenuStyles.xaml is loaded first -->
+                <ResourceDictionary Source="/BusBuddy.WPF;component/Resources/MenuStyles.xaml"/>
 
-  <Application.Resources>
-    <ResourceDictionary>
+                <!-- Syncfusion Resources -->
+                <ResourceDictionary Source="pack://application:,,,/Syncfusion.Shared.WPF;component/Resources/MenuStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Syncfusion.Shared.WPF;component/Resources/ContextMenuStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Syncfusion.Themes.FluentDark.WPF;component/ThemesStyles.xaml"/>
 
-      <!--   MINIMAL RESOURCE DICTIONARY FOR STARTUP STABILITY  -->
-      <!--  Additional converters and templates will be added after successful initialization  -->
-      <!--  SkinManager theme configuration handled via App.xaml.cs ConfigureSyncfusionTheme()  -->
-
-      <!--  Essential brushes for basic functionality  -->
-      <SolidColorBrush x:Key="ContentForeground"
-          Color="#FFFFFF"/>
-      <SolidColorBrush x:Key="TextForeground"
-          Color="#FFFFFF"/>
-      <SolidColorBrush x:Key="ControlForeground"
-          Color="#FFFFFF"/>
-      <SolidColorBrush x:Key="TextPrimary"
-          Color="#FFFFFF"/>
-      <SolidColorBrush x:Key="BackgroundBrush"
-          Color="#1E1E1E"/>
-      <SolidColorBrush x:Key="BackgroundNormalBrush"
-          Color="#1E1E1E"/>
-      <SolidColorBrush x:Key="SurfaceBackground"
-          Color="#1E1E1E"/>
-      <SolidColorBrush x:Key="SurfaceBorderBrush"
-          Color="#323130"/>
-
-    </ResourceDictionary>
-  </Application.Resources>
-
+                <!-- Other ResourceDictionaries -->
+                <!-- ...existing dictionaries... -->
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

@@ -2,8 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Serilog;
 using BusBuddy.WPF.ViewModels;
+using Serilog;
 using Serilog.Context;
 
 namespace BusBuddy.WPF.Views.GoogleEarth
@@ -22,7 +22,7 @@ namespace BusBuddy.WPF.Views.GoogleEarth
         private string? _pendingLayerType;
         private readonly object _layerChangeLock = new object();
         private const int LayerChangeDebounceDelayMs = 500;
-        private bool _disposed = false;
+        private bool _disposed;
 
         public GoogleEarthView()
         {

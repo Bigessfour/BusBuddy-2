@@ -1,22 +1,6 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║                                                                                                                                                                          ║
 ║                                            🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                      ║
-║                                                          [SUPPORTING DIALOG VIEW]                                                                                      ║
-║                                                                                                                                                                          ║
-║  📋 REQUIRED STANDARDS: This supporting dialog MUST follow the universal standards defined in:                                                                         ║
-║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
-║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
-║                                                                                                                                                                          ║
-║  🔧 MANDATORY IMPLEMENTATIONS:                                                                                                                                          ║
-║     ✅ Window Style: BusBuddyWindowStyle                                                                                                                               ║
-║     ✅ Button Controls: Use syncfusion:ButtonAdv with Label property (NOT Content)                                                                                    ║
-║     ✅ Input Controls: Use Syncfusion equivalents (ComboBoxAdv, TextBoxExt, etc.)                                                                                     ║
-║     ✅ Theme Application:  on ALL Syncfusion controls                                                           ║
-║     ✅ Color Palette: Use FluentDark brushes defined in SyncfusionFluentDarkTheme.xaml                                                                                ║
-║                                                                                                                                                                          ║
-║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
-║                                                                                                                                                                          ║
 ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 -->
 
@@ -26,8 +10,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusBuddy.WPF.Views.Bus"
-        xmlns:sf="http://schemas.syncfusion.com/wpf"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         xmlns:sfinput="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.WPF"
         xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
         mc:Ignorable="d"
@@ -219,8 +203,18 @@
         <!-- Footer with Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
             <TextBlock Text="* Required fields" Foreground="Gray" VerticalAlignment="Center" Margin="0,0,20,0"/>
-            <Button Content="Cancel" Width="100" Height="30" Margin="0,0,10,0" Click="CancelButton_Click"/>
-            <Button Content="Save" Width="100" Height="30" Click="SaveButton_Click" IsDefault="True"/>
+            <syncfusion:ButtonAdv Label="Cancel"
+                              Width="100"
+                              Height="30"
+                              Margin="0,0,10,0"
+                              Click="CancelButton_Click"
+                              Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"/>
+            <syncfusion:ButtonAdv Label="Save"
+                              Width="100"
+                              Height="30"
+                              Click="SaveButton_Click"
+                              IsDefault="True"
+                              Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"/>
         </StackPanel>
 
         <!-- Validation Message -->
@@ -240,6 +234,3 @@
         </Border>
     </Grid>
 </Window>
-
-
-

@@ -1,0 +1,113 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<UserControl x:Class="BusBuddy.WPF.Views.Vehicle.VehiclesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="#2D2D30"
+                Padding="20">
+            <TextBlock Text="🚌 Vehicle Management"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="White"/>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Row="1"
+              Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Data Grid -->
+            <syncfusion:SfDataGrid Grid.Row="0"
+                                   ItemsSource="{Binding Vehicles}"
+                                   SelectedItem="{Binding SelectedVehicle, Mode=TwoWay}"
+                                   AutoGenerateColumns="False"
+                                   AllowResizingColumns="True"
+                                   AllowSorting="True"
+                                   AllowFiltering="True"
+                                   ColumnSizer="Star"
+                                   SelectionMode="Single"
+                                   SelectionUnit="Row"
+                                   NavigationMode="Row"
+                                   AllowEditing="False"
+                                   ShowRowHeader="True"
+                                   EnableDataVirtualization="True"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   RowHeight="40"
+                                   HeaderRowHeight="45">
+                <syncfusion:SfDataGrid.Columns>
+                    <syncfusion:GridTextColumn MappingName="BusNumber"
+                                               HeaderText="Bus #"
+                                               Width="100"/>
+                    <syncfusion:GridTextColumn MappingName="LicensePlate"
+                                               HeaderText="License Plate"
+                                               Width="120"/>
+                    <syncfusion:GridTextColumn MappingName="Make"
+                                               HeaderText="Make"
+                                               Width="120"/>
+                    <syncfusion:GridTextColumn MappingName="Model"
+                                               HeaderText="Model"
+                                               Width="150"/>
+                    <syncfusion:GridTextColumn MappingName="Year"
+                                               HeaderText="Year"
+                                               Width="80"/>
+                    <syncfusion:GridTextColumn MappingName="Capacity"
+                                               HeaderText="Capacity"
+                                               Width="80"/>
+                    <syncfusion:GridTextColumn MappingName="Status"
+                                               HeaderText="Status"
+                                               Width="120"/>
+                    <syncfusion:GridTextColumn MappingName="Mileage"
+                                               HeaderText="Mileage"
+                                               Width="100"/>
+                </syncfusion:SfDataGrid.Columns>
+            </syncfusion:SfDataGrid>
+
+            <!-- Button Panel with Syncfusion ButtonAdv -->
+            <StackPanel Grid.Row="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,20,0,0">
+                <syncfusion:ButtonAdv Label="Add Vehicle"
+                                      Command="{Binding AddVehicleCommand}"
+                                      Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
+                                      Width="120"
+                                      Height="35"
+                                      Margin="0,0,10,0"/>
+                <syncfusion:ButtonAdv Label="Edit"
+                                      Command="{Binding EditVehicleCommand}"
+                                      Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
+                                      Width="80"
+                                      Height="35"
+                                      Margin="0,0,10,0"/>
+                <syncfusion:ButtonAdv Label="Delete"
+                                      Command="{Binding DeleteVehicleCommand}"
+                                      Style="{StaticResource BusBuddyButtonAdvStyle}"
+                                      Width="80"
+                                      Height="35"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

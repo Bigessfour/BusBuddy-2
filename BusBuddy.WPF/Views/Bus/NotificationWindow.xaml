@@ -3,9 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
         Title="Notification"
-        Height="180" 
+        Height="180"
         Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -17,30 +19,31 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
+
             <!-- Title -->
-            <TextBlock x:Name="TitleText" 
-                       Text="Operation Successful" 
-                       FontSize="16" 
-                       FontWeight="Bold" 
+            <TextBlock x:Name="TitleText"
+                       Text="Operation Successful"
+                       FontSize="16"
+                       FontWeight="Bold"
                        Margin="0,0,0,10"/>
-            
+
             <!-- Message -->
-            <TextBlock x:Name="MessageText" 
-                       Grid.Row="1" 
-                       Text="The operation was completed successfully." 
-                       TextWrapping="Wrap" 
+            <TextBlock x:Name="MessageText"
+                       Grid.Row="1"
+                       Text="The operation was completed successfully."
+                       TextWrapping="Wrap"
                        VerticalAlignment="Center"/>
-            
+
             <!-- Button -->
-            <Button Grid.Row="2" 
-                    Content="OK" 
-                    Width="80" 
-                    Height="30" 
-                    Margin="0,10,0,0" 
-                    HorizontalAlignment="Right" 
-                    Click="OkButton_Click"
-                    IsDefault="True"/>
+            <syncfusion:ButtonAdv Grid.Row="2"
+                          Label="OK"
+                          Width="80"
+                          Height="30"
+                          Margin="0,10,0,0"
+                          HorizontalAlignment="Right"
+                          Click="OkButton_Click"
+                          IsDefault="True"
+                          Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"/>
         </Grid>
     </Border>
 </Window>

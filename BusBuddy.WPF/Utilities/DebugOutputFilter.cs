@@ -191,6 +191,8 @@ namespace BusBuddy.WPF.Utilities
             },
             [FilterCategory.UIThemeIssues] = new List<Regex>
             {
+                new Regex(@"SfSkinManager\.ApplyThemeAsDefaultStyle", RegexOptions.IgnoreCase),
+                new Regex(@"SfSkinManager\.SetTheme", RegexOptions.IgnoreCase),
                 new Regex(@"theme.*not.*applied", RegexOptions.IgnoreCase),
                 new Regex(@"FluentDark.*theme.*error", RegexOptions.IgnoreCase),
                 new Regex(@"Office2019Colorful.*theme.*error", RegexOptions.IgnoreCase),

@@ -9,6 +9,9 @@ namespace BusBuddy.WPF.Controls
         public StudentStatisticsPanel()
         {
             InitializeComponent();
+            // Apply Syncfusion theme using the helper
+            Utilities.SyncfusionThemeManager.ApplyTheme(this);
+
             DataContext = this;
         }
 

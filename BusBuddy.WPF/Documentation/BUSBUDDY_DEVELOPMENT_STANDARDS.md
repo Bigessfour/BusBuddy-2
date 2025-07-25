@@ -309,6 +309,18 @@ private void UserControl_Loaded(object sender, RoutedEventArgs e)
 
 ---
 
+## Global Static Resources
+
+- All color brushes and converters used across the application are defined in a single ResourceDictionary (see `Controls/StandardDataViewTemplate.xaml`).
+- Reference these resources via `{DynamicResource ...}` in all XAML files.
+- Do not duplicate resource keys in multiple dictionaries.
+
+## Syncfusion Theme and Style Management
+
+- All Syncfusion theming is globally managed via `SfSkinManager.ApplicationTheme` in `App.xaml.cs`.
+- Do not manually merge Syncfusion theme ResourceDictionaries.
+- Use only properties and methods documented for Syncfusion WPF 30.1.40.
+
 ## 🎨 **VIEW LAYOUT STANDARDS**
 
 ### **MANDATORY VIEW STRUCTURE**

@@ -1,49 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- 🚌 BusBuddy WPF - Greenfield Foundation Phase 1 -->
   <PropertyGroup>
-    <NoWarn>$(NoWarn);CA1416</NoWarn>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <UserSecretsId>ff9695ed-d3b1-41ee-b7bc-9731b55a8757</UserSecretsId>
-    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <ProjectName>BusBuddy.WPF</ProjectName>
+
+    <!-- Phase 1: Essential Build Configuration -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Strings\AppResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
-      <PublicResXFileCodeGenerator>True</PublicResXFileCodeGenerator>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Strings\Navigation.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Navigation.Designer.cs</LastGenOutput>
-      <PublicResXFileCodeGenerator>True</PublicResXFileCodeGenerator>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Strings\Messages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
-      <PublicResXFileCodeGenerator>True</PublicResXFileCodeGenerator>
-    </EmbeddedResource>
-  </ItemGroup>
-
-    <!-- Exclude unused pivot grid theme resource dictionaries -->
-    <ItemGroup>
-      <Page Remove="Resources\Themes\PivotGridControl\**\*.xaml" />
-      <Page Remove="Resources\Themes\PivotSchemaDesigner\**\*.xaml" />
-    </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Resources\Strings\AppResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>AppResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
+  <!-- 🏗️ CORE PROJECT REFERENCE -->
   <ItemGroup>
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
   </ItemGroup>
@@ -163,72 +131,45 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- WPF-Specific Packages (Beyond Directory.Build.props) -->
+    <PackageReference Include="Syncfusion.SfChart.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfNavigationDrawer.WPF" Version="$(SyncfusionVersion)" />
+    <!-- Removed duplicates: SfBusyIndicator and SfProgressBar are in Directory.Build.props -->
+    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="$(SyncfusionVersion)" />
+
+    <!-- 🎛️ SPECIALIZED CONTROL PACKAGES -->
+    <PackageReference Include="Syncfusion.SfChat.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfRichTextBoxAdv.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfScheduler.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfGauge.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfAccordion.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfMaps.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.PdfViewer.WPF" Version="$(SyncfusionVersion)" />
+
+    <!-- 📄 PDF AND DOCUMENT PACKAGES -->
+    <PackageReference Include="Syncfusion.SfSpreadsheet.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.Edit.WPF" Version="$(SyncfusionVersion)" />
+
+    <!-- 🗂️ LEGACY GRID SUPPORT -->
+    <PackageReference Include="Syncfusion.Grid.WPF" Version="$(SyncfusionVersion)" />
+  </ItemGroup>
+
+  <!-- Application-Specific Packages -->
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
-    <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="3.0.0" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 
     <!-- Additional Extensions -->
     <PackageReference Include="System.Net.Http.Json" Version="9.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
-
-    <!-- 🎯 SYNCFUSION WPF 30.1.40 - ESSENTIAL PACKAGES ONLY (Latest Available Version) -->
-
-    <!-- CORE PACKAGES -->
-    <PackageReference Include="Syncfusion.Licensing" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="30.1.40" />
-
-    <!-- THEME PACKAGES -->
-    <PackageReference Include="Syncfusion.Themes.FluentDark.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.Themes.FluentLight.WPF" Version="30.1.40" />
-
-    <!-- ESSENTIAL CONTROL PACKAGES -->
-    <PackageReference Include="Syncfusion.Shared.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.Tools.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfInput.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfChart.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfNavigationDrawer.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfProgressBar.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="30.1.40" />
-
-    <!-- BUTTON AND COMBOBOX CONTROLS (included in SfInput.WPF) -->
-    <!-- SfButton and SfComboBox are included in Syncfusion.SfInput.WPF package -->
-
-    <!-- SPECIALIZED CONTROL PACKAGES -->
-    <PackageReference Include="Syncfusion.SfChat.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfRichTextBoxAdv.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfScheduler.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfGauge.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfAccordion.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.SfMaps.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.PdfViewer.WPF" Version="30.1.40" />
-
-    <!-- PDF AND DOCUMENT PACKAGES -->
-    <PackageReference Include="Syncfusion.SfSpreadsheet.WPF" Version="30.1.40" />
-    <PackageReference Include="Syncfusion.Edit.WPF" Version="30.1.40" />
-
-    <!-- LEGACY GRID SUPPORT -->
-    <PackageReference Include="Syncfusion.Grid.WPF" Version="30.1.40" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
   </ItemGroup>
 
   <!-- 🧹 CLEAN CONFIGURATION -->

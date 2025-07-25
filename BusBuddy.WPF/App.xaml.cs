@@ -1,420 +1,106 @@
-using System;
-using System.IO;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Threading;
-using AutoMapper;
-using BusBuddy.Core.Data;
-using BusBuddy.Core.Data.UnitOfWork;
-using BusBuddy.WPF.Logging;
-using BusBuddy.WPF.Utilities;
-using BusBuddy.WPF.ViewModels;
-using BusBuddy.WPF.Views.Main;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Serilog;
-using Syncfusion.Licensing;
-using Syncfusion.SfSkinManager;
-using Syncfusion.Themes.FluentDark.WPF;
-using Syncfusion.Themes.FluentLight.WPF;
+using System.Windows;
+using BusBuddy.WPF.ViewModels;
 
-namespace BusBuddy.WPF;
-
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
-public partial class App : Application
+namespace BusBuddy.WPF
 {
-    private IHost _host = null!;
-
     /// <summary>
-    /// Gets the service provider for the application.
+    /// Interaction logic for App.xaml
+    /// Phase 1: Minimal application startup with basic ViewModels
     /// </summary>
-    public IServiceProvider Services { get; private set; } = default!;
-
-    public App()
+    public partial class App : Application
     {
-        // Constructor intentionally left empty for better startup performance.
-        // Heavy initialization moved to OnStartup.
-    }
+        private IHost? _host;
 
-    private void RegisterSyncfusionLicense()
-    {
-        try
+        protected override void OnStartup(StartupEventArgs e)
         {
-            // Try environment variable first for security
-            string? licenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
-
-            // Fallback to appsettings if not found in environment
-            if (string.IsNullOrWhiteSpace(licenseKey))
-            {
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile("appsettings.json", optional: true)
-                    .Build();
-                licenseKey = config["Syncfusion:LicenseKey"];
-            }
-
-            // Register license if found
-            if (!string.IsNullOrWhiteSpace(licenseKey))
-            {
-                SyncfusionLicenseProvider.RegisterLicense(licenseKey);
-                Log.Debug("Syncfusion license registered successfully");
-            }
-            else
-            {
-                Log.Warning("Syncfusion license key not found in environment variables or appsettings.json");
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Failed to register Syncfusion license");
-        }
-    }
-
-    private void ConfigureSyncfusionTheme()
-    {
-        try
-        {
-            // Register custom FluentDark theme settings (Official API)
-            var fluentDarkSettings = new FluentDarkThemeSettings()
-            {
-                PrimaryBackground = new SolidColorBrush(Color.FromRgb(30, 30, 30)), // BusBuddy dark theme
-                PrimaryForeground = new SolidColorBrush(Colors.White),
-                BodyFontSize = 14,
-                HeaderFontSize = 16,
-                SubHeaderFontSize = 15,
-                TitleFontSize = 18,
-                SubTitleFontSize = 16,
-                BodyAltFontSize = 13,
-                FontFamily = new FontFamily("Segoe UI")
-            };
-            SfSkinManager.RegisterThemeSettings("FluentDark", fluentDarkSettings);
-
-            // Register custom FluentLight theme settings (Official API)
-            var fluentLightSettings = new FluentLightThemeSettings()
-            {
-                PrimaryBackground = new SolidColorBrush(Colors.White),
-                PrimaryForeground = new SolidColorBrush(Colors.Black),
-                BodyFontSize = 14,
-                HeaderFontSize = 16,
-                SubHeaderFontSize = 15,
-                TitleFontSize = 18,
-                SubTitleFontSize = 16,
-                BodyAltFontSize = 13,
-                FontFamily = new FontFamily("Segoe UI")
-            };
-            SfSkinManager.RegisterThemeSettings("FluentLight", fluentLightSettings);
-
-            // Apply FluentDark theme globally using official SkinManager API
-            SfSkinManager.ApplyStylesOnApplication = true;
-            SfSkinManager.ApplyThemeAsDefaultStyle = true;
-
-            // Set FluentDark theme as default - proper Syncfusion 30.1.40 API usage
-            SfSkinManager.ApplicationTheme = new Theme("FluentDark");
-
-            Log.Information("✅ Syncfusion themes configured with custom settings and official API compliance");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "❌ Failed to configure Syncfusion themes with custom settings");
-
-            // Fallback to basic theme configuration
+            // Phase 2: Enhanced error handling and logging
             try
             {
-                SfSkinManager.ApplyStylesOnApplication = true;
-                SfSkinManager.ApplyThemeAsDefaultStyle = true;
-                SfSkinManager.ApplicationTheme = new Theme("FluentDark");
-                Log.Warning("⚠️ Applied fallback FluentDark theme without custom settings");
-            }
-            catch (Exception fallbackEx)
-            {
-                Log.Error(fallbackEx, "❌ Fallback theme configuration also failed");
-            }
-        }
-    }
-    protected override async void OnStartup(StartupEventArgs e)
-    {
-        base.OnStartup(e);
-
-        // Register Syncfusion license
-        RegisterSyncfusionLicense();
-
-        // Configure theme
-        ConfigureSyncfusionTheme();
-
-        // Build host
-        _host = Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration((context, config) =>
-            {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            })
-            .UseSerilog((context, services, configuration) =>
-            {
-                configuration
-                    .ReadFrom.Configuration(context.Configuration)
-                    .Enrich.FromLogContext()
-                    .WriteTo.Console()
-                    .WriteTo.File("logs/application-.log",
-                        rollingInterval: RollingInterval.Day,
-                        shared: true,
-                        flushToDiskInterval: TimeSpan.FromSeconds(1));
-            })
-            .ConfigureServices((context, services) =>
-            {
-                ConfigureServices(services, context.Configuration);
-            })
-            .Build();
-        Services = _host.Services;
-
-        Log.Information("Host built successfully");
-
-        // Set up exception handlers
-        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-        DispatcherUnhandledException += OnDispatcherUnhandledException;
-        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-
-        await _host.StartAsync();
-
-        // Handle command line if present
-        if (e.Args.Length > 0)
-        {
-            await HandleCommandLineArgumentsAsync(e.Args);
-            Shutdown();
-            return;
-        }
-
-        // Orchestrate startup
-        var mainWindow = new MainWindow();
-
-        try
-        {
-            var mainViewModel = Services.GetRequiredService<MainViewModel>();
-            mainWindow.DataContext = mainViewModel;
-            mainWindow.Show();
-
-            _ = Task.Run(async () =>
-            {
+                // Register Syncfusion license (Phase 1 requirement)
                 try
                 {
-                    // Try to get orchestration service if available
-                    var orchestrationService = Services.GetService<object>()?.GetType().Assembly
-                        .GetType("BusBuddy.WPF.Services.StartupOrchestrationService");
-
-                    var loadingViewModel = Services.GetRequiredService<LoadingViewModel>();
-
-                    if (orchestrationService != null)
+                    var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
+                    if (!string.IsNullOrEmpty(licenseKey))
                     {
-                        // Use reflection to call the service if it exists
-                        Log.Information("Executing startup sequence with orchestration service");
-                        // This would use reflection to call ExecuteStartupSequenceAsync
-
-                        // For now, just navigate to dashboard as a fallback
-                        await Task.Delay(100); // Ensure we have an await in the async lambda
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            if (mainViewModel.GetType().GetMethod("NavigateToDashboard") != null)
-                            {
-                                mainViewModel.NavigateToDashboard();
-                            }
-                        });
+                        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+                        Console.WriteLine("✅ Syncfusion license registered successfully");
                     }
                     else
                     {
-                        // Fallback: Just navigate to dashboard
-                        Log.Warning("Startup orchestration service not available, using fallback");
-                        await Task.Delay(100); // Ensure we have an await in the async lambda
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            if (mainViewModel.GetType().GetMethod("NavigateToDashboard") != null)
-                            {
-                                mainViewModel.NavigateToDashboard();
-                            }
-                        });
+                        Console.WriteLine("⚠️ No Syncfusion license key found in environment variables");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, "Error during startup orchestration");
+                    // Phase 1: Simple error handling
+                    Console.WriteLine($"❌ Syncfusion license error: {ex.Message}");
+                    MessageBox.Show($"Syncfusion license error: {ex.Message}", "Warning");
                 }
-            });
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error initializing main view model");
-            mainWindow.Show(); // Show window anyway
-        }
 
-        // Pre-warm caches in background
-        _ = Task.Run(PreWarmCachesAsync);
-    }
+                Console.WriteLine("🏗️ Building dependency injection host...");
 
-    private async Task PreWarmCachesAsync()
-    {
-        try
-        {
-            // Use reflection to check if bus caching service exists
-            Log.Information("Pre-warming application caches");
+                // Phase 1: Basic host builder
+                _host = Host.CreateDefaultBuilder()
+                    .ConfigureServices((context, services) =>
+                    {
+                        Console.WriteLine("📦 Registering services...");
 
-            // Simple delay to ensure some async operation occurs
-            await Task.Delay(100);
+                        // Phase 1: Register only essential ViewModels
+                        services.AddTransient<MainWindowViewModel>();
+                        services.AddTransient<DashboardViewModel>();
+                        services.AddTransient<DriversViewModel>();
+                        services.AddTransient<VehiclesViewModel>();
+                        services.AddTransient<ActivityScheduleViewModel>();
 
-            // Just log that pre-warming was attempted since we can't access the actual types
-            Log.Information("Cache pre-warming completed");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Cache pre-warming failed");
-        }
-    }
+                        Console.WriteLine("✅ Services registered successfully");
+                    })
+                    .Build();
 
-    private async Task HandleCommandLineArgumentsAsync(string[] args)
-    {
-        // Simplified handling; add debug cases under #if DEBUG if needed
-        Log.Information("Processing command line arguments: {Arguments}", string.Join(" ", args));
+                Console.WriteLine("✅ Host built successfully");
 
-        // Add an await to make this properly async
-        await Task.CompletedTask;
-    }
+                base.OnStartup(e);
 
-    private void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-    {
-        // Logging and Diagnostics
-        services.AddSingleton<PerformanceMonitor>();
+                Console.WriteLine("🪟 Creating main window...");
 
-        // Database
-        string? connectionString = configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<BusBuddyDbContext>(options =>
-        {
-            options.UseSqlServer(connectionString, sqlOptions =>
-            {
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(10),
-                    errorNumbersToAdd: null);
-                sqlOptions.CommandTimeout(15);
-            });
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-        }, ServiceLifetime.Scoped);
+                // Phase 1: Simple window creation
+                var mainWindow = new Views.Main.MainWindow();
 
-        // Data Access
-        services.AddScoped<IBusBuddyDbContextFactory, BusBuddyDbContextFactory>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
+                Console.WriteLine("🔗 Getting ViewModel from DI container...");
+                var viewModel = _host.Services.GetRequiredService<MainWindowViewModel>();
 
-        // Core Services
-        services.AddMemoryCache();
+                Console.WriteLine("🎯 Setting DataContext...");
+                mainWindow.DataContext = viewModel;
 
-        // Register remaining services based on availability
-        RegisterRemainingServices(services);
+                Console.WriteLine("🚀 Showing main window...");
+                mainWindow.Show();
 
-        // ViewModels
-        services.AddScoped<MainViewModel>();
-        services.AddScoped<LoadingViewModel>();
-        services.AddScoped<DashboardViewModel>();
-    }
-
-    private void RegisterRemainingServices(IServiceCollection services)
-    {
-        // This method conditionally registers services based on their availability
-        // It's separated to make the main method cleaner and easier to maintain
-
-        try
-        {
-            // 🎯 REGISTER ESSENTIAL CORE SERVICES
-
-            // Core Business Services
-            services.AddScoped<BusBuddy.Core.Services.Interfaces.IBusService, BusBuddy.Core.Services.BusService>();
-            services.AddScoped<BusBuddy.Core.Services.IDriverService, BusBuddy.Core.Services.DriverService>();
-            services.AddScoped<BusBuddy.Core.Services.IRouteService, BusBuddy.Core.Services.RouteService>();
-            services.AddScoped<BusBuddy.Core.Services.IStudentService, BusBuddy.Core.Services.StudentService>();
-            services.AddScoped<BusBuddy.Core.Services.IMaintenanceService, BusBuddy.Core.Services.MaintenanceService>();
-            services.AddScoped<BusBuddy.Core.Services.IFuelService, BusBuddy.Core.Services.FuelService>();
-            services.AddScoped<BusBuddy.Core.Services.IActivityLogService, BusBuddy.Core.Services.ActivityLogService>();
-            services.AddScoped<BusBuddy.Core.Services.IDashboardMetricsService, BusBuddy.Core.Services.DashboardMetricsService>();
-
-            // Caching and Performance Services
-            services.AddSingleton<BusBuddy.Core.Services.IEnhancedCachingService, BusBuddy.Core.Services.EnhancedCachingService>();
-            services.AddSingleton<BusBuddy.Core.Services.IBusCachingService, BusBuddy.Core.Services.BusCachingService>();
-
-            // 🎯 REGISTER WPF PRESENTATION SERVICES
-
-            services.AddSingleton<BusBuddy.WPF.Services.INavigationService, BusBuddy.WPF.Services.NavigationService>();
-            services.AddScoped<BusBuddy.WPF.Services.ILazyViewModelService, BusBuddy.WPF.Services.LazyViewModelService>();
-            services.AddScoped<BusBuddy.WPF.Services.StartupOrchestrationService>();
-
-            // 🎯 REGISTER CORE VIEWMODELS (Aligned with existing files)
-
-            // Main Application ViewModels
-            services.AddScoped<BusBuddy.WPF.ViewModels.DashboardViewModel>();
-            services.AddScoped<LoadingViewModel>();
-            services.AddScoped<MainViewModel>();
-
-            // Management ViewModels (using correct namespaces from actual files)
-            services.AddTransient<BusBuddy.WPF.ViewModels.BusManagementViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.DriverManagementViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.RouteManagementViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.Schedule.ScheduleManagementViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.StudentManagementViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.MaintenanceTrackingViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.FuelManagementViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.ActivityLogViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.SettingsViewModel>();
-
-            // Student ViewModels
-            services.AddTransient<BusBuddy.WPF.ViewModels.StudentListViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.StudentDetailViewModel>();
-            services.AddTransient<BusBuddy.WPF.ViewModels.Student.StudentEditViewModel>();
-
-            // Schedule ViewModels
-            services.AddTransient<BusBuddy.WPF.ViewModels.ScheduleManagement.ScheduleViewModel>();
-
-            // Register AutoMapper
-            var mappingProfileType = Type.GetType("BusBuddy.WPF.Mapping.MappingProfile, BusBuddy.WPF");
-            if (mappingProfileType != null)
-            {
-                services.AddAutoMapper(mappingProfileType);
-                Log.Debug("AutoMapper profile registered");
+                Console.WriteLine("✅ Application startup completed successfully!");
             }
-
-            // Register Utilities
-            var dbValidatorType = Type.GetType("BusBuddy.WPF.Utilities.DatabaseValidator, BusBuddy.WPF");
-            if (dbValidatorType != null)
+            catch (Exception ex)
             {
-                services.AddScoped(dbValidatorType);
-                Log.Debug("Database validator registered");
+                // Phase 2: Enhanced error reporting
+                var errorMessage = $"❌ CRITICAL ERROR during application startup:\n\n" +
+                                  $"Error: {ex.Message}\n\n" +
+                                  $"Type: {ex.GetType().Name}\n\n" +
+                                  $"Stack Trace:\n{ex.StackTrace}";
+
+                Console.WriteLine(errorMessage);
+
+                MessageBox.Show(errorMessage, "🚌 BusBuddy - Critical Startup Error",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+
+                // Ensure clean shutdown
+                Environment.Exit(1);
             }
-
-            Log.Information("All essential services registered successfully for Syncfusion WPF 30.1.40 implementation");
         }
-        catch (Exception ex)
+
+        protected override void OnExit(ExitEventArgs e)
         {
-            Log.Error(ex, "Error registering essential services");
+            _host?.Dispose();
+            base.OnExit(e);
         }
     }
-
-    #region Exception Handling
-
-    private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
-    {
-        var ex = e.ExceptionObject as Exception;
-        Log.Fatal(ex, "Unhandled domain exception. IsTerminating: {IsTerminating}", e.IsTerminating);
-        // Note: IsTerminating is read-only and determined by the runtime
-    }
-
-    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-    {
-        Log.Error(e.Exception, "Unhandled UI exception");
-        e.Handled = true;
-    }
-
-    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
-    {
-        Log.Error(e.Exception, "Unobserved task exception");
-        e.SetObserved();
-    }
-
-    #endregion
 }

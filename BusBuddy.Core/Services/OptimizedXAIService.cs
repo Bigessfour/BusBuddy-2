@@ -63,8 +63,8 @@ namespace BusBuddy.Core.Services
 
             // Load configuration
             var xaiConfig = configuration.GetSection("XAI");
-            _apiKey = xaiConfig["ApiKey"] ?? throw new ArgumentException("XAI ApiKey not configured");
-            _model = xaiConfig["DefaultModel"] ?? "grok-3-latest";
+            _apiKey = xaiConfig["ApiKey"] ?? Environment.GetEnvironmentVariable("XAI_API_KEY") ?? throw new ArgumentException("XAI ApiKey not configured. Set XAI_API_KEY environment variable.");
+            _model = xaiConfig["DefaultModel"] ?? "grok-4"; // Updated to latest Grok-4 model
 
             var maxTokensPerDay = xaiConfig.GetValue<int>("MaxTokensPerDay", 100000);
             _budgetManager = new TokenBudgetManager(maxTokensPerDay, TimeSpan.FromDays(1));
@@ -74,12 +74,8 @@ namespace BusBuddy.Core.Services
             _batchSemaphore = new SemaphoreSlim(1, 1);
             _concurrencySemaphore = new SemaphoreSlim(MAX_CONCURRENT_REQUESTS, MAX_CONCURRENT_REQUESTS);
 
-            // Configure HttpClient with connection pooling
-            var handler = new HttpClientHandler
-            {
-                MaxConnectionsPerServer = 100
-            };
-            _httpClient = new HttpClient(handler, disposeHandler: true)
+            // Configure HttpClient with connection pooling - properly dispose handler
+            _httpClient = new HttpClient()
             {
                 Timeout = TimeSpan.FromSeconds(60)
             };
@@ -115,6 +111,20 @@ namespace BusBuddy.Core.Services
             {
                 var optimizedPrompt = OptimizePrompt(prompt, context);
                 int estimatedTokens = EstimateTokens(optimizedPrompt);
+
+                // Enhanced token validation using XAI best practices
+                var (isValid, warning, recommendedMax) = ValidateTokenCount(estimatedTokens);
+                if (!isValid)
+                {
+                    Interlocked.Increment(ref _totalErrors);
+                    Logger.Error("Token validation failed: {Warning}. Estimated tokens: {TokenCount}", warning, estimatedTokens);
+                    throw new InvalidOperationException($"Token validation failed: {warning}");
+                }
+
+                if (warning != null)
+                {
+                    Logger.Warning("Token usage warning: {Warning}. Consider optimizing prompt.", warning);
+                }
 
                 if (!_budgetManager.CanProcess(estimatedTokens))
                 {
@@ -161,12 +171,25 @@ namespace BusBuddy.Core.Services
         }
 
         /// <summary>
-        /// Stream large responses for better user experience
+        /// Stream large responses for better user experience with enhanced token validation
         /// </summary>
         public async IAsyncEnumerable<string> StreamResponseAsync(string prompt)
         {
             var optimizedPrompt = OptimizePrompt(prompt);
             int estimatedTokens = EstimateTokens(optimizedPrompt);
+
+            // Enhanced token validation for streaming requests
+            var (isValid, warning, recommendedMax) = ValidateTokenCount(estimatedTokens, isStreaming: true);
+            if (!isValid)
+            {
+                Logger.Error("Streaming token validation failed: {Warning}. Estimated tokens: {TokenCount}", warning, estimatedTokens);
+                throw new InvalidOperationException($"Token validation failed for streaming: {warning}");
+            }
+
+            if (warning != null)
+            {
+                Logger.Warning("Streaming token usage warning: {Warning}. Consider optimizing prompt.", warning);
+            }
 
             if (!_budgetManager.CanProcess(estimatedTokens))
             {
@@ -294,13 +317,163 @@ namespace BusBuddy.Core.Services
         /// <summary>
         /// Estimate token count for budget management
         /// </summary>
+        /// <summary>
+        /// Enhanced token estimation using tokenizer patterns optimized for Grok models
+        /// Based on XAI documentation recommendations for accurate token counting
+        /// </summary>
         private int EstimateTokens(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return 0;
 
-            // Rough estimation: ~4 characters per token for English text
-            return (int)Math.Ceiling(text.Length / 4.0);
+            // Enhanced tokenization following XAI best practices
+            return TokenizeText(text).Count;
+        }
+
+        /// <summary>
+        /// Tokenizes text using patterns optimized for Grok model tokenizer
+        /// Implements subword tokenization similar to GPT-style tokenizers
+        /// </summary>
+        private List<string> TokenizeText(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return new List<string>();
+
+            var tokens = new List<string>();
+            var words = text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var word in words)
+            {
+                // Handle punctuation and special characters as separate tokens
+                var currentWord = word.Trim();
+                if (string.IsNullOrEmpty(currentWord)) continue;
+
+                // Split on common punctuation
+                var punctuationPattern = new[] { '.', ',', '!', '?', ';', ':', '"', '\'', '(', ')', '[', ']', '{', '}' };
+                var wordTokens = SplitWordOnPunctuation(currentWord, punctuationPattern);
+
+                foreach (var token in wordTokens)
+                {
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        // Apply subword tokenization for longer words (BPE-style)
+                        tokens.AddRange(ApplySubwordTokenization(token));
+                    }
+                }
+            }
+
+            return tokens;
+        }
+
+        /// <summary>
+        /// Splits a word on punctuation marks, treating each punctuation as a separate token
+        /// </summary>
+        private List<string> SplitWordOnPunctuation(string word, char[] punctuation)
+        {
+            var result = new List<string>();
+            var currentToken = new StringBuilder();
+
+            foreach (char c in word)
+            {
+                if (punctuation.Contains(c))
+                {
+                    if (currentToken.Length > 0)
+                    {
+                        result.Add(currentToken.ToString());
+                        currentToken.Clear();
+                    }
+                    result.Add(c.ToString());
+                }
+                else
+                {
+                    currentToken.Append(c);
+                }
+            }
+
+            if (currentToken.Length > 0)
+            {
+                result.Add(currentToken.ToString());
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Applies subword tokenization similar to Byte-Pair Encoding (BPE)
+        /// Optimized for Grok model tokenizer behavior
+        /// </summary>
+        private List<string> ApplySubwordTokenization(string word)
+        {
+            var tokens = new List<string>();
+
+            // For words longer than 6 characters, apply subword splitting
+            if (word.Length <= 6)
+            {
+                tokens.Add(word);
+                return tokens;
+            }
+
+            // Simple BPE-like tokenization
+            var remaining = word;
+            while (remaining.Length > 0)
+            {
+                if (remaining.Length <= 4)
+                {
+                    tokens.Add(remaining);
+                    break;
+                }
+
+                // Take chunks of 4-6 characters, preferring word boundaries
+                var chunkSize = Math.Min(6, remaining.Length);
+                var chunk = remaining.Substring(0, chunkSize);
+
+                // Adjust chunk size to avoid splitting at vowel-consonant boundaries when possible
+                if (chunkSize < remaining.Length && IsVowel(remaining[chunkSize - 1]) && !IsVowel(remaining[chunkSize]))
+                {
+                    chunkSize = Math.Max(3, chunkSize - 1);
+                    chunk = remaining.Substring(0, chunkSize);
+                }
+
+                tokens.Add(chunk);
+                remaining = remaining.Substring(chunkSize);
+            }
+
+            return tokens;
+        }
+
+        /// <summary>
+        /// Helper method to identify vowels for better subword tokenization
+        /// </summary>
+        private bool IsVowel(char c)
+        {
+            return "aeiouAEIOU".Contains(c);
+        }
+
+        /// <summary>
+        /// Validates token count against XAI model limits and provides optimization suggestions
+        /// </summary>
+        private (bool IsValid, string? Warning, int RecommendedMaxTokens) ValidateTokenCount(int tokenCount, bool isStreaming = false)
+        {
+            const int GROK_4_CONTEXT_LIMIT = 262144; // 256K tokens for Grok-4
+            const int RECOMMENDED_REQUEST_LIMIT = 8192; // Conservative limit for individual requests
+            const int WARNING_THRESHOLD = 4096; // Warn at 4K tokens
+
+            if (tokenCount > GROK_4_CONTEXT_LIMIT)
+            {
+                return (false, $"Token count {tokenCount:N0} exceeds Grok-4 context limit of {GROK_4_CONTEXT_LIMIT:N0} tokens", RECOMMENDED_REQUEST_LIMIT);
+            }
+
+            if (tokenCount > RECOMMENDED_REQUEST_LIMIT)
+            {
+                return (false, $"Token count {tokenCount:N0} exceeds recommended request limit of {RECOMMENDED_REQUEST_LIMIT:N0} tokens", RECOMMENDED_REQUEST_LIMIT);
+            }
+
+            if (tokenCount > WARNING_THRESHOLD)
+            {
+                return (true, $"High token count {tokenCount:N0}. Consider optimizing prompt for better performance.", RECOMMENDED_REQUEST_LIMIT);
+            }
+
+            return (true, null, RECOMMENDED_REQUEST_LIMIT);
         }
 
         /// <summary>

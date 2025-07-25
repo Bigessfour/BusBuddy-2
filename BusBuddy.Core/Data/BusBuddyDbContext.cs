@@ -1,9 +1,9 @@
+using System.Linq.Expressions;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Models.Base;
 using BusBuddy.Core.Models.Trips;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Linq.Expressions;
 
 namespace BusBuddy.Core.Data;
 /// <summary>
@@ -25,7 +25,7 @@ public class BusBuddyDbContext : DbContext
     /// <summary>
     /// Controls whether to skip global data seeding (for test isolation)
     /// </summary>
-    public static bool SkipGlobalSeedData { get; set; } = false;
+    public static bool SkipGlobalSeedData { get; set; }
 
     private string _currentAuditUser = "System";
 

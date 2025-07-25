@@ -1,11 +1,6 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
 ║                                            🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                      ║
-║                                                          [SUPPORTING DIALOG VIEW]                                                                                      ║
-║  📋 REQUIRED STANDARDS: This supporting dialog MUST follow the universal standards defined in:                                                                         ║
-║     - BusBuddy.WPF\Resources\SyncfusionFluentDarkTheme.xaml (Universal Control Standards)                                                                             ║
-║     - Documentation\SyncfusionThemeImplementationGuide.md (Implementation Guide)                                                                                       ║
-║  📚 DEVELOPMENT REFERENCE: See Documentation\SyncfusionThemeImplementationGuide.md for copy-paste templates                                                          ║
 ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 -->
 
@@ -14,41 +9,81 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
         mc:Ignorable="d"
         Title="Confirmation"
-        Height="200"
-        Width="400"
+        Height="250"
+        Width="450"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False">
     <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Message -->
-        <TextBlock x:Name="MessageText"
-                   Text="Are you sure you want to perform this action?"
-                   TextWrapping="Wrap"
-                   VerticalAlignment="Center"/>
+        <!-- Icon and Title -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+            <Border Background="#FF8C00"
+                    Width="48"
+                    Height="48"
+                    CornerRadius="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="0,0,15,0">
+                <TextBlock Text="⚠️"
+                           FontSize="24"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Confirm Action"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Margin="0,0,0,5"/>
+                <TextBlock Text="Please confirm that you want to proceed with this action."
+                           FontSize="12"
+                           Foreground="#666666"/>
+            </StackPanel>
+        </StackPanel>
 
-        <!-- Buttons -->
-        <StackPanel Grid.Row="1"
+        <!-- Message Content -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource SurfaceBackground}"
+                BorderBrush="{DynamicResource SurfaceBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Margin="0,0,0,20">
+            <TextBlock x:Name="MessageText"
+                       Text="Are you sure you want to perform this action?"
+                       TextWrapping="Wrap"
+                       FontSize="14"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"/>
+        </Border>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    Margin="0,20,0,0">
-            <Button Content="No"
-                    Width="80"
-                    Height="30"
-                    Margin="0,0,10,0"
-                    Click="NoButton_Click"
-                    IsCancel="True"/>
-            <Button Content="Yes"
-                    Width="80"
-                    Height="30"
-                    Click="YesButton_Click"
-                    IsDefault="True"/>
+                    HorizontalAlignment="Right">
+            <syncfusion:ButtonAdv Label="No, Cancel"
+                                  Width="100"
+                                  Height="35"
+                                  Margin="0,0,10,0"
+                                  Click="NoButton_Click"
+                                  IsCancel="True"
+                                  Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"/>
+            <syncfusion:ButtonAdv Label="Yes, Continue"
+                                  Width="120"
+                                  Height="35"
+                                  Click="YesButton_Click"
+                                  IsDefault="True"
+                                  Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

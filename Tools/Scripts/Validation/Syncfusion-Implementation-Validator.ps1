@@ -157,36 +157,44 @@ function Test-LicenseConfiguration {
     $issues = @()
 
     if (Test-Path $appFile) {
-        $content = Get-Content $appFile -Raw
-
-        if ($content -match 'Syncfusion\.Licensing\.SyncfusionLicenseProvider\.RegisterLicense') {
-            Write-ValidationLog "✅ License registration found in App.xaml.cs" "SUCCESS"
-        } else {
-            $issues += [PSCustomObject]@{
-                File     = "App.xaml.cs"
-                Issue    = "Missing Syncfusion license registration"
-                Severity = "ERROR"
-            }
-        }
-
         # Check if license is registered before InitializeComponent
-        $lines = $content -split "`n"
-        $licenseLineIndex = -1
-        $initComponentLineIndex = -1
-
-        for ($i = 0; $i -lt $lines.Count; $i++) {
-            if ($lines[$i] -match 'RegisterLicense') { $licenseLineIndex = $i }
-            if ($lines[$i] -match 'InitializeComponent') { $initComponentLineIndex = $i }
+        $appContent = Get-Content $appFile -Raw
+        $result = [PSCustomObject]@{
+            IsValid = $false
+            Issues  = @()
         }
 
-        if ($licenseLineIndex -gt -1 -and $initComponentLineIndex -gt -1 -and $licenseLineIndex -gt $initComponentLineIndex) {
-            $issues += [PSCustomObject]@{
-                File     = "App.xaml.cs"
-                Issue    = "License registration should occur before InitializeComponent()"
-                Severity = "WARNING"
-            }
+        # Check for license registration in constructor
+        if ($appContent -match "public App\(\s*\)\s*\{[^}]*(RegisterSyncfusionLicense|SyncfusionLicenseProvider.RegisterLicense)[^}]*\}") {
+            $result.IsValid = $true
         }
-    } else {
+        else {
+            $result.Issues += "License registration not found in App constructor"
+            $result.IsValid = $false
+        }
+
+        # Check if license registration happens before InitializeComponent() call
+        if ($appContent -match "RegisterSyncfusionLicense.*InitializeComponent" -or
+            $appContent -match "SyncfusionLicenseProvider.RegisterLicense.*InitializeComponent") {
+            $result.IsValid = $true
+        }
+        else {
+            $result.Issues += "License not registered before InitializeComponent"
+            $result.IsValid = $false
+        }
+
+        # Verify presence of EnsureSyncfusionResourcesLoaded or similar method
+        if ($appContent -match "EnsureSyncfusionResourcesLoaded|LoadSyncfusionResources|ConfigureSyncfusionTheme") {
+            $result.IsValid = $true && $result.IsValid
+        }
+        else {
+            $result.Issues += "No method to ensure Syncfusion resources are loaded"
+            $result.IsValid = $false
+        }
+
+        return $result
+    }
+    else {
         $issues += [PSCustomObject]@{
             File     = "App.xaml.cs"
             Issue    = "App.xaml.cs not found"
@@ -235,7 +243,8 @@ function Test-AssemblyReferences {
                 Issue    = "Inconsistent Syncfusion package versions: $($versions -join ', ')"
                 Severity = "WARNING"
             }
-        } elseif ($versions.Count -eq 1) {
+        }
+        elseif ($versions.Count -eq 1) {
             Write-ValidationLog "✅ Consistent Syncfusion version: $($versions[0])" "SUCCESS"
         }
     }
@@ -284,7 +293,8 @@ function Invoke-SyncfusionValidation {
                     Write-ValidationLog "  📁 $($_.File): $($_.Issue)" $_.Severity
                 }
             }
-        } else {
+        }
+        else {
             Write-ValidationLog "✅ No issues found! Syncfusion implementation looks good." "SUCCESS"
         }
 
@@ -302,13 +312,129 @@ function Invoke-SyncfusionValidation {
         $reportData | ConvertTo-Json -Depth 10 | Out-File -FilePath $reportPath -Encoding utf8
         Write-ValidationLog "📄 Detailed report saved to: $reportPath" "INFO"
 
-    } catch {
+    }
+    catch {
         Write-ValidationLog "❌ Validation failed: $($_.Exception.Message)" "ERROR"
         throw
     }
 
     Write-ValidationLog "✅ Syncfusion validation completed" "SUCCESS"
     return $allIssues.Count -eq 0
+}
+
+function Test-SyncfusionImplementation {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [string]$ProjectPath = (Join-Path $PSScriptRoot "..\..\..")
+    )
+
+    Write-Host "Starting Syncfusion implementation validation..." -ForegroundColor Cyan
+
+    $wpfProjectPath = Join-Path $ProjectPath "BusBuddy.WPF"
+    $resourcesPath = Join-Path $wpfProjectPath "Resources"
+    $appXaml = Join-Path $wpfProjectPath "App.xaml"
+    $menuStyles = Join-Path $resourcesPath "MenuStyles.xaml"
+    $themeSvc = Join-Path $wpfProjectPath "Services\ThemeService.cs"
+
+    $issues = @()
+    $warnings = @()
+
+    # Check required files exist
+    Write-Host "Checking required files..." -ForegroundColor Yellow
+
+    if (-not (Test-Path $appXaml)) {
+        $issues += "App.xaml not found"
+    }
+
+    if (-not (Test-Path $menuStyles)) {
+        $issues += "MenuStyles.xaml not found"
+    }
+
+    if (-not (Test-Path $themeSvc)) {
+        $issues += "ThemeService.cs not found"
+    }
+
+    # Check App.xaml includes MenuStyles.xaml
+    if (Test-Path $appXaml) {
+        Write-Host "Checking App.xaml ResourceDictionary setup..." -ForegroundColor Yellow
+        $appContent = Get-Content $appXaml -Raw
+
+        if (-not ($appContent -match "ResourceDictionary\.MergedDictionaries")) {
+            $issues += "App.xaml does not have MergedDictionaries section"
+        }
+
+        if (-not ($appContent -match "component/Resources/MenuStyles\.xaml")) {
+            $issues += "App.xaml does not include MenuStyles.xaml in MergedDictionaries"
+        }
+    }
+
+    # Check MenuStyles.xaml has required styles
+    if (Test-Path $menuStyles) {
+        Write-Host "Checking MenuStyles.xaml for required styles..." -ForegroundColor Yellow
+        $menuStylesContent = Get-Content $menuStyles -Raw
+
+        $requiredStyles = @(
+            "MenuItemStyle",
+            "MenuSeparatorStyle",
+            "ContextMenuStyle"
+        )
+
+        foreach ($style in $requiredStyles) {
+            if (-not ($menuStylesContent -match "x:Key=`"$style`"")) {
+                $issues += "MenuStyles.xaml missing required style: $style"
+            }
+        }
+    }
+
+    # Check ThemeService.cs for proper SfSkinManager usage
+    if (Test-Path $themeSvc) {
+        Write-Host "Checking ThemeService.cs for proper SfSkinManager implementation..." -ForegroundColor Yellow
+        $themeSvcContent = Get-Content $themeSvc -Raw
+
+        $requiredPatterns = @(
+            "SfSkinManager\.ApplyThemeAsDefaultStyle\s*=\s*true",
+            "SfSkinManager\.ApplicationTheme",
+            "SfSkinManager\.SetTheme\("
+        )
+
+        foreach ($pattern in $requiredPatterns) {
+            if (-not ($themeSvcContent -match $pattern)) {
+                $issues += "ThemeService.cs missing required SfSkinManager implementation: $pattern"
+            }
+        }
+
+        # Check theme registration
+        if (-not ($themeSvcContent -match "SfSkinManager\.RegisterThemeSettings\(")) {
+            $warnings += "ThemeService.cs may be missing theme settings registration"
+        }
+    }
+
+    # Output results
+    if ($issues.Count -eq 0) {
+        Write-Host "`nSyncfusion implementation validation PASSED!" -ForegroundColor Green
+    }
+    else {
+        Write-Host "`nSyncfusion implementation validation FAILED!" -ForegroundColor Red
+        Write-Host "`nCritical Issues:" -ForegroundColor Red
+        foreach ($issue in $issues) {
+            Write-Host "- $issue" -ForegroundColor Red
+        }
+    }
+
+    if ($warnings.Count -gt 0) {
+        Write-Host "`nWarnings:" -ForegroundColor Yellow
+        foreach ($warning in $warnings) {
+            Write-Host "- $warning" -ForegroundColor Yellow
+        }
+    }
+
+    # Return validation result object
+    [PSCustomObject]@{
+        Success  = ($issues.Count -eq 0)
+        Issues   = $issues
+        Warnings = $warnings
+    }
 }
 
 # Main execution

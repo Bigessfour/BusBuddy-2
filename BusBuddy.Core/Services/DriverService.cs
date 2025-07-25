@@ -1,9 +1,9 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace BusBuddy.Core.Services
 {
@@ -17,7 +17,7 @@ namespace BusBuddy.Core.Services
         private static readonly ILogger Logger = Log.ForContext<DriverService>();
         private readonly IEnhancedCachingService _cachingService;
         private static readonly SemaphoreSlim _semaphore = new(1, 1);
-        private static bool _nullValuesFixed = false;
+        private static bool _nullValuesFixed;
 
         public DriverService(IBusBuddyDbContextFactory contextFactory, IEnhancedCachingService cachingService)
         {

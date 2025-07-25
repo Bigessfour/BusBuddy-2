@@ -94,7 +94,8 @@ function Start-BusBuddyHotReload {
             while ($true) {
                 Start-Sleep -Seconds 1
             }
-        } finally {
+        }
+        finally {
             $watcher.EnableRaisingEvents = $false
             $watcher.Dispose()
 
@@ -102,7 +103,8 @@ function Start-BusBuddyHotReload {
                 Get-Job -Name "BusBuddyLogMonitor" -ErrorAction SilentlyContinue | Stop-Job | Remove-Job
             }
         }
-    } finally {
+    }
+    finally {
         Pop-Location
     }
 }
@@ -160,7 +162,8 @@ function Start-BusBuddyDevSession {
             while ($true) {
                 try {
                     Watch-BusBuddyLogs -Lines 5 -Follow
-                } catch {
+                }
+                catch {
                     Start-Sleep -Seconds 5
                 }
             }
@@ -194,7 +197,8 @@ function Stop-BusBuddyDevSession {
         Write-Host "🧹 Cleaning up $($jobs.Count) background jobs..." -ForegroundColor Cyan
         $jobs | Stop-Job | Remove-Job -Force
         Write-Host "✅ Background jobs cleaned up" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "ℹ️ No background jobs to clean up" -ForegroundColor Gray
     }
 
@@ -340,7 +344,8 @@ function Invoke-BusBuddyFullDiagnostic {
             MostRecentLog       = if ($logFiles.Count -gt 0) { $logFiles[0].Name } else { $null }
             TotalLogSize        = $totalSize
         }
-    } else {
+    }
+    else {
         $diagnosticData.LogAnalysis = @{
             LogsDirectoryExists = $false
             TotalLogFiles       = 0
@@ -499,3 +504,22 @@ Write-Host "   bb-quick-test      - Rapid build-test-validate cycle" -Foreground
 Write-Host "   bb-diagnostic      - Comprehensive project health check" -ForegroundColor Gray
 Write-Host "   bb-report          - Generate detailed project report" -ForegroundColor Gray
 Write-Host ""
+
+function Get-SyncfusionErrors {
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$ErrorLines
+    )
+    $syncfusionErrors = $ErrorLines | Where-Object { $_ -match 'Syncfusion' }
+    if ($syncfusionErrors) {
+        Write-Host "Syncfusion-related errors detected:" -ForegroundColor Yellow
+        $syncfusionErrors | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+    }
+    else {
+        Write-Host "No Syncfusion-related errors found."
+    }
+}
+
+# Example usage:
+# $logLines = Get-Content 'logs/build-latest.log'
+# Get-SyncfusionErrors -ErrorLines $logLines

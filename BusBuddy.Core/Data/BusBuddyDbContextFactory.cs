@@ -38,7 +38,7 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory, IDesignTimeDb
         }
 
         // Create a scope to ensure proper dependency resolution
-        var scope = _serviceProvider.CreateScope();
+        using var scope = _serviceProvider.CreateScope();
 
         // Get a fresh DbContext instance from the DI container
         var context = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();
@@ -64,7 +64,7 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory, IDesignTimeDb
         }
 
         // Create a scope to ensure proper dependency resolution
-        var scope = _serviceProvider.CreateScope();
+        using var scope = _serviceProvider.CreateScope();
 
         // Get a fresh DbContext instance from the DI container
         var dbContext = scope.ServiceProvider.GetRequiredService<BusBuddyDbContext>();

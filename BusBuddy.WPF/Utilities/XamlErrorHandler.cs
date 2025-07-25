@@ -1,11 +1,11 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
-using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using System.Threading.Tasks;
 
 namespace BusBuddy.WPF.Utilities
 {
@@ -16,7 +16,7 @@ namespace BusBuddy.WPF.Utilities
     public static class XamlErrorHandler
     {
         private static readonly Serilog.ILogger Logger = Log.ForContext(typeof(XamlErrorHandler));
-        private static volatile int _recoveryAttempts = 0;
+        private static volatile int _recoveryAttempts;
         private static readonly int MAX_RECOVERY_ATTEMPTS = 3;
         private static readonly object _recoveryLock = new object();
 

@@ -8,7 +8,7 @@ using BusBuddy.Core.Services.Interfaces;
 using Serilog;
 using Syncfusion.UI.Xaml.Scheduler;
 
-namespace BusBuddy.WPF.Services;
+namespace BusBuddy.Core.Services;
 
 /// <summary>
 /// Custom Schedule Data Provider for BusBuddy

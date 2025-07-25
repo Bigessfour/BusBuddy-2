@@ -298,7 +298,7 @@ public class SchemaValidationResult
 
 public class FixResult
 {
-    public int IssuesFixed { get; set; } = 0;
+    public int IssuesFixed { get; set; }
     public List<string> FixesApplied { get; set; } = new();
 }
 

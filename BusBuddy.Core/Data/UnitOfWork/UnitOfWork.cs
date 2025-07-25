@@ -17,7 +17,7 @@ public class UnitOfWork : IUnitOfWork
     private readonly IUserContextService _userContextService;
     private IDbContextTransaction? _transaction;
     private string? _currentAuditUser;
-    private bool _disposed = false;
+    private bool _disposed;
 
     // Repository instances
     private IActivityRepository? _activities;

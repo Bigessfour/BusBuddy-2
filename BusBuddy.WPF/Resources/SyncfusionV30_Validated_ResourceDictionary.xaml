@@ -155,7 +155,9 @@
     ║     • xmlns:syncfusiontools="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.WPF"
     ║     • xmlns:syncfusionGrid="clr-namespace:Syncfusion.UI.Xaml.Grid;assembly=Syncfusion.SfGrid.WPF"
     ║     • xmlns:syncfusionButton="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.WPF"
-    ║     • xmlns:syncfusionInput="clr-namespace:Syncfusion.Windows.Tools.Controls;assembly=Syncfusion.Tools.WPF"
+    ║     • xmlns:syncfusionInput="clr-namespace:Syncfusion.Windows.Controls.Input;assembly=Syncfusion.SfInput.WPF"
+    ║     • xmlns:syncfusionBusy="clr-namespace:Syncfusion.Windows.Controls.Notification;assembly=Syncfusion.SfBusyIndicator.WPF"
+    ║     • xmlns:syncfusionChart="clr-namespace:Syncfusion.UI.Xaml.Charts;assembly=Syncfusion.SfChart.WPF"
     ║
     ║  💡 CONTROL STYLE IMPLEMENTATION STRATEGY:
     ║     • Styles applied via FluentDark/FluentLight themes

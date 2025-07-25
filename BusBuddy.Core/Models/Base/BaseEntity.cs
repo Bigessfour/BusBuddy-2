@@ -15,7 +15,7 @@ public abstract class BaseEntity : INotifyPropertyChanged
     private DateTime? _updatedDate;
     private string? _createdBy;
     private string? _updatedBy;
-    private bool _isDeleted = false;
+    private bool _isDeleted;
     private string? _customFields;
 
     /// <summary>
