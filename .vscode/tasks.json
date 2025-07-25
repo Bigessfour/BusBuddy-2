@@ -789,6 +789,96 @@
       },
       "detail": "📦 Restore packages only - shows package sources, restore performance, cache hits, and dependency status",
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "🛡️ BB: Dependency Security Scan",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\dependency-management.ps1",
+        "-ScanVulnerabilities"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🛡️ Scan all packages for security vulnerabilities and generate security report",
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 BB: Full Dependency Analysis",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\dependency-management.ps1",
+        "-Full"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "📊 Complete dependency analysis: security scan, version validation, consistency check, and detailed reporting",
+      "problemMatcher": []
+    },
+    {
+      "label": "📌 BB: Validate Version Pinning",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\dependency-management.ps1",
+        "-ValidateVersions"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "📌 Validate that all package versions are properly pinned and consistent across projects",
+      "problemMatcher": []
     }
   ]
 }

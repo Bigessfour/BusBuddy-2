@@ -104,7 +104,7 @@ namespace BusBuddy.Core.Services
                             new { role = "system", content = "You are Bus Buddy AI, an expert transportation management assistant. Provide detailed, actionable insights for school bus operations." },
                             new { role = "user", content = prompt }
                         },
-                        model = "grok-3-latest",
+                        model = "grok-4-latest",
                         temperature = 0.3,
                         max_tokens = 2000
                     };

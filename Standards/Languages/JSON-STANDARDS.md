@@ -15,7 +15,6 @@
 
 ### **Performance Data**
 - `benchmark-results-*.json` - Performance benchmark results
-- `steve-rewards.json` - User reward tracking
 
 ## **JSON Standards Enforcement**
 

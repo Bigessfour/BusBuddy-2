@@ -7,6 +7,8 @@ using BusBuddy.WPF.Logging;
 using BusBuddy.Core.Extensions;
 using BusBuddy.Core;
 using BusBuddy.Core.Data;
+using BusBuddy.Core.Services;
+using BusBuddy.Core.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.IO;
@@ -75,6 +77,19 @@ namespace BusBuddy.WPF
 
             // Phase 1: Basic host builder with database and data seeding
             _host = Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration((context, config) =>
+                {
+                    // Load Azure configuration if available
+                    var azureConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration", "Production", "appsettings.azure.json");
+                    if (File.Exists(azureConfigPath))
+                    {
+                        config.AddJsonFile(azureConfigPath, optional: true, reloadOnChange: true);
+                        Log.Information("📋 Azure configuration loaded from {ConfigPath}", azureConfigPath);
+                    }
+
+                    // Add environment variables to resolve ${VAR_NAME} placeholders
+                    config.AddEnvironmentVariables();
+                })
                 .ConfigureServices((context, services) =>
                 {
                     Log.Information("📦 Registering services...");
@@ -86,6 +101,10 @@ namespace BusBuddy.WPF
 
                     // Phase 1: Register Phase 1 services including data seeding
                     services.AddPhase1Services();
+
+                    // Azure Configuration Support
+                    var azureConfigService = new AzureConfigurationService(context.Configuration);
+                    azureConfigService.RegisterServices(services);
 
                     // Phase 1: Register only essential ViewModels
                     services.AddTransient<MainWindowViewModel>();

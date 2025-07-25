@@ -984,3 +984,24 @@ phd-mentor-error.log
 
 # Steve Happiness Tracker - ALLOW
 !steve-happiness-tracker.ps1
+
+# ===================================================
+# AZURE CONFIGURATION INFRASTRUCTURE - ALLOW ALL
+# ===================================================
+# Azure Configuration Service and Options
+!BusBuddy.Core/Configuration/
+!BusBuddy.Core/Configuration/*.cs
+!BusBuddy.Core/Services/AzureConfigurationService.cs
+
+# Azure Configuration Files Structure
+!Configuration/
+!Configuration/Production/
+!Configuration/Production/appsettings.azure.json
+!Configuration/Development/
+
+# Grok 4 Integration Documentation
+!Documentation/GROK-4-UPGRADE-SUMMARY.md
+
+# Dependency Management for Azure Packages
+!dependency-management.ps1
+!NuGet.config

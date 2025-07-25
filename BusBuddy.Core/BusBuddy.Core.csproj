@@ -19,13 +19,24 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EntityFrameworkVersion)" />
 
     <!-- Microsoft Extensions (Additional for Core) -->
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(MicrosoftExtensionsVersion)" />
 
-    <!-- External APIs -->
+    <!-- Google Earth Engine Integration -->
     <PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
+    <PackageReference Include="Google.Apis.Core" Version="1.70.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.0.0" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.70.0.3834" />
+
+    <!-- xAI Grok API Integration (OpenAI-compatible) -->
+    <PackageReference Include="OpenAI" Version="2.0.0-beta.10" />
+
+    <!-- Resilience and HTTP -->
+    <PackageReference Include="Polly" Version="8.4.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.7" />
+
+    <!-- Azure Authentication (Optional for Azure SQL Managed Identity) -->
+    <PackageReference Include="Azure.Identity" Version="1.13.0" />
 
     <!-- 📄 Syncfusion PDF Generation for Core Services -->
     <PackageReference Include="Syncfusion.Pdf.NET" Version="$(SyncfusionVersion)" />

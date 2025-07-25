@@ -168,8 +168,6 @@
 
     <!-- Additional Extensions -->
     <PackageReference Include="System.Net.Http.Json" Version="9.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
   </ItemGroup>
 
   <!-- 🧹 CLEAN CONFIGURATION -->

@@ -77,14 +77,14 @@ namespace BusBuddy.Core.Services
                 var prompt = BuildRouteOptimizationPrompt(request);
                 var xaiRequest = new XAIRequest
                 {
-                    Model = _configuration["XAI:DefaultModel"] ?? "grok-3-latest",
+                    Model = _configuration["XAI:DefaultModel"] ?? "grok-4-latest",
                     Messages = new[]
                     {
                         new XAIMessage { Role = "system", Content = GetTransportationExpertSystemPrompt() },
                         new XAIMessage { Role = "user", Content = prompt }
                     },
                     Temperature = _configuration.GetValue<double>("XAI:Temperature", 0.3),
-                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 4000)
+                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 128000)
                 };
 
                 var response = await CallXAIAPI(CHAT_COMPLETIONS_ENDPOINT, xaiRequest);
@@ -109,14 +109,14 @@ namespace BusBuddy.Core.Services
                 var prompt = BuildMaintenancePredictionPrompt(request);
                 var xaiRequest = new XAIRequest
                 {
-                    Model = _configuration["XAI:DefaultModel"] ?? "grok-3-latest",
+                    Model = _configuration["XAI:DefaultModel"] ?? "grok-4-latest",
                     Messages = new[]
                     {
                         new XAIMessage { Role = "system", Content = GetMaintenanceExpertSystemPrompt() },
                         new XAIMessage { Role = "user", Content = prompt }
                     },
                     Temperature = 0.2, // Lower temperature for more precise technical predictions
-                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 4000) / 2
+                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 128000) / 2
                 };
 
                 if (!_isConfigured)
@@ -146,14 +146,14 @@ namespace BusBuddy.Core.Services
                 var prompt = BuildSafetyAnalysisPrompt(request);
                 var xaiRequest = new XAIRequest
                 {
-                    Model = _configuration["XAI:DefaultModel"] ?? "grok-3-latest",
+                    Model = _configuration["XAI:DefaultModel"] ?? "grok-4-latest",
                     Messages = new[]
                     {
                         new XAIMessage { Role = "system", Content = GetSafetyExpertSystemPrompt() },
                         new XAIMessage { Role = "user", Content = prompt }
                     },
                     Temperature = 0.1, // Very low temperature for safety-critical analysis
-                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 4000) / 2
+                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 128000) / 2
                 };
 
                 if (!_isConfigured)
@@ -183,14 +183,14 @@ namespace BusBuddy.Core.Services
                 var prompt = BuildStudentOptimizationPrompt(request);
                 var xaiRequest = new XAIRequest
                 {
-                    Model = _configuration["XAI:DefaultModel"] ?? "grok-3-latest",
+                    Model = _configuration["XAI:DefaultModel"] ?? "grok-4-latest",
                     Messages = new[]
                     {
                         new XAIMessage { Role = "system", Content = GetLogisticsExpertSystemPrompt() },
                         new XAIMessage { Role = "user", Content = prompt }
                     },
                     Temperature = _configuration.GetValue<double>("XAI:Temperature", 0.3),
-                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 4000)
+                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 128000)
                 };
 
                 if (!_isConfigured)
@@ -229,14 +229,14 @@ namespace BusBuddy.Core.Services
 
                 var xaiRequest = new XAIRequest
                 {
-                    Model = _configuration["XAI:DefaultModel"] ?? "grok-3-latest",
+                    Model = _configuration["XAI:DefaultModel"] ?? "grok-4-latest",
                     Messages = new[]
                     {
                         new XAIMessage { Role = "system", Content = systemPrompt },
                         new XAIMessage { Role = "user", Content = message }
                     },
                     Temperature = _configuration.GetValue<double>("XAI:Temperature", 0.7),
-                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 2000)
+                    MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 64000)
                 };
 
                 var response = await CallXAIAPI(CHAT_COMPLETIONS_ENDPOINT, xaiRequest);
