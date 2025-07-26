@@ -1274,7 +1274,7 @@ function Get-BusBuddyCommands {
     #>
     [CmdletBinding()]
     param(
-        [ValidateSet('All', 'Essential', 'Build', 'Development', 'Analysis', 'Fun')]
+        [ValidateSet('All', 'Essential', 'Build', 'Development', 'Analysis', 'GitHub', 'Fun')]
         [string]$Category = 'All',
 
         [switch]$ShowAliases
@@ -1296,11 +1296,17 @@ function Get-BusBuddyCommands {
             @{ Name = 'bb-env-check'; Description = 'Check environment'; Function = 'Test-BusBuddyEnvironment' }
             @{ Name = 'bb-dev-workflow'; Description = 'Complete development workflow'; Function = 'Invoke-BusBuddyDevWorkflow' }
         )
-        'Analysis' = @(
+        'Analysis'    = @(
             @{ Name = 'bb-manage-dependencies'; Description = 'Dependency management'; Function = 'Invoke-BusBuddyDependencyManagement' }
             @{ Name = 'bb-error-fix'; Description = 'Analyze build errors'; Function = 'Invoke-BusBuddyErrorAnalysis' }
             @{ Name = 'bb-warning-analysis'; Description = 'Analyze build warnings'; Function = 'Show-BusBuddyWarningAnalysis' }
             @{ Name = 'bb-get-workflow-results'; Description = 'Monitor GitHub workflows'; Function = 'Get-BusBuddyWorkflowResults' }
+        )
+        'GitHub'      = @(
+            @{ Name = 'bb-github-stage'; Description = 'Smart Git staging'; Function = 'Invoke-BusBuddyGitHubStaging' }
+            @{ Name = 'bb-github-commit'; Description = 'Intelligent commit creation'; Function = 'Invoke-BusBuddyGitHubCommit' }
+            @{ Name = 'bb-github-push'; Description = 'Push with workflow monitoring'; Function = 'Invoke-BusBuddyGitHubPush' }
+            @{ Name = 'bb-github-workflow'; Description = 'Complete GitHub workflow'; Function = 'Invoke-BusBuddyCompleteGitHubWorkflow' }
         )
         'Environment' = @(
             @{ Name = 'bb-install-extensions'; Description = 'Install VS Code extensions'; Function = 'Install-BusBuddyVSCodeExtensions' }
@@ -1927,12 +1933,12 @@ function New-DependencyReport {
         $packageOutput = & dotnet list package --include-transitive 2>&1
 
         $report = @{
-            Timestamp = Get-Date
-            Packages = $packageOutput | Where-Object { $_ -match ">" }
+            Timestamp    = Get-Date
+            Packages     = $packageOutput | Where-Object { $_ -match ">" }
             ProjectFiles = (Get-ChildItem -Recurse -Name "*.csproj")
-            Summary = @{
+            Summary      = @{
                 TotalProjects = (Get-ChildItem -Recurse -Name "*.csproj").Count
-                PackageCount = ($packageOutput | Where-Object { $_ -match ">" }).Count
+                PackageCount  = ($packageOutput | Where-Object { $_ -match ">" }).Count
             }
         }
 
@@ -2052,14 +2058,14 @@ function Invoke-BusBuddyDevWorkflow {
     Write-Host ""
 
     $workflowResults = @{
-        BuildSuccess = $false
+        BuildSuccess     = $false
         ValidationPassed = $false
-        TestsPassed = $false
-        WarningCount = 0
+        TestsPassed      = $false
+        WarningCount     = 0
         NextPhase2Target = $null
-        Duration = $null
-        Issues = @()
-        Recommendations = @()
+        Duration         = $null
+        Issues           = @()
+        Recommendations  = @()
     }
 
     $projectRoot = Get-BusBuddyProjectRoot
@@ -2183,33 +2189,33 @@ function Invoke-BusBuddyDevWorkflow {
             # Intelligent Phase 2 target selection based on project state
             $phase2Targets = @(
                 @{
-                    Target = "Implement comprehensive UI testing with Syncfusion controls"
-                    Priority = if ($workflowResults.TestsPassed) { 3 } else { 1 }
+                    Target      = "Implement comprehensive UI testing with Syncfusion controls"
+                    Priority    = if ($workflowResults.TestsPassed) { 3 } else { 1 }
                     Description = "Automated UI testing for dashboard, driver management, and vehicle tracking"
                 }
                 @{
-                    Target = "Integrate real-world data seeding and Azure SQL connectivity"
-                    Priority = if ($workflowResults.ValidationPassed) { 2 } else { 3 }
+                    Target      = "Integrate real-world data seeding and Azure SQL connectivity"
+                    Priority    = if ($workflowResults.ValidationPassed) { 2 } else { 3 }
                     Description = "Production-ready data integration with sample transportation data"
                 }
                 @{
-                    Target = "Enhance Dashboard with advanced analytics and reporting"
-                    Priority = if ($workflowResults.BuildSuccess) { 2 } else { 4 }
+                    Target      = "Enhance Dashboard with advanced analytics and reporting"
+                    Priority    = if ($workflowResults.BuildSuccess) { 2 } else { 4 }
                     Description = "Business intelligence dashboard with charts and KPI monitoring"
                 }
                 @{
-                    Target = "Optimize routing algorithms with xAI Grok API integration"
-                    Priority = 4
+                    Target      = "Optimize routing algorithms with xAI Grok API integration"
+                    Priority    = 4
                     Description = "AI-powered route optimization and predictive maintenance"
                 }
                 @{
-                    Target = "Reduce analyzer warnings and improve code quality (Focus: CS860x null safety)"
-                    Priority = if ($workflowResults.WarningCount -gt 200) { 1 } else { 3 }
+                    Target      = "Reduce analyzer warnings and improve code quality (Focus: CS860x null safety)"
+                    Priority    = if ($workflowResults.WarningCount -gt 200) { 1 } else { 3 }
                     Description = "Address null safety warnings and improve overall code quality metrics"
                 }
                 @{
-                    Target = "Implement advanced MVVM patterns and dependency injection"
-                    Priority = if ($workflowResults.ValidationPassed) { 3 } else { 2 }
+                    Target      = "Implement advanced MVVM patterns and dependency injection"
+                    Priority    = if ($workflowResults.ValidationPassed) { 3 } else { 2 }
                     Description = "Upgrade to sophisticated MVVM with proper IoC container integration"
                 }
             )
@@ -2372,13 +2378,12 @@ function Get-BusBuddyWorkflowResults {
 
             $headers = @{
                 Authorization = "token $env:GITHUB_TOKEN"
-                Accept = "application/vnd.github.v3+json"
+                Accept        = "application/vnd.github.v3+json"
             }
 
-            $baseUrl = "https://api.github.com/repos/$Repository/actions/runs"
             $queryParams = @("per_page=$Count")
             if ($Status -ne 'all') { $queryParams += "status=$Status" }
-            $fullUrl = "$baseUrl?$($queryParams -join '&')"
+            $fullUrl = "https://api.github.com/repos/$Repository/actions/runs?$($queryParams -join '&')"
 
             try {
                 $response = Invoke-RestMethod -Uri $fullUrl -Headers $headers -Method Get
@@ -2387,14 +2392,14 @@ function Get-BusBuddyWorkflowResults {
                 # Convert to consistent format
                 $results = $results | ForEach-Object {
                     [PSCustomObject]@{
-                        id = $_.id
-                        name = $_.name
+                        id           = $_.id
+                        name         = $_.name
                         workflowName = $_.name
-                        status = $_.status
-                        conclusion = $_.conclusion
-                        createdAt = $_.created_at
-                        event = $_.event
-                        headBranch = $_.head_branch
+                        status       = $_.status
+                        conclusion   = $_.conclusion
+                        createdAt    = $_.created_at
+                        event        = $_.event
+                        headBranch   = $_.head_branch
                     }
                 }
 
@@ -2446,12 +2451,12 @@ function Get-BusBuddyWorkflowResults {
                 }
 
                 [PSCustomObject]@{
-                    Status = "$statusIcon $($_.status)"
-                    Workflow = $_.workflowName
+                    Status     = "$statusIcon $($_.status)"
+                    Workflow   = $_.workflowName
                     Conclusion = $_.conclusion
-                    Created = [DateTime]::Parse($_.createdAt).ToString('MM-dd HH:mm')
-                    Branch = $_.headBranch
-                    Event = $_.event
+                    Created    = [DateTime]::Parse($_.createdAt).ToString('MM-dd HH:mm')
+                    Branch     = $_.headBranch
+                    Event      = $_.event
                 }
             }
 
@@ -2607,11 +2612,11 @@ function Show-BusBuddyWarningAnalysis {
         if ($GenerateReport) {
             $reportPath = Join-Path $projectRoot "warning-analysis-report.json"
             $reportData = @{
-                Timestamp = Get-Date
-                TotalWarnings = $warnings.Count
-                Categories = $warningCategories
+                Timestamp       = Get-Date
+                TotalWarnings   = $warnings.Count
+                Categories      = $warningCategories
                 NullSafetyCount = $nullSafetyWarnings.Count
-                TopCategories = $sortedCategories | ForEach-Object { @{ Code = $_.Key; Count = $_.Value.Count } }
+                TopCategories   = $sortedCategories | ForEach-Object { @{ Code = $_.Key; Count = $_.Value.Count } }
                 Recommendations = @(
                     "Focus on CS860x null safety warnings first",
                     "Configure ruleset to suppress non-critical analyzer warnings",
@@ -2658,21 +2663,21 @@ function Get-WarningCodeDescription {
     param([string]$Code)
 
     $descriptions = @{
-        'CS8600' = 'Converting null literal or possible null value to non-nullable type'
-        'CS8601' = 'Possible null reference assignment'
-        'CS8602' = 'Dereference of a possibly null reference'
-        'CS8603' = 'Possible null reference return'
-        'CS8604' = 'Possible null reference argument'
-        'CS8618' = 'Non-nullable field must contain a non-null value when exiting constructor'
-        'CS8625' = 'Cannot convert null literal to non-nullable reference type'
-        'CA1031' = 'Do not catch general exception types'
-        'CA1303' = 'Do not pass literals as localized parameters'
-        'CA1848' = 'Use the LoggerMessage delegates'
-        'CA2007' = 'Consider calling ConfigureAwait on the awaited task'
-        'CS1591' = 'Missing XML comment for publicly visible type or member'
-        'CA1822' = 'Mark members as static'
-        'CA1805' = 'Do not initialize unnecessarily'
-        'CA1812' = 'Avoid uninstantiated internal classes'
+        'CS8600'  = 'Converting null literal or possible null value to non-nullable type'
+        'CS8601'  = 'Possible null reference assignment'
+        'CS8602'  = 'Dereference of a possibly null reference'
+        'CS8603'  = 'Possible null reference return'
+        'CS8604'  = 'Possible null reference argument'
+        'CS8618'  = 'Non-nullable field must contain a non-null value when exiting constructor'
+        'CS8625'  = 'Cannot convert null literal to non-nullable reference type'
+        'CA1031'  = 'Do not catch general exception types'
+        'CA1303'  = 'Do not pass literals as localized parameters'
+        'CA1848'  = 'Use the LoggerMessage delegates'
+        'CA2007'  = 'Consider calling ConfigureAwait on the awaited task'
+        'CS1591'  = 'Missing XML comment for publicly visible type or member'
+        'CA1822'  = 'Mark members as static'
+        'CA1805'  = 'Do not initialize unnecessarily'
+        'CA1812'  = 'Avoid uninstantiated internal classes'
         'IDE0051' = 'Remove unused private members'
         'IDE0052' = 'Remove unread private members'
     }
@@ -2741,38 +2746,38 @@ function Install-BusBuddyVSCodeExtensions {
 
     # Define extension categories
     $extensionCategories = @{
-        'Essential' = @{
-            'ms-dotnettools.csharp' = '.NET C# Support - Core IntelliSense and debugging'
-            'ms-vscode.powershell' = 'PowerShell 7.5 support with advanced features'
-            'ms-dotnettools.csdevkit' = '.NET development kit with build/test integration'
-            'eamodio.gitlens' = 'Git supercharged - history, blame, and GitHub integration'
+        'Essential'         = @{
+            'ms-dotnettools.csharp'           = '.NET C# Support - Core IntelliSense and debugging'
+            'ms-vscode.powershell'            = 'PowerShell 7.5 support with advanced features'
+            'ms-dotnettools.csdevkit'         = '.NET development kit with build/test integration'
+            'eamodio.gitlens'                 = 'Git supercharged - history, blame, and GitHub integration'
             'spmeesseman.vscode-taskexplorer' = 'Task Explorer (EXCLUSIVE task management method)'
         }
-        'Core Development' = @{
+        'Core Development'  = @{
             'ms-dotnettools.vscode-dotnet-runtime' = '.NET runtime management'
-            'ms-dotnettools.xaml' = 'XAML language support for WPF'
-            'josefpihrt-vscode.roslynator' = 'Advanced C# code analysis and refactoring'
-            'esbenp.prettier-vscode' = 'Code formatter for consistency'
-            'editorconfig.editorconfig' = 'EditorConfig support for team consistency'
+            'ms-dotnettools.xaml'                  = 'XAML language support for WPF'
+            'josefpihrt-vscode.roslynator'         = 'Advanced C# code analysis and refactoring'
+            'esbenp.prettier-vscode'               = 'Code formatter for consistency'
+            'editorconfig.editorconfig'            = 'EditorConfig support for team consistency'
         }
         'Testing & Quality' = @{
-            'ms-vscode.test-adapter-converter' = 'Test adapter converter'
+            'ms-vscode.test-adapter-converter'      = 'Test adapter converter'
             'streetsidesoftware.code-spell-checker' = 'Spell checker for documentation'
-            'aaron-bond.better-comments' = 'Enhanced comment highlighting'
+            'aaron-bond.better-comments'            = 'Enhanced comment highlighting'
         }
         'AI & Productivity' = @{
-            'github.copilot' = 'GitHub Copilot AI assistance'
-            'github.copilot-chat' = 'GitHub Copilot Chat interface'
+            'github.copilot'               = 'GitHub Copilot AI assistance'
+            'github.copilot-chat'          = 'GitHub Copilot Chat interface'
             'ms-vscode.powershell-preview' = 'PowerShell preview with PS 7.5.2 features'
         }
-        'Azure & Cloud' = @{
-            'ms-vscode.azure-account' = 'Azure account management'
+        'Azure & Cloud'     = @{
+            'ms-vscode.azure-account'                  = 'Azure account management'
             'ms-azuretools.vscode-azureresourcegroups' = 'Azure resource management'
         }
-        'Advanced Tools' = @{
+        'Advanced Tools'    = @{
             'syncfusioninc.maui-vscode-extensions' = 'Syncfusion development support'
-            'ms-vscode.hexeditor' = 'Hex editor for binary files'
-            'ms-vscode-remote.remote-ssh' = 'Remote development via SSH'
+            'ms-vscode.hexeditor'                  = 'Hex editor for binary files'
+            'ms-vscode-remote.remote-ssh'          = 'Remote development via SSH'
         }
     }
 
@@ -2816,9 +2821,9 @@ function Install-BusBuddyVSCodeExtensions {
     Write-Host "Total extensions to process: $($extensionsToInstall.Count)" -ForegroundColor Gray
 
     $installResults = @{
-        Installed = @()
-        Skipped = @()
-        Failed = @()
+        Installed        = @()
+        Skipped          = @()
+        Failed           = @()
         AlreadyInstalled = @()
     }
 
@@ -2881,11 +2886,11 @@ function Install-BusBuddyVSCodeExtensions {
     if ($projectRoot) {
         $reportPath = Join-Path $projectRoot "vscode-extensions-install-report.json"
         $report = @{
-            Timestamp = Get-Date
-            VSCodeCommand = $codeCommand
+            Timestamp        = Get-Date
+            VSCodeCommand    = $codeCommand
             InstallationType = if ($Essential) { 'Essential' } elseif ($Advanced) { 'Advanced' } else { 'Recommended' }
-            Results = $installResults
-            NextSteps = @(
+            Results          = $installResults
+            NextSteps        = @(
                 "Restart VS Code to activate extensions",
                 "Run bb-health to validate development environment",
                 "Check .vscode/extensions.json for team recommendations",
@@ -2904,7 +2909,8 @@ function Install-BusBuddyVSCodeExtensions {
 
     $successRate = if ($extensionsToInstall.Count -gt 0) {
         [math]::Round((($installResults.Installed.Count + $installResults.AlreadyInstalled.Count) / $extensionsToInstall.Count) * 100, 1)
-    } else { 100 }
+    }
+    else { 100 }
 
     Write-Host ""
     if ($successRate -ge 90) {
@@ -2949,13 +2955,13 @@ function Test-BusBuddyVSCodeSetup {
     Write-Host "══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
 
     $validationResults = @{
-        VSCodeAvailable = $false
+        VSCodeAvailable     = $false
         ExtensionsInstalled = @()
-        ExtensionsMissing = @()
-        TasksConfigured = $false
-        SettingsValid = $false
-        OverallScore = 0
-        Recommendations = @()
+        ExtensionsMissing   = @()
+        TasksConfigured     = $false
+        SettingsValid       = $false
+        OverallScore        = 0
+        Recommendations     = @()
     }
 
     # Check VS Code availability
@@ -2984,11 +2990,11 @@ function Test-BusBuddyVSCodeSetup {
     Write-Host "🔌 Checking Essential Extensions..." -ForegroundColor Cyan
 
     $essentialExtensions = @{
-        'ms-dotnettools.csharp' = 'C# Development'
-        'ms-vscode.powershell' = 'PowerShell Support'
+        'ms-dotnettools.csharp'           = 'C# Development'
+        'ms-vscode.powershell'            = 'PowerShell Support'
         'spmeesseman.vscode-taskexplorer' = 'Task Explorer (Required)'
-        'eamodio.gitlens' = 'Git Integration'
-        'ms-dotnettools.csdevkit' = '.NET Development Kit'
+        'eamodio.gitlens'                 = 'Git Integration'
+        'ms-dotnettools.csdevkit'         = '.NET Development Kit'
     }
 
     try {
@@ -3095,7 +3101,7 @@ function Test-BusBuddyVSCodeSetup {
     if ($validationResults.TasksConfigured) { $currentScore += 15 }
     if ($validationResults.SettingsValid) { $currentScore += 15 }
 
-    $validationResults.OverallScore = [math]::Round($currentScore, 1)
+    $validationResults.OverallScore = [math]::Round(($currentScore / $maxScore) * 100, 1)
 
     # Display summary
     Write-Host ""
@@ -3821,6 +3827,114 @@ New-Alias -Name "bb-validate-vscode" -Value "Test-BusBuddyVSCodeSetup" -Descript
 
 #endregion
 
+#region GitHub Automation Integration
+
+# Load GitHub automation script
+$githubScriptPath = Join-Path $PSScriptRoot "..\Tools\Scripts\GitHub\BusBuddy-GitHub-Automation.ps1"
+if (Test-Path $githubScriptPath) {
+    . $githubScriptPath
+}
+
+# Wrapper functions for Bus Buddy integration
+function Invoke-BusBuddyGitHubStaging {
+    <#
+    .SYNOPSIS
+        Smart Git staging with Bus Buddy integration (bb-github-stage)
+    #>
+    [CmdletBinding()]
+    param([switch]$InteractiveMode, [switch]$UseExtensions)
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        if ($UseExtensions -and (Test-VSCodeExtension -ExtensionId "eamodio.gitlens")) {
+            Write-BusBuddyStatus "🔗 GitLens extension detected" -Status Info
+        }
+        return Invoke-SmartGitStaging -InteractiveMode:$InteractiveMode
+    }
+    finally { Pop-Location }
+}
+
+function Invoke-BusBuddyGitHubCommit {
+    <#
+    .SYNOPSIS
+        Intelligent commit creation with Bus Buddy standards (bb-github-commit)
+    #>
+    [CmdletBinding()]
+    param([string[]]$StagedFiles, [switch]$GenerateMessage, [string]$CustomMessage, [switch]$UseExtensions)
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        return New-IntelligentCommit -StagedFiles $StagedFiles -GenerateMessage:$GenerateMessage -CustomMessage $CustomMessage
+    }
+    finally { Pop-Location }
+}
+
+function Invoke-BusBuddyGitHubPush {
+    <#
+    .SYNOPSIS
+        Push and workflow monitoring with Bus Buddy integration (bb-github-push)
+    #>
+    [CmdletBinding()]
+    param([switch]$WaitForCompletion, [switch]$UseExtensions, [int]$TimeoutMinutes = 30)
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        return Start-WorkflowRun -WaitForCompletion:$WaitForCompletion -TimeoutMinutes $TimeoutMinutes
+    }
+    finally { Pop-Location }
+}
+
+function Invoke-BusBuddyCompleteGitHubWorkflow {
+    <#
+    .SYNOPSIS
+        Complete GitHub workflow automation (bb-github-workflow)
+    #>
+    [CmdletBinding()]
+    param([switch]$GenerateCommitMessage, [switch]$WaitForCompletion, [switch]$AnalyzeResults, [switch]$AutoFix, [switch]$InteractiveMode, [string]$CommitMessage, [bool]$UseExtensions = $true)
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        # Check VS Code extensions from extensions.json
+        if ($UseExtensions) {
+            $extensions = @("eamodio.gitlens", "github.vscode-pull-request-github", "spmeesseman.vscode-taskexplorer", "github.copilot", "ms-vscode.powershell", "ms-dotnettools.csdevkit")
+            foreach ($ext in $extensions) {
+                if (Test-VSCodeExtension -ExtensionId $ext) {
+                    Write-BusBuddyStatus "✅ Extension $ext active" -Status Success
+                }
+                else {
+                    Write-BusBuddyStatus "⚠️ Extension $ext not found" -Status Warning
+                }
+            }
+        }
+        return Invoke-CompleteGitHubWorkflow -GenerateCommitMessage:$GenerateCommitMessage -WaitForCompletion:$WaitForCompletion -AnalyzeResults:$AnalyzeResults -AutoFix:$AutoFix -CommitMessage $CommitMessage
+    }
+    finally { Pop-Location }
+}
+
+function Test-VSCodeExtension {
+    param([string]$ExtensionId)
+    try {
+        if (Get-Command code -ErrorAction SilentlyContinue) {
+            $installedExtensions = & code --list-extensions 2>$null
+            return ($installedExtensions -contains $ExtensionId)
+        }
+        return $false
+    }
+    catch { return $false }
+}
+
+# Create GitHub aliases
+Set-Alias -Name 'bb-github-stage' -Value 'Invoke-BusBuddyGitHubStaging'
+Set-Alias -Name 'bb-github-commit' -Value 'Invoke-BusBuddyGitHubCommit'
+Set-Alias -Name 'bb-github-push' -Value 'Invoke-BusBuddyGitHubPush'
+Set-Alias -Name 'bb-github-workflow' -Value 'Invoke-BusBuddyCompleteGitHubWorkflow'
+
+#endregion
+
 #region Export Definitions
 
 # Export all functions that should be available publicly
@@ -3872,10 +3986,215 @@ Export-ModuleMember -Function @(
     'Get-BusBuddyWorkflowResults',
     'Show-BusBuddyWarningAnalysis',
 
+    # GitHub automation functions
+    'Invoke-BusBuddyGitHubPush',
+    'Invoke-BusBuddyGitHubCommit',
+    'Invoke-BusBuddyGitHubStaging',
+    'Invoke-BusBuddyCompleteGitHubWorkflow',
+
     # VS Code integration functions
     'Install-BusBuddyVSCodeExtensions',
     'Test-BusBuddyVSCodeSetup'
 )
+
+#region GitHub Automation Integration
+
+# Load GitHub automation script
+$githubScriptPath = Join-Path $PSScriptRoot "..\Tools\Scripts\GitHub\BusBuddy-GitHub-Automation.ps1"
+if (Test-Path $githubScriptPath) {
+    . $githubScriptPath
+}
+
+# Wrapper functions for Bus Buddy integration
+function Invoke-BusBuddyGitHubStaging {
+    <#
+    .SYNOPSIS
+        Smart Git staging with Bus Buddy integration (bb-github-stage)
+    .DESCRIPTION
+        Intelligently stages files for commit with interactive mode support.
+        Integrates with VS Code extensions for enhanced workflow.
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$InteractiveMode,
+        [switch]$UseExtensions
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        Write-BusBuddyStatus "🎯 Starting smart Git staging..." -Status Info
+
+        # Check for GitLens extension integration
+        if ($UseExtensions -and (Test-VSCodeExtension -ExtensionId "eamodio.gitlens")) {
+            Write-BusBuddyStatus "🔗 GitLens extension detected - enhanced Git integration available" -Status Info
+        }
+
+        $result = Invoke-SmartGitStaging -InteractiveMode:$InteractiveMode
+
+        if ($result.Count -gt 0) {
+            Write-BusBuddyStatus "✅ Successfully staged $($result.Count) files" -Status Success
+        }
+
+        return $result
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Invoke-BusBuddyGitHubCommit {
+    <#
+    .SYNOPSIS
+        Intelligent commit creation with Bus Buddy standards (bb-github-commit)
+    .DESCRIPTION
+        Creates intelligent commits following Bus Buddy conventions.
+        Supports automatic message generation and VS Code extension integration.
+    #>
+    [CmdletBinding()]
+    param(
+        [string[]]$StagedFiles,
+        [switch]$GenerateMessage,
+        [string]$CustomMessage,
+        [switch]$UseExtensions
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        Write-BusBuddyStatus "💾 Creating intelligent commit..." -Status Info
+
+        # Check for GitHub Pull Request extension
+        if ($UseExtensions -and (Test-VSCodeExtension -ExtensionId "github.vscode-pull-request-github")) {
+            Write-BusBuddyStatus "🔗 GitHub PR extension detected - enhanced GitHub integration available" -Status Info
+        }
+
+        $result = New-IntelligentCommit -StagedFiles $StagedFiles -GenerateMessage:$GenerateMessage -CustomMessage $CustomMessage
+
+        if ($result) {
+            Write-BusBuddyStatus "✅ Commit created: $($result.Hash)" -Status Success
+        }
+
+        return $result
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Invoke-BusBuddyGitHubPush {
+    <#
+    .SYNOPSIS
+        Push and workflow monitoring with Bus Buddy integration (bb-github-push)
+    .DESCRIPTION
+        Pushes changes to GitHub and monitors workflow execution.
+        Integrates with Task Explorer for enhanced monitoring.
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$WaitForCompletion,
+        [switch]$UseExtensions,
+        [int]$TimeoutMinutes = 30
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        Write-BusBuddyStatus "🚀 Pushing to GitHub with workflow monitoring..." -Status Info
+
+        # Check for Task Explorer integration
+        if ($UseExtensions -and (Test-VSCodeExtension -ExtensionId "spmeesseman.vscode-taskexplorer")) {
+            Write-BusBuddyStatus "🔗 Task Explorer detected - can monitor via VS Code tasks" -Status Info
+        }
+
+        $result = Start-WorkflowRun -WaitForCompletion:$WaitForCompletion -TimeoutMinutes $TimeoutMinutes
+
+        return $result
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Invoke-BusBuddyCompleteGitHubWorkflow {
+    <#
+    .SYNOPSIS
+        Complete GitHub workflow automation (bb-github-workflow)
+    .DESCRIPTION
+        Executes the complete GitHub workflow: stage → commit → push → monitor.
+        Integrates with all recommended VS Code extensions for optimal experience.
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$GenerateCommitMessage,
+        [switch]$WaitForCompletion,
+        [switch]$AnalyzeResults,
+        [switch]$AutoFix,
+        [switch]$InteractiveMode,
+        [string]$CommitMessage,
+        [bool]$UseExtensions = $true
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+    try {
+        Write-BusBuddyStatus "🎯 Starting complete GitHub workflow automation..." -Status Info
+
+        # Check and report extension status for key extensions from extensions.json
+        if ($UseExtensions) {
+            $extensions = @(
+                @{ Name = "GitLens"; Id = "eamodio.gitlens" },
+                @{ Name = "GitHub Pull Requests"; Id = "github.vscode-pull-request-github" },
+                @{ Name = "Task Explorer"; Id = "spmeesseman.vscode-taskexplorer" },
+                @{ Name = "GitHub Copilot"; Id = "github.copilot" },
+                @{ Name = "PowerShell"; Id = "ms-vscode.powershell" },
+                @{ Name = "C# DevKit"; Id = "ms-dotnettools.csdevkit" },
+                @{ Name = "Roslynator"; Id = "josefpihrt-vscode.roslynator" }
+            )
+
+            foreach ($ext in $extensions) {
+                if (Test-VSCodeExtension -ExtensionId $ext.Id) {
+                    Write-BusBuddyStatus "✅ $($ext.Name) extension active" -Status Success
+                }
+                else {
+                    Write-BusBuddyStatus "⚠️ $($ext.Name) extension not found - install for enhanced workflow" -Status Warning
+                }
+            }
+        }
+
+        $result = Invoke-CompleteGitHubWorkflow -GenerateCommitMessage:$GenerateCommitMessage -WaitForCompletion:$WaitForCompletion -AnalyzeResults:$AnalyzeResults -AutoFix:$AutoFix -CommitMessage $CommitMessage
+
+        Write-BusBuddyStatus "🎉 Complete GitHub workflow finished!" -Status Success
+        return $result
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+# Helper function to test VS Code extensions
+function Test-VSCodeExtension {
+    param([string]$ExtensionId)
+
+    try {
+        if (Get-Command code -ErrorAction SilentlyContinue) {
+            $installedExtensions = & code --list-extensions 2>$null
+            return ($installedExtensions -contains $ExtensionId)
+        }
+        return $false
+    }
+    catch {
+        return $false
+    }
+}
+
+# Create aliases for GitHub functions
+Set-Alias -Name 'bb-github-stage' -Value 'Invoke-BusBuddyGitHubStaging'
+Set-Alias -Name 'bb-github-commit' -Value 'Invoke-BusBuddyGitHubCommit'
+Set-Alias -Name 'bb-github-push' -Value 'Invoke-BusBuddyGitHubPush'
+Set-Alias -Name 'bb-github-workflow' -Value 'Invoke-BusBuddyCompleteGitHubWorkflow'
+
+#endregion
 
 # Export all aliases
 Export-ModuleMember -Alias @(
@@ -3886,7 +4205,8 @@ Export-ModuleMember -Alias @(
     'bb-db-diag', 'bb-db-test', 'bb-db-add-migration', 'bb-db-update', 'bb-db-seed',
     'bb-manage-dependencies', 'bb-error-fix',
     'bb-dev-workflow', 'bb-get-workflow-results', 'bb-warning-analysis',
-    'bb-install-extensions', 'bb-validate-vscode'
+    'bb-install-extensions', 'bb-validate-vscode',
+    'bb-github-push', 'bb-github-commit', 'bb-github-stage', 'bb-github-workflow'
 )
 
 #endregion
