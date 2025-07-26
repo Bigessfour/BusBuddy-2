@@ -470,22 +470,31 @@ function Get-WorkflowIssues {
     }
 
     foreach ($run in $WorkflowResults) {
-        if ($run.conclusion -ne 'success' -and $run.status -eq 'completed') {
+        # Safe property access with fallbacks
+        $runStatus = if ($run.PSObject.Properties['status']) { $run.status } else { 'unknown' }
+        $runConclusion = if ($run.PSObject.Properties['conclusion']) { $run.conclusion } else { 'unknown' }
+        $runWorkflowName = if ($run.PSObject.Properties['workflowName']) { $run.workflowName } else { $run.name }
+        $runCreatedAt = if ($run.PSObject.Properties['createdAt']) { $run.createdAt } else { 'unknown' }
+        $runHeadBranch = if ($run.PSObject.Properties['headBranch']) { $run.headBranch } else { 'unknown' }
+        $runUrl = if ($run.PSObject.Properties['url']) { $run.url } else { 'unknown' }
+        $runId = if ($run.PSObject.Properties['id']) { $run.id } else { $run.databaseId }
+
+        if ($runConclusion -ne 'success' -and $runStatus -eq 'completed') {
             $issue = [PSCustomObject]@{
-                RunId        = $run.id
-                WorkflowName = $run.workflowName
-                Status       = $run.status
-                Conclusion   = $run.conclusion
-                CreatedAt    = $run.createdAt
-                Branch       = $run.headBranch
-                Url          = $run.url
-                IssueType    = switch ($run.conclusion) {
+                RunId        = $runId
+                WorkflowName = $runWorkflowName
+                Status       = $runStatus
+                Conclusion   = $runConclusion
+                CreatedAt    = $runCreatedAt
+                Branch       = $runHeadBranch
+                Url          = $runUrl
+                IssueType    = switch ($runConclusion) {
                     'failure' { 'Build/Test Failure' }
                     'cancelled' { 'Workflow Cancelled' }
                     'timed_out' { 'Workflow Timeout' }
                     default { 'Unknown Issue' }
                 }
-                Severity     = if ($run.conclusion -eq 'failure') { 'High' } else { 'Medium' }
+                Severity     = if ($runConclusion -eq 'failure') { 'High' } else { 'Medium' }
             }
 
             $issues += $issue
