@@ -260,7 +260,7 @@ public class Bus : INotifyPropertyChanged
 
     // Extended properties for maximum flexibility
     [Display(Name = "Created Date")]
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; } // Remove dynamic default, handle in application logic
 
     [Display(Name = "Updated Date")]
     public DateTime? UpdatedDate { get; set; }

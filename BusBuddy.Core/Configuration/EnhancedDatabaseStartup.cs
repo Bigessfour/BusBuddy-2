@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Context;
+using Serilog.Events;
 
 namespace BusBuddy.Core.Configuration;
 
@@ -30,31 +31,49 @@ public static class EnhancedDatabaseStartup
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            options.UseSqlServer(connectionString, sqlOptions =>
+            options.UseSqlite(connectionString, sqliteOptions =>
             {
-                // Enhanced connection resilience - handles most SqlExceptions automatically
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: new[] { 2, 20, 64, 233, 10053, 10054 }); // Additional transient errors
-
-                // Set appropriate timeouts
-                sqlOptions.CommandTimeout(60);
+                // SQLite-specific configuration for Phase 1
+                sqliteOptions.CommandTimeout(60);
 
                 // Enable migration assembly if needed
-                sqlOptions.MigrationsAssembly("BusBuddy.Core");
+                sqliteOptions.MigrationsAssembly("BusBuddy.Core");
             });
 
-            // Configure logging based on environment
+            // Configure logging based on environment with Serilog enrichments
             if (environment?.IsDevelopment() == true)
             {
                 options.EnableSensitiveDataLogging();
                 options.EnableDetailedErrors();
-                options.LogTo(Console.WriteLine, LogLevel.Information);
+
+                // Development logging with Serilog integration and enrichments
+                options.LogTo(message =>
+                {
+                    using (LogContext.PushProperty("DatabaseOperation", "EFCoreLogging"))
+                    using (LogContext.PushProperty("Environment", "Development"))
+                    using (LogContext.PushProperty("MessageLength", message?.Length ?? 0))
+                    {
+                        var logger = Log.ForContext("SourceContext", "EntityFramework");
+                        logger.Information("EF Core Development: {Message}", message);
+                    }
+                }, Microsoft.Extensions.Logging.LogLevel.Information);
             }
             else
             {
-                options.LogTo(Console.WriteLine, LogLevel.Warning);
+                // Production logging with Serilog integration and minimal enrichments
+                options.LogTo(message =>
+                {
+                    using (LogContext.PushProperty("DatabaseOperation", "EFCoreLogging"))
+                    using (LogContext.PushProperty("Environment", "Production"))
+                    {
+                        var logger = Log.ForContext("SourceContext", "EntityFramework");
+                        if (message != null && (message.Contains("warn", StringComparison.OrdinalIgnoreCase) ||
+                                              message.Contains("error", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            logger.Warning("EF Core Production: {Message}", message);
+                        }
+                    }
+                }, Microsoft.Extensions.Logging.LogLevel.Warning);
             }
 
             // Configure query behavior

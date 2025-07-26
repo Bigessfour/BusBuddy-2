@@ -213,7 +213,7 @@ public class DatabaseResilienceService
                 }
             }
 
-            result.IsHealthy = !result.Issues.Any();
+            result.IsHealthy = result.Issues.Count == 0;
 
             Logger.Information("Database health check completed. Healthy: {IsHealthy}, Issues: {IssueCount}",
                 result.IsHealthy, result.Issues.Count);

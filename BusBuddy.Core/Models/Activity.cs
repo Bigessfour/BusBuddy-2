@@ -83,6 +83,25 @@ public class Activity : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Foreign key to the Destinations table (optional for backward compatibility)
+    /// </summary>
+    [Display(Name = "Destination")]
+    public int? DestinationId { get; set; }
+
+    /// <summary>
+    /// Navigation property to the Destination entity
+    /// </summary>
+    [ForeignKey("DestinationId")]
+    public virtual Destination? DestinationEntity { get; set; }
+
+    /// <summary>
+    /// Override destination text for custom locations not in the Destinations table
+    /// </summary>
+    [StringLength(200)]
+    [Display(Name = "Custom Destination")]
+    public string? DestinationOverride { get; set; }
+
     [Required]
     [Display(Name = "Leave Time")]
     public TimeSpan LeaveTime
@@ -372,7 +391,7 @@ public class Activity : INotifyPropertyChanged
     public DateTime? ApprovalDate { get; set; }
 
     [Display(Name = "Created Date")]
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; } // Remove dynamic default, handle in application logic
 
     [Display(Name = "Updated Date")]
     public DateTime? UpdatedDate { get; set; }

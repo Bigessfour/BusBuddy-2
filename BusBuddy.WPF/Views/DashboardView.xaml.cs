@@ -11,7 +11,9 @@ namespace BusBuddy.WPF.Views
         public DashboardView()
         {
             InitializeComponent();
-            DataContext = new DashboardViewModel();
+            var vm = new DashboardViewModel();
+            DataContext = vm;
+            Loaded += async (s, e) => await vm.LoadDashboardAsync();
         }
     }
 }

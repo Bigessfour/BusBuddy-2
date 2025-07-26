@@ -250,6 +250,398 @@ namespace BusBuddy.Core.Services
             }
         }
 
+        #region Phase 1 Program Management & Analytics
+
+        /// <summary>
+        /// Analyze Phase 1 progress and provide insights for program management
+        /// </summary>
+        public async Task<PhaseAnalysisResult> AnalyzePhase1ProgressAsync(Phase1ProgressRequest request)
+        {
+            try
+            {
+                var prompt = BuildPhase1AnalysisPrompt(request);
+                var response = await SendChatMessageAsync(prompt, "Phase 1 Progress Analysis");
+
+                if (_isConfigured && !string.IsNullOrEmpty(response))
+                {
+                    return ParsePhase1AnalysisResponse(response);
+                }
+
+                return CreateMockPhase1Analysis(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error analyzing Phase 1 progress for project {ProjectName}", request.ProjectName);
+                return CreateMockPhase1Analysis(request);
+            }
+        }
+
+        /// <summary>
+        /// Get development insights and recommendations for the current development state
+        /// </summary>
+        public async Task<DevelopmentInsights> GetDevelopmentInsightsAsync(DevelopmentStateRequest request)
+        {
+            try
+            {
+                var prompt = BuildDevelopmentInsightsPrompt(request);
+                var response = await SendChatMessageAsync(prompt, "Development Insights");
+
+                if (_isConfigured && !string.IsNullOrEmpty(response))
+                {
+                    return ParseDevelopmentInsights(response);
+                }
+
+                return CreateMockDevelopmentInsights(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error getting development insights for {ComponentName}", request.ComponentName);
+                return CreateMockDevelopmentInsights(request);
+            }
+        }
+
+        /// <summary>
+        /// Analyze build and runtime performance for optimization suggestions
+        /// </summary>
+        public async Task<PerformanceAnalysis> AnalyzePerformanceAsync(PerformanceDataRequest request)
+        {
+            try
+            {
+                var prompt = BuildPerformanceAnalysisPrompt(request);
+                var response = await SendChatMessageAsync(prompt, "Performance Analysis");
+
+                if (_isConfigured && !string.IsNullOrEmpty(response))
+                {
+                    return ParsePerformanceAnalysis(response);
+                }
+
+                return CreateMockPerformanceAnalysis(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error analyzing performance for {ApplicationName}", request.ApplicationName);
+                return CreateMockPerformanceAnalysis(request);
+            }
+        }
+
+        /// <summary>
+        /// Generate dynamic mock data with AI assistance for testing and development
+        /// </summary>
+        public async Task<GeneratedDataSet> GenerateMockDataAsync(MockDataRequest request)
+        {
+            try
+            {
+                var prompt = BuildMockDataPrompt(request);
+                var response = await SendChatMessageAsync(prompt, "Mock Data Generation");
+
+                if (_isConfigured && !string.IsNullOrEmpty(response))
+                {
+                    return ParseGeneratedDataSet(response);
+                }
+
+                return CreateBasicMockData(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error generating mock data for {DataType}", request.DataType);
+                return CreateBasicMockData(request);
+            }
+        }
+
+        /// <summary>
+        /// Get contextual help and documentation suggestions
+        /// </summary>
+        public async Task<ContextualHelp> GetContextualHelpAsync(HelpRequest request)
+        {
+            try
+            {
+                var prompt = BuildContextualHelpPrompt(request);
+                var response = await SendChatMessageAsync(prompt, "Contextual Help");
+
+                if (_isConfigured && !string.IsNullOrEmpty(response))
+                {
+                    return ParseContextualHelp(response);
+                }
+
+                return CreateBasicHelp(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error getting contextual help for {Topic}", request.Topic);
+                return CreateBasicHelp(request);
+            }
+        }
+
+        #endregion
+
+        #region Phase 1 Program Management Helper Methods
+
+        // Minimal stub for missing method
+        private PhaseAnalysisResult CreateMockPhase1Analysis(Phase1ProgressRequest request)
+        {
+            return new PhaseAnalysisResult();
+        }
+
+        // Minimal stub for missing method
+        private string BuildDevelopmentInsightsPrompt(DevelopmentStateRequest request)
+        {
+            return "Development insights prompt";
+        }
+
+        // Minimal stub for missing method
+        private DevelopmentInsights ParseDevelopmentInsights(string response)
+        {
+            return new DevelopmentInsights();
+        }
+
+        // Minimal stub for missing method
+        private DevelopmentInsights CreateMockDevelopmentInsights(DevelopmentStateRequest request)
+        {
+            return new DevelopmentInsights();
+        }
+
+        // Minimal stub for missing method
+        private string BuildPerformanceAnalysisPrompt(PerformanceDataRequest request)
+        {
+            return "Performance analysis prompt";
+        }
+
+        // Minimal stub for missing method
+        private PerformanceAnalysis ParsePerformanceAnalysis(string response)
+        {
+            return new PerformanceAnalysis();
+        }
+
+        // Minimal stub for missing method
+        private PerformanceAnalysis CreateMockPerformanceAnalysis(PerformanceDataRequest request)
+        {
+            return new PerformanceAnalysis();
+        }
+
+        // Minimal stub for missing method
+        private string BuildMockDataPrompt(MockDataRequest request)
+        {
+            return "Mock data prompt";
+        }
+
+        // Minimal stub for missing method
+        private GeneratedDataSet ParseGeneratedDataSet(string response)
+        {
+            return new GeneratedDataSet();
+        }
+
+        // Minimal stub for missing method
+        private GeneratedDataSet CreateBasicMockData(MockDataRequest request)
+        {
+            return new GeneratedDataSet();
+        }
+
+        // Minimal stub for missing method
+        private string BuildContextualHelpPrompt(HelpRequest request)
+        {
+            return "Contextual help prompt";
+        }
+
+        private string BuildPhase1AnalysisPrompt(Phase1ProgressRequest request)
+        {
+            var prompt = $@"
+# BusBuddy Phase 1 Development Analysis
+
+## Project Overview
+- **Project**: {request.ProjectName}
+- **Current Phase**: {request.CurrentPhase}
+- **Days in Development**: {request.DaysInDevelopment}
+- **Team Size**: {request.TeamSize}
+- **Target Completion**: {request.TargetCompletion:yyyy-MM-dd}
+
+## Technical Metrics
+- **Build Status**: {request.BuildStatus}
+- **Tests**: {request.TestsPassingCount}/{request.TotalTestsCount} passing
+- **Code Coverage**: {request.CodeCoverage:P1}
+- **Critical Issues**: {request.CriticalIssuesCount}
+- **Components**: {request.CompletedComponents}/{request.TotalComponents} completed
+- **Lines of Code**: {request.LinesOfCode:N0}
+
+## Development Activity
+- **Commits This Week**: {request.CommitsThisWeek}
+- **Pull Requests**: {request.OpenPullRequests} open, {request.MergedPullRequests} merged
+- **Average Build Time**: {request.AverageBuildTime:F1} seconds
+- **Active Developers**: {request.ActiveDevelopers}
+- **Issues Closed This Week**: {request.IssuesClosedThisWeek}
+- **Documentation Pages**: {request.DocumentationPages}
+
+## Current Focus Areas
+{string.Join("", request.CurrentFocusAreas.Select(area => $"- {area}\n"))}
+
+Please analyze this development state and provide:
+1. **Overall Health Assessment** (Excellent/Good/Fair/Poor)
+2. **Health Score** (0-100)
+3. **Risk Level** (Low/Medium/High/Critical)
+4. **Top 5 Recommendations** for improving development velocity
+5. **Predicted Completion Date** based on current velocity
+6. **Next 3 Key Milestones** to focus on
+7. **Technical Debt Analysis**
+8. **Team Productivity Assessment**
+
+Focus on actionable insights for a WPF .NET application in Phase 1 development.";
+
+            return prompt;
+        }
+
+        private PhaseAnalysisResult ParsePhase1AnalysisResponse(string response)
+        {
+            var result = new PhaseAnalysisResult();
+
+            try
+            {
+                // Extract overall health
+                var healthMatch = Regex.Match(response, @"Overall Health.*?:\s*(\w+)", RegexOptions.IgnoreCase);
+                if (healthMatch.Success)
+                    result.OverallHealth = healthMatch.Groups[1].Value;
+
+                // Extract health score
+                var scoreMatch = Regex.Match(response, @"Health Score.*?:\s*(\d+)", RegexOptions.IgnoreCase);
+                if (scoreMatch.Success && int.TryParse(scoreMatch.Groups[1].Value, out int score))
+                    result.HealthScore = score;
+
+                // Extract risk level
+                var riskMatch = Regex.Match(response, @"Risk Level.*?:\s*(\w+)", RegexOptions.IgnoreCase);
+                if (riskMatch.Success)
+                    result.RiskLevel = riskMatch.Groups[1].Value;
+
+                // Extract recommendations
+                var recMatches = Regex.Matches(response, @"(?:Recommendation|•|\*|\d+\.)\s*(.+?)(?=\n|$)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                result.Recommendations = recMatches.Cast<Match>()
+                    .Select(m => m.Groups[1].Value.Trim())
+                    .Where(s => !string.IsNullOrEmpty(s) && s.Length > 10)
+                    .Take(5)
+                    .ToArray();
+
+                // Extract predicted completion date
+                var dateMatch = Regex.Match(response, @"(?:Predicted|Completion).*?Date.*?:\s*(\d{4}-\d{2}-\d{2})", RegexOptions.IgnoreCase);
+                if (dateMatch.Success && DateTime.TryParse(dateMatch.Groups[1].Value, out DateTime completionDate))
+                    result.PredictedCompletionDate = completionDate;
+                else
+                    result.PredictedCompletionDate = DateTime.Now.AddDays(30); // Default estimate
+
+                // Extract next milestones
+                var milestoneMatches = Regex.Matches(response, @"(?:Milestone|Next|•|\*|\d+\.)\s*(.+?)(?=\n|$)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                result.NextMilestones = milestoneMatches.Cast<Match>()
+                    .Select(m => m.Groups[1].Value.Trim())
+                    .Where(s => !string.IsNullOrEmpty(s) && s.Length > 5)
+                    .Take(3)
+                    .ToArray();
+
+                // Extract technical debt analysis
+                var debtMatch = Regex.Match(response, @"Technical Debt.*?:\s*(.+?)(?=\n\n|\n[A-Z]|$)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                if (debtMatch.Success)
+                    result.TechnicalDebt = debtMatch.Groups[1].Value.Trim();
+
+                // Extract team productivity
+                var prodMatch = Regex.Match(response, @"(?:Team\s+)?Productivity.*?:\s*(.+?)(?=\n\n|\n[A-Z]|$)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                if (prodMatch.Success)
+                    result.TeamProductivity = prodMatch.Groups[1].Value.Trim();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning(ex, "Error parsing Phase 1 analysis response, using defaults");
+                result.OverallHealth = "Analysis Error";
+                result.HealthScore = 50;
+                result.RiskLevel = "Medium";
+                result.Recommendations = new[] { "Unable to parse analysis recommendations" };
+                result.PredictedCompletionDate = DateTime.Now.AddDays(30);
+                result.NextMilestones = new[] { "Complete analysis parsing", "Resume development", "Review metrics" };
+                result.TechnicalDebt = "Unable to assess technical debt from response";
+                result.TeamProductivity = "Unable to assess team productivity from response";
+            }
+
+            return result;
+        }
+
+        private string BuildDevelopmentStatePrompt(DevelopmentStateRequest request)
+        {
+            var prompt = $@"
+# BusBuddy Component Development State Analysis
+
+## Component Information
+- **Name**: {request.ComponentName}
+- **Complexity**: {request.ComplexityLevel}
+- **Last Modified**: {request.LastModified:yyyy-MM-dd HH:mm}
+
+## Technology Stack
+{string.Join("", request.TechnologyStack.Select(tech => $"- {tech}\n"))}
+
+## Recent Changes
+- **Files Changed**: {request.FilesChanged}
+- **Lines Added**: {request.LinesAdded:+#;-#;0}
+- **Lines Removed**: {request.LinesRemoved}
+- **Recent Commits**: {request.RecentCommits}
+
+## Code Metrics
+- **Methods Count**: {request.MethodsCount}
+- **Classes Count**: {request.ClassesCount}
+
+## Issues & Requests
+- **Bug Reports**: {request.BugReports}
+- **Feature Requests**: {request.FeatureRequests}
+- **Performance Issues**: {request.PerformanceIssues}
+
+## Dependencies
+{string.Join("", request.Dependencies.Select(dep => $"- {dep}\n"))}
+
+## Current Challenges
+{string.Join("", request.CurrentChallenges.Select(challenge => $"- {challenge}\n"))}
+
+Please provide development insights including:
+1. **Component Health Status**
+2. **Development Velocity Assessment**
+3. **Risk Areas** to monitor
+4. **Optimization Opportunities**
+5. **Next Development Steps**
+6. **Resource Requirements**
+
+Focus on actionable insights for WPF .NET development.";
+
+            return prompt;
+        }
+
+        private async Task<DevelopmentStateRequest> GatherDevelopmentMetricsAsync(string componentName)
+        {
+            var request = new DevelopmentStateRequest
+            {
+                ComponentName = componentName,
+                TechnologyStack = new List<string> { "WPF", ".NET 8.0", "Entity Framework Core", "Syncfusion", "Serilog" },
+                ComplexityLevel = "Medium",
+                LastModified = DateTime.Now,
+                FilesChanged = 0,
+                LinesAdded = 0,
+                LinesRemoved = 0,
+                MethodsCount = 0,
+                ClassesCount = 0,
+                RecentCommits = 0,
+                BugReports = 0,
+                FeatureRequests = 0,
+                PerformanceIssues = 0,
+                Dependencies = new List<string>(),
+                CurrentChallenges = new List<string>()
+            };
+
+            try
+            {
+                // In a real implementation, this would gather actual metrics
+                // For now, we'll return the basic structure
+                Logger.Information("Gathering development metrics for component: {ComponentName}", componentName);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning(ex, "Error gathering development metrics for {ComponentName}", componentName);
+            }
+
+            return request;
+        }
+
+        #endregion
+
         #region Prompt Building Methods
 
         private string BuildRouteOptimizationPrompt(RouteAnalysisRequest request)
@@ -832,12 +1224,12 @@ Be helpful, informative, and always prioritize student safety. Provide practical
                 foreach (var line in lines)
                 {
                     var trimmed = line.Trim();
-                    if (trimmed.StartsWith("-") || trimmed.StartsWith("•") ||
-                        trimmed.StartsWith("*") || char.IsDigit(trimmed[0]))
+                    if (trimmed.StartsWith('-') || trimmed.StartsWith('•') ||
+                        trimmed.StartsWith('*') || char.IsDigit(trimmed[0]))
                     {
                         recommendations.Add(trimmed.TrimStart('-', '•', '*', ' ', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'));
                     }
-                    else if (trimmed.ToLower().Contains("recommend") || trimmed.ToLower().Contains("suggest"))
+                    else if (trimmed.Contains("recommend", StringComparison.OrdinalIgnoreCase) || trimmed.Contains("suggest", StringComparison.OrdinalIgnoreCase))
                     {
                         recommendations.Add(trimmed);
                     }
@@ -853,8 +1245,8 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
         private string ExtractRiskLevel(string content)
         {
-            var lowerContent = content.ToLower();
-            if (lowerContent.Contains("high risk") || lowerContent.Contains("critical"))
+            var lowerContent = content.ToLowerInvariant();
+            if (lowerContent.Contains("high risk", StringComparison.OrdinalIgnoreCase) || lowerContent.Contains("critical", StringComparison.OrdinalIgnoreCase))
                 return "High";
             if (lowerContent.Contains("medium risk") || lowerContent.Contains("moderate"))
                 return "Medium";
@@ -872,7 +1264,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
                 foreach (var line in lines)
                 {
-                    if (line.ToLower().Contains("risk") && line.Length > 10)
+                    if (line.Contains("risk", StringComparison.OrdinalIgnoreCase) && line.Length > 10)
                     {
                         risks.Add(line.Trim());
                     }
@@ -895,9 +1287,8 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
                 foreach (var line in lines)
                 {
-                    var lower = line.ToLower();
-                    if ((lower.Contains("mitigate") || lower.Contains("prevent") ||
-                         lower.Contains("reduce") || lower.Contains("improve")) && line.Length > 10)
+                    if ((line.Contains("mitigate", StringComparison.OrdinalIgnoreCase) || line.Contains("prevent", StringComparison.OrdinalIgnoreCase) ||
+                         line.Contains("reduce", StringComparison.OrdinalIgnoreCase) || line.Contains("improve", StringComparison.OrdinalIgnoreCase)) && line.Length > 10)
                     {
                         mitigations.Add(line.Trim());
                     }
@@ -920,11 +1311,11 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
                 foreach (var component in commonComponents)
                 {
-                    if (content.ToLower().Contains(component))
+                    if (content.Contains(component, StringComparison.OrdinalIgnoreCase))
                     {
                         components.Add(new ComponentPrediction
                         {
-                            Component = char.ToUpper(component[0]) + component.Substring(1),
+                            Component = char.ToUpperInvariant(component[0]) + component.Substring(1),
                             PredictedWearDate = DateTime.Now.AddDays(Random.Shared.Next(30, 120)),
                             ConfidenceLevel = 0.7 + Random.Shared.NextDouble() * 0.25,
                             EstimatedCost = 100 + Random.Shared.Next(50, 500)
@@ -949,14 +1340,14 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
                 foreach (var riskType in riskTypes)
                 {
-                    if (content.ToLower().Contains(riskType.ToLower()))
+                    if (content.Contains(riskType, StringComparison.OrdinalIgnoreCase))
                     {
                         factors.Add(new SafetyRiskFactor
                         {
                             Factor = riskType,
                             RiskLevel = ExtractRiskLevel(content),
                             Impact = $"{riskType}-related safety considerations",
-                            Mitigation = $"Enhanced {riskType.ToLower()} monitoring and protocols"
+                            Mitigation = $"Enhanced {riskType.ToLowerInvariant()} monitoring and protocols"
                         });
                     }
                 }
@@ -971,10 +1362,10 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
         private string ExtractComplianceStatus(string content)
         {
-            var lowerContent = content.ToLower();
-            if (lowerContent.Contains("non-compliant") || lowerContent.Contains("violation"))
+            var lowerContent = content.ToLowerInvariant();
+            if (lowerContent.Contains("non-compliant", StringComparison.OrdinalIgnoreCase) || lowerContent.Contains("violation", StringComparison.OrdinalIgnoreCase))
                 return "Non-Compliant";
-            if (lowerContent.Contains("partial") || lowerContent.Contains("minor"))
+            if (lowerContent.Contains("partial", StringComparison.OrdinalIgnoreCase) || lowerContent.Contains("minor", StringComparison.OrdinalIgnoreCase))
                 return "Partially Compliant";
             return "Fully Compliant";
         }
@@ -1212,6 +1603,207 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             public int PromptTokens { get; set; }
             public int CompletionTokens { get; set; }
             public int TotalTokens { get; set; }
+        }
+
+        #endregion
+
+        #region Phase 1 Program Management & Analytics Models
+
+        public class Phase1ProgressRequest
+        {
+            public string ProjectName { get; set; } = "BusBuddy";
+            public string CurrentPhase { get; set; } = "Phase 1";
+            public int DaysInDevelopment { get; set; }
+            public int TeamSize { get; set; } = 1;
+            public DateTime TargetCompletion { get; set; }
+            public string BuildStatus { get; set; } = "Passing";
+            public int TestsPassingCount { get; set; }
+            public int TotalTestsCount { get; set; }
+            public double CodeCoverage { get; set; }
+            public int CriticalIssuesCount { get; set; }
+            public int TotalComponents { get; set; }
+            public int CompletedComponents { get; set; }
+            public int LinesOfCode { get; set; }
+            public int CommitsThisWeek { get; set; }
+            public int OpenPullRequests { get; set; }
+            public int MergedPullRequests { get; set; }
+            public double AverageBuildTime { get; set; }
+            public int ActiveDevelopers { get; set; }
+            public int IssuesClosedThisWeek { get; set; }
+            public int DocumentationPages { get; set; }
+            public List<string> CurrentFocusAreas { get; set; } = new();
+        }
+
+        public class PhaseAnalysisResult
+        {
+            public string OverallHealth { get; set; } = string.Empty;
+            public int HealthScore { get; set; }
+            public string RiskLevel { get; set; } = string.Empty;
+            public string[] Recommendations { get; set; } = Array.Empty<string>();
+            public DateTime PredictedCompletionDate { get; set; }
+            public string[] NextMilestones { get; set; } = Array.Empty<string>();
+            public string TechnicalDebt { get; set; } = string.Empty;
+            public string TeamProductivity { get; set; } = string.Empty;
+        }
+
+        public class DevelopmentStateRequest
+        {
+            public string ComponentName { get; set; } = string.Empty;
+            public List<string> TechnologyStack { get; set; } = new();
+            public string ComplexityLevel { get; set; } = "Medium";
+            public DateTime LastModified { get; set; }
+            public int FilesChanged { get; set; }
+            public int LinesAdded { get; set; }
+            public int LinesRemoved { get; set; }
+            public int MethodsCount { get; set; }
+            public int ClassesCount { get; set; }
+            public int RecentCommits { get; set; }
+            public int BugReports { get; set; }
+            public int FeatureRequests { get; set; }
+            public int PerformanceIssues { get; set; }
+            public List<string> Dependencies { get; set; } = new();
+            public List<string> CurrentChallenges { get; set; } = new();
+        }
+
+        public class DevelopmentInsights
+        {
+            public int QualityScore { get; set; }
+            public string[] RecommendedActions { get; set; } = Array.Empty<string>();
+            public string ArchitectureHealth { get; set; } = string.Empty;
+            public int PerformanceScore { get; set; }
+            public int SecurityScore { get; set; }
+            public int MaintainabilityScore { get; set; }
+            public string BestPracticesAlignment { get; set; } = string.Empty;
+            public string[] PriorityIssues { get; set; } = Array.Empty<string>();
+        }
+
+        public class PerformanceDataRequest
+        {
+            public string ApplicationName { get; set; } = "BusBuddy";
+            public string Version { get; set; } = "1.0.0";
+            public string Environment { get; set; } = "Development";
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public double AverageResponseTime { get; set; }
+            public double PeakResponseTime { get; set; }
+            public double MemoryUsage { get; set; }
+            public double PeakMemoryUsage { get; set; }
+            public double AverageCpuUsage { get; set; }
+            public double PeakCpuUsage { get; set; }
+            public double DatabaseQueryTime { get; set; }
+            public double Uptime { get; set; }
+            public double ErrorRate { get; set; }
+            public int SuccessfulRequests { get; set; }
+            public int FailedRequests { get; set; }
+            public int ActiveUsers { get; set; }
+            public double AverageSessionDuration { get; set; }
+            public double PageLoadTime { get; set; }
+            public double UserSatisfactionScore { get; set; }
+            public List<string> IdentifiedBottlenecks { get; set; } = new();
+        }
+
+        public class PerformanceAnalysis
+        {
+            public int OverallScore { get; set; }
+            public string[] CriticalIssues { get; set; } = Array.Empty<string>();
+            public string[] OptimizationOpportunities { get; set; } = Array.Empty<string>();
+            public string ScalabilityAssessment { get; set; } = string.Empty;
+            public string ResourceUtilization { get; set; } = string.Empty;
+            public Dictionary<string, string> ExpectedImprovements { get; set; } = new();
+        }
+
+        public class MockDataRequest
+        {
+            public string DataType { get; set; } = string.Empty;
+            public int RecordCount { get; set; } = 25;
+            public string RealismLevel { get; set; } = "High";
+            public string Purpose { get; set; } = "Development Testing";
+            public List<SchemaField> SchemaFields { get; set; } = new();
+            public string GeographicRegion { get; set; } = "US Midwest";
+            public string TimePeriod { get; set; } = "School Year 2024-2025";
+            public string Scenario { get; set; } = "Normal Operations";
+            public List<string> Relationships { get; set; } = new();
+            public List<string> Constraints { get; set; } = new();
+        }
+
+        public class SchemaField
+        {
+            public string Name { get; set; } = string.Empty;
+            public string Type { get; set; } = string.Empty;
+            public string Constraints { get; set; } = string.Empty;
+        }
+
+        public class GeneratedDataSet
+        {
+            public int RecordCount { get; set; }
+            public string DataType { get; set; } = string.Empty;
+            public object[] GeneratedData { get; set; } = Array.Empty<object>();
+            public Dictionary<string, object> Metadata { get; set; } = new();
+        }
+
+        public class HelpRequest
+        {
+            public string ExperienceLevel { get; set; } = "Intermediate";
+            public string CurrentTask { get; set; } = string.Empty;
+            public string TechnologyFocus { get; set; } = string.Empty;
+            public string LearningGoal { get; set; } = string.Empty;
+            public string Question { get; set; } = string.Empty;
+            public string CodeContext { get; set; } = string.Empty;
+            public string ErrorMessage { get; set; } = string.Empty;
+            public List<string> AttemptedSolutions { get; set; } = new();
+            public string Topic { get; set; } = string.Empty;
+        }
+
+        // Minimal stub for missing method
+        private ContextualHelp CreateMockDevelopmentInsights(HelpRequest request)
+        {
+            return new ContextualHelp
+            {
+                Answer = "Development insights are not available in this build.",
+                Confidence = 0,
+                Examples = Array.Empty<string>(),
+                RelatedTopics = Array.Empty<string>(),
+                DocumentationLinks = Array.Empty<string>(),
+                TroubleshootingTips = Array.Empty<string>()
+            };
+        }
+
+        // Minimal stub for missing method
+        private ContextualHelp ParseContextualHelp(string response)
+        {
+            return new ContextualHelp
+            {
+                Answer = response ?? "No help available.",
+                Confidence = 50,
+                Examples = Array.Empty<string>(),
+                RelatedTopics = Array.Empty<string>(),
+                DocumentationLinks = Array.Empty<string>(),
+                TroubleshootingTips = Array.Empty<string>()
+            };
+        }
+
+        // Minimal stub for missing method
+        private ContextualHelp CreateBasicHelp(HelpRequest request)
+        {
+            return new ContextualHelp
+            {
+                Answer = "Basic help is not available in this build.",
+                Confidence = 0,
+                Examples = Array.Empty<string>(),
+                RelatedTopics = Array.Empty<string>(),
+                DocumentationLinks = Array.Empty<string>(),
+                TroubleshootingTips = Array.Empty<string>()
+            };
+        }
+
+        public class ContextualHelp
+        {
+            public string Answer { get; set; } = string.Empty;
+            public int Confidence { get; set; }
+            public string[] Examples { get; set; } = Array.Empty<string>();
+            public string[] RelatedTopics { get; set; } = Array.Empty<string>();
+            public string[] DocumentationLinks { get; set; } = Array.Empty<string>();
+            public string[] TroubleshootingTips { get; set; } = Array.Empty<string>();
         }
 
         #endregion

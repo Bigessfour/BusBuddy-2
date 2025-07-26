@@ -1,0 +1,33 @@
+using Microsoft.Extensions.Hosting;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace YourNamespace.Data
+{
+    public class SeedDataService
+    {
+        private readonly BusBuddyDbContext _context;
+        private readonly IHostEnvironment _env;
+
+        public SeedDataService(BusBuddyDbContext context, IHostEnvironment env)
+        {
+            _context = context;
+            _env = env;
+        }
+
+        public async Task SeedAsync()
+        {
+            if (!_env.IsDevelopment()) return; // Skip in prod
+
+            await _context.Database.MigrateAsync(); // Apply migrations
+
+            if (!_context.Drivers.Any())
+            {
+                // Sample data (idempotent: check existence)
+                _context.Drivers.Add(new Driver { Name = "Sample Driver", LicenseNumber = "ABC123" });
+                // Add more entities with relationships...
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
+}

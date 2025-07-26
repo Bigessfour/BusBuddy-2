@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Serilog.Context;
 using System;
 using System.Collections.Generic;
@@ -38,13 +38,13 @@ namespace BusBuddy.WPF.Logging
                 {
                     using (LogContext.PushProperty("AdditionalData", additionalData))
                     {
-                        logger.LogInformation(logMessage + " - Data: {AdditionalData}",
+                        logger.Information(logMessage + " - Data: {AdditionalData}",
                             controlType, controlName ?? "Unnamed", instanceId, lifecycleEvent, callerMethod, additionalData);
                     }
                 }
                 else
                 {
-                    logger.LogInformation(logMessage,
+                    logger.Information(logMessage,
                         controlType, controlName ?? "Unnamed", instanceId, lifecycleEvent, callerMethod);
                 }
             }
@@ -65,7 +65,7 @@ namespace BusBuddy.WPF.Logging
                     using (LogContext.PushProperty("ThemeName", themeName))
                     using (LogContext.PushProperty("TargetControl", targetControl))
                     {
-                        logger.LogInformation("[SF_THEME] Theme operation '{ThemeOperation}' applying '{ThemeName}' to '{TargetControl}' in {CallerMethod}",
+                        logger.Information("[SF_THEME] Theme operation '{ThemeOperation}' applying '{ThemeName}' to '{TargetControl}' in {CallerMethod}",
                             operation, themeName, targetControl, callerMethod);
                     }
                 }
@@ -73,13 +73,13 @@ namespace BusBuddy.WPF.Logging
                 {
                     using (LogContext.PushProperty("ThemeName", themeName))
                     {
-                        logger.LogInformation("[SF_THEME] Theme operation '{ThemeOperation}' with theme '{ThemeName}' in {CallerMethod}",
+                        logger.Information("[SF_THEME] Theme operation '{ThemeOperation}' with theme '{ThemeName}' in {CallerMethod}",
                             operation, themeName, callerMethod);
                     }
                 }
                 else
                 {
-                    logger.LogInformation("[SF_THEME] Theme operation '{ThemeOperation}' in {CallerMethod}",
+                    logger.Information("[SF_THEME] Theme operation '{ThemeOperation}' in {CallerMethod}",
                         operation, callerMethod);
                 }
             }
@@ -118,14 +118,14 @@ namespace BusBuddy.WPF.Logging
 
                     if (durationMs > 500)
                     {
-                        logger.LogWarning("[SF_DATA_SLOW] Syncfusion {ControlType} data operation '{DataOperation}' took {DurationMs:F1}ms (SLOW) in {CallerMethod} - {Details}",
+                        logger.Warning("[SF_DATA_SLOW] Syncfusion {ControlType} data operation '{DataOperation}' took {DurationMs:F1}ms (SLOW) in {CallerMethod} - {Details}",
                             controlType, operation, durationMs, callerMethod, string.Join(", ", logProperties));
                         return;
                     }
                 }
 
-                var details = logProperties.Any() ? $" - {string.Join(", ", logProperties)}" : "";
-                logger.LogInformation("[SF_DATA] Syncfusion {ControlType} data operation '{DataOperation}' in {CallerMethod}{Details}",
+                var details = logProperties.Count > 0 ? $" - {string.Join(", ", logProperties)}" : "";
+                logger.Information("[SF_DATA] Syncfusion {ControlType} data operation '{DataOperation}' in {CallerMethod}{Details}",
                     controlType, operation, callerMethod, details);
             }
         }
@@ -149,13 +149,13 @@ namespace BusBuddy.WPF.Logging
                         {
                             using (LogContext.PushProperty("EventArgs", eventArgs))
                             {
-                                logger.LogDebug("[SF_EVENT] Syncfusion {ControlType} '{ControlName}' fired '{EventName}' in {CallerMethod} - Args: {EventArgs}",
+                                logger.Debug("[SF_EVENT] Syncfusion {ControlType} '{ControlName}' fired '{EventName}' in {CallerMethod} - Args: {EventArgs}",
                                     controlType, controlName, eventName, callerMethod, eventArgs);
                             }
                         }
                         else
                         {
-                            logger.LogDebug("[SF_EVENT] Syncfusion {ControlType} '{ControlName}' fired '{EventName}' in {CallerMethod}",
+                            logger.Debug("[SF_EVENT] Syncfusion {ControlType} '{ControlName}' fired '{EventName}' in {CallerMethod}",
                                 controlType, controlName, eventName, callerMethod);
                         }
                     }
@@ -166,13 +166,13 @@ namespace BusBuddy.WPF.Logging
                     {
                         using (LogContext.PushProperty("EventArgs", eventArgs))
                         {
-                            logger.LogDebug("[SF_EVENT] Syncfusion {ControlType} fired '{EventName}' in {CallerMethod} - Args: {EventArgs}",
+                            logger.Debug("[SF_EVENT] Syncfusion {ControlType} fired '{EventName}' in {CallerMethod} - Args: {EventArgs}",
                                 controlType, eventName, callerMethod, eventArgs);
                         }
                     }
                     else
                     {
-                        logger.LogDebug("[SF_EVENT] Syncfusion {ControlType} fired '{EventName}' in {CallerMethod}",
+                        logger.Debug("[SF_EVENT] Syncfusion {ControlType} fired '{EventName}' in {CallerMethod}",
                             controlType, eventName, callerMethod);
                     }
                 }
@@ -193,13 +193,6 @@ namespace BusBuddy.WPF.Logging
             using (LogContext.PushProperty("DurationMs", durationMs))
             using (LogContext.PushProperty("CallerMethod", callerMethod))
             {
-                var logLevel = durationMs switch
-                {
-                    > 1000 => LogLevel.Warning,
-                    > 500 => LogLevel.Information,
-                    _ => LogLevel.Debug
-                };
-
                 var performanceRating = durationMs switch
                 {
                     > 1000 => "VERY SLOW",
@@ -212,14 +205,42 @@ namespace BusBuddy.WPF.Logging
                 {
                     using (LogContext.PushProperty("PerformanceContext", performanceContext))
                     {
-                        logger.Log(logLevel, "[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod} - Context: {PerformanceContext}",
-                            controlType, operation, durationMs, performanceRating, callerMethod, performanceContext);
+                        // Use appropriate log level based on duration
+                        if (durationMs > 1000)
+                        {
+                            logger.Warning("[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod} - Context: {PerformanceContext}",
+                                controlType, operation, durationMs, performanceRating, callerMethod, performanceContext);
+                        }
+                        else if (durationMs > 500)
+                        {
+                            logger.Information("[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod} - Context: {PerformanceContext}",
+                                controlType, operation, durationMs, performanceRating, callerMethod, performanceContext);
+                        }
+                        else
+                        {
+                            logger.Debug("[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod} - Context: {PerformanceContext}",
+                                controlType, operation, durationMs, performanceRating, callerMethod, performanceContext);
+                        }
                     }
                 }
                 else
                 {
-                    logger.Log(logLevel, "[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod}",
-                        controlType, operation, durationMs, performanceRating, callerMethod);
+                    // Use appropriate log level based on duration
+                    if (durationMs > 1000)
+                    {
+                        logger.Warning("[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod}",
+                            controlType, operation, durationMs, performanceRating, callerMethod);
+                    }
+                    else if (durationMs > 500)
+                    {
+                        logger.Information("[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod}",
+                            controlType, operation, durationMs, performanceRating, callerMethod);
+                    }
+                    else
+                    {
+                        logger.Debug("[SF_PERF] Syncfusion {ControlType} operation '{Operation}' took {DurationMs:F1}ms ({PerformanceRating}) in {CallerMethod}",
+                            controlType, operation, durationMs, performanceRating, callerMethod);
+                    }
                 }
             }
         }
@@ -241,7 +262,7 @@ namespace BusBuddy.WPF.Logging
                     using (LogContext.PushProperty("ControlName", controlName))
                     using (LogContext.PushProperty("AdditionalContext", additionalContext))
                     {
-                        logger.LogError(exception, "[SF_ERROR] Syncfusion {ControlType} '{ControlName}' error during '{Operation}' in {CallerMethod} - Context: {AdditionalContext} - Error: {ErrorMessage}",
+                        logger.Error(exception, "[SF_ERROR] Syncfusion {ControlType} '{ControlName}' error during '{Operation}' in {CallerMethod} - Context: {AdditionalContext} - Error: {ErrorMessage}",
                             controlType, controlName, operation, callerMethod, additionalContext, exception.Message);
                     }
                 }
@@ -249,13 +270,13 @@ namespace BusBuddy.WPF.Logging
                 {
                     using (LogContext.PushProperty("ControlName", controlName))
                     {
-                        logger.LogError(exception, "[SF_ERROR] Syncfusion {ControlType} '{ControlName}' error during '{Operation}' in {CallerMethod} - Error: {ErrorMessage}",
+                        logger.Error(exception, "[SF_ERROR] Syncfusion {ControlType} '{ControlName}' error during '{Operation}' in {CallerMethod} - Error: {ErrorMessage}",
                             controlType, controlName, operation, callerMethod, exception.Message);
                     }
                 }
                 else
                 {
-                    logger.LogError(exception, "[SF_ERROR] Syncfusion {ControlType} error during '{Operation}' in {CallerMethod} - Error: {ErrorMessage}",
+                    logger.Error(exception, "[SF_ERROR] Syncfusion {ControlType} error during '{Operation}' in {CallerMethod} - Error: {ErrorMessage}",
                         controlType, operation, callerMethod, exception.Message);
                 }
             }
@@ -276,13 +297,13 @@ namespace BusBuddy.WPF.Logging
                 {
                     using (LogContext.PushProperty("DiagnosticData", diagnosticData))
                     {
-                        logger.LogDebug("[SF_DIAG] Syncfusion {ControlType} diagnostic: {DiagnosticInfo} in {CallerMethod} - Data: {DiagnosticData}",
+                        logger.Debug("[SF_DIAG] Syncfusion {ControlType} diagnostic: {DiagnosticInfo} in {CallerMethod} - Data: {DiagnosticData}",
                             controlType, diagnosticInfo, callerMethod, diagnosticData);
                     }
                 }
                 else
                 {
-                    logger.LogDebug("[SF_DIAG] Syncfusion {ControlType} diagnostic: {DiagnosticInfo} in {CallerMethod}",
+                    logger.Debug("[SF_DIAG] Syncfusion {ControlType} diagnostic: {DiagnosticInfo} in {CallerMethod}",
                         controlType, diagnosticInfo, callerMethod);
                 }
             }

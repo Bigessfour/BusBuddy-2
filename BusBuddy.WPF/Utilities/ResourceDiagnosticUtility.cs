@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +17,7 @@ namespace BusBuddy.WPF.Utilities
         /// </summary>
         /// <param name="assemblyName">The name of the assembly to inspect</param>
         /// <param name="logger">Logger instance for output</param>
-        public static void LogAllEmbeddedResources(string assemblyName, ILogger logger)
+        public static void LogAllEmbeddedResources(string assemblyName)
         {
             try
             {
@@ -42,13 +42,13 @@ namespace BusBuddy.WPF.Utilities
 
                 if (assembly == null)
                 {
-                    logger.LogWarning($"[RESOURCE_DIAGNOSTIC] Could not load assembly: {assemblyName}");
+                    Log.Warning("[RESOURCE_DIAGNOSTIC] Could not load assembly: {AssemblyName}", assemblyName);
                     return;
                 }
 
                 // Get all embedded resources
                 string[] resources = assembly.GetManifestResourceNames();
-                logger.LogInformation($"[RESOURCE_DIAGNOSTIC] Found {resources.Length} resources in {assemblyName}:");
+                Log.Information("[RESOURCE_DIAGNOSTIC] Found {ResourceCount} resources in {AssemblyName}", resources.Length, assemblyName);
 
                 StringBuilder sb = new StringBuilder();
                 foreach (string resource in resources)
@@ -56,11 +56,11 @@ namespace BusBuddy.WPF.Utilities
                     sb.AppendLine($"  • {resource}");
                 }
 
-                logger.LogInformation($"[RESOURCE_DIAGNOSTIC] Resources in {assemblyName}:\n{sb}");
+                Log.Information("[RESOURCE_DIAGNOSTIC] Resources in {AssemblyName}:\n{ResourceList}", assemblyName, sb.ToString());
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"[RESOURCE_DIAGNOSTIC] Error inspecting resources in {assemblyName}");
+                Log.Error(ex, "[RESOURCE_DIAGNOSTIC] Error inspecting resources in {AssemblyName}", assemblyName);
             }
         }
 
@@ -72,14 +72,14 @@ namespace BusBuddy.WPF.Utilities
         /// <param name="outputPath">The path where the resource should be saved</param>
         /// <param name="logger">Logger instance for output</param>
         /// <returns>True if successful, false otherwise</returns>
-        public static bool ExtractResourceToFile(string assemblyName, string resourceName, string outputPath, ILogger logger)
+        public static bool ExtractResourceToFile(string assemblyName, string resourceName, string outputPath)
         {
             try
             {
                 Assembly? assembly = Assembly.Load(assemblyName);
                 if (assembly == null)
                 {
-                    logger.LogWarning($"[RESOURCE_DIAGNOSTIC] Could not load assembly: {assemblyName}");
+                    Log.Warning("[RESOURCE_DIAGNOSTIC] Could not load assembly: {AssemblyName}", assemblyName);
                     return false;
                 }
 
@@ -87,7 +87,7 @@ namespace BusBuddy.WPF.Utilities
                 {
                     if (resourceStream == null)
                     {
-                        logger.LogWarning($"[RESOURCE_DIAGNOSTIC] Resource not found: {resourceName}");
+                        Log.Warning("[RESOURCE_DIAGNOSTIC] Resource not found: {ResourceName}", resourceName);
                         return false;
                     }
 
@@ -97,12 +97,12 @@ namespace BusBuddy.WPF.Utilities
                     }
                 }
 
-                logger.LogInformation($"[RESOURCE_DIAGNOSTIC] Resource extracted to: {outputPath}");
+                Log.Information("[RESOURCE_DIAGNOSTIC] Resource extracted to: {OutputPath}", outputPath);
                 return true;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"[RESOURCE_DIAGNOSTIC] Error extracting resource {resourceName} from {assemblyName}");
+                Log.Error(ex, "[RESOURCE_DIAGNOSTIC] Error extracting resource {ResourceName} from {AssemblyName}", resourceName, assemblyName);
                 return false;
             }
         }
@@ -111,12 +111,12 @@ namespace BusBuddy.WPF.Utilities
         /// Logs information about all loaded assemblies in the current AppDomain
         /// </summary>
         /// <param name="logger">Logger instance for output</param>
-        public static void LogLoadedAssemblies(ILogger logger)
+        public static void LogLoadedAssemblies()
         {
             try
             {
                 Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                logger.LogInformation($"[RESOURCE_DIAGNOSTIC] Found {assemblies.Length} loaded assemblies:");
+                Log.Information("[RESOURCE_DIAGNOSTIC] Found {AssemblyCount} loaded assemblies:", assemblies.Length);
 
                 var syncfusionAssemblies = new List<Assembly>();
                 StringBuilder sb = new StringBuilder();
@@ -127,18 +127,18 @@ namespace BusBuddy.WPF.Utilities
                     string version = assembly.GetName().Version?.ToString() ?? "Unknown";
                     string location = string.IsNullOrEmpty(assembly.Location) ? "[Dynamic Assembly]" : assembly.Location;
 
-                    if (name != null && name.StartsWith("Syncfusion."))
+                    if (name != null && name.StartsWith("Syncfusion.", StringComparison.Ordinal))
                     {
                         syncfusionAssemblies.Add(assembly);
                         sb.AppendLine($"  • {name} ({version}) - {location}");
                     }
                 }
 
-                logger.LogInformation($"[RESOURCE_DIAGNOSTIC] Syncfusion assemblies ({syncfusionAssemblies.Count}):\n{sb}");
+                Log.Information("[RESOURCE_DIAGNOSTIC] Syncfusion assemblies ({SyncfusionCount}):\n{SyncfusionList}", syncfusionAssemblies.Count, sb.ToString());
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "[RESOURCE_DIAGNOSTIC] Error inspecting loaded assemblies");
+                Log.Error(ex, "[RESOURCE_DIAGNOSTIC] Error inspecting loaded assemblies");
             }
         }
     }

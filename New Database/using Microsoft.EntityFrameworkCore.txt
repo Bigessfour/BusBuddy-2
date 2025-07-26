@@ -1,0 +1,108 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
+using YourNamespace.Models; // Adjust namespace as needed
+
+namespace YourNamespace.Data // Adjust namespace
+{
+    public class BusBuddyDbContext : DbContext
+    {
+        private readonly IConfiguration _configuration;
+
+        public BusBuddyDbContext(DbContextOptions<BusBuddyDbContext> options, IConfiguration configuration)
+            : base(options)
+        {
+            _configuration = configuration;
+        }
+
+        // DbSets for all core and supporting entities
+        public DbSet<Driver> Drivers { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Activity> Activities { get; set; }
+        public DbSet<Bus> Buses { get; set; } // Previously ignored, now included
+        public DbSet<Route> Routes { get; set; } // Previously ignored, now included
+        public DbSet<Student> Students { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<RouteStop> RouteStops { get; set; }
+        public DbSet<Fuel> Fuels { get; set; }
+        // Add DbSets for the remaining ~70 models as needed
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Fallback for design-time (e.g., migrations)
+                optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
+            }
+
+            // Enable detailed errors and logging for dev, resiliency for prod
+            optionsBuilder.EnableDetailedErrors();
+            optionsBuilder.EnableSensitiveDataLogging(); // Disable in prod via env check
+            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
+
+            // Connection resiliency with retries (good for Azure SQL in prod)
+            optionsBuilder.UseSqlServer(
+                _configuration.GetConnectionString("DefaultConnection"),
+                sqlOptions => sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null)
+            );
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configure base entity if using BaseEntity.cs (e.g., for timestamps, soft delete)
+            modelBuilder.Entity<BaseEntity>().HasKey(e => e.Id);
+            modelBuilder.Entity<BaseEntity>().Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+            modelBuilder.Entity<BaseEntity>().Property(e => e.UpdatedAt).HasDefaultValueSql("GETDATE()");
+
+            // Example relationships (adjust based on your models)
+            modelBuilder.Entity<Bus>()
+                .HasMany(b => b.Routes)
+                .WithOne(r => r.Bus)
+                .HasForeignKey(r => r.BusId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Route>()
+                .HasMany(r => r.RouteStops)
+                .WithOne(rs => rs.Route)
+                .HasForeignKey(rs => rs.RouteId);
+
+            modelBuilder.Entity<Driver>()
+                .HasMany(d => d.Activities)
+                .WithOne(a => a.Driver)
+                .HasForeignKey(a => a.DriverId);
+
+            // Handle null fixes from DatabaseNullFixMigration.cs (e.g., make columns nullable if needed)
+            modelBuilder.Entity<Activity>().Property(a => a.Description).IsRequired(false); // Example
+
+            // Concurrency token for optimistic locking (add RowVersion to BaseEntity if not present)
+            modelBuilder.Entity<BaseEntity>().Property(e => e.RowVersion).IsRowVersion();
+
+            // Apply configurations for all entities (if you have IEntityTypeConfiguration classes)
+            // modelBuilder.ApplyConfigurationsFromAssembly(typeof(BusBuddyDbContext).Assembly);
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            // Auto-update timestamps if using BaseEntity
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                }
+                if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+    }
+}

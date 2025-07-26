@@ -19,6 +19,12 @@ namespace BusBuddy.Core.Services
     public class UserSettingsService : IUserSettingsService
     {
         private static readonly ILogger Logger = Log.ForContext<UserSettingsService>();
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         private readonly string _settingsFilePath;
         private Dictionary<string, object> _settings;
 
@@ -44,10 +50,8 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                if (_settings.ContainsKey(key))
+                if (_settings.TryGetValue(key, out var value))
                 {
-                    var value = _settings[key];
-
                     if (value is JsonElement jsonElement)
                     {
                         // Handle JsonElement deserialization
@@ -127,13 +131,7 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                };
-
-                var json = JsonSerializer.Serialize(_settings, options);
+                var json = JsonSerializer.Serialize(_settings, JsonOptions);
                 await File.WriteAllTextAsync(_settingsFilePath, json);
 
                 Logger.Information("User settings saved successfully to {FilePath}", _settingsFilePath);

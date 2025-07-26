@@ -1,0 +1,20 @@
+var builder = WebApplication.CreateBuilder(args);
+
+// Add DbContext with scoped lifetime
+builder.Services.AddDbContext<BusBuddyDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add UnitOfWork and repos
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+// Add individual repos if needed separately
+
+var app = builder.Build();
+
+// Seed data on startup (dev only)
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<SeedDataService>();
+    await seeder.SeedAsync();
+}
+
+// ... other app setup

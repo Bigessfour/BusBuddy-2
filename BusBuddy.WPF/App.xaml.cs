@@ -28,8 +28,8 @@ namespace BusBuddy.WPF
             // Phase 2: Enhanced error handling and logging
             try
             {
-                // Run async initialization
-                Task.Run(async () => await InitializeApplicationAsync(e)).Wait();
+                // Run async initialization on UI thread
+                InitializeApplicationAsync(e).Wait();
             }
             catch (Exception ex)
             {
@@ -97,7 +97,7 @@ namespace BusBuddy.WPF
 
                     // Phase 1: Register database context
                     services.AddDbContext<BusBuddyDbContext>(options =>
-                        options.UseSqlServer("Data Source=BusBuddy.db"));
+                        options.UseSqlite("Data Source=BusBuddy.db"));
 
                     // Phase 1: Register Phase 1 services including data seeding
                     services.AddPhase1Services();

@@ -99,11 +99,13 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<T> Repository<T>() where T : class
     {
-        var type = typeof(T); if (!_repositories.ContainsKey(type))
+        var type = typeof(T);
+        if (!_repositories.TryGetValue(type, out var repository))
         {
-            _repositories[type] = new Repository<T>(_context, _userContextService);
+            repository = new Repository<T>(_context, _userContextService);
+            _repositories[type] = repository;
         }
-        return (IRepository<T>)_repositories[type];
+        return (IRepository<T>)repository;
     }
 
     #endregion
@@ -248,7 +250,7 @@ public class UnitOfWork : IUnitOfWork
     public async Task<int> BulkInsertAsync<T>(IEnumerable<T> entities) where T : class
     {
         var entityList = entities.ToList();
-        if (!entityList.Any()) return 0;
+        if (entityList.Count == 0) return 0;
 
         await _context.Set<T>().AddRangeAsync(entityList);
         return await SaveChangesAsync();
@@ -257,7 +259,7 @@ public class UnitOfWork : IUnitOfWork
     public async Task<int> BulkUpdateAsync<T>(IEnumerable<T> entities) where T : class
     {
         var entityList = entities.ToList();
-        if (!entityList.Any()) return 0;
+        if (entityList.Count == 0) return 0;
 
         _context.Set<T>().UpdateRange(entityList);
         return await SaveChangesAsync();
@@ -266,7 +268,7 @@ public class UnitOfWork : IUnitOfWork
     public async Task<int> BulkDeleteAsync<T>(IEnumerable<T> entities) where T : class
     {
         var entityList = entities.ToList();
-        if (!entityList.Any()) return 0;
+        if (entityList.Count == 0) return 0;
 
         _context.Set<T>().RemoveRange(entityList);
         return await SaveChangesAsync();
@@ -480,7 +482,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         return await FindAsync(s => s.AMRoute == routeStr || s.PMRoute == routeStr);
     }
     public async Task<IEnumerable<Student>> GetStudentsWithoutRouteAsync() => await FindAsync(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute));
-    public async Task<Student?> GetStudentByNameAsync(string name) => await FirstOrDefaultAsync(s => s.StudentName.Contains(name));
+    public async Task<Student?> GetStudentByNameAsync(string studentName) => await FirstOrDefaultAsync(s => s.StudentName.Contains(studentName));
     public async Task<IEnumerable<Student>> SearchStudentsByNameAsync(string searchTerm) => await FindAsync(s => s.StudentName.Contains(searchTerm));
     public async Task<IEnumerable<Student>> GetStudentsWithSpecialNeedsAsync() => await FindAsync(s => s.SpecialNeeds);
     public async Task<IEnumerable<Student>> GetStudentsWithMedicalConditionsAsync() => await FindAsync(s => !string.IsNullOrEmpty(s.MedicalNotes));

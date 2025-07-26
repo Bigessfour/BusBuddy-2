@@ -1,0 +1,58 @@
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
+
+namespace YourNamespace.Data
+{
+    public interface IUnitOfWork : IDisposable
+    {
+        IDriverRepository Drivers { get; }
+        IVehicleRepository Vehicles { get; }
+        // Add properties for all other repos...
+
+        Task<int> SaveChangesAsync();
+    }
+
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly BusBuddyDbContext _context;
+        private readonly ILogger<UnitOfWork> _logger;
+
+        public IDriverRepository Drivers { get; }
+        public IVehicleRepository Vehicles { get; }
+        // Add other repo properties...
+
+        public UnitOfWork(BusBuddyDbContext context, ILogger<UnitOfWork> logger)
+        {
+            _context = context;
+            _logger = logger;
+
+            Drivers = new DriverRepository(_context);
+            Vehicles = new VehicleRepository(_context);
+            // Initialize others...
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            try
+            {
+                return await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                _logger.LogError(ex, "Concurrency error during save.");
+                throw; // Or handle refresh/retry
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving changes.");
+                throw;
+            }
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+    }
+}

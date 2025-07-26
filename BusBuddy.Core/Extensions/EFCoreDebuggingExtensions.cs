@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging;
 using Serilog;
+
 using System.Diagnostics;
 using System.Text;
 
@@ -28,12 +28,8 @@ public static class EFCoreDebuggingExtensions
             .EnableServiceProviderCaching() // Cache service provider for performance
             .LogTo(message =>
             {
-                Debug.WriteLine(message);
                 Logger.Debug(message);
-            }, LogLevel.Information)
-            .ConfigureWarnings(warnings => warnings
-                .Throw(RelationalEventId.QueryPossibleUnintendedUseOfEqualsWarning)
-                .Log(CoreEventId.FirstWithoutOrderByAndFilterWarning));
+            }); // Removed Microsoft logging level, use Serilog logger directly where needed
     }
 
     /// <summary>
@@ -94,7 +90,7 @@ public static class EFCoreDebuggingExtensions
                 .Select(p => $"{p.Metadata.Name}={p.CurrentValue}")
                 .ToList();
 
-            return keyValues.Any() ? string.Join(", ", keyValues) : "No Key";
+            return keyValues.Count > 0 ? string.Join(", ", keyValues) : "No Key";
         }
         catch
         {

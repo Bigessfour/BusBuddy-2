@@ -3,9 +3,332 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="400">
-    <Grid>
-        <DataGrid ItemsSource="{Binding Activities}" AutoGenerateColumns="True" Margin="10" />
+             d:DesignHeight="800"
+             d:DesignWidth="1200">
+
+  <UserControl.Resources>
+    <!-- Phase 2: Enhanced styling for Activity Schedule -->
+    <Style x:Key="HeaderStyle"
+           TargetType="TextBlock">
+      <Setter Property="FontSize"
+              Value="18"/>
+      <Setter Property="FontWeight"
+              Value="Bold"/>
+      <Setter Property="Foreground"
+              Value="#2C3E50"/>
+      <Setter Property="Margin"
+              Value="5"/>
+    </Style>
+
+    <Style x:Key="SubHeaderStyle"
+           TargetType="TextBlock">
+      <Setter Property="FontSize"
+              Value="14"/>
+      <Setter Property="FontWeight"
+              Value="SemiBold"/>
+      <Setter Property="Foreground"
+              Value="#34495E"/>
+      <Setter Property="Margin"
+              Value="3"/>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid Margin="10">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- Header Section -->
+    <StackPanel Grid.Row="0"
+                Orientation="Horizontal"
+                Margin="0,0,0,10">
+      <TextBlock Text="📅 Activity Schedule Management"
+                 Style="{StaticResource HeaderStyle}"/>
+      <Button Content="🔄 Refresh"
+              Command="{Binding RefreshCommand}"
+              Margin="20,0,10,0"
+              Padding="10,5"
+              Background="#3498DB"
+              Foreground="White"
+              BorderThickness="0"/>
+      <Button Content="➕ Add Activity"
+              Command="{Binding AddActivityCommand}"
+              Margin="10,0"
+              Padding="10,5"
+              Background="#27AE60"
+              Foreground="White"
+              BorderThickness="0"/>
+    </StackPanel>
+
+    <!-- Quick Stats Section -->
+    <Grid Grid.Row="1"
+          Margin="0,0,0,15">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.Column="0"
+              Background="#E8F4FD"
+              BorderBrush="#3498DB"
+              BorderThickness="1"
+              CornerRadius="5"
+              Padding="15"
+              Margin="0,0,5,0">
+        <StackPanel>
+          <TextBlock Text="📊 Today's Activities"
+                     Style="{StaticResource SubHeaderStyle}"/>
+          <TextBlock Text="{Binding TodayActivitiesCount}"
+                     FontSize="24"
+                     FontWeight="Bold"
+                     Foreground="#3498DB"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="1"
+              Background="#E8F8F5"
+              BorderBrush="#27AE60"
+              BorderThickness="1"
+              CornerRadius="5"
+              Padding="15"
+              Margin="5,0">
+        <StackPanel>
+          <TextBlock Text="🚌 Scheduled Trips"
+                     Style="{StaticResource SubHeaderStyle}"/>
+          <TextBlock Text="{Binding ScheduledTripsCount}"
+                     FontSize="24"
+                     FontWeight="Bold"
+                     Foreground="#27AE60"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="2"
+              Background="#FDF2E9"
+              BorderBrush="#E67E22"
+              BorderThickness="1"
+              CornerRadius="5"
+              Padding="15"
+              Margin="5,0">
+        <StackPanel>
+          <TextBlock Text="⏰ In Progress"
+                     Style="{StaticResource SubHeaderStyle}"/>
+          <TextBlock Text="{Binding InProgressCount}"
+                     FontSize="24"
+                     FontWeight="Bold"
+                     Foreground="#E67E22"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="3"
+              Background="#FADBD8"
+              BorderBrush="#E74C3C"
+              BorderThickness="1"
+              CornerRadius="5"
+              Padding="15"
+              Margin="5,0,0,0">
+        <StackPanel>
+          <TextBlock Text="⚠️ Needs Attention"
+                     Style="{StaticResource SubHeaderStyle}"/>
+          <TextBlock Text="{Binding NeedsAttentionCount}"
+                     FontSize="24"
+                     FontWeight="Bold"
+                     Foreground="#E74C3C"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
     </Grid>
+
+    <!-- Main Content with TabControl -->
+    <TabControl Grid.Row="2"
+                Background="White">
+
+      <!-- Calendar View Tab -->
+      <TabItem Header="📅 Calendar View">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+
+          <!-- View Controls -->
+          <StackPanel Grid.Row="0"
+                      Orientation="Horizontal"
+                      Margin="10"
+                      HorizontalAlignment="Right">
+            <TextBlock Text="View:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+            <ComboBox SelectedValue="{Binding SelectedViewType}"
+                      Width="120"
+                      Margin="0,0,10,0">
+              <ComboBoxItem Content="Day"
+                            Tag="Day"/>
+              <ComboBoxItem Content="Week"
+                            Tag="Week"/>
+              <ComboBoxItem Content="Month"
+                            Tag="Month"
+                            IsSelected="True"/>
+            </ComboBox>
+
+            <Button Content="Today"
+                    Command="{Binding GoToTodayCommand}"
+                    Margin="10,0"
+                    Padding="8,4"/>
+          </StackPanel>
+
+          <!-- Syncfusion Scheduler Integration -->
+          <syncfusion:SfScheduler Grid.Row="1"
+                                  x:Name="ActivityScheduler"
+                                  ViewType="Month"
+                                  ItemsSource="{Binding ActivitySchedules}"
+                                  SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                                  Margin="10">
+
+            <!-- Appointment Mapping -->
+            <syncfusion:SfScheduler.AppointmentMapping>
+              <syncfusion:AppointmentMapping Subject="Subject"
+                                             StartTime="ScheduledDate"
+                                             EndTime="ScheduledEndTime"
+                                             AppointmentBackground="StatusColor"
+                                             IsAllDay="IsAllDay"
+                                             Notes="Notes"
+                                             Location="ScheduledDestination"/>
+            </syncfusion:SfScheduler.AppointmentMapping>
+
+            <!-- Month View Settings -->
+            <syncfusion:SfScheduler.MonthViewSettings>
+              <syncfusion:MonthViewSettings ShowAgendaView="True"
+                                            AgendaViewHeight="200"/>
+            </syncfusion:SfScheduler.MonthViewSettings>
+
+          </syncfusion:SfScheduler>
+        </Grid>
+      </TabItem>
+
+      <!-- List View Tab -->
+      <TabItem Header="📋 List View">
+        <Grid Margin="10">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+
+          <!-- Filter Controls -->
+          <StackPanel Grid.Row="0"
+                      Orientation="Horizontal"
+                      Margin="0,0,0,10">
+            <TextBlock Text="Filter by Status:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+            <ComboBox SelectedValue="{Binding StatusFilter}"
+                      Width="150"
+                      Margin="0,0,20,0">
+              <ComboBoxItem Content="All Statuses"
+                            Tag="All"
+                            IsSelected="True"/>
+              <ComboBoxItem Content="Scheduled"
+                            Tag="Scheduled"/>
+              <ComboBoxItem Content="Confirmed"
+                            Tag="Confirmed"/>
+              <ComboBoxItem Content="In Progress"
+                            Tag="InProgress"/>
+              <ComboBoxItem Content="Completed"
+                            Tag="Completed"/>
+              <ComboBoxItem Content="Cancelled"
+                            Tag="Cancelled"/>
+            </ComboBox>
+
+            <TextBlock Text="Date Range:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+            <TextBox Text="{Binding StartDateFilter}"
+                     Width="120"
+                     Margin="0,0,10,0"
+                     ToolTip="Start Date (YYYY-MM-DD)"/>
+            <TextBlock Text="to"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+            <TextBox Text="{Binding EndDateFilter}"
+                     Width="120"
+                     Margin="0,0,20,0"
+                     ToolTip="End Date (YYYY-MM-DD)"/>
+
+            <Button Content="Apply Filter"
+                    Command="{Binding ApplyFilterCommand}"
+                    Padding="10,5"
+                    Background="#3498DB"
+                    Foreground="White"
+                    BorderThickness="0"/>
+          </StackPanel>
+
+          <!-- Enhanced List View -->
+          <ListView Grid.Row="1"
+                    x:Name="ActivityList"
+                    ItemsSource="{Binding FilteredActivitySchedules}"
+                    SelectedItem="{Binding SelectedActivity}">
+
+            <ListView.View>
+              <GridView>
+                <GridViewColumn Header="Date"
+                                DisplayMemberBinding="{Binding ScheduledDate, StringFormat={}{0:yyyy-MM-dd}}"
+                                Width="100"/>
+                <GridViewColumn Header="Leave Time"
+                                DisplayMemberBinding="{Binding ScheduledLeaveTime, StringFormat={}{0:hh\\:mm}}"
+                                Width="80"/>
+                <GridViewColumn Header="Type"
+                                DisplayMemberBinding="{Binding TripType}"
+                                Width="120"/>
+                <GridViewColumn Header="Destination"
+                                DisplayMemberBinding="{Binding ScheduledDestination}"
+                                Width="200"/>
+                <GridViewColumn Header="Driver"
+                                DisplayMemberBinding="{Binding ScheduledDriver.DriverName}"
+                                Width="150"/>
+                <GridViewColumn Header="Vehicle"
+                                DisplayMemberBinding="{Binding ScheduledVehicle.BusNumber}"
+                                Width="100"/>
+                <GridViewColumn Header="Status"
+                                DisplayMemberBinding="{Binding Status}"
+                                Width="100"/>
+                <GridViewColumn Header="Requested By"
+                                DisplayMemberBinding="{Binding RequestedBy}"
+                                Width="150"/>
+              </GridView>
+            </ListView.View>
+
+            <!-- Context Menu -->
+            <ListView.ContextMenu>
+              <ContextMenu>
+                <MenuItem Header="✏️ Edit Activity"
+                          Command="{Binding EditActivityCommand}"/>
+                <MenuItem Header="👁️ View Details"
+                          Command="{Binding ViewDetailsCommand}"/>
+                <Separator/>
+                <MenuItem Header="✅ Mark as Confirmed"
+                          Command="{Binding ConfirmActivityCommand}"/>
+                <MenuItem Header="🚀 Mark as In Progress"
+                          Command="{Binding StartActivityCommand}"/>
+                <MenuItem Header="✅ Mark as Completed"
+                          Command="{Binding CompleteActivityCommand}"/>
+                <Separator/>
+                <MenuItem Header="❌ Cancel Activity"
+                          Command="{Binding CancelActivityCommand}"/>
+              </ContextMenu>
+            </ListView.ContextMenu>
+          </ListView>
+        </Grid>
+      </TabItem>
+
+    </TabControl>
+  </Grid>
 </UserControl>

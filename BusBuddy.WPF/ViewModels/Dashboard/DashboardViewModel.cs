@@ -75,10 +75,9 @@ namespace BusBuddy.WPF.ViewModels
 
         public DashboardViewModel()
         {
-            _ = LoadDashboardDataAsync();
+            _ = LoadDashboardAsync();
         }
-
-        private async Task LoadDashboardDataAsync()
+        public async Task LoadDashboardAsync()
         {
             try
             {

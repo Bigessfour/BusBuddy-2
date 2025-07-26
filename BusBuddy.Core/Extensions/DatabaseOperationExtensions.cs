@@ -116,7 +116,7 @@ public static class DatabaseOperationExtensions
             // Check for required string properties that are null or empty
             if (property.PropertyType == typeof(string))
             {
-                var isRequired = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false).Any();
+                var isRequired = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false).Length > 0;
                 if (isRequired && string.IsNullOrWhiteSpace(value?.ToString()))
                 {
                     logger.Warning("Required property {PropertyName} is null or empty for entity {EntityType}",
@@ -125,7 +125,7 @@ public static class DatabaseOperationExtensions
             }
 
             // Check for foreign key properties that might be invalid
-            if (property.Name.EndsWith("Id") && property.PropertyType == typeof(int))
+            if (property.Name.EndsWith("Id", StringComparison.Ordinal) && property.PropertyType == typeof(int))
             {
                 var intValue = (int?)value ?? 0;
                 if (intValue <= 0)

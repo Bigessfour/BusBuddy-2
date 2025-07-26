@@ -127,6 +127,7 @@ namespace BusBuddy.Core.Logging
             }
 
             _disposed = true;
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace BusBuddy.WPF.Utilities

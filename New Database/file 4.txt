@@ -1,0 +1,18 @@
+namespace YourNamespace.Data.Repositories
+{
+    public interface IDriverRepository : IRepository<Driver>
+    {
+        // Custom method example
+        Task<IEnumerable<Driver>> GetDriversWithActivitiesAsync();
+    }
+
+    public class DriverRepository : Repository<Driver>, IDriverRepository
+    {
+        public DriverRepository(BusBuddyDbContext context) : base(context) { }
+
+        public async Task<IEnumerable<Driver>> GetDriversWithActivitiesAsync()
+        {
+            return await _dbSet.Include(d => d.Activities).ToListAsync();
+        }
+    }
+}

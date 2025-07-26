@@ -33,8 +33,8 @@ namespace BusBuddy.Core.Utilities
                 // Add DbContext - you may need to adjust connection string
                 services.AddDbContext<BusBuddyDbContext>(options =>
                 {
-                    // Use the same connection string as your main application
-                    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=BusBuddyDb;Trusted_Connection=true;MultipleActiveResultSets=true");
+                    // Use SQLite for Phase 1
+                    options.UseSqlite("Data Source=BusBuddy.db");
                 });
 
                 var serviceProvider = services.BuildServiceProvider();

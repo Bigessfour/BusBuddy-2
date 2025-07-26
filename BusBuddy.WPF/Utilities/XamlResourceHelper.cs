@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,7 +35,7 @@ namespace BusBuddy.WPF.Utilities
         {
             try
             {
-                _logger?.LogDebug("[XAML] Verifying XAML resource: {Uri}", resourceUri);
+                _logger?.Debug("[XAML] Verifying XAML resource: {Uri}", resourceUri);
 
                 // Create a URI object from the string
                 Uri uri = new Uri(resourceUri, UriKind.Absolute);
@@ -45,14 +45,14 @@ namespace BusBuddy.WPF.Utilities
                 resourceDict.Source = uri;
 
                 // Log success and some basic stats
-                _logger?.LogInformation("[XAML] Successfully verified XAML resource: {Uri} with {Count} resources",
+                _logger?.Information("[XAML] Successfully verified XAML resource: {Uri} with {Count} resources",
                     resourceUri, resourceDict.Count);
 
                 return true;
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "[XAML] Error verifying XAML resource {Uri}: {Message}", resourceUri, ex.Message);
+                _logger?.Error(ex, "[XAML] Error verifying XAML resource {Uri}: {Message}", resourceUri, ex.Message);
                 return false;
             }
         }
@@ -67,7 +67,7 @@ namespace BusBuddy.WPF.Utilities
         {
             try
             {
-                _logger?.LogDebug("[XAML] Diagnosing resource access for: {Assembly}/{Path}", assemblyName, resourcePath);
+                _logger?.Debug("[XAML] Diagnosing resource access for: {Assembly}/{Path}", assemblyName, resourcePath);
 
                 // Check if the assembly is loaded
                 var assembly = AppDomain.CurrentDomain.GetAssemblies()
@@ -75,7 +75,7 @@ namespace BusBuddy.WPF.Utilities
 
                 if (assembly == null)
                 {
-                    _logger?.LogWarning("[XAML] Assembly not loaded: {Assembly}", assemblyName);
+                    _logger?.Warning("[XAML] Assembly not loaded: {Assembly}", assemblyName);
                     return $"Assembly '{assemblyName}' is not loaded in the current AppDomain.";
                 }
 
@@ -85,16 +85,16 @@ namespace BusBuddy.WPF.Utilities
 
                 if (!resourceExists)
                 {
-                    _logger?.LogWarning("[XAML] Resource not found: {Resource} in {Assembly}", resourcePath, assemblyName);
+                    _logger?.Warning("[XAML] Resource not found: {Resource} in {Assembly}", resourcePath, assemblyName);
                     return $"Resource '{resourcePath}' was not found in assembly '{assemblyName}'.";
                 }
 
-                _logger?.LogInformation("[XAML] Resource exists: {Resource} in {Assembly}", resourcePath, assemblyName);
+                _logger?.Information("[XAML] Resource exists: {Resource} in {Assembly}", resourcePath, assemblyName);
                 return $"Resource '{resourcePath}' exists in assembly '{assemblyName}' and should be accessible.";
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "[XAML] Error diagnosing resource access: {Message}", ex.Message);
+                _logger?.Error(ex, "[XAML] Error diagnosing resource access: {Message}", ex.Message);
                 return $"Error diagnosing resource access: {ex.Message}";
             }
         }
@@ -107,7 +107,7 @@ namespace BusBuddy.WPF.Utilities
         {
             try
             {
-                _logger?.LogDebug("[XAML] Detecting circular references in resource dictionaries");
+                _logger?.Debug("[XAML] Detecting circular references in resource dictionaries");
 
                 // We can't fully detect all circular references, but we can check for common patterns
                 if (Application.Current == null || Application.Current.Resources.MergedDictionaries == null)
@@ -141,16 +141,16 @@ namespace BusBuddy.WPF.Utilities
 
                 if (potentialCircular.Count > 0)
                 {
-                    _logger?.LogWarning("[XAML] Detected potential circular references: {Count}", potentialCircular.Count);
+                    _logger?.Warning("[XAML] Detected potential circular references: {Count}", potentialCircular.Count);
                     return $"Potential circular references detected: {string.Join(", ", potentialCircular)}";
                 }
 
-                _logger?.LogInformation("[XAML] No circular references detected");
+                _logger?.Information("[XAML] No circular references detected");
                 return "No circular references detected.";
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "[XAML] Error detecting circular references: {Message}", ex.Message);
+                _logger?.Error(ex, "[XAML] Error detecting circular references: {Message}", ex.Message);
                 return $"Error detecting circular references: {ex.Message}";
             }
         }
@@ -164,11 +164,11 @@ namespace BusBuddy.WPF.Utilities
         {
             try
             {
-                _logger?.LogDebug("[XAML] Verifying style exists: {StyleKey}", styleKey);
+                _logger?.Debug("[XAML] Verifying style exists: {StyleKey}", styleKey);
 
                 if (Application.Current == null)
                 {
-                    _logger?.LogWarning("[XAML] Application.Current is null");
+                    _logger?.Warning("[XAML] Application.Current is null");
                     return false;
                 }
 
@@ -178,7 +178,7 @@ namespace BusBuddy.WPF.Utilities
                 {
                     // Verify it's actually a Style
                     bool isStyle = Application.Current.Resources[styleKey] is System.Windows.Style;
-                    _logger?.LogInformation("[XAML] Style {StyleKey} exists: {Exists}, IsStyle: {IsStyle}",
+                    _logger?.Information("[XAML] Style {StyleKey} exists: {Exists}, IsStyle: {IsStyle}",
                         styleKey, styleExists, isStyle);
                     return isStyle;
                 }
@@ -189,7 +189,7 @@ namespace BusBuddy.WPF.Utilities
                     if (dict.Contains(styleKey))
                     {
                         bool isStyle = dict[styleKey] is System.Windows.Style;
-                        _logger?.LogInformation("[XAML] Style {StyleKey} exists in merged dictionary: {Exists}, IsStyle: {IsStyle}",
+                        _logger?.Information("[XAML] Style {StyleKey} exists in merged dictionary: {Exists}, IsStyle: {IsStyle}",
                             styleKey, true, isStyle);
                         return isStyle;
                     }
@@ -200,19 +200,19 @@ namespace BusBuddy.WPF.Utilities
                         if (nestedDict.Contains(styleKey))
                         {
                             bool isStyle = nestedDict[styleKey] is System.Windows.Style;
-                            _logger?.LogInformation("[XAML] Style {StyleKey} exists in nested dictionary: {Exists}, IsStyle: {IsStyle}",
+                            _logger?.Information("[XAML] Style {StyleKey} exists in nested dictionary: {Exists}, IsStyle: {IsStyle}",
                                 styleKey, true, isStyle);
                             return isStyle;
                         }
                     }
                 }
 
-                _logger?.LogWarning("[XAML] Style not found: {StyleKey}", styleKey);
+                _logger?.Warning("[XAML] Style not found: {StyleKey}", styleKey);
                 return false;
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "[XAML] Error verifying style {StyleKey}: {Message}", styleKey, ex.Message);
+                _logger?.Error(ex, "[XAML] Error verifying style {StyleKey}: {Message}", styleKey, ex.Message);
                 return false;
             }
         }

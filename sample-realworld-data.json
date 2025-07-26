@@ -1,0 +1,44 @@
+{
+  "Drivers": [
+    {
+      "DriverId": 1,
+      "FirstName": "Alice",
+      "LastName": "Smith",
+      "LicenseNumber": "D12345"
+    },
+    {
+      "DriverId": 2,
+      "FirstName": "Bob",
+      "LastName": "Johnson",
+      "LicenseNumber": "D23456"
+    }
+  ],
+  "Vehicles": [
+    {
+      "VehicleId": 1,
+      "RegistrationNumber": "ABC123",
+      "Model": "Ford Transit"
+    },
+    {
+      "VehicleId": 2,
+      "RegistrationNumber": "XYZ789",
+      "Model": "Mercedes Sprinter"
+    }
+  ],
+  "Activities": [
+    {
+      "ActivityId": 1,
+      "DriverId": 1,
+      "VehicleId": 1,
+      "StartTime": "2025-07-25T08:00:00",
+      "EndTime": "2025-07-25T10:00:00"
+    },
+    {
+      "ActivityId": 2,
+      "DriverId": 2,
+      "VehicleId": 2,
+      "StartTime": "2025-07-25T09:00:00",
+      "EndTime": "2025-07-25T11:00:00"
+    }
+  ]
+}

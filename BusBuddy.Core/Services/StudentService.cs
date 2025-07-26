@@ -169,12 +169,11 @@ public class StudentService : IStudentService
         {
             Logger.Information("Searching students with term: {SearchTerm}", searchTerm);
 
-            var term = searchTerm.ToLower();
             // Don't dispose the context here as it might be needed after the method returns
             var context = _contextFactory.CreateDbContext();
             return await context.Students
-                .Where(s => s.StudentName.ToLower().Contains(term) ||
-                           (s.StudentNumber != null && s.StudentNumber.ToLower().Contains(term)))
+                .Where(s => s.StudentName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                           (s.StudentNumber != null && s.StudentNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(s => s.StudentName)
                 .ToListAsync();
         }

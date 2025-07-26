@@ -1,10 +1,11 @@
 using System.Linq.Expressions;
 using System.IO;
 using BusBuddy.Core.Models;
-using BusBuddy.Core.Models.Base;
 using BusBuddy.Core.Models.Trips;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Context;
 
 namespace BusBuddy.Core.Data;
 /// <summary>
@@ -86,41 +87,48 @@ public class BusBuddyDbContext : DbContext
                 .Build();
 
             // Support switching between local and Azure databases
-            var databaseProvider = configuration["DatabaseProvider"] ?? "Local";
+            var databaseProvider = configuration["AppSettings:DatabaseProvider"] ?? "Local";
             var connectionStringKey = databaseProvider == "Azure" ? "DefaultConnection" : "DefaultConnection";
 
             var connectionString = configuration.GetConnectionString(connectionStringKey);
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                // Fallback to local connection
+                // Fallback to local SQLite connection for Phase 1
                 connectionString = configuration.GetConnectionString("LocalConnection")
-                    ?? "Server=localhost\\SQLEXPRESS;Database=BusBuddyDB;Trusted_Connection=True;TrustServerCertificate=True;";
+                    ?? "Data Source=BusBuddy.db";
             }
 
-            optionsBuilder.UseSqlServer(connectionString, options =>
+            // Use SQLite for Phase 1 development
+            optionsBuilder.UseSqlite(connectionString, options =>
             {
-                // Enhanced connection resilience with different settings for Azure vs Local
-                if (databaseProvider == "Azure")
-                {
-                    options.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(60),
-                        errorNumbersToAdd: null);
-                    options.CommandTimeout(120); // Longer timeout for cloud
-                }
-                else
-                {
-                    options.EnableRetryOnFailure(
-                        maxRetryCount: 3,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
-                    options.CommandTimeout(60); // Standard timeout for local
-                }
+                // SQLite-specific configuration
+                options.CommandTimeout(60);
             });
 
-            // Add detailed logging for SQL exceptions
-            optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Warning);
+            // Add detailed logging for SQL exceptions with Serilog enrichments
+            optionsBuilder.LogTo(message =>
+            {
+                using (Serilog.Context.LogContext.PushProperty("DatabaseContext", "BusBuddyDbContext"))
+                using (Serilog.Context.LogContext.PushProperty("SourceContext", "EntityFramework"))
+                {
+                    var logger = Serilog.Log.ForContext("SourceContext", "BusBuddyDbContext");
+                    if (message.Contains("warn", StringComparison.OrdinalIgnoreCase) ||
+                        message.Contains("warning", StringComparison.OrdinalIgnoreCase))
+                    {
+                        logger.Warning("EF Core: {Message}", message);
+                    }
+                    else if (message.Contains("error", StringComparison.OrdinalIgnoreCase) ||
+                             message.Contains("exception", StringComparison.OrdinalIgnoreCase))
+                    {
+                        logger.Error("EF Core: {Message}", message);
+                    }
+                    else
+                    {
+                        logger.Information("EF Core: {Message}", message);
+                    }
+                }
+            }, Microsoft.Extensions.Logging.LogLevel.Warning);
 
             // Enable sensitive data logging in debug mode only
             if (System.Diagnostics.Debugger.IsAttached)
@@ -672,7 +680,9 @@ public class BusBuddyDbContext : DbContext
     /// </summary>
     private void ConfigureGlobalQueryFilters(ModelBuilder modelBuilder)
     {
+        // TODO: Re-implement soft delete filter when entities inherit from BaseEntity
         // Apply soft delete filter to all entities that inherit from BaseEntity
+        /*
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
@@ -686,6 +696,7 @@ public class BusBuddyDbContext : DbContext
                 modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
             }
         }
+        */
     }
 
     private void ConfigureNullHandling(ModelBuilder modelBuilder)
@@ -897,9 +908,12 @@ public class BusBuddyDbContext : DbContext
 
     /// <summary>
     /// Apply audit fields to entities before saving
+    /// TODO: Re-implement when entities inherit from BaseEntity
     /// </summary>
     private void ApplyAuditFields()
     {
+        // TODO: Re-implement audit fields when entities inherit from BaseEntity
+        /*
         var entities = ChangeTracker.Entries<BaseEntity>()
             .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
@@ -925,5 +939,6 @@ public class BusBuddyDbContext : DbContext
             // Call entity-specific OnSaving method
             entity.Entity.OnSaving();
         }
+        */
     }
 }

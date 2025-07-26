@@ -211,7 +211,7 @@ namespace BusBuddy.Core.Services
                 // First check if the driver is assigned to any routes
                 using var checkContext = _contextFactory.CreateDbContext();
                 var hasActiveRoutes = await checkContext.Routes
-                    .AnyAsync(r => (r.AMDriverId == driverId || r.PMDriverId == driverId) && r.Date >= DateTime.Today);
+                    .CountAsync(r => (r.AMDriverId == driverId || r.PMDriverId == driverId) && r.Date >= DateTime.Today) > 0;
 
                 if (hasActiveRoutes)
                 {
@@ -348,17 +348,17 @@ namespace BusBuddy.Core.Services
                     return await GetAllDriversAsync();
                 }
 
-                var term = searchTerm.ToLower();
+                var term = searchTerm.ToLowerInvariant();
                 using var context = _contextFactory.CreateDbContext();
                 return await context.Drivers
                     .AsNoTracking()
                     .Where(d =>
-                        d.DriverName.ToLower().Contains(term) ||
-                        (d.FirstName != null && d.FirstName.ToLower().Contains(term)) ||
-                        (d.LastName != null && d.LastName.ToLower().Contains(term)) ||
-                        (d.DriverPhone != null && d.DriverPhone.Contains(term)) ||
-                        (d.DriverEmail != null && d.DriverEmail.ToLower().Contains(term)) ||
-                        (d.LicenseNumber != null && d.LicenseNumber.Contains(term)))
+                        (!string.IsNullOrEmpty(d.DriverName) && d.DriverName.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                        (!string.IsNullOrEmpty(d.FirstName) && d.FirstName.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                        (!string.IsNullOrEmpty(d.LastName) && d.LastName.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                        (!string.IsNullOrEmpty(d.DriverPhone) && d.DriverPhone.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                        (!string.IsNullOrEmpty(d.DriverEmail) && d.DriverEmail.Contains(term, StringComparison.OrdinalIgnoreCase)) ||
+                        (!string.IsNullOrEmpty(d.LicenseNumber) && d.LicenseNumber.Contains(term, StringComparison.OrdinalIgnoreCase)))
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -1376,7 +1376,7 @@ namespace BusBuddy.Core.Services
 
         #region Helper Classes
 
-        private class DriverIdComparer : IEqualityComparer<Driver>
+        private sealed class DriverIdComparer : IEqualityComparer<Driver>
         {
             public bool Equals(Driver? x, Driver? y)
             {

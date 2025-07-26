@@ -48,7 +48,7 @@
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "${workspaceFolder}\\run-comprehensive-pipeline.ps1"
+        "${workspaceFolder}\\Scripts\\Maintenance\\run-comprehensive-pipeline.ps1"
       ],
       "group": {
         "kind": "build",

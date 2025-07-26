@@ -1,0 +1,39 @@
+Migrations
+Remove manual DatabaseNullFixMigration.cs. Run:
+
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+For prod deployment (e.g., Azure), use CI/CD to run migrations, or call _context.Database.MigrateAsync() in Program.cs with prod checks.
+
+Diagnostics Script Update (database-diagnostics.ps1)
+Add health checks.
+
+powershell
+
+Collapse
+
+Wrap
+
+Copy
+param (
+    [string]$ConnectionString = "Server=(localdb)\mssqllocaldb;Database=BusBuddyDev;Trusted_Connection=True;"
+)
+
+# Check connection
+try {
+    $conn = New-Object System.Data.SqlClient.SqlConnection $ConnectionString
+    $conn.Open()
+    Write-Host "Connection successful."
+    $conn.Close()
+} catch {
+    Write-Host "Connection failed: $_"
+}
+
+# Query stats example
+$sql = "SELECT COUNT(*) FROM Drivers"
+$cmd = New-Object System.Data.SqlClient.SqlCommand $sql, $conn
+$conn.Open()
+$count = $cmd.ExecuteScalar()
+Write-Host "Driver count: $count"
+$conn.Close()
+This setup resolves duplicates, includes all models, adds migrations, seeding (dev-only), logging, resiliency, and DI for robust dev/prod use. Test thoroughly, and adjust relationships based on exact models. For the full 76 entities, add DbSets and repos accordingly

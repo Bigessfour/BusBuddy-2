@@ -1,6 +1,6 @@
 using BusBuddy.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Extensions;
 
@@ -16,11 +16,11 @@ public static class Phase1StartupExtensions
     public static async Task InitializePhase1Async(this IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Phase1DataSeedingService>>();
+        var logger = Serilog.Log.ForContext<Phase1DataSeedingService>();
 
         try
         {
-            logger.LogInformation("🚀 Starting Phase 1 initialization...");
+            logger.Information("🚀 Starting Phase 1 initialization...");
 
             // Initialize database and seed data
             var dataSeeder = scope.ServiceProvider.GetRequiredService<Phase1DataSeedingService>();
@@ -28,13 +28,13 @@ public static class Phase1StartupExtensions
 
             // Get data summary
             var summary = await dataSeeder.GetDataSummaryAsync();
-            logger.LogInformation(summary);
+            logger.Information("{Summary}", summary);
 
-            logger.LogInformation("✅ Phase 1 initialization completed successfully!");
+            logger.Information("✅ Phase 1 initialization completed successfully!");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "❌ Phase 1 initialization failed");
+            logger.Error(ex, "❌ Phase 1 initialization failed");
             throw;
         }
     }

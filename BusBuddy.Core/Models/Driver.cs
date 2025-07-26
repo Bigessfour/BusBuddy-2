@@ -219,7 +219,7 @@ public class Driver : INotifyPropertyChanged
     public DateTime? HireDate { get; set; }
 
     [Display(Name = "Created Date")]
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; } // Remove dynamic default, handle in application logic
 
     [Display(Name = "Updated Date")]
     public DateTime? UpdatedDate { get; set; }

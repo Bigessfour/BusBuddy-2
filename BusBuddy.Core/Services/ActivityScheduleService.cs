@@ -72,8 +72,7 @@ namespace BusBuddy.Core.Services
 
         public async Task<ActivitySchedule> CreateActivityScheduleAsync(ActivitySchedule activitySchedule)
         {
-            if (activitySchedule == null)
-                throw new ArgumentNullException(nameof(activitySchedule));
+            ArgumentNullException.ThrowIfNull(activitySchedule);
 
             try
             {

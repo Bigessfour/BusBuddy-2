@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Threading.Tasks;
 
@@ -10,19 +10,16 @@ namespace BusBuddy.WPF.Utilities
     /// </summary>
     public class BackgroundTaskManager
     {
-        private readonly ILogger<BackgroundTaskManager> _logger;
+        private static readonly Serilog.ILogger Logger = Serilog.Log.ForContext<BackgroundTaskManager>();
 
-        public BackgroundTaskManager(ILogger<BackgroundTaskManager> logger)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        public BackgroundTaskManager() { }
 
         /// <summary>
         /// Placeholder method for starting background tasks
         /// </summary>
         public Task StartAsync()
         {
-            _logger.LogInformation("BackgroundTaskManager: StartAsync called (stub implementation)");
+            Logger.Information("BackgroundTaskManager: StartAsync called (stub implementation)");
             return Task.CompletedTask;
         }
 
@@ -31,7 +28,7 @@ namespace BusBuddy.WPF.Utilities
         /// </summary>
         public Task StopAsync()
         {
-            _logger.LogInformation("BackgroundTaskManager: StopAsync called (stub implementation)");
+            Logger.Information("BackgroundTaskManager: StopAsync called (stub implementation)");
             return Task.CompletedTask;
         }
 
@@ -40,7 +37,7 @@ namespace BusBuddy.WPF.Utilities
         /// </summary>
         public void QueueBackgroundWorkItem(Func<Task> workItem)
         {
-            _logger.LogInformation("BackgroundTaskManager: QueueBackgroundWorkItem called (stub implementation)");
+            Logger.Information("BackgroundTaskManager: QueueBackgroundWorkItem called (stub implementation)");
             // In a real implementation, this would queue the work item
             // For now, we'll just execute it synchronously in debug builds
 #if DEBUG
@@ -52,7 +49,7 @@ namespace BusBuddy.WPF.Utilities
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Background work item failed");
+                    Logger.Error(ex, "Background work item failed");
                 }
             });
 #endif

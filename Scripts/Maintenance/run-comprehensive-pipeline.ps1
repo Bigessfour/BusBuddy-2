@@ -36,16 +36,17 @@ try {
     Write-Log "Working Directory: $PSScriptRoot"
     Write-Log "Log File: $logFile"
 
-    Set-Location $PSScriptRoot
-
+    # Always use workspace root for solution/project validation
+    $workspaceRoot = Resolve-Path "$PSScriptRoot\..\.." | Select-Object -ExpandProperty Path
+    Write-Log "Workspace Root: $workspaceRoot"
     # Project Structure Validation
     Write-Log 'Validating Project Structure' 'VALIDATE'
-    if (-not (Test-Path 'BusBuddy.sln')) {
-        Write-Log 'ERROR: BusBuddy.sln not found!' 'ERROR'
+    if (-not (Test-Path "$workspaceRoot\BusBuddy.sln")) {
+        Write-Log 'ERROR: BusBuddy.sln not found in workspace root!' 'ERROR'
         exit 1
     }
-    if (-not (Test-Path 'BusBuddy.WPF\BusBuddy.WPF.csproj')) {
-        Write-Log 'ERROR: BusBuddy.WPF project not found!' 'ERROR'
+    if (-not (Test-Path "$workspaceRoot\BusBuddy.WPF\BusBuddy.WPF.csproj")) {
+        Write-Log 'ERROR: BusBuddy.WPF project not found in workspace root!' 'ERROR'
         exit 1
     }
     Write-Log '✅ Project structure validated'

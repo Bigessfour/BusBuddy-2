@@ -1,4 +1,7 @@
+
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- ...existing code... -->
+  <!-- Removed explicit Page Includes for ActivityScheduleView, DriversView, VehiclesView, DashboardView to fix duplicate compile items error -->
 
   <!-- 🚌 BusBuddy WPF - Greenfield Foundation Phase 1 -->
   <PropertyGroup>

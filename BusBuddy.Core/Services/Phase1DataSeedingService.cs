@@ -1,7 +1,7 @@
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace BusBuddy.Core.Services;
 
@@ -13,12 +13,11 @@ namespace BusBuddy.Core.Services;
 public class Phase1DataSeedingService
 {
     private readonly BusBuddyDbContext _context;
-    private readonly ILogger<Phase1DataSeedingService> _logger;
+    private static readonly ILogger Logger = Log.ForContext<Phase1DataSeedingService>();
 
-    public Phase1DataSeedingService(BusBuddyDbContext context, ILogger<Phase1DataSeedingService> logger)
+    public Phase1DataSeedingService(BusBuddyDbContext context)
     {
         _context = context;
-        _logger = logger;
     }
 
     /// <summary>
@@ -28,12 +27,17 @@ public class Phase1DataSeedingService
     {
         try
         {
-            _logger.LogInformation("🗂️ Starting Phase 1 data seeding...");
+            Logger.Information("🗂️ Starting Phase 1 data seeding...");
+
+            // Ensure database and tables are created
+            Logger.Information("🔧 Ensuring database schema exists...");
+            await _context.Database.EnsureCreatedAsync();
+            Logger.Information("✅ Database schema ready");
 
             // Check if data already exists
             if (await _context.Drivers.AnyAsync())
             {
-                _logger.LogInformation("📊 Data already exists, skipping seeding");
+                Logger.Information("📊 Data already exists, skipping seeding");
                 return;
             }
 
@@ -42,18 +46,18 @@ public class Phase1DataSeedingService
             await SeedActivitiesAsync();
 
             await _context.SaveChangesAsync();
-            _logger.LogInformation("✅ Phase 1 data seeding completed successfully!");
+            Logger.Information("✅ Phase 1 data seeding completed successfully!");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "❌ Error during Phase 1 data seeding");
+            Logger.Error(ex, "❌ Error during Phase 1 data seeding");
             throw;
         }
     }
 
     private async Task SeedDriversAsync()
     {
-        _logger.LogInformation("🚌 Seeding drivers...");
+        Logger.Information("🚌 Seeding drivers...");
 
         var drivers = new[]
         {
@@ -78,12 +82,12 @@ public class Phase1DataSeedingService
         };
 
         await _context.Drivers.AddRangeAsync(drivers);
-        _logger.LogInformation($"✅ Added {drivers.Length} drivers");
+        Logger.Information($"✅ Added {drivers.Length} drivers");
     }
 
     private async Task SeedVehiclesAsync()
     {
-        _logger.LogInformation("🚐 Seeding vehicles...");
+        Logger.Information("🚐 Seeding vehicles...");
 
         var vehicles = new[]
         {
@@ -103,12 +107,12 @@ public class Phase1DataSeedingService
         };
 
         await _context.Vehicles.AddRangeAsync(vehicles);
-        _logger.LogInformation($"✅ Added {vehicles.Length} vehicles");
+        Logger.Information($"✅ Added {vehicles.Length} vehicles");
     }
 
     private async Task SeedActivitiesAsync()
     {
-        _logger.LogInformation("📅 Seeding activities...");
+        Logger.Information("📅 Seeding activities...");
 
         var baseDate = DateTime.Today;
         var activities = new List<Activity>();
@@ -144,7 +148,7 @@ public class Phase1DataSeedingService
         }
 
         await _context.Activities.AddRangeAsync(activities);
-        _logger.LogInformation($"✅ Added {activities.Count} activities");
+        Logger.Information($"✅ Added {activities.Count} activities");
     }
 
     /// <summary>

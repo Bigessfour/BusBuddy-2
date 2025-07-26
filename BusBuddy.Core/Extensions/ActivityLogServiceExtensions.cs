@@ -161,7 +161,7 @@ namespace BusBuddy.Core.Extensions
             // Truncate if necessary
             if (formatted.Length > maxLength)
             {
-                return formatted.Substring(0, maxLength) + "[...]";
+                return string.Concat(formatted.AsSpan(0, maxLength), "[...]");
             }
 
             return formatted;

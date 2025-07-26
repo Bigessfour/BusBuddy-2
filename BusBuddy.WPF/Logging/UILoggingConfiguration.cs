@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -79,10 +78,8 @@ namespace BusBuddy.WPF.Logging
         /// </summary>
         public static IServiceCollection AddUILogging(this IServiceCollection services)
         {
-            services.AddLogging(loggingBuilder =>
-            {
-                loggingBuilder.AddSerilog();
-            });
+            // Configure Serilog as the primary logger
+            services.AddSingleton<ILogger>(Log.Logger);
 
             // Register UI-specific logging services
             services.AddSingleton<UIPerformanceLogger>();
@@ -92,35 +89,31 @@ namespace BusBuddy.WPF.Logging
         }
 
         /// <summary>
-        /// Create a logger factory specifically configured for UI components
+        /// Create and configure Serilog logger specifically for UI components
         /// </summary>
-        public static ILoggerFactory CreateUILoggerFactory(string logsDirectory)
+        public static ILogger CreateUILogger(string logsDirectory)
         {
             var logger = new LoggerConfiguration()
                 .ConfigureUILogging(logsDirectory)
                 .CreateLogger();
 
             Log.Logger = logger;
-
-            return LoggerFactory.Create(builder =>
-            {
-                builder.AddSerilog(logger);
-            });
+            return logger;
         }
 
         /// <summary>
-        /// Log levels for different UI operations
+        /// Log event levels for different UI operations (using Serilog conventions)
         /// </summary>
         public static class UILogLevels
         {
-            public const LogLevel ButtonClick = LogLevel.Information;
-            public const LogLevel Navigation = LogLevel.Information;
-            public const LogLevel WindowOperation = LogLevel.Information;
-            public const LogLevel SyncfusionEvent = LogLevel.Debug;
-            public const LogLevel SyncfusionLifecycle = LogLevel.Information;
-            public const LogLevel SyncfusionTheme = LogLevel.Information;
-            public const LogLevel PerformanceWarning = LogLevel.Warning;
-            public const LogLevel UIError = LogLevel.Error;
+            public const LogEventLevel ButtonClick = LogEventLevel.Information;
+            public const LogEventLevel Navigation = LogEventLevel.Information;
+            public const LogEventLevel WindowOperation = LogEventLevel.Information;
+            public const LogEventLevel SyncfusionEvent = LogEventLevel.Debug;
+            public const LogEventLevel SyncfusionLifecycle = LogEventLevel.Information;
+            public const LogEventLevel SyncfusionTheme = LogEventLevel.Information;
+            public const LogEventLevel PerformanceWarning = LogEventLevel.Warning;
+            public const LogEventLevel UIError = LogEventLevel.Error;
         }
 
         /// <summary>

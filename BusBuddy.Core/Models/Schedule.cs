@@ -91,7 +91,7 @@ public class Schedule
     public bool IsSportsTrip => !string.IsNullOrEmpty(SportsCategory) && SportsCategory != "Activity";
 
     [NotMapped]
-    public bool IsHomeGame => !string.IsNullOrEmpty(Location) && Location.ToLower().Contains("home");
+    public bool IsHomeGame => !string.IsNullOrEmpty(Location) && Location.Contains("home", StringComparison.OrdinalIgnoreCase);
 
     [NotMapped]
     public bool IsAwayGame => !string.IsNullOrEmpty(Location) && !IsHomeGame;

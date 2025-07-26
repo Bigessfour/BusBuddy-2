@@ -194,7 +194,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         if (string.IsNullOrEmpty(commandText) || commandText.Length <= maxLength)
             return commandText;
 
-        return commandText.Substring(0, maxLength) + "...";
+        return string.Concat(commandText.AsSpan(0, maxLength), "...");
     }
 
     private Dictionary<string, object?> ExtractParameters(DbCommand command)
@@ -224,7 +224,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
     {
         var queries = _recentQueries.ToList();
 
-        if (!queries.Any())
+        if (queries.Count == 0)
         {
             return new QueryPerformanceStats();
         }

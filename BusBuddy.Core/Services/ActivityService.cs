@@ -315,18 +315,16 @@ public class ActivityService : IActivityService
         {
             Logger.Information("Searching activities with term: {SearchTerm}", searchTerm);
 
-            var lowerSearchTerm = searchTerm.ToLower();
-
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
                 .Include(a => a.Driver)
                 .Where(a =>
-                    a.ActivityType.ToLower().Contains(lowerSearchTerm) ||
-                    (a.Description != null && a.Description.ToLower().Contains(lowerSearchTerm)) ||
-                    a.Destination.ToLower().Contains(lowerSearchTerm) ||
-                    a.RequestedBy.ToLower().Contains(lowerSearchTerm) ||
-                    (a.Notes != null && a.Notes.ToLower().Contains(lowerSearchTerm)))
+                    a.ActivityType.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    (a.Description != null && a.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    a.Destination.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    a.RequestedBy.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    (a.Notes != null && a.Notes.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
                 .OrderByDescending(a => a.Date)
                 .ToListAsync();
         }
@@ -939,7 +937,7 @@ public class ActivityService : IActivityService
             {
                 var conflicts = await DetectScheduleConflictsAsync(activity);
 
-                if (conflicts.Any())
+                if (conflicts.Count > 0)
                 {
                     if (conflicts.Any(c => c.DriverId == activity.DriverId && activity.DriverId > 0))
                         errors.Add("Driver is already scheduled during this time");
@@ -1330,7 +1328,7 @@ public class ActivityService : IActivityService
                 .Select(d => new
                 {
                     DriverId = d.DriverId,
-                    Name = d.DriverId.HasValue && driverNames.ContainsKey(d.DriverId.Value) ? driverNames[d.DriverId.Value] : $"Driver {d.DriverId}",
+                    Name = d.DriverId.HasValue && driverNames.TryGetValue(d.DriverId.Value, out var driverName) ? driverName : $"Driver {d.DriverId}",
                     Count = d.Count
                 })
                 .ToDictionary(d => d.Name, d => d.Count);

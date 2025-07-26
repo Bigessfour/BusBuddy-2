@@ -65,7 +65,7 @@ public class ActivitySchedule
     public string? Notes { get; set; }
 
     [Display(Name = "Created Date")]
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; } // Remove dynamic default
 
     [Display(Name = "Updated Date")]
     public DateTime? UpdatedDate { get; set; }

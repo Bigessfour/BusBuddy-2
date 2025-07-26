@@ -1,0 +1,1905 @@
+?? Starting Microsoft.Extensions.Logging scan...
+?? Workspace: C:\Users\biges\Desktop\BusBuddy\BusBuddy
+?? Timestamp: 2025-07-25 16:03:22
+
+?? Collecting files to scan...
+?? Found 354 files to scan
+
+?? Scanning files for Microsoft.Extensions.Logging references...
+[33;1mWARNING: ? Error scanning file C:\Users\biges\Desktop\BusBuddy\BusBuddy\BusBuddy.WPF\Controls\StandardDataViewTemplate.xaml.cs: Exception calling "Matches" with "3" argument(s): "Value cannot be null. (Parameter 'input')"[0m
+[33;1mWARNING: ? Error scanning file C:\Users\biges\Desktop\BusBuddy\BusBuddy\BusBuddy.WPF\Converters\TypeConverter.cs: Exception calling "Matches" with "3" argument(s): "Value cannot be null. (Parameter 'input')"[0m
+[33;1mWARNING: ? Error scanning file C:\Users\biges\Desktop\BusBuddy\BusBuddy\BusBuddy.WPF\Converters\UserMsgBgConverter.cs: Exception calling "Matches" with "3" argument(s): "Value cannot be null. (Parameter 'input')"[0m
+[33;1mWARNING: ? Error scanning file C:\Users\biges\Desktop\BusBuddy\BusBuddy\BusBuddy.WPF\Utilities\WpfGridManager.cs: Exception calling "Matches" with "3" argument(s): "Value cannot be null. (Parameter 'input')"[0m
+[33;1mWARNING: ? Error scanning file C:\Users\biges\Desktop\BusBuddy\BusBuddy\BusBuddy.WPF\Utilities\WpfLayoutManager.cs: Exception calling "Matches" with "3" argument(s): "Value cannot be null. (Parameter 'input')"[0m
+?? Generating recommendations...
+
+= * 80
+?? MICROSOFT.EXTENSIONS.LOGGING SCAN RESULTS
+= * 80
+
+?? Results saved to: .\microsoft-logging-scan-results.json
+{
+  "Recommendations": [
+    "?? Found 213 Microsoft.Extensions.Logging references in 23 files",
+    "?? Replace Microsoft.Extensions.Logging interfaces with Serilog ILogger",
+    "?? Convert Microsoft.Extensions.Logging method calls to Serilog syntax",
+    "?? Remove Microsoft.Extensions.Logging package references from project files",
+    "?? Remove unused Microsoft.Extensions.Logging using statements"
+  ],
+  "Findings": [
+    {
+      "Match": "using Microsoft.Extensions.Logging",
+      "LineNumber": 8,
+      "Pattern": "using Microsoft\\.Extensions\\.Logging",
+      "Context": "using Microsoft.Extensions.Logging;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 6,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.Hosting",
+      "LineNumber": 7,
+      "Pattern": "using Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "LogLevel.",
+      "LineNumber": 53,
+      "Pattern": "LogLevel\\.",
+      "Context": "options.LogTo(Console.WriteLine, LogLevel.Information);",
+      "Category": "LoggingMethods",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "LogLevel.",
+      "LineNumber": 57,
+      "Pattern": "LogLevel\\.",
+      "Context": "options.LogTo(Console.WriteLine, LogLevel.Warning);",
+      "Category": "LoggingMethods",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 8,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "using Microsoft.Extensions.Logging;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 6,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 7,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 23,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddEnhancedDatabase(",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 24,
+      "Pattern": "IServiceCollection",
+      "Context": "this IServiceCollection services,",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Configuration\\EnhancedDatabaseStartup.cs"
+    },
+    {
+      "Match": "LogLevel.",
+      "LineNumber": 123,
+      "Pattern": "LogLevel\\.",
+      "Context": "optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Warning);",
+      "Category": "LoggingMethods",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Data\\BusBuddyDbContext.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Data\\BusBuddyDbContext.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 123,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Warning);",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Data\\BusBuddyDbContext.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Data\\BusBuddyDbContext.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 5,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Data\\BusBuddyDbContextFactory.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Data\\BusBuddyDbContextFactory.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 5,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Data\\BusBuddyDbContextFactory.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Data\\BusBuddyDbContextFactory.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 5,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 5,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 19,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddDatabaseResilience(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 19,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddDatabaseResilience(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\DatabaseOperationExtensions.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 45,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddPhase1Services(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 45,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddPhase1Services(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\Phase1StartupExtensions.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 9,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 9,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 24,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 24,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Extensions\\ServiceCollectionExtensions.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\AzureConfigurationService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\AzureConfigurationService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\AzureConfigurationService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\AzureConfigurationService.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 22,
+      "Pattern": "IServiceCollection",
+      "Context": "void RegisterServices(IServiceCollection services);",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\AzureConfigurationService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\AzureConfigurationService.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 120,
+      "Pattern": "IServiceCollection",
+      "Context": "public void RegisterServices(IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\AzureConfigurationService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\AzureConfigurationService.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 10,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\DashboardMetricsService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\DashboardMetricsService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 10,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\DashboardMetricsService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\DashboardMetricsService.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 3,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\FleetMonitoringService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\FleetMonitoringService.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.Hosting",
+      "LineNumber": 4,
+      "Pattern": "using Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\FleetMonitoringService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\FleetMonitoringService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 3,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\FleetMonitoringService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\FleetMonitoringService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 63,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "var busService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IBusService>(scope.ServiceProvider);",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\FleetMonitoringService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\FleetMonitoringService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 64,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "var maintenanceService = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<IMaintenanceService>(scope.ServiceProvider);",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\FleetMonitoringService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\FleetMonitoringService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 4,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\FleetMonitoringService.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\FleetMonitoringService.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 6,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\ServiceContainer.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\ServiceContainer.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 6,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\ServiceContainer.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\ServiceContainer.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 12,
+      "Pattern": "IServiceCollection",
+      "Context": "public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Services\\ServiceContainer.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Services\\ServiceContainer.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.Hosting",
+      "LineNumber": 3,
+      "Pattern": "using Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 3,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Utilities\\DatabaseNullFixUtility.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Utilities\\DatabaseSchemaValidator.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Utilities\\DatabaseSchemaValidator.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\Utilities\\DatabaseSchemaValidator.cs",
+      "RelativePath": ".\\BusBuddy.Core\\Utilities\\DatabaseSchemaValidator.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\App.xaml.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\App.xaml.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.Hosting",
+      "LineNumber": 3,
+      "Pattern": "using Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\App.xaml.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\App.xaml.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 2,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\App.xaml.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\App.xaml.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 3,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "using Microsoft.Extensions.Hosting;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\App.xaml.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\App.xaml.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 1,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 1,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 79,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddUILogging(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 79,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddUILogging(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Logging\\UILoggingConfiguration.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 1,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "// Removed Microsoft.Extensions.Logging; using only Serilog",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Logging\\UIPerformanceLogger.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Logging\\UIPerformanceLogger.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 4,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\DevelopmentModeService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\DevelopmentModeService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 4,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\DevelopmentModeService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\DevelopmentModeService.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 1,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\LazyViewModelService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\LazyViewModelService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 1,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\LazyViewModelService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\LazyViewModelService.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 4,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\MappingService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\MappingService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 4,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\MappingService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\MappingService.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 145,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddAutoMapperServices(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\MappingService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\MappingService.cs"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 145,
+      "Pattern": "IServiceCollection",
+      "Context": "public static IServiceCollection AddAutoMapperServices(this IServiceCollection services)",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\MappingService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\MappingService.cs"
+    },
+    {
+      "Match": "using Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 3,
+      "Pattern": "using Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "UsingStatements",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\StartupOptimizationService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\StartupOptimizationService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 3,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "using Microsoft.Extensions.DependencyInjection;",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\Services\\StartupOptimizationService.cs",
+      "RelativePath": ".\\BusBuddy.WPF\\Services\\StartupOptimizationService.cs"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 1,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "?? Starting Microsoft.Extensions.Logging scan...",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\logging-scan-summary.json",
+      "RelativePath": ".\\logging-scan-summary.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 8,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "?? Scanning files for Microsoft.Extensions.Logging references...",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\logging-scan-summary.json",
+      "RelativePath": ".\\logging-scan-summary.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 85,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 104,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 117,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 129,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 142,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 164,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 240,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 241,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 242,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Configuration\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 243,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Console\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 244,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Debug\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 245,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventLog\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 246,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventSource\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 259,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 260,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 316,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 706,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 709,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 715,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 719,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 728,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Configuration\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 737,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 738,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 743,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Console\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 749,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 750,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 751,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Configuration\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 756,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Debug\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 762,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 763,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 766,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventLog\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 772,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 773,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 778,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventSource\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 784,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 785,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 897,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 163,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 211,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 217,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 234,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 235,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 257,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 272,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 314,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 473,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"6.0.0\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 640,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 669,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 703,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 714,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 724,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 736,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 748,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 761,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 771,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 783,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 796,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 220,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 239,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 315,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting.Abstractions\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 697,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting.Abstractions\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.Core\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.Core\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 39,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 52,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 74,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 150,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 151,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 152,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Configuration\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 153,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Console\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 154,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Debug\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 155,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventLog\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 156,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventSource\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 213,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 224,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 723,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 735,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 746,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 863,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 874,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 875,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 879,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 885,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 889,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 898,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Configuration\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 907,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 908,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 913,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Console\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 919,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 920,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 921,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Configuration\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 926,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Debug\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 932,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 933,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 936,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventLog\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 942,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 943,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 948,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.EventSource\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 954,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 955,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "\"Microsoft.Extensions.Logging.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 73,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 121,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 127,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 144,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 145,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 211,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 532,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"6.0.0\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 797,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 826,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 860,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 872,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 884,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 894,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 906,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 918,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 931,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 941,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 953,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 966,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 977,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.DependencyInjection",
+      "LineNumber": 1404,
+      "Pattern": "Microsoft\\.Extensions\\.DependencyInjection",
+      "Context": "\"Microsoft.Extensions.DependencyInjection\": \"[9.0.7, )\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 130,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 149,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting.Abstractions\": \"9.0.7\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 212,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting.Abstractions\": \"9.0.0\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 854,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting.Abstractions\": {",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Hosting",
+      "LineNumber": 1405,
+      "Pattern": "Microsoft\\.Extensions\\.Hosting",
+      "Context": "\"Microsoft.Extensions.Hosting\": \"[9.0.7, )\",",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\BusBuddy.WPF\\packages.lock.json",
+      "RelativePath": ".\\BusBuddy.WPF\\packages.lock.json"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 4,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "Scans the entire BusBuddy workspace for Microsoft.Extensions.Logging references",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 8,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "Microsoft.Extensions.Logging references after the migration to Serilog with enrichments.",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 50,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "# Define search patterns for Microsoft.Extensions.Logging",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 87,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "Write-Host \"?? Starting Microsoft.Extensions.Logging scan...\" -ForegroundColor Cyan",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 167,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "Write-Host \"?? Scanning files for Microsoft.Extensions.Logging references...\" -ForegroundColor Cyan",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 191,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "$results.Recommendations += \"? No Microsoft.Extensions.Logging references found - migration appears complete!\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 194,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "$results.Recommendations += \"?? Found $($results.Summary.TotalOccurrences) Microsoft.Extensions.Logging references in $($results.Summary.FilesWithMicrosoftLogging) files\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 202,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "$results.Recommendations += \"?? Remove unused Microsoft.Extensions.Logging using statements\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 205,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "$results.Recommendations += \"?? Replace Microsoft.Extensions.Logging interfaces with Serilog ILogger\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 208,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "$results.Recommendations += \"?? Convert Microsoft.Extensions.Logging method calls to Serilog syntax\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "Microsoft.Extensions.Logging",
+      "LineNumber": 211,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "$results.Recommendations += \"?? Remove Microsoft.Extensions.Logging package references from project files\"",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "MICROSOFT.EXTENSIONS.LOGGING",
+      "LineNumber": 220,
+      "Pattern": "Microsoft\\.Extensions\\.Logging",
+      "Context": "Write-Host \"?? MICROSOFT.EXTENSIONS.LOGGING SCAN RESULTS\" -ForegroundColor Cyan",
+      "Category": "PackageReferences",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "ILogger<",
+      "LineNumber": 58,
+      "Pattern": "ILogger<",
+      "Context": "\"ILogger<\",",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "ILoggerFactory",
+      "LineNumber": 59,
+      "Pattern": "ILoggerFactory",
+      "Context": "\"ILoggerFactory\",",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    },
+    {
+      "Match": "IServiceCollection",
+      "LineNumber": 60,
+      "Pattern": "IServiceCollection",
+      "Context": "\"IServiceCollection\"",
+      "Category": "LoggingInterfaces",
+      "FilePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\scan-microsoft-logging.ps1",
+      "RelativePath": ".\\scan-microsoft-logging.ps1"
+    }
+  ],
+  "Summary": {
+    "FilesWithMicrosoftLogging": 23,
+    "WorkspacePath": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy",
+    "ScanTimestamp": "2025-07-25 16:03:22",
+    "TotalOccurrences": 213,
+    "TotalFilesScanned": 354
+  }
+}
+
+= * 80
+?? Scan completed at 2025-07-25 16:03:24
+= * 80

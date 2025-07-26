@@ -90,7 +90,7 @@ public class BusBuddyDbContextFactory : IBusBuddyDbContextFactory, IDesignTimeDb
             .Build();
 
         var optionsBuilder = new DbContextOptionsBuilder<BusBuddyDbContext>();
-        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        optionsBuilder.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
 
         return new BusBuddyDbContext(optionsBuilder.Options);
     }
