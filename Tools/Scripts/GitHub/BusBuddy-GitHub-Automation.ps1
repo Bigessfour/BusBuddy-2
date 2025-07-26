@@ -322,14 +322,21 @@ function Start-WorkflowRun {
         if ($workflowResults -and $workflowResults.Count -gt 0) {
             $latestRun = $workflowResults[0]
 
-            Write-GitHubStatus "Workflow Status: $($latestRun.status) | Conclusion: $($latestRun.conclusion)" -Status Info
+            # Debug: Show available properties
+            Write-GitHubStatus "🔍 Debug: Available properties: $($latestRun.PSObject.Properties.Name -join ', ')" -Status Info
 
-            if ($latestRun.status -eq 'completed') {
-                if ($latestRun.conclusion -eq 'success') {
+            # Safe property access with fallbacks
+            $runStatus = if ($latestRun.PSObject.Properties['status']) { $latestRun.status } else { 'unknown' }
+            $runConclusion = if ($latestRun.PSObject.Properties['conclusion']) { $latestRun.conclusion } else { 'unknown' }
+
+            Write-GitHubStatus "Workflow Status: $runStatus | Conclusion: $runConclusion" -Status Info
+
+            if ($runStatus -eq 'completed') {
+                if ($runConclusion -eq 'success') {
                     Write-GitHubStatus "🎉 Workflow completed successfully!" -Status Success
                 }
                 else {
-                    Write-GitHubStatus "❌ Workflow failed with conclusion: $($latestRun.conclusion)" -Status Error
+                    Write-GitHubStatus "❌ Workflow failed with conclusion: $runConclusion" -Status Error
                 }
                 break
             }

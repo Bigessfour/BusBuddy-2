@@ -1,0 +1,14 @@
+{
+  "Files": [
+    ".vscode/tasks.json",
+    "PowerShell/BusBuddy.psd1",
+    "PowerShell/Load-BusBuddyModule.ps1",
+    "PowerShell/Module-Integration.ps1",
+    "Scripts/fix-github-workflow-monitoring.ps1",
+    "Tools/Scripts/GitHub/BusBuddy-GitHub-Automation.ps1",
+    "Tools/Scripts/PowerShell-7.5.2-Syntax-Enforcer.ps1"
+  ],
+  "Timestamp": "2025-07-26T15:23:59.4591072-06:00",
+  "Hash": "78680da3e5ffc39807cbaddaf6c3b36a2d0a35d3",
+  "Message": "chore(multiple-files): Update 7 files"
+}
