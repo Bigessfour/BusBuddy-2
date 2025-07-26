@@ -1299,6 +1299,7 @@ function Get-BusBuddyCommands {
             @{ Name = 'bb-get-workflow-results'; Description = 'Monitor GitHub workflows'; Function = 'Get-BusBuddyWorkflowResults' }
         )
         'GitHub'      = @(
+            @{ Name = 'bb-git-status'; Description = 'Git status with health check'; Function = 'Get-BusBuddyGitStatus' }
             @{ Name = 'bb-github-stage'; Description = 'Smart Git staging'; Function = 'Invoke-BusBuddyGitHubStaging' }
             @{ Name = 'bb-github-commit'; Description = 'Intelligent commit creation'; Function = 'Invoke-BusBuddyGitHubCommit' }
             @{ Name = 'bb-github-push'; Description = 'Push with workflow monitoring'; Function = 'Invoke-BusBuddyGitHubPush' }
@@ -3839,6 +3840,151 @@ if (Test-Path $githubScriptPath) {
 }
 
 # Wrapper functions for Bus Buddy integration
+function Get-BusBuddyGitStatus {
+    <#
+    .SYNOPSIS
+        Enhanced Git status with Bus Buddy health check integration (bb-git-status)
+
+    .DESCRIPTION
+        Displays Git status information combined with BusBuddy environment health check.
+        Helps identify tracked files, modified files, untracked files, and ignored files
+        while providing context about the overall project health.
+
+    .PARAMETER Detailed
+        Show detailed Git status with more verbose output
+
+    .PARAMETER IncludeIgnored
+        Include ignored files in the status output
+
+    .PARAMETER QuickHealth
+        Run a quick health check instead of detailed analysis
+
+    .EXAMPLE
+        bb-git-status
+
+    .EXAMPLE
+        Get-BusBuddyGitStatus -Detailed
+
+    .EXAMPLE
+        bb-git-status -IncludeIgnored -QuickHealth
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$Detailed,
+        [switch]$IncludeIgnored,
+        [switch]$QuickHealth
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    Push-Location $projectRoot
+
+    try {
+        Write-BusBuddyStatus "🔍 Checking Git status and project health..." -Status Info
+        Write-Host ""
+
+        # Git Repository Information
+        Write-Host "📁 Repository Information:" -ForegroundColor Cyan
+        $currentBranch = git branch --show-current 2>$null
+        if ($currentBranch) {
+            Write-Host "   Current Branch: $currentBranch" -ForegroundColor Green
+        }
+
+        $remoteUrl = git config --get remote.origin.url 2>$null
+        if ($remoteUrl) {
+            Write-Host "   Remote Origin: $remoteUrl" -ForegroundColor Yellow
+        }
+
+        Write-Host ""
+
+        # Git Status Output
+        Write-Host "📊 Git Status:" -ForegroundColor Cyan
+
+        if ($Detailed) {
+            # Detailed git status with more information
+            $gitArgs = @('status', '--verbose', '--branch')
+            if ($IncludeIgnored) {
+                $gitArgs += '--ignored'
+            }
+            & git @gitArgs
+        }
+        else {
+            # Standard git status
+            $gitArgs = @('status')
+            if ($IncludeIgnored) {
+                $gitArgs += '--ignored'
+            }
+            & git @gitArgs
+        }
+
+        Write-Host ""
+
+        # Quick analysis of git status
+        $gitStatusOutput = git status --porcelain 2>$null
+        if ($gitStatusOutput) {
+            # Ensure we have an array for counting
+            if ($gitStatusOutput -is [string]) {
+                $gitStatusArray = @($gitStatusOutput)
+            }
+            else {
+                $gitStatusArray = $gitStatusOutput
+            }
+
+            $modifiedLines = $gitStatusArray | Where-Object { $_ -match '^\s*M' }
+            $addedLines = $gitStatusArray | Where-Object { $_ -match '^\s*A' }
+            $deletedLines = $gitStatusArray | Where-Object { $_ -match '^\s*D' }
+            $untrackedLines = $gitStatusArray | Where-Object { $_ -match '^\?\?' }
+
+            $modifiedFiles = if ($modifiedLines) { @($modifiedLines).Count } else { 0 }
+            $addedFiles = if ($addedLines) { @($addedLines).Count } else { 0 }
+            $deletedFiles = if ($deletedLines) { @($deletedLines).Count } else { 0 }
+            $untrackedFiles = if ($untrackedLines) { @($untrackedLines).Count } else { 0 }
+
+            Write-Host "📈 Status Summary:" -ForegroundColor Magenta
+            if ($modifiedFiles -gt 0) { Write-Host "   Modified files: $modifiedFiles" -ForegroundColor Yellow }
+            if ($addedFiles -gt 0) { Write-Host "   Added files: $addedFiles" -ForegroundColor Green }
+            if ($deletedFiles -gt 0) { Write-Host "   Deleted files: $deletedFiles" -ForegroundColor Red }
+            if ($untrackedFiles -gt 0) { Write-Host "   Untracked files: $untrackedFiles" -ForegroundColor Cyan }
+
+            Write-Host ""
+
+            # Actionable recommendations
+            Write-Host "💡 Recommendations:" -ForegroundColor Blue
+            if ($untrackedFiles -gt 0) {
+                Write-Host "   • Use 'git add <file>' to stage new files for tracking" -ForegroundColor Gray
+            }
+            if ($modifiedFiles -gt 0) {
+                Write-Host "   • Use 'git add <file>' to stage modified files for commit" -ForegroundColor Gray
+            }
+            if ($modifiedFiles -gt 0 -or $addedFiles -gt 0) {
+                Write-Host "   • Use 'bb-github-workflow' for complete GitHub integration" -ForegroundColor Gray
+            }
+        }
+        else {
+            Write-Host "✅ Working tree clean - no changes detected" -ForegroundColor Green
+        }
+
+        Write-Host ""
+
+        # Chain with health check for momentum
+        Write-Host "🏥 BusBuddy Health Check:" -ForegroundColor Cyan
+        if ($QuickHealth) {
+            Test-BusBuddyEnvironment
+        }
+        else {
+            Test-BusBuddyEnvironment -Detailed
+        }
+
+        Write-BusBuddyStatus "✅ Git status and health check completed" -Status Success
+    }
+    catch {
+        Write-BusBuddyError "Error getting Git status: $_"
+        throw
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function Invoke-BusBuddyGitHubStaging {
     <#
     .SYNOPSIS
@@ -3942,6 +4088,7 @@ function Test-VSCodeExtension {
 }
 
 # Create GitHub aliases
+Set-Alias -Name 'bb-git-status' -Value 'Get-BusBuddyGitStatus'
 Set-Alias -Name 'bb-github-stage' -Value 'Invoke-BusBuddyGitHubStaging'
 Set-Alias -Name 'bb-github-commit' -Value 'Invoke-BusBuddyGitHubCommit'
 Set-Alias -Name 'bb-github-push' -Value 'Invoke-BusBuddyGitHubPush'
@@ -4001,6 +4148,7 @@ Export-ModuleMember -Function @(
     'Show-BusBuddyWarningAnalysis',
 
     # GitHub automation functions
+    'Get-BusBuddyGitStatus',
     'Invoke-BusBuddyGitHubPush',
     'Invoke-BusBuddyGitHubCommit',
     'Invoke-BusBuddyGitHubStaging',
@@ -4220,7 +4368,7 @@ Export-ModuleMember -Alias @(
     'bb-manage-dependencies', 'bb-error-fix',
     'bb-dev-workflow', 'bb-get-workflow-results', 'bb-warning-analysis',
     'bb-install-extensions', 'bb-validate-vscode',
-    'bb-github-push', 'bb-github-commit', 'bb-github-stage', 'bb-github-workflow'
+    'bb-git-status', 'bb-github-push', 'bb-github-commit', 'bb-github-stage', 'bb-github-workflow'
 )
 
 #endregion
