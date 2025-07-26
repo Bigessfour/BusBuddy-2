@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+#Requires -Version 7.5
 <#
 .SYNOPSIS
 Fix and enhance GitHub Actions workflow monitoring for BusBuddy

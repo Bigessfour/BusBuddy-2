@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+#Requires -Version 7.5
 <#
 .SYNOPSIS
     Bus Buddy PowerShell Module Loader
@@ -39,15 +39,15 @@ function Write-LoaderStatus {
     $colors = @{
         'Success' = 'Green'
         'Warning' = 'Yellow'
-        'Error' = 'Red'
-        'Info' = 'Cyan'
+        'Error'   = 'Red'
+        'Info'    = 'Cyan'
     }
 
     $icons = @{
         'Success' = '✅'
         'Warning' = '⚠️'
-        'Error' = '❌'
-        'Info' = '🚌'
+        'Error'   = '❌'
+        'Info'    = '🚌'
     }
 
     if (-not $Quiet) {
@@ -98,7 +98,8 @@ $existingModule = Get-Module -Name "BusBuddy" -ErrorAction SilentlyContinue
 if ($existingModule -and -not $Force) {
     Write-LoaderStatus "Bus Buddy module already loaded (version $($existingModule.Version))" -Status Warning
     Write-Host "Use -Force to reload the module." -ForegroundColor Yellow
-} else {
+}
+else {
     # Remove existing module if force reload
     if ($existingModule -and $Force) {
         Write-LoaderStatus "Removing existing module..." -Status Info
@@ -117,12 +118,14 @@ if ($existingModule -and -not $Force) {
         $envValid = Test-BusBuddyEnvironment
         if ($envValid) {
             Write-LoaderStatus "Development environment validated" -Status Success
-        } else {
+        }
+        else {
             Write-LoaderStatus "Environment validation found issues" -Status Warning
             Write-Host "Run 'bb-env-check' for detailed information." -ForegroundColor Yellow
         }
 
-    } catch {
+    }
+    catch {
         Write-LoaderStatus "Failed to load module: $($_.Exception.Message)" -Status Error
         exit 1
     }

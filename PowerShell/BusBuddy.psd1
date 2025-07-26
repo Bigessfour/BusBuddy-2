@@ -1,3 +1,5 @@
+#Requires -Version 7.5
+
 #
 # Module manifest for module 'BusBuddy'
 #
@@ -51,7 +53,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules      = @()  # Add e.g., 'Pester' for testing if needed from Gallery
+    RequiredModules      = @('PSAISuite')  # AI integration module for enhanced BusBuddy functionality
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
@@ -84,6 +86,15 @@
         'bb-github-commit',
         'bb-github-stage',
         'bb-github-workflow',
+        'bb-ai-config',
+        'bb-ai-chat',
+        'bb-ai-task',
+        'bb-ai-route',
+        'bb-ai-review',
+        'bb-runtime-errors',
+        'bb-form-monitor',
+        'bb-capture-output',
+        'bb-run-with-capture',
         'Get-BusBuddyProjectRoot',
         'Write-BusBuddyStatus',
         'Write-BusBuddyError',
@@ -120,7 +131,14 @@
         'bb-env-check',
         'bb-happiness',
         'bb-commands',
-        'bb-info'
+        'bb-info',
+        'bb-ai-config',
+        'bb-ai-chat',
+        'bb-ai-task',
+        'bb-ai-route',
+        'bb-ai-review',
+        'bb-runtime-errors',
+        'bb-form-monitor'
     )
 
     # DSC resources to export from this module

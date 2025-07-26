@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+#Requires -Version 7.5
 <#
 .SYNOPSIS
     Bus Buddy PowerShell Module Integration
@@ -45,7 +45,8 @@ Write-Host "══════════════════════�
 try {
     Import-Module $modulePath -Force
     Write-Host "✅ Module loaded successfully" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Host "❌ Failed to load module: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
@@ -169,10 +170,12 @@ if ($TestIntegration) {
             $result = Invoke-Expression $test.Command
             if ($result) {
                 Write-Host " ✅" -ForegroundColor Green
-            } else {
+            }
+            else {
                 Write-Host " ⚠️ (No result)" -ForegroundColor Yellow
             }
-        } catch {
+        }
+        catch {
             Write-Host " ❌ Error: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
@@ -183,10 +186,12 @@ if ($TestIntegration) {
         $buildResult = Invoke-BusBuddyBuild -Verbosity quiet
         if ($buildResult) {
             Write-Host "  ✅ Build test passed" -ForegroundColor Green
-        } else {
+        }
+        else {
             Write-Host "  ⚠️ Build test had issues (check project state)" -ForegroundColor Yellow
         }
-    } catch {
+    }
+    catch {
         Write-Host "  ❌ Build test failed: $($_.Exception.Message)" -ForegroundColor Red
     }
 }

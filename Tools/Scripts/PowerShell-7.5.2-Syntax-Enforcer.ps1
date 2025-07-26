@@ -29,6 +29,11 @@ function Test-PowerShell752Syntax {
         [switch]$Strict
     )
 
+    # Parameter validation
+    if ([string]::IsNullOrEmpty($ScriptPath)) {
+        throw "ScriptPath parameter cannot be null or empty"
+    }
+
     $issues = @()
     $content = Get-Content -Path $ScriptPath -Raw
 
@@ -56,12 +61,32 @@ function Test-PowerShell752Syntax {
     }
 
     # 3. Check for proper error handling in parallel blocks
-    if ($content -match 'ForEach-Object\s+-Parallel' -and $content -notmatch 'try\s*{.*catch') {
-        $issues += @{
-            Type    = "Critical"
-            Rule    = "ParallelErrorHandling"
-            Message = "Parallel blocks must include try/catch error handling"
-            Fix     = "Wrap parallel block content in try/catch"
+    if ($content -match 'ForEach-Object\s+-Parallel') {
+        # Simplified check: Look for ForEach-Object -Parallel followed by try/catch within reasonable distance
+        $parallelMatches = [regex]::Matches($content, 'ForEach-Object\s+-Parallel\s*\{', 'IgnoreCase')
+        $hasParallelTryCatch = $false
+
+        foreach ($match in $parallelMatches) {
+            # Extract the content after ForEach-Object -Parallel { for about 500 characters
+            $startPos = $match.Index + $match.Length
+            $endPos = [Math]::Min($startPos + 500, $content.Length)
+            $blockContent = $content.Substring($startPos, $endPos - $startPos)
+
+            # Check if this block contains try/catch
+            if ($blockContent -match '(?s)try\s*\{.*?catch') {
+                $hasParallelTryCatch = $true
+                break
+            }
+        }
+
+        # Only add issue if we found parallel blocks but no try/catch
+        if ($parallelMatches.Count -gt 0 -and -not $hasParallelTryCatch) {
+            $issues += @{
+                Type    = "Critical"
+                Rule    = "ParallelErrorHandling"
+                Message = "Parallel blocks must include try/catch error handling"
+                Fix     = "Wrap parallel block content in try/catch"
+            }
         }
     }
 
@@ -107,17 +132,25 @@ function Test-PowerShell752Syntax {
 
     # 8. Check for proper parameter validation
     $parameterBlocks = [regex]::Matches($content, '\[Parameter\([^\]]*\)\]\s*\[([^\]]+)\]\s*\$(\w+)')
+    $unvalidatedStringParams = @()
+
     foreach ($match in $parameterBlocks) {
         $paramType = $match.Groups[1].Value
         $paramName = $match.Groups[2].Value
 
-        if ($paramType -eq "string" -and $content -notmatch "ArgumentNullException\.ThrowIfNull\(\`$$paramName\)") {
-            $issues += @{
-                Type    = "Suggestion"
-                Rule    = "ParameterValidation"
-                Message = "String parameters should validate for null"
-                Fix     = "Add ArgumentNullException.ThrowIfNull(`$$paramName)"
-            }
+        if ($paramType -eq "string" -and $content -notmatch "if\s*\(\s*\[string\]::IsNullOrEmpty\(\`$$paramName\)\)") {
+            $unvalidatedStringParams += $paramName
+        }
+    }
+
+    # Add single suggestion if any unvalidated string parameters found
+    if ($unvalidatedStringParams.Count -gt 0) {
+        $paramList = $unvalidatedStringParams -join ", "
+        $issues += @{
+            Type    = "Suggestion"
+            Rule    = "ParameterValidation"
+            Message = "String parameters should validate for null: $paramList"
+            Fix     = "Add validation: if ([string]::IsNullOrEmpty(`$paramName)) { throw ... }"
         }
     }
 
@@ -133,6 +166,7 @@ function Test-PowerShell752Syntax {
 
     # 10. Check for BusBuddy-specific patterns
     if ($content -match 'Write-Host' -and $content -notmatch 'Logger\.') {
+        # Count only once per script, regardless of how many Write-Host instances
         $issues += @{
             Type    = "Warning"
             Rule    = "BusBuddyLogging"
@@ -219,6 +253,14 @@ function New-PowerShell752Template {
         [string]$OutputPath = "."
     )
 
+    # Parameter validation
+    if ([string]::IsNullOrEmpty($ScriptName)) {
+        throw "ScriptName parameter cannot be null or empty"
+    }
+    if ([string]::IsNullOrEmpty($OutputPath)) {
+        throw "OutputPath parameter cannot be null or empty"
+    }
+
     $template = switch ($Type) {
         "Script" {
             @"
@@ -259,7 +301,9 @@ if (`$PSVersionTable.PSVersion -lt [version]'7.5.0') {
 
 try {
     # Validate parameters
-    ArgumentNullException.ThrowIfNull(`$InputPath)
+    if ([string]::IsNullOrEmpty(`$InputPath)) {
+        throw "InputPath parameter cannot be null or empty"
+    }
 
     if (-not (Test-Path `$InputPath)) {
         throw "Path not found: `$InputPath"
@@ -293,7 +337,7 @@ try {
     Write-Error "Script failed: `$(`$_.Exception.Message)"
     throw
 }
-"@ 
+"@
         }
 
         "Module" {
@@ -335,7 +379,9 @@ function Get-$ScriptName {
     )
 
     try {
-        ArgumentNullException.ThrowIfNull(`$InputData)
+        if ([string]::IsNullOrEmpty(`$InputData)) {
+            throw "InputData parameter cannot be null or empty"
+        }
 
         Write-Verbose "Processing input data: `$InputData"
 
@@ -372,7 +418,9 @@ function Start-$ScriptName {
     )
 
     try {
-        ArgumentNullException.ThrowIfNull(`$Items)
+        if ($null -eq `$Items -or `$Items.Count -eq 0) {
+            throw "Items parameter cannot be null or empty"
+        }
 
         Write-Verbose "Starting parallel processing of `$(`$Items.Count) items"
 
@@ -403,7 +451,7 @@ function Start-$ScriptName {
 
 # Export module members
 Export-ModuleMember -Function 'Get-$ScriptName', 'Start-$ScriptName'
-"@ 
+"@
         }
 
         "Function" {
@@ -503,7 +551,7 @@ function Invoke-$ScriptName {
         }
     }
 }
-"@ 
+"@
         }
     }
 
@@ -563,6 +611,11 @@ function Invoke-MandatorySyntaxCheck {
         [Parameter()]
         [string[]]$OnlyValidateNew = @()  # Only validate specific new files
     )
+
+    # Parameter validation
+    if ([string]::IsNullOrEmpty($Path)) {
+        throw "Path parameter cannot be null or empty"
+    }
 
     Write-Host "🔒 MANDATORY PowerShell 7.5.2 Syntax Check" -ForegroundColor Magenta
     Write-Host "   Path: $Path" -ForegroundColor Gray

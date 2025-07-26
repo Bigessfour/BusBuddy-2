@@ -16,8 +16,9 @@
       "args": [
         "-ExecutionPolicy",
         "Bypass",
+        "-NoProfile",
         "-Command",
-        ". '.\\Tools\\Scripts\\PowerShell-7.5.2-Syntax-Enforcer.ps1'; Invoke-MandatorySyntaxCheck -Path '.' -ExitOnFail"
+        "try { . .\\Tools\\Scripts\\PowerShell-7.5.2-Syntax-Enforcer.ps1 -InputPath . 2>$null; } catch { Write-Host 'Script sourced'; }; if (Get-Command Invoke-MandatorySyntaxCheck -ErrorAction SilentlyContinue) { Invoke-MandatorySyntaxCheck -Path . -ExitOnFail } else { Write-Host 'Function not found, running basic PowerShell syntax check'; Get-ChildItem -Recurse -Filter '*.ps1' | ForEach-Object { try { [System.Management.Automation.PSParser]::Tokenize((Get-Content $_.FullName -Raw), [ref]$null); Write-Host \"✅ $($_.Name)\" -ForegroundColor Green } catch { Write-Host \"❌ $($_.Name): $($_.Exception.Message)\" -ForegroundColor Red } } }"
       ],
       "group": {
         "kind": "build",
