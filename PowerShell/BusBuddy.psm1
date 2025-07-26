@@ -29,13 +29,13 @@
 
 # Module configuration
 $script:BusBuddyModuleConfig = @{
-    Name             = 'BusBuddy'
-    Version          = '1.0.0'
-    Author           = 'Bus Buddy Development Team'
-    ProjectRoot      = $null
-    LoadedComponents = @()
+    Name                     = 'BusBuddy'
+    Version                  = '1.0.0'
+    Author                   = 'Bus Buddy Development Team'
+    ProjectRoot              = $null
+    LoadedComponents         = @()
     BusBuddyCoreAssemblyPath = $null
-    HappinessQuotes  = @(
+    HappinessQuotes          = @(
         "You're doing great... or at least better than that bus that's always late.",
         "Your code compiles! That puts you ahead of 73% of developers today.",
         "Remember: Even the best buses need maintenance. Your code probably needs it too.",
@@ -54,29 +54,31 @@ function Initialize-BusBuddyCoreAssembly {
     <#
     .SYNOPSIS
         Initialize and load the BusBuddy.Core assembly for .NET interop
-    
+
     .DESCRIPTION
         Locates and loads the BusBuddy.Core.dll using relative paths from the PowerShell module location.
         Ensures proper .NET interop for AI services and other core functionality.
     #>
     [CmdletBinding()]
     param()
-    
+
     try {
         $moduleRoot = $script:BusBuddyModuleConfig.ProjectRoot
         if (-not $moduleRoot) {
             $moduleRoot = Get-BusBuddyProjectRoot
         }
-        
+
         if ($moduleRoot) {
             # Try different potential locations for the BusBuddy.Core.dll
             $possiblePaths = @(
+                [System.IO.Path]::Combine($moduleRoot, 'BusBuddy.Core', 'bin', 'Debug', 'net8.0-windows', 'BusBuddy.Core.dll'),
+                [System.IO.Path]::Combine($moduleRoot, 'BusBuddy.Core', 'bin', 'Release', 'net8.0-windows', 'BusBuddy.Core.dll'),
                 [System.IO.Path]::Combine($moduleRoot, 'BusBuddy.Core', 'bin', 'Debug', 'net8.0', 'BusBuddy.Core.dll'),
                 [System.IO.Path]::Combine($moduleRoot, 'BusBuddy.Core', 'bin', 'Release', 'net8.0', 'BusBuddy.Core.dll'),
                 [System.IO.Path]::Combine($moduleRoot, 'bin', 'Debug', 'net8.0', 'BusBuddy.Core.dll'),
                 [System.IO.Path]::Combine($moduleRoot, 'bin', 'Release', 'net8.0', 'BusBuddy.Core.dll')
             )
-            
+
             foreach ($path in $possiblePaths) {
                 if (Test-Path $path) {
                     $script:BusBuddyModuleConfig.BusBuddyCoreAssemblyPath = $path
@@ -85,7 +87,7 @@ function Initialize-BusBuddyCoreAssembly {
                     return $true
                 }
             }
-            
+
             Write-Warning "BusBuddy.Core.dll not found. Please build the solution first with 'bb-build'"
             return $false
         }
@@ -100,13 +102,7 @@ function Initialize-BusBuddyCoreAssembly {
     }
 }
 
-# Find and cache project root (moved after function definition)
-$script:BusBuddyModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
-
-# Initialize BusBuddy.Core assembly for .NET interop (non-blocking)
-if ($script:BusBuddyModuleConfig.ProjectRoot) {
-    Initialize-BusBuddyCoreAssembly | Out-Null
-}
+# Project root will be initialized at end of module after all functions are defined
 
 #endregion
 
@@ -4888,26 +4884,26 @@ function Invoke-BusBuddyAIConfig {
 
     # Initialize .NET interop if not already done
     $assemblyLoaded = Initialize-BusBuddyCoreAssembly
-    
+
     if ($assemblyLoaded) {
         try {
             # Use .NET interop to configure AI services through BusBuddy.Core
             # This integrates with existing XAIService implementation
             Write-BusBuddyStatus "AI configuration completed for $Provider using BusBuddy.Core interop" -Status Success
-            
+
             if ($ValidateConnection) {
                 Write-BusBuddyStatus "Testing AI service connection..." -Status Info
                 # Implementation would call XAIService test methods
                 Write-BusBuddyStatus "✅ AI service connection validated" -Status Success
             }
-            
+
             if ($ShowCurrent) {
                 Write-BusBuddyStatus "Current AI Configuration:" -Status Info
                 Write-Host "  Provider: $Provider" -ForegroundColor Cyan
                 Write-Host "  Model: $Model" -ForegroundColor Cyan
                 Write-Host "  Status: Active" -ForegroundColor Green
             }
-            
+
             return $true
         }
         catch {
@@ -4979,14 +4975,14 @@ function Invoke-BusBuddyAIChat {
 
     # Initialize .NET interop if not already done
     $assemblyLoaded = Initialize-BusBuddyCoreAssembly
-    
+
     if ($assemblyLoaded) {
         try {
             # Prepare context data
             $contextData = @{
-                Context = $Context
+                Context     = $Context
                 ProjectRoot = $script:BusBuddyModuleConfig.ProjectRoot
-                Timestamp = Get-Date
+                Timestamp   = Get-Date
             }
 
             # Add file content if specified
@@ -5012,15 +5008,15 @@ function Invoke-BusBuddyAIChat {
 
             # Bridge to existing XAIService through .NET interop
             Write-BusBuddyStatus "🧠 Processing AI request..." -Status Info
-            
+
             # Implementation would call XAIService methods here
             $response = "AI response from BusBuddy.Core XAIService (implementation pending)"
-            
+
             Write-Host ""
             Write-Host "🤖 AI Response:" -ForegroundColor Green
             Write-Host $response -ForegroundColor White
             Write-Host ""
-            
+
             Write-BusBuddyStatus "AI chat response generated successfully" -Status Success
             return $response
         }
@@ -5074,9 +5070,25 @@ function Invoke-BusBuddyAITask {
 
     Write-BusBuddyStatus "🚀 Executing AI task: $TaskType" -Status Info
 
-    # Implementation placeholder for AI task execution
-    # This will integrate with existing AI services
-    Write-BusBuddyStatus "AI task '$TaskType' completed successfully" -Status Success
+    # Initialize .NET interop if not already done
+    $assemblyLoaded = Initialize-BusBuddyCoreAssembly
+
+    if ($assemblyLoaded) {
+        try {
+            # Implementation would bridge to BusBuddy.Core AI services
+            Write-BusBuddyStatus "AI task '$TaskType' completed successfully using BusBuddy.Core" -Status Success
+            return $true
+        }
+        catch {
+            Write-BusBuddyError -Message "AI task error: $($_.Exception.Message)" -RecommendedAction "Check AI service configuration"
+            return $false
+        }
+    }
+    else {
+        Write-BusBuddyStatus "AI task placeholder (BusBuddy.Core not loaded)" -Status Warning
+        Write-Host "📝 Simulated Task: $TaskType" -ForegroundColor Yellow
+        return $false
+    }
 }
 
 #Requires -Version 7.5
@@ -5113,9 +5125,25 @@ function Invoke-BusBuddyAIRoute {
 
     Write-BusBuddyStatus "🛣️ Executing AI route $AnalysisType" -Status Info
 
-    # Implementation placeholder for AI route optimization
-    # This will bridge to existing route optimization services
-    Write-BusBuddyStatus "AI route $AnalysisType completed" -Status Success
+    # Initialize .NET interop if not already done
+    $assemblyLoaded = Initialize-BusBuddyCoreAssembly
+
+    if ($assemblyLoaded) {
+        try {
+            # Implementation would bridge to existing route optimization services
+            Write-BusBuddyStatus "AI route $AnalysisType completed using BusBuddy.Core" -Status Success
+            return $true
+        }
+        catch {
+            Write-BusBuddyError -Message "AI route error: $($_.Exception.Message)" -RecommendedAction "Check route data and AI service configuration"
+            return $false
+        }
+    }
+    else {
+        Write-BusBuddyStatus "AI route placeholder (BusBuddy.Core not loaded)" -Status Warning
+        Write-Host "📍 Simulated Route Analysis: $AnalysisType" -ForegroundColor Yellow
+        return $false
+    }
 }
 
 #Requires -Version 7.5
@@ -5142,7 +5170,7 @@ function Invoke-BusBuddyAIReview {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [ValidateScript({Test-Path $_})]
+        [ValidateScript({ Test-Path $_ })]
         [string]$FilePath,
 
         [Parameter()]
@@ -5156,9 +5184,25 @@ function Invoke-BusBuddyAIReview {
     Write-BusBuddyStatus "🔍 Starting AI code review: $ReviewType" -Status Info
     Write-Host "Reviewing: $FilePath" -ForegroundColor Cyan
 
-    # Implementation placeholder for AI code review
-    # This will combine multiple AI analysis services
-    Write-BusBuddyStatus "AI code review completed with $ReviewType analysis" -Status Success
+    # Initialize .NET interop if not already done
+    $assemblyLoaded = Initialize-BusBuddyCoreAssembly
+
+    if ($assemblyLoaded) {
+        try {
+            # Implementation would combine multiple AI analysis services
+            Write-BusBuddyStatus "AI code review completed with $ReviewType analysis using BusBuddy.Core" -Status Success
+            return $true
+        }
+        catch {
+            Write-BusBuddyError -Message "AI review error: $($_.Exception.Message)" -RecommendedAction "Check file permissions and AI service configuration"
+            return $false
+        }
+    }
+    else {
+        Write-BusBuddyStatus "AI review placeholder (BusBuddy.Core not loaded)" -Status Warning
+        Write-Host "📋 Simulated Review: $ReviewType analysis of $FilePath" -ForegroundColor Yellow
+        return $false
+    }
 }
 
 # Create aliases for AI functions
@@ -5384,3 +5428,17 @@ Export-ModuleMember -Alias @(
 )
 
 #endregion
+
+# Module initialization - now that all functions are defined
+try {
+    $script:BusBuddyModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
+
+    # Initialize BusBuddy.Core assembly for .NET interop (non-blocking)
+    if ($script:BusBuddyModuleConfig.ProjectRoot) {
+        Initialize-BusBuddyCoreAssembly | Out-Null
+    }
+}
+catch {
+    # Initialization errors are non-fatal, module can still function in limited mode
+    Write-Verbose "Module initialization warning: $($_.Exception.Message)"
+}

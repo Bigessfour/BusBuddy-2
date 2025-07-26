@@ -200,5 +200,5 @@ bb-ai-chat -Prompt "Analyze git diff for potential issues" -AttachDiff
 ---
 
 > 💡 **Pro Tip**: Combine AI functions with PowerShell pipelines for powerful automation workflows
-> 
+>
 > 🚌 **BusBuddy Philosophy**: AI amplifies human creativity — it doesn't replace developer insight!

@@ -15,6 +15,7 @@ This file contains custom instructions for GitHub Copilot when working with this
 ### **Phase 1 Development Standards**
 - ✅ **Build without errors** - Priority #1
 - 🔒 **MANDATORY PowerShell 7.5.2 Syntax** - All PowerShell scripts MUST pass syntax validation
+- 🤖 **MANDATORY AI Integration** - Use PSAISuite with xAI Grok-4-0709 for ALL code generation (see Documentation/AI-TOOLS-USAGE-STANDARDS.md)
 - ✅ **Basic data display** - ListView/DataGrid sufficient for now
 - ✅ **Real transportation data** - 15-20 drivers, 10-15 vehicles, 25-30 activities
 - ⚠️ **Defer to Phase 2**: Advanced MVVM, comprehensive testing, performance optimization
