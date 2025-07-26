@@ -110,7 +110,12 @@
         'Invoke-BusBuddyHealthCheck',
         'Get-BusBuddyHappiness',
         'Get-BusBuddyCommands',
-        'Get-BusBuddyInfo'
+        'Get-BusBuddyInfo',
+        'Invoke-BusBuddyAIConfig',
+        'Invoke-BusBuddyAIChat',
+        'Invoke-BusBuddyAITask',
+        'Invoke-BusBuddyAIRoute',
+        'Invoke-BusBuddyAIReview'
     )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
