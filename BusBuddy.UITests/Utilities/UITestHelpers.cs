@@ -1,10 +1,13 @@
 using System.Windows;
 using System.Windows.Threading;
+using System.IO;
+using System.Windows.Forms;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.UIA3;
 using Microsoft.EntityFrameworkCore;
 using BusBuddy.Core.Data;
+using BusBuddy.Core.Models;
 using BusBuddy.UITests.Builders;
 
 namespace BusBuddy.UITests.Utilities;
@@ -37,7 +40,7 @@ public static class UITestHelpers
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         while (stopwatch.ElapsedMilliseconds < timeoutMs)
         {
-            Application.Current?.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+            System.Windows.Application.Current?.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
             Thread.Sleep(50);
         }
     }
@@ -62,19 +65,40 @@ public static class UITestHelpers
         // Clear existing data
         context.Drivers.RemoveRange(context.Drivers);
         context.Vehicles.RemoveRange(context.Vehicles);
-        context.ActivitySchedules.RemoveRange(context.ActivitySchedules);
+        context.Activities.RemoveRange(context.Activities);
 
         // Add test drivers
         var drivers = DriverTestDataBuilder.CreateDriversList(5);
         context.Drivers.AddRange(drivers);
 
-        // Add test vehicles
-        var vehicles = VehicleTestDataBuilder.CreateVehicleFleet(3);
-        context.Vehicles.AddRange(vehicles);
+        // Add test vehicles (convert to Bus objects for BusBuddyDbContext)
+        var vehicleList = VehicleTestDataBuilder.CreateVehicleFleet(3);
+        var buses = vehicleList.Select(v => new Bus
+        {
+            VehicleId = v.Id,
+            Make = v.Make,
+            Model = v.Model,
+            LicenseNumber = v.PlateNumber,
+            SeatingCapacity = v.Capacity
+        }).ToList();
+        context.Vehicles.AddRange(buses);
 
-        // Add test activity schedules
-        var activities = ActivityScheduleTestDataBuilder.CreateWeeklySchedule(7);
-        context.ActivitySchedules.AddRange(activities);
+        // Add test activities (convert ActivitySchedule to Activity for BusBuddyDbContext)
+        var activitySchedules = ActivityScheduleTestDataBuilder.CreateWeeklySchedule(7);
+        var activityList = activitySchedules.Select(s => new Activity
+        {
+            ActivityId = s.ActivityScheduleId,
+            Date = s.ScheduledDate,
+            ActivityType = s.TripType,
+            Destination = s.ScheduledDestination,
+            LeaveTime = s.ScheduledLeaveTime,
+            EventTime = s.ScheduledEventTime,
+            AssignedVehicleId = s.ScheduledVehicleId,
+            DriverId = s.ScheduledDriverId,
+            RequestedBy = "Test User",
+            Status = "Scheduled"
+        }).ToList();
+        context.Activities.AddRange(activityList);
 
         context.SaveChanges();
     }
@@ -143,7 +167,7 @@ public static class UITestHelpers
             Directory.CreateDirectory(directory);
 
             var fullPath = Path.Combine(directory, $"{fileName}_{DateTime.Now:yyyyMMdd_HHmmss}.png");
-            screenshot.ToFile(fullPath);
+            screenshot.Save(fullPath, System.Drawing.Imaging.ImageFormat.Png);
         }
         catch (Exception ex)
         {

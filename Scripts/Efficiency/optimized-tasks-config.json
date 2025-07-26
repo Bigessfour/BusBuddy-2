@@ -1,0 +1,229 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "env": {
+      "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+      "DOTNET_NOLOGO": "1",
+      "DOTNET_ENVIRONMENT": "Development"
+    }
+  },
+  "tasks": [
+    {
+      "label": "⚡ BB: Lightning Build",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "BusBuddy.sln",
+        "--verbosity",
+        "quiet",
+        "--nologo",
+        "--no-dependencies"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "⚡ Ultra-fast build with minimal output - for rapid iteration"
+    },
+    {
+      "label": "🏃 BB: Speed Run",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "BusBuddy.WPF\\BusBuddy.WPF.csproj",
+        "--no-build"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "🏃 Run without rebuild (assumes already built) - maximum speed"
+    },
+    {
+      "label": "⚡ BB: Flash Test",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "test",
+        "BusBuddy.sln",
+        "--no-build",
+        "--verbosity",
+        "minimal",
+        "--nologo"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "⚡ Lightning-fast test run (no rebuild) - for immediate feedback"
+    },
+    {
+      "label": "🚀 BB: One-Shot Setup",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '🚌 One-shot development setup...' -ForegroundColor Cyan; dotnet clean BusBuddy.sln -v minimal; dotnet restore BusBuddy.sln -v minimal; dotnet build BusBuddy.sln -v minimal --nologo; Write-Host '✅ Development environment ready' -ForegroundColor Green"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "🚀 Complete clean → restore → build in one optimized command"
+    },
+    {
+      "label": "🔧 BB: Smart Rebuild",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Test-Path 'BusBuddy.WPF\\bin\\Debug\\net8.0-windows\\BusBuddy.WPF.exe') { $lastBuild = (Get-Item 'BusBuddy.WPF\\bin\\Debug\\net8.0-windows\\BusBuddy.WPF.exe').LastWriteTime; $codeFiles = Get-ChildItem -Recurse -Include '*.cs','*.xaml' | Where-Object { $_.LastWriteTime -gt $lastBuild }; if ($codeFiles.Count -eq 0) { Write-Host '✅ Build is up to date' -ForegroundColor Green; exit 0 } }; Write-Host '🔨 Building...' -ForegroundColor Yellow; dotnet build BusBuddy.sln --verbosity minimal --nologo"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "🔧 Intelligent rebuild - only builds if source files changed"
+    },
+    {
+      "label": "📊 BB: Performance Check",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '📊 BusBuddy Performance Status:' -ForegroundColor Cyan; if (Test-Path 'BusBuddy.WPF\\bin\\Debug\\net8.0-windows\\BusBuddy.WPF.exe') { $buildAge = (Get-Date) - (Get-Item 'BusBuddy.WPF\\bin\\Debug\\net8.0-windows\\BusBuddy.WPF.exe').LastWriteTime; Write-Host \"   Last build: $($buildAge.TotalMinutes.ToString('F1')) minutes ago\" -ForegroundColor Gray } else { Write-Host '   Status: Not built' -ForegroundColor Yellow }; if (-not (Test-Path 'BusBuddy.WPF\\obj\\project.assets.json')) { Write-Host '   Packages: Need restore' -ForegroundColor Yellow } else { Write-Host '   Packages: Restored' -ForegroundColor Green }; $syntaxCheck = dotnet build BusBuddy.sln --no-restore --verbosity quiet 2>&1; if ($LASTEXITCODE -eq 0) { Write-Host '   Syntax: ✅ Clean' -ForegroundColor Green } else { Write-Host '   Syntax: ❌ Issues detected' -ForegroundColor Red }"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "📊 Quick performance and status check - no builds, just analysis"
+    },
+    {
+      "label": "🧹 BB: Quick Clean",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "clean",
+        "BusBuddy.sln",
+        "--verbosity",
+        "minimal"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "🧹 Fast clean operation with minimal output"
+    },
+    {
+      "label": "📦 BB: Smart Restore",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Test-Path 'BusBuddy.WPF\\obj\\project.assets.json') { $lastRestore = (Get-Item 'BusBuddy.WPF\\obj\\project.assets.json').LastWriteTime; $projectFiles = Get-ChildItem -Recurse -Include '*.csproj' | Where-Object { $_.LastWriteTime -gt $lastRestore }; if ($projectFiles.Count -eq 0) { Write-Host '✅ Packages are up to date' -ForegroundColor Green; exit 0 } }; Write-Host '📦 Restoring packages...' -ForegroundColor Yellow; dotnet restore BusBuddy.sln --verbosity minimal"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "📦 Intelligent restore - only restores if project files changed"
+    },
+    {
+      "label": "🎯 BB: Apply Efficiency Enhancements",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "Scripts\\Efficiency\\master-efficiency-enhancement.ps1",
+        "-ApplyAll"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "detail": "🎯 Apply all efficiency enhancements for streamlined development"
+    }
+  ]
+}

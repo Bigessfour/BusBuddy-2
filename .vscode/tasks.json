@@ -10,7 +10,27 @@
   },
   "tasks": [
     {
-      "label": "🚌 BB: Enforce Workflow Check",
+      "label": "� BB: Mandatory PowerShell 7.5.2 Syntax Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        ". '.\\Tools\\Scripts\\PowerShell-7.5.2-Syntax-Enforcer.ps1'; Invoke-MandatorySyntaxCheck -Path '.' -ExitOnFail"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "detail": "🔒 MANDATORY: Validates all PowerShell scripts against 7.5.2 requirements before any build"
+    },
+    {
+      "label": "�🚌 BB: Enforce Workflow Check",
       "type": "shell",
       "command": "pwsh",
       "args": [
@@ -89,6 +109,41 @@
       },
       "isBackground": false,
       "detail": "🏗️ Industry-standard comprehensive build & run pipeline with full logging, environment validation, and error analysis",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "🌊 BB: Terminal Flow Monitor",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\BusBuddy-Terminal-Flow-Monitor.ps1",
+        "-MonitorMode",
+        "All",
+        "-LogToFile",
+        "-ShowDots"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🌊 PowerShell Gallery terminal flow monitoring - tracks dots, progress, and application lifecycle with enhanced logging",
       "problemMatcher": [
         "$msCompile"
       ]
@@ -900,6 +955,69 @@
       },
       "isBackground": false,
       "detail": "📌 Validate that all package versions are properly pinned and consistent across projects",
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 BB: Advanced Error Capture & Run",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\Advanced-Error-Capture-Runner.ps1",
+        "-CaptureMode",
+        "Both",
+        "-RealTimeDisplay",
+        "-WaitForUserAction"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🚀 Complete workflow: Start error capture → Launch BusBuddy → Monitor until app closes or user continues",
+      "problemMatcher": []
+    },
+    {
+      "label": "🎯 BB: Simple Error Capture & Run",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\Simple-Error-Capture-Runner.ps1",
+        "-ShowRealTime"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🎯 Simple workflow: Monitor → Launch → Wait for app close → Report results",
       "problemMatcher": []
     }
   ]

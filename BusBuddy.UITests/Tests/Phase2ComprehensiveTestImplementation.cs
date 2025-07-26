@@ -1,13 +1,15 @@
 using NUnit.Framework;
 using FluentAssertions;
-using BusBuddy.WPF.ViewModels;
+// Use only the correct VehiclesViewModel for command/property tests
 using BusBuddy.WPF.ViewModels.Vehicle;
+using BusBuddy.WPF.ViewModels;
+
+// Only use the correct VehiclesViewModel import to avoid ambiguity
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows.Input;
 using Moq;
 
@@ -24,7 +26,7 @@ public class Phase2ComprehensiveTestImplementation
     private ServiceProvider? _serviceProvider;
     private BusBuddyDbContext? _context;
     private DriversViewModel? _driversViewModel;
-    private VehiclesViewModel? _vehiclesViewModel;
+    private BusBuddy.WPF.ViewModels.Vehicle.VehiclesViewModel? _vehiclesViewModel;
     private DashboardViewModel? _dashboardViewModel;
 
     #region Test Infrastructure Setup
@@ -65,33 +67,33 @@ public class Phase2ComprehensiveTestImplementation
         // Enhanced test data for Phase 2 comprehensive testing
         var drivers = new[]
         {
-            new Driver { DriverId = 1, DriverName = "John Smith", Status = "Active", LicenseNumber = "D123456", ExperienceYears = 15 },
-            new Driver { DriverId = 2, DriverName = "Sarah Johnson", Status = "Active", LicenseNumber = "D789012", ExperienceYears = 8 },
-            new Driver { DriverId = 3, DriverName = "Mike Wilson", Status = "Inactive", LicenseNumber = "D345678", ExperienceYears = 12 },
-            new Driver { DriverId = 4, DriverName = "Emily Davis", Status = "Active", LicenseNumber = "D567890", ExperienceYears = 5 },
-            new Driver { DriverId = 5, DriverName = "Robert Brown", Status = "Training", LicenseNumber = "D234567", ExperienceYears = 2 }
+            new Driver { DriverId = 1, DriverName = "John Smith", Status = "Active", DriversLicenceType = "D123456" },
+            new Driver { DriverId = 2, DriverName = "Sarah Johnson", Status = "Active", DriversLicenceType = "D789012" },
+            new Driver { DriverId = 3, DriverName = "Mike Wilson", Status = "Inactive", DriversLicenceType = "D345678" },
+            new Driver { DriverId = 4, DriverName = "Emily Davis", Status = "Active", DriversLicenceType = "D567890" },
+            new Driver { DriverId = 5, DriverName = "Robert Brown", Status = "Training", DriversLicenceType = "D234567" }
         };
 
-        var vehicles = new[]
+        var buses = new[]
         {
-            new Vehicle { Id = 1, Make = "Blue Bird", Model = "Vision", PlateNumber = "Bus-001", Capacity = 72, Status = "Active" },
-            new Vehicle { Id = 2, Make = "Blue Bird", Model = "Vision", PlateNumber = "Bus-002", Capacity = 71, Status = "Active" },
-            new Vehicle { Id = 3, Make = "Thomas", Model = "C2", PlateNumber = "Bus-003", Capacity = 77, Status = "Maintenance" },
-            new Vehicle { Id = 4, Make = "IC Bus", Model = "CE Series", PlateNumber = "Bus-004", Capacity = 75, Status = "Active" },
-            new Vehicle { Id = 5, Make = "Blue Bird", Model = "All American", PlateNumber = "Bus-005", Capacity = 72, Status = "Out of Service" }
+            new Bus { VehicleId = 1, BusNumber = "Bus-001", Make = "Blue Bird", Model = "Vision", Year = 2019, SeatingCapacity = 72, Status = "Active" },
+            new Bus { VehicleId = 2, BusNumber = "Bus-002", Make = "Blue Bird", Model = "Vision", Year = 2020, SeatingCapacity = 71, Status = "Active" },
+            new Bus { VehicleId = 3, BusNumber = "Bus-003", Make = "Thomas", Model = "C2", Year = 2018, SeatingCapacity = 77, Status = "Maintenance" },
+            new Bus { VehicleId = 4, BusNumber = "Bus-004", Make = "IC Bus", Model = "CE Series", Year = 2021, SeatingCapacity = 75, Status = "Active" },
+            new Bus { VehicleId = 5, BusNumber = "Bus-005", Make = "Blue Bird", Model = "All American", Year = 2017, SeatingCapacity = 72, Status = "Out of Service" }
         };
 
         var activities = new[]
         {
-            new Activity { Id = 1, Name = "Morning Route A", Date = DateTime.Today, Time = "07:30 AM", Location = "North Campus", Status = "Scheduled" },
-            new Activity { Id = 2, Name = "Morning Route B", Date = DateTime.Today, Time = "08:00 AM", Location = "South Campus", Status = "In Progress" },
-            new Activity { Id = 3, Name = "Afternoon Route A", Date = DateTime.Today, Time = "03:30 PM", Location = "North Campus", Status = "Confirmed" },
-            new Activity { Id = 4, Name = "Field Trip - Museum", Date = DateTime.Today.AddDays(1), Time = "09:00 AM", Location = "City Museum", Status = "Scheduled" },
-            new Activity { Id = 5, Name = "Sports Event Transport", Date = DateTime.Today.AddDays(-1), Time = "06:00 PM", Location = "Sports Complex", Status = "Completed" }
+            new Activity { ActivityId = 1, ActivityType = "Morning Route A", Date = DateTime.Today, LeaveTime = new TimeSpan(7,30,0), Destination = "North Campus", Status = "Scheduled" },
+            new Activity { ActivityId = 2, ActivityType = "Morning Route B", Date = DateTime.Today, LeaveTime = new TimeSpan(8,0,0), Destination = "South Campus", Status = "In Progress" },
+            new Activity { ActivityId = 3, ActivityType = "Afternoon Route A", Date = DateTime.Today, LeaveTime = new TimeSpan(15,30,0), Destination = "North Campus", Status = "Confirmed" },
+            new Activity { ActivityId = 4, ActivityType = "Field Trip - Museum", Date = DateTime.Today.AddDays(1), LeaveTime = new TimeSpan(9,0,0), Destination = "City Museum", Status = "Scheduled" },
+            new Activity { ActivityId = 5, ActivityType = "Sports Event Transport", Date = DateTime.Today.AddDays(-1), LeaveTime = new TimeSpan(18,0,0), Destination = "Sports Complex", Status = "Completed" }
         };
 
         _context.Drivers.AddRange(drivers);
-        _context.Vehicles.AddRange(vehicles);
+        _context.Vehicles.AddRange(buses);
         _context.Activities.AddRange(activities);
         _context.SaveChanges();
     }
@@ -101,7 +103,7 @@ public class Phase2ComprehensiveTestImplementation
         if (_context == null) return;
 
         _driversViewModel = new DriversViewModel(_context);
-        _vehiclesViewModel = new VehiclesViewModel();
+        _vehiclesViewModel = new BusBuddy.WPF.ViewModels.Vehicle.VehiclesViewModel();
         _dashboardViewModel = new DashboardViewModel();
     }
 

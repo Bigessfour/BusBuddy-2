@@ -407,6 +407,15 @@ CConversionLog*
 *.sqlite          # Consider using Git LFS for SQLite databases
 *.bak             # Consider using Git LFS for large backup files
 
+# PowerShell Documentation Management
+PowerShell/*.pdf  # Exclude large PDF documentation files (e.g., powershell-scripting-powershell-7.5.pdf)
+!Documentation/PowerShell-7.5.2-Reference.md  # Include AI-accessible reference
+!Tools/Scripts/PDF-to-Markdown-Converter.ps1  # Include conversion utilities
+temp_pdf_conversion/  # Exclude temporary conversion files
+*.hocr  # Exclude OCR output files
+page_*.png  # Exclude page image files
+page_*.tiff  # Exclude page image files
+
 # Syncfusion Documentation and Large Files (NEVER commit these!)
 SF Documentation/
 libs/*/Utilities/Extensions/VS*/

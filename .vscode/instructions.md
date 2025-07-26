@@ -80,6 +80,24 @@ if ($failedRun) {
 }
 ```
 
+### 6. **Git Repository Management & PowerShell Equivalents**
+```powershell
+# STEP 1: Check repository health and .gitignore effectiveness
+bb-git-check -CheckTracked -ShowStats
+
+# STEP 2: Get PowerShell equivalents for Unix git commands
+bb-git-help
+
+# STEP 3: Use PowerShell-native git commands (avoid grep, head, tail, wc)
+# ❌ DON'T: git ls-files | grep "\.cs$" | head -10
+# ✅ DO: git ls-files | Where-Object { $_ -match "\.cs$" } | Select-Object -First 10
+
+# STEP 4: PowerShell git analysis patterns
+git ls-files | Where-Object { $_ -match "bin/|obj/|\.cache" }  # Find build artifacts
+git status --porcelain | Where-Object { $_ -match "^.M" }     # Modified files only
+(git ls-files | Measure-Object).Count                          # Count tracked files
+```
+
 ## 🔧 **Mandatory BusBuddy PowerShell Usage Pattern**
 
 ### **Before Manual Debugging:**
@@ -102,6 +120,13 @@ if ($failedRun) {
 - **Follow API compliance**: PowerShell 7.5 optimized patterns and enhanced JSON handling
 - **Leverage existing infrastructure**: Enhanced error handling, logging, structured reporting
 - **GitHub Actions Integration**: Use `gh` CLI with PowerShell-compatible commands (no `head`, `tail`, etc.)
+- **PowerShell Git Commands**: Use `bb-git-help` for PowerShell equivalents of Unix commands
+
+### **PowerShell vs Unix Command Guidelines:**
+- ❌ **Avoid**: `grep`, `head`, `tail`, `wc`, `awk`, `sed` (Unix tools not available in PowerShell)
+- ✅ **Use**: `Where-Object`, `Select-Object -First`, `Measure-Object`, ForEach-Object` (PowerShell native)
+- ✅ **Example**: `git ls-files | Where-Object { $_ -match "\.cs$" }` instead of `git ls-files | grep "\.cs$"`
+- ✅ **Reference**: Use `bb-git-help` for complete PowerShell equivalents guide
 
 ## 📊 **BusBuddy PowerShell Advantage Examples**
 
@@ -189,11 +214,15 @@ bb-env-check                  # Environment validation
 bb-commands -Category Essential # List essential commands
 bb-happiness                  # Get motivated!
 
+# Git & Repository Management
+bb-git-check -CheckTracked -ShowStats  # Repository analysis and .gitignore check
+bb-git-help                            # PowerShell equivalents for Unix git commands
+
 # PowerShell 7.5 Feature Testing
 Test-PowerShell75Features -ShowBenchmarks
 
 # Configuration validation
-Test-BusBuddyConfiguration -AllowComments -AllowTrailingCommas
+Test-BusBuddyConfiguration -AllowComments -AllowTrailingComments
 ```
 
 **🎯 Lock this behavior into muscle memory: BusBuddy PowerShell FIRST, manual debugging LAST!**

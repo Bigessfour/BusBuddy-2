@@ -53,31 +53,31 @@ public class Phase1ValidationTests
             new Driver { DriverId = 3, DriverName = "Mike Wilson", Status = "Inactive", LicenseNumber = "D345678" }
         };
 
-        // Add test vehicles
+        // Add test vehicles as Bus objects for BusBuddyDbContext
         var vehicles = new[]
         {
-            new Vehicle { Id = 1, Make = "Blue Bird", Model = "Vision", PlateNumber = "Bus-001", Capacity = 72 },
-            new Vehicle { Id = 2, Make = "Blue Bird", Model = "Vision", PlateNumber = "Bus-002", Capacity = 71 },
-            new Vehicle { Id = 3, Make = "Thomas", Model = "C2", PlateNumber = "Bus-003", Capacity = 77 }
+            new Bus { VehicleId = 1, Make = "Blue Bird", Model = "Vision", LicenseNumber = "Bus-001", SeatingCapacity = 72 },
+            new Bus { VehicleId = 2, Make = "Blue Bird", Model = "Vision", LicenseNumber = "Bus-002", SeatingCapacity = 71 },
+            new Bus { VehicleId = 3, Make = "Thomas", Model = "C2", LicenseNumber = "Bus-003", SeatingCapacity = 77 }
         };
 
         // Add test activities
         var activities = new[]
         {
             new Activity {
-                Id = 1,
-                Name = "Morning Route",
+                ActivityId = 1,
+                ActivityType = "Morning Route",
                 Date = DateTime.Today,
-                Time = "08:00 AM",
-                Location = "School Campus",
+                LeaveTime = TimeSpan.FromHours(8),
+                Destination = "School Campus",
                 Status = "Scheduled"
             },
             new Activity {
-                Id = 2,
-                Name = "Afternoon Route",
+                ActivityId = 2,
+                ActivityType = "Afternoon Route",
                 Date = DateTime.Today,
-                Time = "03:30 PM",
-                Location = "School Campus",
+                LeaveTime = TimeSpan.FromHours(15.5),
+                Destination = "School Campus",
                 Status = "Confirmed"
             }
         };
@@ -136,20 +136,20 @@ public class Phase1ValidationTests
         // Arrange & Act
         var activity = new Activity
         {
-            Id = 999,
-            Name = "Test Activity",
+            ActivityId = 999,
+            ActivityType = "Test Activity",
             Date = DateTime.Today,
-            Time = "12:00 PM",
-            Location = "Test Location",
+            LeaveTime = TimeSpan.FromHours(12),
+            Destination = "Test Location",
             Status = "Test Status"
         };
 
         // Assert with FluentAssertions
-        activity.Id.Should().Be(999);
-        activity.Name.Should().Be("Test Activity");
+        activity.ActivityId.Should().Be(999);
+        activity.ActivityType.Should().Be("Test Activity");
         activity.Date.Should().Be(DateTime.Today);
-        activity.Time.Should().Be("12:00 PM");
-        activity.Location.Should().Be("Test Location");
+        activity.LeaveTime.Should().Be(TimeSpan.FromHours(12));
+        activity.Destination.Should().Be("Test Location");
         activity.Status.Should().Be("Test Status");
     }
 
@@ -164,7 +164,8 @@ public class Phase1ValidationTests
         _context.Should().NotBeNull();
 
         // Act
-        var drivers = _context.Drivers.ToList();
+        _context.Should().NotBeNull("Context should be initialized");
+        var drivers = _context!.Drivers.ToList();
 
         // Assert with FluentAssertions
         drivers.Should().HaveCountGreaterThanOrEqualTo(3, "should have at least 3 test drivers");
@@ -179,12 +180,13 @@ public class Phase1ValidationTests
         _context.Should().NotBeNull();
 
         // Act
-        var vehicles = _context.Vehicles.ToList();
+        _context.Should().NotBeNull("Context should be initialized");
+        var vehicles = _context!.Vehicles.ToList();
 
         // Assert with FluentAssertions
         vehicles.Should().HaveCountGreaterThanOrEqualTo(3, "should have at least 3 test vehicles");
         vehicles.Should().Contain(v => v.Make == "Blue Bird", "should contain Blue Bird vehicles");
-        vehicles.Should().Contain(v => v.PlateNumber.StartsWith("Bus-"), "should have proper plate numbers");
+        vehicles.Should().Contain(v => v.LicenseNumber.StartsWith("Bus-"), "should have proper license numbers");
     }
 
     [Test]
@@ -194,11 +196,12 @@ public class Phase1ValidationTests
         _context.Should().NotBeNull();
 
         // Act
-        var activities = _context.Activities.ToList();
+        _context.Should().NotBeNull("Context should be initialized");
+        var activities = _context!.Activities.ToList();
 
         // Assert with FluentAssertions
         activities.Should().HaveCountGreaterThanOrEqualTo(2, "should have at least 2 test activities");
-        activities.Should().Contain(a => a.Name == "Morning Route", "should contain Morning Route");
+        activities.Should().Contain(a => a.ActivityType == "Morning Route", "should contain Morning Route");
         activities.Should().Contain(a => a.Status == "Scheduled", "should have scheduled activities");
     }
 
@@ -211,7 +214,7 @@ public class Phase1ValidationTests
     {
         // Arrange
         _context.Should().NotBeNull();
-        var initialCount = _context.Drivers.Count();
+        var initialCount = _context!.Drivers.Count();
 
         // Act - Create
         var newDriver = new Driver
@@ -260,21 +263,21 @@ public class Phase1ValidationTests
         _context.Should().NotBeNull();
 
         // Act & Assert - Drivers with FluentAssertions
-        var drivers = _context.Drivers.ToList();
-        drivers.Should().Contain(d => d.LicenseNumber?.StartsWith("D") == true, "drivers should have license numbers starting with D");
+        var drivers = _context!.Drivers.ToList();
+        drivers.Should().Contain(d => d.LicenseNumber != null && d.LicenseNumber.StartsWith('D'), "drivers should have license numbers starting with D");
         drivers.Should().Contain(d => d.Status == "Active", "should have active drivers");
         drivers.Should().Contain(d => d.Status == "Inactive", "should have inactive drivers for testing");
 
         // Act & Assert - Vehicles with FluentAssertions
         var vehicles = _context.Vehicles.ToList();
-        vehicles.Should().OnlyContain(v => v.Capacity > 0, "all vehicles should have capacity > 0");
+        vehicles.Should().OnlyContain(v => v.SeatingCapacity > 0, "all vehicles should have seating capacity > 0");
         vehicles.Should().Contain(v => v.Make == "Blue Bird", "should include Blue Bird buses");
         vehicles.Should().Contain(v => v.Make == "Thomas", "should include Thomas buses");
 
         // Act & Assert - Activities with FluentAssertions
         var activities = _context.Activities.ToList();
-        activities.Should().Contain(a => a.Time?.Contains("AM") == true, "should have morning activities");
-        activities.Should().Contain(a => a.Time?.Contains("PM") == true, "should have afternoon activities");
+        activities.Should().Contain(a => a.LeaveTime < TimeSpan.FromHours(12), "should have morning activities");
+        activities.Should().Contain(a => a.LeaveTime >= TimeSpan.FromHours(12), "should have afternoon activities");
         activities.Should().Contain(a => a.Status == "Scheduled", "should have scheduled activities");
         activities.Should().Contain(a => a.Status == "Confirmed", "should have confirmed activities");
     }
@@ -292,7 +295,7 @@ public class Phase1ValidationTests
         _context.Should().NotBeNull();
 
         // Act & Assert - Verify all required DbSets exist with FluentAssertions
-        _context.Drivers.Should().NotBeNull("Drivers DbSet should be implemented");
+        _context!.Drivers.Should().NotBeNull("Drivers DbSet should be implemented");
         _context.Vehicles.Should().NotBeNull("Vehicles DbSet should be implemented");
         _context.Activities.Should().NotBeNull("Activities DbSet should be implemented");
 

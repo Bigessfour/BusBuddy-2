@@ -75,7 +75,7 @@ jobs:
           echo "🧪 GitHub Actions Testing Platform - Comprehensive Analysis..."
 
           # Create TestResults directory if it doesn't exist
-          New-Item -ItemType Directory -Path "./TestResults" -Force | Out-Null
+          mkdir -Force ./TestResults 2>$null
 
           # Check if test projects exist
           $testProjects = Get-ChildItem -Path . -Recurse -Include "*.Tests.csproj", "*Test*.csproj" -ErrorAction SilentlyContinue
@@ -94,9 +94,8 @@ jobs:
             echo "📝 No test projects found yet - creating minimal test result for workflow"
             echo "This is normal for early development phase"
 
-            # Create a minimal valid TRX file
-            $trxContent = '<?xml version="1.0" encoding="UTF-8"?><TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"><ResultSummary outcome="Completed"><Counters total="0" executed="0" passed="0" failed="0" /></ResultSummary></TestRun>'
-            $trxContent | Out-File -FilePath "./TestResults/placeholder-results.trx" -Encoding UTF8
+            # Create a minimal valid TRX file (single-line echo to avoid YAML issues)
+            echo '<?xml version="1.0" encoding="UTF-8"?><TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"><ResultSummary outcome="Completed"><Counters total="0" executed="0" passed="0" failed="0" /></ResultSummary></TestRun>' > ./TestResults/placeholder-results.trx
 
             echo "📋 Created placeholder test results for workflow compatibility"
             echo "💡 Ready for comprehensive testing when test projects are added"
@@ -107,10 +106,10 @@ jobs:
           $xamlFiles = (Get-ChildItem -Path . -Recurse -Include "*.xaml" -Exclude "bin","obj" | Measure-Object).Count
 
           echo "� GitHub Actions Testing Platform Analysis:"
-          echo "   📊 C# files ready for testing: $csFiles"
-          echo "   📊 XAML files for UI testing: $xamlFiles"
-          echo "   🎯 Test coverage opportunity: High"
-          echo "   📋 Recommended: Unit tests for ViewModels and Services"
+          echo "   - C# files: $csFiles"
+          echo "   - XAML files: $xamlFiles"
+          echo "   - Test coverage opportunity: High"
+          echo "   - Recommended: Add unit tests for ViewModels, Services, and Core logic"
       - name: 📊 Generate coverage report
         id: coverage-step
         run: |
@@ -327,4 +326,5 @@ jobs:
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| CodeQL Analysis | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
           echo "| Dependency Scan | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Vulnerable Packages | ${{ steps.vuln-scan.outputs.vulnerable-packages || '0' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Vulnerable Packages | ${{ steps.vuln-scan.outputs.vulnerable-packages || '0' }} |" >> $GITHUB_STEP_SUMMARY

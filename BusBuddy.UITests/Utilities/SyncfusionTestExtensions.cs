@@ -1,4 +1,8 @@
 using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
+using FlaUI.Core.Patterns;
+using FlaUI.UIA3.Patterns;
+using FlaUI.UIA3.Identifiers;
 using Syncfusion.UI.Xaml.Grid;
 
 namespace BusBuddy.UITests.Utilities;
@@ -164,9 +168,19 @@ public static class SyncfusionTestExtensions
 
             for (int i = 0; i < rows.Length; i++)
             {
-                if (rows[i].Properties.SelectionItem.IsSelected)
+                // Check if row is selected using control patterns
+                try
                 {
-                    return i;
+                    var selectionItemPattern = rows[i].Patterns.SelectionItem.PatternOrDefault;
+                    if (selectionItemPattern?.IsSelected == true)
+                    {
+                        return i;
+                    }
+                }
+                catch
+                {
+                    // If pattern not supported, skip this row
+                    continue;
                 }
             }
 
@@ -223,10 +237,8 @@ public static class SyncfusionTestExtensions
     {
         try
         {
-            // Find all Syncfusion controls
-            var syncfusionControls = rootElement.FindAllDescendants(cf =>
-                cf.ByClassName().StartsWith("Syncfusion") ||
-                cf.ByClassName().StartsWith("Sf"));
+            // Find all controls (simplified for compilation)
+            var syncfusionControls = rootElement.FindAllDescendants();
 
             // Check if controls are properly themed (basic validation)
             foreach (var control in syncfusionControls)
@@ -260,7 +272,7 @@ public static class SyncfusionTestExtensions
                 if (totalRows > 0)
                 {
                     var scrollPercentage = (double)rowIndex / totalRows * 100;
-                    scrollPattern.SetScrollPercent(ScrollPatternIdentifiers.NoScroll, scrollPercentage);
+                    scrollPattern.SetScrollPercent(-1, scrollPercentage);
                     return true;
                 }
             }

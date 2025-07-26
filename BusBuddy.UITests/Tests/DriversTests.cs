@@ -99,7 +99,8 @@ public class DriversTests
 
         // Assert with FluentAssertions
         filteredDrivers.Should().NotBeEmpty("should find drivers by email domain");
-        filteredDrivers.Should().OnlyContain(d => d.DriverEmail?.Contains(searchTerm) == true,
+        // Avoid null-propagation in expression tree: use explicit null check
+        filteredDrivers.Should().OnlyContain(d => !string.IsNullOrEmpty(d.DriverEmail) && d.DriverEmail.Contains(searchTerm, StringComparison.OrdinalIgnoreCase),
                      "all results should have matching email domain");
     }
 
@@ -109,8 +110,9 @@ public class DriversTests
     public void Drivers_StatusFilter_ShouldShowOnlyActiveDrivers()
     {
         // Arrange & Act
-        var activeDrivers = _testDrivers!.Where(d => d.Status == "Active").ToList();
-        var inactiveDrivers = _testDrivers.Where(d => d.Status != "Active").ToList();
+        var testDrivers = _testDrivers ?? new List<Driver>();
+        var activeDrivers = testDrivers.Where(d => d.Status == "Active").ToList();
+        var inactiveDrivers = testDrivers.Where(d => d.Status != "Active").ToList();
 
         // Assert with FluentAssertions
         activeDrivers.Should().NotBeEmpty("should have active drivers");
@@ -186,9 +188,9 @@ public class DriversTests
         canDelete.Should().BeFalse("Delete command should be disabled when no driver is selected");
     }
 
-    [TestMethod]
-    [TestCategory("Drivers")]
-    [TestCategory("Performance")]
+    [Test]
+    [Category("Drivers")]
+    [Category("Performance")]
     public void Drivers_DataLoading_ShouldBeEfficient()
     {
         // Arrange
@@ -201,15 +203,14 @@ public class DriversTests
         stopwatch.Stop();
 
         // Assert
-        Assert.IsTrue(stopwatch.ElapsedMilliseconds < 500,
-                     $"Driver operations should complete quickly. Actual: {stopwatch.ElapsedMilliseconds}ms");
-        Assert.IsTrue(drivers.Count > 0, "Should load drivers");
-        Assert.IsTrue(filteredDrivers.Count > 0, "Should filter drivers");
+        stopwatch.ElapsedMilliseconds.Should().BeLessThan(500, $"Driver operations should complete quickly. Actual: {stopwatch.ElapsedMilliseconds}ms");
+        drivers.Count.Should().BeGreaterThan(0, "Should load drivers");
+        filteredDrivers.Count.Should().BeGreaterThan(0, "Should filter drivers");
     }
 
-    [TestMethod]
-    [TestCategory("Drivers")]
-    [TestCategory("Integration")]
+    [Test]
+    [Category("Drivers")]
+    [Category("Integration")]
     public void Drivers_CRUDOperations_ShouldWorkCorrectly()
     {
         // Test Create
@@ -225,8 +226,8 @@ public class DriversTests
 
         // Verify Create
         var createdDriver = _testContext.Drivers.Find(999);
-        Assert.IsNotNull(createdDriver, "Should create new driver");
-        Assert.AreEqual("Test New Driver", createdDriver.DriverName);
+        createdDriver.Should().NotBeNull("Should create new driver");
+        createdDriver!.DriverName.Should().Be("Test New Driver");
 
         // Test Update
         createdDriver.DriverName = "Updated Driver Name";
@@ -234,7 +235,7 @@ public class DriversTests
 
         // Verify Update
         var updatedDriver = _testContext.Drivers.Find(999);
-        Assert.AreEqual("Updated Driver Name", updatedDriver!.DriverName);
+        updatedDriver!.DriverName.Should().Be("Updated Driver Name");
 
         // Test Delete
         _testContext.Drivers.Remove(updatedDriver);
@@ -242,82 +243,80 @@ public class DriversTests
 
         // Verify Delete
         var deletedDriver = _testContext.Drivers.Find(999);
-        Assert.IsNull(deletedDriver, "Driver should be deleted");
+        deletedDriver.Should().BeNull("Driver should be deleted");
     }
 
-    [TestMethod]
-    [TestCategory("Drivers")]
-    [TestCategory("EdgeCases")]
+    [Test]
+    [Category("Drivers")]
+    [Category("EdgeCases")]
     public void Drivers_EdgeCases_ShouldHandleEmptyAndNullValues()
     {
         // Test empty search
-        var emptySearchResults = _testDrivers!.Where(d =>
+        var testDrivers = _testDrivers ?? new List<Driver>();
+        var emptySearchResults = testDrivers.Where(d =>
             d.DriverName.Contains("", StringComparison.OrdinalIgnoreCase)).ToList();
-        Assert.AreEqual(_testDrivers.Count, emptySearchResults.Count,
-                       "Empty search should return all drivers");
+        emptySearchResults.Count.Should().Be(testDrivers.Count, "Empty search should return all drivers");
 
         // Test null handling
-        var driversWithoutEmail = _testDrivers.Where(d => string.IsNullOrEmpty(d.DriverEmail)).ToList();
-        Assert.IsTrue(driversWithoutEmail.Count >= 0, "Should handle drivers without email gracefully");
+        var driversWithoutEmail = testDrivers.Where(d => string.IsNullOrEmpty(d.DriverEmail)).ToList();
+        driversWithoutEmail.Count.Should().BeGreaterOrEqualTo(0, "Should handle drivers without email gracefully");
 
         // Test case insensitive search
-        var lowerCaseSearch = _testDrivers.Where(d =>
+        var lowerCaseSearch = testDrivers.Where(d =>
             d.DriverName.Contains("john", StringComparison.OrdinalIgnoreCase)).ToList();
-        var upperCaseSearch = _testDrivers.Where(d =>
+        var upperCaseSearch = testDrivers.Where(d =>
             d.DriverName.Contains("JOHN", StringComparison.OrdinalIgnoreCase)).ToList();
-        Assert.AreEqual(lowerCaseSearch.Count, upperCaseSearch.Count,
-                       "Search should be case insensitive");
+        lowerCaseSearch.Count.Should().Be(upperCaseSearch.Count, "Search should be case insensitive");
     }
 
-    [TestMethod]
-    [TestCategory("Drivers")]
-    [TestCategory("TestInfrastructure")]
+    [Test]
+    [Category("Drivers")]
+    [Category("TestInfrastructure")]
     public void Drivers_TestDataBuilder_ShouldCreateVariedScenarios()
     {
         // Test active driver creation
         var activeDriver = DriverTestDataBuilder.CreateActiveDriver(100, "Active Test Driver");
-        Assert.AreEqual("Active", activeDriver.Status);
-        Assert.IsTrue(activeDriver.TrainingComplete);
+        activeDriver.Status.Should().Be("Active");
+        activeDriver.TrainingComplete.Should().BeTrue();
 
         // Test inactive driver creation
         var inactiveDriver = DriverTestDataBuilder.CreateInactiveDriver(101, "Inactive Test Driver");
-        Assert.AreEqual("Inactive", inactiveDriver.Status);
+        inactiveDriver.Status.Should().Be("Inactive");
 
         // Test trainee driver creation
         var traineeDriver = DriverTestDataBuilder.CreateTraineeDriver(102, "Trainee Test Driver");
-        Assert.AreEqual("Training", traineeDriver.Status);
-        Assert.IsFalse(traineeDriver.TrainingComplete);
+        traineeDriver.Status.Should().Be("Training");
+        traineeDriver.TrainingComplete.Should().BeFalse();
 
         // Test list creation
         var driversList = DriverTestDataBuilder.CreateDriversList(3);
-        Assert.AreEqual(3, driversList.Count);
-        Assert.IsTrue(driversList.All(d => d.DriverId > 0));
-        Assert.IsTrue(driversList.All(d => !string.IsNullOrEmpty(d.DriverName)));
+        driversList.Count.Should().Be(3);
+        driversList.All(d => d.DriverId > 0).Should().BeTrue();
+        driversList.All(d => !string.IsNullOrEmpty(d.DriverName)).Should().BeTrue();
     }
 
-    [TestMethod]
-    [TestCategory("Drivers")]
-    [TestCategory("DataConsistency")]
+    [Test]
+    [Category("Drivers")]
+    [Category("DataConsistency")]
     public void Drivers_DataConsistency_ShouldMaintainIntegrity()
     {
         // Verify no duplicate IDs
-        var driverIds = _testDrivers!.Select(d => d.DriverId).ToList();
+        var testDrivers = _testDrivers ?? new List<Driver>();
+        var driverIds = testDrivers.Select(d => d.DriverId).ToList();
         var uniqueIds = driverIds.Distinct().ToList();
-        Assert.AreEqual(driverIds.Count, uniqueIds.Count, "Driver IDs should be unique");
+        driverIds.Count.Should().Be(uniqueIds.Count, "Driver IDs should be unique");
 
         // Verify no duplicate names
-        var driverNames = _testDrivers.Select(d => d.DriverName).ToList();
+        var driverNames = testDrivers.Select(d => d.DriverName).ToList();
         var uniqueNames = driverNames.Distinct().ToList();
-        Assert.AreEqual(driverNames.Count, uniqueNames.Count, "Driver names should be unique in test data");
+        driverNames.Count.Should().Be(uniqueNames.Count, "Driver names should be unique in test data");
 
         // Verify valid status values
         var validStatuses = new[] { "Active", "Inactive", "Training", "Suspended" };
-        Assert.IsTrue(_testDrivers.All(d => validStatuses.Contains(d.Status)),
-                     "All drivers should have valid status values");
+        testDrivers.All(d => validStatuses.Contains(d.Status)).Should().BeTrue("All drivers should have valid status values");
 
         // Verify consistent phone number format
-        var driversWithPhones = _testDrivers.Where(d => !string.IsNullOrEmpty(d.DriverPhone)).ToList();
-        Assert.IsTrue(driversWithPhones.All(d => d.DriverPhone!.Contains("(")),
-                     "Phone numbers should be consistently formatted");
+        var driversWithPhones = testDrivers.Where(d => !string.IsNullOrEmpty(d.DriverPhone)).ToList();
+        driversWithPhones.All(d => d.DriverPhone!.Contains('(')).Should().BeTrue("Phone numbers should be consistently formatted");
     }
 }

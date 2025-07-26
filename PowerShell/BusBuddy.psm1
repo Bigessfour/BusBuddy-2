@@ -434,6 +434,594 @@ function Test-BusBuddyConfiguration {
 
 #endregion
 
+#region Git and Repository Functions
+
+function Invoke-BusBuddyGitIgnoreCheck {
+    <#
+    .SYNOPSIS
+        Analyze repository for files that should be ignored
+
+    .DESCRIPTION
+        Checks for tracked build artifacts, temporary files, and other files that should typically be ignored.
+        Provides PowerShell equivalents for common Unix git commands.
+
+    .PARAMETER ShowSuggestions
+        Show suggestions for improving .gitignore
+
+    .PARAMETER CheckTracked
+        Check currently tracked files for potential issues
+
+    .PARAMETER ShowStats
+        Display repository statistics
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$ShowSuggestions,
+        [switch]$CheckTracked,
+        [switch]$ShowStats
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    if (-not $projectRoot) {
+        Write-BusBuddyError -Message "Project root not found" -RecommendedAction "Ensure you're in a Bus Buddy project directory"
+        return
+    }
+
+    Push-Location $projectRoot
+
+    try {
+        Write-BusBuddyStatus "🔍 Git Repository Analysis" -Status Info
+        Write-Host ""
+
+        if ($CheckTracked) {
+            Write-BusBuddyStatus "Checking for tracked build artifacts..." -Status Info
+
+            # PowerShell equivalent of: git ls-files | grep -E "(bin/|obj/|\.cache|\.user|\.suo)"
+            $buildArtifacts = git ls-files | Where-Object { $_ -match "(bin/|obj/|\.cache|\.user|\.suo|\.tmp|\.temp)" }
+
+            if ($buildArtifacts) {
+                Write-BusBuddyStatus "⚠️ Found tracked build artifacts:" -Status Warning
+                $buildArtifacts | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+                Write-Host ""
+                Write-Host "To remove these from tracking:" -ForegroundColor Cyan
+                Write-Host "  git rm --cached -r bin/ obj/ *.cache *.user *.suo" -ForegroundColor Green
+            }
+            else {
+                Write-BusBuddyStatus "✅ No build artifacts are being tracked" -Status Success
+            }
+
+            # Check for log and temporary files
+            $tempFiles = git ls-files | Where-Object { $_ -match "\.(log|tmp|temp|bak)$" }
+            if ($tempFiles) {
+                Write-BusBuddyStatus "⚠️ Found tracked temporary files:" -Status Warning
+                $tempFiles | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+            }
+            else {
+                Write-BusBuddyStatus "✅ No temporary files are being tracked" -Status Success
+            }
+        }
+
+        if ($ShowStats) {
+            Write-BusBuddyStatus "Repository Statistics:" -Status Info
+
+            $allFiles = git ls-files
+            $totalCount = ($allFiles | Measure-Object).Count
+
+            Write-Host "Total tracked files: $totalCount" -ForegroundColor Cyan
+
+            # File type breakdown (PowerShell equivalent of Unix commands)
+            $fileTypes = $allFiles | Group-Object { Split-Path $_ -Extension } |
+            Sort-Object Count -Descending | Select-Object -First 10
+
+            Write-Host ""
+            Write-Host "Top file types:" -ForegroundColor Yellow
+            foreach ($type in $fileTypes) {
+                $extension = if ($type.Name) { $type.Name } else { "(no extension)" }
+                Write-Host "  $($type.Count.ToString().PadLeft(3)) files - $extension" -ForegroundColor Gray
+            }
+        }
+
+        if ($ShowSuggestions) {
+            Write-Host ""
+            Write-BusBuddyStatus "💡 PowerShell Git Command Equivalents:" -Status Info
+
+            $equivalents = @(
+                @{ Unix = "git ls-files | grep pattern"; PowerShell = 'git ls-files | Where-Object { $_ -match "pattern" }' }
+                @{ Unix = "git status | grep modified"; PowerShell = 'git status --porcelain | Where-Object { $_ -match "^.M" }' }
+                @{ Unix = "find . -name '*.log'"; PowerShell = "Get-ChildItem -Recurse -Filter '*.log'" }
+                @{ Unix = "git ls-files | wc -l"; PowerShell = "(git ls-files | Measure-Object).Count" }
+                @{ Unix = "git log --oneline | head -5"; PowerShell = "git log --oneline | Select-Object -First 5" }
+            )
+
+            foreach ($equiv in $equivalents) {
+                Write-Host "Unix: " -ForegroundColor Red -NoNewline
+                Write-Host $equiv.Unix -ForegroundColor White
+                Write-Host "PS:   " -ForegroundColor Blue -NoNewline
+                Write-Host $equiv.PowerShell -ForegroundColor Green
+                Write-Host ""
+            }
+        }
+
+        # Check .gitignore effectiveness
+        Write-BusBuddyStatus "Checking .gitignore effectiveness..." -Status Info
+
+        $untracked = git ls-files --others --exclude-standard
+        if ($untracked) {
+            $untrackedCount = ($untracked | Measure-Object).Count
+            Write-Host "Untracked files not ignored: $untrackedCount" -ForegroundColor Yellow
+            if ($untrackedCount -le 5) {
+                $untracked | ForEach-Object { Write-Host "  - $_" -ForegroundColor Gray }
+            }
+        }
+        else {
+            Write-BusBuddyStatus "✅ All untracked files are properly ignored" -Status Success
+        }
+
+    }
+    catch {
+        Write-BusBuddyError -Message "Git analysis error: $($_.Exception.Message)" -Exception $_.Exception
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Get-BusBuddyGitEquivalents {
+    <#
+    .SYNOPSIS
+        Display PowerShell equivalents for common Unix git commands
+
+    .DESCRIPTION
+        Provides a quick reference for PowerShell alternatives to Unix commands commonly used with git
+    #>
+    [CmdletBinding()]
+    param()
+
+    Write-Host ""
+    Write-BusBuddyStatus "🔧 PowerShell Git Command Reference" -Status Info
+    Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+
+    $commands = @(
+        @{
+            Category    = "File Filtering"
+            Unix        = "git ls-files | grep '\.cs$'"
+            PowerShell  = 'git ls-files | Where-Object { $_ -match "\.cs$" }'
+            Description = "Find all C# files"
+        }
+        @{
+            Category    = "File Filtering"
+            Unix        = "git ls-files | grep -v test"
+            PowerShell  = 'git ls-files | Where-Object { $_ -notmatch "test" }'
+            Description = "Exclude test files"
+        }
+        @{
+            Category    = "Counting"
+            Unix        = "git ls-files | wc -l"
+            PowerShell  = "(git ls-files | Measure-Object).Count"
+            Description = "Count tracked files"
+        }
+        @{
+            Category    = "Limiting Output"
+            Unix        = "git log --oneline | head -10"
+            PowerShell  = "git log --oneline | Select-Object -First 10"
+            Description = "Show first 10 commits"
+        }
+        @{
+            Category    = "Status Filtering"
+            Unix        = "git status --porcelain | grep '^M'"
+            PowerShell  = 'git status --porcelain | Where-Object { $_ -match "^.M" }'
+            Description = "Show only modified files"
+        }
+        @{
+            Category    = "File Search"
+            Unix        = "find . -name '*.log' -type f"
+            PowerShell  = "Get-ChildItem -Recurse -Filter '*.log' -File"
+            Description = "Find log files recursively"
+        }
+    )
+
+    $currentCategory = ""
+    foreach ($cmd in $commands) {
+        if ($cmd.Category -ne $currentCategory) {
+            $currentCategory = $cmd.Category
+            Write-Host ""
+            Write-Host $currentCategory -ForegroundColor Cyan
+            Write-Host ("-" * $currentCategory.Length) -ForegroundColor DarkCyan
+        }
+
+        Write-Host "  📄 " -ForegroundColor Blue -NoNewline
+        Write-Host $cmd.Description -ForegroundColor White
+        Write-Host "     Unix: " -ForegroundColor Red -NoNewline
+        Write-Host $cmd.Unix -ForegroundColor Gray
+        Write-Host "     PS:   " -ForegroundColor Green -NoNewline
+        Write-Host $cmd.PowerShell -ForegroundColor White
+        Write-Host ""
+    }
+
+    Write-Host ""
+    Write-BusBuddyStatus "💡 Pro Tips:" -Status Info
+    Write-Host "  • Use 'bb-git-check' for repository analysis" -ForegroundColor Yellow
+    Write-Host "  • PowerShell has better object handling than Unix pipes" -ForegroundColor Yellow
+    Write-Host "  • Use Get-Help for detailed parameter information" -ForegroundColor Yellow
+    Write-Host ""
+}
+
+function Invoke-BusBuddyGitRepairKit {
+    <#
+    .SYNOPSIS
+        Advanced git repository repair and optimization toolkit
+
+    .DESCRIPTION
+        Handles common git pitfalls including assume-unchanged files, large files,
+        performance issues, and repository alignment problems
+
+    .PARAMETER CheckAssumeUnchanged
+        Check for and fix assume-unchanged files
+
+    .PARAMETER AggressiveCleanup
+        Perform aggressive garbage collection for performance
+
+    .PARAMETER CheckBranch
+        Verify current branch and provide switching guidance
+
+    .PARAMETER FullRepair
+        Run all repair operations
+
+    .PARAMETER Force
+        Force operations without confirmation
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$CheckAssumeUnchanged,
+        [switch]$AggressiveCleanup,
+        [switch]$CheckBranch,
+        [switch]$FullRepair,
+        [switch]$Force
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    if (-not $projectRoot) {
+        Write-BusBuddyError -Message "Project root not found" -RecommendedAction "Ensure you're in a Bus Buddy project directory"
+        return
+    }
+
+    Push-Location $projectRoot
+
+    try {
+        Write-BusBuddyStatus "🔧 Git Repository Repair Kit" -Status Info
+        Write-Host "════════════════════════════════════════" -ForegroundColor DarkGray
+        Write-Host ""
+
+        # Set all switches if FullRepair is specified
+        if ($FullRepair) {
+            $CheckAssumeUnchanged = $true
+            $AggressiveCleanup = $true
+            $CheckBranch = $true
+        }
+
+        $issuesFound = 0
+        $issuesFixed = 0
+
+        # Check for assume-unchanged files
+        if ($CheckAssumeUnchanged) {
+            Write-BusBuddyStatus "Checking for assume-unchanged files..." -Status Info
+
+            try {
+                # PowerShell equivalent of: git ls-files -v | grep '^[[:lower:]]'
+                $assumeUnchangedFiles = git ls-files -v | Where-Object { $_ -match '^[a-z]' }
+
+                if ($assumeUnchangedFiles) {
+                    $issuesFound++
+                    Write-BusBuddyStatus "⚠️ Found files marked as assume-unchanged:" -Status Warning
+
+                    foreach ($file in $assumeUnchangedFiles) {
+                        $fileName = $file.Substring(2)  # Remove the status prefix
+                        Write-Host "  - $fileName" -ForegroundColor Yellow
+
+                        if ($Force -or (Read-Host "Fix assume-unchanged for '$fileName'? (y/N)") -eq 'y') {
+                            git update-index --no-assume-unchanged $fileName
+                            if ($LASTEXITCODE -eq 0) {
+                                Write-Host "    ✅ Fixed: $fileName" -ForegroundColor Green
+                                $issuesFixed++
+                            }
+                            else {
+                                Write-Host "    ❌ Failed to fix: $fileName" -ForegroundColor Red
+                            }
+                        }
+                    }
+                }
+                else {
+                    Write-BusBuddyStatus "✅ No assume-unchanged files found" -Status Success
+                }
+            }
+            catch {
+                Write-BusBuddyStatus "Error checking assume-unchanged files: $($_.Exception.Message)" -Status Warning
+            }
+        }
+
+        # Aggressive cleanup for performance
+        if ($AggressiveCleanup) {
+            Write-Host ""
+            Write-BusBuddyStatus "Performing aggressive cleanup for performance..." -Status Info
+
+            if ($Force -or (Read-Host "This may take time. Proceed with aggressive cleanup? (y/N)") -eq 'y') {
+                Write-Host "🧹 Running garbage collection..." -ForegroundColor Yellow
+
+                try {
+                    $gcOutput = git gc --aggressive --prune=now 2>&1
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-BusBuddyStatus "✅ Aggressive cleanup completed successfully" -Status Success
+                        $issuesFixed++
+
+                        # Show size improvement if possible
+                        if ($gcOutput -match "size-pack: (\d+)") {
+                            Write-Host "Repository optimized for better performance" -ForegroundColor Green
+                        }
+                    }
+                    else {
+                        Write-BusBuddyStatus "⚠️ Cleanup completed with warnings" -Status Warning
+                        Write-Host "$gcOutput" -ForegroundColor Yellow
+                    }
+                }
+                catch {
+                    Write-BusBuddyStatus "Error during cleanup: $($_.Exception.Message)" -Status Warning
+                }
+            }
+            else {
+                Write-Host "Skipping aggressive cleanup" -ForegroundColor Gray
+            }
+        }
+
+        # Branch verification
+        if ($CheckBranch) {
+            Write-Host ""
+            Write-BusBuddyStatus "Checking current branch..." -Status Info
+
+            try {
+                $currentBranch = git branch --show-current
+                $isOnMain = ($currentBranch -eq "main") -or ($currentBranch -eq "master")
+
+                Write-Host "Current branch: $currentBranch" -ForegroundColor $(if ($isOnMain) { "Green" } else { "Yellow" })
+
+                if (-not $isOnMain) {
+                    $issuesFound++
+                    Write-BusBuddyStatus "⚠️ Not on main/master branch" -Status Warning
+                    Write-Host "Available branches:" -ForegroundColor Cyan
+
+                    $branches = git branch --all | Where-Object { $_ -notmatch "HEAD" }
+                    foreach ($branch in $branches) {
+                        $cleanBranch = $branch.Trim().TrimStart('*').Trim()
+                        $isCurrentBranch = $branch.StartsWith('*')
+                        $color = if ($isCurrentBranch) { "Green" } else { "Gray" }
+                        Write-Host "  $cleanBranch" -ForegroundColor $color
+                    }
+
+                    Write-Host ""
+                    Write-Host "To switch to main branch:" -ForegroundColor Cyan
+                    Write-Host "  git checkout main" -ForegroundColor White
+                    Write-Host "  # or" -ForegroundColor Gray
+                    Write-Host "  git checkout master" -ForegroundColor White
+                }
+                else {
+                    Write-BusBuddyStatus "✅ On main branch" -Status Success
+                }
+            }
+            catch {
+                Write-BusBuddyStatus "Error checking branch: $($_.Exception.Message)" -Status Warning
+            }
+        }
+
+        # Summary
+        Write-Host ""
+        Write-Host "🏥 Repository Repair Summary:" -ForegroundColor Cyan
+        Write-Host "═══════════════════════════════" -ForegroundColor DarkGray
+        Write-Host "Issues Found: $issuesFound" -ForegroundColor $(if ($issuesFound -eq 0) { "Green" } else { "Yellow" })
+        Write-Host "Issues Fixed: $issuesFixed" -ForegroundColor $(if ($issuesFixed -eq $issuesFound) { "Green" } else { "Yellow" })
+
+        if ($issuesFound -eq 0) {
+            Write-BusBuddyStatus "✅ Repository is in excellent health!" -Status Success
+        }
+        elseif ($issuesFixed -eq $issuesFound) {
+            Write-BusBuddyStatus "✅ All issues have been resolved!" -Status Success
+        }
+        else {
+            Write-BusBuddyStatus "⚠️ Some issues require manual attention" -Status Warning
+        }
+
+    }
+    catch {
+        Write-BusBuddyError -Message "Repository repair error: $($_.Exception.Message)" -Exception $_.Exception
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+
+
+function Start-BusBuddyRepositoryAlignment {
+    <#
+    .SYNOPSIS
+        Complete repository alignment workflow for optimal scanning
+
+    .DESCRIPTION
+        Implements the full repository alignment process including build verification,
+        git status check, and preparation for enhanced error diagnosis
+
+    .PARAMETER IncludeBuild
+        Include build verification in alignment process
+
+    .PARAMETER PushAfterAlignment
+        Automatically push changes after alignment
+
+    .PARAMETER Force
+        Force operations without confirmation
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$IncludeBuild,
+        [switch]$PushAfterAlignment,
+        [switch]$Force
+    )
+
+    Write-BusBuddyStatus "🚌 BusBuddy Repository Alignment Workflow" -Status Info
+    Write-Host "════════════════════════════════════════════════════" -ForegroundColor DarkGray
+    Write-Host ""
+    Write-Host "🎯 Goal: Aligned repos enable seamless journeys!" -ForegroundColor Cyan
+    Write-Host ""
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    if (-not $projectRoot) {
+        Write-BusBuddyError -Message "Project root not found" -RecommendedAction "Ensure you're in a Bus Buddy project directory"
+        return $false
+    }
+
+    try {
+        # Step 1: Repository repair and health check
+        Write-BusBuddyStatus "Step 1: Repository Health Check & Repair" -Status Info
+        Invoke-BusBuddyGitRepairKit -FullRepair -Force:$Force
+
+        Write-Host ""
+
+        # Step 2: Build verification (if requested)
+        if ($IncludeBuild) {
+            Write-BusBuddyStatus "Step 2: Build Verification" -Status Build
+            $buildSuccess = Invoke-BusBuddyBuild -Configuration Debug -Restore -Verbosity minimal
+
+            if (-not $buildSuccess) {
+                Write-BusBuddyStatus "❌ Build failed - addressing before alignment" -Status Error
+                Write-Host "💡 Build issues must be resolved for complete alignment" -ForegroundColor Yellow
+                return $false
+            }
+            else {
+                Write-BusBuddyStatus "✅ Build verification passed" -Status Success
+            }
+        }
+
+        Write-Host ""
+
+        # Step 3: Enhanced git status
+        Write-BusBuddyStatus "Step 3: Comprehensive Git Status Analysis" -Status Info
+        Get-BusBuddyGitStatus -Detailed -QuickHealth
+
+        Write-Host ""
+
+        # Step 4: Repository statistics
+        Write-BusBuddyStatus "Step 4: Repository Scan Optimization" -Status Info
+
+        # Get comprehensive file statistics
+        $allFiles = git ls-files
+        $totalTracked = ($allFiles | Measure-Object).Count
+
+        # Categorize files for better scanning
+        $fileCategories = @{
+            'Source Code'   = ($allFiles | Where-Object { $_ -match '\.(cs|xaml|ps1|psm1)$' }).Count
+            'Configuration' = ($allFiles | Where-Object { $_ -match '\.(json|config|xml|yml|yaml)$' }).Count
+            'Documentation' = ($allFiles | Where-Object { $_ -match '\.(md|txt|rst)$' }).Count
+            'Project Files' = ($allFiles | Where-Object { $_ -match '\.(csproj|sln|props)$' }).Count
+            'Other'         = 0
+        }
+        $fileCategories.Other = $totalTracked - ($fileCategories.Values | Measure-Object -Sum).Sum
+
+        Write-Host "📊 Repository Scan Profile:" -ForegroundColor Cyan
+        Write-Host "  Total tracked files: $totalTracked" -ForegroundColor White
+        foreach ($category in $fileCategories.GetEnumerator()) {
+            $percentage = if ($totalTracked -gt 0) { [math]::Round(($category.Value / $totalTracked) * 100, 1) } else { 0 }
+            Write-Host "  $($category.Key): $($category.Value) files ($percentage%)" -ForegroundColor Gray
+        }
+
+        # Step 5: Alignment verification
+        Write-Host ""
+        Write-BusBuddyStatus "Step 5: Final Alignment Verification" -Status Info
+
+        $isAligned = $true
+        $alignmentIssues = @()
+
+        # Check git status
+        $gitStatus = git status --porcelain
+        if ($gitStatus) {
+            $alignmentIssues += "Working directory has uncommitted changes"
+            $isAligned = $false
+        }
+
+        # Check branch
+        $currentBranch = git branch --show-current
+        $isOnMain = ($currentBranch -eq "main") -or ($currentBranch -eq "master")
+        if (-not $isOnMain) {
+            $alignmentIssues += "Not on main/master branch (current: $currentBranch)"
+        }
+
+        # Check remote alignment
+        try {
+            $trackingBranch = git rev-parse --abbrev-ref "$currentBranch@{upstream}" 2>$null
+            if ($trackingBranch) {
+                $aheadBehind = git rev-list --left-right --count "$trackingBranch...$currentBranch" 2>$null
+                if ($aheadBehind) {
+                    $parts = $aheadBehind -split '\s+'
+                    $behind = [int]$parts[0]
+                    $ahead = [int]$parts[1]
+
+                    if ($behind -gt 0) {
+                        $alignmentIssues += "$behind commits behind remote"
+                        $isAligned = $false
+                    }
+                    if ($ahead -gt 0) {
+                        $alignmentIssues += "$ahead commits ahead of remote"
+                        if ($PushAfterAlignment) {
+                            Write-BusBuddyStatus "🚀 Auto-pushing commits to remote..." -Status Info
+                            git push
+                            if ($LASTEXITCODE -eq 0) {
+                                Write-BusBuddyStatus "✅ Successfully pushed to remote" -Status Success
+                            }
+                            else {
+                                $alignmentIssues += "Failed to push commits to remote"
+                                $isAligned = $false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch {
+            # Remote alignment check failed, but not critical
+        }
+
+        # Final summary
+        Write-Host ""
+        Write-Host "🏁 Repository Alignment Summary:" -ForegroundColor Cyan
+        Write-Host "═══════════════════════════════════" -ForegroundColor DarkGray
+
+        if ($isAligned) {
+            Write-BusBuddyStatus "✅ Repository is fully aligned and scan-ready!" -Status Success
+            Write-Host ""
+            Write-Host "🎉 Benefits of aligned repository:" -ForegroundColor Green
+            Write-Host "  • Enhanced error diagnosis capabilities" -ForegroundColor Gray
+            Write-Host "  • Optimal file scanning and analysis" -ForegroundColor Gray
+            Write-Host "  • Improved development workflow momentum" -ForegroundColor Gray
+            Write-Host "  • Better collaboration and issue tracking" -ForegroundColor Gray
+            Write-Host ""
+            Write-Host "🚌 'Aligned repos enable seamless journeys!' - BusBuddy Philosophy ✨" -ForegroundColor Cyan
+        }
+        else {
+            Write-BusBuddyStatus "⚠️ Repository alignment has some issues:" -Status Warning
+            foreach ($issue in $alignmentIssues) {
+                Write-Host "  • $issue" -ForegroundColor Yellow
+            }
+            Write-Host ""
+            Write-Host "💡 Address these issues for optimal repository alignment" -ForegroundColor Blue
+        }
+
+        return $isAligned
+
+    }
+    catch {
+        Write-BusBuddyError -Message "Repository alignment error: $($_.Exception.Message)" -Exception $_.Exception
+        return $false
+    }
+}
+
+#endregion
+
 #region Build and Development Functions
 
 function Invoke-BusBuddyBuild {
@@ -1299,7 +1887,11 @@ function Get-BusBuddyCommands {
             @{ Name = 'bb-get-workflow-results'; Description = 'Monitor GitHub workflows'; Function = 'Get-BusBuddyWorkflowResults' }
         )
         'GitHub'      = @(
-            @{ Name = 'bb-git-status'; Description = 'Git status with health check'; Function = 'Get-BusBuddyGitStatus' }
+            @{ Name = 'bb-git-status'; Description = 'Enhanced git status with health check'; Function = 'Get-BusBuddyGitStatus' }
+            @{ Name = 'bb-git-check'; Description = 'Analyze repository and .gitignore'; Function = 'Invoke-BusBuddyGitIgnoreCheck' }
+            @{ Name = 'bb-git-help'; Description = 'PowerShell git command reference'; Function = 'Get-BusBuddyGitEquivalents' }
+            @{ Name = 'bb-git-repair'; Description = 'Advanced git repository repair toolkit'; Function = 'Invoke-BusBuddyGitRepairKit' }
+            @{ Name = 'bb-repo-align'; Description = 'Complete repository alignment workflow'; Function = 'Start-BusBuddyRepositoryAlignment' }
             @{ Name = 'bb-github-stage'; Description = 'Smart Git staging'; Function = 'Invoke-BusBuddyGitHubStaging' }
             @{ Name = 'bb-github-commit'; Description = 'Intelligent commit creation'; Function = 'Invoke-BusBuddyGitHubCommit' }
             @{ Name = 'bb-github-push'; Description = 'Push with workflow monitoring'; Function = 'Invoke-BusBuddyGitHubPush' }
@@ -1718,9 +2310,10 @@ function Invoke-BusBuddyErrorAnalysis {
     # Display results
     Write-Host ""
     Write-Host "📊 Error Analysis Results:" -ForegroundColor Cyan
-    Write-Host "Total Errors Found: $($errors.Count)" -ForegroundColor $(if ($errors.Count -eq 0) { 'Green' } else { 'Red' })
+    $errorCount = @($errors).Count
+    Write-Host "Total Errors Found: $errorCount" -ForegroundColor $(if ($errorCount -eq 0) { 'Green' } else { 'Red' })
 
-    if ($errors.Count -gt 0) {
+    if ($errorCount -gt 0) {
         Write-Host ""
         Write-Host "❌ Errors Detected:" -ForegroundColor Red
         $errors | Group-Object Type | ForEach-Object {
@@ -1759,8 +2352,8 @@ function Invoke-BusBuddyErrorAnalysis {
         Errors  = $errors
         Fixes   = $fixes
         Summary = @{
-            TotalErrors       = $errors.Count
-            AutoFixableErrors = ($fixes | Where-Object { $_.AutoFixable }).Count
+            TotalErrors       = @($errors).Count
+            AutoFixableErrors = @($fixes | Where-Object { $_.AutoFixable }).Count
         }
     }
 }
@@ -1779,6 +2372,21 @@ Set-Alias -Name 'bb-restore' -Value 'Invoke-BusBuddyRestore' -Description 'Resto
 # Advanced development aliases
 Set-Alias -Name 'bb-dev-session' -Value 'Start-BusBuddyDevSession' -Description 'Start development session'
 Set-Alias -Name 'bb-health' -Value 'Invoke-BusBuddyHealthCheck' -Description 'Project health check'
+
+# Git and repository aliases
+Set-Alias -Name 'bb-git-check' -Value 'Invoke-BusBuddyGitIgnoreCheck' -Description 'Analyze repository and .gitignore effectiveness'
+Set-Alias -Name 'bb-git-help' -Value 'Get-BusBuddyGitEquivalents' -Description 'PowerShell equivalents for Unix git commands'
+Set-Alias -Name 'bb-ps-git' -Value 'Get-BusBuddyGitEquivalents' -Description 'PowerShell git command reference'
+Set-Alias -Name 'bb-git-repair' -Value 'Invoke-BusBuddyGitRepairKit' -Description 'Advanced git repository repair toolkit'
+Set-Alias -Name 'bb-repo-align' -Value 'Start-BusBuddyRepositoryAlignment' -Description 'Complete repository alignment workflow'
+
+# Happiness and utility aliases
+Set-Alias -Name 'bb-happiness' -Value 'Get-BusBuddyHappiness' -Description 'Get motivational quotes'
+Set-Alias -Name 'bb-commands' -Value 'Get-BusBuddyCommands' -Description 'List all Bus Buddy commands'
+Set-Alias -Name 'bb-info' -Value 'Get-BusBuddyInfo' -Description 'Show module information and status'
+
+# Export all functions and aliases
+Export-ModuleMember -Function * -Alias *
 Set-Alias -Name 'bb-env-check' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation'
 Set-Alias -Name 'bb-validate' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation (alias)'
 

@@ -14,10 +14,18 @@ This file contains custom instructions for GitHub Copilot when working with this
 
 ### **Phase 1 Development Standards**
 - ✅ **Build without errors** - Priority #1
+- 🔒 **MANDATORY PowerShell 7.5.2 Syntax** - All PowerShell scripts MUST pass syntax validation
 - ✅ **Basic data display** - ListView/DataGrid sufficient for now
 - ✅ **Real transportation data** - 15-20 drivers, 10-15 vehicles, 25-30 activities
 - ⚠️ **Defer to Phase 2**: Advanced MVVM, comprehensive testing, performance optimization
 - ⚠️ **Defer to Phase 2**: Advanced styling, complex validation, external integrations
+
+### **MANDATORY PowerShell 7.5.2 Enforcement**
+- **Syntax Enforcer**: Use `Tools\Scripts\PowerShell-7.5.2-Syntax-Enforcer.ps1` for ALL PowerShell scripts
+- **Build Integration**: Syntax validation is automatically run in all build pipelines
+- **No Exceptions**: All PowerShell scripts MUST include `#Requires -Version 7.5` directive
+- **Template Usage**: Use `New-PowerShell752Template` for all new PowerShell scripts
+- **Validation Command**: `Invoke-MandatorySyntaxCheck -Path . -ExitOnFail` blocks deployment on failures
 
 ### **Enhanced Task Monitoring Standards**
 - **Enhanced Task Monitor**: Use `enhanced-task-monitor-fixed.ps1` for ALL builds/runs
@@ -477,6 +485,24 @@ bb-report               # Generate comprehensive project report
 - **Cross-Platform Paths**: Use `Join-Path` and `Resolve-Path` for platform-agnostic path handling
 - **Module Management**: Use `Import-Module -Force` for development module reloading
 - **Background Jobs**: Use `Start-ThreadJob` for lightweight background tasks over `Start-Job`
+
+### PowerShell 7.5.2 Technical Reference Documentation
+- **Reference File**: `Documentation/PowerShell-7.5.2-Reference.md` - Comprehensive feature reference extracted from official PDF documentation
+- **Source Material**: `PowerShell/powershell-scripting-powershell-7.5.pdf` (excluded from git via .gitignore)
+- **Conversion Tool**: `Tools/Scripts/PDF-to-Markdown-Converter.ps1` - Automated conversion utilities based on OpenAI Community best practices
+- **Conversion Methods**: Supports Ghostscript+Tesseract OCR and GPT-4o Vision API approaches
+- **Conversion Purpose**: Makes PDF documentation accessible for AI assistance and code development
+- **Key Sections**:
+  - Threading and Parallel Processing enhancements
+  - Error Handling improvements and structured error information
+  - Performance optimizations and memory management
+  - New cmdlets and parameter enhancements
+  - Cross-platform compatibility features
+  - BusBuddy-specific implementation examples
+- **Usage Pattern**: Reference this documentation when implementing PowerShell 7.5.2 features in Phase 2 development
+- **Maintenance**: Update reference file when new PowerShell features are implemented in BusBuddy modules
+- **Integration**: All Phase 2 PowerShell modules should reference this documentation for feature implementation
+- **Update Command**: Run `Update-PowerShellReference` from the conversion script to regenerate from PDF
 
 ### Performance and Optimization
 - **Background Jobs**: Use PowerShell jobs for long-running debug operations
