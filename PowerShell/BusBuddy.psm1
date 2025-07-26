@@ -3891,9 +3891,20 @@ function Invoke-BusBuddyCompleteGitHubWorkflow {
     <#
     .SYNOPSIS
         Complete GitHub workflow automation (bb-github-workflow)
+    .DESCRIPTION
+        Executes the complete GitHub workflow: stage → commit → push → monitor.
+        Integrates with all recommended VS Code extensions for optimal experience.
     #>
-    [CmdletBinding()]
-    param([switch]$GenerateCommitMessage, [switch]$WaitForCompletion, [switch]$AnalyzeResults, [switch]$AutoFix, [switch]$InteractiveMode, [string]$CommitMessage, [bool]$UseExtensions = $true)
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [switch]$GenerateCommitMessage,
+        [switch]$WaitForCompletion,
+        [switch]$AnalyzeResults,
+        [switch]$AutoFix,
+        [switch]$InteractiveMode,
+        [string]$CommitMessage,
+        [bool]$UseExtensions = $true
+    )
 
     $projectRoot = Get-BusBuddyProjectRoot
     Push-Location $projectRoot

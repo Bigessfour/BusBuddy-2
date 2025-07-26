@@ -540,6 +540,7 @@ function Invoke-CompleteGitHubWorkflow {
         [switch]$WaitForCompletion,
         [switch]$AnalyzeResults,
         [switch]$AutoFix,
+        [switch]$InteractiveMode,
         [string]$CommitMessage
     )
 
