@@ -73,8 +73,8 @@ gh run list --limit 3  # Quick status check
 $failedRun = gh run list --status failure --limit 1 --json id,workflowName | ConvertFrom-Json
 if ($failedRun) {
     # Get failure summary
-    gh run view $failedRun.id --json jobs | ConvertFrom-Json | ForEach-Object { 
-        $_.jobs | Where-Object { $_.conclusion -eq "failure" } | Select-Object name,conclusion 
+    gh run view $failedRun.id --json jobs | ConvertFrom-Json | ForEach-Object {
+        $_.jobs | Where-Object { $_.conclusion -eq "failure" } | Select-Object name,conclusion
     }
     # Make minimal fix and re-push immediately
 }
@@ -151,7 +151,7 @@ gh run list --limit 3
 
 ### **Notification-Driven Development:**
 - ✅ **Email notifications** for CI completion (already configured)
-- ✅ **GitHub mobile app** for push notifications  
+- ✅ **GitHub mobile app** for push notifications
 - ✅ **VS Code GitHub extension** for in-editor status
 - ✅ **Never wait for CI** - productivity killer in industry
 
