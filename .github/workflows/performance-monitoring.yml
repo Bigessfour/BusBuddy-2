@@ -39,20 +39,20 @@ jobs:
         run: |
           echo "⏱️ Benchmarking build performance..."
           $startTime = Get-Date
-          
+
           dotnet restore ${{ env.SOLUTION_FILE }} --verbosity quiet
           $restoreTime = (Get-Date) - $startTime
-          
+
           $buildStart = Get-Date
           dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity quiet
           $buildTime = (Get-Date) - $buildStart
-          
+
           $totalTime = (Get-Date) - $startTime
-          
+
           echo "restore-time=$($restoreTime.TotalSeconds)" >> $env:GITHUB_OUTPUT
           echo "build-time=$($buildTime.TotalSeconds)" >> $env:GITHUB_OUTPUT
           echo "total-time=$($totalTime.TotalSeconds)" >> $env:GITHUB_OUTPUT
-          
+
           echo "📊 Performance Results:"
           echo "   Restore: $($restoreTime.TotalSeconds)s"
           echo "   Build: $($buildTime.TotalSeconds)s"
