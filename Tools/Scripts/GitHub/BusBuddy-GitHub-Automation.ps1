@@ -30,12 +30,12 @@ $ErrorActionPreference = "Stop"
 # ═══════════════════════════════════════════════════════════════════════════════
 
 $script:GitHubConfig = @{
-    Repository = $Repository
-    Branch = $Branch
+    Repository        = $Repository
+    Branch            = $Branch
     WorkflowOutputDir = "logs/github-workflows"
-    MaxRetries = 3
-    RetryDelay = 5
-    TimeoutMinutes = 30
+    MaxRetries        = 3
+    RetryDelay        = 5
+    TimeoutMinutes    = 30
 }
 
 # Ensure output directory exists
@@ -56,17 +56,17 @@ function Write-GitHubStatus {
     )
 
     $colors = @{
-        Info = 'Cyan'
+        Info    = 'Cyan'
         Success = 'Green'
         Warning = 'Yellow'
-        Error = 'Red'
+        Error   = 'Red'
     }
 
     $icons = @{
-        Info = '📡'
+        Info    = '📡'
         Success = '✅'
         Warning = '⚠️'
-        Error = '❌'
+        Error   = '❌'
     }
 
     Write-Host "$($icons[$Status]) $Message" -ForegroundColor $colors[$Status]
@@ -85,17 +85,17 @@ function Invoke-GitCommand {
             $exitCode = $LASTEXITCODE
 
             return [PSCustomObject]@{
-                Output = $result
+                Output   = $result
                 ExitCode = $exitCode
-                Success = ($exitCode -eq 0)
+                Success  = ($exitCode -eq 0)
             }
         }
         else {
             & git @Arguments
             return [PSCustomObject]@{
-                Output = $null
+                Output   = $null
                 ExitCode = $LASTEXITCODE
-                Success = ($LASTEXITCODE -eq 0)
+                Success  = ($LASTEXITCODE -eq 0)
             }
         }
     }
@@ -104,9 +104,9 @@ function Invoke-GitCommand {
             throw "Git command failed: $($_.Exception.Message)"
         }
         return [PSCustomObject]@{
-            Output = $_.Exception.Message
+            Output   = $_.Exception.Message
             ExitCode = -1
-            Success = $false
+            Success  = $false
         }
     }
 }
@@ -154,8 +154,8 @@ function Invoke-SmartGitStaging {
     $changes = $statusResult.Output | ForEach-Object {
         if ($_ -match '^(.{2})\s(.+)$') {
             [PSCustomObject]@{
-                Status = $matches[1]
-                File = $matches[2]
+                Status            = $matches[1]
+                File              = $matches[2]
                 StatusDescription = switch ($matches[1]) {
                     '??' { 'Untracked' }
                     ' M' { 'Modified' }
@@ -276,9 +276,9 @@ function New-IntelligentCommit {
     # Capture commit details
     $commitHash = Invoke-GitCommand -Arguments @('rev-parse', 'HEAD') -CaptureOutput
     $commitDetails = @{
-        Hash = if ($commitHash.Success) { $commitHash.Output.Trim() } else { 'unknown' }
-        Message = $commitMessage
-        Files = $StagedFiles
+        Hash      = if ($commitHash.Success) { $commitHash.Output.Trim() } else { 'unknown' }
+        Message   = $commitMessage
+        Files     = $StagedFiles
         Timestamp = Get-Date
     }
 
@@ -382,7 +382,7 @@ function Get-WorkflowResults {
         if ($results.Count -eq 0 -and $env:GITHUB_TOKEN) {
             $headers = @{
                 Authorization = "token $env:GITHUB_TOKEN"
-                Accept = "application/vnd.github.v3+json"
+                Accept        = "application/vnd.github.v3+json"
             }
 
             $queryParams = @("per_page=$Count")
@@ -392,15 +392,15 @@ function Get-WorkflowResults {
             $response = Invoke-RestMethod -Uri $fullUrl -Headers $headers -Method Get
             $results = $response.workflow_runs | Select-Object -First $Count | ForEach-Object {
                 [PSCustomObject]@{
-                    id = $_.id
-                    name = $_.name
+                    id           = $_.id
+                    name         = $_.name
                     workflowName = $_.name
-                    status = $_.status
-                    conclusion = $_.conclusion
-                    createdAt = $_.created_at
-                    event = $_.event
-                    headBranch = $_.head_branch
-                    url = $_.html_url
+                    status       = $_.status
+                    conclusion   = $_.conclusion
+                    createdAt    = $_.created_at
+                    event        = $_.event
+                    headBranch   = $_.head_branch
+                    url          = $_.html_url
                 }
             }
         }
@@ -408,10 +408,10 @@ function Get-WorkflowResults {
         # Save workflow results
         if ($results.Count -gt 0) {
             $outputContent = @{
-                Timestamp = Get-Date
-                Count = $results.Count
+                Timestamp  = Get-Date
+                Count      = $results.Count
                 Repository = $script:GitHubConfig.Repository
-                Results = $results
+                Results    = $results
             }
 
             Save-WorkflowOutput -Content ($outputContent | ConvertTo-Json -Depth 5) -FileName "workflow-results" -Type "json"
@@ -459,20 +459,20 @@ function Get-WorkflowIssues {
     foreach ($run in $WorkflowResults) {
         if ($run.conclusion -ne 'success' -and $run.status -eq 'completed') {
             $issue = [PSCustomObject]@{
-                RunId = $run.id
+                RunId        = $run.id
                 WorkflowName = $run.workflowName
-                Status = $run.status
-                Conclusion = $run.conclusion
-                CreatedAt = $run.createdAt
-                Branch = $run.headBranch
-                Url = $run.url
-                IssueType = switch ($run.conclusion) {
+                Status       = $run.status
+                Conclusion   = $run.conclusion
+                CreatedAt    = $run.createdAt
+                Branch       = $run.headBranch
+                Url          = $run.url
+                IssueType    = switch ($run.conclusion) {
                     'failure' { 'Build/Test Failure' }
                     'cancelled' { 'Workflow Cancelled' }
                     'timed_out' { 'Workflow Timeout' }
                     default { 'Unknown Issue' }
                 }
-                Severity = if ($run.conclusion -eq 'failure') { 'High' } else { 'Medium' }
+                Severity     = if ($run.conclusion -eq 'failure') { 'High' } else { 'Medium' }
             }
 
             $issues += $issue
@@ -521,10 +521,10 @@ function Invoke-AutomaticIssueFix {
 
     # Save issues report
     $issueReport = @{
-        Timestamp = Get-Date
+        Timestamp   = Get-Date
         TotalIssues = $Issues.Count
-        Issues = $Issues
-        Repository = $script:GitHubConfig.Repository
+        Issues      = $Issues
+        Repository  = $script:GitHubConfig.Repository
     }
 
     Save-WorkflowOutput -Content ($issueReport | ConvertTo-Json -Depth 5) -FileName "workflow-issues" -Type "json"
@@ -573,8 +573,8 @@ function Invoke-CompleteGitHubWorkflow {
         Write-GitHubStatus "🎉 Complete GitHub workflow automation finished successfully!" -Status Success
 
         return @{
-            StagedFiles = $stagedFiles
-            CommitDetails = $commitDetails
+            StagedFiles     = $stagedFiles
+            CommitDetails   = $commitDetails
             WorkflowResults = $workflowResults
         }
 

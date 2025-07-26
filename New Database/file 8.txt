@@ -1,5 +1,0 @@
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=tcp:yourserver.database.windows.net,1433;Database=BusBuddyProd;User ID=youruser;Password={your_password_from_secrets};"
-  }
-}
