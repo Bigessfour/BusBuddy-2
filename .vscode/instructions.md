@@ -58,6 +58,28 @@ bb-commands -Category Essential
 bb-happiness -Count 3
 ```
 
+### 5. **Industry-Standard GitHub Actions Integration**
+```powershell
+# STEP 1: Ship code to GitHub Actions testing platform (never wait for results)
+git add .
+git commit -m "feat: implement feature X"
+git push
+# Continue coding immediately - notifications will alert on completion
+
+# STEP 2: Async CI monitoring (during coffee breaks or natural breaks)
+gh run list --limit 3  # Quick status check
+
+# STEP 3: Handle CI failures professionally (when notifications arrive)
+$failedRun = gh run list --status failure --limit 1 --json id,workflowName | ConvertFrom-Json
+if ($failedRun) {
+    # Get failure summary
+    gh run view $failedRun.id --json jobs | ConvertFrom-Json | ForEach-Object { 
+        $_.jobs | Where-Object { $_.conclusion -eq "failure" } | Select-Object name,conclusion 
+    }
+    # Make minimal fix and re-push immediately
+}
+```
+
 ## 🔧 **Mandatory BusBuddy PowerShell Usage Pattern**
 
 ### **Before Manual Debugging:**
@@ -68,10 +90,18 @@ bb-happiness -Count 3
 5. ✅ Run bb-test for testing and validation issues
 6. ⚠️ Only resort to manual investigation if PowerShell commands can't resolve
 
+### **Industry-Standard CI/CD Integration:**
+1. ✅ **Ship Fast**: Push to GitHub Actions testing platform and continue coding
+2. ✅ **Async Monitoring**: Use email notifications and periodic status checks
+3. ✅ **Professional Fix Cycle**: Handle CI failures during natural development breaks
+4. ✅ **Notification-Driven**: Act on CI results when convenient, not immediately
+5. ✅ **Parallel Development**: Work on next feature while CI validates current feature
+
 ### **BusBuddy PowerShell Generated Solutions:**
 - **Use bb-build flags**: -Clean, -Restore, -Verbosity detailed for comprehensive building
 - **Follow API compliance**: PowerShell 7.5 optimized patterns and enhanced JSON handling
 - **Leverage existing infrastructure**: Enhanced error handling, logging, structured reporting
+- **GitHub Actions Integration**: Use `gh` CLI with PowerShell-compatible commands (no `head`, `tail`, etc.)
 
 ## 📊 **BusBuddy PowerShell Advantage Examples**
 
@@ -90,10 +120,40 @@ bb-happiness -Count 3
 ## 🎯 **Development Session Workflow**
 
 1. **Start Session**: Always run `bb-dev-session -OpenIDE`
-2. **Issue Occurs**: Use appropriate bb-command from list above
-3. **Follow Guidance**: Implement PowerShell-recommended solutions
-4. **Validate**: Re-run bb-health and bb-test to confirm fixes
-5. **Document**: Update progress using bb-info and structured output
+2. **Code Development**: Use bb-daily for quick build-test cycles
+3. **Ship to CI**: Push code with `git push` and continue coding immediately
+4. **Issue Occurs**: Use appropriate bb-command from list above
+5. **CI Monitoring**: Check GitHub Actions asynchronously via notifications
+6. **CI Failures**: Handle professionally during natural breaks (coffee, between features)
+7. **Follow Guidance**: Implement PowerShell-recommended solutions
+8. **Validate**: Re-run bb-health and bb-test to confirm fixes
+9. **Document**: Update progress using bb-info and structured output
+
+## 🏭 **Industry-Standard Workflow Integration**
+
+### **Professional Development Cycle:**
+```powershell
+# Morning startup
+bb-daily
+
+# Development loop (repeat throughout day)
+# 1. Code features locally
+# 2. Quick local validation
+bb-build && bb-test
+# 3. Ship to GitHub Actions (don't wait!)
+git add . && git commit -m "feat: implement X" && git push
+# 4. Continue to next feature immediately
+
+# Periodic CI checks (during breaks)
+gh run list --limit 3
+# Handle any failures when convenient, not immediately
+```
+
+### **Notification-Driven Development:**
+- ✅ **Email notifications** for CI completion (already configured)
+- ✅ **GitHub mobile app** for push notifications  
+- ✅ **VS Code GitHub extension** for in-editor status
+- ✅ **Never wait for CI** - productivity killer in industry
 
 ## 🏆 **Success Metrics**
 
