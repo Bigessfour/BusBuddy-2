@@ -29,12 +29,12 @@
 
 # Module configuration
 $script:BusBuddyModuleConfig = @{
-    Name = 'BusBuddy'
-    Version = '1.0.0'
-    Author = 'Bus Buddy Development Team'
-    ProjectRoot = $null
+    Name             = 'BusBuddy'
+    Version          = '1.0.0'
+    Author           = 'Bus Buddy Development Team'
+    ProjectRoot      = $null
     LoadedComponents = @()
-    HappinessQuotes = @(
+    HappinessQuotes  = @(
         "You're doing great... or at least better than that bus that's always late.",
         "Your code compiles! That puts you ahead of 73% of developers today.",
         "Remember: Even the best buses need maintenance. Your code probably needs it too.",
@@ -132,19 +132,19 @@ function Write-BusBuddyStatus {
     $icons = @{
         'Success' = '✅'
         'Warning' = '⚠️'
-        'Error' = '❌'
-        'Info' = '🚌'
-        'Build' = '🔨'
-        'Test' = '🧪'
+        'Error'   = '❌'
+        'Info'    = '🚌'
+        'Build'   = '🔨'
+        'Test'    = '🧪'
     }
 
     $colors = @{
         'Success' = 'Green'
         'Warning' = 'Yellow'
-        'Error' = 'Red'
-        'Info' = 'Cyan'
-        'Build' = 'Magenta'
-        'Test' = 'Blue'
+        'Error'   = 'Red'
+        'Info'    = 'Cyan'
+        'Build'   = 'Magenta'
+        'Test'    = 'Blue'
     }
 
     $icon = if ($NoIcon) { '' } else { "$($icons[$Status]) " }
@@ -271,7 +271,8 @@ function Test-BusBuddyConfiguration {
 
             Write-BusBuddyStatus "Configuration validation successful: $ConfigPath" -Status Success
             return $config
-        } else {
+        }
+        else {
             Write-BusBuddyError -Message "Invalid JSON in configuration file: $ConfigPath" -RecommendedAction "Check JSON syntax, ensure proper formatting and valid structure"
             return $null
         }
@@ -311,10 +312,12 @@ function Test-BusBuddyConfiguration {
     $psVersion = $PSVersionTable.PSVersion
     if ($psVersion.Major -lt 7) {
         $issues += "PowerShell 7.0+ required (found $psVersion)"
-    } elseif ($psVersion -lt [version]'7.5.0') {
+    }
+    elseif ($psVersion -lt [version]'7.5.0') {
         $recommendations += "Consider upgrading to PowerShell 7.5 for enhanced performance and features"
         Write-BusBuddyStatus "PowerShell $psVersion detected (7.5+ recommended for optimal performance)" -Status Warning
-    } else {
+    }
+    else {
         Write-BusBuddyStatus "PowerShell $psVersion detected - full PowerShell 7.5 features available" -Status Success
     }
 
@@ -323,10 +326,10 @@ function Test-BusBuddyConfiguration {
         Write-BusBuddyStatus "Checking PowerShell 7.5 features..." -Status Info
 
         $ps75Features = @{
-            'Enhanced ConvertTo-CliXml' = Get-Command ConvertTo-CliXml -ErrorAction SilentlyContinue
-            'Enhanced Test-Json (IgnoreComments)' = (Get-Command Test-Json).Parameters.ContainsKey('IgnoreComments')
+            'Enhanced ConvertTo-CliXml'            = Get-Command ConvertTo-CliXml -ErrorAction SilentlyContinue
+            'Enhanced Test-Json (IgnoreComments)'  = (Get-Command Test-Json).Parameters.ContainsKey('IgnoreComments')
             'Enhanced ConvertFrom-Json (DateKind)' = (Get-Command ConvertFrom-Json).Parameters.ContainsKey('DateKind')
-            'Array += Performance Optimization' = $psVersion -ge [version]'7.5.0'
+            'Array += Performance Optimization'    = $psVersion -ge [version]'7.5.0'
         }
 
         foreach ($feature in $ps75Features.GetEnumerator()) {
@@ -340,18 +343,22 @@ function Test-BusBuddyConfiguration {
         $dotnetVersion = & dotnet --version 2>$null
         if (-not $dotnetVersion) {
             $issues += ".NET SDK not found"
-        } else {
+        }
+        else {
             $dotnetVer = [version]$dotnetVersion
             if ($dotnetVer -lt [version]"8.0") {
                 $issues += ".NET 8.0+ required (found $dotnetVersion)"
-            } elseif ($dotnetVer -lt [version]"9.0") {
+            }
+            elseif ($dotnetVer -lt [version]"9.0") {
                 $recommendations += "Consider upgrading to .NET 9 for PowerShell 7.5 optimal performance"
                 Write-BusBuddyStatus ".NET $dotnetVersion detected (.NET 9+ recommended)" -Status Warning
-            } else {
+            }
+            else {
                 Write-BusBuddyStatus ".NET $dotnetVersion detected - optimal for PowerShell 7.5" -Status Success
             }
         }
-    } catch {
+    }
+    catch {
         $issues += ".NET SDK not accessible"
     }
 
@@ -359,7 +366,8 @@ function Test-BusBuddyConfiguration {
     $projectRoot = Get-BusBuddyProjectRoot
     if (-not $projectRoot) {
         $issues += "Bus Buddy project root not found"
-    } else {
+    }
+    else {
         # Enhanced file checking with better error reporting
         $criticalFiles = @(
             @{ Path = "BusBuddy.sln"; Description = "Solution file" }
@@ -408,7 +416,8 @@ function Test-BusBuddyConfiguration {
         }
 
         return $true
-    } else {
+    }
+    else {
         Write-BusBuddyError -Message "Environment validation failed (Score: $environmentScore%)" -RecommendedAction "Resolve the issues listed below to ensure optimal development experience"
 
         foreach ($issue in $issues) {
@@ -476,40 +485,61 @@ function Invoke-BusBuddyBuild {
     Push-Location $projectRoot
 
     try {
-        Write-BusBuddyStatus "Starting Bus Buddy build process..." -Status Build
+        Write-BusBuddyStatus "🔨 Building BusBuddy solution..." -Status Build
 
         # Clean if requested
         if ($Clean) {
-            Write-BusBuddyStatus "Cleaning solution..." -Status Info
-            & dotnet clean BusBuddy.sln --configuration $Configuration --verbosity quiet | Out-Null
+            Write-Host "🧹 Cleaning previous build artifacts..." -ForegroundColor Yellow
+            dotnet clean BusBuddy.sln --configuration $Configuration --verbosity quiet | Out-Null
             if ($LASTEXITCODE -ne 0) {
-                Write-BusBuddyStatus "Clean failed" -Status Error
+                Write-BusBuddyStatus "Clean operation failed" -Status Error
                 return $false
             }
         }
 
         # Restore if requested
         if ($Restore) {
-            Write-BusBuddyStatus "Restoring packages..." -Status Info
-            & dotnet restore BusBuddy.sln --verbosity quiet | Out-Null
+            Write-Host "📦 Restoring NuGet packages..." -ForegroundColor Yellow
+            dotnet restore BusBuddy.sln --verbosity quiet | Out-Null
             if ($LASTEXITCODE -ne 0) {
                 Write-BusBuddyStatus "Package restore failed" -Status Error
                 return $false
             }
         }
 
-        # Build
+        # Build solution with enhanced output analysis
         $buildArgs = @('build', 'BusBuddy.sln', '--configuration', $Configuration, '--verbosity', $Verbosity)
         if ($NoLogo) { $buildArgs += '--nologo' }
 
-        Write-BusBuddyStatus "Building solution (Configuration: $Configuration)..." -Status Build
-        & dotnet @buildArgs | Out-Null
+        Write-Host "🔨 Building solution with configuration: $Configuration" -ForegroundColor Green
+        $buildOutput = & dotnet @buildArgs 2>&1
 
         if ($LASTEXITCODE -eq 0) {
+            # Analyze build output for warnings and success metrics
+            $warnings = $buildOutput | Select-String -Pattern "warning" -AllMatches
+            $warningCount = ($warnings | Measure-Object).Count
+
+            Write-Host "✅ Build completed successfully!" -ForegroundColor Green
+            Write-Host "📊 Build Summary:" -ForegroundColor Cyan
+            Write-Host "   • Configuration: $Configuration" -ForegroundColor Gray
+            Write-Host "   • Warnings: $warningCount" -ForegroundColor $(if ($warningCount -eq 0) { "Green" } else { "Yellow" })
+
+            if ($warningCount -gt 0 -and $Verbosity -ne 'quiet') {
+                Write-Host "⚠️  Build warnings detected:" -ForegroundColor Yellow
+                $warnings | Select-Object -First 5 | ForEach-Object { Write-Host "   $($_.Line)" -ForegroundColor DarkYellow }
+                if ($warningCount -gt 5) {
+                    Write-Host "   ... and $($warningCount - 5) more warnings" -ForegroundColor DarkYellow
+                }
+            }
+
             Write-BusBuddyStatus "Build completed successfully" -Status Success
             return $true
-        } else {
+        }
+        else {
             Write-BusBuddyStatus "Build failed with exit code $LASTEXITCODE" -Status Error
+            if ($Verbosity -ne 'quiet') {
+                $buildOutput | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+            }
             return $false
         }
     }
@@ -562,9 +592,18 @@ function Invoke-BusBuddyRun {
     Push-Location $projectRoot
 
     try {
+        Write-BusBuddyStatus "🚌 Starting BusBuddy application..." -Status Info
+
+        # Verify WPF project exists
+        $wpfProject = "BusBuddy.WPF\BusBuddy.WPF.csproj"
+        if (-not (Test-Path $wpfProject)) {
+            Write-BusBuddyStatus "WPF project not found: $wpfProject" -Status Error
+            return $false
+        }
+
         # Build first unless skipped
         if (-not $NoBuild) {
-            Write-BusBuddyStatus "Building before run..." -Status Build
+            Write-Host "🔨 Building before launch..." -ForegroundColor Yellow
             $buildSuccess = Invoke-BusBuddyBuild -Configuration $Configuration -Verbosity quiet
             if (-not $buildSuccess) {
                 Write-BusBuddyStatus "Build failed, cannot run application" -Status Error
@@ -573,7 +612,7 @@ function Invoke-BusBuddyRun {
         }
 
         # Prepare run arguments
-        $runArgs = @('run', '--project', 'BusBuddy.WPF\BusBuddy.WPF.csproj', '--configuration', $Configuration)
+        $runArgs = @('run', '--project', $wpfProject, '--configuration', $Configuration)
 
         if ($NoBuild) { $runArgs += '--no-build' }
         if ($Arguments.Count -gt 0) { $runArgs += '--'; $runArgs += $Arguments }
@@ -662,7 +701,8 @@ function Invoke-BusBuddyTest {
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyStatus "All tests passed" -Status Success
             return $true
-        } else {
+        }
+        else {
             Write-BusBuddyStatus "Some tests failed (Exit Code: $LASTEXITCODE)" -Status Warning
             return $false
         }
@@ -711,7 +751,8 @@ function Invoke-BusBuddyClean {
 
         if ($Configuration -eq 'All') {
             $configurations = @('Debug', 'Release')
-        } else {
+        }
+        else {
             $configurations = @($Configuration)
         }
 
@@ -865,18 +906,19 @@ function Invoke-BusBuddyHealthCheck {
     $maxScore += 20
 
     $requiredStructure = @{
-        'BusBuddy.sln' = 'Solution file'
+        'BusBuddy.sln'                       = 'Solution file'
         'BusBuddy.Core\BusBuddy.Core.csproj' = 'Core project'
-        'BusBuddy.WPF\BusBuddy.WPF.csproj' = 'WPF project'
-        'README.md' = 'Documentation'
-        'global.json' = 'SDK version file'
+        'BusBuddy.WPF\BusBuddy.WPF.csproj'   = 'WPF project'
+        'README.md'                          = 'Documentation'
+        'global.json'                        = 'SDK version file'
     }
 
     $structureScore = 0
     foreach ($file in $requiredStructure.Keys) {
         if (Test-Path (Join-Path $projectRoot $file)) {
             $structureScore += 4
-        } else {
+        }
+        else {
             $issues += "Missing: $($requiredStructure[$file]) ($file)"
         }
     }
@@ -900,7 +942,8 @@ function Invoke-BusBuddyHealthCheck {
                 try {
                     Get-Content $configPath | ConvertFrom-Json | Out-Null
                     $configScore += 5
-                } catch {
+                }
+                catch {
                     $issues += "Invalid JSON in $config"
                 }
             }
@@ -918,13 +961,16 @@ function Invoke-BusBuddyHealthCheck {
         if ($LASTEXITCODE -eq 0) {
             $healthScore += 30
             Write-BusBuddyStatus "Build validation: PASSED" -Status Success
-        } else {
+        }
+        else {
             $issues += "Solution does not build successfully"
             Write-BusBuddyStatus "Build validation: FAILED" -Status Error
         }
-    } catch {
+    }
+    catch {
         $issues += "Build validation error: $($_.Exception.Message)"
-    } finally {
+    }
+    finally {
         Pop-Location
     }
 
@@ -935,7 +981,8 @@ function Invoke-BusBuddyHealthCheck {
     if (Test-Path (Join-Path $projectRoot "PowerShell\BusBuddy.psm1")) {
         $healthScore += 10
         Write-BusBuddyStatus "PowerShell module: FOUND" -Status Success
-    } else {
+    }
+    else {
         $recommendations += "Consider creating PowerShell module for development automation"
     }
 
@@ -1014,7 +1061,7 @@ function Test-PowerShell75Features {
 
     # ConvertTo-CliXml and ConvertFrom-CliXml
     $features.CliXmlCmdlets = @{
-        ConvertTo = Get-Command ConvertTo-CliXml -ErrorAction SilentlyContinue
+        ConvertTo   = Get-Command ConvertTo-CliXml -ErrorAction SilentlyContinue
         ConvertFrom = Get-Command ConvertFrom-CliXml -ErrorAction SilentlyContinue
     }
     $cliXmlAvailable = $features.CliXmlCmdlets.ConvertTo -and $features.CliXmlCmdlets.ConvertFrom
@@ -1023,7 +1070,7 @@ function Test-PowerShell75Features {
     # Enhanced Test-Json
     $testJsonCmd = Get-Command Test-Json
     $features.EnhancedTestJson = @{
-        IgnoreComments = $testJsonCmd.Parameters.ContainsKey('IgnoreComments')
+        IgnoreComments      = $testJsonCmd.Parameters.ContainsKey('IgnoreComments')
         AllowTrailingCommas = $testJsonCmd.Parameters.ContainsKey('AllowTrailingCommas')
     }
     $enhancedJsonAvailable = $features.EnhancedTestJson.IgnoreComments -and $features.EnhancedTestJson.AllowTrailingCommas
@@ -1066,8 +1113,8 @@ function Test-PowerShell75Features {
         Write-Host "    List.Add(): $([math]::Round($listTime.TotalMilliseconds, 2))ms" -ForegroundColor Cyan
 
         $features.PerformanceBenchmark = @{
-            ArrayTime = $arrayTime.TotalMilliseconds
-            ListTime = $listTime.TotalMilliseconds
+            ArrayTime        = $arrayTime.TotalMilliseconds
+            ListTime         = $listTime.TotalMilliseconds
             ArrayToListRatio = if ($listTime.TotalMilliseconds -gt 0) { $arrayTime.TotalMilliseconds / $listTime.TotalMilliseconds } else { 0 }
         }
     }
@@ -1086,13 +1133,16 @@ function Test-PowerShell75Features {
                     $status = if ($feature.Enabled) { '✅ Enabled' } else { '⚠️ Available but not enabled' }
                     Write-Host "  $status $($feature.Name)" -ForegroundColor $(if ($feature.Enabled) { 'Green' } else { 'Yellow' })
                 }
-            } else {
+            }
+            else {
                 Write-Host "  ℹ️ No relevant experimental features found" -ForegroundColor Gray
             }
-        } else {
+        }
+        else {
             Write-Host "  ℹ️ Get-ExperimentalFeature not available" -ForegroundColor Gray
         }
-    } catch {
+    }
+    catch {
         Write-Host "  ⚠️ Unable to check experimental features" -ForegroundColor Yellow
     }
 
@@ -1162,11 +1212,37 @@ function Get-BusBuddyHappiness {
 
     $quotes = $script:BusBuddyModuleConfig.HappinessQuotes
 
+    # Add theme-specific quotes
+    $themeQuotes = switch ($Theme) {
+        'Debugging' {
+            @(
+                "🐛 Debugging: It's like being a detective in a crime novel where you're also the murderer.",
+                "🔍 Remember: There are only two types of code - code that works and code that doesn't work yet.",
+                "🎯 Every bug is just an undocumented feature waiting to be discovered!"
+            )
+        }
+        'Building' {
+            @(
+                "🔨 A successful build is like a perfectly timed bus route - everything just clicks!",
+                "⚙️ Compilation errors are just the computer's way of asking for clarification.",
+                "🚀 Clean builds are like empty buses - rare but beautiful when they happen!"
+            )
+        }
+        'Testing' {
+            @(
+                "🧪 Writing tests is like checking if the bus actually goes where the sign says it does.",
+                "✅ Green tests are the developer's equivalent of hitting all green lights.",
+                "🎪 Testing in production is like using your customers as crash test dummies!"
+            )
+        }
+        default { $quotes }
+    }
+
     if ($All) {
         Write-Host ""
-        Write-BusBuddyStatus "🚌 All Bus Buddy Happiness Quotes:" -Status Info
-        for ($i = 0; $i -lt $quotes.Count; $i++) {
-            Write-Host "  $($i + 1). $($quotes[$i])" -ForegroundColor Yellow
+        Write-Host "🚌 All Bus Buddy Happiness Quotes ($Theme theme):" -ForegroundColor Cyan
+        for ($i = 0; $i -lt $themeQuotes.Count; $i++) {
+            Write-Host "  $($i + 1). $($themeQuotes[$i])" -ForegroundColor Yellow
         }
         Write-Host ""
         return
@@ -1205,21 +1281,32 @@ function Get-BusBuddyCommands {
     )
 
     $commands = @{
-        'Essential' = @(
+        'Essential'   = @(
             @{ Name = 'bb-build'; Description = 'Build the solution'; Function = 'Invoke-BusBuddyBuild' }
             @{ Name = 'bb-run'; Description = 'Run the application'; Function = 'Invoke-BusBuddyRun' }
             @{ Name = 'bb-test'; Description = 'Run tests'; Function = 'Invoke-BusBuddyTest' }
             @{ Name = 'bb-health'; Description = 'Health check'; Function = 'Invoke-BusBuddyHealthCheck' }
         )
-        'Build' = @(
+        'Build'       = @(
             @{ Name = 'bb-clean'; Description = 'Clean build artifacts'; Function = 'Invoke-BusBuddyClean' }
             @{ Name = 'bb-restore'; Description = 'Restore NuGet packages'; Function = 'Invoke-BusBuddyRestore' }
         )
         'Development' = @(
             @{ Name = 'bb-dev-session'; Description = 'Start development session'; Function = 'Start-BusBuddyDevSession' }
             @{ Name = 'bb-env-check'; Description = 'Check environment'; Function = 'Test-BusBuddyEnvironment' }
+            @{ Name = 'bb-dev-workflow'; Description = 'Complete development workflow'; Function = 'Invoke-BusBuddyDevWorkflow' }
         )
-        'Fun' = @(
+        'Analysis' = @(
+            @{ Name = 'bb-manage-dependencies'; Description = 'Dependency management'; Function = 'Invoke-BusBuddyDependencyManagement' }
+            @{ Name = 'bb-error-fix'; Description = 'Analyze build errors'; Function = 'Invoke-BusBuddyErrorAnalysis' }
+            @{ Name = 'bb-warning-analysis'; Description = 'Analyze build warnings'; Function = 'Show-BusBuddyWarningAnalysis' }
+            @{ Name = 'bb-get-workflow-results'; Description = 'Monitor GitHub workflows'; Function = 'Get-BusBuddyWorkflowResults' }
+        )
+        'Environment' = @(
+            @{ Name = 'bb-install-extensions'; Description = 'Install VS Code extensions'; Function = 'Install-BusBuddyVSCodeExtensions' }
+            @{ Name = 'bb-validate-vscode'; Description = 'Validate VS Code setup'; Function = 'Test-BusBuddyVSCodeSetup' }
+        )
+        'Fun'         = @(
             @{ Name = 'bb-happiness'; Description = 'Get motivational quotes'; Function = 'Get-BusBuddyHappiness' }
             @{ Name = 'bb-commands'; Description = 'List all commands'; Function = 'Get-BusBuddyCommands' }
         )
@@ -1238,7 +1325,8 @@ function Get-BusBuddyCommands {
                 Write-Host " - $($cmd.Description)" -ForegroundColor Gray
             }
         }
-    } else {
+    }
+    else {
         if ($commands.ContainsKey($Category)) {
             Write-Host ""
             Write-Host "📂 $Category Commands:" -ForegroundColor Magenta
@@ -1283,7 +1371,8 @@ function Get-BusBuddyInfo {
         $status = if ($envValid) { '✅ Ready' } else { '⚠️ Issues Detected' }
         $color = if ($envValid) { 'Green' } else { 'Yellow' }
         Write-Host "Status: $status" -ForegroundColor $color
-    } else {
+    }
+    else {
         Write-Host "Status: ❌ Project Not Found" -ForegroundColor Red
     }
 
@@ -1360,7 +1449,8 @@ function Invoke-BusBuddyRestore {
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyStatus "Package restore completed successfully" -Status Success
             return $true
-        } else {
+        }
+        else {
             Write-BusBuddyStatus "Package restore failed with exit code $LASTEXITCODE" -Status Error
             return $false
         }
@@ -1371,6 +1461,304 @@ function Invoke-BusBuddyRestore {
     }
     finally {
         Pop-Location
+    }
+}
+
+function Invoke-BusBuddyDependencyManagement {
+    <#
+    .SYNOPSIS
+        Comprehensive dependency management for Bus Buddy (bb-manage-dependencies)
+
+    .DESCRIPTION
+        Manages NuGet dependencies, vulnerability scanning, version validation,
+        and dependency health monitoring. Incorporates functionality from the
+        original dependency-management.ps1 script.
+
+    .PARAMETER ScanVulnerabilities
+        Scan for vulnerable packages
+
+    .PARAMETER ValidateVersions
+        Validate version pinning across projects
+
+    .PARAMETER GenerateReport
+        Generate dependency report
+
+    .PARAMETER UpdatePackages
+        Update packages to latest versions
+
+    .PARAMETER RestoreOnly
+        Restore packages only
+
+    .PARAMETER Full
+        Run all checks
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$ScanVulnerabilities,
+        [switch]$ValidateVersions,
+        [switch]$GenerateReport,
+        [switch]$UpdatePackages,
+        [switch]$RestoreOnly,
+        [switch]$Full
+    )
+
+    # Set all switches if Full is specified
+    if ($Full) {
+        $ScanVulnerabilities = $true
+        $ValidateVersions = $true
+        $GenerateReport = $true
+        $RestoreOnly = $true
+    }
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    if (-not $projectRoot) {
+        Write-BusBuddyStatus "Project root not found" -Status Error
+        return $false
+    }
+
+    Push-Location $projectRoot
+
+    try {
+        Write-BusBuddyStatus "🚌 BusBuddy Dependency Management & Security Scanner" -Status Info
+        Write-Host "📅 $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Gray
+        Write-Host ""
+
+        $results = @{
+            RestoreSuccessful    = $false
+            VulnerabilitiesFound = 0
+            VersionIssues        = 0
+            ReportGenerated      = $false
+            UpdatesAvailable     = 0
+        }
+
+        # Step 1: Package Restore
+        if ($RestoreOnly -or $Full) {
+            Write-Host "📦 Step 1: Package Restoration" -ForegroundColor Cyan
+            Write-Host "=============================" -ForegroundColor Cyan
+
+            $restoreResult = Invoke-BusBuddyRestore
+            $results.RestoreSuccessful = $restoreResult
+
+            if (-not $restoreResult) {
+                Write-BusBuddyStatus "Package restore failed - stopping dependency management" -Status Error
+                return $results
+            }
+        }
+
+        # Step 2: Vulnerability Scanning
+        if ($ScanVulnerabilities) {
+            Write-Host ""
+            Write-Host "🛡️ Step 2: Vulnerability Scanning" -ForegroundColor Cyan
+            Write-Host "==================================" -ForegroundColor Cyan
+
+            $vulnResults = Invoke-VulnerabilityScanning
+            $results.VulnerabilitiesFound = $vulnResults.Count
+        }
+
+        # Step 3: Version Validation
+        if ($ValidateVersions) {
+            Write-Host ""
+            Write-Host "📌 Step 3: Version Pinning Validation" -ForegroundColor Cyan
+            Write-Host "=====================================" -ForegroundColor Cyan
+
+            $versionResults = Test-VersionPinning
+            $results.VersionIssues = $versionResults.Issues.Count
+        }
+
+        # Step 4: Report Generation
+        if ($GenerateReport) {
+            Write-Host ""
+            Write-Host "📄 Step 4: Dependency Report Generation" -ForegroundColor Cyan
+            Write-Host "=======================================" -ForegroundColor Cyan
+
+            $reportResult = New-DependencyReport
+            $results.ReportGenerated = $reportResult
+        }
+
+        # Step 5: Package Updates
+        if ($UpdatePackages) {
+            Write-Host ""
+            Write-Host "⬆️ Step 5: Package Updates" -ForegroundColor Cyan
+            Write-Host "==========================" -ForegroundColor Cyan
+
+            $updateResults = Update-Packages
+            $results.UpdatesAvailable = $updateResults.Count
+        }
+
+        # Summary
+        Write-Host ""
+        Show-DependencySummary -Results $results
+
+        return $results
+    }
+    catch {
+        Write-BusBuddyStatus "Dependency management error: $($_.Exception.Message)" -Status Error
+        return $results
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Invoke-BusBuddyErrorAnalysis {
+    <#
+    .SYNOPSIS
+        Analyze and fix Bus Buddy build errors (bb-error-fix)
+
+    .DESCRIPTION
+        Analyzes build errors and provides automated fix recommendations.
+        Incorporates functionality from the original bb-error-fix.ps1 script.
+
+    .PARAMETER BuildOutput
+        Build output text to analyze
+
+    .PARAMETER AutoFix
+        Automatically apply fixes where possible
+
+    .PARAMETER Detailed
+        Provide detailed error analysis
+    #>
+    [CmdletBinding()]
+    param(
+        [string]$BuildOutput,
+        [switch]$AutoFix,
+        [switch]$Detailed
+    )
+
+    Write-BusBuddyStatus "🔍 Bus Buddy Error Analysis Tool" -Status Info
+    Write-Host "=================================" -ForegroundColor Cyan
+
+    $errors = @()
+    $fixes = @()
+
+    if (-not $BuildOutput) {
+        # Get build output by running a build
+        Write-Host "🔨 Running build to capture errors..." -ForegroundColor Yellow
+        $projectRoot = Get-BusBuddyProjectRoot
+        if ($projectRoot) {
+            Push-Location $projectRoot
+            try {
+                $BuildOutput = dotnet build BusBuddy.sln --verbosity normal 2>&1 | Out-String
+            }
+            finally {
+                Pop-Location
+            }
+        }
+    }
+
+    if (-not $BuildOutput) {
+        Write-BusBuddyStatus "No build output to analyze" -Status Warning
+        return
+    }
+
+    # Extract specific errors
+    $buildLines = $BuildOutput -split "`n"
+
+    foreach ($line in $buildLines) {
+        # XAML namespace errors
+        if ($line -match "error MC3074.*'(.+?)' does not exist.*Line (\d+)") {
+            $tagName = $matches[1]
+            $lineNumber = $matches[2]
+            $filePath = if ($line -match "([^\\]+\.xaml)") { $matches[1] } else { "Unknown" }
+
+            $errors += [PSCustomObject]@{
+                Type     = "XAML Namespace"
+                File     = $filePath
+                Line     = $lineNumber
+                Element  = $tagName
+                Message  = "Tag '$tagName' does not exist"
+                Severity = "Error"
+            }
+
+            # Common XAML fixes
+            $suggestedFix = switch -Regex ($tagName) {
+                "^sf:" { "Add Syncfusion namespace: xmlns:sf=""http://schemas.syncfusion.com/wpf""" }
+                "^syncfusion:" { "Add Syncfusion namespace: xmlns:syncfusion=""http://schemas.syncfusion.com/wpf""" }
+                "^local:" { "Add local namespace: xmlns:local=""clr-namespace:YourNamespace""" }
+                default { "Check namespace declaration for '$tagName'" }
+            }
+
+            $fixes += [PSCustomObject]@{
+                ErrorType   = "XAML Namespace"
+                File        = $filePath
+                Line        = $lineNumber
+                Suggestion  = $suggestedFix
+                AutoFixable = $false
+            }
+        }
+
+        # C# compilation errors
+        if ($line -match "error CS\d+.*") {
+            $errors += [PSCustomObject]@{
+                Type     = "C# Compilation"
+                Message  = $line.Trim()
+                Severity = "Error"
+            }
+        }
+
+        # Package reference errors
+        if ($line -match "error NU\d+.*") {
+            $errors += [PSCustomObject]@{
+                Type     = "NuGet Package"
+                Message  = $line.Trim()
+                Severity = "Error"
+            }
+
+            $fixes += [PSCustomObject]@{
+                ErrorType   = "Package Reference"
+                Suggestion  = "Run 'dotnet restore' or check package.lock.json"
+                AutoFixable = $true
+            }
+        }
+    }
+
+    # Display results
+    Write-Host ""
+    Write-Host "📊 Error Analysis Results:" -ForegroundColor Cyan
+    Write-Host "Total Errors Found: $($errors.Count)" -ForegroundColor $(if ($errors.Count -eq 0) { 'Green' } else { 'Red' })
+
+    if ($errors.Count -gt 0) {
+        Write-Host ""
+        Write-Host "❌ Errors Detected:" -ForegroundColor Red
+        $errors | Group-Object Type | ForEach-Object {
+            Write-Host "  $($_.Name): $($_.Count) errors" -ForegroundColor Yellow
+            if ($Detailed) {
+                $_.Group | ForEach-Object {
+                    Write-Host "    • $($_.Message)" -ForegroundColor Gray
+                }
+            }
+        }
+
+        Write-Host ""
+        Write-Host "🔧 Suggested Fixes:" -ForegroundColor Yellow
+        $fixes | ForEach-Object {
+            $fixIcon = if ($_.AutoFixable) { "🤖" } else { "💡" }
+            Write-Host "  $fixIcon $($_.Suggestion)" -ForegroundColor Cyan
+        }
+
+        if ($AutoFix) {
+            Write-Host ""
+            Write-Host "🤖 Applying automatic fixes..." -ForegroundColor Green
+
+            $autoFixableFixes = $fixes | Where-Object { $_.AutoFixable }
+            foreach ($fix in $autoFixableFixes) {
+                switch ($fix.ErrorType) {
+                    "Package Reference" {
+                        Write-Host "   Restoring packages..." -ForegroundColor Yellow
+                        Invoke-BusBuddyRestore
+                    }
+                }
+            }
+        }
+    }
+
+    return @{
+        Errors  = $errors
+        Fixes   = $fixes
+        Summary = @{
+            TotalErrors       = $errors.Count
+            AutoFixableErrors = ($fixes | Where-Object { $_.AutoFixable }).Count
+        }
     }
 }
 
@@ -1428,6 +1816,1319 @@ if (Get-BusBuddyProjectRoot) {
 
 #endregion
 
+#region Development Workflow Functions
+
+# Helper functions for dependency management
+function Invoke-VulnerabilityScanning {
+    <#
+    .SYNOPSIS
+        Scan for vulnerable NuGet packages
+    #>
+    [CmdletBinding()]
+    param()
+
+    Write-Host "🔍 Scanning for vulnerable packages..." -ForegroundColor Yellow
+
+    try {
+        # Use dotnet list package --vulnerable if available
+        $vulnerableOutput = & dotnet list package --vulnerable 2>&1
+
+        if ($LASTEXITCODE -eq 0) {
+            $vulnerableLines = $vulnerableOutput | Where-Object { $_ -match ">" -and $_ -notmatch "The following sources were used" }
+
+            if ($vulnerableLines.Count -gt 0) {
+                Write-Host "⚠️ Found $($vulnerableLines.Count) vulnerable packages:" -ForegroundColor Red
+                foreach ($line in $vulnerableLines) {
+                    Write-Host "  • $line" -ForegroundColor Red
+                }
+                return $vulnerableLines
+            }
+            else {
+                Write-Host "✅ No vulnerable packages detected" -ForegroundColor Green
+                return @()
+            }
+        }
+        else {
+            Write-Host "⚠️ Vulnerability scanning not available in this .NET version" -ForegroundColor Yellow
+            return @()
+        }
+    }
+    catch {
+        Write-Host "❌ Error during vulnerability scanning: $($_.Exception.Message)" -ForegroundColor Red
+        return @()
+    }
+}
+
+function Test-VersionPinning {
+    <#
+    .SYNOPSIS
+        Validate package version pinning across projects
+    #>
+    [CmdletBinding()]
+    param()
+
+    Write-Host "📌 Validating version pinning..." -ForegroundColor Yellow
+
+    $issues = @()
+
+    try {
+        # Find all project files
+        $projectFiles = Get-ChildItem -Recurse -Name "*.csproj"
+
+        foreach ($projectFile in $projectFiles) {
+            $content = Get-Content $projectFile -Raw
+
+            # Check for floating version references (e.g., 1.0.* or 1.0.+)
+            if ($content -match 'Version="[^"]*[\*\+][^"]*"') {
+                $issues += "Floating version detected in $projectFile"
+            }
+
+            # Check for missing version attributes
+            $packageRefs = $content | Select-String -Pattern '<PackageReference\s+Include="([^"]*)"(?:\s+Version="([^"]*)")?'
+            foreach ($match in $packageRefs.Matches) {
+                if (-not $match.Groups[2].Value) {
+                    $issues += "Missing version for package $($match.Groups[1].Value) in $projectFile"
+                }
+            }
+        }
+
+        if ($issues.Count -eq 0) {
+            Write-Host "✅ All packages have proper version pinning" -ForegroundColor Green
+        }
+        else {
+            Write-Host "⚠️ Found $($issues.Count) version pinning issues:" -ForegroundColor Yellow
+            foreach ($issue in $issues) {
+                Write-Host "  • $issue" -ForegroundColor Red
+            }
+        }
+
+        return @{ Issues = $issues }
+    }
+    catch {
+        Write-Host "❌ Error validating version pinning: $($_.Exception.Message)" -ForegroundColor Red
+        return @{ Issues = @("Version validation failed: $($_.Exception.Message)") }
+    }
+}
+
+function New-DependencyReport {
+    <#
+    .SYNOPSIS
+        Generate dependency report
+    #>
+    [CmdletBinding()]
+    param()
+
+    Write-Host "📄 Generating dependency report..." -ForegroundColor Yellow
+
+    try {
+        $reportPath = "dependency-report-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+
+        # Get package list
+        $packageOutput = & dotnet list package --include-transitive 2>&1
+
+        $report = @{
+            Timestamp = Get-Date
+            Packages = $packageOutput | Where-Object { $_ -match ">" }
+            ProjectFiles = (Get-ChildItem -Recurse -Name "*.csproj")
+            Summary = @{
+                TotalProjects = (Get-ChildItem -Recurse -Name "*.csproj").Count
+                PackageCount = ($packageOutput | Where-Object { $_ -match ">" }).Count
+            }
+        }
+
+        $report | ConvertTo-Json -Depth 3 | Out-File $reportPath -Encoding UTF8
+        Write-Host "✅ Report generated: $reportPath" -ForegroundColor Green
+
+        return $true
+    }
+    catch {
+        Write-Host "❌ Error generating report: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Update-Packages {
+    <#
+    .SYNOPSIS
+        Update packages to latest versions
+    #>
+    [CmdletBinding()]
+    param()
+
+    Write-Host "⬆️ Checking for package updates..." -ForegroundColor Yellow
+
+    try {
+        # Check for outdated packages
+        $outdatedOutput = & dotnet list package --outdated 2>&1
+        $outdatedPackages = $outdatedOutput | Where-Object { $_ -match ">" -and $_ -notmatch "Project" }
+
+        if ($outdatedPackages.Count -gt 0) {
+            Write-Host "📦 Found $($outdatedPackages.Count) outdated packages:" -ForegroundColor Yellow
+            foreach ($package in $outdatedPackages) {
+                Write-Host "  • $package" -ForegroundColor Cyan
+            }
+        }
+        else {
+            Write-Host "✅ All packages are up to date" -ForegroundColor Green
+        }
+
+        return $outdatedPackages
+    }
+    catch {
+        Write-Host "❌ Error checking for updates: $($_.Exception.Message)" -ForegroundColor Red
+        return @()
+    }
+}
+
+function Show-DependencySummary {
+    <#
+    .SYNOPSIS
+        Show dependency management summary
+    #>
+    [CmdletBinding()]
+    param(
+        [hashtable]$Results
+    )
+
+    Write-Host ""
+    Write-Host "📊 Dependency Management Summary:" -ForegroundColor Cyan
+    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+    Write-Host "✅ Package Restore: $(if ($Results.RestoreSuccessful) { 'Success' } else { 'Failed' })" -ForegroundColor $(if ($Results.RestoreSuccessful) { 'Green' } else { 'Red' })
+    Write-Host "🛡️ Vulnerabilities: $($Results.VulnerabilitiesFound)" -ForegroundColor $(if ($Results.VulnerabilitiesFound -eq 0) { 'Green' } else { 'Red' })
+    Write-Host "📌 Version Issues: $($Results.VersionIssues)" -ForegroundColor $(if ($Results.VersionIssues -eq 0) { 'Green' } else { 'Yellow' })
+    Write-Host "📄 Report Generated: $(if ($Results.ReportGenerated) { 'Yes' } else { 'No' })" -ForegroundColor $(if ($Results.ReportGenerated) { 'Green' } else { 'Gray' })
+
+    if ($Results.UpdatesAvailable -gt 0) {
+        Write-Host "⬆️ Updates Available: $($Results.UpdatesAvailable)" -ForegroundColor Yellow
+    }
+
+    Write-Host ""
+    $overallScore = if ($Results.RestoreSuccessful -and $Results.VulnerabilitiesFound -eq 0 -and $Results.VersionIssues -eq 0) { 'Excellent' } elseif ($Results.RestoreSuccessful) { 'Good' } else { 'Needs Attention' }
+    Write-Host "Overall Status: $overallScore" -ForegroundColor $(
+        switch ($overallScore) {
+            'Excellent' { 'Green' }
+            'Good' { 'Yellow' }
+            default { 'Red' }
+        }
+    )
+}
+
+function Invoke-BusBuddyDevWorkflow {
+    <#
+    .SYNOPSIS
+        Comprehensive development workflow for Bus Buddy (bb-dev-workflow)
+
+    .DESCRIPTION
+        Orchestrates a complete development cycle: build → validate → test → identify next Phase 2 target.
+        Handles warnings from analyzers, validates against rulesets, and provides structured development guidance.
+
+    .PARAMETER FullCycle
+        Run complete cycle including application launch
+
+    .PARAMETER SkipValidation
+        Skip deep validation and warning analysis
+
+    .PARAMETER SkipTests
+        Skip test execution
+
+    .PARAMETER Phase2Target
+        Override automatic Phase 2 target selection
+
+    .PARAMETER AnalysisMode
+        Enable comprehensive analysis mode for warnings
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$FullCycle,
+        [switch]$SkipValidation,
+        [switch]$SkipTests,
+        [string]$Phase2Target,
+        [switch]$AnalysisMode
+    )
+
+    $startTime = Get-Date
+    Write-BusBuddyStatus "🚌 Starting BusBuddy Development Workflow" -Status Info
+    Write-Host "Started at: $($startTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Gray
+    Write-Host ""
+
+    $workflowResults = @{
+        BuildSuccess = $false
+        ValidationPassed = $false
+        TestsPassed = $false
+        WarningCount = 0
+        NextPhase2Target = $null
+        Duration = $null
+        Issues = @()
+        Recommendations = @()
+    }
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    if (-not $projectRoot) {
+        Write-BusBuddyStatus "Project root not found - workflow cannot continue" -Status Error
+        return $workflowResults
+    }
+
+    Push-Location $projectRoot
+
+    try {
+        # =====================================
+        # Step 1: Clean Build with Analysis
+        # =====================================
+        Write-BusBuddyStatus "Step 1: Building solution..." -Status Build
+        Write-Host "🔨 Building with clean state and analyzer validation" -ForegroundColor Cyan
+
+        # Clean build to ensure fresh state
+        $cleanResult = Invoke-BusBuddyClean -Configuration Debug
+        if (-not $cleanResult) {
+            $workflowResults.Issues += "Clean operation failed"
+        }
+
+        # Build with enhanced analysis
+        $buildResult = Invoke-BusBuddyBuild -Configuration Debug -Restore -Verbosity normal
+        $workflowResults.BuildSuccess = $buildResult
+
+        if (-not $buildResult) {
+            Write-BusBuddyStatus "❌ Build failed - workflow terminated" -Status Error
+            $workflowResults.Issues += "Build compilation failed"
+            return $workflowResults
+        }
+
+        Write-BusBuddyStatus "✅ Build completed successfully" -Status Success
+
+        # =====================================
+        # Step 2: Deep Validation & Analysis
+        # =====================================
+        if (-not $SkipValidation) {
+            Write-Host ""
+            Write-BusBuddyStatus "Step 2: Validation and Analysis..." -Status Info
+            Write-Host "🔍 Running comprehensive validation checks" -ForegroundColor Cyan
+
+            # Enhanced build with analyzer reporting
+            if ($AnalysisMode) {
+                Write-Host "🔬 Running enhanced analyzer validation..." -ForegroundColor Yellow
+                $analyzerOutput = & dotnet build BusBuddy.sln --no-incremental /p:EnableNETAnalyzers=true /p:AnalysisMode=All /p:ReportAnalyzer=true --verbosity normal 2>&1
+
+                if ($analyzerOutput) {
+                    $warnings = $analyzerOutput | Select-String -Pattern "warning"
+                    $workflowResults.WarningCount = ($warnings | Measure-Object).Count
+
+                    Write-Host "📊 Analyzer Results:" -ForegroundColor Yellow
+                    Write-Host "   • Total Warnings: $($workflowResults.WarningCount)" -ForegroundColor $(if ($workflowResults.WarningCount -lt 100) { 'Green' } elseif ($workflowResults.WarningCount -lt 300) { 'Yellow' } else { 'Red' })
+
+                    # Focus on null safety warnings (CS860x)
+                    $nullSafetyWarnings = $warnings | Where-Object { $_.Line -match "CS860\d" }
+                    if ($nullSafetyWarnings) {
+                        Write-Host "   • Null Safety Warnings (CS860x): $($nullSafetyWarnings.Count)" -ForegroundColor Red
+                        $workflowResults.Recommendations += "Address null safety warnings (CS860x) - these are configured as errors in BusBuddy-Practical.ruleset"
+                    }
+                }
+            }
+
+            # Health check validation
+            Write-Host "🏥 Running health check..." -ForegroundColor Yellow
+            $healthResult = Invoke-BusBuddyHealthCheck -Quick
+            $workflowResults.ValidationPassed = $healthResult
+
+            # Dependency vulnerability scanning
+            Write-Host "🛡️ Scanning dependencies for vulnerabilities..." -ForegroundColor Yellow
+            try {
+                $depResults = Invoke-BusBuddyDependencyManagement -ScanVulnerabilities -ValidateVersions
+                if ($depResults.VulnerabilitiesFound -gt 0) {
+                    $workflowResults.Issues += "$($depResults.VulnerabilitiesFound) security vulnerabilities found in dependencies"
+                }
+                if ($depResults.VersionIssues -gt 0) {
+                    $workflowResults.Issues += "$($depResults.VersionIssues) version pinning issues detected"
+                }
+            }
+            catch {
+                Write-BusBuddyStatus "⚠️ Dependency analysis failed: $($_.Exception.Message)" -Status Warning
+                $workflowResults.Issues += "Dependency analysis incomplete"
+            }
+
+            Write-BusBuddyStatus "$(if ($workflowResults.ValidationPassed) { '✅' } else { '⚠️' }) Validation completed" -Status $(if ($workflowResults.ValidationPassed) { 'Success' } else { 'Warning' })
+        }
+
+        # =====================================
+        # Step 3: Test Execution
+        # =====================================
+        if (-not $SkipTests) {
+            Write-Host ""
+            Write-BusBuddyStatus "Step 3: Running test suite..." -Status Test
+            Write-Host "🧪 Executing comprehensive test validation" -ForegroundColor Cyan
+
+            $testResult = Invoke-BusBuddyTest -Configuration Debug -Logger "console;verbosity=minimal"
+            $workflowResults.TestsPassed = $testResult
+
+            if ($testResult) {
+                Write-BusBuddyStatus "✅ All tests passed" -Status Success
+            }
+            else {
+                Write-BusBuddyStatus "⚠️ Some tests failed or had issues" -Status Warning
+                $workflowResults.Issues += "Test execution encountered failures"
+            }
+        }
+
+        # =====================================
+        # Step 4: Phase 2 Target Identification
+        # =====================================
+        Write-Host ""
+        Write-BusBuddyStatus "Step 4: Identifying next Phase 2 target..." -Status Info
+        Write-Host "🎯 Analyzing project state for Phase 2 priorities" -ForegroundColor Cyan
+
+        if ($Phase2Target) {
+            $workflowResults.NextPhase2Target = $Phase2Target
+            Write-Host "🎯 Using specified target: $Phase2Target" -ForegroundColor Green
+        }
+        else {
+            # Intelligent Phase 2 target selection based on project state
+            $phase2Targets = @(
+                @{
+                    Target = "Implement comprehensive UI testing with Syncfusion controls"
+                    Priority = if ($workflowResults.TestsPassed) { 3 } else { 1 }
+                    Description = "Automated UI testing for dashboard, driver management, and vehicle tracking"
+                }
+                @{
+                    Target = "Integrate real-world data seeding and Azure SQL connectivity"
+                    Priority = if ($workflowResults.ValidationPassed) { 2 } else { 3 }
+                    Description = "Production-ready data integration with sample transportation data"
+                }
+                @{
+                    Target = "Enhance Dashboard with advanced analytics and reporting"
+                    Priority = if ($workflowResults.BuildSuccess) { 2 } else { 4 }
+                    Description = "Business intelligence dashboard with charts and KPI monitoring"
+                }
+                @{
+                    Target = "Optimize routing algorithms with xAI Grok API integration"
+                    Priority = 4
+                    Description = "AI-powered route optimization and predictive maintenance"
+                }
+                @{
+                    Target = "Reduce analyzer warnings and improve code quality (Focus: CS860x null safety)"
+                    Priority = if ($workflowResults.WarningCount -gt 200) { 1 } else { 3 }
+                    Description = "Address null safety warnings and improve overall code quality metrics"
+                }
+                @{
+                    Target = "Implement advanced MVVM patterns and dependency injection"
+                    Priority = if ($workflowResults.ValidationPassed) { 3 } else { 2 }
+                    Description = "Upgrade to sophisticated MVVM with proper IoC container integration"
+                }
+            )
+
+            # Select target based on priority (lower number = higher priority)
+            $selectedTarget = $phase2Targets | Sort-Object Priority | Select-Object -First 1
+            $workflowResults.NextPhase2Target = $selectedTarget.Target
+
+            Write-Host "🎯 Recommended Phase 2 Target:" -ForegroundColor Green
+            Write-Host "   Target: $($selectedTarget.Target)" -ForegroundColor White
+            Write-Host "   Priority: $($selectedTarget.Priority)" -ForegroundColor Gray
+            Write-Host "   Description: $($selectedTarget.Description)" -ForegroundColor Gray
+        }
+
+        # =====================================
+        # Step 5: Full Cycle (Optional)
+        # =====================================
+        if ($FullCycle) {
+            Write-Host ""
+            Write-BusBuddyStatus "Step 5: Launching application..." -Status Info
+            Write-Host "🚀 Starting Bus Buddy application for validation" -ForegroundColor Cyan
+
+            try {
+                $runResult = Invoke-BusBuddyRun -Configuration Debug -NoBuild
+                if ($runResult) {
+                    Write-BusBuddyStatus "✅ Application launched successfully" -Status Success
+                }
+                else {
+                    Write-BusBuddyStatus "⚠️ Application launch had issues" -Status Warning
+                    $workflowResults.Issues += "Application runtime issues detected"
+                }
+            }
+            catch {
+                Write-BusBuddyStatus "❌ Application launch failed: $($_.Exception.Message)" -Status Error
+                $workflowResults.Issues += "Application launch failed"
+            }
+        }
+
+        # =====================================
+        # Workflow Summary
+        # =====================================
+        $endTime = Get-Date
+        $workflowResults.Duration = $endTime - $startTime
+
+        Write-Host ""
+        Write-BusBuddyStatus "🏁 Development Workflow Complete" -Status Success
+        Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+        Write-Host "📊 Workflow Summary:" -ForegroundColor Cyan
+        Write-Host "   • Duration: $([math]::Round($workflowResults.Duration.TotalMinutes, 1)) minutes" -ForegroundColor Gray
+        Write-Host "   • Build: $(if ($workflowResults.BuildSuccess) { '✅ Success' } else { '❌ Failed' })" -ForegroundColor $(if ($workflowResults.BuildSuccess) { 'Green' } else { 'Red' })
+        Write-Host "   • Validation: $(if ($workflowResults.ValidationPassed) { '✅ Passed' } else { '⚠️ Issues' })" -ForegroundColor $(if ($workflowResults.ValidationPassed) { 'Green' } else { 'Yellow' })
+        Write-Host "   • Tests: $(if ($workflowResults.TestsPassed) { '✅ Passed' } else { '⚠️ Issues' })" -ForegroundColor $(if ($workflowResults.TestsPassed) { 'Green' } else { 'Yellow' })
+        Write-Host "   • Warnings: $($workflowResults.WarningCount)" -ForegroundColor $(if ($workflowResults.WarningCount -lt 100) { 'Green' } elseif ($workflowResults.WarningCount -lt 300) { 'Yellow' } else { 'Red' })
+
+        if ($workflowResults.Issues.Count -gt 0) {
+            Write-Host ""
+            Write-Host "⚠️ Issues Identified:" -ForegroundColor Yellow
+            foreach ($issue in $workflowResults.Issues) {
+                Write-Host "   • $issue" -ForegroundColor Red
+            }
+        }
+
+        if ($workflowResults.Recommendations.Count -gt 0) {
+            Write-Host ""
+            Write-Host "💡 Recommendations:" -ForegroundColor Blue
+            foreach ($rec in $workflowResults.Recommendations) {
+                Write-Host "   • $rec" -ForegroundColor Cyan
+            }
+        }
+
+        Write-Host ""
+        Write-Host "🎯 Next Phase 2 Focus:" -ForegroundColor Magenta
+        Write-Host "   $($workflowResults.NextPhase2Target)" -ForegroundColor White
+
+        return $workflowResults
+    }
+    catch {
+        Write-BusBuddyStatus "❌ Workflow error: $($_.Exception.Message)" -Status Error
+        $workflowResults.Issues += "Workflow execution error: $($_.Exception.Message)"
+        return $workflowResults
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Get-BusBuddyWorkflowResults {
+    <#
+    .SYNOPSIS
+        Monitor GitHub Actions workflow results (bb-get-workflow-results)
+
+    .DESCRIPTION
+        Retrieves and displays GitHub Actions workflow run status and results.
+        Supports both GitHub CLI and REST API methods for comprehensive monitoring.
+
+    .PARAMETER Count
+        Number of recent workflow runs to retrieve
+
+    .PARAMETER Repository
+        Repository name (defaults to current repository)
+
+    .PARAMETER Status
+        Filter by workflow status (completed, in_progress, queued)
+
+    .PARAMETER Detailed
+        Show detailed workflow information including logs
+    #>
+    [CmdletBinding()]
+    param(
+        [int]$Count = 5,
+        [string]$Repository = "Bigessfour/BusBuddy-2",
+        [ValidateSet('completed', 'in_progress', 'queued', 'all')]
+        [string]$Status = 'all',
+        [switch]$Detailed
+    )
+
+    Write-BusBuddyStatus "📡 Retrieving GitHub Actions workflow results..." -Status Info
+
+    $results = @()
+
+    try {
+        # Method 1: Try GitHub CLI first (preferred)
+        if (Get-Command gh -ErrorAction SilentlyContinue) {
+            Write-Host "🔗 Using GitHub CLI for workflow data..." -ForegroundColor Yellow
+
+            $ghArgs = @('run', 'list', '--limit', $Count, '--json', 'status,conclusion,createdAt,name,workflowName,id,event,headBranch')
+            if ($Status -ne 'all') {
+                $ghArgs += '--status', $Status
+            }
+
+            try {
+                $ghOutput = & gh @ghArgs 2>&1
+                if ($LASTEXITCODE -eq 0) {
+                    $results = $ghOutput | ConvertFrom-Json
+                    Write-BusBuddyStatus "✅ Retrieved $($results.Count) workflow runs via GitHub CLI" -Status Success
+                }
+                else {
+                    Write-BusBuddyStatus "⚠️ GitHub CLI failed: $ghOutput" -Status Warning
+                    throw "GitHub CLI failed"
+                }
+            }
+            catch {
+                Write-BusBuddyStatus "⚠️ GitHub CLI error, falling back to REST API..." -Status Warning
+                $results = @()  # Clear results to trigger fallback
+            }
+        }
+
+        # Method 2: Fallback to REST API
+        if ($results.Count -eq 0) {
+            Write-Host "🌐 Using GitHub REST API for workflow data..." -ForegroundColor Yellow
+
+            # Check for GitHub token
+            if (-not $env:GITHUB_TOKEN) {
+                Write-BusBuddyStatus "❌ GITHUB_TOKEN environment variable not set" -Status Error
+                Write-Host "💡 Set your GitHub Personal Access Token:" -ForegroundColor Blue
+                Write-Host "   `$env:GITHUB_TOKEN = 'your_token_here'" -ForegroundColor Gray
+                Write-Host "   Or: gh auth login" -ForegroundColor Gray
+                return $null
+            }
+
+            $headers = @{
+                Authorization = "token $env:GITHUB_TOKEN"
+                Accept = "application/vnd.github.v3+json"
+            }
+
+            $baseUrl = "https://api.github.com/repos/$Repository/actions/runs"
+            $queryParams = @("per_page=$Count")
+            if ($Status -ne 'all') { $queryParams += "status=$Status" }
+            $fullUrl = "$baseUrl?$($queryParams -join '&')"
+
+            try {
+                $response = Invoke-RestMethod -Uri $fullUrl -Headers $headers -Method Get
+                $results = $response.workflow_runs | Select-Object -First $Count
+
+                # Convert to consistent format
+                $results = $results | ForEach-Object {
+                    [PSCustomObject]@{
+                        id = $_.id
+                        name = $_.name
+                        workflowName = $_.name
+                        status = $_.status
+                        conclusion = $_.conclusion
+                        createdAt = $_.created_at
+                        event = $_.event
+                        headBranch = $_.head_branch
+                    }
+                }
+
+                Write-BusBuddyStatus "✅ Retrieved $($results.Count) workflow runs via REST API" -Status Success
+            }
+            catch {
+                Write-BusBuddyStatus "❌ REST API error: $($_.Exception.Message)" -Status Error
+                return $null
+            }
+        }
+
+        # Display results
+        if ($results.Count -eq 0) {
+            Write-BusBuddyStatus "ℹ️ No workflow runs found" -Status Info
+            return $null
+        }
+
+        Write-Host ""
+        Write-Host "📊 GitHub Actions Workflow Results:" -ForegroundColor Cyan
+        Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+
+        if ($Detailed) {
+            foreach ($run in $results) {
+                $statusIcon = switch ($run.status) {
+                    'completed' { if ($run.conclusion -eq 'success') { '✅' } elseif ($run.conclusion -eq 'failure') { '❌' } else { '⚠️' } }
+                    'in_progress' { '🔄' }
+                    'queued' { '⏳' }
+                    default { '❓' }
+                }
+
+                Write-Host ""
+                Write-Host "$statusIcon Workflow: $($run.workflowName)" -ForegroundColor White
+                Write-Host "   • ID: $($run.id)" -ForegroundColor Gray
+                Write-Host "   • Status: $($run.status)" -ForegroundColor $(if ($run.status -eq 'completed') { 'Green' } elseif ($run.status -eq 'in_progress') { 'Yellow' } else { 'Gray' })
+                Write-Host "   • Conclusion: $($run.conclusion)" -ForegroundColor $(if ($run.conclusion -eq 'success') { 'Green' } elseif ($run.conclusion -eq 'failure') { 'Red' } else { 'Yellow' })
+                Write-Host "   • Created: $([DateTime]::Parse($run.createdAt).ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Gray
+                Write-Host "   • Event: $($run.event)" -ForegroundColor Gray
+                Write-Host "   • Branch: $($run.headBranch)" -ForegroundColor Gray
+            }
+        }
+        else {
+            # Compact table format
+            $tableData = $results | ForEach-Object {
+                $statusIcon = switch ($_.status) {
+                    'completed' { if ($_.conclusion -eq 'success') { '✅' } elseif ($_.conclusion -eq 'failure') { '❌' } else { '⚠️' } }
+                    'in_progress' { '🔄' }
+                    'queued' { '⏳' }
+                    default { '❓' }
+                }
+
+                [PSCustomObject]@{
+                    Status = "$statusIcon $($_.status)"
+                    Workflow = $_.workflowName
+                    Conclusion = $_.conclusion
+                    Created = [DateTime]::Parse($_.createdAt).ToString('MM-dd HH:mm')
+                    Branch = $_.headBranch
+                    Event = $_.event
+                }
+            }
+
+            $tableData | Format-Table -AutoSize
+        }
+
+        # Summary statistics
+        $statusCounts = $results | Group-Object status
+        $conclusionCounts = $results | Where-Object { $_.conclusion } | Group-Object conclusion
+
+        Write-Host ""
+        Write-Host "📈 Summary Statistics:" -ForegroundColor Cyan
+        foreach ($statusGroup in $statusCounts) {
+            Write-Host "   • $($statusGroup.Name): $($statusGroup.Count)" -ForegroundColor Gray
+        }
+        if ($conclusionCounts) {
+            Write-Host "   Recent Conclusions:" -ForegroundColor Gray
+            foreach ($conclusionGroup in $conclusionCounts) {
+                $color = switch ($conclusionGroup.Name) {
+                    'success' { 'Green' }
+                    'failure' { 'Red' }
+                    default { 'Yellow' }
+                }
+                Write-Host "     - $($conclusionGroup.Name): $($conclusionGroup.Count)" -ForegroundColor $color
+            }
+        }
+
+        return $results
+    }
+    catch {
+        Write-BusBuddyStatus "❌ Error retrieving workflow results: $($_.Exception.Message)" -Status Error
+        return $null
+    }
+}
+
+function Show-BusBuddyWarningAnalysis {
+    <#
+    .SYNOPSIS
+        Analyze and categorize build warnings (bb-warning-analysis)
+
+    .DESCRIPTION
+        Provides detailed analysis of build warnings with focus on null safety (CS860x)
+        and actionable recommendations for reducing warning count below 100.
+
+    .PARAMETER ShowTop
+        Number of top warning types to display
+
+    .PARAMETER FocusNullSafety
+        Focus analysis on null safety warnings (CS860x series)
+
+    .PARAMETER GenerateReport
+        Generate detailed warning report file
+    #>
+    [CmdletBinding()]
+    param(
+        [int]$ShowTop = 10,
+        [switch]$FocusNullSafety,
+        [switch]$GenerateReport
+    )
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    if (-not $projectRoot) {
+        Write-BusBuddyStatus "Project root not found" -Status Error
+        return
+    }
+
+    Push-Location $projectRoot
+
+    try {
+        Write-BusBuddyStatus "🔍 Analyzing build warnings..." -Status Info
+
+        # Get detailed build output with warnings
+        $buildOutput = & dotnet build BusBuddy.sln --verbosity normal /p:EnableNETAnalyzers=true 2>&1
+        $warnings = $buildOutput | Select-String -Pattern "warning"
+
+        if (-not $warnings) {
+            Write-BusBuddyStatus "🎉 No warnings found!" -Status Success
+            return
+        }
+
+        Write-Host ""
+        Write-Host "📊 Warning Analysis Results:" -ForegroundColor Cyan
+        Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+        Write-Host "Total Warnings: $($warnings.Count)" -ForegroundColor $(if ($warnings.Count -lt 100) { 'Green' } elseif ($warnings.Count -lt 300) { 'Yellow' } else { 'Red' })
+
+        # Categorize warnings
+        $warningCategories = @{}
+        $nullSafetyWarnings = @()
+
+        foreach ($warning in $warnings) {
+            $warningLine = $warning.Line
+
+            # Extract warning code (e.g., CS8600, CA1234, etc.)
+            if ($warningLine -match "warning\s+([A-Z]{2}\d{4})") {
+                $warningCode = $matches[1]
+
+                if (-not $warningCategories.ContainsKey($warningCode)) {
+                    $warningCategories[$warningCode] = @()
+                }
+                $warningCategories[$warningCode] += $warningLine
+
+                # Track null safety warnings specifically
+                if ($warningCode -match "CS860\d") {
+                    $nullSafetyWarnings += $warningLine
+                }
+            }
+        }
+
+        # Display top warning categories
+        Write-Host ""
+        Write-Host "🏆 Top $ShowTop Warning Categories:" -ForegroundColor Yellow
+        $sortedCategories = $warningCategories.GetEnumerator() | Sort-Object { $_.Value.Count } -Descending | Select-Object -First $ShowTop
+
+        foreach ($category in $sortedCategories) {
+            $code = $category.Key
+            $count = $category.Value.Count
+            $description = Get-WarningCodeDescription -Code $code
+
+            Write-Host "   $code ($count occurrences): $description" -ForegroundColor Cyan
+
+            # Show sample for top 3
+            if ($sortedCategories.IndexOf($category) -lt 3) {
+                $sample = $category.Value[0] -replace '.*warning\s+[A-Z]{2}\d{4}:\s*', '' -replace '\s*\[.*\].*$', ''
+                Write-Host "     Sample: $($sample.Substring(0, [Math]::Min(80, $sample.Length)))" -ForegroundColor Gray
+            }
+        }
+
+        # Null safety analysis
+        if ($FocusNullSafety -or $nullSafetyWarnings.Count -gt 0) {
+            Write-Host ""
+            Write-Host "🛡️ Null Safety Analysis (CS860x series):" -ForegroundColor Magenta
+            Write-Host "Null Safety Warnings: $($nullSafetyWarnings.Count)" -ForegroundColor $(if ($nullSafetyWarnings.Count -eq 0) { 'Green' } else { 'Red' })
+
+            if ($nullSafetyWarnings.Count -gt 0) {
+                $nullSafetyByCode = $nullSafetyWarnings | ForEach-Object {
+                    if ($_ -match "warning\s+(CS860\d)") { $matches[1] }
+                } | Group-Object | Sort-Object Count -Descending
+
+                foreach ($group in $nullSafetyByCode) {
+                    Write-Host "   $($group.Name): $($group.Count) occurrences" -ForegroundColor Yellow
+                }
+
+                Write-Host ""
+                Write-Host "💡 Null Safety Recommendations:" -ForegroundColor Blue
+                Write-Host "   • Enable nullable reference types: <Nullable>enable</Nullable>" -ForegroundColor Cyan
+                Write-Host "   • Add null checks: ArgumentNullException.ThrowIfNull(parameter)" -ForegroundColor Cyan
+                Write-Host "   • Use null-conditional operators: object?.Property" -ForegroundColor Cyan
+                Write-Host "   • Initialize collections in constructors to avoid null references" -ForegroundColor Cyan
+            }
+        }
+
+        # Generate report if requested
+        if ($GenerateReport) {
+            $reportPath = Join-Path $projectRoot "warning-analysis-report.json"
+            $reportData = @{
+                Timestamp = Get-Date
+                TotalWarnings = $warnings.Count
+                Categories = $warningCategories
+                NullSafetyCount = $nullSafetyWarnings.Count
+                TopCategories = $sortedCategories | ForEach-Object { @{ Code = $_.Key; Count = $_.Value.Count } }
+                Recommendations = @(
+                    "Focus on CS860x null safety warnings first",
+                    "Configure ruleset to suppress non-critical analyzer warnings",
+                    "Aim for <100 total warnings by Phase 2 completion",
+                    "Use dotnet build /p:ReportAnalyzer=true for detailed analysis"
+                )
+            }
+
+            $reportData | ConvertTo-Json -Depth 3 | Out-File $reportPath -Encoding UTF8
+            Write-BusBuddyStatus "📄 Detailed report saved to: $reportPath" -Status Info
+        }
+
+        # Final recommendations
+        Write-Host ""
+        Write-Host "🎯 Action Plan:" -ForegroundColor Green
+        if ($warnings.Count -gt 300) {
+            Write-Host "   1. HIGH PRIORITY: Reduce warnings from $($warnings.Count) to <300" -ForegroundColor Red
+            Write-Host "   2. Configure BusBuddy-Practical.ruleset to suppress non-critical warnings" -ForegroundColor Yellow
+            Write-Host "   3. Focus on null safety (CS860x) warnings first" -ForegroundColor Yellow
+        }
+        elseif ($warnings.Count -gt 100) {
+            Write-Host "   1. MEDIUM PRIORITY: Reduce warnings from $($warnings.Count) to <100" -ForegroundColor Yellow
+            Write-Host "   2. Address top 5 warning categories systematically" -ForegroundColor Cyan
+        }
+        else {
+            Write-Host "   🎉 EXCELLENT: Warning count is under control!" -ForegroundColor Green
+            Write-Host "   Focus on code quality improvements and Phase 2 features" -ForegroundColor Cyan
+        }
+
+    }
+    catch {
+        Write-BusBuddyStatus "❌ Error analyzing warnings: $($_.Exception.Message)" -Status Error
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function Get-WarningCodeDescription {
+    <#
+    .SYNOPSIS
+        Get description for common warning codes
+    #>
+    param([string]$Code)
+
+    $descriptions = @{
+        'CS8600' = 'Converting null literal or possible null value to non-nullable type'
+        'CS8601' = 'Possible null reference assignment'
+        'CS8602' = 'Dereference of a possibly null reference'
+        'CS8603' = 'Possible null reference return'
+        'CS8604' = 'Possible null reference argument'
+        'CS8618' = 'Non-nullable field must contain a non-null value when exiting constructor'
+        'CS8625' = 'Cannot convert null literal to non-nullable reference type'
+        'CA1031' = 'Do not catch general exception types'
+        'CA1303' = 'Do not pass literals as localized parameters'
+        'CA1848' = 'Use the LoggerMessage delegates'
+        'CA2007' = 'Consider calling ConfigureAwait on the awaited task'
+        'CS1591' = 'Missing XML comment for publicly visible type or member'
+        'CA1822' = 'Mark members as static'
+        'CA1805' = 'Do not initialize unnecessarily'
+        'CA1812' = 'Avoid uninstantiated internal classes'
+        'IDE0051' = 'Remove unused private members'
+        'IDE0052' = 'Remove unread private members'
+    }
+
+    return $descriptions[$Code] ?? "Unknown warning type"
+}
+
+function Install-BusBuddyVSCodeExtensions {
+    <#
+    .SYNOPSIS
+        Install recommended VS Code extensions for Bus Buddy development (bb-install-extensions)
+
+    .DESCRIPTION
+        Installs the curated set of VS Code extensions for optimal Bus Buddy development.
+        Supports .NET 9, WPF, PowerShell 7.5, Azure integration, and warning reduction.
+        Extensions are defined in .vscode/extensions.json for team consistency.
+
+    .PARAMETER All
+        Install all recommended extensions (default behavior)
+
+    .PARAMETER Essential
+        Install only essential extensions for basic development
+
+    .PARAMETER Advanced
+        Install advanced extensions including AI tools and productivity enhancements
+
+    .PARAMETER ListOnly
+        List available extensions without installing
+
+    .PARAMETER Force
+        Force reinstall extensions even if already installed
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$All,
+        [switch]$Essential,
+        [switch]$Advanced,
+        [switch]$ListOnly,
+        [switch]$Force
+    )
+
+    Write-BusBuddyStatus "🔌 VS Code Extensions Manager for Bus Buddy" -Status Info
+    Write-Host "══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+
+    # Check if VS Code CLI is available
+    $codeCommand = $null
+    $codeCommands = @('code', 'code-insiders', 'codium')
+
+    foreach ($cmd in $codeCommands) {
+        if (Get-Command $cmd -ErrorAction SilentlyContinue) {
+            $codeCommand = $cmd
+            break
+        }
+    }
+
+    if (-not $codeCommand) {
+        Write-BusBuddyStatus "❌ VS Code CLI not found in PATH" -Status Error
+        Write-Host "💡 Solutions:" -ForegroundColor Blue
+        Write-Host "   • Install VS Code and add to PATH" -ForegroundColor Gray
+        Write-Host "   • Run from VS Code integrated terminal" -ForegroundColor Gray
+        Write-Host "   • Use 'code --help' to verify CLI availability" -ForegroundColor Gray
+        return $false
+    }
+
+    Write-BusBuddyStatus "✅ Found VS Code CLI: $codeCommand" -Status Success
+
+    # Define extension categories
+    $extensionCategories = @{
+        'Essential' = @{
+            'ms-dotnettools.csharp' = '.NET C# Support - Core IntelliSense and debugging'
+            'ms-vscode.powershell' = 'PowerShell 7.5 support with advanced features'
+            'ms-dotnettools.csdevkit' = '.NET development kit with build/test integration'
+            'eamodio.gitlens' = 'Git supercharged - history, blame, and GitHub integration'
+            'spmeesseman.vscode-taskexplorer' = 'Task Explorer (EXCLUSIVE task management method)'
+        }
+        'Core Development' = @{
+            'ms-dotnettools.vscode-dotnet-runtime' = '.NET runtime management'
+            'ms-dotnettools.xaml' = 'XAML language support for WPF'
+            'josefpihrt-vscode.roslynator' = 'Advanced C# code analysis and refactoring'
+            'esbenp.prettier-vscode' = 'Code formatter for consistency'
+            'editorconfig.editorconfig' = 'EditorConfig support for team consistency'
+        }
+        'Testing & Quality' = @{
+            'ms-vscode.test-adapter-converter' = 'Test adapter converter'
+            'streetsidesoftware.code-spell-checker' = 'Spell checker for documentation'
+            'aaron-bond.better-comments' = 'Enhanced comment highlighting'
+        }
+        'AI & Productivity' = @{
+            'github.copilot' = 'GitHub Copilot AI assistance'
+            'github.copilot-chat' = 'GitHub Copilot Chat interface'
+            'ms-vscode.powershell-preview' = 'PowerShell preview with PS 7.5.2 features'
+        }
+        'Azure & Cloud' = @{
+            'ms-vscode.azure-account' = 'Azure account management'
+            'ms-azuretools.vscode-azureresourcegroups' = 'Azure resource management'
+        }
+        'Advanced Tools' = @{
+            'syncfusioninc.maui-vscode-extensions' = 'Syncfusion development support'
+            'ms-vscode.hexeditor' = 'Hex editor for binary files'
+            'ms-vscode-remote.remote-ssh' = 'Remote development via SSH'
+        }
+    }
+
+    # Determine which extensions to install
+    $extensionsToInstall = @()
+
+    if ($Essential) {
+        $extensionsToInstall = $extensionCategories['Essential'].Keys
+        Write-Host "📦 Installing Essential Extensions Only" -ForegroundColor Yellow
+    }
+    elseif ($Advanced) {
+        $extensionsToInstall = $extensionCategories.Values | ForEach-Object { $_.Keys } | Sort-Object -Unique
+        Write-Host "🚀 Installing All Advanced Extensions" -ForegroundColor Cyan
+    }
+    else {
+        # Default: Core Development + Essential
+        $extensionsToInstall = $extensionCategories['Essential'].Keys + $extensionCategories['Core Development'].Keys
+        Write-Host "🔧 Installing Recommended Extensions (Essential + Core Development)" -ForegroundColor Green
+    }
+
+    if ($ListOnly) {
+        Write-Host ""
+        Write-Host "📋 Available Extension Categories:" -ForegroundColor Cyan
+
+        foreach ($category in $extensionCategories.Keys) {
+            Write-Host ""
+            Write-Host "📂 $category" -ForegroundColor Magenta
+            foreach ($ext in $extensionCategories[$category].GetEnumerator()) {
+                $installed = & $codeCommand --list-extensions | Where-Object { $_ -eq $ext.Key }
+                $status = if ($installed) { "✅" } else { "⬜" }
+                Write-Host "   $status $($ext.Key)" -ForegroundColor White
+                Write-Host "      $($ext.Value)" -ForegroundColor Gray
+            }
+        }
+        return $true
+    }
+
+    # Install extensions
+    Write-Host ""
+    Write-Host "🔌 Installing VS Code Extensions..." -ForegroundColor Cyan
+    Write-Host "Total extensions to process: $($extensionsToInstall.Count)" -ForegroundColor Gray
+
+    $installResults = @{
+        Installed = @()
+        Skipped = @()
+        Failed = @()
+        AlreadyInstalled = @()
+    }
+
+    foreach ($extensionId in $extensionsToInstall) {
+        try {
+            # Check if already installed
+            $installed = & $codeCommand --list-extensions | Where-Object { $_ -eq $extensionId }
+
+            if ($installed -and -not $Force) {
+                Write-Host "⏭️  $extensionId (already installed)" -ForegroundColor DarkGray
+                $installResults.AlreadyInstalled += $extensionId
+                continue
+            }
+
+            Write-Host "📦 Installing $extensionId..." -ForegroundColor Yellow -NoNewline
+
+            $installOutput = & $codeCommand --install-extension $extensionId --force 2>&1
+
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host " ✅" -ForegroundColor Green
+                $installResults.Installed += $extensionId
+            }
+            else {
+                Write-Host " ❌" -ForegroundColor Red
+                Write-Host "   Error: $installOutput" -ForegroundColor Red
+                $installResults.Failed += @{ Extension = $extensionId; Error = $installOutput }
+            }
+        }
+        catch {
+            Write-Host " ❌ Exception" -ForegroundColor Red
+            Write-Host "   Error: $($_.Exception.Message)" -ForegroundColor Red
+            $installResults.Failed += @{ Extension = $extensionId; Error = $_.Exception.Message }
+        }
+    }
+
+    # Display summary
+    Write-Host ""
+    Write-Host "📊 Installation Summary:" -ForegroundColor Cyan
+    Write-Host "══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+    Write-Host "✅ Newly Installed: $($installResults.Installed.Count)" -ForegroundColor Green
+    Write-Host "⏭️  Already Installed: $($installResults.AlreadyInstalled.Count)" -ForegroundColor Gray
+    Write-Host "❌ Failed: $($installResults.Failed.Count)" -ForegroundColor Red
+
+    if ($installResults.Failed.Count -gt 0) {
+        Write-Host ""
+        Write-Host "❌ Failed Extensions:" -ForegroundColor Red
+        foreach ($failure in $installResults.Failed) {
+            Write-Host "   • $($failure.Extension): $($failure.Error)" -ForegroundColor Red
+        }
+    }
+
+    if ($installResults.Installed.Count -gt 0) {
+        Write-Host ""
+        Write-Host "🔄 Restart VS Code to activate new extensions" -ForegroundColor Yellow
+        Write-Host "💡 Run 'bb-health' after restart to validate environment" -ForegroundColor Blue
+    }
+
+    # Generate extensions report
+    $projectRoot = Get-BusBuddyProjectRoot
+    if ($projectRoot) {
+        $reportPath = Join-Path $projectRoot "vscode-extensions-install-report.json"
+        $report = @{
+            Timestamp = Get-Date
+            VSCodeCommand = $codeCommand
+            InstallationType = if ($Essential) { 'Essential' } elseif ($Advanced) { 'Advanced' } else { 'Recommended' }
+            Results = $installResults
+            NextSteps = @(
+                "Restart VS Code to activate extensions",
+                "Run bb-health to validate development environment",
+                "Check .vscode/extensions.json for team recommendations",
+                "Use bb-dev-workflow to test integrated development cycle"
+            )
+        }
+
+        try {
+            $report | ConvertTo-Json -Depth 3 | Out-File $reportPath -Encoding UTF8
+            Write-Host "📄 Installation report saved to: $reportPath" -ForegroundColor Blue
+        }
+        catch {
+            Write-BusBuddyStatus "⚠️ Could not save report: $($_.Exception.Message)" -Status Warning
+        }
+    }
+
+    $successRate = if ($extensionsToInstall.Count -gt 0) {
+        [math]::Round((($installResults.Installed.Count + $installResults.AlreadyInstalled.Count) / $extensionsToInstall.Count) * 100, 1)
+    } else { 100 }
+
+    Write-Host ""
+    if ($successRate -ge 90) {
+        Write-BusBuddyStatus "🎉 Extensions setup completed successfully ($successRate% success rate)" -Status Success
+    }
+    elseif ($successRate -ge 70) {
+        Write-BusBuddyStatus "⚠️ Extensions setup completed with some issues ($successRate% success rate)" -Status Warning
+    }
+    else {
+        Write-BusBuddyStatus "❌ Extensions setup had significant issues ($successRate% success rate)" -Status Error
+    }
+
+    return $installResults
+}
+
+function Test-BusBuddyVSCodeSetup {
+    <#
+    .SYNOPSIS
+        Validate VS Code setup for Bus Buddy development (bb-validate-vscode)
+
+    .DESCRIPTION
+        Comprehensive validation of VS Code environment including extensions,
+        settings, and integration with Bus Buddy development workflow.
+
+    .PARAMETER ShowDetails
+        Show detailed information about each extension and setting
+
+    .PARAMETER CheckTasks
+        Validate VS Code task configuration
+
+    .PARAMETER CheckSettings
+        Validate VS Code settings configuration
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$ShowDetails,
+        [switch]$CheckTasks,
+        [switch]$CheckSettings
+    )
+
+    Write-BusBuddyStatus "🔍 VS Code Setup Validation for Bus Buddy" -Status Info
+    Write-Host "══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+
+    $validationResults = @{
+        VSCodeAvailable = $false
+        ExtensionsInstalled = @()
+        ExtensionsMissing = @()
+        TasksConfigured = $false
+        SettingsValid = $false
+        OverallScore = 0
+        Recommendations = @()
+    }
+
+    # Check VS Code availability
+    $codeCommand = $null
+    $codeCommands = @('code', 'code-insiders', 'codium')
+
+    foreach ($cmd in $codeCommands) {
+        if (Get-Command $cmd -ErrorAction SilentlyContinue) {
+            $codeCommand = $cmd
+            $validationResults.VSCodeAvailable = $true
+            break
+        }
+    }
+
+    if ($validationResults.VSCodeAvailable) {
+        Write-Host "✅ VS Code CLI Available: $codeCommand" -ForegroundColor Green
+    }
+    else {
+        Write-Host "❌ VS Code CLI Not Found" -ForegroundColor Red
+        $validationResults.Recommendations += "Install VS Code and ensure CLI is in PATH"
+        return $validationResults
+    }
+
+    # Check essential extensions
+    Write-Host ""
+    Write-Host "🔌 Checking Essential Extensions..." -ForegroundColor Cyan
+
+    $essentialExtensions = @{
+        'ms-dotnettools.csharp' = 'C# Development'
+        'ms-vscode.powershell' = 'PowerShell Support'
+        'spmeesseman.vscode-taskexplorer' = 'Task Explorer (Required)'
+        'eamodio.gitlens' = 'Git Integration'
+        'ms-dotnettools.csdevkit' = '.NET Development Kit'
+    }
+
+    try {
+        $installedExtensions = & $codeCommand --list-extensions 2>&1
+
+        foreach ($ext in $essentialExtensions.GetEnumerator()) {
+            if ($installedExtensions -contains $ext.Key) {
+                Write-Host "   ✅ $($ext.Value) ($($ext.Key))" -ForegroundColor Green
+                $validationResults.ExtensionsInstalled += $ext.Key
+            }
+            else {
+                Write-Host "   ❌ $($ext.Value) ($($ext.Key))" -ForegroundColor Red
+                $validationResults.ExtensionsMissing += $ext.Key
+                $validationResults.Recommendations += "Install missing extension: $($ext.Key)"
+            }
+        }
+    }
+    catch {
+        Write-Host "   ⚠️ Could not check extensions: $($_.Exception.Message)" -ForegroundColor Yellow
+        $validationResults.Recommendations += "Manually verify extension installation"
+    }
+
+    # Check .vscode configuration
+    $projectRoot = Get-BusBuddyProjectRoot
+    if ($projectRoot) {
+        Write-Host ""
+        Write-Host "⚙️ Checking VS Code Configuration..." -ForegroundColor Cyan
+
+        # Check extensions.json
+        $extensionsJsonPath = Join-Path $projectRoot ".vscode\extensions.json"
+        if (Test-Path $extensionsJsonPath) {
+            Write-Host "   ✅ .vscode/extensions.json exists" -ForegroundColor Green
+
+            if ($ShowDetails) {
+                try {
+                    $extensionsConfig = Get-Content $extensionsJsonPath | ConvertFrom-Json
+                    $recommendedCount = $extensionsConfig.recommendations.Count
+                    Write-Host "      • Recommended extensions: $recommendedCount" -ForegroundColor Gray
+                }
+                catch {
+                    Write-Host "      ⚠️ Could not parse extensions.json" -ForegroundColor Yellow
+                }
+            }
+        }
+        else {
+            Write-Host "   ❌ .vscode/extensions.json missing" -ForegroundColor Red
+            $validationResults.Recommendations += "Create .vscode/extensions.json for team consistency"
+        }
+
+        # Check tasks.json
+        if ($CheckTasks) {
+            $tasksJsonPath = Join-Path $projectRoot ".vscode\tasks.json"
+            if (Test-Path $tasksJsonPath) {
+                Write-Host "   ✅ .vscode/tasks.json exists" -ForegroundColor Green
+                $validationResults.TasksConfigured = $true
+
+                if ($ShowDetails) {
+                    try {
+                        $tasksConfig = Get-Content $tasksJsonPath | ConvertFrom-Json
+                        $taskCount = $tasksConfig.tasks.Count
+                        Write-Host "      • Configured tasks: $taskCount" -ForegroundColor Gray
+                    }
+                    catch {
+                        Write-Host "      ⚠️ Could not parse tasks.json" -ForegroundColor Yellow
+                    }
+                }
+            }
+            else {
+                Write-Host "   ⚠️ .vscode/tasks.json missing (optional)" -ForegroundColor Yellow
+            }
+        }
+
+        # Check settings.json
+        if ($CheckSettings) {
+            $settingsJsonPath = Join-Path $projectRoot ".vscode\settings.json"
+            if (Test-Path $settingsJsonPath) {
+                Write-Host "   ✅ .vscode/settings.json exists" -ForegroundColor Green
+                $validationResults.SettingsValid = $true
+
+                if ($ShowDetails) {
+                    try {
+                        $settingsConfig = Get-Content $settingsJsonPath | ConvertFrom-Json
+                        $settingCount = ($settingsConfig | Get-Member -MemberType NoteProperty).Count
+                        Write-Host "      • Custom settings: $settingCount" -ForegroundColor Gray
+                    }
+                    catch {
+                        Write-Host "      ⚠️ Could not parse settings.json" -ForegroundColor Yellow
+                    }
+                }
+            }
+            else {
+                Write-Host "   ⚠️ .vscode/settings.json missing (optional)" -ForegroundColor Yellow
+            }
+        }
+    }
+
+    # Calculate overall score
+    $maxScore = 100
+    $currentScore = 0
+
+    if ($validationResults.VSCodeAvailable) { $currentScore += 20 }
+    $extensionScore = ($validationResults.ExtensionsInstalled.Count / $essentialExtensions.Count) * 50
+    $currentScore += $extensionScore
+    if ($validationResults.TasksConfigured) { $currentScore += 15 }
+    if ($validationResults.SettingsValid) { $currentScore += 15 }
+
+    $validationResults.OverallScore = [math]::Round($currentScore, 1)
+
+    # Display summary
+    Write-Host ""
+    Write-Host "📊 VS Code Setup Summary:" -ForegroundColor Cyan
+    Write-Host "══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+    Write-Host "Overall Score: $($validationResults.OverallScore)%" -ForegroundColor $(
+        if ($validationResults.OverallScore -ge 80) { 'Green' }
+        elseif ($validationResults.OverallScore -ge 60) { 'Yellow' }
+        else { 'Red' }
+    )
+    Write-Host "Essential Extensions: $($validationResults.ExtensionsInstalled.Count)/$($essentialExtensions.Count) installed" -ForegroundColor $(
+        if ($validationResults.ExtensionsMissing.Count -eq 0) { 'Green' } else { 'Yellow' }
+    )
+
+    if ($validationResults.Recommendations.Count -gt 0) {
+        Write-Host ""
+        Write-Host "💡 Recommendations:" -ForegroundColor Blue
+        foreach ($rec in $validationResults.Recommendations) {
+            Write-Host "   • $rec" -ForegroundColor Cyan
+        }
+
+        Write-Host ""
+        Write-Host "🚀 Quick Fixes:" -ForegroundColor Yellow
+        Write-Host "   bb-install-extensions          # Install missing extensions" -ForegroundColor Green
+        Write-Host "   bb-install-extensions -ListOnly # See all available extensions" -ForegroundColor Green
+        Write-Host "   bb-dev-workflow                # Test complete development cycle" -ForegroundColor Green
+    }
+
+    return $validationResults
+}
+
+#endregion
+
 #region AI Mentor System Functions
 
 function Get-BusBuddyMentor {
@@ -1470,7 +3171,7 @@ function Get-BusBuddyMentor {
     param(
         [Parameter(Position = 0)]
         [ValidateSet('PowerShell', 'WPF', 'EntityFramework', 'Azure', 'MVVM', 'Debugging', 'Testing', 'Git',
-                     'Architecture', 'DataModels', 'Services', 'UIPatterns', 'Syncfusion', 'Getting Started')]
+            'Architecture', 'DataModels', 'Services', 'UIPatterns', 'Syncfusion', 'Getting Started')]
         [string]$Topic = 'Getting Started',
 
         [switch]$IncludeExamples,
@@ -1481,6 +3182,63 @@ function Get-BusBuddyMentor {
         [switch]$Motivate,
         [switch]$Humor
     )
+
+    Write-Host "🤖 BusBuddy AI Mentor - $Topic Learning Assistant" -ForegroundColor Cyan
+    Write-Host "=======================================" -ForegroundColor Cyan
+    Write-Host ""
+
+    # Enhanced topic routing with better documentation links
+    switch ($Topic) {
+        "PowerShell" {
+            Write-Host "📘 PowerShell 7.5+ Learning Path:" -ForegroundColor Green
+            Write-Host "   • Modern syntax improvements and performance enhancements"
+            Write-Host "   • Enhanced JSON handling and REST API interactions"
+            Write-Host "   • Cross-platform compatibility and containerization"
+            if ($OpenDocs) {
+                Start-Process "https://learn.microsoft.com/en-us/powershell/scripting/whats-new/what-s-new-in-powershell-75"
+            }
+            if ($IncludeExamples) {
+                Write-Host "`n📝 Quick Example:" -ForegroundColor Yellow
+                Write-Host "   # Modern PowerShell 7.5 features"
+                Write-Host "   \$data = @{ Name='BusBuddy'; Version='2.0' } | ConvertTo-Json"
+                Write-Host "   Get-Process | Where-Object CPU -gt 100 | Select-Object -First 5"
+            }
+        }
+        "WPF" {
+            Write-Host "🖥️ WPF & XAML Mastery:" -ForegroundColor Green
+            Write-Host "   • MVVM pattern implementation and data binding"
+            Write-Host "   • Custom controls and styling with modern UI patterns"
+            Write-Host "   • Syncfusion component integration and theming"
+            if ($OpenDocs) {
+                Start-Process "https://learn.microsoft.com/en-us/dotnet/desktop/wpf/"
+            }
+            if (Test-Path "./Docs/Learning/WPF-Learning-Path.md") {
+                Write-Host "   📚 Local guide: ./Docs/Learning/WPF-Learning-Path.md"
+            }
+        }
+        "Getting Started" {
+            Write-Host "🌟 Welcome to BusBuddy Development!" -ForegroundColor Green
+            Write-Host "   1. Environment Setup: bb-health (check your development environment)"
+            Write-Host "   2. First Build: bb-build (compile the solution)"
+            Write-Host "   3. Run Application: bb-run (launch BusBuddy WPF)"
+            Write-Host "   4. Testing: bb-test (run the test suite)"
+            Write-Host "   5. Explore: bb-commands (see all available commands)"
+            Write-Host ""
+            Write-Host "📚 Learning Resources:" -ForegroundColor Cyan
+            Write-Host "   • PowerShell: bb-mentor -Topic PowerShell"
+            Write-Host "   • WPF Development: bb-mentor -Topic WPF"
+            Write-Host "   • Architecture: bb-mentor -Topic MVVM"
+        }
+        default {
+            Write-Host "📋 Available Topics:" -ForegroundColor Yellow
+            Write-Host "   PowerShell, WPF, EntityFramework, Azure, MVVM, Testing, Git"
+            Write-Host "`n💡 Usage: bb-mentor -Topic <TopicName> [-OpenDocs] [-IncludeExamples]"
+            if (Test-Path "./Docs/Learning/$Topic.md") {
+                Write-Host "📖 Found local guide: ./Docs/Learning/$Topic.md"
+                if ($OpenDocs) { Start-Process "./Docs/Learning/$Topic.md" }
+            }
+        }
+    }
 
     if ($Motivate) {
         $quotes = @(
@@ -1500,11 +3258,11 @@ function Get-BusBuddyMentor {
     }
 
     $mentorContent = @{
-        'PowerShell' = @{
-            'Summary' = 'PowerShell is a powerful shell and scripting language for automation'
-            'KeyConcepts' = @('Variables', 'Functions', 'Modules', 'Pipeline', 'Objects')
-            'OfficialDocs' = 'https://learn.microsoft.com/en-us/powershell/'
-            'Examples' = @(
+        'PowerShell'      = @{
+            'Summary'          = 'PowerShell is a powerful shell and scripting language for automation'
+            'KeyConcepts'      = @('Variables', 'Functions', 'Modules', 'Pipeline', 'Objects')
+            'OfficialDocs'     = 'https://learn.microsoft.com/en-us/powershell/'
+            'Examples'         = @(
                 '# Variables and basic operations',
                 '$name = "BusBuddy"',
                 '$version = Get-Content ".\version.txt"',
@@ -1527,11 +3285,11 @@ function Get-BusBuddyMentor {
             )
         }
 
-        'WPF' = @{
-            'Summary' = 'Windows Presentation Foundation for rich desktop UI development'
-            'KeyConcepts' = @('XAML', 'Data Binding', 'Controls', 'Styles', 'Resources')
-            'OfficialDocs' = 'https://learn.microsoft.com/en-us/dotnet/desktop/wpf/'
-            'Examples' = @(
+        'WPF'             = @{
+            'Summary'          = 'Windows Presentation Foundation for rich desktop UI development'
+            'KeyConcepts'      = @('XAML', 'Data Binding', 'Controls', 'Styles', 'Resources')
+            'OfficialDocs'     = 'https://learn.microsoft.com/en-us/dotnet/desktop/wpf/'
+            'Examples'         = @(
                 '<!-- Basic XAML structure -->',
                 '<Window x:Class="BusBuddy.MainWindow">',
                 '    <Grid>',
@@ -1560,10 +3318,10 @@ function Get-BusBuddyMentor {
         }
 
         'Getting Started' = @{
-            'Summary' = 'Welcome to BusBuddy development! Here is your roadmap.'
-            'KeyConcepts' = @('Setup', 'Build', 'Run', 'Debug', 'Learn')
-            'OfficialDocs' = 'https://github.com/Bigessfour/BusBuddy-2'
-            'Examples' = @(
+            'Summary'          = 'Welcome to BusBuddy development! Here is your roadmap.'
+            'KeyConcepts'      = @('Setup', 'Build', 'Run', 'Debug', 'Learn')
+            'OfficialDocs'     = 'https://github.com/Bigessfour/BusBuddy-2'
+            'Examples'         = @(
                 '# Quick start commands',
                 'bb-build          # Build the solution',
                 'bb-run            # Run the application',
@@ -1616,8 +3374,8 @@ function Get-BusBuddyMentor {
     if ($BeginnerMode) {
         Write-Host "`n🌱 Beginner Tips:" -ForegroundColor Yellow
         $beginnerTips = @{
-            'PowerShell' = "Start with basic commands like Get-Help, Get-Command, and Get-Member. Use tab completion!"
-            'WPF' = "Begin with simple XAML layouts and data binding. Visual Studio designer can help!"
+            'PowerShell'      = "Start with basic commands like Get-Help, Get-Command, and Get-Member. Use tab completion!"
+            'WPF'             = "Begin with simple XAML layouts and data binding. Visual Studio designer can help!"
             'Getting Started' = "Take it one step at a time. Build first, then run, then explore the code!"
         }
         if ($beginnerTips[$Topic]) {
@@ -1680,11 +3438,11 @@ function Search-OfficialDocs {
     )
 
     $docUrls = @{
-        'PowerShell' = 'https://learn.microsoft.com/en-us/powershell/'
-        'WPF' = 'https://learn.microsoft.com/en-us/dotnet/desktop/wpf/'
+        'PowerShell'      = 'https://learn.microsoft.com/en-us/powershell/'
+        'WPF'             = 'https://learn.microsoft.com/en-us/dotnet/desktop/wpf/'
         'EntityFramework' = 'https://learn.microsoft.com/en-us/ef/core/'
-        'Azure' = 'https://learn.microsoft.com/en-us/azure/'
-        'DotNet' = 'https://learn.microsoft.com/en-us/dotnet/'
+        'Azure'           = 'https://learn.microsoft.com/en-us/azure/'
+        'DotNet'          = 'https://learn.microsoft.com/en-us/dotnet/'
     }
 
     $searchUrl = "https://learn.microsoft.com/en-us/search/?terms=$([uri]::EscapeDataString($Query))&category=$Technology"
@@ -1749,7 +3507,7 @@ function Get-QuickReference {
                 'Where-Object {condition}# Filter objects',
                 'ForEach-Object {action} # Perform action on each object'
             )
-            'Syntax' = @(
+            'Syntax'   = @(
                 '# PowerShell Syntax Reference',
                 '$variable = "value"     # Variable assignment',
                 'function Name { }       # Function declaration',
@@ -1758,7 +3516,7 @@ function Get-QuickReference {
                 'try { } catch { }       # Error handling'
             )
         }
-        'BusBuddy' = @{
+        'BusBuddy'   = @{
             'Commands' = @(
                 '# BusBuddy PowerShell Commands',
                 'bb-build               # Build the solution',
@@ -1850,15 +3608,18 @@ function Invoke-BusBuddyDatabaseDiagnostic {
 
         if ($TestConnection) {
             & $scriptPath -TestConnection
-        } elseif ($CheckMigrations) {
+        }
+        elseif ($CheckMigrations) {
             & $scriptPath -CheckMigrations
-        } else {
+        }
+        else {
             & $scriptPath -FullDiagnostic
         }
 
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyStatus "Database diagnostics completed successfully"
-        } else {
+        }
+        else {
             Write-BusBuddyError "Database diagnostics completed with issues"
         }
     }
@@ -1911,7 +3672,8 @@ function Add-BusBuddyMigration {
 
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyStatus "Migration '$Name' added successfully"
-        } else {
+        }
+        else {
             Write-BusBuddyError "Migration add failed"
         }
     }
@@ -1958,7 +3720,8 @@ function Update-BusBuddyDatabase {
 
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyStatus "Database updated successfully"
-        } else {
+        }
+        else {
             Write-BusBuddyError "Database update failed"
         }
     }
@@ -2023,7 +3786,8 @@ function Import-BusBuddyRealWorldData {
 
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyStatus "Sample data imported successfully"
-        } else {
+        }
+        else {
             Write-BusBuddyError "Sample data import failed"
         }
     }
@@ -2041,6 +3805,19 @@ New-Alias -Name "bb-db-test" -Value "Test-BusBuddyDatabaseConnection" -Descripti
 New-Alias -Name "bb-db-add-migration" -Value "Add-BusBuddyMigration" -Description "Add EF Core migration"
 New-Alias -Name "bb-db-update" -Value "Update-BusBuddyDatabase" -Description "Update database schema"
 New-Alias -Name "bb-db-seed" -Value "Import-BusBuddyRealWorldData" -Description "Import sample data"
+
+# Package management aliases
+New-Alias -Name "bb-manage-dependencies" -Value "Invoke-BusBuddyDependencyManagement" -Description "Comprehensive dependency management"
+New-Alias -Name "bb-error-fix" -Value "Invoke-BusBuddyErrorAnalysis" -Description "Analyze and fix build errors"
+
+# Development workflow aliases
+New-Alias -Name "bb-dev-workflow" -Value "Invoke-BusBuddyDevWorkflow" -Description "Comprehensive development workflow"
+New-Alias -Name "bb-get-workflow-results" -Value "Get-BusBuddyWorkflowResults" -Description "Monitor GitHub Actions workflows"
+New-Alias -Name "bb-warning-analysis" -Value "Show-BusBuddyWarningAnalysis" -Description "Analyze build warnings"
+
+# VS Code integration aliases
+New-Alias -Name "bb-install-extensions" -Value "Install-BusBuddyVSCodeExtensions" -Description "Install VS Code extensions"
+New-Alias -Name "bb-validate-vscode" -Value "Test-BusBuddyVSCodeSetup" -Description "Validate VS Code setup"
 
 #endregion
 
@@ -2084,7 +3861,20 @@ Export-ModuleMember -Function @(
     'Add-BusBuddyMigration',
     'Update-BusBuddyDatabase',
     'Test-BusBuddyDatabaseConnection',
-    'Import-BusBuddyRealWorldData'
+    'Import-BusBuddyRealWorldData',
+
+    # Package management functions
+    'Invoke-BusBuddyDependencyManagement',
+    'Invoke-BusBuddyErrorAnalysis',
+
+    # Development workflow functions
+    'Invoke-BusBuddyDevWorkflow',
+    'Get-BusBuddyWorkflowResults',
+    'Show-BusBuddyWarningAnalysis',
+
+    # VS Code integration functions
+    'Install-BusBuddyVSCodeExtensions',
+    'Test-BusBuddyVSCodeSetup'
 )
 
 # Export all aliases
@@ -2093,7 +3883,10 @@ Export-ModuleMember -Alias @(
     'bb-dev-session', 'bb-health', 'bb-env-check',
     'bb-happiness', 'bb-commands', 'bb-info',
     'bb-mentor', 'bb-docs', 'bb-ref',
-    'bb-db-diag', 'bb-db-test', 'bb-db-add-migration', 'bb-db-update', 'bb-db-seed'
+    'bb-db-diag', 'bb-db-test', 'bb-db-add-migration', 'bb-db-update', 'bb-db-seed',
+    'bb-manage-dependencies', 'bb-error-fix',
+    'bb-dev-workflow', 'bb-get-workflow-results', 'bb-warning-analysis',
+    'bb-install-extensions', 'bb-validate-vscode'
 )
 
 #endregion

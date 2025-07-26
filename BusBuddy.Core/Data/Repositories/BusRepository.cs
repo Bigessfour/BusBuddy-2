@@ -25,7 +25,7 @@ public class BusRepository : Repository<Bus>, IBusRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime date, TimeSpan? startTime = null, TimeSpan? endTime = null)
+    public async Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime availabilityDate, TimeSpan? startTime = null, TimeSpan? endTime = null)
     {
         var activeVehicles = await GetActiveVehiclesAsync();
 
@@ -34,7 +34,7 @@ public class BusRepository : Repository<Bus>, IBusRepository
 
         // Get vehicles that don't have conflicting activities
         var conflictingVehicleIds = await _context.Activities
-            .Where(a => a.Date.Date == date.Date &&
+            .Where(a => a.Date.Date == availabilityDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
                         (a.LeaveTime <= startTime && a.EventTime >= endTime)))
@@ -223,7 +223,7 @@ public class BusRepository : Repository<Bus>, IBusRepository
             .ToList();
     }
 
-    public IEnumerable<Bus> GetAvailableVehicles(DateTime date, TimeSpan? startTime = null, TimeSpan? endTime = null)
+    public IEnumerable<Bus> GetAvailableVehicles(DateTime availabilityDate, TimeSpan? startTime = null, TimeSpan? endTime = null)
     {
         var activeVehicles = GetActiveVehicles();
 
@@ -232,7 +232,7 @@ public class BusRepository : Repository<Bus>, IBusRepository
 
         // Get vehicles that don't have conflicting activities
         var conflictingVehicleIds = _context.Activities
-            .Where(a => a.Date.Date == date.Date &&
+            .Where(a => a.Date.Date == availabilityDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
                         (a.LeaveTime <= startTime && a.EventTime >= endTime)))

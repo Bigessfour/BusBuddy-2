@@ -289,14 +289,14 @@ namespace BusBuddy.Core.Services
 
         #region Scheduling Operations
 
-        public async Task<bool> IsVehicleAvailableAsync(int vehicleId, DateTime date, TimeSpan startTime, TimeSpan endTime)
+        public async Task<bool> IsVehicleAvailableAsync(int vehicleId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime)
         {
             try
             {
                 // Check if there are any conflicting schedules for this vehicle
                 var conflicts = await _unitOfWork.ActivitySchedules.FindAsync(a =>
                     a.ScheduledVehicleId == vehicleId &&
-                    a.ScheduledDate.Date == date.Date &&
+                    a.ScheduledDate.Date == scheduleDate.Date &&
                     a.Status != "Cancelled" &&
                     ((a.ScheduledLeaveTime <= startTime && a.ScheduledEventTime > startTime) || // Overlaps start time
                      (a.ScheduledLeaveTime < endTime && a.ScheduledEventTime >= endTime) || // Overlaps end time
@@ -311,14 +311,14 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        public async Task<bool> IsDriverAvailableAsync(int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime)
+        public async Task<bool> IsDriverAvailableAsync(int driverId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime)
         {
             try
             {
                 // Check if there are any conflicting schedules for this driver
                 var conflicts = await _unitOfWork.ActivitySchedules.FindAsync(a =>
                     a.ScheduledDriverId == driverId &&
-                    a.ScheduledDate.Date == date.Date &&
+                    a.ScheduledDate.Date == scheduleDate.Date &&
                     a.Status != "Cancelled" &&
                     ((a.ScheduledLeaveTime <= startTime && a.ScheduledEventTime > startTime) || // Overlaps start time
                      (a.ScheduledLeaveTime < endTime && a.ScheduledEventTime >= endTime) || // Overlaps end time
@@ -333,7 +333,7 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        public async Task<IEnumerable<Driver>> GetAvailableDriversAsync(DateTime date, TimeSpan startTime, TimeSpan endTime)
+        public async Task<IEnumerable<Driver>> GetAvailableDriversAsync(DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime)
         {
             try
             {
@@ -347,7 +347,7 @@ namespace BusBuddy.Core.Services
                 // Get all drivers with conflicting schedules for the given time period
                 var busyDriverIds = await context.ActivitySchedule
                     .Where(a =>
-                        a.ScheduledDate.Date == date.Date &&
+                        a.ScheduledDate.Date == scheduleDate.Date &&
                         a.Status != "Cancelled" &&
                         ((a.ScheduledLeaveTime <= startTime && a.ScheduledEventTime > startTime) || // Overlaps start time
                          (a.ScheduledLeaveTime < endTime && a.ScheduledEventTime >= endTime) || // Overlaps end time
@@ -361,12 +361,12 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error getting available drivers for date: {Date}", date);
+                Logger.Error(ex, "Error getting available drivers for date: {Date}", scheduleDate);
                 throw;
             }
         }
 
-        public async Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime date, TimeSpan startTime, TimeSpan endTime)
+        public async Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime)
         {
             try
             {
@@ -380,7 +380,7 @@ namespace BusBuddy.Core.Services
                 // Get all buses with conflicting schedules for the given time period
                 var busyBusIds = await context.ActivitySchedule
                     .Where(a =>
-                        a.ScheduledDate.Date == date.Date &&
+                        a.ScheduledDate.Date == scheduleDate.Date &&
                         a.Status != "Cancelled" &&
                         ((a.ScheduledLeaveTime <= startTime && a.ScheduledEventTime > startTime) || // Overlaps start time
                          (a.ScheduledLeaveTime < endTime && a.ScheduledEventTime >= endTime) || // Overlaps end time
@@ -394,7 +394,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error getting available vehicles for date: {Date}", date);
+                Logger.Error(ex, "Error getting available vehicles for date: {Date}", scheduleDate);
                 throw;
             }
         }
@@ -491,13 +491,13 @@ namespace BusBuddy.Core.Services
 
         #region Conflict Detection
 
-        public async Task<IEnumerable<ActivitySchedule>> FindScheduleConflictsAsync(DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityScheduleId = null)
+        public async Task<IEnumerable<ActivitySchedule>> FindScheduleConflictsAsync(DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityScheduleId = null)
         {
             try
             {
                 var baseQuery = _unitOfWork.ActivitySchedules.Query()
                     .Where(a =>
-                        a.ScheduledDate.Date == date.Date &&
+                        a.ScheduledDate.Date == scheduleDate.Date &&
                         a.Status != "Cancelled" &&
                         ((a.ScheduledLeaveTime <= startTime && a.ScheduledEventTime > startTime) || // Overlaps start time
                          (a.ScheduledLeaveTime < endTime && a.ScheduledEventTime >= endTime) || // Overlaps end time
@@ -515,7 +515,7 @@ namespace BusBuddy.Core.Services
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error finding schedule conflicts for date: {Date}", date);
+                Logger.Error(ex, "Error finding schedule conflicts for date: {Date}", scheduleDate);
                 throw;
             }
         }

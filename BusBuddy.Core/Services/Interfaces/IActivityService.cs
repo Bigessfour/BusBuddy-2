@@ -17,7 +17,7 @@ namespace BusBuddy.Core.Services.Interfaces
 
         // Date Range Queries
         Task<IEnumerable<Activity>> GetActivitiesByDateRangeAsync(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<Activity>> GetActivitiesByDateAsync(DateTime date);
+        Task<IEnumerable<Activity>> GetActivitiesByDateAsync(DateTime activityDate);
         Task<IEnumerable<Activity>> GetUpcomingActivitiesAsync(int days = 7);
 
         // Filtering Operations

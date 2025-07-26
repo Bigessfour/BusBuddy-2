@@ -12,25 +12,25 @@
     RootModule           = 'BusBuddy.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.1.0'
+    ModuleVersion        = '1.0.0'
 
     # Supported PSEditions
     CompatiblePSEditions = @('Core')
 
     # ID used to uniquely identify this module
-    GUID                 = '12345678-1234-5678-9012-123456789012'
+    GUID                 = '21ff42ae-cd8d-4bb8-8f99-b31f63be42b5'
 
     # Author of this module
-    Author               = 'Bus Buddy Development Team'
+    Author               = 'Bigessfour'
 
     # Company or vendor of this module
-    CompanyName          = 'Bus Buddy Project'
+    CompanyName          = 'BusBuddy Team'
 
     # Copyright statement for this module
-    Copyright            = '(c) 2025 Bus Buddy Project. All rights reserved.'
+    Copyright            = '(c) 2025 BusBuddy. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description          = 'Professional PowerShell module optimized for PowerShell 7.5+ and Bus Buddy WPF development. Features enhanced JSON handling, performance optimizations, structured error reporting, and comprehensive development workflow automation with motivational developer happiness features.'
+    Description          = 'Automation module for BusBuddy development workflow'
 
     # Minimum version of the PowerShell engine required by this module
     PowerShellVersion    = '7.5'
@@ -51,7 +51,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    # RequiredModules = @()
+    RequiredModules      = @()  # Add e.g., 'Pester' for testing if needed from Gallery
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
@@ -70,6 +70,16 @@
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport    = @(
+        'bb-build',
+        'bb-run',
+        'bb-test',
+        'bb-health',
+        'bb-mentor',
+        'bb-docs',
+        'bb-ref',
+        'bb-happiness',
+        'bb-get-workflow-results',
+        'bb-dev-workflow',
         'Get-BusBuddyProjectRoot',
         'Write-BusBuddyStatus',
         'Write-BusBuddyError',
@@ -128,43 +138,19 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags         = @('BusBuddy', 'WPF', 'Development', 'Build', 'Automation', 'Transportation', 'CSharp', 'DotNet')
+            Tags         = @('BusBuddy', 'Automation', 'WPF', 'Azure')
 
             # A URL to the license for this module.
-            LicenseUri   = 'https://github.com/Bigessfour/BusBuddy-WPF/blob/main/LICENSE'
+            LicenseUri   = 'https://github.com/Bigessfour/BusBuddy-2/blob/main/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri   = 'https://github.com/Bigessfour/BusBuddy-WPF'
+            ProjectUri   = 'https://github.com/Bigessfour/BusBuddy-2'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = @"
-Version 1.0.0
-=============
-
-Initial release of the Bus Buddy PowerShell Module.
-
-Features:
-- Professional PowerShell module structure for development workflow
-- Build automation (bb-build, bb-run, bb-test, bb-clean, bb-restore)
-- Development session management (bb-dev-session, bb-health)
-- Environment validation (bb-env-check)
-- Developer happiness quotes (bb-happiness)
-- Comprehensive command discovery (bb-commands, bb-info)
-- Industry-standard module organization with proper exports
-
-Requirements:
-- PowerShell 7.0+
-- .NET 8.0+
-- Bus Buddy WPF project structure
-
-Quick Start:
-1. Import-Module .\PowerShell\BusBuddy.psm1
-2. bb-dev-session (starts complete development environment)
-3. bb-happiness (because you deserve motivation!)
-"@
+            ReleaseNotes = 'Initial cohesive module for Phase 2 workflow'
 
             # Prerelease string of this module
             # Prerelease = ''

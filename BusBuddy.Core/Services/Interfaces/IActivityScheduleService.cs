@@ -24,16 +24,16 @@ namespace BusBuddy.Core.Services.Interfaces
         Task<IEnumerable<ActivitySchedule>> GetActivitySchedulesByDestinationAsync(string destination);
 
         // Scheduling Operations
-        Task<bool> IsVehicleAvailableAsync(int vehicleId, DateTime date, TimeSpan startTime, TimeSpan endTime);
-        Task<bool> IsDriverAvailableAsync(int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime);
-        Task<IEnumerable<Driver>> GetAvailableDriversAsync(DateTime date, TimeSpan startTime, TimeSpan endTime);
-        Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime date, TimeSpan startTime, TimeSpan endTime);
+        Task<bool> IsVehicleAvailableAsync(int vehicleId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime);
+        Task<bool> IsDriverAvailableAsync(int driverId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime);
+        Task<IEnumerable<Driver>> GetAvailableDriversAsync(DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime);
+        Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime);
         Task<bool> ConfirmActivityScheduleAsync(int activityScheduleId);
         Task<bool> CancelActivityScheduleAsync(int activityScheduleId, string? reason = null);
         Task<bool> CompleteActivityScheduleAsync(int activityScheduleId);
 
         // Conflict Detection
-        Task<IEnumerable<ActivitySchedule>> FindScheduleConflictsAsync(DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityScheduleId = null);
+        Task<IEnumerable<ActivitySchedule>> FindScheduleConflictsAsync(DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityScheduleId = null);
         Task<bool> HasConflictsAsync(ActivitySchedule activitySchedule);
 
         // Analytics and Reporting

@@ -6,7 +6,7 @@ namespace BusBuddy.Core.Services.Interfaces
     {
         bool IsDirty { get; set; }
         List<IScheduleAppointment> GetScheduleForDay(DateTime selectedDate);
-        List<IScheduleAppointment> GetSchedule(DateTime start, DateTime end);
+        List<IScheduleAppointment> GetSchedule(DateTime start, DateTime endDate);
         IScheduleAppointment NewScheduleAppointment();
         void AddItem(IScheduleAppointment appointment);
         void RemoveItem(IScheduleAppointment appointment);

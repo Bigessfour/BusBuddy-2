@@ -18,9 +18,9 @@ public interface IActivityRepository : IRepository<Activity>
     Task<IEnumerable<Activity>> GetTodaysActivitiesAsync();
 
     // Scheduling conflicts
-    Task<IEnumerable<Activity>> GetConflictingActivitiesAsync(DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null);
-    Task<bool> HasSchedulingConflictAsync(int vehicleId, DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null);
-    Task<bool> HasDriverConflictAsync(int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null);
+    Task<IEnumerable<Activity>> GetConflictingActivitiesAsync(DateTime activityDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null);
+    Task<bool> HasSchedulingConflictAsync(int vehicleId, DateTime activityDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null);
+    Task<bool> HasDriverConflictAsync(int driverId, DateTime activityDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null);
 
     // Statistics and reporting
     Task<int> GetActivityCountByMonthAsync(int year, int month);

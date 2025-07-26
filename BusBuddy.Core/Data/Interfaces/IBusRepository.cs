@@ -10,7 +10,7 @@ public interface IBusRepository : IRepository<Bus>
 {
     // Vehicle-specific queries
     Task<IEnumerable<Bus>> GetActiveVehiclesAsync();
-    Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime date, TimeSpan? startTime = null, TimeSpan? endTime = null);
+    Task<IEnumerable<Bus>> GetAvailableVehiclesAsync(DateTime availabilityDate, TimeSpan? startTime = null, TimeSpan? endTime = null);
     Task<IEnumerable<Bus>> GetVehiclesByStatusAsync(string status);
     Task<IEnumerable<Bus>> GetVehiclesByFleetTypeAsync(string fleetType);
     Task<Bus?> GetVehicleByBusNumberAsync(string busNumber);
@@ -40,7 +40,7 @@ public interface IBusRepository : IRepository<Bus>
 
     // Synchronous methods for Syncfusion data binding
     IEnumerable<Bus> GetActiveVehicles();
-    IEnumerable<Bus> GetAvailableVehicles(DateTime date, TimeSpan? startTime = null, TimeSpan? endTime = null);
+    IEnumerable<Bus> GetAvailableVehicles(DateTime availabilityDate, TimeSpan? startTime = null, TimeSpan? endTime = null);
     IEnumerable<Bus> GetVehiclesByStatus(string status);
     Bus? GetVehicleByBusNumber(string busNumber);
     IEnumerable<Bus> GetVehiclesDueForInspection(int withinDays = 30);

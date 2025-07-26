@@ -454,7 +454,7 @@ namespace BusBuddy.WPF.Views.Activity
         {
             var activity = _isEditMode ? _originalActivity : new ActivitySchedule();
 
-            activity.Subject = Subject;
+            // Removed assignment to read-only property 'Subject' — it is computed from TripType and ScheduledDestination
             activity.ScheduledDate = ScheduledDate;
             activity.ScheduledLeaveTime = ScheduledLeaveTime;
             activity.ScheduledEventTime = ScheduledEventTime;

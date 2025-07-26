@@ -205,22 +205,22 @@ public class ActivityService : IActivityService
     }
 
     // Additional interface implementations
-    public async Task<IEnumerable<Activity>> GetActivitiesByDateAsync(DateTime date)
+    public async Task<IEnumerable<Activity>> GetActivitiesByDateAsync(DateTime activityDate)
     {
         try
         {
-            Logger.Information("Retrieving activities for date: {Date}", date);
+            Logger.Information("Retrieving activities for date: {Date}", activityDate);
             return await _context.Activities
                 .Include(a => a.AssignedVehicle)
                 .Include(a => a.Route)
                 .Include(a => a.Driver)
-                .Where(a => a.Date.Date == date.Date)
+                .Where(a => a.Date.Date == activityDate.Date)
                 .OrderBy(a => a.LeaveTime)
                 .ToListAsync();
         }
         catch (Exception ex)
         {
-            Logger.Error(ex, "Error retrieving activities for date: {Date}", date);
+            Logger.Error(ex, "Error retrieving activities for date: {Date}", activityDate);
             throw;
         }
     }

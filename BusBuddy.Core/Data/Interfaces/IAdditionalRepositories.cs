@@ -38,14 +38,14 @@ public interface IMaintenanceRepository : IRepository<Maintenance>
 
 public interface IScheduleRepository : IRepository<Schedule>
 {
-    Task<IEnumerable<Schedule>> GetSchedulesByDateAsync(DateTime date);
+    Task<IEnumerable<Schedule>> GetSchedulesByDateAsync(DateTime scheduleDate);
     Task<IEnumerable<Schedule>> GetSchedulesByRouteAsync(int routeId);
     Task<IEnumerable<Schedule>> GetSchedulesByBusAsync(int busId);
     Task<IEnumerable<Schedule>> GetSchedulesByDriverAsync(int driverId);
     Task<bool> HasConflictAsync(int busId, int driverId, DateTime startTime, DateTime endTime);
 
     // Synchronous methods
-    IEnumerable<Schedule> GetSchedulesByDate(DateTime date);
+    IEnumerable<Schedule> GetSchedulesByDate(DateTime scheduleDate);
     IEnumerable<Schedule> GetSchedulesByRoute(int routeId);
     bool HasConflict(int busId, int driverId, DateTime startTime, DateTime endTime);
 }
@@ -56,27 +56,27 @@ public interface ISchoolCalendarRepository : IRepository<SchoolCalendar>
     Task<IEnumerable<SchoolCalendar>> GetEventsByTypeAsync(string eventType);
     Task<IEnumerable<SchoolCalendar>> GetSchoolDaysAsync(DateTime startDate, DateTime endDate);
     Task<IEnumerable<SchoolCalendar>> GetHolidaysAsync(DateTime startDate, DateTime endDate);
-    Task<bool> IsSchoolDayAsync(DateTime date);
-    Task<bool> AreRoutesRequiredAsync(DateTime date);
+    Task<bool> IsSchoolDayAsync(DateTime checkDate);
+    Task<bool> AreRoutesRequiredAsync(DateTime checkDate);
 
     // Synchronous methods
     IEnumerable<SchoolCalendar> GetEventsByDateRange(DateTime startDate, DateTime endDate);
     IEnumerable<SchoolCalendar> GetSchoolDays(DateTime startDate, DateTime endDate);
-    bool IsSchoolDay(DateTime date);
-    bool AreRoutesRequired(DateTime date);
+    bool IsSchoolDay(DateTime checkDate);
+    bool AreRoutesRequired(DateTime checkDate);
 }
 
 public interface IActivityScheduleRepository : IRepository<ActivitySchedule>
 {
-    Task<IEnumerable<ActivitySchedule>> GetSchedulesByDateAsync(DateTime date);
+    Task<IEnumerable<ActivitySchedule>> GetSchedulesByDateAsync(DateTime scheduleDate);
     Task<IEnumerable<ActivitySchedule>> GetSchedulesByDateRangeAsync(DateTime startDate, DateTime endDate);
     Task<IEnumerable<ActivitySchedule>> GetSchedulesByTripTypeAsync(string tripType);
     Task<IEnumerable<ActivitySchedule>> GetSchedulesByVehicleAsync(int vehicleId);
     Task<IEnumerable<ActivitySchedule>> GetSchedulesByDriverAsync(int driverId);
-    Task<bool> HasConflictAsync(int vehicleId, int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime);
+    Task<bool> HasConflictAsync(int vehicleId, int driverId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime);
 
     // Synchronous methods
-    IEnumerable<ActivitySchedule> GetSchedulesByDate(DateTime date);
+    IEnumerable<ActivitySchedule> GetSchedulesByDate(DateTime scheduleDate);
     IEnumerable<ActivitySchedule> GetSchedulesByTripType(string tripType);
-    bool HasConflict(int vehicleId, int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime);
+    bool HasConflict(int vehicleId, int driverId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime);
 }
