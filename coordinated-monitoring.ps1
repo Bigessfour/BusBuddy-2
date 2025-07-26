@@ -31,12 +31,14 @@ $appJob = Start-Job -ScriptBlock {
     Set-Location $using:PWD
     if (Get-Command bb-run -ErrorAction SilentlyContinue) {
         bb-run -EnableDebug
-    } else {
+    }
+    else {
         # Load BusBuddy module first
         if (Test-Path ".\PowerShell\Load-BusBuddyModule.ps1") {
             . ".\PowerShell\Load-BusBuddyModule.ps1" -Force
             bb-run -EnableDebug
-        } else {
+        }
+        else {
             dotnet run --project "BusBuddy.WPF\BusBuddy.WPF.csproj"
         }
     }
@@ -54,21 +56,21 @@ $appReady = $false
 while ((Get-Date) -lt $waitEnd -and -not $appReady) {
     # Check for ANY dotnet processes (BusBuddy runs as dotnet)
     $busbuddyProcesses = Get-Process -Name "dotnet" -ErrorAction SilentlyContinue
-    
+
     # Also check for any processes with BusBuddy in the name
     $namedProcesses = Get-Process -Name "*BusBuddy*" -ErrorAction SilentlyContinue
-    
+
     if ($namedProcesses) {
         $busbuddyProcesses = $namedProcesses
     }
-    
+
     if ($busbuddyProcesses) {
         # Additional check: Look for log files being created (indicates app is running)
         $logPath = "BusBuddy.WPF\logs"
         if (Test-Path $logPath) {
             $recentLogs = Get-ChildItem $logPath -Filter "*.log" -ErrorAction SilentlyContinue |
-                         Where-Object { ((Get-Date) - $_.LastWriteTime).TotalSeconds -lt 30 }
-            
+            Where-Object { ((Get-Date) - $_.LastWriteTime).TotalSeconds -lt 30 }
+
             if ($recentLogs) {
                 $appReady = $true
                 Write-Host "✅ BusBuddy application is ready!" -ForegroundColor Green
@@ -79,7 +81,7 @@ while ((Get-Date) -lt $waitEnd -and -not $appReady) {
             }
         }
     }
-    
+
     # Show waiting progress
     $elapsed = [math]::Round(((Get-Date) - $waitStart).TotalSeconds, 0)
     Write-Host "   Waiting... ${elapsed}s" -ForegroundColor Yellow
@@ -109,41 +111,41 @@ $cycleCount = 0
 # Enhanced monitoring loop with immediate feedback
 while ((Get-Date) -lt $endTime) {
     $cycleCount++
-    
+
     # Quick dot pattern for feedback
     if ($cycleCount % 3 -eq 0) {
         Write-Host "●" -NoNewline -ForegroundColor Green
     }
-    
+
     # Check for ANY dotnet processes (BusBuddy runs as dotnet) or specific BusBuddy processes
     $activeProcesses = Get-Process -Name "dotnet" -ErrorAction SilentlyContinue
     $namedProcesses = Get-Process -Name "*BusBuddy*" -ErrorAction SilentlyContinue
-    
+
     # Combine both types
     $allProcesses = @($activeProcesses) + @($namedProcesses) | Where-Object { $_ -ne $null }
-    
+
     if ($allProcesses) {
         $interactionCount++
-        
+
         # Monitor logs more aggressively for recent activity
         $logSources = @("BusBuddy.WPF\logs", "logs")
-        
+
         foreach ($logPath in $logSources) {
             if (Test-Path $logPath) {
                 try {
                     $recentLogs = Get-ChildItem $logPath -Filter "*.log" -ErrorAction SilentlyContinue |
-                                 Sort-Object LastWriteTime -Descending |
-                                 Select-Object -First 2
-                    
+                    Sort-Object LastWriteTime -Descending |
+                    Select-Object -First 2
+
                     foreach ($log in $recentLogs) {
                         # Check for very recent activity (last 5 seconds)
                         if (((Get-Date) - $log.LastWriteTime).TotalSeconds -lt 5) {
                             $recentLines = Get-Content $log.FullName -Tail 10 -ErrorAction SilentlyContinue
-                            
+
                             foreach ($line in $recentLines) {
                                 if (-not [string]::IsNullOrWhiteSpace($line)) {
                                     $logEntryCount++
-                                    
+
                                     # Enhanced error detection patterns
                                     if ($line -match "error|exception|fail|critical|fatal|invalid|cannot|unable|timeout") {
                                         $errorCount++
@@ -152,19 +154,20 @@ while ((Get-Date) -lt $endTime) {
                                         Write-Host "   Time: $(Get-Date -Format 'HH:mm:ss.fff')" -ForegroundColor Yellow
                                         Write-Host "   Log: $($log.Name)" -ForegroundColor Gray
                                         Write-Host "   Error: $($line.Trim().Substring(0, [Math]::Min(80, $line.Trim().Length)))" -ForegroundColor White
-                                        
+
                                         # Try BusBuddy PowerShell auto-fix
                                         if (Get-Command bb-error-fix -ErrorAction SilentlyContinue) {
                                             Write-Host "🔧 Applying BusBuddy PowerShell fix..." -ForegroundColor Cyan
                                             try {
                                                 bb-error-fix -AutoFix 2>&1 | Out-Null
-                                            } catch {
+                                            }
+                                            catch {
                                                 Write-Host "   ⚠️ Auto-fix failed" -ForegroundColor Yellow
                                             }
                                         }
                                         Write-Host ""
                                     }
-                                    
+
                                     # Capture any interaction activity
                                     if ($line -match "button|click|navigation|view|window|dialog|form|control") {
                                         Write-Host "📱" -NoNewline -ForegroundColor Blue
@@ -173,32 +176,35 @@ while ((Get-Date) -lt $endTime) {
                             }
                         }
                     }
-                } catch {
+                }
+                catch {
                     # Ignore log reading errors
                 }
             }
         }
-        
+
         # Show status every 5 seconds with process info
         if ($cycleCount % 5 -eq 0) {
             $elapsed = [math]::Round(((Get-Date) - $startTime).TotalSeconds, 0)
             $remaining = $MonitoringDuration - $elapsed
             Write-Host ""
             Write-Host "📊 Status: ${elapsed}s elapsed, ${remaining}s remaining, $errorCount errors, $logEntryCount log entries" -ForegroundColor Cyan
-            
+
             # Show what processes we found
             if ($allProcesses.Count -gt 0) {
                 Write-Host "   Active processes: $($allProcesses.Count) dotnet/BusBuddy processes detected" -ForegroundColor Green
-            } else {
+            }
+            else {
                 Write-Host "   ⚠️ No BusBuddy processes detected" -ForegroundColor Yellow
             }
         }
-    } else {
+    }
+    else {
         if ($cycleCount % 5 -eq 0) {
             Write-Host " [No active window]" -ForegroundColor DarkGray
         }
     }
-    
+
     Start-Sleep -Seconds 1
 }
 
@@ -228,7 +234,8 @@ if ($errorCount -gt 0) {
     Write-Host "   • $errorCount errors were captured and logged" -ForegroundColor Yellow
     Write-Host "   • Run 'bb-error-fix -Detailed' for detailed analysis" -ForegroundColor Blue
     Write-Host "   • Check logs in BusBuddy.WPF\logs for full details" -ForegroundColor Blue
-} else {
+}
+else {
     Write-Host "   • No errors detected during monitoring period" -ForegroundColor Green
     Write-Host "   • Try interacting more with the application to trigger errors" -ForegroundColor Gray
 }

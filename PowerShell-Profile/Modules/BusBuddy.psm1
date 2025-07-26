@@ -13,7 +13,7 @@
     Author         : Bus Buddy Development Team
     Prerequisite   : PowerShell 7.5+ (for optimal performance and features)
     Copyright      : (c) 2025 Bus Buddy Project
-    PS Version     : Optimized for PowerShell 7.5 with .NET 9 features
+    PS Version     : Optimized for PowerShell 7.5 with .NET 8 runtime
 
 .EXAMPLE
     Import-Module .\PowerShell\BusBuddy.psm1
@@ -288,7 +288,7 @@ function Test-BusBuddyConfiguration {
     .DESCRIPTION
         Performs comprehensive validation of the development environment including:
         - PowerShell 7.5+ version check with feature detection
-        - .NET 9+ runtime validation
+        - .NET 8+ runtime validation
         - Project structure and dependency verification
         - PowerShell 7.5 specific feature availability
 
@@ -344,11 +344,8 @@ function Test-BusBuddyConfiguration {
             $dotnetVer = [version]$dotnetVersion
             if ($dotnetVer -lt [version]"8.0") {
                 $issues += ".NET 8.0+ required (found $dotnetVersion)"
-            } elseif ($dotnetVer -lt [version]"9.0") {
-                $recommendations += "Consider upgrading to .NET 9 for PowerShell 7.5 optimal performance"
-                Write-BusBuddyStatus ".NET $dotnetVersion detected (.NET 9+ recommended)" -Status Warning
-            } else {
-                Write-BusBuddyStatus ".NET $dotnetVersion detected - optimal for PowerShell 7.5" -Status Success
+            } elseif ($dotnetVer -ge [version]"8.0") {
+                Write-BusBuddyStatus ".NET $dotnetVersion detected - optimal for BusBuddy development" -Status Success
             }
         }
     } catch {
@@ -1003,10 +1000,10 @@ function Test-PowerShell75Features {
     $features.PowerShellVersion = $psVersion
     $features.IsPS75Plus = $psVersion -ge [version]'7.5.0'
     $features.DotNetVersion = [System.Environment]::Version
-    $features.IsNet9Plus = $features.DotNetVersion -ge [version]'9.0'
+    $features.IsNet8Plus = $features.DotNetVersion -ge [version]'8.0'
 
     Write-Host "PowerShell Version: $($features.PowerShellVersion)" -ForegroundColor $(if ($features.IsPS75Plus) { 'Green' } else { 'Yellow' })
-    Write-Host ".NET Version: $($features.DotNetVersion)" -ForegroundColor $(if ($features.IsNet9Plus) { 'Green' } else { 'Yellow' })
+    Write-Host ".NET Version: $($features.DotNetVersion)" -ForegroundColor $(if ($features.IsNet8Plus) { 'Green' } else { 'Yellow' })
     Write-Host ""
 
     # Test specific PS 7.5 features
@@ -1121,8 +1118,8 @@ function Test-PowerShell75Features {
         if (-not $features.IsPS75Plus) {
             Write-Host "  💡 Upgrade to PowerShell 7.5+ for optimal performance and features" -ForegroundColor Blue
         }
-        if (-not $features.IsNet9Plus) {
-            Write-Host "  💡 Upgrade to .NET 9+ for best PowerShell 7.5 experience" -ForegroundColor Blue
+        if (-not $features.IsNet8Plus) {
+            Write-Host "  💡 Upgrade to .NET 8+ for optimal BusBuddy development experience" -ForegroundColor Blue
         }
     }
 
@@ -1389,6 +1386,7 @@ Set-Alias -Name 'bb-restore' -Value 'Invoke-BusBuddyRestore' -Description 'Resto
 Set-Alias -Name 'bb-dev-session' -Value 'Start-BusBuddyDevSession' -Description 'Start development session'
 Set-Alias -Name 'bb-health' -Value 'Invoke-BusBuddyHealthCheck' -Description 'Project health check'
 Set-Alias -Name 'bb-env-check' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation'
+Set-Alias -Name 'bb-validate' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation (alias)'
 
 # Utility aliases
 Set-Alias -Name 'bb-happiness' -Value 'Get-BusBuddyHappiness' -Description 'Motivational quotes'

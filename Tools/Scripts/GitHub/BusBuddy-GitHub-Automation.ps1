@@ -362,7 +362,8 @@ function Get-WorkflowResults {
     try {
         # Try GitHub CLI first
         if (Get-Command gh -ErrorAction SilentlyContinue) {
-            $ghArgs = @('run', 'list', '--limit', $Count, '--json', 'status,conclusion,createdAt,name,workflowName,id,event,headBranch,url')
+            # Updated field names for GitHub CLI compatibility
+            $ghArgs = @('run', 'list', '--limit', $Count, '--json', 'status,conclusion,createdAt,name,workflowName,databaseId,event,headBranch,url')
             if ($Status -ne 'all') {
                 $ghArgs += '--status', $Status
             }
@@ -370,6 +371,11 @@ function Get-WorkflowResults {
             $ghOutput = & gh @ghArgs 2>&1
             if ($LASTEXITCODE -eq 0) {
                 $results = $ghOutput | ConvertFrom-Json
+                # Convert databaseId to id for compatibility
+                $results = $results | ForEach-Object {
+                    $_ | Add-Member -NotePropertyName 'id' -NotePropertyValue $_.databaseId -Force
+                    $_
+                }
                 Write-GitHubStatus "✅ Retrieved $($results.Count) workflow runs via GitHub CLI" -Status Success
             }
             else {
