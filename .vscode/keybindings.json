@@ -93,7 +93,6 @@
     "key": "ctrl+shift+`",
     "command": "workbench.action.terminal.new"
   },
-
   // 🎯 TASK EXPLORER EXCLUSIVE KEYBINDINGS
   {
     "key": "ctrl+shift+t",
@@ -103,7 +102,6 @@
     "key": "ctrl+alt+t",
     "command": "workbench.view.extension.taskExplorer"
   },
-
   // 🚫 DISABLE COMPETING TASK SHORTCUTS
   {
     "key": "ctrl+shift+p",
@@ -116,5 +114,54 @@
   {
     "key": "f1",
     "command": "-workbench.action.showCommands"
+  },
+  // 🚌 BusBuddy PowerShell Commands Enforcement (Instructions.md)
+  {
+    "key": "ctrl+shift+h",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "bb-health -Detailed\r"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+b",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "bb-build -Clean -Restore\r"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+t",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "bb-test -Coverage\r"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+r",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "bb-run -EnableDebug\r"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+d",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "bb-diagnostic\r"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+s",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "bb-dev-session -OpenIDE\r"
+    },
+    "when": "terminalFocus"
   }
 ]

@@ -104,7 +104,33 @@
   },
   "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2 (BusBuddy)",
   "terminal.integrated.env.windows": {
-    "BUSBUDDY_AI_MODE": "enabled"
+    "BUSBUDDY_AI_MODE": "enabled",
+    "BUSBUDDY_WORKFLOW_ENFORCE": "true",
+    "BUSBUDDY_BB_COMMANDS_REQUIRED": "true",
+    "BUSBUDDY_PHASE": "2"
+  },
+  // 🚌 BusBuddy Workflow Enforcement Settings
+  "busbuddy.enforceWorkflow": true,
+  "busbuddy.requireBBCommands": true,
+  "busbuddy.mandatoryHealthCheck": true,
+  "busbuddy.currentPhase": "2",
+  "busbuddy.enforcePhaseRules": true,
+  "busbuddy.testFramework": "NUnit",
+  "busbuddy.blockMSTest": true,
+  "busbuddy.requireFluentAssertions": true,
+  "busbuddy.requirePowerShell75": true,
+  "busbuddy.blockLegacyPowerShell": true,
+  // Task Explorer Configuration (MANDATORY)
+  "taskExplorer.enable": true,
+  "taskExplorer.showLastTasks": true,
+  "taskExplorer.includeAnt": false,
+  "taskExplorer.includeGulp": false,
+  "taskExplorer.includeGrunt": false,
+  "taskExplorer.includeNpm": false,
+  "taskExplorer.includeWorkspace": true,
+  "taskExplorer.enabledTasks": {
+    "workspace": true,
+    "vscode": true
   },
   "github-actions.workflows.pinned.refresh.enabled": true,
   "github-actions.workflows.pinned.workflows": [

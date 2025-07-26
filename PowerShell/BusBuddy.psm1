@@ -695,8 +695,8 @@ function Invoke-BusBuddyTest {
             Write-BusBuddyStatus "Code coverage collection enabled" -Status Info
         }
 
-        # Run the application
-        & dotnet @runArgs
+        # Run the tests
+        & dotnet @testArgs
 
         if ($LASTEXITCODE -eq 0) {
             Write-BusBuddyStatus "All tests passed" -Status Success

@@ -4,6 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:analytics="clr-namespace:BusBuddy.WPF.Views.Analytics"
         mc:Ignorable="d"
         Title="🚌 Bus Buddy - Transportation Management"
         Height="800"
@@ -19,7 +20,9 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="#2D3748" Padding="10">
+        <Border Grid.Row="0"
+                Background="#2D3748"
+                Padding="10">
             <TextBlock Text="🚌 Bus Buddy Transportation Management"
                        Foreground="White"
                        FontSize="24"
@@ -35,39 +38,68 @@
             </Grid.ColumnDefinitions>
 
             <!-- Navigation Menu -->
-            <Border Grid.Column="0" Background="#F7FAFC" BorderBrush="#E2E8F0" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0"
+                    Background="#F7FAFC"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="0,0,1,0">
                 <StackPanel Margin="10">
-                    <TextBlock Text="Navigation" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                    <TextBlock Text="Navigation"
+                            FontWeight="Bold"
+                            FontSize="16"
+                            Margin="0,0,0,10"/>
 
-                    <Button Name="DashboardButton" Content="📊 Dashboard"
-                            Padding="10,8" Margin="0,2"
+                    <Button Name="DashboardButton"
+                            Content="📊 Dashboard"
+                            Padding="10,8"
+                            Margin="0,2"
                             HorizontalAlignment="Stretch"
                             Click="DashboardButton_Click"/>
 
-                    <Button Name="DriversButton" Content="👤 Drivers"
-                            Padding="10,8" Margin="0,2"
+                    <Button Name="AnalyticsButton"
+                            Content="📈 Analytics"
+                            Padding="10,8"
+                            Margin="0,2"
+                            HorizontalAlignment="Stretch"
+                            Click="AnalyticsButton_Click"/>
+
+                    <Button Name="DriversButton"
+                            Content="👤 Drivers"
+                            Padding="10,8"
+                            Margin="0,2"
                             HorizontalAlignment="Stretch"
                             Click="DriversButton_Click"/>
 
-                    <Button Name="VehiclesButton" Content="🚐 Vehicles"
-                            Padding="10,8" Margin="0,2"
+                    <Button Name="VehiclesButton"
+                            Content="🚐 Vehicles"
+                            Padding="10,8"
+                            Margin="0,2"
                             HorizontalAlignment="Stretch"
                             Click="VehiclesButton_Click"/>
 
-                    <Button Name="ActivitiesButton" Content="📅 Activities"
-                            Padding="10,8" Margin="0,2"
+                    <Button Name="ActivitiesButton"
+                            Content="📅 Activities"
+                            Padding="10,8"
+                            Margin="0,2"
                             HorizontalAlignment="Stretch"
                             Click="ActivitiesButton_Click"/>
                 </StackPanel>
             </Border>
 
             <!-- Content Area -->
-            <Frame Grid.Column="1" Name="ContentFrame" NavigationUIVisibility="Hidden"/>
+            <Frame Grid.Column="1"
+                    x:Name="ContentFrame"
+                    NavigationUIVisibility="Hidden"/>
         </Grid>
 
         <!-- Status Bar -->
-        <Border Grid.Row="2" Background="#EDF2F7" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0" Padding="10,5">
-            <TextBlock Name="StatusText" Text="Ready" FontSize="12"/>
+        <Border Grid.Row="2"
+                Background="#EDF2F7"
+                BorderBrush="#E2E8F0"
+                BorderThickness="0,1,0,0"
+                Padding="10,5">
+            <TextBlock x:Name="StatusText"
+                    Text="Ready"
+                    FontSize="12"/>
         </Border>
     </Grid>
 </Window>

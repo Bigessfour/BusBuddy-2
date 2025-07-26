@@ -18,10 +18,10 @@ public class RouteRepository : Repository<Route>, IRouteRepository
 
     #region Async Route-Specific Operations
 
-    public async Task<IEnumerable<Route>> GetRoutesByDateAsync(DateTime date)
+    public async Task<IEnumerable<Route>> GetRoutesByDateAsync(DateTime targetDate)
     {
         return await Query()
-            .Where(r => r.Date.Date == date.Date)
+            .Where(r => r.Date.Date == targetDate.Date)
             .OrderBy(r => r.RouteName)
             .ToListAsync();
     }
@@ -51,59 +51,59 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             .ToListAsync();
     }
 
-    public async Task<Route?> GetRouteByNameAndDateAsync(string routeName, DateTime date)
+    public async Task<Route?> GetRouteByNameAndDateAsync(string routeName, DateTime targetDate)
     {
         return await Query()
-            .FirstOrDefaultAsync(r => r.RouteName == routeName && r.Date.Date == date.Date);
+            .FirstOrDefaultAsync(r => r.RouteName == routeName && r.Date.Date == targetDate.Date);
     }
 
-    public async Task<IEnumerable<Route>> GetRoutesByVehicleAsync(int vehicleId, DateTime? date = null)
+    public async Task<IEnumerable<Route>> GetRoutesByVehicleAsync(int vehicleId, DateTime? targetDate = null)
     {
         var query = Query()
             .Where(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
 
-        if (date.HasValue)
-            query = query.Where(r => r.Date.Date == date.Value.Date);
+        if (targetDate.HasValue)
+            query = query.Where(r => r.Date.Date == targetDate.Value.Date);
 
         return await query
             .OrderByDescending(r => r.Date)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Route>> GetRoutesByDriverAsync(int driverId, DateTime? date = null)
+    public async Task<IEnumerable<Route>> GetRoutesByDriverAsync(int driverId, DateTime? targetDate = null)
     {
         var query = Query()
             .Where(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
 
-        if (date.HasValue)
-            query = query.Where(r => r.Date.Date == date.Value.Date);
+        if (targetDate.HasValue)
+            query = query.Where(r => r.Date.Date == targetDate.Value.Date);
 
         return await query
             .OrderByDescending(r => r.Date)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Route>> GetRoutesWithoutVehicleAssignmentAsync(DateTime date)
+    public async Task<IEnumerable<Route>> GetRoutesWithoutVehicleAssignmentAsync(DateTime targetDate)
     {
         return await Query()
-            .Where(r => r.Date.Date == date.Date &&
+            .Where(r => r.Date.Date == targetDate.Date &&
                        r.IsActive &&
                        (r.AMVehicleId == null || r.PMVehicleId == null))
             .OrderBy(r => r.RouteName)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Route>> GetRoutesWithoutDriverAssignmentAsync(DateTime date)
+    public async Task<IEnumerable<Route>> GetRoutesWithoutDriverAssignmentAsync(DateTime targetDate)
     {
         return await Query()
-            .Where(r => r.Date.Date == date.Date &&
+            .Where(r => r.Date.Date == targetDate.Date &&
                        r.IsActive &&
                        (r.AMDriverId == null || r.PMDriverId == null))
             .OrderBy(r => r.RouteName)
             .ToListAsync();
     }
 
-    public async Task<decimal> GetTotalMileageByDateAsync(DateTime date)
+    public async Task<decimal> GetTotalMileageByDateAsync(DateTime targetDate)
     {
         var query = Query();
         if (query == null)
@@ -111,7 +111,7 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             return 0; // Return 0 if context or Routes is null
         }
         return await query
-            .Where(r => r.Date.Date == date.Date && r.IsActive)
+            .Where(r => r.Date.Date == targetDate.Date && r.IsActive)
             .SumAsync(r => (r.AMEndMiles - r.AMBeginMiles ?? 0) + (r.PMEndMiles - r.PMBeginMiles ?? 0));
     }
 
@@ -133,7 +133,7 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             query = query.Where(r => r.Date <= endDate.Value.Date);
 
         var routes = await query.ToListAsync();
-        if (!routes.Any()) return 0;
+        if (routes.Count == 0) return 0;
 
         var totalRiders = routes.Sum(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0));
         return routes.Count > 0 ? (decimal)totalRiders / routes.Count : 0;
@@ -167,16 +167,16 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             );
     }
 
-    public async Task<bool> ValidateRouteScheduleAsync(DateTime date)
+    public async Task<bool> ValidateRouteScheduleAsync(DateTime targetDate)
     {
-        var errors = await GetRouteValidationErrorsAsync(date);
+        var errors = await GetRouteValidationErrorsAsync(targetDate);
         return !errors.Any();
     }
 
-    public async Task<IEnumerable<string>> GetRouteValidationErrorsAsync(DateTime date)
+    public async Task<IEnumerable<string>> GetRouteValidationErrorsAsync(DateTime targetDate)
     {
         var errors = new List<string>();
-        var routes = await GetRoutesByDateAsync(date);
+        var routes = await GetRoutesByDateAsync(targetDate);
 
         foreach (var route in routes.Where(r => r.IsActive))
         {
@@ -259,10 +259,10 @@ public class RouteRepository : Repository<Route>, IRouteRepository
 
     #region Synchronous Methods for Syncfusion Data Binding
 
-    public IEnumerable<Route> GetRoutesByDate(DateTime date)
+    public IEnumerable<Route> GetRoutesByDate(DateTime targetDate)
     {
         return Query()
-            .Where(r => r.Date.Date == date.Date)
+            .Where(r => r.Date.Date == targetDate.Date)
             .OrderBy(r => r.RouteName)
             .ToList();
     }
@@ -283,36 +283,36 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             .ToList();
     }
 
-    public IEnumerable<Route> GetRoutesByVehicle(int vehicleId, DateTime? date = null)
+    public IEnumerable<Route> GetRoutesByVehicle(int vehicleId, DateTime? targetDate = null)
     {
         var query = Query()
             .Where(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
 
-        if (date.HasValue)
-            query = query.Where(r => r.Date.Date == date.Value.Date);
+        if (targetDate.HasValue)
+            query = query.Where(r => r.Date.Date == targetDate.Value.Date);
 
         return query
             .OrderByDescending(r => r.Date)
             .ToList();
     }
 
-    public IEnumerable<Route> GetRoutesByDriver(int driverId, DateTime? date = null)
+    public IEnumerable<Route> GetRoutesByDriver(int driverId, DateTime? targetDate = null)
     {
         var query = Query()
             .Where(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
 
-        if (date.HasValue)
-            query = query.Where(r => r.Date.Date == date.Value.Date);
+        if (targetDate.HasValue)
+            query = query.Where(r => r.Date.Date == targetDate.Value.Date);
 
         return query
             .OrderByDescending(r => r.Date)
             .ToList();
     }
 
-    public decimal GetTotalMileageByDate(DateTime date)
+    public decimal GetTotalMileageByDate(DateTime targetDate)
     {
         var routes = Query()
-            .Where(r => r.Date.Date == date.Date && r.IsActive)
+            .Where(r => r.Date.Date == targetDate.Date && r.IsActive)
             .ToList();
 
         return routes.Sum(r =>

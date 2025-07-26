@@ -10,6 +10,28 @@
   },
   "tasks": [
     {
+      "label": "🚌 BB: Enforce Workflow Check",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (-not (Get-Command bb-health -ErrorAction SilentlyContinue)) { Write-Host 'ERROR: BusBuddy PowerShell commands not loaded! Load profiles first.' -ForegroundColor Red; Write-Host 'Run: bb-dev-session -OpenIDE' -ForegroundColor Yellow; exit 1 } else { Write-Host '✅ BusBuddy PowerShell workflow ready' -ForegroundColor Green; bb-health -Quick }"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "detail": "🚌 Enforces instructions.md workflow - runs on folder open"
+    },
+    {
       "label": "🎯 BB: Phase 1 Completion Verification",
       "type": "shell",
       "command": "pwsh.exe",
