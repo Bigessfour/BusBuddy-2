@@ -142,7 +142,7 @@ namespace BusBuddy.Core.Services
                 try
                 {
                     // Check if driver already exists
-                    var licenseNumber = driverJson["licenseNumber"]?.ToString();
+                    var licenseNumber = driverJson["licenseNumber"]?.ToString() ?? string.Empty;
                     if (string.IsNullOrEmpty(licenseNumber)) { continue; }
 
                     var existingDriver = await _context.Drivers
@@ -154,15 +154,20 @@ namespace BusBuddy.Core.Services
                         continue;
                     }
 
+                    var firstName = driverJson["firstName"]?.ToString() ?? string.Empty;
+                    var lastName = driverJson["lastName"]?.ToString() ?? string.Empty;
+                    var fullName = $"{firstName} {lastName}".Trim();
+                    if (string.IsNullOrEmpty(fullName)) { fullName = "Unknown Driver"; }
+
                     var driver = new Driver
                     {
-                        DriverName = $"{driverJson["firstName"]?.ToString()} {driverJson["lastName"]?.ToString()}".Trim(),
-                        DriverPhone = driverJson["phoneNumber"]?.ToString(),
-                        DriverEmail = driverJson["email"]?.ToString(),
-                        Address = driverJson["address"]?.ToString(),
-                        DriversLicenceType = licenseNumber ?? "CDL",
+                        DriverName = fullName,
+                        DriverPhone = driverJson["phoneNumber"]?.ToString() ?? string.Empty,
+                        DriverEmail = driverJson["email"]?.ToString() ?? string.Empty,
+                        Address = driverJson["address"]?.ToString() ?? string.Empty,
+                        DriversLicenceType = licenseNumber,
                         TrainingComplete = true, // Assume all JSON drivers are trained
-                        Status = driverJson["isActive"]?.ToObject<bool>() == true ? "Active" : "Inactive"
+                        Status = (driverJson["isActive"]?.ToObject<bool>() ?? false) ? "Active" : "Inactive"
                     };
 
                     await _context.Drivers.AddAsync(driver);
@@ -189,7 +194,7 @@ namespace BusBuddy.Core.Services
                 try
                 {
                     // Check if vehicle already exists
-                    var licensePlate = vehicleJson["licensePlate"]?.ToString();
+                    var licensePlate = vehicleJson["licensePlate"]?.ToString() ?? string.Empty;
                     if (string.IsNullOrEmpty(licensePlate)) { continue; }
 
                     var existingVehicle = await _context.Vehicles
@@ -201,15 +206,20 @@ namespace BusBuddy.Core.Services
                         continue;
                     }
 
+                    var make = vehicleJson["make"]?.ToString() ?? "Unknown";
+                    var model = vehicleJson["model"]?.ToString() ?? "Unknown";
+                    var capacity = vehicleJson["capacity"]?.ToObject<int>() ?? 50;
+                    var status = vehicleJson["status"]?.ToString() ?? "Operational";
+
                     var vehicle = new Vehicle
                     {
-                        Make = vehicleJson["make"]?.ToString() ?? "Unknown",
-                        Model = vehicleJson["model"]?.ToString() ?? "Unknown",
-                        PlateNumber = licensePlate ?? "UNKNOWN",
-                        Capacity = vehicleJson["capacity"]?.ToObject<int>() ?? 50,
-                        BusNumber = licensePlate ?? "UNKNOWN",
-                        IsActive = vehicleJson["status"]?.ToString() == "Active",
-                        OperationalStatus = vehicleJson["status"]?.ToString() ?? "Operational"
+                        Make = make,
+                        Model = model,
+                        PlateNumber = licensePlate,
+                        Capacity = capacity,
+                        BusNumber = licensePlate,
+                        IsActive = status == "Active",
+                        OperationalStatus = status
                     };
 
                     await _context.Vehicles.AddAsync(vehicle);
@@ -236,7 +246,7 @@ namespace BusBuddy.Core.Services
                 try
                 {
                     // Check if route already exists
-                    var routeName = routeJson["name"]?.ToString();
+                    var routeName = routeJson["name"]?.ToString() ?? string.Empty;
                     if (string.IsNullOrEmpty(routeName)) { continue; }
 
                     var existingRoute = await _context.Routes
@@ -248,12 +258,15 @@ namespace BusBuddy.Core.Services
                         continue;
                     }
 
+                    var description = routeJson["description"]?.ToString() ?? string.Empty;
+                    var isActive = routeJson["isActive"]?.ToObject<bool>() ?? true;
+
                     var route = new Route
                     {
-                        RouteName = routeName ?? "Unknown Route",
-                        Description = routeJson["description"]?.ToString(),
+                        RouteName = routeName,
+                        Description = description,
                         Date = DateTime.Today, // Use today's date for new routes
-                        IsActive = routeJson["isActive"]?.ToObject<bool>() ?? true
+                        IsActive = isActive
                     };
 
                     await _context.Routes.AddAsync(route);
@@ -284,7 +297,7 @@ namespace BusBuddy.Core.Services
             {
                 try
                 {
-                    var activityName = activityJson["name"]?.ToString();
+                    var activityName = activityJson["name"]?.ToString() ?? string.Empty;
                     if (string.IsNullOrEmpty(activityName)) { continue; }
 
                     // Check if activity already exists
@@ -297,30 +310,36 @@ namespace BusBuddy.Core.Services
                         continue;
                     }
 
-                    // Find related entities
-                    var driverName = activityJson["driverName"]?.ToString();
+                    // Find related entities with null safety
+                    var driverName = activityJson["driverName"]?.ToString() ?? string.Empty;
                     var driver = drivers.FirstOrDefault(d => $"{d.FirstName} {d.LastName}" == driverName);
 
-                    var vehiclePlate = activityJson["vehiclePlate"]?.ToString();
+                    var vehiclePlate = activityJson["vehiclePlate"]?.ToString() ?? string.Empty;
                     var vehicle = vehicles.FirstOrDefault(v => v.LicensePlate == vehiclePlate);
 
-                    var routeName = activityJson["routeName"]?.ToString();
+                    var routeName = activityJson["routeName"]?.ToString() ?? string.Empty;
                     var route = routes.FirstOrDefault(r => r.RouteName == routeName);
+
+                    var description = activityJson["description"]?.ToString() ?? string.Empty;
+                    var status = activityJson["status"]?.ToString() ?? "Scheduled";
+                    var notes = activityJson["notes"]?.ToString() ?? string.Empty;
+                    var maxPassengers = activityJson["maxPassengers"]?.ToObject<int?>();
+                    var actualPassengers = activityJson["actualPassengers"]?.ToObject<int?>();
 
                     var activity = new Activity
                     {
                         ActivityType = activityName,
-                        Description = activityJson["description"]?.ToString(),
+                        Description = description,
                         Date = ParseDateSafely(activityJson["date"]?.ToString() ?? string.Empty) ?? DateTime.Now,
                         StartTime = ParseTimeSafely(activityJson["startTime"]?.ToString() ?? string.Empty) ?? TimeSpan.FromHours(8),
                         EndTime = ParseTimeSafely(activityJson["endTime"]?.ToString() ?? string.Empty) ?? TimeSpan.FromHours(9),
                         DriverId = driver?.DriverId,
                         VehicleId = vehicle?.Id ?? 0, // VehicleId property maps to AssignedVehicleId in Activity
                         RouteId = route?.RouteId,
-                        Status = activityJson["status"]?.ToString() ?? "Scheduled",
-                        ExpectedPassengers = activityJson["maxPassengers"]?.ToObject<int>(),
-                        StudentsCount = activityJson["actualPassengers"]?.ToObject<int>(),
-                        Notes = activityJson["notes"]?.ToString(),
+                        Status = status,
+                        ExpectedPassengers = maxPassengers,
+                        StudentsCount = actualPassengers,
+                        Notes = notes,
                         CreatedDate = DateTime.Now
                     };
 

@@ -33,24 +33,24 @@ Write-Host ""
 # Define compatibility replacements
 $CompatibilityReplacements = @{
     # Unix command replacements
-    'grep -i'           = 'Select-String -Pattern'
-    'grep '             = 'Select-String -Pattern'
-    'head -n'           = 'Select-Object -First'
-    'tail -n'           = 'Select-Object -Last'
-    'uniq'              = 'Sort-Object -Unique'
-    'cat '              = 'Get-Content'
-    'find . -name'      = 'Get-ChildItem -Recurse -Filter'
-    'wc -l'             = 'Measure-Object -Line'
-    
+    'grep -i'      = 'Select-String -Pattern'
+    'grep '        = 'Select-String -Pattern'
+    'head -n'      = 'Select-Object -First'
+    'tail -n'      = 'Select-Object -Last'
+    'uniq'         = 'Sort-Object -Unique'
+    'cat '         = 'Get-Content'
+    'find . -name' = 'Get-ChildItem -Recurse -Filter'
+    'wc -l'        = 'Measure-Object -Line'
+
     # Line ending standardization
-    'echo "'            = 'Write-Output "'
-    'echo '             = 'Write-Output'
-    
+    'echo "'       = 'Write-Output "'
+    'echo '        = 'Write-Output'
+
     # Path separators
-    'ls -la'            = 'Get-ChildItem -Force'
-    'ls '               = 'Get-ChildItem'
-    'pwd'               = 'Get-Location'
-    'cd '               = 'Set-Location'
+    'ls -la'       = 'Get-ChildItem -Force'
+    'ls '          = 'Get-ChildItem'
+    'pwd'          = 'Get-Location'
+    'cd '          = 'Set-Location'
 }
 
 # Define files to scan
@@ -63,16 +63,16 @@ Write-Host "📊 Scanning $($FilesToScan.Count) PowerShell files for compatibili
 foreach ($File in $FilesToScan) {
     try {
         $Content = Get-Content -Path $File.FullName -Raw
-        
+
         foreach ($Pattern in $CompatibilityReplacements.Keys) {
             if ($Content -match [regex]::Escape($Pattern)) {
                 $IssuesFound += [PSCustomObject]@{
-                    File = $File.FullName
-                    Issue = $Pattern
+                    File        = $File.FullName
+                    Issue       = $Pattern
                     Replacement = $CompatibilityReplacements[$Pattern]
                     LineNumbers = @()
                 }
-                
+
                 # Find specific line numbers
                 $Lines = Get-Content -Path $File.FullName
                 for ($i = 0; $i -lt $Lines.Count; $i++) {
@@ -103,7 +103,7 @@ $GroupedIssues = $IssuesFound | Group-Object -Property File
 foreach ($Group in $GroupedIssues) {
     Write-Host ""
     Write-Host "📄 File: $($Group.Name)" -ForegroundColor Cyan
-    
+
     foreach ($Issue in $Group.Group) {
         Write-Host "   ❌ Line(s) $($Issue.LineNumbers -join ', '): '$($Issue.Issue)'" -ForegroundColor Red
         Write-Host "   ✅ Suggested: '$($Issue.Replacement)'" -ForegroundColor Green
@@ -117,11 +117,11 @@ switch ($FixMode) {
         Write-Host "📊 Report mode - no changes made" -ForegroundColor Blue
         Write-Host "Run with -FixMode Interactive or -FixMode Auto to apply fixes" -ForegroundColor Blue
     }
-    
+
     "Interactive" {
         Write-Host ""
         Write-Host "🔧 Interactive mode - applying fixes with confirmation..." -ForegroundColor Yellow
-        
+
         foreach ($Group in $GroupedIssues) {
             $Response = Read-Host "Fix issues in $($Group.Name)? (y/N)"
             if ($Response -eq 'y' -or $Response -eq 'Y') {
@@ -129,11 +129,11 @@ switch ($FixMode) {
             }
         }
     }
-    
+
     "Auto" {
         Write-Host ""
         Write-Host "🚀 Auto mode - applying all fixes..." -ForegroundColor Green
-        
+
         foreach ($Group in $GroupedIssues) {
             Invoke-CompatibilityFixes -FilePath $Group.Name -Issues $Group.Group
         }
@@ -145,23 +145,23 @@ function Invoke-CompatibilityFixes {
         [string]$FilePath,
         [array]$Issues
     )
-    
+
     try {
         $Content = Get-Content -Path $FilePath -Raw
         $OriginalContent = $Content
-        
+
         foreach ($Issue in $Issues) {
             $Content = $Content -replace [regex]::Escape($Issue.Issue), $Issue.Replacement
         }
-        
+
         if ($Content -ne $OriginalContent) {
             # Create backup
             $BackupPath = "$FilePath.backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
             Copy-Item -Path $FilePath -Destination $BackupPath
-            
+
             # Apply fix
             Set-Content -Path $FilePath -Value $Content -NoNewline
-            
+
             Write-Host "   ✅ Fixed $($Issues.Count) issue(s) in $FilePath" -ForegroundColor Green
             Write-Host "   📁 Backup created: $BackupPath" -ForegroundColor Blue
         }
