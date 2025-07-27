@@ -318,8 +318,8 @@ namespace BusBuddy.Core.Services
 
                 // Get available drivers
                 var availableDrivers = await _context.Drivers
-                    .Where(d => !assignedDriverIds.Contains(d.Id))
-                    .OrderBy(d => d.Name)
+                    .Where(d => !assignedDriverIds.Contains(d.DriverId))
+                    .OrderBy(d => d.DriverName)
                     .ToListAsync();
 
                 Logger.Information("Found {Count} available drivers for time slot {StartTime} to {EndTime}",

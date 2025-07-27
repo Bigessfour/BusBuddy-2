@@ -1,0 +1,28 @@
+{
+  "workflowFailures": {
+    "CI/CD Build & Test": "Build failure due to ILogger ambiguity",
+    "Code Quality Gate": "Build failure due to ILogger ambiguity",
+    "Bus Buddy CI/CD Pipeline": "Build failure due to ILogger ambiguity"
+  },
+  "nextSteps": [
+    "Remove duplicate package references",
+    "Test build after fixes",
+    "Re-run GitHub Actions workflows"
+  ],
+  "primaryIssue": {
+    "status": "FIXED - Removed Microsoft.Extensions.Logging import",
+    "error": "CS0104: ILogger ambiguous reference",
+    "location": "BusBuddy.Core\\Services\\SportsSchedulingService.cs(22,33)"
+  },
+  "duplicatePackageWarnings": {
+    "BusBuddy.Tests": [
+      "Microsoft.Extensions.Configuration 9.0.7",
+      "Microsoft.Extensions.Configuration.Json 9.0.7",
+      "Microsoft.Extensions.DependencyInjection 9.0.7"
+    ],
+    "BusBuddy.UITests": [
+      "Microsoft.Extensions.DependencyInjection 9.0.7"
+    ]
+  },
+  "timestamp": "2025-07-26 17:57:27"
+}
