@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
+    <!-- Suppress MSBuild warning about locked DLLs during clean -->
+    <NoWarn>MSB3061</NoWarn>
+
     <!-- Core Project Identification -->
     <ProjectName>BusBuddy.Core</ProjectName>
     <IsBusinessLogicLayer>true</IsBusinessLogicLayer>

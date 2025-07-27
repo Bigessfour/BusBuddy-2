@@ -73,25 +73,43 @@ namespace BusBuddy.Core
 
                     try
                     {
-                        // Get connection string from configuration or use default SQLite
-                        var connectionString = _configuration?.GetConnectionString("DefaultConnection")
-                                             ?? "Data Source=BusBuddy.db";
+                        // Get connection string using the appropriate environment helper
+                        var connectionString = GetAppropriateConnectionString();
 
-                        Logger.Information("Using connection string: {ConnectionType}",
-                            connectionString.Contains("Data Source") ? "SQLite" : "SQL Server");
+                        var databaseProvider = _configuration?["DatabaseProvider"] ?? "LocalDB";
 
-                        if (connectionString.Contains("Data Source"))
+                        Logger.Information("Using database provider: {Provider}", databaseProvider);
+                        Logger.Information("Using connection string type: {ConnectionType}",
+                            connectionString.Contains("(localdb)") ? "LocalDB" :
+                            connectionString.Contains(".database.windows.net") ? "Azure SQL" :
+                            connectionString.Contains("Data Source=") ? "SQLite" : "SQL Server");
+
+                        if (connectionString.Contains("(localdb)"))
                         {
-                            // SQLite configuration for development/Phase 1
+                            // SQL LocalDB configuration for development
+                            optionsBuilder.UseSqlServer(connectionString, sqlOptions =>
+                            {
+                                sqlOptions.EnableRetryOnFailure(
+                                    maxRetryCount: 3,
+                                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                                    errorNumbersToAdd: null);
+                                sqlOptions.CommandTimeout(30);
+                            });
+                            Logger.Information("Configured SQL LocalDB with retry policy: {MaxRetries} retries, {MaxDelay}s max delay",
+                                3, 10);
+                        }
+                        else if (connectionString.Contains("Data Source="))
+                        {
+                            // SQLite configuration for Phase 1 compatibility
                             optionsBuilder.UseSqlite(connectionString, options =>
                             {
                                 options.CommandTimeout(30);
                             });
                             Logger.Information("Configured SQLite database with {Timeout}s timeout", 30);
                         }
-                        else
+                        else if (connectionString.Contains("database.windows.net"))
                         {
-                            // SQL Server configuration for production
+                            // Azure SQL Server configuration for production
                             optionsBuilder.UseSqlServer(connectionString, sqlOptions =>
                             {
                                 sqlOptions.EnableRetryOnFailure(
@@ -100,8 +118,22 @@ namespace BusBuddy.Core
                                     errorNumbersToAdd: null);
                                 sqlOptions.CommandTimeout(60);
                             });
-                            Logger.Information("Configured SQL Server with retry policy: {MaxRetries} retries, {MaxDelay}s max delay",
+                            Logger.Information("Configured Azure SQL with retry policy: {MaxRetries} retries, {MaxDelay}s max delay",
                                 5, 30);
+                        }
+                        else
+                        {
+                            // Standard SQL Server configuration for on-premises SQL
+                            optionsBuilder.UseSqlServer(connectionString, sqlOptions =>
+                            {
+                                sqlOptions.EnableRetryOnFailure(
+                                    maxRetryCount: 3,
+                                    maxRetryDelay: TimeSpan.FromSeconds(15),
+                                    errorNumbersToAdd: null);
+                                sqlOptions.CommandTimeout(45);
+                            });
+                            Logger.Information("Configured standard SQL Server with retry policy: {MaxRetries} retries, {MaxDelay}s max delay",
+                                3, 15);
                         }
 
                         // Enhanced logging and monitoring
@@ -135,8 +167,17 @@ namespace BusBuddy.Core
 
         private bool isDevelopment()
         {
-            var environment = _configuration?["Environment"] ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-            return environment.Equals("Development", StringComparison.OrdinalIgnoreCase);
+            return Utilities.EnvironmentHelper.IsDevelopment(_configuration);
+        }
+
+        private string GetAppropriateConnectionString()
+        {
+            if (_configuration == null)
+            {
+                return "Data Source=BusBuddy.db";
+            }
+
+            return Utilities.EnvironmentHelper.GetConnectionString(_configuration);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

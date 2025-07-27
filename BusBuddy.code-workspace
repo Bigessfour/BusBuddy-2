@@ -10,6 +10,7 @@
   "settings": {
     "cSpell.words": [
       "appsettings",
+      "azureresourcegroups",
       "bbanalyze",
       "bbbind",
       "bbcapture",
@@ -20,14 +21,38 @@
       "bbphase",
       "bbvalidate",
       "bbvm",
+      "Bigessfour",
+      "bstr",
+      "busbaddyadmin",
       "BUSBUDDY",
+      "coreclr",
+      "csdevkit",
       "DEBLOATING",
+      "devenv",
+      "dotnettools",
+      "eamodio",
+      "eastus",
+      "esbenp",
+      "hexeditor",
       "Hyperthreading",
+      "josefpihrt",
+      "LASTEXITCODE",
+      "localdb",
       "MVVM",
+      "nologo",
+      "oneline",
+      "pathing",
+      "pwsh",
+      "roslynator",
       "Serilog",
       "setactive",
       "SMBIOSBIOS",
-      "Syncfusion"
+      "spmeesseman",
+      "sqllocaldb",
+      "Syncfusion",
+      "syncfusioninc",
+      "taskexplorer",
+      "uninstantiated"
     ]
   }
 }

@@ -28,6 +28,13 @@ This file contains custom instructions for GitHub Copilot when working with this
 - **Template Usage**: Use `New-PowerShell752Template` for all new PowerShell scripts
 - **Validation Command**: `Invoke-MandatorySyntaxCheck -Path . -ExitOnFail` blocks deployment on failures
 
+### **MANDATORY PowerShell 7.5.2 Profile Loading**
+- **Main Profile**: Always load `PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1` (5434 lines)
+- **Loading Command**: `pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"`
+- **Module Features**: Parallel processing, enhanced error handling, threading, and comprehensive workflow automation
+- **Integration**: All build tasks, debug operations, and development workflows depend on this profile
+- **Size**: 5,434 lines of PowerShell 7.5.2 code fully optimized for .NET 8 runtime
+
 ### **Enhanced Task Monitoring Standards**
 - **Enhanced Task Monitor**: Use `enhanced-task-monitor-fixed.ps1` for ALL builds/runs
 - **Output Capture**: All task output saved to timestamped log files in `logs/` directory
@@ -685,3 +692,34 @@ ConvertFrom-Json -InputObject $jsonString -ErrorAction Stop
 - **Validation**: Use `Logger.Information()` instead of `Console.WriteLine()`
 
 These instructions help maintain consistent code quality, architecture, and development practices throughout the project.
+
+## 🔒 **PowerShell 7.5.2 Development Environment (MANDATORY)**
+
+### Primary PowerShell Profile (5434 lines)
+- **File**: `PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1`
+- **Loading Script**: `load-bus-buddy-profiles.ps1` in project root
+- **Size**: 5,434 lines of advanced PowerShell 7.5.2 code
+- **Features**: Parallel processing, error handling, threading, comprehensive workflow automation
+- **Command Set**: 40+ specialized bb-* commands for development workflow
+
+### Loading Instructions
+- **REQUIRED**: Load at the beginning of EVERY development session:
+```powershell
+pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
+```
+
+### Key Components
+- **Core Module**: 5,434-line BusBuddy.psm1 with complete workflow functionality
+- **Syntax Enforcer**: PowerShell-7.5.2-Syntax-Enforcer.ps1 for PowerShell 7.5.2 compliance
+- **AI Integration**: BusBuddy.AI module with xAI Grok-4-0709 connections
+- **Command Structure**: All commands follow bb-* naming convention
+
+### Integration Requirements
+- **Terminal Profile**: Configure VS Code terminal profile to auto-load PowerShell profile
+- **Task System**: All tasks should leverage PowerShell 7.5.2 profile functionality
+- **Error Handling**: All scripts must use PowerShell 7.5.2 error handling patterns
+- **Syntax Compliance**: All PowerShell code must pass Syntax Enforcer validation
+
+### Documentation Reference
+- **Comprehensive Reference**: `Documentation/PowerShell-7.5.2-Reference.md`
+- **Standards Guide**: `Documentation/POWERSHELL-7.5-FEATURES.md`

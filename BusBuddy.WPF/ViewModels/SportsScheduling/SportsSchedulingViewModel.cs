@@ -8,6 +8,7 @@ using System.Windows.Input;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
 using BusBuddy.WPF.ViewModels;
+using VehicleModel = BusBuddy.Core.Models.Vehicle;
 
 namespace BusBuddy.WPF.ViewModels.SportsScheduling
 {
@@ -23,12 +24,12 @@ namespace BusBuddy.WPF.ViewModels.SportsScheduling
 
         // Collections
         private ObservableCollection<SportsEvent> _sportsEvents = new();
-        private ObservableCollection<BusBuddy.Core.Models.Vehicle> _availableVehicles = new();
+        private ObservableCollection<VehicleModel> _availableVehicles = new();
         private ObservableCollection<Driver> _availableDrivers = new();
 
         // Selected items
         private SportsEvent? _selectedEvent;
-        private BusBuddy.Core.Models.Vehicle? _selectedVehicle;
+        private VehicleModel? _selectedVehicle;
         private Driver? _selectedDriver;
 
         // UI state properties

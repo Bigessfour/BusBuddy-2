@@ -1,252 +1,410 @@
-# 🚌 VS Code BusBuddy PowerShell Development Instructions
+# 🚌 BusBuddy - School Transportation Management System
 
-## 🎯 **CRITICAL: Always Use BusBuddy PowerShell Commands First**
+## 🎯 **Project Overview**
 
-When encountering any development issue, debugging problem, or runtime error in this workspace, **ALWAYS** use the built-in BusBuddy PowerShell Module commands BEFORE manual investigation:
+BusBuddy is a transportation management system designed to help school districts efficiently manage their bus fleets, drivers, routes, and schedules. Our goal is to create an intuitive application that improves safety, reduces administrative overhead, and optimizes transportation resources.
 
-## 🚀 **BusBuddy PowerShell Workflow (MANDATORY)**
+## 📋 **Table of Contents**
 
-### 1. **Runtime Issues & Application Failures**
+- [Quick Start Guide](#-quick-start-guide)
+- [Project Status & Roadmap](#-project-status--roadmap)
+- [Development Environment Setup](#-development-environment-setup)
+- [Problem Resolution Approaches](#-problem-resolution-approaches)
+- [Git & Repository Tips](#-git--repository-tips)
+- [VS Code Integration](#-vs-code-integration)
+- [Syncfusion Implementation](#-syncfusion-implementation)
+- [Debugging & Troubleshooting](#-debugging--troubleshooting)
+- [Quick Reference Commands](#-quick-reference-commands)
+- [Application Architecture](#-application-architecture)
+
+## 🚀 **Quick Start Guide**
+
+### Basic Development Setup (5 Minutes)
+
+1. **Open the Project**:
+   ```
+   Open VS Code → Open Folder → Navigate to BusBuddy folder
+   ```
+
+2. **Build the Solution**:
+   - Use VS Code Task: `⌨️ Ctrl+Shift+P → "Tasks: Run Task" → "Direct: Build Solution (CMD)"`
+   - Or use PowerShell: `dotnet build BusBuddy.sln`
+
+3. **Run the Application**:
+   - Use VS Code Task: `⌨️ Ctrl+Shift+P → "Tasks: Run Task" → "Direct: Run Application (FIXED)"`
+   - Or use PowerShell: `dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj`
+
+4. **PowerShell Helpers** (Optional but Recommended):
+   ```powershell
+   pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
+   bb-health -Quick
+   ```
+
+## 🎯 **Project Status & Roadmap**
+
+### Current Status: Phase 2
+- ✅ **Phase 1 Completed**: MainWindow → Dashboard → 3 Core Views (Drivers, Vehicles, Activities)
+- 🔄 **Phase 2 In Progress**:
+  - Enhancing UI/UX with consistent Syncfusion styling
+  - Improving MVVM architecture
+  - Expanding test coverage
+  - Optimizing performance
+
+### Key Features
+- **Drivers Management**: Personnel records, qualifications, scheduling
+- **Vehicle Fleet**: Bus inventory, maintenance records, assignments
+- **Route Planning**: Efficient route creation and management
+- **Activity Scheduling**: Field trips, special events, non-standard routes
+
+### Next Milestone Goals
+- Complete route management interface
+- Implement maintenance scheduling
+- Add reporting dashboard
+- Enhance data visualization
+
+## � **Development Environment Setup**
+
+BusBuddy uses PowerShell tools to streamline development, but direct commands always work too.
+
+### Standard Approach (Works Anywhere)
 ```powershell
-# STEP 1: Use BusBuddy health check for application issues
-bb-health -Detailed
+# Build the solution
+dotnet build BusBuddy.sln
 
-# STEP 2: Validate environment and dependencies
-bb-env-check
+# Run the application
+dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
 
-# STEP 3: Get project status and validation
-bb-info
+# Clean the solution
+dotnet clean BusBuddy.sln
 ```
 
-### 2. **Build Issues & Compilation Errors**
+### Enhanced Development Environment (REQUIRED)
+The BusBuddy PowerShell profile is REQUIRED for all development activities:
+
 ```powershell
-# STEP 1: Clean build with detailed output
-bb-build -Clean -Restore -Verbosity detailed
+# REQUIRED: Load the PowerShell environment (gives access to bb-* commands)
+pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
 
-# STEP 2: If build fails, check health status
-bb-health -Quick
+# Health check
+bb-health
 
-# STEP 3: Restore packages and try again
-bb-restore
+# Build and run with enhanced monitoring
+bb-build
+bb-run
 ```
 
-### 3. **Testing & Quality Assurance**
+### PowerShell Profile Benefits
+The BusBuddy PowerShell profile (`PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1`) provides:
+- Health check and diagnostic tools
+- Build process with enhanced error detection
+- Comprehensive error analysis and troubleshooting
+- AI code generation integration
+- Development workflow automation
+
+**Note**: These tools are REQUIRED for consistent development workflow. Only use standard .NET commands as emergency fallbacks.
+
+## � **Problem Resolution Approaches**
+
+When encountering issues, you have multiple resolution paths:
+
+### Standard Troubleshooting
+1. **Check Build Errors**: Look at specific error messages and line numbers
+2. **Use VS Code Debugging**: Set breakpoints and step through code
+3. **Review Output Window**: Check for additional diagnostics and logs
+4. **Clean and Rebuild**: Clear artifacts with `dotnet clean` and rebuild
+
+### Using PowerShell Helpers
+If you've loaded the PowerShell environment, these commands can help:
+
+## � **Problem Resolution Approaches**
+
+When encountering issues, follow these resolution paths:
+
+### REQUIRED: PowerShell-Based Troubleshooting
 ```powershell
-# STEP 1: Run comprehensive test suite
-bb-test -Coverage
+# Health check (always the first step)
+bb-health
 
-# STEP 2: Check PowerShell 7.5 compatibility
-Test-PowerShell75Features -ShowBenchmarks
+# Build with detailed output
+bb-build -Verbosity detailed
 
-# STEP 3: Validate configuration files
-Test-BusBuddyConfiguration -AllowComments
+# Run with debug logging
+bb-run -EnableDebug
+
+# Export diagnostics (for sharing issues)
+bb-debug-export
+
+# Advanced diagnostics
+bb-diagnostic
 ```
 
+### Emergency Fallback Only
+Only if PowerShell environment cannot be loaded:
+1. **Check Build Errors**: Run `dotnet build BusBuddy.sln` and review errors
+2. **Use VS Code Debugging**: Set breakpoints and step through code
+3. **Review Output Window**: Check for additional diagnostics and logs
+4. **Clean and Rebuild**: Clear artifacts with `dotnet clean` and rebuild
 
-### 4. **Development Session Management & Daily Workflow**
+### Problem Resolution Strategy
+1. **Try small fixes first** - Target specific errors before large changes
+2. **Keep what works** - Build incrementally on working components
+3. **Ask for help** - Consult team members for complex issues
+4. **Document solutions** - Note what worked for future reference
+
+**Remember**: Start with simple solutions before complex ones.
+
+## 🧰 **Git & Repository Tips**
+
+### PowerShell Git Commands
 ```powershell
-# STEP 1: Start comprehensive development session
-bb-dev-session -OpenIDE
+# PowerShell-friendly git commands
+git status                                                 # Check repo status
+git add .                                                  # Stage all changes
+git commit -m "Add feature X"                              # Commit with message
+git push                                                   # Push to remote
 
-# STEP 2: Run the daily composite workflow (recommended)
-bb-daily
-
-# STEP 3: Get all available commands for current context
-bb-commands -Category Essential
-
-# STEP 4: Get motivational support
-bb-happiness -Count 3
+# PowerShell alternatives to Unix commands
+git ls-files | Where-Object { $_ -match "\.cs$" }          # Find C# files
+git status --porcelain | Where-Object { $_ -match "^.M" }  # Modified files only
+(git ls-files | Measure-Object).Count                      # Count tracked files
 ```
 
-### 5. **Industry-Standard GitHub Actions Integration**
-```powershell
-# STEP 1: Ship code to GitHub Actions testing platform (never wait for results)
-git add .
-git commit -m "feat: implement feature X"
-git push
-# Continue coding immediately - notifications will alert on completion
+## 🧰 **VS Code Integration**
 
-# STEP 2: Async CI monitoring (during coffee breaks or natural breaks)
-gh run list --limit 3  # Quick status check
+VS Code is the primary development environment for BusBuddy. These configurations help streamline development:
 
-# STEP 3: Handle CI failures professionally (when notifications arrive)
-$failedRun = gh run list --status failure --limit 1 --json id,workflowName | ConvertFrom-Json
-if ($failedRun) {
-    # Get failure summary
-    gh run view $failedRun.id --json jobs | ConvertFrom-Json | ForEach-Object {
-        $_.jobs | Where-Object { $_.conclusion -eq "failure" } | Select-Object name,conclusion
-    }
-    # Make minimal fix and re-push immediately
+### Task Integration
+Use VS Code tasks to simplify common operations:
+
+| VS Code Task | Description | How to Access |
+|-------------|-------------|---------------|
+| `Direct: Build Solution (CMD)` | Build the solution | Ctrl+Shift+P → "Tasks: Run Task" |
+| `Direct: Run Application (FIXED)` | Run the application | Ctrl+Shift+P → "Tasks: Run Task" |
+| `BB: Run App` | Run with PowerShell helpers | Ctrl+Shift+P → "Tasks: Run Task" |
+| `�️ BB: Dependency Security Scan` | Security scan | Ctrl+Shift+P → "Tasks: Run Task" |
+
+### Recommended Extensions
+These extensions enhance the development experience:
+- **PowerShell** (ms-vscode.powershell)
+- **C# Dev Kit** (ms-dotnettools.csdevkit)
+- **Task Explorer** (spmeesseman.vscode-taskexplorer)
+
+### Debugging Configuration
+For debugging the application, use this launch configuration:
+
+```json
+{
+  "name": "Debug BusBuddy",
+  "type": "coreclr",
+  "request": "launch",
+  "preLaunchTask": "Build Solution",
+  "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
+  "args": [],
+  "cwd": "${workspaceFolder}/BusBuddy.WPF",
+  "stopAtEntry": false,
+  "console": "internalConsole"
 }
 ```
 
-### 6. **Git Repository Management & PowerShell Equivalents**
-```powershell
-# STEP 1: Check repository health and .gitignore effectiveness
-bb-git-check -CheckTracked -ShowStats
+**Tip**: Use F5 to start debugging after adding this to your launch.json.
 
-# STEP 2: Get PowerShell equivalents for Unix git commands
-bb-git-help
+## 🎨 **Syncfusion Controls Implementation**
 
-# STEP 3: Use PowerShell-native git commands (avoid grep, head, tail, wc)
-# ❌ DON'T: git ls-files | grep "\.cs$" | head -10
-# ✅ DO: git ls-files | Where-Object { $_ -match "\.cs$" } | Select-Object -First 10
+Syncfusion provides the UI components for BusBuddy's interface:
 
-# STEP 4: PowerShell git analysis patterns
-git ls-files | Where-Object { $_ -match "bin/|obj/|\.cache" }  # Find build artifacts
-git status --porcelain | Where-Object { $_ -match "^.M" }     # Modified files only
-(git ls-files | Measure-Object).Count                          # Count tracked files
+### Key Controls
+- **DockingManager**: Main layout for dashboard panels
+- **DataGrid**: For displaying driver, vehicle, and route data
+- **RibbonControl**: Navigation and command interface
+- **Charts**: Data visualization for analytics
+
+### Required Setup
+```csharp
+// In App.xaml.cs - Register license before UI initialization
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");
 ```
 
-## 🔧 **Mandatory BusBuddy PowerShell Usage Pattern**
-
-### **Before Manual Debugging:**
-1. ✅ Run bb-health -Detailed for comprehensive analysis
-2. ✅ Use bb-env-check to validate environment setup
-3. ✅ Check bb-info for module status and capabilities
-4. ✅ Use bb-build with appropriate flags for build issues
-5. ✅ Run bb-test for testing and validation issues
-6. ⚠️ Only resort to manual investigation if PowerShell commands can't resolve
-
-### **Industry-Standard CI/CD Integration:**
-1. ✅ **Ship Fast**: Push to GitHub Actions testing platform and continue coding
-2. ✅ **Async Monitoring**: Use email notifications and periodic status checks
-3. ✅ **Professional Fix Cycle**: Handle CI failures during natural development breaks
-4. ✅ **Notification-Driven**: Act on CI results when convenient, not immediately
-5. ✅ **Parallel Development**: Work on next feature while CI validates current feature
-
-### **BusBuddy PowerShell Generated Solutions:**
-- **Use bb-build flags**: -Clean, -Restore, -Verbosity detailed for comprehensive building
-- **Follow API compliance**: PowerShell 7.5 optimized patterns and enhanced JSON handling
-- **Leverage existing infrastructure**: Enhanced error handling, logging, structured reporting
-- **GitHub Actions Integration**: Use `gh` CLI with PowerShell-compatible commands (no `head`, `tail`, etc.)
-- **PowerShell Git Commands**: Use `bb-git-help` for PowerShell equivalents of Unix commands
-
-### **PowerShell vs Unix Command Guidelines:**
-- ❌ **Avoid**: `grep`, `head`, `tail`, `wc`, `awk`, `sed` (Unix tools not available in PowerShell)
-- ✅ **Use**: `Where-Object`, `Select-Object -First`, `Measure-Object`, ForEach-Object` (PowerShell native)
-- ✅ **Example**: `git ls-files | Where-Object { $_ -match "\.cs$" }` instead of `git ls-files | grep "\.cs$"`
-- ✅ **Reference**: Use `bb-git-help` for complete PowerShell equivalents guide
-
-## 📊 **BusBuddy PowerShell Advantage Examples**
-
-### **Runtime Error Detection:**
-- ✅ **bb-health Result**: Comprehensive project health analysis with specific recommendations
-- ❌ **Manual Approach**: Hours of debugging without structured analysis
-
-### **Build Analysis:**
-- ✅ **bb-build -Verbosity detailed Result**: Structured build output with error categorization
-- ❌ **Manual Approach**: Parsing verbose MSBuild output manually
-
-### **Testing & Validation:**
-- ✅ **bb-test -Coverage Result**: Complete test suite with coverage analysis
-- ❌ **Manual Approach**: Manual test execution without coverage metrics
-
-## 🎯 **Development Session Workflow**
-
-1. **Start Session**: Always run `bb-dev-session -OpenIDE`
-2. **Code Development**: Use bb-daily for quick build-test cycles
-3. **Ship to CI**: Push code with `git push` and continue coding immediately
-4. **Issue Occurs**: Use appropriate bb-command from list above
-5. **CI Monitoring**: Check GitHub Actions asynchronously via notifications
-6. **CI Failures**: Handle professionally during natural breaks (coffee, between features)
-7. **Follow Guidance**: Implement PowerShell-recommended solutions
-8. **Validate**: Re-run bb-health and bb-test to confirm fixes
-9. **Document**: Update progress using bb-info and structured output
-
-## 🏭 **Industry-Standard Workflow Integration**
-
-### **Professional Development Cycle:**
-```powershell
-# Morning startup
-bb-daily
-
-# Development loop (repeat throughout day)
-# 1. Code features locally
-# 2. Quick local validation
-bb-build && bb-test
-# 3. Ship to GitHub Actions (don't wait!)
-git add . && git commit -m "feat: implement X" && git push
-# 4. Continue to next feature immediately
-
-# Periodic CI checks (during breaks)
-gh run list --limit 3
-# Handle any failures when convenient, not immediately
+### Theme Implementation
+```xml
+<!-- In App.xaml -->
+<Application.Resources>
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="pack://application:,,,/Syncfusion.Themes.FluentDark.WPF;component/fluent.xaml" />
+        </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+</Application.Resources>
 ```
 
-### **Notification-Driven Development:**
-- ✅ **Email notifications** for CI completion (already configured)
-- ✅ **GitHub mobile app** for push notifications
-- ✅ **VS Code GitHub extension** for in-editor status
-- ✅ **Never wait for CI** - productivity killer in industry
+### Documentation Resources
+- [Syncfusion WPF Documentation](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf)
+- [Control Gallery](https://help.syncfusion.com/wpf/control-gallery)
+- [Theme Documentation](https://help.syncfusion.com/wpf/themes/getting-started)
 
-## 🏆 **Success Metrics**
+## 🐛 **Debugging & Troubleshooting**
 
-- **Resolution Time**: BusBuddy PowerShell should reduce debugging time by 80%+
-- **Solution Quality**: PowerShell provides tested, optimized recommendations
-- **Consistency**: All developers use same intelligent PowerShell workflow
-- **Knowledge Retention**: Module improves with PowerShell 7.5 feature usage
+### Common Issues & Solutions
 
-## 🚨 **Never Skip BusBuddy PowerShell Commands**
+| Issue Type | Troubleshooting Steps | Resources |
+|------------|----------------------|-----------|
+| **Build Errors** | Check exact error message and line number | VS Code Problems panel |
+| **UI Rendering** | Verify Syncfusion theme registration in App.xaml.cs | Syncfusion documentation |
+| **Runtime Crashes** | Use try/catch blocks and log exceptions | Exception details window |
+| **Database Issues** | Check connection string, verify migrations | SQL Server explorer |
 
-The BusBuddy PowerShell Module is specifically designed to:
-- Understand BusBuddy's specific architecture patterns
-- Provide PowerShell 7.5 optimized guidance and features
-- Leverage project-specific utilities and configurations
-- Generate actionable, tested recommendations with 98% performance improvement
+### VS Code Debug Techniques
 
-**Skipping BusBuddy PowerShell = Missing 80% of available development capability!**
+1. **Set breakpoints**: Click in the gutter to the left of line numbers
+2. **Use watch window**: Add variables to monitor during execution
+3. **Step through code**: Use F10 (step over) and F11 (step into)
+4. **Monitor output**: Check the Debug Console for logs and errors
+
+### Advanced Diagnostics
+
+If you've loaded the PowerShell helpers, additional diagnostics are available:
+
+```powershell
+# Health check for common issues
+bb-health
+
+# Capture runtime errors in real-time
+bb-debug-stream
+
+# Export diagnostic information for sharing
+bb-debug-export
+```
+
+**Remember**: Most issues can be solved with standard VS Code debugging!
 
 ---
-
-
 ## 🔑 **Quick Reference Commands**
 
+### Essential Commands
 ```powershell
-# Essential BusBuddy PowerShell Commands
-bb-dev-session -OpenIDE        # Complete development setup
-bb-daily                      # Composite daily workflow (recommended)
-bb-health -Detailed           # Comprehensive project analysis
-bb-build -Clean -Restore      # Clean build with package restore
-bb-test -Coverage             # Full test suite with coverage
-bb-run -EnableDebug           # Run with debug logging
-bb-env-check                  # Environment validation
-bb-commands -Category Essential # List essential commands
-bb-happiness                  # Get motivated!
+# Build and run (standard)
+dotnet build BusBuddy.sln
+dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
 
-# Git & Repository Management
-bb-git-check -CheckTracked -ShowStats  # Repository analysis and .gitignore check
-bb-git-help                            # PowerShell equivalents for Unix git commands
-
-# PowerShell 7.5 Feature Testing
-Test-PowerShell75Features -ShowBenchmarks
-
-# Configuration validation
-Test-BusBuddyConfiguration -AllowComments -AllowTrailingComments
+# PowerShell helpers (optional)
+pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
+bb-health
+bb-build
+bb-run
 ```
 
-**🎯 Lock this behavior into muscle memory: BusBuddy PowerShell FIRST, manual debugging LAST!**
+### Git Essentials
+```powershell
+git add .
+git commit -m "Descriptive message"
+git push
+```
 
----
+## 🏗️ **Application Architecture**
 
-## 📋 **Core BusBuddy PowerShell Commands Reference**
+BusBuddy follows a layered architecture pattern with clean separation of concerns:
 
-### 🔨 **Build & Development Commands**
-- **`bb-build [options]`** - Build solution (-Clean, -Restore, -Configuration, -Verbosity)
-- **`bb-run [options]`** - Run WPF application (-NoBuild, -EnableDebug, -Configuration)
-- **`bb-test [options]`** - Execute test suite (-Filter, -Coverage, -Configuration)
-- **`bb-clean`** - Clean build artifacts and caches
-- **`bb-restore`** - Restore NuGet packages with force options
+### Project Structure
+```
+BusBuddy/
+├── BusBuddy.Core/          # Business logic layer
+│   ├── Models/             # Domain entities
+│   ├── Services/           # Business services
+│   ├── Data/               # Data access
+│   └── Migrations/         # EF Core migrations
+├── BusBuddy.WPF/           # Presentation layer
+│   ├── ViewModels/         # MVVM ViewModels
+│   ├── Views/              # XAML Views
+│   ├── Controls/           # Custom controls
+│   └── Services/           # UI services
+└── BusBuddy.Tests/         # Test projects
+```
 
-### 🚀 **Session & Environment Management**
-- **`bb-dev-session [options]`** - Start development session (-SkipBuild, -OpenIDE)
-- **`bb-health [options]`** - Project health check (-Quick, -Detailed)
-- **`bb-env-check`** - Environment and dependency validation
-- **`bb-info`** - Module information and status
+### Key Design Patterns
 
-### 😊 **Developer Experience & Utilities**
-- **`bb-happiness [options]`** - Motivational quotes (-Count, -All)
-- **`bb-commands [options]`** - List commands (-Category, -ShowAliases)
-- **`Test-PowerShell75Features [options]`** - PS 7.5 testing (-ShowBenchmarks)
+#### MVVM Implementation
+- **ViewModels**: Handle UI logic and state management
+- **Commands**: Use RelayCommand pattern for UI actions
+- **Data Binding**: Two-way binding to model properties
+- **View Navigation**: Frame or ContentControl-based navigation
 
-**🚌 Making development workflows as reliable as public transportation should be!**
+#### Core Data Concepts
+- **Entity Framework**: Code-first database access
+- **Repository Pattern**: Centralized data access
+- **Business Services**: Implement domain logic
+- **DTOs**: Transfer objects between layers
+
+### Key Components
+- **Drivers**: Personnel management
+- **Vehicles**: Bus fleet management
+- **Routes**: Transportation route planning
+- **Activities**: Special events and field trips
+
+### Syncfusion Integration Points
+- **Main Dashboard**: DockingManager with multiple panels
+- **Data Displays**: SfDataGrid for tabular data
+- **Navigation**: RibbonControl for app-wide navigation
+- **Visualization**: ChartControl for analytics
+
+### Recommended Resources
+- [MVVM Documentation](https://learn.microsoft.com/en-us/dotnet/architecture/maui/mvvm)
+- [EF Core Documentation](https://learn.microsoft.com/en-us/ef/core/)
+- [Syncfusion Guides](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf)
+
+## 🔍 **PowerShell Development Environment**
+
+The PowerShell development environment is REQUIRED for all development activities:
+
+```powershell
+# REQUIRED: Load the PowerShell environment
+pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
+
+# Most useful commands
+bb-health      # Check project health
+bb-build       # Build the solution
+bb-run         # Run the application
+bb-diagnostic  # Comprehensive diagnostics
+bb-dev-session # Complete development session setup
+```
+
+**Remember**: Always use the PowerShell environment for consistent development workflow.
+### 📝 **PowerShell Coding Standards**
+
+BusBuddy enforces strict PowerShell coding standards through PSScriptAnalyzer:
+
+#### 🔄 **Approved PowerShell Verbs**
+
+All PowerShell functions MUST use approved verbs as defined in Microsoft's documentation:
+[PowerShell Approved Verbs](https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/useapprovedverbs)
+
+```powershell
+# Approved verb groups and examples:
+# Common: Get, Set, New, Remove, Enable, Disable, Start, Stop, Read, Write
+# Data: Backup, Restore, Import, Export, Sync, Update, Convert
+# Lifecycle: Install, Uninstall, Register, Unregister, Request, Resume
+# Security: Grant, Revoke, Block, Unblock, Protect, Unprotect
+```
+
+❌ **AVOID these non-approved verbs:**
+- Display/Show (use `Write-*` or `Format-*` instead)
+- Build (use `New-*` or `ConvertTo-*` instead)
+- Execute (use `Invoke-*` instead)
+- Parse (use `ConvertFrom-*` instead)
+
+✅ **CORRECT function naming:**
+```powershell
+function Write-DependencySummary { ... }  # NOT Show-DependencySummary
+function New-ProjectTemplate { ... }      # NOT Build-ProjectTemplate
+function Invoke-BuildProcess { ... }      # NOT Execute-BuildProcess
+function Get-SystemHealth { ... }         # NOT Check-SystemHealth
+```
+
+#### 🔧 **PSScriptAnalyzer Enforcement**
+
+BusBuddy uses PSScriptAnalyzer to enforce these standards:
+
+```powershell
+# Validate script with BusBuddy PSScriptAnalyzer settings
+Invoke-ScriptAnalyzer -Path "YourScript.ps1" -Settings ".vscode/PSScriptAnalyzerSettings.psd1"
+```
+
+The VS Code task `� BB: Mandatory PowerShell 7.5.2 Syntax Check` will verify all scripts against these standards.

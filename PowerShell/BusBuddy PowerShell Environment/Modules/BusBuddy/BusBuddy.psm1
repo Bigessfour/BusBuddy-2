@@ -32,7 +32,7 @@ $script:BusBuddyModuleConfig = @{
     Name                     = 'BusBuddy'
     Version                  = '1.0.0'
     Author                   = 'Bus Buddy Development Team'
-    ProjectRoot              = $null
+    ProjectRoot              = $PSScriptRoot
     LoadedComponents         = @()
     BusBuddyCoreAssemblyPath = $null
     HappinessQuotes          = @(
@@ -47,6 +47,52 @@ $script:BusBuddyModuleConfig = @{
         "Keep going! You're more reliable than weekend bus schedules.",
         "Your debugging session is more efficient than rush hour traffic patterns."
     )
+}
+
+#endregion
+
+#region Module Loading Functions
+
+function Import-BusBuddyFunction {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$FunctionPath
+    )
+
+    if (Test-Path $FunctionPath) {
+        . $FunctionPath
+        return $true
+    }
+    else {
+        Write-Warning "Function file not found: $FunctionPath"
+        return $false
+    }
+}
+
+function Import-BusBuddyFunctionCategory {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Category
+    )
+
+    $categoryPath = Join-Path -Path $script:BusBuddyModuleConfig.ProjectRoot -ChildPath "Functions\$Category"
+
+    if (-not (Test-Path $categoryPath)) {
+        Write-Warning "Function category directory not found: $categoryPath"
+        return @()
+    }
+
+    $functionFiles = Get-ChildItem -Path $categoryPath -Filter "*.ps1"
+    $loadedFiles = @()
+
+    foreach ($file in $functionFiles) {
+        $loaded = Import-BusBuddyFunction -FunctionPath $file.FullName
+        if ($loaded) {
+            $loadedFiles += $file.Name
+        }
+    }
+
+    return $loadedFiles
 }
 
 # Initialize BusBuddy.Core assembly path with relative pathing
@@ -2246,7 +2292,7 @@ function Invoke-BusBuddyDependencyManagement {
 
         # Summary
         Write-Host ""
-        Show-DependencySummary -Results $results
+        Write-DependencySummary -Results $results
 
         return $results
     }
@@ -2460,10 +2506,243 @@ Set-Alias -Name 'bb-info' -Value 'Get-BusBuddyInfo' -Description 'Module informa
 
 #region Module Initialization
 
-# Display welcome message when module loads
-$welcomeMessage = @"
+#Requires -Version 7.5
+function Import-BusBuddyFunction {
+    <#
+    .SYNOPSIS
+        Imports a single Bus Buddy function from a file
 
-🚌 Bus Buddy PowerShell Module Loaded Successfully!
+    .DESCRIPTION
+        Loads a function from a source file and imports it into the module
+        Used by Import-BusBuddyFunctionCategory to load all functions in a category
+
+    .PARAMETER FilePath
+        Path to the file containing the function
+
+    .PARAMETER FunctionName
+        Optional name of the function to import (defaults to file name without extension)
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$FilePath,
+
+        [string]$FunctionName
+    )
+
+    if (-not (Test-Path $FilePath)) {
+        Write-Error "Function file not found: $FilePath"
+        return $false
+    }
+
+    try {
+        # If function name not provided, use file name without extension
+        if (-not $FunctionName) {
+            $FunctionName = [System.IO.Path]::GetFileNameWithoutExtension($FilePath)
+        }
+
+        # Load the function content
+        . $FilePath
+
+        # Export the function
+        Write-Verbose "Imported function: $FunctionName from $FilePath"
+        return $true
+    }
+    catch {
+        Write-Error "Failed to import function from $FilePath`: $($_.Exception.Message)"
+        return $false
+    }
+}
+
+#Requires -Version 7.5
+function Import-BusBuddyFunctionCategory {
+    <#
+    .SYNOPSIS
+        Imports all functions in a Bus Buddy function category
+
+    .DESCRIPTION
+        Loads all PS1 function files from a category folder and imports them
+        into the module using the Import-BusBuddyFunction helper
+
+    .PARAMETER CategoryPath
+        Path to the category folder containing function files
+
+    .PARAMETER CategoryName
+        Name of the category (for logging)
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$CategoryPath,
+
+        [Parameter(Mandatory)]
+        [string]$CategoryName
+    )
+
+    if (-not (Test-Path $CategoryPath)) {
+        Write-Warning "Category folder not found: $CategoryPath"
+        return @()
+    }
+
+    $functionFiles = Get-ChildItem -Path $CategoryPath -Filter "*.ps1" -File
+
+    $importedFunctions = @()
+
+    Write-Verbose "Loading $($functionFiles.Count) functions from category: $CategoryName"
+
+    foreach ($file in $functionFiles) {
+        $functionName = $file.BaseName
+        $imported = Import-BusBuddyFunction -FilePath $file.FullName -FunctionName $functionName
+
+        if ($imported) {
+            $importedFunctions += $functionName
+        }
+    }
+
+    Write-Verbose "Successfully imported $($importedFunctions.Count) functions from category: $CategoryName"
+    return $importedFunctions
+}
+
+#Requires -Version 7.5
+function Initialize-BusBuddyModule {
+    <#
+    .SYNOPSIS
+        Initializes the Bus Buddy PowerShell module
+    
+    .DESCRIPTION
+        Loads all function categories, sets up module configuration, and initializes 
+        the module state. Called during module import to properly configure the environment.
+    
+    .PARAMETER ModuleRoot
+        Root path of the module
+    
+    .PARAMETER ShowDetails
+        Display detailed initialization information
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$ModuleRoot,
+        
+        [switch]$ShowDetails
+    )    # Define module configuration
+    $script:BusBuddyModuleConfig = @{
+        Version                  = '2.0.0'
+        Author                   = 'Bus Buddy Development Team'
+        ProjectRoot              = $null
+        BusBuddyCoreAssemblyPath = $null
+        FunctionCategories       = @(
+            'Build',
+            'Database',
+            'Diagnostics',
+            'Development',
+            'Utilities',
+            'GitHub'
+        )
+        LoadedFunctions          = @()
+        HappinessQuotes          = @(
+            "Remember: Transit systems have schedules, but our code doesn't have to be late!",
+            "Just like a bus route, good code follows clean, predictable patterns.",
+            "Debugging is like tracking a bus - follow the route methodically and you'll find the problem.",
+            "The best code, like the best bus drivers, handles unexpected conditions with grace.",
+            "A good programmer, like a good transit system, values reliability above all else.",
+            "Code without documentation is like a bus without route signs - confusing for everyone.",
+            "Unit tests are like bus inspections - they prevent bigger problems down the road.",
+            "If your code were a bus, would you feel safe riding in it?",
+            "The only place where copy-paste is acceptable is the bus schedule, not your code!"
+        )
+    }
+
+    # Load module settings
+    $settingsPath = Join-Path $ModuleRoot "BusBuddy.settings.ini"
+    $settings = Import-BusBuddySettings -SettingsPath $settingsPath
+
+    # Store settings globally for access throughout module
+    $global:BusBuddySettings = $settings
+
+    # Create paths
+    $categoriesRoot = Join-Path $ModuleRoot "Functions"
+
+    # Initialize categories
+    $allLoadedFunctions = @()
+
+    foreach ($category in $script:BusBuddyModuleConfig.FunctionCategories) {
+        $categoryPath = Join-Path $categoriesRoot $category
+
+        if (Test-Path $categoryPath) {
+            $loadedFunctions = Import-BusBuddyFunctionCategory -CategoryPath $categoryPath -CategoryName $category
+            $allLoadedFunctions += $loadedFunctions
+
+            if ($ShowDetails -or $settings.General.VerboseLogging) {
+                Write-Host "Loaded $($loadedFunctions.Count) functions from category: $category" -ForegroundColor Cyan
+            }
+        }
+        else {
+            if ($ShowDetails -or $settings.General.VerboseLogging) {
+                Write-Host "Category folder not found: $category" -ForegroundColor Yellow
+            }
+        }
+    }
+
+    $script:BusBuddyModuleConfig.LoadedFunctions = $allLoadedFunctions
+
+    # Set project root (will be updated in Get-BusBuddyProjectRoot)
+    $script:BusBuddyModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
+
+    # Initialize core assembly
+    if ($settings.Advanced.LoadDotNetAssemblies) {
+        Initialize-BusBuddyCoreAssembly | Out-Null
+    }
+
+    if ($ShowDetails -or $settings.General.VerboseLogging) {
+        Write-Host "Bus Buddy Module Initialization Complete" -ForegroundColor Green
+        Write-Host "Loaded $($allLoadedFunctions.Count) functions across $($script:BusBuddyModuleConfig.FunctionCategories.Count) categories" -ForegroundColor Green
+    }
+
+    return $script:BusBuddyModuleConfig
+}
+
+# Display welcome message when module loads
+$script:BusBuddyModuleConfig = @{
+    Version                  = '2.0.0'
+    Author                   = 'Bus Buddy Development Team'
+    ProjectRoot              = $null
+    BusBuddyCoreAssemblyPath = $null
+    FunctionCategories       = @(
+        'Build',
+        'Database',
+        'Diagnostics',
+        'Development',
+        'Utilities',
+        'GitHub'
+    )
+    LoadedFunctions          = @()
+    HappinessQuotes          = @(
+        "Remember: Transit systems have schedules, but our code doesn't have to be late!",
+        "Just like a bus route, good code follows clean, predictable patterns.",
+        "Debugging is like tracking a bus - follow the route methodically and you'll find the problem.",
+        "The best code, like the best bus drivers, handles unexpected conditions with grace.",
+        "A good programmer, like a good transit system, values reliability above all else.",
+        "Code without documentation is like a bus without route signs - confusing for everyone.",
+        "Unit tests are like bus inspections - they prevent bigger problems down the road.",
+        "If your code were a bus, would you feel safe riding in it?",
+        "The only place where copy-paste is acceptable is the bus schedule, not your code!"
+    )
+}
+
+# Load settings file
+$settingsPath = Join-Path $PSScriptRoot "BusBuddy.settings.ini"
+$settings = . (Join-Path $PSScriptRoot "Functions\Utilities\Import-BusBuddySettings.ps1") -SettingsPath $settingsPath
+$global:BusBuddySettings = $settings
+
+# Initialize the module
+Initialize-BusBuddyModule -ModuleRoot $PSScriptRoot -ShowDetails:($settings.General.VerboseLogging) | Out-Null
+
+# Show welcome message if enabled in settings
+if ($settings.General.ShowWelcomeMessage) {
+    $welcomeMessage = @"
+
+🚌 Bus Buddy PowerShell Module v$($script:BusBuddyModuleConfig.Version) Loaded Successfully!
 ═══════════════════════════════════════════════════
 
 Quick Commands:
@@ -2477,10 +2756,11 @@ Project Status: $(if (Get-BusBuddyProjectRoot) { '✅ Ready' } else { '⚠️ Pr
 
 "@
 
-Write-Host $welcomeMessage -ForegroundColor Cyan
+    Write-Host $welcomeMessage -ForegroundColor Cyan
+}
 
-# Auto-detect and display environment status
-if (Get-BusBuddyProjectRoot) {
+# Auto-detect and display environment status if enabled in settings
+if ($settings.General.AutoCheckEnvironment -and (Get-BusBuddyProjectRoot)) {
     $envStatus = Test-BusBuddyEnvironment
     if (-not $envStatus) {
         Write-BusBuddyStatus "Environment validation found issues. Run 'bb-env-check' for details." -Status Warning
@@ -2653,10 +2933,10 @@ function Update-Packages {
     }
 }
 
-function Show-DependencySummary {
+function Write-DependencySummary {
     <#
     .SYNOPSIS
-        Show dependency management summary
+        Write dependency management summary
     #>
     [CmdletBinding()]
     param(
@@ -4831,7 +5111,9 @@ Export-ModuleMember -Function @(
 )
 
 #region GitHub Automation Integration
-<#
+
+function Invoke-BusBuddyAIConfig {
+    <#
     .SYNOPSIS
         Configure AI services for BusBuddy development workflows
 
@@ -4854,57 +5136,57 @@ Export-ModuleMember -Function @(
     .PARAMETER ShowCurrent
         Display current AI configuration
     #>
-[CmdletBinding()]
-param(
-    [Parameter()]
-    [ValidateSet("xAI", "OpenAI", "Azure")]
-    [string]$Provider,
+    [CmdletBinding()]
+    param(
+        [Parameter()]
+        [ValidateSet("xAI", "OpenAI", "Azure")]
+        [string]$Provider,
 
-    [string]$ApiKey,
+        [string]$ApiKey,
 
-    [string]$Model,
+        [string]$Model,
 
-    [switch]$ValidateConnection,
+        [switch]$ValidateConnection,
 
-    [switch]$ShowCurrent
-)
+        [switch]$ShowCurrent
+    )
 
-Write-BusBuddyStatus "🤖 Configuring AI provider: $Provider" -Status Info
+    Write-BusBuddyStatus "🤖 Configuring AI provider: $Provider" -Status Info
 
-# Initialize .NET interop if not already done
-$assemblyLoaded = Initialize-BusBuddyCoreAssembly
+    # Initialize .NET interop if not already done
+    $assemblyLoaded = Initialize-BusBuddyCoreAssembly
 
-if ($assemblyLoaded) {
-    try {
-        # Use .NET interop to configure AI services through BusBuddy.Core
-        # This integrates with existing XAIService implementation
-        Write-BusBuddyStatus "AI configuration completed for $Provider using BusBuddy.Core interop" -Status Success
+    if ($assemblyLoaded) {
+        try {
+            # Use .NET interop to configure AI services through BusBuddy.Core
+            # This integrates with existing XAIService implementation
+            Write-BusBuddyStatus "AI configuration completed for $Provider using BusBuddy.Core interop" -Status Success
 
-        if ($ValidateConnection) {
-            Write-BusBuddyStatus "Testing AI service connection..." -Status Info
-            # Implementation would call XAIService test methods
-            Write-BusBuddyStatus "✅ AI service connection validated" -Status Success
+            if ($ValidateConnection) {
+                Write-BusBuddyStatus "Testing AI service connection..." -Status Info
+                # Implementation would call XAIService test methods
+                Write-BusBuddyStatus "✅ AI service connection validated" -Status Success
+            }
+
+            if ($ShowCurrent) {
+                Write-BusBuddyStatus "Current AI Configuration:" -Status Info
+                Write-Host "  Provider: $Provider" -ForegroundColor Cyan
+                Write-Host "  Model: $Model" -ForegroundColor Cyan
+                Write-Host "  Status: Active" -ForegroundColor Green
+            }
+
+            return $true
         }
-
-        if ($ShowCurrent) {
-            Write-BusBuddyStatus "Current AI Configuration:" -Status Info
-            Write-Host "  Provider: $Provider" -ForegroundColor Cyan
-            Write-Host "  Model: $Model" -ForegroundColor Cyan
-            Write-Host "  Status: Active" -ForegroundColor Green
+        catch {
+            Write-BusBuddyError -Message "AI configuration error: $($_.Exception.Message)" -RecommendedAction "Verify AI service credentials and connectivity"
+            return $false
         }
-
-        return $true
     }
-    catch {
-        Write-BusBuddyError -Message "AI configuration error: $($_.Exception.Message)" -RecommendedAction "Verify AI service credentials and connectivity"
+    else {
+        Write-BusBuddyStatus "AI configuration placeholder (BusBuddy.Core not loaded)" -Status Warning
+        Write-BusBuddyStatus "To enable full AI integration: bb-build && Import-Module -Force" -Status Info
         return $false
     }
-}
-else {
-    Write-BusBuddyStatus "AI configuration placeholder (BusBuddy.Core not loaded)" -Status Warning
-    Write-BusBuddyStatus "To enable full AI integration: bb-build && Import-Module -Force" -Status Info
-    return $false
-}
 }
 
 #Requires -Version 7.5
@@ -5402,32 +5684,79 @@ Set-Alias -Name 'bb-github-workflow' -Value 'Invoke-BusBuddyCompleteGitHubWorkfl
 
 #endregion
 
-# Export all aliases
-Export-ModuleMember -Alias @(
+#region Module Exports
+
+# Export all public functions
+$functionsToExport = $script:BusBuddyModuleConfig.LoadedFunctions
+
+# Core development aliases
+Set-Alias -Name 'bb-build' -Value 'Invoke-BusBuddyBuild' -Description 'Build Bus Buddy solution'
+Set-Alias -Name 'bb-run' -Value 'Invoke-BusBuddyRun' -Description 'Run Bus Buddy application'
+Set-Alias -Name 'bb-test' -Value 'Invoke-BusBuddyTest' -Description 'Run Bus Buddy tests'
+Set-Alias -Name 'bb-clean' -Value 'Invoke-BusBuddyClean' -Description 'Clean build artifacts'
+Set-Alias -Name 'bb-restore' -Value 'Invoke-BusBuddyRestore' -Description 'Restore NuGet packages'
+
+# Advanced development aliases
+Set-Alias -Name 'bb-dev-session' -Value 'Start-BusBuddyDevSession' -Description 'Start development session'
+Set-Alias -Name 'bb-health' -Value 'Invoke-BusBuddyHealthCheck' -Description 'Project health check'
+
+# Git and repository aliases
+Set-Alias -Name 'bb-git-check' -Value 'Invoke-BusBuddyGitIgnoreCheck' -Description 'Analyze repository and .gitignore effectiveness'
+Set-Alias -Name 'bb-git-help' -Value 'Get-BusBuddyGitEquivalents' -Description 'PowerShell equivalents for Unix git commands'
+Set-Alias -Name 'bb-ps-git' -Value 'Get-BusBuddyGitEquivalents' -Description 'PowerShell git command reference'
+Set-Alias -Name 'bb-git-repair' -Value 'Invoke-BusBuddyGitRepairKit' -Description 'Advanced git repository repair toolkit'
+Set-Alias -Name 'bb-repo-align' -Value 'Start-BusBuddyRepositoryAlignment' -Description 'Complete repository alignment workflow'
+
+# GitHub integration aliases
+Set-Alias -Name 'bb-github-stage' -Value 'Invoke-BusBuddyGitHubStaging' -Description 'Smart Git staging'
+Set-Alias -Name 'bb-github-commit' -Value 'Invoke-BusBuddyGitHubCommit' -Description 'Intelligent commit creation'
+Set-Alias -Name 'bb-github-push' -Value 'Invoke-BusBuddyGitHubPush' -Description 'Push with workflow monitoring'
+Set-Alias -Name 'bb-github-workflow' -Value 'Invoke-BusBuddyCompleteGitHubWorkflow' -Description 'Complete GitHub workflow'
+
+# Database aliases
+Set-Alias -Name 'bb-db-diag' -Value 'Get-BusBuddyDatabaseStatus' -Description 'Database diagnostics'
+Set-Alias -Name 'bb-db-test' -Value 'Test-BusBuddyDatabaseConnection' -Description 'Test database connection'
+Set-Alias -Name 'bb-db-add-migration' -Value 'Add-BusBuddyDatabaseMigration' -Description 'Add Entity Framework migration'
+Set-Alias -Name 'bb-db-update' -Value 'Update-BusBuddyDatabase' -Description 'Update database to latest migration'
+Set-Alias -Name 'bb-db-seed' -Value 'Invoke-BusBuddyDatabaseSeed' -Description 'Seed database with test data'
+
+# Diagnostic and analysis aliases
+Set-Alias -Name 'bb-manage-dependencies' -Value 'Invoke-BusBuddyDependencyManagement' -Description 'Dependency management'
+Set-Alias -Name 'bb-error-fix' -Value 'Invoke-BusBuddyErrorAnalysis' -Description 'Analyze build errors'
+Set-Alias -Name 'bb-dev-workflow' -Value 'Invoke-BusBuddyDevWorkflow' -Description 'Complete development workflow'
+Set-Alias -Name 'bb-get-workflow-results' -Value 'Get-BusBuddyWorkflowResults' -Description 'Monitor GitHub workflows'
+Set-Alias -Name 'bb-warning-analysis' -Value 'Show-BusBuddyWarningAnalysis' -Description 'Analyze build warnings'
+
+# Happiness and utility aliases
+Set-Alias -Name 'bb-happiness' -Value 'Get-BusBuddyHappiness' -Description 'Get motivational quotes'
+Set-Alias -Name 'bb-commands' -Value 'Get-BusBuddyCommands' -Description 'List all Bus Buddy commands'
+Set-Alias -Name 'bb-info' -Value 'Get-BusBuddyInfo' -Description 'Show module information and status'
+Set-Alias -Name 'bb-env-check' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation'
+Set-Alias -Name 'bb-validate' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation (alias)'
+
+# VS Code integration aliases
+Set-Alias -Name 'bb-install-extensions' -Value 'Install-BusBuddyVSCodeExtensions' -Description 'Install VS Code extensions'
+Set-Alias -Name 'bb-validate-vscode' -Value 'Test-BusBuddyVSCodeSetup' -Description 'Validate VS Code setup'
+
+# Module management aliases
+Set-Alias -Name 'bb-update-loader' -Value 'Update-BusBuddyProfileLoader' -Description 'Update profile loader script'
+Set-Alias -Name 'bb-test-module' -Value 'Test-BusBuddyModularSetup' -Description 'Test modular setup'
+
+# Collect all aliases to export
+$aliasesToExport = @(
     'bb-build', 'bb-run', 'bb-test', 'bb-clean', 'bb-restore',
-    'bb-dev-session', 'bb-health', 'bb-env-check',
+    'bb-dev-session', 'bb-health', 'bb-env-check', 'bb-validate',
     'bb-happiness', 'bb-commands', 'bb-info',
-    'bb-mentor', 'bb-docs', 'bb-ref',
+    'bb-git-check', 'bb-git-help', 'bb-ps-git', 'bb-git-repair', 'bb-repo-align',
     'bb-db-diag', 'bb-db-test', 'bb-db-add-migration', 'bb-db-update', 'bb-db-seed',
     'bb-manage-dependencies', 'bb-error-fix',
     'bb-dev-workflow', 'bb-get-workflow-results', 'bb-warning-analysis',
     'bb-install-extensions', 'bb-validate-vscode',
-    'bb-git-status', 'bb-github-push', 'bb-github-commit', 'bb-github-stage', 'bb-github-workflow',
-    'bb-ai-config', 'bb-ai-chat', 'bb-ai-task', 'bb-ai-route', 'bb-ai-review'
+    'bb-github-stage', 'bb-github-commit', 'bb-github-push', 'bb-github-workflow',
+    'bb-update-loader', 'bb-test-module'
 )
 
+# Export functions and aliases
+Export-ModuleMember -Function $functionsToExport -Alias $aliasesToExport
+
 #endregion
-
-# Module initialization - now that all functions are defined
-try {
-    $script:BusBuddyModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
-
-    # Initialize BusBuddy.Core assembly for .NET interop (non-blocking)
-    if ($script:BusBuddyModuleConfig.ProjectRoot) {
-        Initialize-BusBuddyCoreAssembly | Out-Null
-    }
-}
-catch {
-    # Initialization errors are non-fatal, module can still function in limited mode
-    Write-Verbose "Module initialization warning: $($_.Exception.Message)"
-}
