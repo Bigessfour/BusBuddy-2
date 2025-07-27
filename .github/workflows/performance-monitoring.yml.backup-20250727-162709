@@ -77,4 +77,3 @@ jobs:
           path: |
             performance-*.json
           retention-days: 90
-

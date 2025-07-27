@@ -249,4 +249,3 @@ jobs:
         $metrics | ConvertTo-Json -Depth 3 | Write-Host
 
         # Could be extended to store metrics in a database or file for tracking
-

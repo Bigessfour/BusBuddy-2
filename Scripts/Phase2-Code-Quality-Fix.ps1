@@ -51,19 +51,19 @@ Write-Host "📊 Analyzing Phase 2 files for code quality issues..." -Foreground
 # 1. Check for CS8600 nullable reference warnings
 function Test-NullableReferenceIssues {
     param([string]$FilePath)
-    
+
     if (-not (Test-Path $FilePath)) {
         Write-Warning "File not found: $FilePath"
         return @()
     }
-    
+
     $issues = @()
     $content = Get-Content $FilePath
-    
+
     for ($i = 0; $i -lt $content.Count; $i++) {
         $line = $content[$i]
         $lineNumber = $i + 1
-        
+
         # Check for potential null reference assignments
         if ($line -match '=\s*\w+\["[\w\s]+"\]\?\.ToString\(\)' -and $line -notmatch '\?\?') {
             $issues += [PSCustomObject]@{
@@ -74,7 +74,7 @@ function Test-NullableReferenceIssues {
                 Severity = "Warning"
             }
         }
-        
+
         # Check for ToObject<T>() calls without null checks
         if ($line -match '\.ToObject<\w+>\(\)' -and $line -notmatch '\?\?') {
             $issues += [PSCustomObject]@{
@@ -85,7 +85,7 @@ function Test-NullableReferenceIssues {
                 Severity = "Warning"
             }
         }
-        
+
         # Check for string concatenation with nullable values
         if ($line -match '\$"\{.*\?\.\w+.*\}"' -or $line -match '\+ .*\?\.\w+') {
             $issues += [PSCustomObject]@{
@@ -97,22 +97,22 @@ function Test-NullableReferenceIssues {
             }
         }
     }
-    
+
     return $issues
 }
 
 # 2. Validate JSON file size and structure
 function Test-JsonDataQuality {
     param([string]$JsonPath)
-    
+
     if (-not (Test-Path $JsonPath)) {
         return @()
     }
-    
+
     $issues = @()
     $fileInfo = Get-Item $JsonPath
     $fileSizeMB = [math]::Round($fileInfo.Length / 1MB, 2)
-    
+
     # Check file size
     if ($fileSizeMB -gt 5) {
         $issues += [PSCustomObject]@{
@@ -123,10 +123,10 @@ function Test-JsonDataQuality {
             Severity = "Performance"
         }
     }
-    
+
     try {
         $jsonContent = Get-Content $JsonPath -Raw | ConvertFrom-Json
-        
+
         # Validate structure
         $requiredSections = @("metadata", "drivers", "vehicles", "routes", "activities")
         foreach ($section in $requiredSections) {
@@ -140,7 +140,7 @@ function Test-JsonDataQuality {
                 }
             }
         }
-        
+
         # Check data counts
         if ($jsonContent.drivers -and $jsonContent.drivers.Count -gt 50) {
             $issues += [PSCustomObject]@{
@@ -151,7 +151,7 @@ function Test-JsonDataQuality {
                 Severity = "Performance"
             }
         }
-        
+
     }
     catch {
         $issues += [PSCustomObject]@{
@@ -162,17 +162,17 @@ function Test-JsonDataQuality {
             Severity = "Error"
         }
     }
-    
+
     return $issues
 }
 
 # 3. Check VS Code configuration duplication
 function Test-VSCodeConfigDuplication {
     $issues = @()
-    
+
     $settingsPath = ".vscode\settings.json"
     $settingsFixedPath = ".vscode\settings_fixed.json"
-    
+
     if ((Test-Path $settingsPath) -and (Test-Path $settingsFixedPath)) {
         $issues += [PSCustomObject]@{
             File = $settingsFixedPath
@@ -182,7 +182,7 @@ function Test-VSCodeConfigDuplication {
             Severity = "Maintenance"
         }
     }
-    
+
     return $issues
 }
 
@@ -222,10 +222,10 @@ foreach ($Group in $GroupedBySeverity) {
         "Maintenance" { "Cyan" }
         default { "White" }
     }
-    
+
     Write-Host ""
     Write-Host "🔸 $($Group.Name) Issues ($($Group.Count)):" -ForegroundColor $color
-    
+
     foreach ($Issue in $Group.Group) {
         Write-Host "   📄 $($Issue.File):$($Issue.Line)" -ForegroundColor White
         Write-Host "   ❌ $($Issue.Issue)" -ForegroundColor $color
@@ -237,21 +237,21 @@ foreach ($Group in $GroupedBySeverity) {
 # Generate fixes for nullable reference issues
 function New-NullableReferenceFix {
     param([string]$FilePath, [array]$Issues)
-    
+
     $fixes = @()
-    
+
     foreach ($Issue in $Issues) {
         if ($Issue.Issue -like "*CS8600*" -or $Issue.Issue -like "*nullable*") {
             $originalCode = $Issue.Code
-            
+
             # Generate fix based on the issue type
             if ($originalCode -match '=\s*(\w+)\["([\w\s]+)"\]\?\.ToString\(\)') {
                 $objectName = $Matches[1]
                 $propertyName = $Matches[2]
-                $fixedCode = $originalCode -replace 
+                $fixedCode = $originalCode -replace
                     [regex]::Escape("$objectName[`"$propertyName`"]?.ToString()"),
                     "$objectName[`"$propertyName`"]?.ToString() ?? string.Empty"
-                
+
                 $fixes += [PSCustomObject]@{
                     File = $FilePath
                     Line = $Issue.Line
@@ -262,7 +262,7 @@ function New-NullableReferenceFix {
             }
         }
     }
-    
+
     return $fixes
 }
 

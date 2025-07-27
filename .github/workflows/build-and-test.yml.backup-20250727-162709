@@ -105,7 +105,7 @@ jobs:
           $csFiles = (Get-ChildItem -Path . -Recurse -Include "*.cs" -Exclude "bin","obj","Migrations" | Measure-Object).Count
           $xamlFiles = (Get-ChildItem -Path . -Recurse -Include "*.xaml" -Exclude "bin","obj" | Measure-Object).Count
 
-          echo " GitHub Actions Testing Platform Analysis:"
+          echo "� GitHub Actions Testing Platform Analysis:"
           echo "   - C# files: $csFiles"
           echo "   - XAML files: $xamlFiles"
           echo "   - Test coverage opportunity: High"
@@ -328,4 +328,3 @@ jobs:
           echo "| Dependency Scan | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
           echo "| Vulnerable Packages | ${{ steps.vuln-scan.outputs.vulnerable-packages || '0' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Vulnerable Packages | ${{ steps.vuln-scan.outputs.vulnerable-packages || '0' }} |" >> $GITHUB_STEP_SUMMARY
-

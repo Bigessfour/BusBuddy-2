@@ -66,12 +66,12 @@ function Disable-AllPaging {
     if (Get-Command 'gh' -ErrorAction SilentlyContinue) {
         $env:GH_PAGER = ''
     }
-    
+
     # Git
     if (Get-Command 'git' -ErrorAction SilentlyContinue) {
         git config --global core.pager ''
     }
-    
+
     # Azure CLI
     if (Get-Command 'az' -ErrorAction SilentlyContinue) {
         $env:AZURE_CORE_OUTPUT = 'table'
@@ -136,7 +136,7 @@ if ($Host.UI.RawUI.BufferSize) {
 if (Get-Command 'gh' -ErrorAction SilentlyContinue) {
     Write-Host ""
     Write-Host "🧪 Testing GitHub CLI (no paging)..." -ForegroundColor Cyan
-    
+
     try {
         # This should now display without pagination
         $testResult = gh run list --limit 3 --json status,workflowName,createdAt 2>$null
