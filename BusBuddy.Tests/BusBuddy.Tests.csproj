@@ -29,13 +29,8 @@
     <!-- Entity Framework In-Memory Database for testing -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
 
-    <!-- Dependency Injection for testing -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <!-- Additional testing-specific packages not in Directory.Build.props -->
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
-
-    <!-- Configuration testing -->
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
   </ItemGroup>
 
   <ItemGroup>

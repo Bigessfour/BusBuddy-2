@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="BusBuddy Practical Rules" Description="Practical code analysis rules for BusBuddy with Syncfusion WPF 30.1.40 and C# 12" ToolsVersion="17.0">
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
+    <!-- C# 12 Feature Support -->
+    <Rule Id="CS8600" Action="Warning" />   <!-- Null reference assignment -->
+    <Rule Id="CS8601" Action="Warning" />   <!-- Possible null reference assignment -->
+    <Rule Id="CS8602" Action="Warning" />   <!-- Dereference of null reference -->
+    <Rule Id="CS8618" Action="Warning" />   <!-- Non-nullable property uninitialized -->
+
+    <!-- Syncfusion WPF 30.1.40 Compatibility -->
+    <Rule Id="CA1416" Action="None" />      <!-- Platform compatibility (WPF-specific) -->
+    <Rule Id="CS0108" Action="None" />      <!-- Member hides inherited member (common in MVVM) -->
+
+    <!-- PowerShell 7.5.2 Integration -->
+    <Rule Id="CS1591" Action="None" />      <!-- Missing XML documentation -->
+    <Rule Id="CA1031" Action="None" />      <!-- Do not catch general exception types -->
+  </Rules>
+
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
+    <Rule Id="CA1416" Action="None" />      <!-- Platform-specific API -->
+    <Rule Id="CA1822" Action="Info" />      <!-- Mark members as static -->
+  </Rules>
+</RuleSet>

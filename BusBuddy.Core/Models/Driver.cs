@@ -184,9 +184,28 @@ public class Driver : INotifyPropertyChanged
                 _status = value ?? "Active";
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsAvailable));
+                OnPropertyChanged(nameof(IsActive));
             }
         }
     }
+
+    /// <summary>
+    /// Compatibility property for Id access
+    /// </summary>
+    [NotMapped]
+    public int Id => DriverId;
+
+    /// <summary>
+    /// Compatibility property for Name access
+    /// </summary>
+    [NotMapped]
+    public string Name => DriverName;
+
+    /// <summary>
+    /// Indicates if the driver is active
+    /// </summary>
+    [NotMapped]
+    public bool IsActive => Status == "Active";
 
     // Additional properties for enhanced functionality
     [StringLength(50)]

@@ -955,6 +955,12 @@ grok-tools/
 **/*xai*token*
 **/*grok*token*
 
+# VS Code AI efficiency helpers - ALLOW THESE SPECIFIC FILES
+!.vscode/ai-efficiency-enforcement.md
+!.vscode/ai-efficiency-functions.ps1
+!.vscode/ai-quick-reference.md
+**/*grok*token*
+
 # Environment files that might contain AI keys
 .env.ai
 .env.xai

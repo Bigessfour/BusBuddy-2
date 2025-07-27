@@ -429,7 +429,7 @@ namespace BusBuddy.WPF.Utilities
         /// <summary>
         /// Lightweight logging scope implementation
         /// </summary>
-        private class LoggingScope : IDisposable
+        private sealed class LoggingScope : IDisposable
         {
             private readonly string _operationName;
             private readonly string? _contextId;

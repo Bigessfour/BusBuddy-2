@@ -350,7 +350,7 @@ namespace BusBuddy.WPF.Views.Activity
             if (SelectedVehicle != null && ScheduledRiders > SelectedVehicle.Capacity)
                 errors.Add($"Number of riders ({ScheduledRiders}) exceeds vehicle capacity ({SelectedVehicle.Capacity})");
 
-            if (errors.Any())
+            if (errors.Count > 0)
             {
                 ValidationMessage = string.Join("\n", errors);
                 HasValidationErrors = true;

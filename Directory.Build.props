@@ -25,6 +25,9 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors>CS8600;CS8601;CS8602;CS8618</WarningsAsErrors> <!-- Null safety only -->
 
+    <!-- PHASE 1: Suppress culture warnings for MVP functionality -->
+    <NoWarn>$(NoWarn);CA1304;CA1305;CA1311;CA1016;CA1852</NoWarn>
+
     <!-- INDUSTRY STANDARD: WPF debugging -->
     <UseWPF>true</UseWPF>
     <OutputType>WinExe</OutputType>

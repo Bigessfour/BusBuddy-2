@@ -9,12 +9,14 @@ using ActivityModel = BusBuddy.Core.Models.Activity;
 using BusModel = BusBuddy.Core.Models.Bus;
 using DriverModel = BusBuddy.Core.Models.Driver;
 using DestinationModel = BusBuddy.Core.Models.Destination;
+using VehicleModel = BusBuddy.Core.Models.Vehicle;
 using Microsoft.EntityFrameworkCore;
 using System.Windows;
 using Serilog;
 using Serilog.Context;
 using System;
 using BusBuddy.WPF.ViewModels;
+using static BusBuddy.Core.Models.DestinationTypes;
 
 namespace BusBuddy.WPF.ViewModels.Sports
 {
@@ -223,18 +225,18 @@ namespace BusBuddy.WPF.ViewModels.Sports
                         .Include(a => a.AssignedVehicle)
                         .Include(a => a.Driver)
                         .Include(a => a.DestinationEntity)
-                        .Where(a => a.ActivityType.ToLower().Contains("sports") ||
-                                   a.ActivityType.ToLower().Contains("game") ||
-                                   a.ActivityType.ToLower().Contains("match") ||
-                                   a.ActivityType.ToLower().Contains("tournament") ||
-                                   a.ActivityType.ToLower().Contains("competition"))
+                        .Where(a => a.ActivityType.Contains("sports", StringComparison.OrdinalIgnoreCase) ||
+                                   a.ActivityType.Contains("game", StringComparison.OrdinalIgnoreCase) ||
+                                   a.ActivityType.Contains("match", StringComparison.OrdinalIgnoreCase) ||
+                                   a.ActivityType.Contains("tournament", StringComparison.OrdinalIgnoreCase) ||
+                                   a.ActivityType.Contains("competition", StringComparison.OrdinalIgnoreCase))
                         .OrderBy(a => a.Date)
                         .ThenBy(a => a.LeaveTime)
                         .ToListAsync();
 
-                    // Load available vehicles (active and operational)
-                    var vehicles = await _context.Vehicles
-                        .Where(v => v.IsActive && v.OperationalStatus == "Operational")
+                    // Load available buses (active and available)
+                    var vehicles = await _context.Buses
+                        .Where(v => v.IsAvailable)
                         .OrderBy(v => v.BusNumber)
                         .ToListAsync();
 
@@ -247,7 +249,7 @@ namespace BusBuddy.WPF.ViewModels.Sports
 
                     // Load sports destinations
                     var destinations = await _context.Destinations
-                        .Where(d => d.IsActive && d.DestinationType == DestinationTypes.SportsEvent)
+                        .Where(d => d.IsActive && d.DestinationType == BusBuddy.Core.Models.DestinationTypes.SportsEvent)
                         .OrderBy(d => d.Name)
                         .ToListAsync();
 
@@ -299,7 +301,7 @@ namespace BusBuddy.WPF.ViewModels.Sports
                 var filtered = SportsActivities.Where(a =>
                     a.Date >= FilterStartDate &&
                     a.Date <= FilterEndDate &&
-                    (FilterSport == "All" || a.ActivityType.ToLower().Contains(FilterSport.ToLower()))
+                    (FilterSport == "All" || a.ActivityType.Contains(FilterSport, StringComparison.OrdinalIgnoreCase))
                 ).ToList();
 
                 Application.Current.Dispatcher.Invoke(() =>
@@ -318,7 +320,7 @@ namespace BusBuddy.WPF.ViewModels.Sports
         {
             TotalSportsEvents = SportsActivities.Count;
             AwayGames = SportsActivities.Count(a => a.DestinationEntity != null);
-            HomeGames = SportsActivities.Count(a => a.DestinationEntity == null || a.Destination.ToLower().Contains("home"));
+            HomeGames = SportsActivities.Count(a => a.DestinationEntity == null || a.Destination.Contains("home", StringComparison.OrdinalIgnoreCase));
             UnassignedActivities = SportsActivities.Count(a => a.AssignedVehicleId == 0 || a.DriverId == 0);
         }
 
@@ -481,7 +483,7 @@ namespace BusBuddy.WPF.ViewModels.Sports
                     }
                 }
 
-                if (conflicts.Any())
+                if (conflicts.Count > 0)
                 {
                     var message = "Scheduling conflicts detected:\n\n" + string.Join("\n", conflicts);
                     MessageBox.Show(message, "Scheduling Conflicts", MessageBoxButton.OK, MessageBoxImage.Warning);

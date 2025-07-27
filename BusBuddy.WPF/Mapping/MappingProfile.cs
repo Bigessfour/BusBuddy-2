@@ -155,7 +155,7 @@ namespace BusBuddy.WPF.Mapping
             if (!string.IsNullOrWhiteSpace(state))
                 cityStateParts.Add(state);
 
-            if (cityStateParts.Any())
+            if (cityStateParts.Count > 0)
                 parts.Add(string.Join(", ", cityStateParts));
 
             if (!string.IsNullOrWhiteSpace(zipCode))

@@ -177,7 +177,7 @@ namespace BusBuddy.WPF.Utilities
 
                     var result = await Task.Run(() =>
                     {
-                        var threadId = Thread.CurrentThread.ManagedThreadId;
+                        var threadId = Environment.CurrentManagedThreadId;
                         Logger.Debug("Executing {OperationName} on background thread {ThreadId}", operationName, threadId);
 
                         return operation();

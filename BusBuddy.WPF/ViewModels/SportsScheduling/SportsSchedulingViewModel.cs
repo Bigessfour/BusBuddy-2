@@ -23,12 +23,12 @@ namespace BusBuddy.WPF.ViewModels.SportsScheduling
 
         // Collections
         private ObservableCollection<SportsEvent> _sportsEvents = new();
-        private ObservableCollection<Vehicle> _availableVehicles = new();
+        private ObservableCollection<BusBuddy.Core.Models.Vehicle> _availableVehicles = new();
         private ObservableCollection<Driver> _availableDrivers = new();
 
         // Selected items
         private SportsEvent? _selectedEvent;
-        private Vehicle? _selectedVehicle;
+        private BusBuddy.Core.Models.Vehicle? _selectedVehicle;
         private Driver? _selectedDriver;
 
         // UI state properties
@@ -53,11 +53,11 @@ namespace BusBuddy.WPF.ViewModels.SportsScheduling
             _schedulingService = schedulingService ?? throw new ArgumentNullException(nameof(schedulingService));
 
             // Initialize commands
-            CreateEventCommand = new RelayCommand(async () => await CreateEventAsync(), () => CanCreateEvent());
-            AssignResourcesCommand = new RelayCommand(async () => await AssignResourcesAsync(), () => CanAssignResources());
-            RefreshDataCommand = new RelayCommand(async () => await RefreshDataAsync());
-            ClearSelectionCommand = new RelayCommand(ClearSelection);
-            ValidateEventCommand = new RelayCommand(ValidateCurrentEvent);
+            CreateEventCommand = new RelayCommand(async _ => await CreateEventAsync(), _ => CanCreateEvent());
+            AssignResourcesCommand = new RelayCommand(async _ => await AssignResourcesAsync(), _ => CanAssignResources());
+            RefreshDataCommand = new RelayCommand(async _ => await RefreshDataAsync());
+            ClearSelectionCommand = new RelayCommand(_ => ClearSelection());
+            ValidateEventCommand = new RelayCommand(_ => ValidateCurrentEvent());
 
             // Load initial data
             _ = Task.Run(RefreshDataAsync);
@@ -71,7 +71,7 @@ namespace BusBuddy.WPF.ViewModels.SportsScheduling
             set => SetProperty(ref _sportsEvents, value);
         }
 
-        public ObservableCollection<Vehicle> AvailableVehicles
+        public ObservableCollection<BusBuddy.Core.Models.Vehicle> AvailableVehicles
         {
             get => _availableVehicles;
             set => SetProperty(ref _availableVehicles, value);
@@ -100,7 +100,7 @@ namespace BusBuddy.WPF.ViewModels.SportsScheduling
             }
         }
 
-        public Vehicle? SelectedVehicle
+        public BusBuddy.Core.Models.Vehicle? SelectedVehicle
         {
             get => _selectedVehicle;
             set

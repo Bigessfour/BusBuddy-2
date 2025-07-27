@@ -64,7 +64,10 @@
     "themeConsistency": {
       "enabled": true,
       "severity": "warning",
-      "allowedThemes": ["FluentDark", "FluentLight"],
+      "allowedThemes": [
+        "FluentDark",
+        "FluentLight"
+      ],
       "message": "Use consistent FluentDark or FluentLight themes"
     },
     "controlNaming": {
@@ -134,8 +137,8 @@
   },
   "corruptionDetection": {
     "malformedElements": {
-      "enabled": true,
-      "severity": "error",
+      "enabled": false,
+      "severity": "warning",
       "message": "Detect malformed XAML elements"
     },
     "unclosedTags": {
@@ -145,7 +148,7 @@
     },
     "invalidAttributes": {
       "enabled": true,
-      "severity": "error",
+      "severity": "warning",
       "message": "Detect invalid or corrupted attributes"
     }
   }

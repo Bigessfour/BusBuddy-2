@@ -378,7 +378,7 @@ namespace BusBuddy.WPF.Logging
                 recommendations.Add("Verify theme application sequence");
             }
 
-            return recommendations.Any() ? string.Join("; ", recommendations) : "Review exception details and stack trace";
+            return recommendations.Count > 0 ? string.Join("; ", recommendations) : "Review exception details and stack trace";
         }
 
         private static string AnalyzeRootCause(Exception exception)
@@ -445,7 +445,7 @@ namespace BusBuddy.WPF.Logging
             if (exception.StackTrace?.Contains("SfSkinManager") == true)
                 context.Add("Skin manager issue");
 
-            return context.Any() ? string.Join("; ", context) : "General Syncfusion issue";
+            return context.Count > 0 ? string.Join("; ", context) : "General Syncfusion issue";
         }
 
         private static double? ExtractTimingFromMessage(string messageTemplate)

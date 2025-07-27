@@ -353,7 +353,7 @@ namespace BusBuddy.WPF.Utilities
 
                 var newEntries = await FilterLogFileAsync(filePath, FilterCategory.All, true, true);
 
-                if (newEntries.Any())
+                if (newEntries.Count > 0)
                 {
                     lock (_lockObject)
                     {
@@ -542,7 +542,7 @@ namespace BusBuddy.WPF.Utilities
                 .Take(30)
                 .ToList();
 
-            if (!uniqueItems.Any())
+            if (uniqueItems.Count == 0)
             {
                 return "✅ No actionable items found in debug output - application is running cleanly!";
             }
@@ -809,7 +809,7 @@ namespace BusBuddy.WPF.Utilities
             var entry = new FilteredDebugEntry
             {
                 DetectedAt = DateTime.Now,
-                ThreadId = Thread.CurrentThread.ManagedThreadId.ToString(),
+                ThreadId = Environment.CurrentManagedThreadId.ToString(),
                 ProcessId = Environment.ProcessId.ToString()
             };
 

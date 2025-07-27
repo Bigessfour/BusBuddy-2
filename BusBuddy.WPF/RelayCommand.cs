@@ -13,6 +13,12 @@ namespace BusBuddy.WPF
             _canExecute = canExecute;
         }
 
+        public RelayCommand(Action execute, Func<bool>? canExecute = null)
+            : this(execute != null ? _ => execute() : throw new ArgumentNullException(nameof(execute)),
+                   canExecute != null ? _ => canExecute() : null)
+        {
+        }
+
         public bool CanExecute(object? parameter) => _canExecute == null || _canExecute(parameter);
 
         public void Execute(object? parameter) => _execute(parameter);
@@ -21,6 +27,14 @@ namespace BusBuddy.WPF
         {
             add => CommandManager.RequerySuggested += value;
             remove => CommandManager.RequerySuggested -= value;
+        }
+
+        /// <summary>
+        /// Method to raise CanExecuteChanged event
+        /// </summary>
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
         }
     }
 }

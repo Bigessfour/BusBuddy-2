@@ -53,6 +53,31 @@
       "detail": "🚌 Enforces instructions.md workflow - runs on folder open"
     },
     {
+      "label": "🤖 AI: Efficiency Enforcement Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '🤖 AI Assistant Efficiency Enforcement Check' -ForegroundColor Cyan; Write-Host ''; Write-Host '📋 Environment Validation:' -ForegroundColor Yellow; Write-Host \"✅ Platform: Windows PowerShell $($PSVersionTable.PSVersion)\" -ForegroundColor Green; $bbCommands = @(Get-Command bb-* -ErrorAction SilentlyContinue); Write-Host \"✅ BusBuddy Functions: $($bbCommands.Count) available\" -ForegroundColor Green; $tasksExist = Test-Path '.vscode/tasks.json'; Write-Host \"✅ Tasks Available: $tasksExist\" -ForegroundColor Green; Write-Host ''; Write-Host '🚫 Forbidden Patterns:' -ForegroundColor Red; Write-Host '   ❌ Unix commands (head, tail, grep, uniq)' -ForegroundColor Red; Write-Host '   ❌ Complex pipe chains that can fail' -ForegroundColor Red; Write-Host '   ❌ Single-file edits (max 3 per session)' -ForegroundColor Red; Write-Host ''; Write-Host '✅ Required Patterns:' -ForegroundColor Green; Write-Host '   ✅ Use existing bb-* functions first' -ForegroundColor Green; Write-Host '   ✅ Batch operations for similar fixes' -ForegroundColor Green; Write-Host '   ✅ Simple, reliable PowerShell commands' -ForegroundColor Green; Write-Host ''; Write-Host '📖 Full protocol: .vscode/ai-efficiency-enforcement.md' -ForegroundColor Blue"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "detail": "🤖 Displays AI assistant efficiency enforcement standards and validates environment"
+    },
+    {
       "label": "🎯 BB: Phase 1 Completion Verification",
       "type": "shell",
       "command": "pwsh.exe",

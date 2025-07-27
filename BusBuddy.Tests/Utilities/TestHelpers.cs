@@ -54,11 +54,21 @@ namespace BusBuddy.Tests.Utilities
 
             // Add test vehicles
             var vehicles = CreateTestVehicles();
-            context.Vehicles.AddRange(vehicles);
+            // Convert vehicles to buses for the context
+            var buses = vehicles.Select(v => new Bus
+            {
+                BusNumber = v.BusNumber,
+                Make = v.Make,
+                Model = v.Model,
+                SeatingCapacity = v.Capacity,
+                VINNumber = v.PlateNumber,
+                Status = v.IsActive ? "Active" : "Inactive"
+            }).ToList();
+            context.Vehicles.AddRange(buses);
 
             // Add test activities
             var activities = CreateTestActivities(drivers, vehicles);
-            context.Activities.AddRange(activities);
+            context.ActivitySchedule.AddRange(activities);
 
             context.SaveChanges();
         }
