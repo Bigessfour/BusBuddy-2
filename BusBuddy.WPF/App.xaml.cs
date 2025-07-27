@@ -101,6 +101,8 @@ namespace BusBuddy.WPF
 
                     // Phase 1: Register Phase 1 services including data seeding
                     services.AddPhase1Services();
+                    // Phase 2: Register enhanced real-world data seeder service
+                    services.AddScoped<IPhase2DataSeederService, Phase2DataSeederService>();
 
                     // Azure Configuration Support
                     var azureConfigService = new AzureConfigurationService(context.Configuration);
@@ -128,6 +130,19 @@ namespace BusBuddy.WPF
             Log.Information("🗂️ Initializing Phase 1 data...");
             Console.WriteLine("🗂️ Initializing Phase 1 data...");
             await _host.Services.InitializePhase1Async();
+            // Phase 2: Seed enhanced Phase 2 real-world data
+            Log.Information("🗂️ Initializing Phase 2 enhanced real-world data...");
+            Console.WriteLine("🗂️ Initializing Phase 2 enhanced real-world data...");
+            try
+            {
+                await _host.Services.GetRequiredService<IPhase2DataSeederService>().SeedAsync();
+                Log.Information("✅ Phase 2 data seeding completed successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "❌ Phase 2 data seeding failed: {ErrorMessage}", ex.Message);
+                MessageBox.Show($"Phase 2 data seeding failed: {ex.Message}", "Data Seeding Error");
+            }
 
             base.OnStartup(e);
 

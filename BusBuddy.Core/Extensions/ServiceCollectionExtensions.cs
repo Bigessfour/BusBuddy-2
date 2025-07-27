@@ -84,6 +84,9 @@ namespace BusBuddy.Core.Extensions
             // Register Database NULL Fix Service
             services.AddScoped<BusBuddy.Core.Services.DatabaseNullFixService>();
 
+            // Register Phase 2 Data Seeding Service
+            services.AddScoped<IPhase2DataSeederService, Phase2DataSeederService>();
+
             return services;
         }
     }

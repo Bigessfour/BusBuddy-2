@@ -10,6 +10,107 @@
   },
   "tasks": [
     {
+      "label": "🔧 BB: Isolated Build (File Lock Prevention)",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-NonInteractive",
+        "-Command",
+        "Write-Host 'Preparing build environment...' -ForegroundColor Yellow; Get-Process pwsh -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID } | Stop-Process -Force -ErrorAction SilentlyContinue; [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); Write-Host 'Build environment prepared' -ForegroundColor Green; dotnet build BusBuddy.sln --verbosity minimal"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "detail": "🔧 Isolated build with PowerShell cleanup (NO PROFILE) - for emergency use only"
+    },
+    {
+      "label": "🚌 BB: Profile-Aware Build",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\build-busbuddy-simple.ps1"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🚌 SAFE: Profile-aware build using simplified script with error handling",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "🔍 BB: Diagnostic Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '=== BusBuddy Diagnostic Check ===' -ForegroundColor Cyan; Write-Host 'PowerShell Version:' $PSVersionTable.PSVersion -ForegroundColor Yellow; Write-Host 'Current Location:' $PWD -ForegroundColor Yellow; Write-Host '.NET SDK:' (dotnet --version 2>$null) -ForegroundColor Yellow; Write-Host 'Solution File:' (Test-Path 'BusBuddy.sln') -ForegroundColor Yellow; Write-Host 'Profile Script:' (Test-Path 'load-bus-buddy-profiles.ps1') -ForegroundColor Yellow"
+      ],
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "🔍 Quick diagnostic check of build environment"
+    },
+    {
+      "label": "🧪 BB: Safe Build Test",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\build-busbuddy-simple.ps1",
+        "-SkipProfiles",
+        "-Verbose"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "🧪 Safe build test without profiles, verbose output for troubleshooting",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
       "label": "� BB: Mandatory PowerShell 7.5.2 Syntax Check",
       "type": "shell",
       "command": "pwsh.exe",
@@ -31,9 +132,9 @@
       "detail": "🔒 MANDATORY: Validates all PowerShell scripts against 7.5.2 requirements before any build"
     },
     {
-      "label": "�🚌 BB: Enforce Workflow Check",
+      "label": "🚌🚌 BB: Enforce Workflow Check",
       "type": "shell",
-      "command": "pwsh",
+      "command": "pwsh.exe",
       "args": [
         "-ExecutionPolicy",
         "Bypass",
@@ -50,7 +151,7 @@
       "runOptions": {
         "runOn": "folderOpen"
       },
-      "detail": "🚌 Enforces instructions.md workflow - runs on folder open"
+      "detail": "🚌 Enforces instructions.md workflow - runs on folder open to validate profile integration"
     },
     {
       "label": "🤖 AI: Efficiency Enforcement Check",
@@ -134,7 +235,7 @@
         "clear": true
       },
       "isBackground": false,
-      "detail": "🏗️ Industry-standard comprehensive build & run pipeline with full logging, environment validation, and error analysis",
+      "detail": "🏗️ RECOMMENDED: Profile-aligned comprehensive build & run pipeline with full logging and environment validation",
       "problemMatcher": [
         "$msCompile"
       ]
