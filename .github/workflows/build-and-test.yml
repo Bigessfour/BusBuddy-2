@@ -330,3 +330,4 @@ jobs:
           echo "| Vulnerable Packages | ${{ steps.vuln-scan.outputs.vulnerable-packages || '0' }} |" >> $GITHUB_STEP_SUMMARY
 
 
+
