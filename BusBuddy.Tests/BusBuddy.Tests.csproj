@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- NUnit Testing Framework -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="NUnit" Version="4.0.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+
+    <!-- FluentAssertions for readable test assertions -->
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+
+    <!-- Code Coverage -->
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+
+    <!-- Mocking Framework -->
+    <PackageReference Include="Moq" Version="4.20.69" />
+
+    <!-- Entity Framework In-Memory Database for testing -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
+
+    <!-- Dependency Injection for testing -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
+
+    <!-- Configuration testing -->
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
+    <ProjectReference Include="..\BusBuddy.WPF\BusBuddy.WPF.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Services\" />
+    <Folder Include="Integration\" />
+    <Folder Include="Utilities\" />
+  </ItemGroup>
+
+</Project>

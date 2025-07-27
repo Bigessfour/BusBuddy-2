@@ -9,11 +9,11 @@ namespace BusBuddy.Core.Data.Interfaces;
 public interface IRouteRepository : IRepository<Route>
 {
     // Route-specific queries
-    Task<IEnumerable<Route>> GetRoutesByDateAsync(DateTime date);
+    Task<IEnumerable<Route>> GetRoutesByDateAsync(DateTime targetDate);
     Task<IEnumerable<Route>> GetRoutesByDateRangeAsync(DateTime startDate, DateTime endDate);
     Task<IEnumerable<Route>> GetRoutesByNameAsync(string routeName);
     Task<IEnumerable<Route>> GetActiveRoutesAsync();
-    Task<Route?> GetRouteByNameAndDateAsync(string routeName, DateTime date);
+    Task<Route?> GetRouteByNameAndDateAsync(string routeName, DateTime targetDate);
 
     // Additional async methods for compatibility
     Task UpdateAsync(Route route);
@@ -22,21 +22,21 @@ public interface IRouteRepository : IRepository<Route>
     Task<Route?> GetRouteByIdAsync(int routeId);
 
     // Vehicle and driver assignments
-    Task<IEnumerable<Route>> GetRoutesByVehicleAsync(int vehicleId, DateTime? date = null);
-    Task<IEnumerable<Route>> GetRoutesByDriverAsync(int driverId, DateTime? date = null);
-    Task<IEnumerable<Route>> GetRoutesWithoutVehicleAssignmentAsync(DateTime date);
-    Task<IEnumerable<Route>> GetRoutesWithoutDriverAssignmentAsync(DateTime date);
+    Task<IEnumerable<Route>> GetRoutesByVehicleAsync(int vehicleId, DateTime? targetDate = null);
+    Task<IEnumerable<Route>> GetRoutesByDriverAsync(int driverId, DateTime? targetDate = null);
+    Task<IEnumerable<Route>> GetRoutesWithoutVehicleAssignmentAsync(DateTime targetDate);
+    Task<IEnumerable<Route>> GetRoutesWithoutDriverAssignmentAsync(DateTime targetDate);
 
     // Mileage and statistics
-    Task<decimal> GetTotalMileageByDateAsync(DateTime date);
+    Task<decimal> GetTotalMileageByDateAsync(DateTime targetDate);
     Task<decimal> GetTotalMileageByDateRangeAsync(DateTime startDate, DateTime endDate);
     Task<decimal> GetAverageRidershipByRouteAsync(string routeName, DateTime? startDate = null, DateTime? endDate = null);
     Task<Dictionary<string, decimal>> GetMileageByRouteNameAsync(DateTime startDate, DateTime endDate);
     Task<Dictionary<string, int>> GetRidershipByRouteNameAsync(DateTime startDate, DateTime endDate);
 
     // Schedule validation
-    Task<bool> ValidateRouteScheduleAsync(DateTime date);
-    Task<IEnumerable<string>> GetRouteValidationErrorsAsync(DateTime date);
+    Task<bool> ValidateRouteScheduleAsync(DateTime targetDate);
+    Task<IEnumerable<string>> GetRouteValidationErrorsAsync(DateTime targetDate);
     Task<IEnumerable<Route>> GetRoutesWithMileageIssuesAsync(DateTime? startDate = null, DateTime? endDate = null);
 
     // Reporting
@@ -45,10 +45,10 @@ public interface IRouteRepository : IRepository<Route>
     Task<Dictionary<DateTime, int>> GetDailyRouteCountAsync(DateTime startDate, DateTime endDate);
 
     // Synchronous methods for Syncfusion data binding
-    IEnumerable<Route> GetRoutesByDate(DateTime date);
+    IEnumerable<Route> GetRoutesByDate(DateTime targetDate);
     IEnumerable<Route> GetRoutesByName(string routeName);
     IEnumerable<Route> GetActiveRoutes();
-    IEnumerable<Route> GetRoutesByVehicle(int vehicleId, DateTime? date = null);
-    IEnumerable<Route> GetRoutesByDriver(int driverId, DateTime? date = null);
-    decimal GetTotalMileageByDate(DateTime date);
+    IEnumerable<Route> GetRoutesByVehicle(int vehicleId, DateTime? targetDate = null);
+    IEnumerable<Route> GetRoutesByDriver(int driverId, DateTime? targetDate = null);
+    decimal GetTotalMileageByDate(DateTime targetDate);
 }

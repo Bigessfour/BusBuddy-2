@@ -1,0 +1,38 @@
+{
+  "Projects": [
+    {
+      "Name": "BusBuddy.Core",
+      "ScanResult": [
+        "",
+        "The following sources were used:",
+        "   https://api.nuget.org/v3/index.json",
+        "",
+        "The given project `BusBuddy.Core` has no vulnerable packages given the current sources."
+      ],
+      "Vulnerable": false,
+      "Status": "✅ No vulnerabilities found"
+    },
+    {
+      "Name": "BusBuddy.WPF",
+      "ScanResult": [
+        "",
+        "The following sources were used:",
+        "   https://api.nuget.org/v3/index.json",
+        "",
+        "The given project `BusBuddy.WPF` has no vulnerable packages given the current sources."
+      ],
+      "Vulnerable": false,
+      "Status": "✅ No vulnerabilities found"
+    }
+  ],
+  "VulnerabilityCount": 0,
+  "PackageCount": 292,
+  "Recommendations": [
+    "Resolve package version inconsistencies across projects"
+  ],
+  "VersionMismatches": [
+    "Pre-release: OpenAI = 2.0.0-beta.10 in BusBuddy.Core.csproj",
+    "Serilog.Extensions.Logging has version inconsistencies"
+  ],
+  "Timestamp": "2025-07-26T08:09:33.2278358-06:00"
+}

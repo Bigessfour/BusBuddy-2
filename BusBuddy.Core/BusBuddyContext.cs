@@ -35,6 +35,9 @@ namespace BusBuddy.Core
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Activity> Activities { get; set; }
 
+        // Sports scheduling entities (Phase 2)
+        public DbSet<SportsEvent> SportsEvents { get; set; }
+
         // Extended entities (Production ready)
         public DbSet<Bus> Buses { get; set; }
         public DbSet<Route> Routes { get; set; }
@@ -193,6 +196,36 @@ namespace BusBuddy.Core
                               .OnDelete(DeleteBehavior.SetNull);
                     });
                     Logger.Debug("Configured Activity entity with required properties and Destination relationship");
+
+                    // Configure SportsEvent entity (Phase 2 Sports Scheduling)
+                    modelBuilder.Entity<SportsEvent>(entity =>
+                    {
+                        entity.HasKey(e => e.Id);
+                        entity.Property(e => e.EventName).IsRequired().HasMaxLength(200);
+                        entity.Property(e => e.Location).IsRequired().HasMaxLength(500);
+                        entity.Property(e => e.Status).IsRequired().HasMaxLength(50).HasDefaultValue("Pending");
+                        entity.Property(e => e.SafetyNotes).HasMaxLength(1000);
+                        entity.Property(e => e.Sport).HasMaxLength(100);
+                        entity.Property(e => e.EmergencyContact).HasMaxLength(500);
+                        entity.Property(e => e.WeatherConditions).HasMaxLength(200);
+
+                        // Configure relationships to Vehicle and Driver
+                        entity.HasOne(s => s.Vehicle)
+                              .WithMany()
+                              .HasForeignKey(s => s.VehicleId)
+                              .OnDelete(DeleteBehavior.SetNull);
+
+                        entity.HasOne(s => s.Driver)
+                              .WithMany()
+                              .HasForeignKey(s => s.DriverId)
+                              .OnDelete(DeleteBehavior.SetNull);
+
+                        // Indexes for performance
+                        entity.HasIndex(e => e.StartTime).HasDatabaseName("IX_SportsEvents_StartTime");
+                        entity.HasIndex(e => e.Status).HasDatabaseName("IX_SportsEvents_Status");
+                        entity.HasIndex(e => e.Sport).HasDatabaseName("IX_SportsEvents_Sport");
+                    });
+                    Logger.Debug("Configured SportsEvent entity with Vehicle and Driver relationships for Phase 2");
 
                     // Configure Destination entity
                     modelBuilder.Entity<Destination>(entity =>

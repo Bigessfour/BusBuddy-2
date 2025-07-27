@@ -1,0 +1,93 @@
+name: 🚀 Production Release Pipeline
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  SOLUTION_FILE: "BusBuddy.sln"
+  BUILD_CONFIGURATION: "Release"
+
+jobs:
+  production-build:
+    runs-on: windows-latest
+    environment: production
+    timeout-minutes: 45
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🏗️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 📦 Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ${{ github.workspace }}/**/obj/project.assets.json
+            ${{ github.workspace }}/**/obj/*.csproj.nuget.*
+          key: ${{ runner.os }}-nuget-production-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-production-
+            ${{ runner.os }}-nuget-
+
+      - name: 🔧 Restore dependencies
+        run: |
+          echo "🔄 Restoring NuGet packages for production..."
+          dotnet restore ${{ env.SOLUTION_FILE }} --verbosity normal
+
+      - name: 🏗️ Build production release
+        run: |
+          echo "🔨 Building Bus Buddy for production..."
+          dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal
+
+      - name: 🧪 Run full test suite
+        run: |
+          echo "🧪 Running comprehensive test suite..."
+          dotnet test ${{ env.SOLUTION_FILE }} --no-build --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger trx
+
+      - name: 📦 Publish application
+        run: |
+          echo "📦 Publishing Bus Buddy application..."
+          dotnet publish BusBuddy.WPF/BusBuddy.WPF.csproj --no-build --configuration ${{ env.BUILD_CONFIGURATION }} --output ./publish --verbosity normal
+
+      - name: 📁 Create release archive
+        run: |
+          echo "📁 Creating release archive..."
+          $releaseVersion = "${{ github.event.inputs.release_version || github.event.release.tag_name }}"
+          $archiveName = "BusBuddy-$releaseVersion-windows-x64.zip"
+          Compress-Archive -Path "./publish/*" -DestinationPath "./$archiveName"
+          echo "✅ Created release archive: $archiveName"
+
+      - name: 🚀 Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-release
+          path: "*.zip"
+          retention-days: 90
+
+      - name: 📋 Create release summary
+        run: |
+          echo "## 🚀 Production Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Release Version | ${{ github.event.inputs.release_version || github.event.release.tag_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Configuration | ${{ env.BUILD_CONFIGURATION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| .NET Version | ${{ env.DOTNET_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | Production |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**✅ Production build completed successfully!**" >> $GITHUB_STEP_SUMMARY

@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 
 namespace BusBuddy.WPF.Views.Main
 {
@@ -18,6 +19,12 @@ namespace BusBuddy.WPF.Views.Main
         {
             StatusText.Text = "Loading Dashboard...";
             ContentFrame.Navigate(new DashboardView());
+        }
+
+        private void AnalyticsButton_Click(object sender, RoutedEventArgs e)
+        {
+            StatusText.Text = "Loading Analytics Dashboard...";
+            ContentFrame.Navigate(new BusBuddy.WPF.Views.Analytics.AnalyticsDashboardView());
         }
 
         private void DriversButton_Click(object sender, RoutedEventArgs e)
