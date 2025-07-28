@@ -676,6 +676,9 @@ XAI-Integration/
 *anthropic-*
 *claude-*
 
+# Exception: Allow Grok repository access guide (no secrets)
+!GROK-REPOSITORY-ACCESS.md
+
 # AI API keys and tokens (comprehensive patterns)
 *xai_api_key*
 *XAI_API_KEY*
