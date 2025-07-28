@@ -30,11 +30,10 @@
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
   </ItemGroup>
 
-  <!-- 🔧 .NET 9 Migration: Explicit Framework References -->
+  <!-- 🌐 .NET 9 Framework References with Globalization Support -->
   <ItemGroup>
     <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
-    <PackageReference Include="System.Runtime" Version="4.3.1" />
-    <PackageReference Include="System.Globalization" Version="4.3.0" />
+    <!-- Note: System.Runtime and System.Globalization are included in .NET 9 by default -->
   </ItemGroup>
 
   <ItemGroup>
@@ -184,7 +183,7 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
 
     <!-- Additional Extensions -->
-    <PackageReference Include="System.Net.Http.Json" Version="9.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.7" />
   </ItemGroup>
 
   <!-- 🧹 CLEAN CONFIGURATION -->

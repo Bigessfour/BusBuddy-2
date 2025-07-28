@@ -3,8 +3,11 @@ using FluentAssertions;
 using BusBuddy.WPF.Services;
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
+using BusBuddy.Core.Services.Interfaces;
+using BusBuddy.Core.Services;
 using BusBuddy.Tests.Utilities;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace BusBuddy.Tests.IntegrationTests;
 
@@ -16,7 +19,7 @@ namespace BusBuddy.Tests.IntegrationTests;
 public class ServiceIntegrationTests : BaseTestFixture
 {
     private IDataIntegrityService? _dataIntegrityService;
-    private IXAIChatService? _xaiChatService;
+    private XAIChatService? _xaiChatService;
 
     [SetUp]
     public override void SetUp()
@@ -29,14 +32,14 @@ public class ServiceIntegrationTests : BaseTestFixture
         // Create mock services for DataIntegrityService
         var mockRouteService = new Mock<IRouteService>();
         var mockDriverService = new Mock<IDriverService>();
-        var mockVehicleService = new Mock<IVehicleService>();
+        var mockBusService = new Mock<IBusService>();
         var mockActivityService = new Mock<IActivityService>();
         var mockStudentService = new Mock<IStudentService>();
 
         _dataIntegrityService = new DataIntegrityService(
             mockRouteService.Object,
             mockDriverService.Object,
-            mockVehicleService.Object,
+            mockBusService.Object,
             mockActivityService.Object,
             mockStudentService.Object);
     }
@@ -141,7 +144,7 @@ public class ServiceIntegrationTests : BaseTestFixture
             DriverName = "Expiring License Driver",
             Status = "Active",
             LicenseNumber = "EXP888",
-            LicenseExpirationDate = DateTime.Now.AddDays(15) // Expires soon
+            LicenseExpiryDate = DateTime.Now.AddDays(15) // Expires soon
         };
 
         TestContext!.Drivers.Add(expiringDriver);
@@ -149,7 +152,7 @@ public class ServiceIntegrationTests : BaseTestFixture
 
         // Act - Query for drivers with expiring licenses
         var driversWithExpiringLicenses = TestContext.Drivers
-            .Where(d => d.LicenseExpirationDate < DateTime.Now.AddDays(30))
+            .Where(d => d.LicenseExpiryDate < DateTime.Now.AddDays(30))
             .ToList();
 
         // Assert

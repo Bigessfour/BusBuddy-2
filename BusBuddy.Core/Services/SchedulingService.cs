@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -398,7 +399,7 @@ namespace BusBuddy.Core.Services
                 Logger.Information("Generating safety checklist for event {EventName}", sportsEvent.EventName);
 
                 var checklist = $@"
-🛡️ SAFETY CHECKLIST FOR {sportsEvent.EventName.ToUpper(System.Globalization.CultureInfo.InvariantCulture)}
+🛡️ SAFETY CHECKLIST FOR {sportsEvent.EventName.ToUpper(CultureInfo.InvariantCulture)}
 ═══════════════════════════════════════════════════════════
 
 📅 Event Details:

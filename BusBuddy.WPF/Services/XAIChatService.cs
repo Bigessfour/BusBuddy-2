@@ -146,6 +146,3 @@ namespace BusBuddy.WPF.Services
         }
     }
 }
-        }
-    }
-}

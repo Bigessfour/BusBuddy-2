@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,59 @@ namespace BusBuddy.Core.Services
         private readonly ILogger<Phase2DataSeederService> _logger;
         private readonly Random _random = new Random(42); // Seeded for reproducible data
 
+        // CA1848: Use LoggerMessage.Define for high-performance logging
+        private static readonly Action<ILogger, Exception?> LogSeedingStarted =
+            LoggerMessage.Define(LogLevel.Information, new EventId(1, nameof(LogSeedingStarted)),
+                "🎯 Starting Phase 2 enhanced data seeding...");
+
+        private static readonly Action<ILogger, Exception?> LogSeedingCompleted =
+            LoggerMessage.Define(LogLevel.Information, new EventId(2, nameof(LogSeedingCompleted)),
+                "✅ Phase 2 enhanced data seeding completed successfully!");
+
+        private static readonly Action<ILogger, Exception?> LogDataAlreadyExists =
+            LoggerMessage.Define(LogLevel.Information, new EventId(3, nameof(LogDataAlreadyExists)),
+                "Enhanced Phase 2 data already exists. Skipping seeding.");
+
+        private static readonly Action<ILogger, Exception?> LogSeedingError =
+            LoggerMessage.Define(LogLevel.Error, new EventId(4, nameof(LogSeedingError)),
+                "❌ Error during Phase 2 data seeding");
+
+        private static readonly Action<ILogger, Exception?> LogEnhancedDataSeeding =
+            LoggerMessage.Define(LogLevel.Information, new EventId(5, nameof(LogEnhancedDataSeeding)),
+                "📊 Seeding enhanced real-world transportation data...");
+
+        private static readonly Action<ILogger, Exception?> LogDriverSeeding =
+            LoggerMessage.Define(LogLevel.Information, new EventId(6, nameof(LogDriverSeeding)),
+                "👥 Seeding 50 professional drivers...");
+
+        private static readonly Action<ILogger, Exception?> LogVehicleSeeding =
+            LoggerMessage.Define(LogLevel.Information, new EventId(7, nameof(LogVehicleSeeding)),
+                "🚌 Seeding 25 school buses with maintenance records...");
+
+        private static readonly Action<ILogger, Exception?> LogRouteSeeding =
+            LoggerMessage.Define(LogLevel.Information, new EventId(8, nameof(LogRouteSeeding)),
+                "🗺️ Seeding 100 diverse routes with geographical data...");
+
+        private static readonly Action<ILogger, Exception?> LogActivitySeeding =
+            LoggerMessage.Define(LogLevel.Information, new EventId(9, nameof(LogActivitySeeding)),
+                "📅 Seeding 200 scheduled activities with realistic patterns...");
+
+        private static readonly Action<ILogger, Exception?> LogEnhancedDataCompleted =
+            LoggerMessage.Define(LogLevel.Information, new EventId(10, nameof(LogEnhancedDataCompleted)),
+                "📊 Enhanced real-world data seeding completed.");
+
+        private static readonly Action<ILogger, Exception?> LogClearingExistingData =
+            LoggerMessage.Define(LogLevel.Information, new EventId(11, nameof(LogClearingExistingData)),
+                "Clearing existing activity data for fresh seeding...");
+
+        private static readonly Action<ILogger, string, Exception?> LogGatheringMetrics =
+            LoggerMessage.Define<string>(LogLevel.Information, new EventId(12, nameof(LogGatheringMetrics)),
+                "Gathering development metrics for component: {ComponentName}");
+
+        private static readonly Action<ILogger, string, Exception?> LogGatheringMetricsError =
+            LoggerMessage.Define<string>(LogLevel.Warning, new EventId(13, nameof(LogGatheringMetricsError)),
+                "Error gathering development metrics for {ComponentName}");
+
         private static readonly string[] FirstNames = {
             "Alice", "Bob", "Carlos", "Diana", "Ethan", "Fatima", "George", "Hannah", "Isaac", "Jessica",
             "Kevin", "Linda", "Michael", "Nancy", "Oliver", "Patricia", "Quincy", "Rachel", "Samuel", "Teresa",
@@ -49,9 +103,9 @@ namespace BusBuddy.Core.Services
         private static readonly string[] LastNames = {
             "Anderson", "Brown", "Clark", "Davis", "Evans", "Fisher", "Garcia", "Harris", "Jackson", "Johnson",
             "King", "Lewis", "Martinez", "Nelson", "O'Brien", "Parker", "Quinn", "Rodriguez", "Smith", "Taylor",
-            "Underwood", "Valdez", "Washington", "Xavier", "Young", "Zhang", "Adams", "Baker", "Cooper", "Dixon",
-            "Edwards", "Ford", "Green", "Hall", "Iverson", "Jones", "Kelly", "Lee", "Miller", "Newman",
-            "Owens", "Phillips", "Ramirez", "Stewart", "Thompson", "Upton", "Vargas", "Wilson", "Xu", "Yamamoto"
+            "Underwood", "Valdez", "Washington", "Xavier", "Young", "Zhang", "AdAMS", "BAKER", "COOPER", "DIXON",
+            "EDWARDS", "FORD", "GREEN", "HALL", "IVERSON", "JONES", "KELLY", "LEE", "MILLER", "NEWMAN",
+            "OWENS", "PHILLIPS", "RAMIREZ", "STEWART", "THOMPSON", "UPTON", "VARGAS", "WILSON", "XU", "YAMAMOTO"
         };
 
         private static readonly string[] BusModels = {
@@ -81,38 +135,38 @@ namespace BusBuddy.Core.Services
         {
             try
             {
-                _logger.LogInformation("🎯 Starting Phase 2 enhanced data seeding...");
+                LogSeedingStarted(_logger, null);
 
-                // Check if enhanced data already exists
+                // Check if enhanced data already exists - CA1829: Use .Count property
                 var driverCount = await _context.Drivers.CountAsync();
                 var vehicleCount = await _context.Vehicles.CountAsync();
                 var activityCount = await _context.Activities.CountAsync();
 
                 if (driverCount >= 40 && vehicleCount >= 20 && activityCount >= 150)
                 {
-                    _logger.LogInformation("Enhanced Phase 2 data already exists. Skipping seeding.");
+                    LogDataAlreadyExists(_logger, null);
                     return;
                 }
 
                 await SeedEnhancedRealWorldDataAsync();
 
-                _logger.LogInformation("✅ Phase 2 enhanced data seeding completed successfully!");
+                LogSeedingCompleted(_logger, null);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error during Phase 2 data seeding");
+                LogSeedingError(_logger, ex);
                 throw;
             }
         }
 
         public async Task SeedEnhancedRealWorldDataAsync()
         {
-            _logger.LogInformation("📊 Seeding enhanced real-world transportation data...");
+            LogEnhancedDataSeeding(_logger, null);
 
             // Clear existing data if needed
             if (await _context.Activities.AnyAsync())
             {
-                _logger.LogInformation("Clearing existing activity data for fresh seeding...");
+                LogClearingExistingData(_logger, null);
                 _context.Activities.RemoveRange(_context.Activities);
                 await _context.SaveChangesAsync();
             }
@@ -131,12 +185,12 @@ namespace BusBuddy.Core.Services
 
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("📊 Enhanced real-world data seeding completed.");
+            LogEnhancedDataCompleted(_logger, null);
         }
 
         private async Task<List<Driver>> SeedEnhancedDriversAsync()
         {
-            _logger.LogInformation("👥 Seeding 50 professional drivers...");
+            LogDriverSeeding(_logger, null);
 
             var existingDrivers = await _context.Drivers.ToListAsync();
             var driversToAdd = new List<Driver>();
@@ -155,7 +209,7 @@ namespace BusBuddy.Core.Services
                     LastName = lastName,
                     LicenseNumber = $"CDL-{_random.Next(100000, 999999)}",
                     DriverPhone = $"({_random.Next(200, 999)}) {_random.Next(200, 999)}-{_random.Next(1000, 9999)}",
-                    DriverEmail = $"{firstName.ToLower()}.{lastName.ToLower()}@{GetRandomEmailDomain()}",
+                    DriverEmail = $"{firstName.ToLower(CultureInfo.InvariantCulture)}.{lastName.ToLower(CultureInfo.InvariantCulture)}@{GetRandomEmailDomain()}",
                     HireDate = hireDate,
                     Address = GenerateRandomAddress(),
                     EmergencyContactName = $"{FirstNames[_random.Next(FirstNames.Length)]} {LastNames[_random.Next(LastNames.Length)]}",
@@ -167,7 +221,7 @@ namespace BusBuddy.Core.Services
                 driversToAdd.Add(driver);
             }
 
-            if (driversToAdd.Any())
+            if (driversToAdd.Count > 0) // CA1829: Use .Count property
             {
                 await _context.Drivers.AddRangeAsync(driversToAdd);
                 await _context.SaveChangesAsync();
@@ -178,14 +232,13 @@ namespace BusBuddy.Core.Services
 
         private async Task<List<Vehicle>> SeedEnhancedVehiclesAsync()
         {
-            _logger.LogInformation("🚌 Seeding 25 school buses with maintenance records...");
+            LogVehicleSeeding(_logger, null);
 
             var existingVehicles = await _context.Vehicles.ToListAsync();
             var vehiclesToAdd = new List<Vehicle>();
 
             for (int i = existingVehicles.Count; i < 25; i++)
             {
-
                 var capacity = _random.Next(35, 78);
                 var model = BusModels[_random.Next(BusModels.Length)];
                 var busNumber = $"BUS{i + 1:D3}";
@@ -207,7 +260,7 @@ namespace BusBuddy.Core.Services
                 vehiclesToAdd.Add(vehicle);
             }
 
-            if (vehiclesToAdd.Any())
+            if (vehiclesToAdd.Count > 0) // CA1829: Use .Count property
             {
                 await _context.Vehicles.AddRangeAsync(vehiclesToAdd);
                 await _context.SaveChangesAsync();
@@ -218,7 +271,7 @@ namespace BusBuddy.Core.Services
 
         private async Task<List<Route>> SeedEnhancedRoutesAsync()
         {
-            _logger.LogInformation("🗺️ Seeding 100 diverse routes with geographical data...");
+            LogRouteSeeding(_logger, null);
 
             // Clear existing routes for fresh data
             if (await _context.Routes.AnyAsync())
@@ -229,12 +282,8 @@ namespace BusBuddy.Core.Services
 
             var routes = new List<Route>();
 
-            // Base coordinates for a fictional mid-size school district (around Philadelphia area)
-            // Removed unused baseLat and baseLon
-
             for (int i = 0; i < 100; i++)
             {
-
                 var routeName = $"Route {i + 1:D3}";
                 var description = $"Route serving district stops to random destination.";
                 var distance = (decimal?)Math.Round(_random.NextDouble() * 20 + 1, 2); // 1-21 miles
@@ -243,13 +292,13 @@ namespace BusBuddy.Core.Services
                 var stopCount = _random.Next(3, 15);
                 var busNumber = $"BUS{_random.Next(1, 26):D3}";
                 var isActive = _random.NextDouble() > 0.1; // 90% active
-                var date = DateTime.Today.AddDays(-_random.Next(0, 365));
+                var scheduleDate = DateTime.Today.AddDays(-_random.Next(0, 365));
 
                 var route = new Route
                 {
                     RouteName = routeName,
                     Description = description,
-                    Date = date,
+                    Date = scheduleDate,
                     Distance = distance,
                     EstimatedDuration = estimatedTime,
                     StudentCount = studentCount,
@@ -269,7 +318,7 @@ namespace BusBuddy.Core.Services
 
         private async Task SeedEnhancedActivitiesAsync(List<Driver> drivers, List<Vehicle> vehicles, List<Route> routes)
         {
-            _logger.LogInformation("📅 Seeding 200 scheduled activities with realistic patterns...");
+            LogActivitySeeding(_logger, null);
 
             var activities = new List<Activity>();
             var now = DateTime.Now;
@@ -332,7 +381,6 @@ namespace BusBuddy.Core.Services
         }
 
         #region Helper Methods
-
         private string GetRandomEmailDomain()
         {
             var domains = new[] { "email.com", "mail.org", "webmail.net", "district.edu", "transport.gov" };
@@ -423,6 +471,26 @@ namespace BusBuddy.Core.Services
             return notes[_random.Next(notes.Length)];
         }
 
+        private static SportsEvent CreateSportsEvent(string eventName, string sport, DateTime startTime,
+            string location, int teamSize, bool isHomeGame, string status = "Scheduled")
+        {
+            return new SportsEvent
+            {
+                EventName = eventName,
+                Sport = sport,
+                StartTime = startTime,
+                EndTime = startTime.AddHours(3),
+                Location = location,
+                TeamSize = teamSize,
+                IsHomeGame = isHomeGame,
+                Status = status,
+                WeatherConditions = "Clear",
+                EmergencyContact = "Athletic Director (555) 123-4567",
+                SafetyNotes = $"Standard safety protocols for {sport} transportation",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+        }
         #endregion
     }
 }

@@ -21,6 +21,8 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public byte[] GenerateActivityCalendarReport(List<Activity> activities, DateTime startDate, DateTime endDate)
         {
+            ArgumentNullException.ThrowIfNull(activities);
+
             try
             {
                 Logger.Information("Generating PDF calendar report from {StartDate} to {EndDate}", startDate, endDate);
@@ -110,6 +112,8 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public byte[] GenerateActivityReport(Activity activity)
         {
+            ArgumentNullException.ThrowIfNull(activity);
+
             try
             {
                 Logger.Information("Generating PDF report for activity {ActivityId}", activity.ActivityId);
@@ -228,8 +232,8 @@ namespace BusBuddy.Core.Services
 
             // Header
             sb.AppendLine("BUS BUDDY - ACTIVITY CALENDAR REPORT");
-            sb.AppendLine($"Report Period: {startDate.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture)} - {endDate.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture)}");
-            sb.AppendLine($"Generated: {DateTime.Now.ToString("MMM dd, yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture)}");
+            sb.AppendLine(System.Globalization.CultureInfo.InvariantCulture, $"Report Period: {startDate.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture)} - {endDate.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture)}");
+            sb.AppendLine(System.Globalization.CultureInfo.InvariantCulture, $"Generated: {DateTime.Now.ToString("MMM dd, yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture)}");
             sb.AppendLine(new string('=', 60));
             sb.AppendLine();
 

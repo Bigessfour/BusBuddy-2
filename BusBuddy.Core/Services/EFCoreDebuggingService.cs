@@ -184,13 +184,7 @@ public class EFCoreDebuggingService
             var report = await GenerateFullDebugReportAsync();
 
             // Serialize to JSON with formatting
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var json = JsonSerializer.Serialize(report, options);
+            var json = JsonSerializer.Serialize(report, JsonOptions);
             await File.WriteAllTextAsync(reportPath, json);
 
             // Also create a human-readable text report
@@ -347,7 +341,14 @@ public class EFCoreDebuggingService
         }
     }
 
-    private string FormatReportAsText(EFCoreDebugReport report)
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true,
+        PropertyNameCaseInsensitive = true
+    };
+
+    private static string FormatReportAsText(EFCoreDebugReport report)
     {
         var sb = new StringBuilder();
 

@@ -1,4 +1,3 @@
-
 using BusBuddy.Core.Models;
 
 namespace BusBuddy.Core.Data.Interfaces;

@@ -17,10 +17,10 @@ public class ActivityScheduleRepository : Repository<ActivitySchedule>, IActivit
 
     #region Async ActivitySchedule-Specific Operations
 
-    public async Task<IEnumerable<ActivitySchedule>> GetSchedulesByDateAsync(DateTime date)
+    public async Task<IEnumerable<ActivitySchedule>> GetSchedulesByDateAsync(DateTime scheduleDate)
     {
         return await Query()
-            .Where(asc => asc.ScheduledDate.Date == date.Date)
+            .Where(asc => asc.ScheduledDate.Date == scheduleDate.Date)
             .OrderBy(asc => asc.ScheduledLeaveTime)
             .ToListAsync();
     }
@@ -61,11 +61,11 @@ public class ActivityScheduleRepository : Repository<ActivitySchedule>, IActivit
             .ToListAsync();
     }
 
-    public async Task<bool> HasConflictAsync(int vehicleId, int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime)
+    public async Task<bool> HasConflictAsync(int vehicleId, int driverId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime)
     {
         return await Query()
             .AnyAsync(asc => (asc.ScheduledVehicleId == vehicleId || asc.ScheduledDriverId == driverId) &&
-                            asc.ScheduledDate.Date == date.Date &&
+                            asc.ScheduledDate.Date == scheduleDate.Date &&
                             ((asc.ScheduledLeaveTime <= startTime && asc.ScheduledEventTime > startTime) ||
                              (asc.ScheduledLeaveTime < endTime && asc.ScheduledEventTime >= endTime) ||
                              (asc.ScheduledLeaveTime >= startTime && asc.ScheduledEventTime <= endTime)));
@@ -75,10 +75,10 @@ public class ActivityScheduleRepository : Repository<ActivitySchedule>, IActivit
 
     #region Synchronous ActivitySchedule-Specific Operations
 
-    public IEnumerable<ActivitySchedule> GetSchedulesByDate(DateTime date)
+    public IEnumerable<ActivitySchedule> GetSchedulesByDate(DateTime scheduleDate)
     {
         return Query()
-            .Where(asc => asc.ScheduledDate.Date == date.Date)
+            .Where(asc => asc.ScheduledDate.Date == scheduleDate.Date)
             .OrderBy(asc => asc.ScheduledLeaveTime)
             .ToList();
     }
@@ -92,11 +92,11 @@ public class ActivityScheduleRepository : Repository<ActivitySchedule>, IActivit
             .ToList();
     }
 
-    public bool HasConflict(int vehicleId, int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime)
+    public bool HasConflict(int vehicleId, int driverId, DateTime scheduleDate, TimeSpan startTime, TimeSpan endTime)
     {
         return Query()
             .Any(asc => (asc.ScheduledVehicleId == vehicleId || asc.ScheduledDriverId == driverId) &&
-                       asc.ScheduledDate.Date == date.Date &&
+                       asc.ScheduledDate.Date == scheduleDate.Date &&
                        ((asc.ScheduledLeaveTime <= startTime && asc.ScheduledEventTime > startTime) ||
                         (asc.ScheduledLeaveTime < endTime && asc.ScheduledEventTime >= endTime) ||
                         (asc.ScheduledLeaveTime >= startTime && asc.ScheduledEventTime <= endTime)));

@@ -126,7 +126,7 @@ namespace BusBuddy.Core.Services
             }
 
             // Process alerts
-            if (alerts.Any())
+            if (alerts.Count > 0)
             {
                 await ProcessAlerts(alerts);
             }

@@ -192,3 +192,33 @@ dotnet_diagnostic.CS1591.severity = none        # Missing XML comment for public
 
 # Test project exclusions are handled via Directory.Build.props in test projects
 # Note: Global config sections must use absolute paths, so test exclusions are moved to Directory.Build.props
+
+# Global analyzer configuration for BusBuddy
+# Reduces noise from overly strict analyzers while maintaining code quality
+
+# Async configuration - reduce noise
+dotnet_diagnostic.CA2007.severity = suggestion  # ConfigureAwait review
+dotnet_diagnostic.CA1849.severity = suggestion  # Call async methods when in an async method
+
+# Format provider suggestions - reduce noise
+dotnet_diagnostic.CA1305.severity = suggestion  # Specify IFormatProvider
+dotnet_diagnostic.CA1304.severity = suggestion  # Specify CultureInfo
+
+# LINQ performance suggestions - reduce noise
+dotnet_diagnostic.CA1860.severity = suggestion  # Avoid using 'Enumerable.Any()' extension method
+dotnet_diagnostic.CA1851.severity = suggestion  # Possible multiple enumerations of IEnumerable collection
+
+# Logging performance suggestions - reduce noise
+dotnet_diagnostic.CA1848.severity = suggestion  # Use LoggerMessage delegates for high performance logging scenarios
+
+# Static member suggestions - keep as warning but not error
+dotnet_diagnostic.CA1822.severity = warning     # Mark members as static
+
+# Keep critical rules as errors
+dotnet_diagnostic.CA1062.severity = error       # Validate arguments of public methods
+dotnet_diagnostic.CA2201.severity = error       # Do not raise reserved exception types
+dotnet_diagnostic.CA2245.severity = error       # Do not assign a property to itself
+
+# Suppress low-impact rules that create noise
+dotnet_diagnostic.CA1716.severity = none        # Identifiers should not match keywords
+dotnet_diagnostic.CA1720.severity = none        # Identifier contains type name

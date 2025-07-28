@@ -10,37 +10,6 @@
   },
   "tasks": [
     {
-      "label": "🔧 BB: Isolated Build (File Lock Prevention)",
-      "type": "shell",
-      "command": "pwsh.exe",
-      "args": [
-        "-NoProfile",
-        "-NonInteractive",
-        "-Command",
-        "& { Write-Host 'Preparing build environment...' -ForegroundColor Yellow; try { Get-Process pwsh -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID } | Stop-Process -Force -ErrorAction SilentlyContinue; [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); Write-Host 'Build environment prepared' -ForegroundColor Green; dotnet build BusBuddy.sln --verbosity minimal; $buildResult = $LASTEXITCODE; if ($buildResult -eq 0) { Write-Host '✅ Build completed successfully' -ForegroundColor Green } else { Write-Host '❌ Build failed' -ForegroundColor Red } } finally { [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); Write-Host 'Build cleanup completed' -ForegroundColor Green }; exit $buildResult }"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "runOptions": {
-        "instanceLimit": 1
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "dedicated",
-        "showReuseMessage": false,
-        "clear": true
-      },
-      "isBackground": false,
-      "problemMatcher": [
-        "$msCompile"
-      ],
-      "detail": "🔧 FIXED: Isolated build with guaranteed cleanup and file lock prevention"
-    },
-    {
       "label": "🔓 BB: Resolve File Locks (MSBuild Research)",
       "type": "shell",
       "command": "pwsh.exe",

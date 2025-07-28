@@ -139,7 +139,7 @@ namespace BusBuddy.Core.Services
             }
         }
 
-        private double CalculateOptimizationScore(Route route)
+        private static double CalculateOptimizationScore(Route route)
         {
             // Calculate a score based on route efficiency factors
             var baseScore = 70.0;
@@ -155,20 +155,26 @@ namespace BusBuddy.Core.Services
             return Math.Min(100.0, baseScore + distanceScore + studentScore);
         }
 
-        private double CalculateSafetyRating(Route route)
+        private static double CalculateSafetyRating(Route route)
         {
             // Calculate safety rating based on route characteristics
             var baseRating = 85.0;
 
             // Shorter routes tend to be safer (handle nullable decimal)
             var distance = (double)(route.Distance ?? 10.0m);
-            if (distance < 5.0) baseRating += 10.0;
-            else if (distance > 15.0) baseRating -= 5.0;
+            if (distance < 5.0)
+            {
+                baseRating += 10.0;
+            }
+            else if (distance > 15.0)
+            {
+                baseRating -= 5.0;
+            }
 
             return Math.Max(60.0, Math.Min(100.0, baseRating));
         }
 
-        private double CalculateEfficiencyRating(Route route)
+        private static double CalculateEfficiencyRating(Route route)
         {
             // Calculate efficiency based on students per mile (handle nullable values)
             var studentCount = route.StudentCount ?? 0;
@@ -188,7 +194,7 @@ namespace BusBuddy.Core.Services
         public Route Route { get; set; } = new();
         public TerrainAnalysisResult? TerrainAnalysis { get; set; }
         public WeatherData? WeatherData { get; set; }
-        public XAIService.AIRouteRecommendations? AIRecommendations { get; set; }
+        public AIRouteRecommendations? AIRecommendations { get; set; }
         public DateTime AnalysisTimestamp { get; set; }
 
         // Additional properties for compatibility with existing code

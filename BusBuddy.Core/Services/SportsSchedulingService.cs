@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using BusBuddy.Core.Models;
@@ -82,6 +83,7 @@ namespace BusBuddy.Core.Services
         }
 
         /// <summary>
+        /// Gets sports events within a date range
         /// Gets sports events within a date range
         /// </summary>
         /// <param name="startDate">Start date filter (optional)</param>
@@ -236,8 +238,8 @@ namespace BusBuddy.Core.Services
                 var noConflicts = conflicts == 0;
 
                 Logger.Information("Conflict validation for Vehicle {VehicleId}, Driver {DriverId}: {Result}",
-                    vehicleId?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "N/A",
-                    driverId?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "N/A",
+                    vehicleId?.ToString(CultureInfo.InvariantCulture) ?? "N/A",
+                    driverId?.ToString(CultureInfo.InvariantCulture) ?? "N/A",
                     noConflicts ? "No conflicts" : $"{conflicts} conflicts found");
 
                 return noConflicts;
@@ -270,7 +272,7 @@ namespace BusBuddy.Core.Services
                 var assignedVehicleIds = await _context.SportsEvents
                     .Where(e => e.VehicleId.HasValue &&
                                e.StartTime < endTime && e.EndTime > startTime)
-                    .Select(e => e.VehicleId.Value)
+                    .Select(e => e.VehicleId!.Value)
                     .Distinct()
                     .ToListAsync();
 
@@ -313,7 +315,7 @@ namespace BusBuddy.Core.Services
                 var assignedDriverIds = await _context.SportsEvents
                     .Where(e => e.DriverId.HasValue &&
                                e.StartTime < endTime && e.EndTime > startTime)
-                    .Select(e => e.DriverId.Value)
+                    .Select(e => e.DriverId!.Value)
                     .Distinct()
                     .ToListAsync();
 

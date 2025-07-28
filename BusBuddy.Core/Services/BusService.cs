@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Context;
 using System.Diagnostics;
+using System.Globalization;
 using ActivityType = BusBuddy.Core.Models.Activity;
 
 namespace BusBuddy.Core.Services
@@ -158,7 +159,7 @@ namespace BusBuddy.Core.Services
                     if (!string.IsNullOrEmpty(sortColumn))
                     {
                         // Apply ordering based on the column name
-                        query = sortColumn.ToLower() switch
+                        query = sortColumn.ToLower(CultureInfo.InvariantCulture) switch
                         {
                             "busnumber" => isAscending
                                 ? query.OrderBy(v => v.BusNumber)

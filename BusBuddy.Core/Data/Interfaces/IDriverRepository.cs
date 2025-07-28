@@ -10,7 +10,7 @@ public interface IDriverRepository : IRepository<Driver>
 {
     // Driver-specific queries
     Task<IEnumerable<Driver>> GetActiveDriversAsync();
-    Task<IEnumerable<Driver>> GetAvailableDriversAsync(DateTime date, TimeSpan? startTime = null, TimeSpan? endTime = null);
+    Task<IEnumerable<Driver>> GetAvailableDriversAsync(DateTime checkDate, TimeSpan? startTime = null, TimeSpan? endTime = null);
     Task<IEnumerable<Driver>> GetDriversByLicenseTypeAsync(string licenseType);
     Task<IEnumerable<Driver>> GetDriversWithCompletedTrainingAsync();
     Task<IEnumerable<Driver>> GetDriversWithPendingTrainingAsync();
@@ -24,9 +24,9 @@ public interface IDriverRepository : IRepository<Driver>
     Task<IEnumerable<Driver>> GetDriversRequiringTrainingRenewalAsync(int withinDays = 30);
 
     // Scheduling and availability
-    Task<bool> IsDriverAvailableAsync(int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime);
-    Task<IEnumerable<Driver>> GetDriversScheduledForDateAsync(DateTime date);
-    Task<IEnumerable<Driver>> GetDriversWithNoScheduleAsync(DateTime date);
+    Task<bool> IsDriverAvailableAsync(int driverId, DateTime checkDate, TimeSpan startTime, TimeSpan endTime);
+    Task<IEnumerable<Driver>> GetDriversScheduledForDateAsync(DateTime checkDate);
+    Task<IEnumerable<Driver>> GetDriversWithNoScheduleAsync(DateTime checkDate);
 
     // Performance and statistics
     Task<int> GetTotalDriverCountAsync();
@@ -42,9 +42,9 @@ public interface IDriverRepository : IRepository<Driver>
 
     // Synchronous methods for Syncfusion data binding
     IEnumerable<Driver> GetActiveDrivers();
-    IEnumerable<Driver> GetAvailableDrivers(DateTime date, TimeSpan? startTime = null, TimeSpan? endTime = null);
+    IEnumerable<Driver> GetAvailableDrivers(DateTime checkDate, TimeSpan? startTime = null, TimeSpan? endTime = null);
     IEnumerable<Driver> GetDriversByLicenseType(string licenseType);
     IEnumerable<Driver> GetDriversWithCompletedTraining();
     IEnumerable<Driver> GetDriversWithExpiringLicenses(int withinDays = 30);
-    bool IsDriverAvailable(int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime);
+    bool IsDriverAvailable(int driverId, DateTime checkDate, TimeSpan startTime, TimeSpan endTime);
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -372,77 +373,126 @@ namespace BusBuddy.Core.Services
             }
         }
 
+        private static ContextualHelp ParseContextualHelp(string response)
+        {
+            return new ContextualHelp
+            {
+                Topic = "AI Response",
+                HelpContent = response,
+                RelatedTopics = ExtractRelatedTopics(response),
+                ActionableSteps = ExtractActionableSteps(response)
+            };
+        }
+
+        private static ContextualHelp CreateBasicHelp(HelpRequest request)
+        {
+            return new ContextualHelp
+            {
+                Topic = request.Topic,
+                HelpContent = $"Help information for {request.Topic}",
+                RelatedTopics = new[] { "General Help", "Documentation", "FAQ" },
+                ActionableSteps = new[] { "Review documentation", "Check examples", "Contact support" }
+            };
+        }
+
+        private static string[] ExtractRelatedTopics(string content)
+        {
+            // Simple extraction of potential related topics
+            var topics = new List<string>();
+            var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                if (line.Contains("related", StringComparison.OrdinalIgnoreCase) ||
+                    line.Contains("see also", StringComparison.OrdinalIgnoreCase))
+                {
+                    topics.Add(line.Trim());
+                }
+            }
+
+            return topics.Take(3).ToArray();
+        }
+
+        private static string[] ExtractActionableSteps(string content)
+        {
+            // Extract numbered steps or bullet points
+            var steps = new List<string>();
+            var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim();
+                if (trimmed.StartsWith("1.") || trimmed.StartsWith("2.") ||
+                    trimmed.StartsWith("3.") || trimmed.StartsWith("-") ||
+                    trimmed.StartsWith("*"))
+                {
+                    steps.Add(trimmed);
+                }
+            }
+
+            return steps.Take(5).ToArray();
+        }
+
         #endregion
 
         #region Phase 1 Program Management Helper Methods
 
-        // Minimal stub for missing method
-        private PhaseAnalysisResult CreateMockPhase1Analysis(Phase1ProgressRequest request)
+        private static PhaseAnalysisResult CreateMockPhase1Analysis(Phase1ProgressRequest request)
         {
             return new PhaseAnalysisResult();
         }
 
-        // Minimal stub for missing method
-        private string BuildDevelopmentInsightsPrompt(DevelopmentStateRequest request)
+        private static string BuildDevelopmentInsightsPrompt(DevelopmentStateRequest request)
         {
             return "Development insights prompt";
         }
 
-        // Minimal stub for missing method
-        private DevelopmentInsights ParseDevelopmentInsights(string response)
+        private static DevelopmentInsights ParseDevelopmentInsights(string response)
         {
             return new DevelopmentInsights();
         }
 
-        // Minimal stub for missing method
-        private DevelopmentInsights CreateMockDevelopmentInsights(DevelopmentStateRequest request)
+        private static DevelopmentInsights CreateMockDevelopmentInsights(DevelopmentStateRequest request)
         {
             return new DevelopmentInsights();
         }
 
-        // Minimal stub for missing method
-        private string BuildPerformanceAnalysisPrompt(PerformanceDataRequest request)
+        private static string BuildPerformanceAnalysisPrompt(PerformanceDataRequest request)
         {
             return "Performance analysis prompt";
         }
 
-        // Minimal stub for missing method
-        private PerformanceAnalysis ParsePerformanceAnalysis(string response)
+        private static PerformanceAnalysis ParsePerformanceAnalysis(string response)
         {
             return new PerformanceAnalysis();
         }
 
-        // Minimal stub for missing method
-        private PerformanceAnalysis CreateMockPerformanceAnalysis(PerformanceDataRequest request)
+        private static PerformanceAnalysis CreateMockPerformanceAnalysis(PerformanceDataRequest request)
         {
             return new PerformanceAnalysis();
         }
 
-        // Minimal stub for missing method
-        private string BuildMockDataPrompt(MockDataRequest request)
+        private static string BuildMockDataPrompt(MockDataRequest request)
         {
             return "Mock data prompt";
         }
 
-        // Minimal stub for missing method
-        private GeneratedDataSet ParseGeneratedDataSet(string response)
+        private static GeneratedDataSet ParseGeneratedDataSet(string response)
         {
             return new GeneratedDataSet();
         }
 
-        // Minimal stub for missing method
-        private GeneratedDataSet CreateBasicMockData(MockDataRequest request)
+        private static GeneratedDataSet CreateBasicMockData(MockDataRequest request)
         {
             return new GeneratedDataSet();
         }
 
-        // Minimal stub for missing method
-        private string BuildContextualHelpPrompt(HelpRequest request)
+        private static string BuildContextualHelpPrompt(HelpRequest request)
         {
             return "Contextual help prompt";
         }
 
-        private string BuildPhase1AnalysisPrompt(Phase1ProgressRequest request)
+        private static string BuildPhase1AnalysisPrompt(Phase1ProgressRequest request)
         {
             var prompt = $@"
 # BusBuddy Phase 1 Development Analysis
@@ -488,7 +538,7 @@ Focus on actionable insights for a WPF .NET application in Phase 1 development."
             return prompt;
         }
 
-        private PhaseAnalysisResult ParsePhase1AnalysisResponse(string response)
+        private static PhaseAnalysisResult ParsePhase1AnalysisResponse(string response)
         {
             var result = new PhaseAnalysisResult();
 
@@ -497,17 +547,23 @@ Focus on actionable insights for a WPF .NET application in Phase 1 development."
                 // Extract overall health
                 var healthMatch = Regex.Match(response, @"Overall Health.*?:\s*(\w+)", RegexOptions.IgnoreCase);
                 if (healthMatch.Success)
+                {
                     result.OverallHealth = healthMatch.Groups[1].Value;
+                }
 
                 // Extract health score
                 var scoreMatch = Regex.Match(response, @"Health Score.*?:\s*(\d+)", RegexOptions.IgnoreCase);
                 if (scoreMatch.Success && int.TryParse(scoreMatch.Groups[1].Value, out int score))
+                {
                     result.HealthScore = score;
+                }
 
                 // Extract risk level
                 var riskMatch = Regex.Match(response, @"Risk Level.*?:\s*(\w+)", RegexOptions.IgnoreCase);
                 if (riskMatch.Success)
+                {
                     result.RiskLevel = riskMatch.Groups[1].Value;
+                }
 
                 // Extract recommendations
                 var recMatches = Regex.Matches(response, @"(?:Recommendation|•|\*|\d+\.)\s*(.+?)(?=\n|$)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -520,9 +576,13 @@ Focus on actionable insights for a WPF .NET application in Phase 1 development."
                 // Extract predicted completion date
                 var dateMatch = Regex.Match(response, @"(?:Predicted|Completion).*?Date.*?:\s*(\d{4}-\d{2}-\d{2})", RegexOptions.IgnoreCase);
                 if (dateMatch.Success && DateTime.TryParse(dateMatch.Groups[1].Value, out DateTime completionDate))
+                {
                     result.PredictedCompletionDate = completionDate;
+                }
                 else
+                {
                     result.PredictedCompletionDate = DateTime.Now.AddDays(30); // Default estimate
+                }
 
                 // Extract next milestones
                 var milestoneMatches = Regex.Matches(response, @"(?:Milestone|Next|•|\*|\d+\.)\s*(.+?)(?=\n|$)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -535,12 +595,16 @@ Focus on actionable insights for a WPF .NET application in Phase 1 development."
                 // Extract technical debt analysis
                 var debtMatch = Regex.Match(response, @"Technical Debt.*?:\s*(.+?)(?=\n\n|\n[A-Z]|$)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
                 if (debtMatch.Success)
+                {
                     result.TechnicalDebt = debtMatch.Groups[1].Value.Trim();
+                }
 
                 // Extract team productivity
                 var prodMatch = Regex.Match(response, @"(?:Team\s+)?Productivity.*?:\s*(.+?)(?=\n\n|\n[A-Z]|$)", RegexOptions.IgnoreCase | RegexOptions.Singleline);
                 if (prodMatch.Success)
+                {
                     result.TeamProductivity = prodMatch.Groups[1].Value.Trim();
+                }
             }
             catch (Exception ex)
             {
@@ -558,7 +622,7 @@ Focus on actionable insights for a WPF .NET application in Phase 1 development."
             return result;
         }
 
-        private string BuildDevelopmentStatePrompt(DevelopmentStateRequest request)
+        private static string BuildDevelopmentStatePrompt(DevelopmentStateRequest request)
         {
             var prompt = $@"
 # BusBuddy Component Development State Analysis
@@ -631,6 +695,9 @@ Focus on actionable insights for WPF .NET development.";
                 // In a real implementation, this would gather actual metrics
                 // For now, we'll return the basic structure
                 Logger.Information("Gathering development metrics for component: {ComponentName}", componentName);
+
+                // Add await to make this actually async or remove async keyword
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {
@@ -644,7 +711,7 @@ Focus on actionable insights for WPF .NET development.";
 
         #region Prompt Building Methods
 
-        private string BuildRouteOptimizationPrompt(RouteAnalysisRequest request)
+        private static string BuildRouteOptimizationPrompt(RouteAnalysisRequest request)
         {
             return $@"SCHOOL BUS ROUTE OPTIMIZATION ANALYSIS
 
@@ -661,13 +728,13 @@ TERRAIN DATA:
 - Route Difficulty: {request.TerrainData?.RouteDifficulty}
 
 WEATHER CONDITIONS:
-- Current Condition: {request.WeatherData?.Condition}
-- Temperature: {request.WeatherData?.Temperature}°C
-- Visibility: {request.WeatherData?.Visibility}km
-- Wind: {request.WeatherData?.WindCondition}
+- Current Condition: {request.WeatherData?.Condition ?? "Unknown"}
+- Temperature: {request.WeatherData?.Temperature ?? 0}°C
+- Visibility: {request.WeatherData?.Visibility ?? 0}km
+- Wind: {request.WeatherData?.WindCondition ?? "Unknown"}
 
 TRAFFIC STATUS:
-- Overall Condition: {request.TrafficData?.OverallCondition}
+- Overall Condition: {request.TrafficData?.OverallCondition ?? "Unknown"}
 
 HISTORICAL PERFORMANCE:
 - Average Fuel Consumption: {request.HistoricalData?.AverageFuelConsumption} mpg
@@ -691,7 +758,7 @@ Please provide comprehensive recommendations in JSON format with:
 - Implementation timeline";
         }
 
-        private string BuildMaintenancePredictionPrompt(MaintenanceAnalysisRequest request)
+        private static string BuildMaintenancePredictionPrompt(MaintenanceAnalysisRequest request)
         {
             return $@"PREDICTIVE MAINTENANCE ANALYSIS
 
@@ -717,7 +784,7 @@ CURRENT CONDITIONS:
 Predict maintenance needs, component wear, optimal service intervals, and cost optimization strategies.";
         }
 
-        private string BuildSafetyAnalysisPrompt(SafetyAnalysisRequest request)
+        private static string BuildSafetyAnalysisPrompt(SafetyAnalysisRequest request)
         {
             return $@"TRANSPORTATION SAFETY RISK ANALYSIS
 
@@ -740,7 +807,7 @@ HISTORICAL SAFETY DATA:
 Analyze risks and provide safety enhancement recommendations.";
         }
 
-        private string BuildStudentOptimizationPrompt(StudentOptimizationRequest request)
+        private static string BuildStudentOptimizationPrompt(StudentOptimizationRequest request)
         {
             return $@"STUDENT ASSIGNMENT OPTIMIZATION
 
@@ -763,7 +830,7 @@ Provide optimal student-to-bus assignments with reasoning.";
 
         #region System Prompts
 
-        private string GetTransportationExpertSystemPrompt()
+        private static string GetTransportationExpertSystemPrompt()
         {
             return @"You are an expert transportation optimization specialist with decades of experience in school bus fleet management. You have deep knowledge of:
 - Route optimization algorithms
@@ -778,7 +845,7 @@ Provide optimal student-to-bus assignments with reasoning.";
 Provide detailed, actionable recommendations based on data analysis. Always prioritize safety while optimizing for efficiency and cost-effectiveness.";
         }
 
-        private string GetMaintenanceExpertSystemPrompt()
+        private static string GetMaintenanceExpertSystemPrompt()
         {
             return @"You are a certified fleet maintenance expert specializing in school bus preventive maintenance and predictive analytics. Your expertise includes:
 - Predictive maintenance algorithms
@@ -792,7 +859,7 @@ Provide detailed, actionable recommendations based on data analysis. Always prio
 Provide precise maintenance predictions with confidence levels and cost justifications.";
         }
 
-        private string GetSafetyExpertSystemPrompt()
+        private static string GetSafetyExpertSystemPrompt()
         {
             return @"You are a school transportation safety specialist with expertise in:
 - Risk assessment and mitigation
@@ -806,7 +873,7 @@ Provide precise maintenance predictions with confidence levels and cost justific
 Always prioritize student and driver safety. Provide comprehensive risk assessments with specific mitigation strategies.";
         }
 
-        private string GetLogisticsExpertSystemPrompt()
+        private static string GetLogisticsExpertSystemPrompt()
         {
             return @"You are a logistics optimization expert specializing in student transportation efficiency. Your expertise includes:
 - Student assignment algorithms
@@ -820,7 +887,7 @@ Always prioritize student and driver safety. Provide comprehensive risk assessme
 Provide mathematically sound optimization recommendations with clear implementation steps.";
         }
 
-        private string GetGeneralChatSystemPrompt()
+        private static string GetGeneralChatSystemPrompt()
         {
             return @"You are BusBuddy AI, an intelligent assistant for school transportation management. You help with:
 - Transportation planning and optimization
@@ -841,14 +908,8 @@ Be helpful, informative, and always prioritize student safety. Provide practical
         {
             try
             {
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    WriteIndented = false
-                };
-
-                var json = JsonSerializer.Serialize(request, options);
-                using var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var json = JsonSerializer.Serialize(request, ApiJsonOptions);
+                using var content = new StringContent(json, Encoding.UTF8, MediaTypeHeaderValue.Parse("application/json"));
 
                 Logger.Debug("Calling xAI API: {Endpoint} with model: {Model}", endpoint, request.Model);
 
@@ -858,7 +919,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
                 var responseJson = await response.Content.ReadAsStringAsync();
                 Logger.Debug("xAI API response received: {ResponseLength} characters", responseJson.Length);
 
-                var result = JsonSerializer.Deserialize<XAIResponse>(responseJson, options);
+                var result = JsonSerializer.Deserialize<XAIResponse>(responseJson, ApiJsonOptions);
                 return result ?? new XAIResponse();
             }
             catch (HttpRequestException ex)
@@ -882,7 +943,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
         #region Mock Implementations (Current)
 
-        private async Task<AIRouteRecommendations> GenerateMockAIRecommendations(RouteAnalysisRequest request)
+        private static async Task<AIRouteRecommendations> GenerateMockAIRecommendations(RouteAnalysisRequest request)
         {
             await Task.Delay(2000); // Simulate AI processing time
 
@@ -919,7 +980,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             };
         }
 
-        private async Task<AIMaintenancePrediction> GenerateMockMaintenancePrediction(MaintenanceAnalysisRequest request)
+        private static async Task<AIMaintenancePrediction> GenerateMockMaintenancePrediction(MaintenanceAnalysisRequest request)
         {
             await Task.Delay(1800);
 
@@ -949,7 +1010,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             };
         }
 
-        private async Task<AISafetyAnalysis> GenerateMockSafetyAnalysis(SafetyAnalysisRequest request)
+        private static async Task<AISafetyAnalysis> GenerateMockSafetyAnalysis(SafetyAnalysisRequest request)
         {
             await Task.Delay(1500);
 
@@ -977,7 +1038,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             };
         }
 
-        private async Task<AIStudentOptimization> GenerateMockStudentOptimization(StudentOptimizationRequest request)
+        private static async Task<AIStudentOptimization> GenerateMockStudentOptimization(StudentOptimizationRequest request)
         {
             await Task.Delay(2200);
 
@@ -1004,7 +1065,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             };
         }
 
-        private string GenerateMockChatResponse(string message)
+        private static string GenerateMockChatResponse(string message)
         {
             // Simulate realistic chat responses based on the input message
             var responses = new[]
@@ -1024,49 +1085,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
         #region Response Parsing (Future Implementation)
 
-        private AIRouteRecommendations ParseRouteRecommendations(XAIResponse response)
-        {
-            try
-            {
-                if (response?.Choices?.Length > 0)
-                {
-                    var content = response.Choices[0].Message.Content;
-                    Logger.Debug("Parsing xAI route optimization response: {Content}", content);
-
-                    // Try to parse structured JSON response or extract key information
-                    if (content.Contains("{") && content.Contains("}"))
-                    {
-                        // Attempt to parse JSON response
-                        try
-                        {
-                            var options = new JsonSerializerOptions
-                            {
-                                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                                PropertyNameCaseInsensitive = true
-                            };
-                            return JsonSerializer.Deserialize<AIRouteRecommendations>(content, options) ?? CreateDefaultRouteRecommendations(content);
-                        }
-                        catch (JsonException)
-                        {
-                            return CreateDefaultRouteRecommendations(content);
-                        }
-                    }
-                    else
-                    {
-                        return CreateDefaultRouteRecommendations(content);
-                    }
-                }
-
-                return CreateDefaultRouteRecommendations("No response from xAI");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error parsing xAI route recommendations");
-                return CreateDefaultRouteRecommendations("Error parsing AI response");
-            }
-        }
-
-        private AIRouteRecommendations CreateDefaultRouteRecommendations(string aiResponse)
+        private static AIRouteRecommendations CreateDefaultRouteRecommendations(string aiResponse)
         {
             return new AIRouteRecommendations
             {
@@ -1088,13 +1107,50 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             };
         }
 
-        private AIMaintenancePrediction ParseMaintenancePrediction(XAIResponse response)
+        private static AIRouteRecommendations ParseRouteRecommendations(XAIResponse response)
         {
             try
             {
                 if (response?.Choices?.Length > 0)
                 {
-                    var content = response.Choices[0].Message.Content;
+                    var content = response.Choices[0].Message?.Content ?? string.Empty;
+                    Logger.Debug("Parsing xAI route optimization response: {Content}", content);
+
+                    // Try to parse structured JSON response or extract key information
+                    if (content.Contains('{') && content.Contains('}'))
+                    {
+                        // Attempt to parse JSON response
+                        try
+                        {
+                            return JsonSerializer.Deserialize<AIRouteRecommendations>(content, ParseJsonOptions) ?? CreateDefaultRouteRecommendations(content);
+                        }
+                        catch (JsonException)
+                        {
+                            return CreateDefaultRouteRecommendations(content);
+                        }
+                    }
+                    else
+                    {
+                        return CreateDefaultRouteRecommendations(content);
+                    }
+                }
+
+                return CreateDefaultRouteRecommendations("No response from xAI");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error parsing xAI route recommendations");
+                return CreateDefaultRouteRecommendations("Error parsing AI response");
+            }
+        }
+
+        private static AIMaintenancePrediction ParseMaintenancePrediction(XAIResponse response)
+        {
+            try
+            {
+                if (response?.Choices?.Length > 0)
+                {
+                    var content = response.Choices[0].Message?.Content ?? string.Empty;
                     Logger.Debug("Parsing xAI maintenance prediction response");
 
                     return new AIMaintenancePrediction
@@ -1116,13 +1172,13 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private AISafetyAnalysis ParseSafetyAnalysis(XAIResponse response)
+        private static AISafetyAnalysis ParseSafetyAnalysis(XAIResponse response)
         {
             try
             {
                 if (response?.Choices?.Length > 0)
                 {
-                    var content = response.Choices[0].Message.Content;
+                    var content = response.Choices[0].Message?.Content ?? string.Empty;
                     Logger.Debug("Parsing xAI safety analysis response");
 
                     return new AISafetyAnalysis
@@ -1144,13 +1200,13 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private AIStudentOptimization ParseStudentOptimization(XAIResponse response)
+        private static AIStudentOptimization ParseStudentOptimization(XAIResponse response)
         {
             try
             {
                 if (response?.Choices?.Length > 0)
                 {
-                    var content = response.Choices[0].Message.Content;
+                    var content = response.Choices[0].Message?.Content ?? string.Empty;
                     Logger.Debug("Parsing xAI student optimization response");
 
                     return new AIStudentOptimization
@@ -1180,14 +1236,14 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
         #region AI Response Parsing Helper Methods
 
-        private double? ExtractNumericValue(string content, params string[] keywords)
+        private static double? ExtractNumericValue(string content, params string[] keywords)
         {
             try
             {
-                var lowerContent = content.ToLower();
+                var lowerContent = content.ToLowerInvariant();
                 foreach (var keyword in keywords)
                 {
-                    var keywordIndex = lowerContent.IndexOf(keyword.ToLower());
+                    var keywordIndex = lowerContent.IndexOf(keyword, StringComparison.CurrentCultureIgnoreCase);
                     if (keywordIndex >= 0)
                     {
                         // Look for numbers near the keyword
@@ -1214,7 +1270,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private string[] ExtractRecommendations(string content)
+        private static string[] ExtractRecommendations(string content)
         {
             try
             {
@@ -1243,19 +1299,28 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private string ExtractRiskLevel(string content)
+        private static string ExtractRiskLevel(string content)
         {
             var lowerContent = content.ToLowerInvariant();
             if (lowerContent.Contains("high risk", StringComparison.OrdinalIgnoreCase) || lowerContent.Contains("critical", StringComparison.OrdinalIgnoreCase))
+            {
                 return "High";
+            }
+
             if (lowerContent.Contains("medium risk") || lowerContent.Contains("moderate"))
+            {
                 return "Medium";
+            }
+
             if (lowerContent.Contains("low risk") || lowerContent.Contains("minimal"))
+            {
                 return "Low";
+            }
+
             return "Medium"; // Default
         }
 
-        private string[] ExtractRisks(string content)
+        private static string[] ExtractRisks(string content)
         {
             try
             {
@@ -1278,7 +1343,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private string[] ExtractMitigations(string content)
+        private static string[] ExtractMitigations(string content)
         {
             try
             {
@@ -1302,7 +1367,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private ComponentPrediction[] ExtractComponentPredictions(string content)
+        private static ComponentPrediction[] ExtractComponentPredictions(string content)
         {
             try
             {
@@ -1331,7 +1396,7 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private SafetyRiskFactor[] ExtractSafetyRiskFactors(string content)
+        private static SafetyRiskFactor[] ExtractSafetyRiskFactors(string content)
         {
             try
             {
@@ -1360,22 +1425,28 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private string ExtractComplianceStatus(string content)
+        private static string ExtractComplianceStatus(string content)
         {
             var lowerContent = content.ToLowerInvariant();
             if (lowerContent.Contains("non-compliant", StringComparison.OrdinalIgnoreCase) || lowerContent.Contains("violation", StringComparison.OrdinalIgnoreCase))
+            {
                 return "Non-Compliant";
+            }
+
             if (lowerContent.Contains("partial", StringComparison.OrdinalIgnoreCase) || lowerContent.Contains("minor", StringComparison.OrdinalIgnoreCase))
+            {
                 return "Partially Compliant";
+            }
+
             return "Fully Compliant";
         }
 
-        private StudentAssignment[] ExtractStudentAssignments(string content)
+        private static StudentAssignment[] ExtractStudentAssignments(string content)
         {
             try
             {
                 var assignments = new List<StudentAssignment>();
-                var busCount = (int)(ExtractNumericValue(content, "bus", "buses") ?? 3);
+                var busCount = ExtractNumericValue(content, "bus", "buses", "vehicle") ?? 5;
 
                 for (int i = 1; i <= Math.Min(busCount, 5); i++)
                 {
@@ -1398,413 +1469,26 @@ Be helpful, informative, and always prioritize student safety. Provide practical
 
         #endregion
 
-        #region Documentation Access Methods
+        #region JSON Serialization Options
 
-        /// <summary>
-        /// Gets the official xAI overview documentation URL
-        /// </summary>
-        public string GetOfficialDocumentationUrl() => _documentationSettings.GetOverviewUrl();
-
-        /// <summary>
-        /// Gets the xAI Chat API guide URL
-        /// </summary>
-        public string GetChatApiGuideUrl() => _documentationSettings.GetChatGuideUrl();
-
-        /// <summary>
-        /// Gets the xAI API reference URL
-        /// </summary>
-        public string GetApiReferenceUrl() => _documentationSettings.GetApiReferenceUrl();
-
-        /// <summary>
-        /// Gets all available documentation URLs
-        /// </summary>
-        public Dictionary<string, string> GetAllDocumentationUrls() => _documentationSettings.GetAllUrls();
-
-        /// <summary>
-        /// Validates that all documentation URLs are accessible
-        /// </summary>
-        public bool ValidateDocumentationUrls() => _documentationSettings.ValidateUrls();
-
-        #endregion
-
-        #region Data Models for xAI Integration
-
-        public class RouteAnalysisRequest
+        private static readonly JsonSerializerOptions ApiJsonOptions = new()
         {
-            public int RouteId { get; set; }
-            public double CurrentDistance { get; set; }
-            public int StudentCount { get; set; }
-            public int VehicleCapacity { get; set; }
-            public TerrainAnalysisResult? TerrainData { get; set; }
-            public WeatherData? WeatherData { get; set; }
-            public TrafficData? TrafficData { get; set; }
-            public HistoricalPerformanceData? HistoricalData { get; set; }
-        }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false
+        };
 
-        public class HistoricalPerformanceData
+        private static readonly JsonSerializerOptions ParseJsonOptions = new()
         {
-            public double AverageFuelConsumption { get; set; }
-            public double OnTimePerformance { get; set; }
-            public int SafetyIncidents { get; set; }
-        }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
+        };
 
-        public class AIRouteRecommendations
+        private static readonly JsonSerializerOptions JsonOptions = new()
         {
-            public RouteRecommendation OptimalRoute { get; set; } = new();
-            public RiskAssessment RiskAssessment { get; set; } = new();
-            public double ConfidenceLevel { get; set; }
-            public string Reasoning { get; set; } = string.Empty;
-        }
-
-        public class RouteRecommendation
-        {
-            public double EstimatedFuelSavings { get; set; }
-            public double EstimatedTimeSavings { get; set; }
-            public double SafetyScore { get; set; }
-            public string[] RecommendedChanges { get; set; } = Array.Empty<string>();
-        }
-
-        public class RiskAssessment
-        {
-            public string OverallRiskLevel { get; set; } = string.Empty;
-            public string[] IdentifiedRisks { get; set; } = Array.Empty<string>();
-            public string[] MitigationStrategies { get; set; } = Array.Empty<string>();
-        }
-
-        public class MaintenanceAnalysisRequest
-        {
-            public int BusId { get; set; }
-            public string VehicleMake { get; set; } = string.Empty;
-            public string VehicleModel { get; set; } = string.Empty;
-            public int VehicleYear { get; set; }
-            public int CurrentMileage { get; set; }
-            public DateTime LastMaintenanceDate { get; set; }
-            public double DailyMiles { get; set; }
-            public string TerrainDifficulty { get; set; } = string.Empty;
-            public double StopFrequency { get; set; }
-            public double ElevationChanges { get; set; }
-            public int EngineHours { get; set; }
-            public string BrakeUsage { get; set; } = string.Empty;
-            public string TireCondition { get; set; } = string.Empty;
-            public string FluidLevels { get; set; } = string.Empty;
-        }
-
-        public class AIMaintenancePrediction
-        {
-            public DateTime PredictedMaintenanceDate { get; set; }
-            public ComponentPrediction[] ComponentPredictions { get; set; } = Array.Empty<ComponentPrediction>();
-            public decimal TotalEstimatedCost { get; set; }
-            public decimal PotentialSavings { get; set; }
-            public string Reasoning { get; set; } = string.Empty;
-        }
-
-        public class ComponentPrediction
-        {
-            public string Component { get; set; } = string.Empty;
-            public DateTime PredictedWearDate { get; set; }
-            public double ConfidenceLevel { get; set; }
-            public decimal EstimatedCost { get; set; }
-        }
-
-        public class SafetyAnalysisRequest
-        {
-            public string RouteType { get; set; } = string.Empty;
-            public string TrafficDensity { get; set; } = string.Empty;
-            public string RoadConditions { get; set; } = string.Empty;
-            public string WeatherConditions { get; set; } = string.Empty;
-            public string[] AgeGroups { get; set; } = Array.Empty<string>();
-            public int SpecialNeedsCount { get; set; }
-            public int TotalStudents { get; set; }
-            public int PreviousIncidents { get; set; }
-            public int NearMissReports { get; set; }
-            public string DriverSafetyRecord { get; set; } = string.Empty;
-        }
-
-        public class AISafetyAnalysis
-        {
-            public double OverallSafetyScore { get; set; }
-            public SafetyRiskFactor[] RiskFactors { get; set; } = Array.Empty<SafetyRiskFactor>();
-            public string[] Recommendations { get; set; } = Array.Empty<string>();
-            public string ComplianceStatus { get; set; } = string.Empty;
-            public double ConfidenceLevel { get; set; }
-        }
-
-        public class SafetyRiskFactor
-        {
-            public string Factor { get; set; } = string.Empty;
-            public string RiskLevel { get; set; } = string.Empty;
-            public string Impact { get; set; } = string.Empty;
-            public string Mitigation { get; set; } = string.Empty;
-        }
-
-        public class StudentOptimizationRequest
-        {
-            public int TotalStudents { get; set; }
-            public int AvailableBuses { get; set; }
-            public string GeographicConstraints { get; set; } = string.Empty;
-            public string SpecialRequirements { get; set; } = string.Empty;
-        }
-
-        public class AIStudentOptimization
-        {
-            public StudentAssignment[] OptimalAssignments { get; set; } = Array.Empty<StudentAssignment>();
-            public EfficiencyMetrics EfficiencyGains { get; set; } = new();
-            public double ConfidenceLevel { get; set; }
-            public string Reasoning { get; set; } = string.Empty;
-        }
-
-        public class StudentAssignment
-        {
-            public int BusId { get; set; }
-            public int StudentsAssigned { get; set; }
-            public double CapacityUtilization { get; set; }
-            public double AverageRideTime { get; set; }
-        }
-
-        public class EfficiencyMetrics
-        {
-            public double TotalTimeSaved { get; set; }
-            public double FuelSavings { get; set; }
-            public double CapacityOptimization { get; set; }
-        }
-
-        #endregion
-
-        #region xAI API Models (Future Implementation)
-
-        public class XAIRequest
-        {
-            public string Model { get; set; } = string.Empty;
-            public XAIMessage[] Messages { get; set; } = Array.Empty<XAIMessage>();
-            public double Temperature { get; set; }
-            public int MaxTokens { get; set; }
-        }
-
-        public class XAIMessage
-        {
-            public string Role { get; set; } = string.Empty;
-            public string Content { get; set; } = string.Empty;
-        }
-
-        public class XAIResponse
-        {
-            public XAIChoice[] Choices { get; set; } = Array.Empty<XAIChoice>();
-            public XAIUsage Usage { get; set; } = new();
-        }
-
-        public class XAIChoice
-        {
-            public XAIMessage Message { get; set; } = new();
-            public string FinishReason { get; set; } = string.Empty;
-        }
-
-        public class XAIUsage
-        {
-            public int PromptTokens { get; set; }
-            public int CompletionTokens { get; set; }
-            public int TotalTokens { get; set; }
-        }
-
-        #endregion
-
-        #region Phase 1 Program Management & Analytics Models
-
-        public class Phase1ProgressRequest
-        {
-            public string ProjectName { get; set; } = "BusBuddy";
-            public string CurrentPhase { get; set; } = "Phase 1";
-            public int DaysInDevelopment { get; set; }
-            public int TeamSize { get; set; } = 1;
-            public DateTime TargetCompletion { get; set; }
-            public string BuildStatus { get; set; } = "Passing";
-            public int TestsPassingCount { get; set; }
-            public int TotalTestsCount { get; set; }
-            public double CodeCoverage { get; set; }
-            public int CriticalIssuesCount { get; set; }
-            public int TotalComponents { get; set; }
-            public int CompletedComponents { get; set; }
-            public int LinesOfCode { get; set; }
-            public int CommitsThisWeek { get; set; }
-            public int OpenPullRequests { get; set; }
-            public int MergedPullRequests { get; set; }
-            public double AverageBuildTime { get; set; }
-            public int ActiveDevelopers { get; set; }
-            public int IssuesClosedThisWeek { get; set; }
-            public int DocumentationPages { get; set; }
-            public List<string> CurrentFocusAreas { get; set; } = new();
-        }
-
-        public class PhaseAnalysisResult
-        {
-            public string OverallHealth { get; set; } = string.Empty;
-            public int HealthScore { get; set; }
-            public string RiskLevel { get; set; } = string.Empty;
-            public string[] Recommendations { get; set; } = Array.Empty<string>();
-            public DateTime PredictedCompletionDate { get; set; }
-            public string[] NextMilestones { get; set; } = Array.Empty<string>();
-            public string TechnicalDebt { get; set; } = string.Empty;
-            public string TeamProductivity { get; set; } = string.Empty;
-        }
-
-        public class DevelopmentStateRequest
-        {
-            public string ComponentName { get; set; } = string.Empty;
-            public List<string> TechnologyStack { get; set; } = new();
-            public string ComplexityLevel { get; set; } = "Medium";
-            public DateTime LastModified { get; set; }
-            public int FilesChanged { get; set; }
-            public int LinesAdded { get; set; }
-            public int LinesRemoved { get; set; }
-            public int MethodsCount { get; set; }
-            public int ClassesCount { get; set; }
-            public int RecentCommits { get; set; }
-            public int BugReports { get; set; }
-            public int FeatureRequests { get; set; }
-            public int PerformanceIssues { get; set; }
-            public List<string> Dependencies { get; set; } = new();
-            public List<string> CurrentChallenges { get; set; } = new();
-        }
-
-        public class DevelopmentInsights
-        {
-            public int QualityScore { get; set; }
-            public string[] RecommendedActions { get; set; } = Array.Empty<string>();
-            public string ArchitectureHealth { get; set; } = string.Empty;
-            public int PerformanceScore { get; set; }
-            public int SecurityScore { get; set; }
-            public int MaintainabilityScore { get; set; }
-            public string BestPracticesAlignment { get; set; } = string.Empty;
-            public string[] PriorityIssues { get; set; } = Array.Empty<string>();
-        }
-
-        public class PerformanceDataRequest
-        {
-            public string ApplicationName { get; set; } = "BusBuddy";
-            public string Version { get; set; } = "1.0.0";
-            public string Environment { get; set; } = "Development";
-            public DateTime StartDate { get; set; }
-            public DateTime EndDate { get; set; }
-            public double AverageResponseTime { get; set; }
-            public double PeakResponseTime { get; set; }
-            public double MemoryUsage { get; set; }
-            public double PeakMemoryUsage { get; set; }
-            public double AverageCpuUsage { get; set; }
-            public double PeakCpuUsage { get; set; }
-            public double DatabaseQueryTime { get; set; }
-            public double Uptime { get; set; }
-            public double ErrorRate { get; set; }
-            public int SuccessfulRequests { get; set; }
-            public int FailedRequests { get; set; }
-            public int ActiveUsers { get; set; }
-            public double AverageSessionDuration { get; set; }
-            public double PageLoadTime { get; set; }
-            public double UserSatisfactionScore { get; set; }
-            public List<string> IdentifiedBottlenecks { get; set; } = new();
-        }
-
-        public class PerformanceAnalysis
-        {
-            public int OverallScore { get; set; }
-            public string[] CriticalIssues { get; set; } = Array.Empty<string>();
-            public string[] OptimizationOpportunities { get; set; } = Array.Empty<string>();
-            public string ScalabilityAssessment { get; set; } = string.Empty;
-            public string ResourceUtilization { get; set; } = string.Empty;
-            public Dictionary<string, string> ExpectedImprovements { get; set; } = new();
-        }
-
-        public class MockDataRequest
-        {
-            public string DataType { get; set; } = string.Empty;
-            public int RecordCount { get; set; } = 25;
-            public string RealismLevel { get; set; } = "High";
-            public string Purpose { get; set; } = "Development Testing";
-            public List<SchemaField> SchemaFields { get; set; } = new();
-            public string GeographicRegion { get; set; } = "US Midwest";
-            public string TimePeriod { get; set; } = "School Year 2024-2025";
-            public string Scenario { get; set; } = "Normal Operations";
-            public List<string> Relationships { get; set; } = new();
-            public List<string> Constraints { get; set; } = new();
-        }
-
-        public class SchemaField
-        {
-            public string Name { get; set; } = string.Empty;
-            public string Type { get; set; } = string.Empty;
-            public string Constraints { get; set; } = string.Empty;
-        }
-
-        public class GeneratedDataSet
-        {
-            public int RecordCount { get; set; }
-            public string DataType { get; set; } = string.Empty;
-            public object[] GeneratedData { get; set; } = Array.Empty<object>();
-            public Dictionary<string, object> Metadata { get; set; } = new();
-        }
-
-        public class HelpRequest
-        {
-            public string ExperienceLevel { get; set; } = "Intermediate";
-            public string CurrentTask { get; set; } = string.Empty;
-            public string TechnologyFocus { get; set; } = string.Empty;
-            public string LearningGoal { get; set; } = string.Empty;
-            public string Question { get; set; } = string.Empty;
-            public string CodeContext { get; set; } = string.Empty;
-            public string ErrorMessage { get; set; } = string.Empty;
-            public List<string> AttemptedSolutions { get; set; } = new();
-            public string Topic { get; set; } = string.Empty;
-        }
-
-        // Minimal stub for missing method
-        private ContextualHelp CreateMockDevelopmentInsights(HelpRequest request)
-        {
-            return new ContextualHelp
-            {
-                Answer = "Development insights are not available in this build.",
-                Confidence = 0,
-                Examples = Array.Empty<string>(),
-                RelatedTopics = Array.Empty<string>(),
-                DocumentationLinks = Array.Empty<string>(),
-                TroubleshootingTips = Array.Empty<string>()
-            };
-        }
-
-        // Minimal stub for missing method
-        private ContextualHelp ParseContextualHelp(string response)
-        {
-            return new ContextualHelp
-            {
-                Answer = response ?? "No help available.",
-                Confidence = 50,
-                Examples = Array.Empty<string>(),
-                RelatedTopics = Array.Empty<string>(),
-                DocumentationLinks = Array.Empty<string>(),
-                TroubleshootingTips = Array.Empty<string>()
-            };
-        }
-
-        // Minimal stub for missing method
-        private ContextualHelp CreateBasicHelp(HelpRequest request)
-        {
-            return new ContextualHelp
-            {
-                Answer = "Basic help is not available in this build.",
-                Confidence = 0,
-                Examples = Array.Empty<string>(),
-                RelatedTopics = Array.Empty<string>(),
-                DocumentationLinks = Array.Empty<string>(),
-                TroubleshootingTips = Array.Empty<string>()
-            };
-        }
-
-        public class ContextualHelp
-        {
-            public string Answer { get; set; } = string.Empty;
-            public int Confidence { get; set; }
-            public string[] Examples { get; set; } = Array.Empty<string>();
-            public string[] RelatedTopics { get; set; } = Array.Empty<string>();
-            public string[] DocumentationLinks { get; set; } = Array.Empty<string>();
-            public string[] TroubleshootingTips { get; set; } = Array.Empty<string>();
-        }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true
+        };
 
         #endregion
     }

@@ -49,15 +49,15 @@ public class SchoolCalendarRepository : Repository<SchoolCalendar>, ISchoolCalen
             .ToListAsync();
     }
 
-    public async Task<bool> IsSchoolDayAsync(DateTime date)
+    public async Task<bool> IsSchoolDayAsync(DateTime checkDate)
     {
-        var calendarEntry = await FirstOrDefaultAsync(sc => sc.Date.Date == date.Date);
+        var calendarEntry = await FirstOrDefaultAsync(sc => sc.Date.Date == checkDate.Date);
         return calendarEntry != null && calendarEntry.EventType == "School Day";
     }
 
-    public async Task<bool> AreRoutesRequiredAsync(DateTime date)
+    public async Task<bool> AreRoutesRequiredAsync(DateTime checkDate)
     {
-        var calendarEntry = await FirstOrDefaultAsync(sc => sc.Date.Date == date.Date);
+        var calendarEntry = await FirstOrDefaultAsync(sc => sc.Date.Date == checkDate.Date);
         return calendarEntry?.RoutesRequired ?? false;
     }
 

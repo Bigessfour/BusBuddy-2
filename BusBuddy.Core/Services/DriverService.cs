@@ -21,6 +21,9 @@ namespace BusBuddy.Core.Services
 
         public DriverService(IBusBuddyDbContextFactory contextFactory, IEnhancedCachingService cachingService)
         {
+            ArgumentNullException.ThrowIfNull(contextFactory);
+            ArgumentNullException.ThrowIfNull(cachingService);
+
             _contextFactory = contextFactory;
             _cachingService = cachingService;
         }
@@ -98,6 +101,8 @@ namespace BusBuddy.Core.Services
 
         public async Task<Driver> AddDriverAsync(Driver driver)
         {
+            ArgumentNullException.ThrowIfNull(driver);
+
             try
             {
                 Logger.Information("Adding new driver: {DriverName}", driver.DriverName);
@@ -139,6 +144,8 @@ namespace BusBuddy.Core.Services
 
         public async Task<bool> UpdateDriverAsync(Driver driver)
         {
+            ArgumentNullException.ThrowIfNull(driver);
+
             try
             {
                 Logger.Information("Updating driver with ID: {DriverId}", driver.DriverId);
@@ -297,6 +304,8 @@ namespace BusBuddy.Core.Services
 
         public async Task<List<Driver>> GetDriversByQualificationStatusAsync(string status)
         {
+            ArgumentNullException.ThrowIfNull(status);
+
             try
             {
                 Logger.Information("Retrieving drivers by qualification status: {Status}", status);
@@ -318,6 +327,8 @@ namespace BusBuddy.Core.Services
 
         public async Task<List<Driver>> GetDriversByLicenseStatusAsync(string status)
         {
+            ArgumentNullException.ThrowIfNull(status);
+
             try
             {
                 Logger.Information("Retrieving drivers by license status: {Status}", status);
@@ -339,6 +350,8 @@ namespace BusBuddy.Core.Services
 
         public async Task<List<Driver>> SearchDriversAsync(string searchTerm)
         {
+            ArgumentNullException.ThrowIfNull(searchTerm);
+
             try
             {
                 Logger.Information("Searching drivers with term: {SearchTerm}", searchTerm);
@@ -698,6 +711,8 @@ namespace BusBuddy.Core.Services
 
         public async Task<bool> UpdateDriverStatusAsync(int driverId, string status)
         {
+            ArgumentNullException.ThrowIfNull(status);
+
             try
             {
                 Logger.Information("Updating status for driver {DriverId} to {Status}", driverId, status);
@@ -1384,7 +1399,9 @@ namespace BusBuddy.Core.Services
             public bool Equals(Driver? x, Driver? y)
             {
                 if (x == null || y == null)
+                {
                     return false;
+                }
 
                 return x.DriverId == y.DriverId;
             }

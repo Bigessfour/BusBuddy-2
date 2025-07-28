@@ -80,10 +80,10 @@ public class ActivityRepository : Repository<Activity>, IActivityRepository
 
     #region Scheduling Conflicts
 
-    public async Task<IEnumerable<Activity>> GetConflictingActivitiesAsync(DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null)
+    public async Task<IEnumerable<Activity>> GetConflictingActivitiesAsync(DateTime activityDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null)
     {
         var query = Query()
-            .Where(a => a.Date.Date == date.Date &&
+            .Where(a => a.Date.Date == activityDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
                         (a.LeaveTime <= startTime && a.EventTime >= endTime)));
@@ -96,11 +96,11 @@ public class ActivityRepository : Repository<Activity>, IActivityRepository
         return await query.ToListAsync();
     }
 
-    public async Task<bool> HasSchedulingConflictAsync(int vehicleId, DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null)
+    public async Task<bool> HasSchedulingConflictAsync(int vehicleId, DateTime activityDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null)
     {
         var query = Query()
             .Where(a => a.AssignedVehicleId == vehicleId &&
-                       a.Date.Date == date.Date &&
+                       a.Date.Date == activityDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
                         (a.LeaveTime <= startTime && a.EventTime >= endTime)));
@@ -113,11 +113,11 @@ public class ActivityRepository : Repository<Activity>, IActivityRepository
         return await query.AnyAsync();
     }
 
-    public async Task<bool> HasDriverConflictAsync(int driverId, DateTime date, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null)
+    public async Task<bool> HasDriverConflictAsync(int driverId, DateTime activityDate, TimeSpan startTime, TimeSpan endTime, int? excludeActivityId = null)
     {
         var query = Query()
             .Where(a => a.DriverId == driverId &&
-                       a.Date.Date == date.Date &&
+                       a.Date.Date == activityDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
                         (a.LeaveTime <= startTime && a.EventTime >= endTime)));

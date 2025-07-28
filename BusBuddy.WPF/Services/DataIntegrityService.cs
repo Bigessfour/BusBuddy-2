@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.Models;
 using Serilog;
 
@@ -18,20 +19,20 @@ namespace BusBuddy.WPF.Services
         private static readonly ILogger Logger = Log.ForContext<DataIntegrityService>();
         private readonly IRouteService _routeService;
         private readonly IDriverService _driverService;
-        private readonly IVehicleService _vehicleService;
+        private readonly IBusService _busService;
         private readonly IActivityService _activityService;
         private readonly IStudentService _studentService;
 
         public DataIntegrityService(
             IRouteService routeService,
             IDriverService driverService,
-            IVehicleService vehicleService,
+            IBusService busService,
             IActivityService activityService,
             IStudentService studentService)
         {
             _routeService = routeService ?? throw new ArgumentNullException(nameof(routeService));
             _driverService = driverService ?? throw new ArgumentNullException(nameof(driverService));
-            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
+            _busService = busService ?? throw new ArgumentNullException(nameof(busService));
             _activityService = activityService ?? throw new ArgumentNullException(nameof(activityService));
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
         }
@@ -90,7 +91,7 @@ namespace BusBuddy.WPF.Services
 
             try
             {
-                var routes = await _routeService.GetAllRoutesAsync();
+                var routes = await _routeService.GetAllActiveRoutesAsync();
 
                 foreach (var route in routes)
                 {
@@ -100,97 +101,118 @@ namespace BusBuddy.WPF.Services
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Route",
-                            EntityId = route.RouteId.ToString(),
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Missing Required Data",
                             Description = "Route name is null or empty",
                             Severity = "High"
                         });
                     }
 
-                    // Validate route number format
-                    if (route.RouteNumber <= 0)
+                    // Validate date is not in the past
+                    if (route.Date.Date < DateTime.Today)
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Route",
-                            EntityId = route.RouteId.ToString(),
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Business Logic Violation",
+                            Description = "Route date is in the past",
+                            Severity = "Medium"
+                        });
+                    }
+
+                    // Validate vehicle assignments
+                    if (route.AMVehicleId.HasValue && route.AMVehicleId <= 0)
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Route",
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Invalid Data Format",
-                            Description = "Route number must be greater than 0",
+                            Description = "AM Vehicle ID must be greater than 0 if assigned",
                             Severity = "High"
                         });
                     }
 
-                    // Validate route stops
-                    if (route.Stops == null || !route.Stops.Any())
+                    if (route.PMVehicleId.HasValue && route.PMVehicleId <= 0)
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Route",
-                            EntityId = route.RouteId.ToString(),
-                            IssueType = "Missing Required Data",
-                            Description = "Route has no stops defined",
-                            Severity = "Critical"
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Invalid Data Format",
+                            Description = "PM Vehicle ID must be greater than 0 if assigned",
+                            Severity = "High"
                         });
                     }
-                    else
-                    {
-                        // Validate individual stops
-                        foreach (var stop in route.Stops)
-                        {
-                            if (string.IsNullOrWhiteSpace(stop.StopName))
-                            {
-                                issues.Add(new DataIntegrityIssue
-                                {
-                                    EntityType = "Route",
-                                    EntityId = route.RouteId.ToString(),
-                                    IssueType = "Missing Required Data",
-                                    Description = $"Stop at position {stop.StopOrder} has no name",
-                                    Severity = "Medium"
-                                });
-                            }
 
-                            if (stop.Latitude == 0 && stop.Longitude == 0)
-                            {
-                                issues.Add(new DataIntegrityIssue
-                                {
-                                    EntityType = "Route",
-                                    EntityId = route.RouteId.ToString(),
-                                    IssueType = "Missing Required Data",
-                                    Description = $"Stop '{stop.StopName}' has no GPS coordinates",
-                                    Severity = "Medium"
-                                });
-                            }
-                        }
-                    }
-
-                    // Validate route schedule consistency
-                    if (route.StartTime >= route.EndTime)
+                    // Validate driver assignments
+                    if (route.AMDriverId.HasValue && route.AMDriverId <= 0)
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Route",
-                            EntityId = route.RouteId.ToString(),
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Invalid Data Format",
+                            Description = "AM Driver ID must be greater than 0 if assigned",
+                            Severity = "High"
+                        });
+                    }
+
+                    if (route.PMDriverId.HasValue && route.PMDriverId <= 0)
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Route",
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Invalid Data Format",
+                            Description = "PM Driver ID must be greater than 0 if assigned",
+                            Severity = "High"
+                        });
+                    }
+
+                    // Validate mileage consistency
+                    if (route.AMBeginMiles.HasValue && route.AMEndMiles.HasValue &&
+                        route.AMEndMiles < route.AMBeginMiles)
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Route",
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Business Logic Violation",
-                            Description = "Route start time must be before end time",
+                            Description = "AM end miles must be greater than or equal to begin miles",
+                            Severity = "High"
+                        });
+                    }
+
+                    if (route.PMBeginMiles.HasValue && route.PMEndMiles.HasValue &&
+                        route.PMEndMiles < route.PMBeginMiles)
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Route",
+                            EntityId = route.RouteId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Business Logic Violation",
+                            Description = "PM end miles must be greater than or equal to begin miles",
                             Severity = "High"
                         });
                     }
                 }
 
-                // Check for duplicate route numbers
-                var duplicateRouteNumbers = routes
-                    .GroupBy(r => r.RouteNumber)
+                // Check for duplicate route names on the same date
+                var duplicateRouteNames = routes
+                    .GroupBy(r => new { r.RouteName, r.Date.Date })
                     .Where(g => g.Count() > 1)
                     .Select(g => g.Key);
 
-                foreach (var duplicateNumber in duplicateRouteNumbers)
+                foreach (var duplicate in duplicateRouteNames)
                 {
                     issues.Add(new DataIntegrityIssue
                     {
                         EntityType = "Route",
                         EntityId = "Multiple",
                         IssueType = "Duplicate Data",
-                        Description = $"Route number {duplicateNumber} is used by multiple routes",
+                        Description = $"Route name '{duplicate.RouteName}' is used by multiple routes on {duplicate.Date:yyyy-MM-dd}",
                         Severity = "High"
                     });
                 }
@@ -224,8 +246,8 @@ namespace BusBuddy.WPF.Services
             {
                 var activities = await _activityService.GetAllActivitiesAsync();
                 var drivers = await _driverService.GetAllDriversAsync();
-                var vehicles = await _vehicleService.GetAllVehiclesAsync();
-                var routes = await _routeService.GetAllRoutesAsync();
+                var vehicles = await _busService.GetAllBusesAsync();
+                var routes = await _routeService.GetAllActiveRoutesAsync();
 
                 foreach (var activity in activities)
                 {
@@ -235,7 +257,7 @@ namespace BusBuddy.WPF.Services
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Activity",
-                            EntityId = activity.ActivityId.ToString(),
+                            EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Missing Required Data",
                             Description = "Activity type is null or empty",
                             Severity = "High"
@@ -243,27 +265,27 @@ namespace BusBuddy.WPF.Services
                     }
 
                     // Validate date logic
-                    if (activity.StartTime >= activity.EndTime)
+                    if (activity.LeaveTime >= activity.EventTime)
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Activity",
-                            EntityId = activity.ActivityId.ToString(),
+                            EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Business Logic Violation",
-                            Description = "Activity start time must be before end time",
+                            Description = "Activity leave time must be before event time",
                             Severity = "High"
                         });
                     }
 
                     // Validate future dates for scheduled activities
-                    if (activity.Status == "Scheduled" && activity.StartTime < DateTime.Now)
+                    if (activity.Status == "Scheduled" && activity.Date.Date < DateTime.Today)
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Activity",
-                            EntityId = activity.ActivityId.ToString(),
+                            EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Business Logic Violation",
-                            Description = "Scheduled activity cannot have start time in the past",
+                            Description = "Scheduled activity cannot have date in the past",
                             Severity = "Medium"
                         });
                     }
@@ -277,7 +299,7 @@ namespace BusBuddy.WPF.Services
                             issues.Add(new DataIntegrityIssue
                             {
                                 EntityType = "Activity",
-                                EntityId = activity.ActivityId.ToString(),
+                                EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                 IssueType = "Reference Integrity",
                                 Description = $"Assigned driver ID {activity.DriverId} does not exist",
                                 Severity = "High"
@@ -297,17 +319,17 @@ namespace BusBuddy.WPF.Services
                     }
 
                     // Validate vehicle assignment
-                    if (activity.VehicleId.HasValue)
+                    if (activity.AssignedVehicleId > 0)
                     {
-                        var assignedVehicle = vehicles.FirstOrDefault(v => v.VehicleId == activity.VehicleId.Value);
+                        var assignedVehicle = vehicles.FirstOrDefault(v => v.VehicleId == activity.AssignedVehicleId);
                         if (assignedVehicle == null)
                         {
                             issues.Add(new DataIntegrityIssue
                             {
                                 EntityType = "Activity",
-                                EntityId = activity.ActivityId.ToString(),
+                                EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                 IssueType = "Reference Integrity",
-                                Description = $"Assigned vehicle ID {activity.VehicleId} does not exist",
+                                Description = $"Assigned vehicle ID {activity.AssignedVehicleId} does not exist",
                                 Severity = "High"
                             });
                         }
@@ -316,9 +338,9 @@ namespace BusBuddy.WPF.Services
                             issues.Add(new DataIntegrityIssue
                             {
                                 EntityType = "Activity",
-                                EntityId = activity.ActivityId.ToString(),
+                                EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                 IssueType = "Business Logic Violation",
-                                Description = $"Vehicle {assignedVehicle.VehicleNumber} is not active",
+                                Description = $"Vehicle {assignedVehicle.BusNumber} is not active",
                                 Severity = "Medium"
                             });
                         }
@@ -370,105 +392,97 @@ namespace BusBuddy.WPF.Services
             try
             {
                 var students = await _studentService.GetAllStudentsAsync();
-                var routes = await _routeService.GetAllRoutesAsync();
+                var routes = await _routeService.GetAllActiveRoutesAsync();
 
                 foreach (var student in students)
                 {
-                    // Validate required fields
-                    if (string.IsNullOrWhiteSpace(student.FirstName))
+                    // Validate required fields - Student model uses StudentName, not FirstName/LastName
+                    if (string.IsNullOrWhiteSpace(student.StudentName))
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Student",
-                            EntityId = student.StudentId.ToString(),
+                            EntityId = student.StudentId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Missing Required Data",
-                            Description = "Student first name is null or empty",
+                            Description = "Student name is null or empty",
                             Severity = "High"
                         });
                     }
 
-                    if (string.IsNullOrWhiteSpace(student.LastName))
+                    // Validate student number format
+                    if (string.IsNullOrWhiteSpace(student.StudentNumber))
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Student",
-                            EntityId = student.StudentId.ToString(),
+                            EntityId = student.StudentId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Missing Required Data",
-                            Description = "Student last name is null or empty",
+                            Description = "Student number is required",
                             Severity = "High"
                         });
                     }
 
-                    // Validate student ID format (assuming numeric)
-                    if (string.IsNullOrWhiteSpace(student.StudentNumber) || !student.StudentNumber.All(char.IsDigit))
+                    // Validate grade level - Grade is string in Student model
+                    if (string.IsNullOrWhiteSpace(student.Grade))
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Student",
-                            EntityId = student.StudentId.ToString(),
-                            IssueType = "Invalid Data Format",
-                            Description = "Student number must be numeric",
-                            Severity = "Medium"
-                        });
-                    }
-
-                    // Validate grade level
-                    if (student.GradeLevel < 1 || student.GradeLevel > 12)
-                    {
-                        issues.Add(new DataIntegrityIssue
-                        {
-                            EntityType = "Student",
-                            EntityId = student.StudentId.ToString(),
-                            IssueType = "Invalid Data Format",
-                            Description = "Grade level must be between 1 and 12",
-                            Severity = "Medium"
-                        });
-                    }
-
-                    // Validate route assignment
-                    if (student.RouteId.HasValue)
-                    {
-                        var assignedRoute = routes.FirstOrDefault(r => r.RouteId == student.RouteId.Value);
-                        if (assignedRoute == null)
-                        {
-                            issues.Add(new DataIntegrityIssue
-                            {
-                                EntityType = "Student",
-                                EntityId = student.StudentId.ToString(),
-                                IssueType = "Reference Integrity",
-                                Description = $"Assigned route ID {student.RouteId} does not exist",
-                                Severity = "High"
-                            });
-                        }
-                    }
-
-                    // Validate pickup/dropoff stops
-                    if (student.PickupStopId.HasValue && student.RouteId.HasValue)
-                    {
-                        var route = routes.FirstOrDefault(r => r.RouteId == student.RouteId.Value);
-                        if (route != null && !route.Stops.Any(s => s.StopId == student.PickupStopId.Value))
-                        {
-                            issues.Add(new DataIntegrityIssue
-                            {
-                                EntityType = "Student",
-                                EntityId = student.StudentId.ToString(),
-                                IssueType = "Reference Integrity",
-                                Description = "Pickup stop is not on assigned route",
-                                Severity = "High"
-                            });
-                        }
-                    }
-
-                    // Validate contact information
-                    if (string.IsNullOrWhiteSpace(student.ParentPhone) && string.IsNullOrWhiteSpace(student.EmergencyContact))
-                    {
-                        issues.Add(new DataIntegrityIssue
-                        {
-                            EntityType = "Student",
-                            EntityId = student.StudentId.ToString(),
+                            EntityId = student.StudentId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Missing Required Data",
-                            Description = "Student has no parent phone or emergency contact",
+                            Description = "Grade is required",
+                            Severity = "Medium"
+                        });
+                    }
+
+                    // Validate home address
+                    if (string.IsNullOrWhiteSpace(student.HomeAddress))
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Student",
+                            EntityId = student.StudentId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Missing Required Data",
+                            Description = "Home address is required for transportation",
+                            Severity = "High"
+                        });
+                    }
+
+                    // Validate contact information - Use correct property names
+                    if (string.IsNullOrWhiteSpace(student.EmergencyPhone) && string.IsNullOrWhiteSpace(student.ParentGuardian))
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Student",
+                            EntityId = student.StudentId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Missing Required Data",
+                            Description = "Student has no emergency phone or parent guardian contact",
                             Severity = "Critical"
+                        });
+                    }
+
+                    // Validate bus stop assignments if present
+                    if (!string.IsNullOrWhiteSpace(student.AMRoute) && string.IsNullOrWhiteSpace(student.BusStop))
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Student",
+                            EntityId = student.StudentId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Business Logic Violation",
+                            Description = "Student assigned to AM route but no bus stop specified",
+                            Severity = "Medium"
+                        });
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(student.PMRoute) && string.IsNullOrWhiteSpace(student.BusStop))
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Student",
+                            EntityId = student.StudentId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Business Logic Violation",
+                            Description = "Student assigned to PM route but no bus stop specified",
+                            Severity = "Medium"
                         });
                     }
                 }
@@ -523,34 +537,60 @@ namespace BusBuddy.WPF.Services
 
                 foreach (var driver in drivers)
                 {
-                    // Validate license expiration
-                    if (driver.LicenseExpirationDate < DateTime.Now.AddDays(30))
+                    // Validate license expiration - Driver model uses LicenseExpiryDate
+                    if (driver.LicenseExpiryDate.HasValue && driver.LicenseExpiryDate < DateTime.Now.AddDays(30))
                     {
-                        var severity = driver.LicenseExpirationDate < DateTime.Now ? "Critical" : "High";
-                        var description = driver.LicenseExpirationDate < DateTime.Now
+                        var severity = driver.LicenseExpiryDate < DateTime.Now ? "Critical" : "High";
+                        var description = driver.LicenseExpiryDate < DateTime.Now
                             ? "Driver license has expired"
                             : "Driver license expires within 30 days";
 
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Driver",
-                            EntityId = driver.DriverId.ToString(),
+                            EntityId = driver.DriverId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "License Issue",
                             Description = description,
                             Severity = severity
                         });
                     }
 
-                    // Validate contact information
-                    if (string.IsNullOrWhiteSpace(driver.PhoneNumber))
+                    // Validate contact information - Driver model uses DriverPhone
+                    if (string.IsNullOrWhiteSpace(driver.DriverPhone))
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Driver",
-                            EntityId = driver.DriverId.ToString(),
+                            EntityId = driver.DriverId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                             IssueType = "Missing Required Data",
                             Description = "Driver has no phone number",
                             Severity = "High"
+                        });
+                    }
+
+                    // Validate driver name
+                    if (string.IsNullOrWhiteSpace(driver.DriverName))
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Driver",
+                            EntityId = driver.DriverId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Missing Required Data",
+                            Description = "Driver name is required",
+                            Severity = "High"
+                        });
+                    }
+
+                    // Validate driver status
+                    if (string.IsNullOrWhiteSpace(driver.Status))
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Driver",
+                            EntityId = driver.DriverId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Missing Required Data",
+                            Description = "Driver status is required",
+                            Severity = "Medium"
                         });
                     }
                 }
@@ -582,33 +622,46 @@ namespace BusBuddy.WPF.Services
 
             try
             {
-                var vehicles = await _vehicleService.GetAllVehiclesAsync();
+                var vehicles = await _busService.GetAllBusesAsync();
 
                 foreach (var vehicle in vehicles)
                 {
-                    // Validate inspection dates
-                    if (vehicle.LastInspectionDate.HasValue && vehicle.LastInspectionDate < DateTime.Now.AddDays(-365))
+                    // Validate vehicle number/bus number
+                    if (string.IsNullOrWhiteSpace(vehicle.BusNumber))
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Vehicle",
-                            EntityId = vehicle.VehicleId.ToString(),
-                            IssueType = "Compliance Issue",
-                            Description = "Vehicle inspection is overdue (>365 days)",
-                            Severity = "Critical"
+                            EntityId = vehicle.VehicleId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Missing Required Data",
+                            Description = "Bus number is required",
+                            Severity = "High"
                         });
                     }
 
-                    // Validate mileage consistency
-                    if (vehicle.Mileage < 0)
+                    // Validate vehicle status
+                    if (string.IsNullOrWhiteSpace(vehicle.Status))
                     {
                         issues.Add(new DataIntegrityIssue
                         {
                             EntityType = "Vehicle",
-                            EntityId = vehicle.VehicleId.ToString(),
-                            IssueType = "Invalid Data Format",
-                            Description = "Vehicle mileage cannot be negative",
-                            Severity = "High"
+                            EntityId = vehicle.VehicleId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Missing Required Data",
+                            Description = "Vehicle status is required",
+                            Severity = "Medium"
+                        });
+                    }
+
+                    // Validate make and model for better tracking
+                    if (string.IsNullOrWhiteSpace(vehicle.Make) && string.IsNullOrWhiteSpace(vehicle.Model))
+                    {
+                        issues.Add(new DataIntegrityIssue
+                        {
+                            EntityType = "Vehicle",
+                            EntityId = vehicle.VehicleId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            IssueType = "Missing Required Data",
+                            Description = "Vehicle make and model information is missing",
+                            Severity = "Low"
                         });
                     }
                 }
@@ -642,12 +695,12 @@ namespace BusBuddy.WPF.Services
             {
                 var activities = await _activityService.GetAllActivitiesAsync();
                 var drivers = await _driverService.GetAllDriversAsync();
-                var vehicles = await _vehicleService.GetAllVehiclesAsync();
+                var vehicles = await _busService.GetAllBusesAsync();
 
                 // Check for double-booked drivers
                 var driverConflicts = activities
                     .Where(a => a.DriverId.HasValue && a.Status == "Scheduled")
-                    .GroupBy(a => new { a.DriverId, Date = a.StartTime.Date })
+                    .GroupBy(a => new { a.DriverId, Date = a.Date.Date })
                     .Where(g => g.Count() > 1);
 
                 foreach (var conflict in driverConflicts)
@@ -657,14 +710,14 @@ namespace BusBuddy.WPF.Services
                     {
                         var overlaps = conflictingActivities
                             .Where(other => other.ActivityId != activity.ActivityId)
-                            .Any(other => activity.StartTime < other.EndTime && activity.EndTime > other.StartTime);
+                            .Any(other => activity.LeaveTime < other.EventTime && activity.EventTime > other.LeaveTime);
 
                         if (overlaps)
                         {
                             issues.Add(new DataIntegrityIssue
                             {
                                 EntityType = "Activity",
-                                EntityId = activity.ActivityId.ToString(),
+                                EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                 IssueType = "Scheduling Conflict",
                                 Description = $"Driver {conflict.Key.DriverId} has overlapping activities",
                                 Severity = "High"
@@ -675,8 +728,8 @@ namespace BusBuddy.WPF.Services
 
                 // Check for double-booked vehicles
                 var vehicleConflicts = activities
-                    .Where(a => a.VehicleId.HasValue && a.Status == "Scheduled")
-                    .GroupBy(a => new { a.VehicleId, Date = a.StartTime.Date })
+                    .Where(a => a.AssignedVehicleId > 0 && a.Status == "Scheduled")
+                    .GroupBy(a => new { VehicleId = a.AssignedVehicleId, Date = a.Date.Date })
                     .Where(g => g.Count() > 1);
 
                 foreach (var conflict in vehicleConflicts)
@@ -686,14 +739,14 @@ namespace BusBuddy.WPF.Services
                     {
                         var overlaps = conflictingActivities
                             .Where(other => other.ActivityId != activity.ActivityId)
-                            .Any(other => activity.StartTime < other.EndTime && activity.EndTime > other.StartTime);
+                            .Any(other => activity.LeaveTime < other.EventTime && activity.EventTime > other.LeaveTime);
 
                         if (overlaps)
                         {
                             issues.Add(new DataIntegrityIssue
                             {
                                 EntityType = "Activity",
-                                EntityId = activity.ActivityId.ToString(),
+                                EntityId = activity.ActivityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                 IssueType = "Scheduling Conflict",
                                 Description = $"Vehicle {conflict.Key.VehicleId} has overlapping activities",
                                 Severity = "High"
@@ -733,27 +786,27 @@ namespace BusBuddy.WPF.Services
                 {
                     case "route":
                         var routeIssues = await ValidateRoutesAsync();
-                        issues.AddRange(routeIssues.Where(i => i.EntityId == entityId.ToString()));
+                        issues.AddRange(routeIssues.Where(i => i.EntityId == entityId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                         break;
 
                     case "activity":
                         var activityIssues = await ValidateActivitiesAsync();
-                        issues.AddRange(activityIssues.Where(i => i.EntityId == entityId.ToString()));
+                        issues.AddRange(activityIssues.Where(i => i.EntityId == entityId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                         break;
 
                     case "student":
                         var studentIssues = await ValidateStudentsAsync();
-                        issues.AddRange(studentIssues.Where(i => i.EntityId == entityId.ToString()));
+                        issues.AddRange(studentIssues.Where(i => i.EntityId == entityId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                         break;
 
                     case "driver":
                         var driverIssues = await ValidateDriversAsync();
-                        issues.AddRange(driverIssues.Where(i => i.EntityId == entityId.ToString()));
+                        issues.AddRange(driverIssues.Where(i => i.EntityId == entityId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                         break;
 
                     case "vehicle":
                         var vehicleIssues = await ValidateVehiclesAsync();
-                        issues.AddRange(vehicleIssues.Where(i => i.EntityId == entityId.ToString()));
+                        issues.AddRange(vehicleIssues.Where(i => i.EntityId == entityId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
                         break;
 
                     default:
@@ -777,7 +830,7 @@ namespace BusBuddy.WPF.Services
                 issues.Add(new DataIntegrityIssue
                 {
                     EntityType = entityType,
-                    EntityId = entityId.ToString(),
+                    EntityId = entityId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                     IssueType = "Validation Error",
                     Description = $"Entity validation failed: {ex.Message}",
                     Severity = "Critical"

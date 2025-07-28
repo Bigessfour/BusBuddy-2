@@ -325,7 +325,7 @@ namespace BusBuddy.Core.Services
                         schedules.Count(), stopwatch.ElapsedMilliseconds);
 
                     // Log category breakdown for diagnostics
-                    if (schedules.Any())
+                    if (schedules.Count > 0)
                     {
                         var categoryBreakdown = schedules.GroupBy(s => s.SportsCategory ?? "None")
                             .ToDictionary(g => g.Key, g => g.Count());

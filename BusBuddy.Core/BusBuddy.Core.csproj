@@ -40,7 +40,7 @@
 
     <!-- Resilience and HTTP -->
     <PackageReference Include="Polly" Version="8.4.1" />
-    <PackageReference Include="System.Net.Http.Json" Version="9.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.7" />
 
     <!-- Azure Authentication (Optional for Azure SQL Managed Identity) -->
     <PackageReference Include="Azure.Identity" Version="1.13.0" />

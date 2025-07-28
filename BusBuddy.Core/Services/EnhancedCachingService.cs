@@ -115,7 +115,7 @@ namespace BusBuddy.Core.Services
         {
             Debug.WriteLine($"[DEBUG] EnhancedCachingService.SetDashboardMetricsDirectly: Called with {metrics?.Count ?? 0} metrics");
 
-            if (metrics == null || !metrics.Any())
+            if (metrics == null || metrics.Count == 0)
             {
                 Logger.Warning("Attempted to cache empty dashboard metrics");
                 Debug.WriteLine($"[DEBUG] EnhancedCachingService: Attempted to cache empty metrics, skipping");

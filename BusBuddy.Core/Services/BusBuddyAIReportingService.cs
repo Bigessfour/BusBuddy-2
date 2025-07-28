@@ -29,6 +29,12 @@ namespace BusBuddy.Core.Services
             ContextAwarePromptBuilder promptBuilder,
             IConfiguration configuration)
         {
+            ArgumentNullException.ThrowIfNull(httpClient);
+            ArgumentNullException.ThrowIfNull(cache);
+            ArgumentNullException.ThrowIfNull(transportationContext);
+            ArgumentNullException.ThrowIfNull(promptBuilder);
+            ArgumentNullException.ThrowIfNull(configuration);
+
             _httpClient = httpClient;
             _cache = cache;
             _transportationContext = transportationContext;
@@ -41,6 +47,8 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<AIReportResponse> GenerateReportAsync(string reportType, string? location = null, Dictionary<string, object>? parameters = null)
         {
+            ArgumentNullException.ThrowIfNull(reportType);
+
             var startTime = DateTime.UtcNow;
             var operationId = Guid.NewGuid().ToString();
 
@@ -330,7 +338,9 @@ Please provide a comprehensive analysis with specific recommendations and action
         private string BuildParametersSection(Dictionary<string, object> parameters)
         {
             if (parameters == null || parameters.Count == 0)
+            {
                 return "";
+            }
 
             var parameterLines = new List<string>();
             foreach (var param in parameters)

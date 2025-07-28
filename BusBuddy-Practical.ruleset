@@ -1,48 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="BusBuddy Practical Rules" Description="Practical code analysis rules for BusBuddy with Syncfusion WPF 30.1.40 and .NET 9.0" ToolsVersion="17.0">
+<RuleSet Name="BusBuddy Practical Rules" Description="Practical code analysis rules for BusBuddy with reduced noise" ToolsVersion="17.0">
   <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
-    <!-- C# 12/.NET 9.0 Feature Support -->
-    <Rule Id="CS8600" Action="Warning" />   <!-- Null reference assignment -->
-    <Rule Id="CS8601" Action="Warning" />   <!-- Possible null reference assignment -->
-    <Rule Id="CS8602" Action="Warning" />   <!-- Dereference of null reference -->
-    <Rule Id="CS8618" Action="Warning" />   <!-- Non-nullable property uninitialized -->
+    <!-- Keep CA1062 as Error - Null parameter validation is critical -->
+    <Rule Id="CA1062" Action="Error" />
 
-    <!-- Syncfusion WPF 30.1.40 Compatibility -->
-    <Rule Id="CA1416" Action="None" />      <!-- Platform compatibility (WPF-specific) -->
-    <Rule Id="CS0108" Action="None" />      <!-- Member hides inherited member (common in MVVM) -->
+    <!-- Reduce noise - downgrade to Info/Warning -->
+    <Rule Id="CA2007" Action="Info" />      <!-- ConfigureAwait review, not enforce -->
+    <Rule Id="CA1822" Action="Warning" />   <!-- Static member suggestions -->
 
-    <!-- PowerShell 7.5.2 Integration -->
-    <Rule Id="CS1591" Action="None" />      <!-- Missing XML documentation -->
-    <Rule Id="CA1031" Action="None" />      <!-- Do not catch general exception types -->
-  </Rules>
+    <!-- Additional noise reduction -->
+    <Rule Id="CA1305" Action="Info" />      <!-- Specify IFormatProvider -->
+    <Rule Id="CA1860" Action="Info" />      <!-- Avoid using 'Enumerable.Any()' extension method -->
+    <Rule Id="CA1848" Action="Info" />      <!-- Use LoggerMessage delegates -->
+    <Rule Id="CA1851" Action="Info" />      <!-- Possible multiple enumerations -->
 
-  <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
-    <!-- Platform and Framework Rules -->
-    <Rule Id="CA1416" Action="None" />      <!-- Platform-specific API -->
-    <Rule Id="CA1822" Action="Info" />      <!-- Mark members as static -->
-
-    <!-- Globalization and Culture Rules - PRIORITY -->
-    <Rule Id="CA1304" Action="Warning" />   <!-- Specify CultureInfo (ToLower/ToUpper) -->
-    <Rule Id="CA1305" Action="Warning" />   <!-- Specify IFormatProvider (ToString/AppendLine) -->
-    <Rule Id="CA1310" Action="Warning" />   <!-- Specify StringComparison (StartsWith/EndsWith) -->
-    <Rule Id="CA1311" Action="Warning" />   <!-- Specify a culture or use invariant version -->
-
-    <!-- Performance and Best Practices -->
-    <Rule Id="CA1845" Action="Info" />      <!-- Use span-based string operations -->
-    <Rule Id="CA1847" Action="Info" />      <!-- Use char instead of string for single character -->
-    <Rule Id="CA1850" Action="Info" />      <!-- Prefer static methods over instance methods -->
-    <Rule Id="CA1854" Action="Info" />      <!-- Prefer TryGetValue over ContainsKey -->
-    <Rule Id="CA1860" Action="Info" />      <!-- Prefer Count comparison over Any() -->
-    <Rule Id="CA1861" Action="Info" />      <!-- Prefer static readonly fields over constant arrays -->
-    <Rule Id="CA1869" Action="Info" />      <!-- Cache and reuse JsonSerializerOptions -->
-
-    <!-- Exception and Error Handling -->
-    <Rule Id="CA1510" Action="Info" />      <!-- Use ArgumentNullException.ThrowIfNull -->
-    <Rule Id="CA1816" Action="Warning" />   <!-- Call GC.SuppressFinalize correctly -->
-    <Rule Id="CA2201" Action="Warning" />   <!-- Do not raise reserved exception types -->
-
-    <!-- Development-Friendly Relaxations -->
-    <Rule Id="CA1031" Action="None" />      <!-- Do not catch general exception types (relaxed for development) -->
-    <Rule Id="CA1062" Action="None" />      <!-- Validate arguments of public methods (too strict for development) -->
+    <!-- Keep important rules as errors -->
+    <Rule Id="CA1031" Action="Warning" />   <!-- Do not catch general exception types -->
+    <Rule Id="CA2000" Action="Warning" />   <!-- Dispose objects before losing scope -->
+    <Rule Id="CA2201" Action="Error" />     <!-- Do not raise reserved exception types -->
+    <Rule Id="CA2245" Action="Error" />     <!-- Do not assign a property to itself -->
   </Rules>
 </RuleSet>

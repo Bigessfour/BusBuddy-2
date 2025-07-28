@@ -226,20 +226,18 @@ public class ModelValidationTests
         {
             StudentId = 1,
             StudentNumber = "12345",
-            FirstName = "John",
-            LastName = "Doe",
-            GradeLevel = 8,
-            ParentPhone = "(555) 123-4567",
-            EmergencyContact = "(555) 987-6543"
+            StudentName = "John Doe",
+            Grade = "8",
+            EmergencyPhone = "(555) 123-4567",
+            ParentGuardian = "Jane Doe"
         };
 
         // Act & Assert
         student.StudentId.Should().BePositive("StudentId should be positive");
         student.StudentNumber.Should().NotBeNullOrEmpty("StudentNumber is required");
-        student.FirstName.Should().NotBeNullOrEmpty("FirstName is required");
-        student.LastName.Should().NotBeNullOrEmpty("LastName is required");
-        student.GradeLevel.Should().BeInRange(1, 12, "GradeLevel should be valid");
-        student.ParentPhone.Should().NotBeNullOrEmpty("ParentPhone is required for safety");
+        student.StudentName.Should().NotBeNullOrEmpty("StudentName is required");
+        student.Grade.Should().NotBeNullOrEmpty("Grade is required");
+        student.EmergencyPhone.Should().NotBeNullOrEmpty("EmergencyPhone is required for safety");
     }
 
     [Test]

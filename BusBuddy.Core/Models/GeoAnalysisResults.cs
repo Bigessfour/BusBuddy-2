@@ -8,18 +8,4 @@ namespace BusBuddy.Core.Models
         public string TerrainType { get; set; } = string.Empty;
         public string RouteDifficulty { get; set; } = string.Empty;
     }
-
-    public class WeatherData
-    {
-        public string Condition { get; set; } = string.Empty;
-        public double Temperature { get; set; }
-        public double Visibility { get; set; }
-        public string WindCondition { get; set; } = string.Empty;
-    }
-
-    public class TrafficData
-    {
-        public string OverallCondition { get; set; } = string.Empty;
-        public Dictionary<string, string> RouteConditions { get; set; } = new();
-    }
 }

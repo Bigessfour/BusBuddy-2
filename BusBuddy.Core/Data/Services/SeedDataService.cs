@@ -259,7 +259,7 @@ namespace BusBuddy.Core.Data.Services
 
         #region Seed Data Creation Methods
 
-        private List<Driver> CreateSeedDrivers()
+        private static List<Driver> CreateSeedDrivers()
         {
             var seedDate = DateTime.UtcNow.Date;
 
@@ -278,7 +278,7 @@ namespace BusBuddy.Core.Data.Services
             };
         }
 
-        private List<Vehicle> CreateSeedVehicles()
+        private static List<Vehicle> CreateSeedVehicles()
         {
             return new List<Vehicle>
             {
@@ -295,7 +295,7 @@ namespace BusBuddy.Core.Data.Services
             };
         }
 
-        private List<Activity> CreateSeedActivities()
+        private static List<Activity> CreateSeedActivities()
         {
             var baseDate = DateTime.UtcNow.Date.AddDays(1);
             var seedDate = DateTime.UtcNow.Date;

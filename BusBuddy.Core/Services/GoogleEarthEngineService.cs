@@ -3,6 +3,7 @@ using Serilog;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace BusBuddy.Core.Services
 {
@@ -47,6 +48,7 @@ namespace BusBuddy.Core.Services
             else
             {
                 Logger.Information($"Google Earth Engine configured for project: {_projectId}");
+                Logger.Information($"Google Earth Engine configured for project: {_projectId}");
             }
         }
 
@@ -55,7 +57,6 @@ namespace BusBuddy.Core.Services
         /// <summary>
         /// Retrieves GeoJSON route data from Google Earth Engine for a given region or asset using the official export workflow.
         /// </summary>
-
         public async Task<string> GetRouteGeoJsonAsync(string assetIdOrRegion)
         {
             if (!_isConfigured)
@@ -67,7 +68,9 @@ namespace BusBuddy.Core.Services
             // 1. Authenticate and get access token (service account or OAuth2)
             string accessToken = await GetGoogleAccessTokenAsync();
             if (string.IsNullOrEmpty(accessToken))
+            {
                 throw new InvalidOperationException("Failed to obtain Google access token.");
+            }
 
             // 2. Start export task to Google Drive (exportTable)
             using var httpClient = new HttpClient();
@@ -85,9 +88,12 @@ namespace BusBuddy.Core.Services
             var exportResultJson = await exportResponse.Content.ReadAsStringAsync();
 
             // Parse exportResult to get the task name (ID)
-            var exportResult = System.Text.Json.JsonDocument.Parse(exportResultJson);
+            using var exportResult = JsonDocument.Parse(exportResultJson);
             if (!exportResult.RootElement.TryGetProperty("name", out var taskNameElement))
+            {
                 throw new InvalidOperationException("Export response missing task name.");
+            }
+
             string taskName = taskNameElement.GetString() ?? throw new InvalidOperationException("Task name is null.");
 
             // 3. Poll for export task completion
@@ -108,14 +114,17 @@ namespace BusBuddy.Core.Services
             // 5. Clean up: Delete file from Drive after download
             bool deleted = await TryDeleteDriveFileAsync(driveFileId, accessToken);
             if (!deleted)
+            {
                 Logger.Warning("Failed to delete exported file from Drive: {FileId}", driveFileId);
+            }
 
             return geoJson;
         }
+
         /// <summary>
         /// Polls the GEE export task until completion and returns the resulting Drive file ID.
         /// </summary>
-        private async Task<string> PollForExportAndGetDriveFileIdAsync(string taskName, string accessToken, int maxAttempts, int initialDelayMs)
+        private static async Task<string> PollForExportAndGetDriveFileIdAsync(string taskName, string accessToken, int maxAttempts, int initialDelayMs)
         {
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -139,7 +148,7 @@ namespace BusBuddy.Core.Services
                         statusResponse.EnsureSuccessStatusCode();
                     }
                     var statusJson = await statusResponse.Content.ReadAsStringAsync();
-                    var statusDoc = System.Text.Json.JsonDocument.Parse(statusJson);
+                    var statusDoc = JsonDocument.Parse(statusJson);
                     if (statusDoc.RootElement.TryGetProperty("state", out var stateElem))
                     {
                         string state = stateElem.GetString() ?? "";
@@ -174,7 +183,7 @@ namespace BusBuddy.Core.Services
         /// <summary>
         /// Attempts to delete a file from Google Drive after download to avoid clutter/quota issues.
         /// </summary>
-        private async Task<bool> TryDeleteDriveFileAsync(string fileId, string accessToken)
+        private static async Task<bool> TryDeleteDriveFileAsync(string fileId, string accessToken)
         {
             try
             {
@@ -183,7 +192,10 @@ namespace BusBuddy.Core.Services
                 var deleteUrl = $"https://www.googleapis.com/drive/v3/files/{fileId}";
                 var response = await httpClient.DeleteAsync(deleteUrl);
                 if (response.IsSuccessStatusCode)
+                {
                     return true;
+                }
+
                 Logger.Warning("Drive file delete returned status {StatusCode} for file {FileId}", response.StatusCode, fileId);
                 return false;
             }
@@ -197,7 +209,7 @@ namespace BusBuddy.Core.Services
         /// <summary>
         /// Downloads the exported GeoJSON file from Google Drive using the Drive API.
         /// </summary>
-        private async Task<string> DownloadGeoJsonFromDriveAsync(string fileId, string accessToken)
+        private static async Task<string> DownloadGeoJsonFromDriveAsync(string fileId, string accessToken)
         {
             try
             {

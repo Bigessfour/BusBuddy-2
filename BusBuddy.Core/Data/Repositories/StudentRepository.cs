@@ -526,12 +526,12 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public int GetStudentCountByRoute(int routeId) => _context.Students.Count(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
 
     // IRepository<Student> implementation
-    public async Task<IEnumerable<Student>> GetAllAsync() => await GetAllAsync(false);
-    public async Task<Student?> GetByIdAsync(object id) => await GetByIdAsync((int)id, false);
-    public async Task<Student> AddAsync(Student entity) => await CreateAsync(entity);
+    public override async Task<IEnumerable<Student>> GetAllAsync() => await GetAllAsync(false);
+    public override async Task<Student?> GetByIdAsync(object id) => await GetByIdAsync((int)id, false);
+    public override async Task<Student> AddAsync(Student entity) => await CreateAsync(entity);
     public async Task<bool> DeleteAsync(object id) => await DeleteAsync((int)id);
     public async Task<bool> ExistsAsync(object id) => await _context.Students.AnyAsync(s => s.StudentId == (int)id);
-    public IQueryable<Student> Query() => _context.Students.AsQueryable();
-    public async Task<int> CountAsync() => await _context.Students.CountAsync();
+    public override IQueryable<Student> Query() => _context.Students.AsQueryable();
+    public override async Task<int> CountAsync() => await _context.Students.CountAsync();
     public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
 }
