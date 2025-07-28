@@ -722,6 +722,9 @@ grok-*.ps1
 AI-*.md
 XAI-*.md
 
+# Exception: Allow Grok repository access guide (no secrets)
+!GROK-REPOSITORY-ACCESS.md
+
 # Configuration files with secrets
 config.json
 local.settings.json

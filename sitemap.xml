@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- BusBuddy Repository Sitemap for AI/Bot Access -->
+    
+    <!-- Main Repository -->
+    <url>
+        <loc>https://github.com/Bigessfour/BusBuddy-2</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>1.0</priority>
+    </url>
+    
+    <!-- Key Documentation -->
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/README.md</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- Core Models -->
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.Core/Models/Driver.cs</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.Core/Models/Vehicle.cs</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.Core/Models/Route.cs</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.Core/Models/Activity.cs</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- AI Integration -->
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.Core/Models/AI/XAIModels.cs</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.9</priority>
+    </url>
+    
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.Core/Services/XAIService.cs</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.9</priority>
+    </url>
+    
+    <!-- Main Application -->
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.WPF/App.xaml.cs</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Configuration -->
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/BusBuddy.sln</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/Directory.Build.props</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.7</priority>
+    </url>
+    
+    <!-- API Access Points -->
+    <url>
+        <loc>https://api.github.com/repos/Bigessfour/BusBuddy-2</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.6</priority>
+    </url>
+    
+    <url>
+        <loc>https://api.github.com/repos/Bigessfour/BusBuddy-2/contents</loc>
+        <lastmod>2025-07-28</lastmod>
+        <priority>0.6</priority>
+    </url>
+</urlset>
