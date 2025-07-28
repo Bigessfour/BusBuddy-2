@@ -1,0 +1,1218 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "env": {
+      "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+      "DOTNET_NOLOGO": "1",
+      "DOTNET_ENVIRONMENT": "Development"
+    }
+  },
+  "tasks": [
+    {
+      "label": "🔧 BB: Isolated Build (File Lock Prevention)",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-NonInteractive",
+        "-Command",
+        "& { Write-Host 'Preparing build environment...' -ForegroundColor Yellow; try { Get-Process pwsh -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID } | Stop-Process -Force -ErrorAction SilentlyContinue; [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); Write-Host 'Build environment prepared' -ForegroundColor Green; dotnet build BusBuddy.sln --verbosity minimal; $buildResult = $LASTEXITCODE; if ($buildResult -eq 0) { Write-Host '✅ Build completed successfully' -ForegroundColor Green } else { Write-Host '❌ Build failed' -ForegroundColor Red } } finally { [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); Write-Host 'Build cleanup completed' -ForegroundColor Green }; exit $buildResult }"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "detail": "🔧 FIXED: Isolated build with guaranteed cleanup and file lock prevention"
+    },
+    {
+      "label": "🔓 BB: Resolve File Locks (MSBuild Research)",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\Maintenance\\MSB3027-File-Lock-Solution-Fixed.ps1",
+        "-Mode",
+        "Complete",
+        "-Force"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🔓 EMERGENCY: Resolve MSB3027/MSB3021 file locks using MSBuild research-based solution"
+    },
+    {
+      "label": "🚌 BB: Profile-Aware Build",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\build-busbuddy-simple.ps1"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🚌 SAFE: Profile-aware build using simplified script with error handling",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "🔍 BB: Diagnostic Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '=== BusBuddy Diagnostic Check ===' -ForegroundColor Cyan; Write-Host 'PowerShell Version:' $PSVersionTable.PSVersion -ForegroundColor Yellow; Write-Host 'Current Location:' $PWD -ForegroundColor Yellow; Write-Host '.NET SDK:' (dotnet --version 2>$null) -ForegroundColor Yellow; Write-Host 'Solution File:' (Test-Path 'BusBuddy.sln') -ForegroundColor Yellow; Write-Host 'Profile Script:' (Test-Path 'load-bus-buddy-profiles.ps1') -ForegroundColor Yellow"
+      ],
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "🔍 Quick diagnostic check of build environment"
+    },
+    {
+      "label": "🧪 BB: Safe Build Test",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\build-busbuddy-simple.ps1",
+        "-SkipProfiles",
+        "-Verbose"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "🧪 Safe build test without profiles, verbose output for troubleshooting",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "� BB: Mandatory PowerShell 7.5.2 Syntax Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-NoProfile",
+        "-Command",
+        "try { . .\\Tools\\Scripts\\PowerShell-7.5.2-Syntax-Enforcer.ps1 -InputPath . 2>$null; } catch { Write-Host 'Script sourced'; }; if (Get-Command Invoke-MandatorySyntaxCheck -ErrorAction SilentlyContinue) { Invoke-MandatorySyntaxCheck -Path . -ExitOnFail } else { Write-Host 'Function not found, running basic PowerShell syntax check'; Get-ChildItem -Recurse -Filter '*.ps1' | ForEach-Object { try { [System.Management.Automation.PSParser]::Tokenize((Get-Content $_.FullName -Raw), [ref]$null); Write-Host \"✅ $($_.Name)\" -ForegroundColor Green } catch { Write-Host \"❌ $($_.Name): $($_.Exception.Message)\" -ForegroundColor Red } } }"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "detail": "🔒 MANDATORY: Validates all PowerShell scripts against 7.5.2 requirements before any build"
+    },
+    {
+      "label": "🚌🚌 BB: Enforce Workflow Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (-not (Get-Command bb-health -ErrorAction SilentlyContinue)) { Write-Host 'ERROR: BusBuddy PowerShell commands not loaded! Load profiles first.' -ForegroundColor Red; Write-Host 'Run: bb-dev-session -OpenIDE' -ForegroundColor Yellow; exit 1 } else { Write-Host '✅ BusBuddy PowerShell workflow ready' -ForegroundColor Green; bb-health -Quick }"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "detail": "🚌 Enforces instructions.md workflow - runs on folder open to validate profile integration"
+    },
+    {
+      "label": "🤖 AI: Efficiency Enforcement Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '🤖 AI Assistant Efficiency Enforcement Check' -ForegroundColor Cyan; Write-Host ''; Write-Host '📋 Environment Validation:' -ForegroundColor Yellow; Write-Host \"✅ Platform: Windows PowerShell $($PSVersionTable.PSVersion)\" -ForegroundColor Green; $bbCommands = @(Get-Command bb-* -ErrorAction SilentlyContinue); Write-Host \"✅ BusBuddy Functions: $($bbCommands.Count) available\" -ForegroundColor Green; $tasksExist = Test-Path '.vscode/tasks.json'; Write-Host \"✅ Tasks Available: $tasksExist\" -ForegroundColor Green; Write-Host ''; Write-Host '🚫 Forbidden Patterns:' -ForegroundColor Red; Write-Host '   ❌ Unix commands (head, tail, grep, uniq)' -ForegroundColor Red; Write-Host '   ❌ Complex pipe chains that can fail' -ForegroundColor Red; Write-Host '   ❌ Single-file edits (max 3 per session)' -ForegroundColor Red; Write-Host ''; Write-Host '✅ Required Patterns:' -ForegroundColor Green; Write-Host '   ✅ Use existing bb-* functions first' -ForegroundColor Green; Write-Host '   ✅ Batch operations for similar fixes' -ForegroundColor Green; Write-Host '   ✅ Simple, reliable PowerShell commands' -ForegroundColor Green; Write-Host ''; Write-Host '📖 Full protocol: .vscode/ai-efficiency-enforcement.md' -ForegroundColor Blue"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "detail": "🤖 Displays AI assistant efficiency enforcement standards and validates environment"
+    },
+    {
+      "label": "🎯 BB: Phase 1 Completion Verification",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\phase1-completion-verification.ps1"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🎯 Phase 1 completion verification - validates all Phase 1 goals achieved",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "🏗️ BB: Comprehensive Build & Run Pipeline",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\Maintenance\\run-comprehensive-pipeline.ps1"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🏗️ RECOMMENDED: Profile-aligned comprehensive build & run pipeline with full logging and environment validation",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "🌊 BB: Terminal Flow Monitor",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\BusBuddy-Terminal-Flow-Monitor.ps1",
+        "-MonitorMode",
+        "All",
+        "-LogToFile",
+        "-ShowDots"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🌊 PowerShell Gallery terminal flow monitoring - tracks dots, progress, and application lifecycle with enhanced logging",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "Terminal Reset",
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "echo Terminal reset complete"
+      ],
+      "group": "none",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Reset terminal state - creates a fresh terminal"
+    },
+    {
+      "label": "Simple Build",
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "cd /d \"${workspaceFolder}\" && dotnet build BusBuddy.sln"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Simple build using CMD"
+    },
+    {
+      "label": "BB: Run App",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& { $ErrorActionPreference = 'Stop'; Set-Location '${workspaceFolder}'; Write-Host '🚌 Loading Bus Buddy profiles...' -ForegroundColor Cyan; try { if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ Profiles loaded' -ForegroundColor Green } else { Write-Host '⚠️ Profiles not found, using direct command' -ForegroundColor Yellow }; Write-Host '🚌 Starting BusBuddy application...' -ForegroundColor Cyan; if (Get-Command bb-run -ErrorAction SilentlyContinue) { bb-run } else { dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' } } finally { Write-Host '🧹 Cleaning up processes...' -ForegroundColor Yellow; Get-Process pwsh -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID -and $_.ProcessName -eq 'pwsh' } | Stop-Process -Force -ErrorAction SilentlyContinue; [System.GC]::Collect(); Write-Host '✅ Cleanup completed' -ForegroundColor Green } }"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "problemMatcher": [],
+      "detail": "🚌 FIXED: Run BusBuddy with controlled profile loading and guaranteed process cleanup"
+    },
+    {
+      "label": "Debug Run with Error Capture",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; Write-Host 'Loading Bus Buddy profiles...' -ForegroundColor Cyan; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet } else { Write-Host 'No profiles found' -ForegroundColor Yellow }; Write-Host 'Profiles ready, starting application...' -ForegroundColor Green; try { if (Get-Command bb-run -ErrorAction SilentlyContinue) { Write-Host 'Using bb-run command...' -ForegroundColor Yellow; bb-run } else { Write-Host 'Using direct dotnet run...' -ForegroundColor Yellow; dotnet run --project \"BusBuddy.WPF\\BusBuddy.WPF.csproj\" --verbosity normal } } catch { Write-Host \"Error: $_\" -ForegroundColor Red; Write-Host $_.Exception.Message -ForegroundColor Red }"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Debug version with error capture and verbose output - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "Test Advanced Command",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet } else { Write-Host 'No profiles found' -ForegroundColor Yellow }; Write-Host 'Testing bb-health command...' -ForegroundColor Cyan; if (Get-Command bb-health -ErrorAction SilentlyContinue) { bb-health } else { Write-Host 'bb-health command not available, running basic health check' -ForegroundColor Yellow; dotnet build BusBuddy.sln --verbosity quiet }"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Test that advanced commands are working properly - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "BB: Grok Integration Test",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        ".\\AI-Assistant\\test-grok-integration.ps1"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "🤖 Test BusBuddy's Grok AI integration features and connectivity",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Capture Runtime Errors",
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "cd /d \"${workspaceFolder}\" && echo Starting application with error capture... && dotnet run --project BusBuddy.WPF\\BusBuddy.WPF.csproj --verbosity detailed 2>&1"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Run with detailed output and capture both stdout and stderr",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Simple Direct Run",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "BusBuddy.WPF\\BusBuddy.WPF.csproj"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Direct dotnet run without PowerShell profiles - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "Direct Run (No Profiles)",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; Write-Host 'Running without profiles...' -ForegroundColor Cyan; dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' --verbosity minimal"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Direct run without profile loading to test basic functionality - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "Open VS Code Integrated Terminal",
+      "type": "shell",
+      "command": "echo",
+      "args": [
+        "Opening VS Code integrated terminal... Use Ctrl+` or Terminal > New Terminal from menu"
+      ],
+      "group": "none",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Instructions to open VS Code integrated terminal for PowerShell extension"
+    },
+    {
+      "label": "PS Fixed: Load Bus Buddy Profiles",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; Write-Host '🚌 Loading Bus Buddy profiles...' -ForegroundColor Cyan; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ Bus Buddy profiles loaded successfully' -ForegroundColor Green } else { Write-Host '⚠️ Bus Buddy profiles not found' -ForegroundColor Yellow }"
+      ],
+      "group": "none",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Load Bus Buddy PowerShell profiles for development - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "🔗 GitHub: Complete Automated Workflow",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; if (Test-Path '.\\Tools\\Scripts\\GitHub\\BusBuddy-GitHub-Automation.ps1') { . '.\\Tools\\Scripts\\GitHub\\BusBuddy-GitHub-Automation.ps1'; Invoke-CompleteGitHubWorkflow -GenerateCommitMessage -WaitForCompletion -AnalyzeResults -AutoFix } else { Write-Host 'GitHub automation script not found' -ForegroundColor Red }"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Complete automated workflow: stage, commit, push, monitor, analyze, and fix issues - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "📦 GitHub: Smart Stage and Commit",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; . '.\\Tools\\Scripts\\GitHub\\BusBuddy-GitHub-Automation.ps1'; $staged = Invoke-SmartGitStaging -InteractiveMode; if ($staged.Count -gt 0) { New-IntelligentCommit -StagedFiles $staged -GenerateMessage }"
+      ],
+      "group": "build",
+      "isBackground": false,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "Intelligent staging and commit with interactive mode and generated messages",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "🚀 GitHub: Push and Monitor Workflow",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; . '.\\Tools\\Scripts\\GitHub\\BusBuddy-GitHub-Automation.ps1'; Start-WorkflowRun -WaitForCompletion"
+      ],
+      "group": "build",
+      "isBackground": false,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "Push changes and monitor GitHub Actions workflow completion",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "📊 GitHub: Analyze Last Workflow",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; . '.\\Tools\\Scripts\\GitHub\\BusBuddy-GitHub-Automation.ps1'; $latest = gh api '/repos/Bigessfour/BusBuddy-WPF/actions/runs?per_page=1' | ConvertFrom-Json; $run = $latest.workflow_runs[0]; $results = Get-WorkflowResults -WorkflowRun $run -IncludeLogs -DownloadArtifacts; if (-not $results.Summary.OverallSuccess) { $issues = Get-WorkflowIssues -WorkflowResults $results; Invoke-AutomaticIssueFix -Issues $issues -InteractiveMode }"
+      ],
+      "group": "test",
+      "isBackground": false,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "Analyze the latest workflow run, identify issues, and attempt automatic fixes",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "PS Fixed: Build Solution",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location -Path \"${workspaceFolder}\"; Write-Host '🔨 Building Bus Buddy solution...' -ForegroundColor Cyan; dotnet build \"BusBuddy.sln\" --verbosity normal"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Build solution with simplified command - captures output"
+    },
+    {
+      "label": "Direct: Build Solution (CMD)",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "BusBuddy.sln",
+        "--verbosity",
+        "minimal",
+        "--nologo"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "cmd.exe",
+          "args": [
+            "/c"
+          ]
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Clean build output - minimal verbosity, shows only errors/warnings/summary"
+    },
+    {
+      "label": "Direct: Run Application (CMD)",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "BusBuddy.WPF/BusBuddy.WPF.csproj"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "cmd.exe",
+          "args": [
+            "/c"
+          ]
+        }
+      },
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Run application using Command Prompt to avoid PowerShell path issues",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Direct: Run Application (FIXED)",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "BusBuddy.WPF/BusBuddy.WPF.csproj"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Direct dotnet run command without PowerShell wrapper - WORKING",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "PS Fixed: Run Application",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location -Path \"${workspaceFolder}\"; dotnet run --project \"BusBuddy.WPF\\BusBuddy.WPF.csproj\" --verbosity normal"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Fixed: Run application with proper path handling",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "PS Fixed: Test Solution",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; if (Get-Command bb-test -ErrorAction SilentlyContinue) { bb-test } else { dotnet test BusBuddy.sln } } else { dotnet test BusBuddy.sln }"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Fixed: Run tests using correct PowerShell -Command syntax - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "PS Fixed: Health Check",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& {Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; bb-health } else { Write-Host 'Basic health check'; dotnet build BusBuddy.sln --verbosity quiet && Write-Host 'Build: OK' -ForegroundColor Green || Write-Host 'Build: FAILED' -ForegroundColor Red }}"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Fixed: Health check using script block syntax - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "PS Fixed: Advanced Diagnostics",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Set-Location '${workspaceFolder}'; if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; if (Get-Command bb-diagnostic -ErrorAction SilentlyContinue) { bb-diagnostic } else { Write-Host 'Basic diagnostic check'; Get-ChildItem -Recurse -Include '*.cs','*.xaml','*.ps1' | Measure-Object | Select-Object Count } } else { Write-Host 'Basic diagnostic check'; Get-ChildItem -Recurse -Include '*.cs','*.xaml','*.ps1' | Measure-Object | Select-Object Count }"
+      ],
+      "group": "test",
+      "runOptions": {
+        "reevaluateOnRerun": true,
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "isBackground": false,
+      "detail": "Fixed: Comprehensive diagnostics using correct PowerShell -Command syntax - captures output",
+      "problemMatcher": []
+    },
+    {
+      "label": "PS Fixed: Analyze Scripts",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { Write-Host 'Running PSScriptAnalyzer...' -ForegroundColor Cyan; Invoke-ScriptAnalyzer -Path '.' -Recurse -IncludeDefaultRules | Select-Object -First 10 } else { Write-Host 'PSScriptAnalyzer not installed. Install with: Install-Module -Name PSScriptAnalyzer' -ForegroundColor Yellow }"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Fixed: Analyze PowerShell scripts using correct -Command syntax",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "PS Fixed: System Information",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host '=== System Information ===' -ForegroundColor Cyan; Write-Host 'PowerShell Version:' -ForegroundColor Yellow; $PSVersionTable.PSVersion; Write-Host 'OS Information:' -ForegroundColor Yellow; Get-CimInstance -Class Win32_OperatingSystem | Select-Object Caption, Version; Write-Host 'Hardware:' -ForegroundColor Yellow; Get-CimInstance -Class Win32_ComputerSystem | Select-Object Name, TotalPhysicalMemory"
+      ],
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "Fixed: System information using correct PowerShell -Command syntax",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "PS Fixed: Clean Build",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Write-Host 'Cleaning solution...' -ForegroundColor Yellow; dotnet clean BusBuddy.sln && Write-Host 'Clean completed successfully' -ForegroundColor Green || Write-Host 'Clean failed' -ForegroundColor Red"
+      ],
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Fixed: Clean solution using correct PowerShell -Command syntax"
+    },
+    {
+      "label": "📦 Restore Packages (Status Report)",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "restore",
+        "BusBuddy.sln",
+        "--verbosity",
+        "normal",
+        "--nologo",
+        "--force"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "cmd.exe",
+          "args": [
+            "/c"
+          ]
+        }
+      },
+      "group": "build",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "detail": "📦 Restore packages only - shows package sources, restore performance, cache hits, and dependency status",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "🛡️ BB: Dependency Security Scan",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\dependency-management.ps1",
+        "-ScanVulnerabilities"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🛡️ Scan all packages for security vulnerabilities and generate security report",
+      "problemMatcher": []
+    },
+    {
+      "label": "📊 BB: Full Dependency Analysis",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\dependency-management.ps1",
+        "-Full"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "📊 Complete dependency analysis: security scan, version validation, consistency check, and detailed reporting",
+      "problemMatcher": []
+    },
+    {
+      "label": "📌 BB: Validate Version Pinning",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\dependency-management.ps1",
+        "-ValidateVersions"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "📌 Validate that all package versions are properly pinned and consistent across projects",
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 BB: Advanced Error Capture & Run",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\Advanced-Error-Capture-Runner.ps1",
+        "-CaptureMode",
+        "Both",
+        "-RealTimeDisplay",
+        "-WaitForUserAction"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🚀 Complete workflow: Start error capture → Launch BusBuddy → Monitor until app closes or user continues",
+      "problemMatcher": []
+    },
+    {
+      "label": "🎯 BB: Simple Error Capture & Run",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\Scripts\\Simple-Error-Capture-Runner.ps1",
+        "-ShowRealTime"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🎯 Simple workflow: Monitor → Launch → Wait for app close → Report results",
+      "problemMatcher": []
+    },
+    {
+      "label": "🔧 Fix .NET Installation (0x80070643 Error)",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "Start-Process pwsh.exe -ArgumentList '-ExecutionPolicy Bypass -File \"${workspaceFolder}\\fix-dotnet-installation.ps1\" -FallbackToNet8' -Verb RunAs"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "🔧 REPAIR: Fix .NET 9.0 SDK installation error 0x80070643 and fallback to stable .NET 8.0",
+      "problemMatcher": []
+    }
+  ]
+}

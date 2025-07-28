@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- Suppress MSBuild warning about locked DLLs during clean -->
+    <NoWarn>MSB3061</NoWarn>
+
+    <!-- Core Project Identification -->
+    <ProjectName>BusBuddy.Core</ProjectName>
+    <IsBusinessLogicLayer>true</IsBusinessLogicLayer>
+
+    <!-- MSB3027/MSB3021 File Lock Prevention -->
+    <UseSharedCompilation>false</UseSharedCompilation>
+    <BuildInParallel>false</BuildInParallel>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <ShadowCopyFiles>false</ShadowCopyFiles>
+    <ProduceOnlyReferenceAssembly>false</ProduceOnlyReferenceAssembly>
+  </PropertyGroup>
+
+  <!-- Core Business Logic Packages -->
+  <ItemGroup>
+    <!-- Database and EF Core (Versions managed by Directory.Build.props) -->
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EntityFrameworkVersion)" />
+
+    <!-- Google Earth Engine Integration -->
+    <PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
+    <PackageReference Include="Google.Apis.Core" Version="1.70.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.0.0" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.70.0.3834" />
+
+    <!-- xAI Grok API Integration (OpenAI-compatible) -->
+    <PackageReference Include="OpenAI" Version="2.0.0-beta.10" />
+
+    <!-- Resilience and HTTP -->
+    <PackageReference Include="Polly" Version="8.4.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.0" />
+
+    <!-- Azure Authentication (Optional for Azure SQL Managed Identity) -->
+    <PackageReference Include="Azure.Identity" Version="1.13.0" />
+
+    <!-- Serilog Extensions (Core Serilog packages defined in Directory.Build.props) -->
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+
+    <!-- 📄 Syncfusion PDF Generation for Core Services -->
+    <PackageReference Include="Syncfusion.Pdf.NET" Version="$(SyncfusionVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

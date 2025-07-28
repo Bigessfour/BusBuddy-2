@@ -1,0 +1,195 @@
+# 🚌 BusBuddy - School Transportation Management System
+
+## 🎯 **Mission Statement**
+
+BusBuddy is a transportation management system designed to help school districts efficiently manage their bus fleets, drivers, routes, and schedules. Our goal is to create an intuitive application that improves safety, reduces administrative overhead, and optimizes transportation resources.
+
+## ✅ **Project Status (July 27, 2025)**
+
+- **Current Phase**: Phase 2 Development
+- **Build Status**: Vehicle namespace conflicts resolved, ruleset file created
+- **Core Features**: Drivers management, vehicle fleet, route planning, activity scheduling
+- **Recent Fixes**:
+  - ✅ Vehicle namespace conflicts in SportsSchedulingViewModel.cs
+  - ✅ Missing ruleset file (BusBuddy-Practical.ruleset)
+
+## 🚀 **Quick Start Guide**
+
+### Get Up and Running in 5 Minutes
+
+1. **Open the Project**:
+   ```
+   Open VS Code → Open Folder → Navigate to BusBuddy folder
+   ```
+
+2. **Build the Solution**:
+   ```powershell
+   dotnet build BusBuddy.sln
+   ```
+
+3. **Run the Application**:
+   ```powershell
+   dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
+   ```
+
+4. **Using VS Code Tasks** (Alternative):
+   - Press `Ctrl+Shift+P` → "Tasks: Run Task" → "Direct: Build Solution (CMD)"
+   - Press `Ctrl+Shift+P` → "Tasks: Run Task" → "Direct: Run Application (FIXED)"
+
+5. **PowerShell Helpers** (Optional):
+   ```powershell
+   pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
+   bb-health -Quick
+   ```
+
+## 🏗️ **Technology Stack**
+
+- **UI Framework**: WPF with Syncfusion Essential Studio 30.1.40
+- **Backend**: .NET 8.0 with Entity Framework Core
+- **Architecture**: MVVM pattern with clean separation of concerns
+- **Optional Tools**: PowerShell 7.5.2 helpers for enhanced development
+
+## 📊 **Key Features**
+
+### Current Functionality
+- **Drivers Management**: Personnel records, qualifications, scheduling
+- **Vehicle Fleet**: Bus inventory, maintenance records, assignments
+- **Route Planning**: Efficient route creation and management
+- **Activity Scheduling**: Field trips, special events, non-standard routes
+
+### Coming Soon
+- Enhanced reporting dashboard
+- Maintenance scheduling
+- Data visualization improvements
+
+## 🧰 **Development Guide**
+
+### Standard Development Workflow
+```powershell
+# Build the solution
+dotnet build BusBuddy.sln
+
+# Run the application
+dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
+
+# Clean the solution
+dotnet clean BusBuddy.sln
+```
+
+### Git Workflow
+```powershell
+# Check status of your changes
+git status
+
+# Stage your changes
+git add .
+
+# Commit with a descriptive message
+git commit -m "Description of your changes"
+
+# Push to remote repository
+git push
+```
+
+### VS Code Integration
+- **Recommended Extensions**: PowerShell, C# Dev Kit, Task Explorer
+- **Debugging**: Use F5 or the Debug menu after configuring launch.json
+- **Tasks**: Access via Ctrl+Shift+P → "Tasks: Run Task" for build and run operations
+
+### VS Code Launch Configuration
+Add this to your `.vscode/launch.json` file for debugging:
+
+```json
+{
+  "name": "Debug BusBuddy",
+  "type": "coreclr",
+  "request": "launch",
+  "preLaunchTask": "Build Solution",
+  "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
+  "args": [],
+  "cwd": "${workspaceFolder}/BusBuddy.WPF",
+  "stopAtEntry": false,
+  "console": "internalConsole"
+}
+```
+
+### Syncfusion Controls
+BusBuddy uses Syncfusion Essential Studio for WPF 30.1.40 for its UI components:
+
+```csharp
+// Required license registration in App.xaml.cs
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");
+```
+
+### Syncfusion Theme Implementation
+Add this to your `App.xaml` to implement the FluentDark theme:
+
+```xml
+<Application.Resources>
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="pack://application:,,,/Syncfusion.Themes.FluentDark.WPF;component/fluent.xaml" />
+        </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+</Application.Resources>
+```
+
+## 🔧 **Troubleshooting**
+
+### Common Issues
+- **Build Errors**: Check the Problems panel in VS Code for specific errors
+- **UI Rendering**: Verify Syncfusion theme registration in App.xaml.cs
+- **Runtime Crashes**: Use try/catch blocks and check the Output window
+- **Database Issues**: Verify connection string and check EF Core migrations
+
+### Getting Help
+- Review detailed instructions in `.vscode/instructions.md`
+- Use VS Code's debugging tools to diagnose issues
+- If using PowerShell helpers, run `bb-health` for comprehensive diagnostics
+
+## 📁 **Project Structure**
+
+```
+BusBuddy/
+├── BusBuddy.Core/          # Business logic layer
+│   ├── Models/             # Domain entities
+│   ├── Services/           # Business services
+│   ├── Data/               # Data access
+│   └── Migrations/         # EF Core migrations
+├── BusBuddy.WPF/           # Presentation layer
+│   ├── ViewModels/         # MVVM ViewModels
+│   ├── Views/              # XAML Views
+│   ├── Controls/           # Custom controls
+│   └── Services/           # UI services
+├── BusBuddy.Tests/         # Unit & integration tests
+├── BusBuddy.UITests/       # UI automation tests
+└── Documentation/          # Project documentation
+```
+
+## 📚 **Documentation**
+
+For detailed documentation and instructions:
+- See `.vscode/instructions.md` for comprehensive development guidance
+- Check the `Documentation/` folder for architectural and usage guides
+- Visit the [Syncfusion WPF Documentation](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf) for UI component guides
+
+### VS Code Task Configurations
+Key tasks available in the VS Code Tasks menu (Ctrl+Shift+P → "Tasks: Run Task"):
+
+| Task Name | Description |
+|-----------|-------------|
+| `Direct: Build Solution (CMD)` | Clean build of the solution |
+| `Direct: Run Application (FIXED)` | Run the application with proper paths |
+| `BB: Run App` | Run with PowerShell helpers (if loaded) |
+| `🛡️ BB: Dependency Security Scan` | Scan for package vulnerabilities |
+| `PS Fixed: Health Check` | Run system health check |
+
+---
+
+## Contributing
+
+BusBuddy is designed to help school districts manage transportation efficiently. Your contributions to improve the application are welcome!
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

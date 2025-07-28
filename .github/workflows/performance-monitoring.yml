@@ -1,0 +1,84 @@
+name: 📊 Performance Monitoring
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Weekly on Monday at 6 AM UTC
+  workflow_dispatch:
+    inputs:
+      benchmark_type:
+        description: 'Benchmark type'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - 'full'
+          - 'build-only'
+          - 'startup-only'
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  SOLUTION_FILE: "BusBuddy.sln"
+  BUILD_CONFIGURATION: "Release"
+
+jobs:
+  performance-benchmark:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: ⏱️ Benchmark build performance
+        id: build-benchmark
+        run: |
+          echo "⏱️ Benchmarking build performance..."
+          $startTime = Get-Date
+
+          dotnet restore ${{ env.SOLUTION_FILE }} --verbosity quiet
+          $restoreTime = (Get-Date) - $startTime
+
+          $buildStart = Get-Date
+          dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity quiet
+          $buildTime = (Get-Date) - $buildStart
+
+          $totalTime = (Get-Date) - $startTime
+
+          echo "restore-time=$($restoreTime.TotalSeconds)" >> $env:GITHUB_OUTPUT
+          echo "build-time=$($buildTime.TotalSeconds)" >> $env:GITHUB_OUTPUT
+          echo "total-time=$($totalTime.TotalSeconds)" >> $env:GITHUB_OUTPUT
+
+          echo "📊 Performance Results:"
+          echo "   Restore: $($restoreTime.TotalSeconds)s"
+          echo "   Build: $($buildTime.TotalSeconds)s"
+          echo "   Total: $($totalTime.TotalSeconds)s"
+
+      - name: 📊 Generate performance report
+        run: |
+          echo "## 📊 Performance Benchmark Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Time (seconds) |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|----------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Package Restore | ${{ steps.build-benchmark.outputs.restore-time }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ steps.build-benchmark.outputs.build-time }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total | ${{ steps.build-benchmark.outputs.total-time }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**📈 Trend Analysis:** Compare with previous runs for performance regression detection" >> $GITHUB_STEP_SUMMARY
+
+      - name: 💾 Store performance data
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-data-${{ github.run_number }}
+          path: |
+            performance-*.json
+          retention-days: 90
+
+
+
+
+

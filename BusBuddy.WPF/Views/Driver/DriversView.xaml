@@ -1,0 +1,113 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                              🔒 BUSBUDDY SYNCFUSION THEME COMPLIANCE REFERENCE 🔒                                                                    ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<UserControl x:Class="BusBuddy.WPF.Views.Driver.DriversView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+             d:DesignWidth="900">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="#2D2D30"
+                Padding="20">
+            <TextBlock Text="👨‍✈️ Driver Management"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="White"/>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Row="1"
+              Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Data Grid -->
+            <syncfusion:SfDataGrid Grid.Row="0"
+                                   ItemsSource="{Binding Drivers}"
+                                   SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
+                                   AutoGenerateColumns="False"
+                                   AllowResizingColumns="True"
+                                   AllowSorting="True"
+                                   AllowFiltering="True"
+                                   ColumnSizer="Star"
+                                   SelectionMode="Single"
+                                   SelectionUnit="Row"
+                                   NavigationMode="Row"
+                                   AllowEditing="False"
+                                   ShowRowHeader="True"
+                                   EnableDataVirtualization="True"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   RowHeight="40"
+                                   HeaderRowHeight="45">
+                <syncfusion:SfDataGrid.Columns>
+                    <syncfusion:GridTextColumn MappingName="FirstName"
+                                               HeaderText="First Name"
+                                               Width="120"/>
+                    <syncfusion:GridTextColumn MappingName="LastName"
+                                               HeaderText="Last Name"
+                                               Width="120"/>
+                    <syncfusion:GridTextColumn MappingName="LicenseNumber"
+                                               HeaderText="License #"
+                                               Width="100"/>
+                    <syncfusion:GridTextColumn MappingName="PhoneNumber"
+                                               HeaderText="Phone"
+                                               Width="120"/>
+                    <syncfusion:GridTextColumn MappingName="Email"
+                                               HeaderText="Email"
+                                               Width="200"/>
+                    <syncfusion:GridTextColumn MappingName="Status"
+                                               HeaderText="Status"
+                                               Width="100"/>
+                    <syncfusion:GridDateTimeColumn MappingName="HireDate"
+                                                   HeaderText="Hire Date"
+                                                   Width="120"/>
+                    <syncfusion:GridTextColumn MappingName="YearsExperience"
+                                               HeaderText="Experience"
+                                               Width="100"/>
+                </syncfusion:SfDataGrid.Columns>
+            </syncfusion:SfDataGrid>
+
+            <!-- Button Panel with Syncfusion ButtonAdv -->
+            <StackPanel Grid.Row="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,20,0,0">
+                <syncfusion:ButtonAdv Label="Add Driver"
+                                      Command="{Binding AddDriverCommand}"
+                                      Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"
+                                      Width="120"
+                                      Height="35"
+                                      Margin="0,0,10,0"/>
+                <syncfusion:ButtonAdv Label="Edit"
+                                      Command="{Binding EditDriverCommand}"
+                                      Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"
+                                      Width="80"
+                                      Height="35"
+                                      Margin="0,0,10,0"/>
+                <syncfusion:ButtonAdv Label="Delete"
+                                      Command="{Binding DeleteDriverCommand}"
+                                      Style="{StaticResource BusBuddyButtonAdvStyle}"
+                                      Width="80"
+                                      Height="35"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

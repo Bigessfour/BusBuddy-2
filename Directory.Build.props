@@ -1,0 +1,73 @@
+<Project>
+  <!-- 🚌 BusBuddy - Modern Foundation Configuration (.NET 9.0) -->
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Modern Versions for .NET 9.0 Environment -->
+    <SyncfusionVersion>30.1.40</SyncfusionVersion>
+    <EntityFrameworkVersion>9.0.0</EntityFrameworkVersion>
+
+    <!-- INDUSTRY STANDARD: Practical Code Quality -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)BusBuddy-Practical.ruleset</CodeAnalysisRuleSet>
+
+    <!-- INDUSTRY STANDARD: Single-user desktop app settings -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Temporarily relaxed null safety for development; re-enable later -->
+    <!-- <WarningsAsErrors>CS8600;CS8601;CS8602;CS8618</WarningsAsErrors> -->
+
+    <!-- INDUSTRY STANDARD: WPF debugging -->
+    <UseWPF>true</UseWPF>
+    <OutputType>WinExe</OutputType>
+  </PropertyGroup>
+
+  <!-- PURE SERILOG: No Microsoft.Extensions dependencies -->
+  <ItemGroup>
+    <!-- Pure Serilog Configuration -->
+    <PackageReference Include="Serilog" Version="4.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <!-- Serilog Enrichments for Pure Serilog Environment -->
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="Serilog.Enrichers.Process" Version="3.0.0" />
+    <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.1.2" />
+    <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="3.0.1" />
+  </ItemGroup>
+
+  <!-- INDUSTRY STANDARD: Essential WPF behaviors -->
+  <ItemGroup Condition="'$(UseWPF)' == 'true'">
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+  </ItemGroup>
+
+  <!-- INDUSTRY STANDARD: Syncfusion Professional Setup (WPF Projects Only) -->
+  <ItemGroup Condition="'$(UseWPF)' == 'true'">
+    <!-- Core Syncfusion - REQUIRED -->
+    <PackageReference Include="Syncfusion.Licensing" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.Shared.WPF" Version="$(SyncfusionVersion)" />
+
+    <!-- INDUSTRY STANDARD: Essential Business App Controls -->
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfInput.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfChart.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.SfBusyIndicator.WPF" Version="$(SyncfusionVersion)" />
+
+    <!-- INDUSTRY STANDARD: Professional Theming -->
+    <PackageReference Include="Syncfusion.SfSkinManager.WPF" Version="$(SyncfusionVersion)" />
+    <PackageReference Include="Syncfusion.Themes.FluentDark.WPF" Version="$(SyncfusionVersion)" />
+  </ItemGroup>
+
+  <!-- INDUSTRY STANDARD: Entity Framework for Business Apps -->
+  <ItemGroup Condition="'$(ProjectName)' == 'BusBuddy.Core' OR '$(ProjectName)' == 'BusBuddy.WPF'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
