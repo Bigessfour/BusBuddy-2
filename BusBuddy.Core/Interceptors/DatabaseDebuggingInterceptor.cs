@@ -28,6 +28,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         InterceptionResult<DbDataReader> result,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(command);
         StartCommandTiming(command, "ExecuteReaderAsync");
         return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
     }
@@ -38,6 +39,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         DbDataReader result,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(command);
         StopCommandTiming(command, eventData, "ExecuteReaderAsync");
         return base.ReaderExecutedAsync(command, eventData, result, cancellationToken);
     }
@@ -48,6 +50,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         InterceptionResult<object> result,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(command);
         StartCommandTiming(command, "ExecuteScalarAsync");
         return base.ScalarExecutingAsync(command, eventData, result, cancellationToken);
     }
@@ -58,6 +61,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         object? result,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(command);
         StopCommandTiming(command, eventData, "ExecuteScalarAsync");
         return base.ScalarExecutedAsync(command, eventData, result, cancellationToken);
     }
@@ -68,6 +72,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(command);
         StartCommandTiming(command, "ExecuteNonQueryAsync");
         return base.NonQueryExecutingAsync(command, eventData, result, cancellationToken);
     }
@@ -78,6 +83,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         int result,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(command);
         StopCommandTiming(command, eventData, "ExecuteNonQueryAsync", result);
         return base.NonQueryExecutedAsync(command, eventData, result, cancellationToken);
     }
@@ -86,6 +92,8 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         DbCommand command,
         CommandErrorEventData eventData)
     {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(eventData);
         HandleCommandError(command, eventData);
         base.CommandFailed(command, eventData);
     }
@@ -95,6 +103,8 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         CommandErrorEventData eventData,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(command);
+        ArgumentNullException.ThrowIfNull(eventData);
         HandleCommandError(command, eventData);
         return base.CommandFailedAsync(command, eventData, cancellationToken);
     }
@@ -153,7 +163,7 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         }
     }
 
-    private void LogQueryExecution(QueryExecutionInfo queryInfo, bool isError = false)
+    private static void LogQueryExecution(QueryExecutionInfo queryInfo, bool isError = false)
     {
         if (isError)
         {
@@ -189,15 +199,17 @@ public class DatabaseDebuggingInterceptor : DbCommandInterceptor
         }
     }
 
-    private string TruncateCommandText(string commandText, int maxLength = 200)
+    private static string TruncateCommandText(string commandText, int maxLength = 200)
     {
         if (string.IsNullOrEmpty(commandText) || commandText.Length <= maxLength)
+        {
             return commandText;
+        }
 
         return string.Concat(commandText.AsSpan(0, maxLength), "...");
     }
 
-    private Dictionary<string, object?> ExtractParameters(DbCommand command)
+    private static Dictionary<string, object?> ExtractParameters(DbCommand command)
     {
         var parameters = new Dictionary<string, object?>();
 

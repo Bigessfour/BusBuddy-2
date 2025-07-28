@@ -1968,7 +1968,7 @@ function Get-BusBuddyCommands {
     #>
     [CmdletBinding()]
     param(
-        [ValidateSet('All', 'Essential', 'Build', 'Development', 'Analysis', 'GitHub', 'Fun')]
+        [ValidateSet('All', 'Essential', 'Build', 'Development', 'Analysis', 'GitHub', 'AI', 'Fun')]
         [string]$Category = 'All',
 
         [switch]$ShowAliases
@@ -2010,6 +2010,16 @@ function Get-BusBuddyCommands {
         'Environment' = @(
             @{ Name = 'bb-install-extensions'; Description = 'Install VS Code extensions'; Function = 'Install-BusBuddyVSCodeExtensions' }
             @{ Name = 'bb-validate-vscode'; Description = 'Validate VS Code setup'; Function = 'Test-BusBuddyVSCodeSetup' }
+        )
+        'AI'          = @(
+            @{ Name = 'bb-tavily-search'; Description = 'Search with Tavily Expert AI'; Function = 'Invoke-BusBuddyTavilySearch' }
+            @{ Name = 'bb-search'; Description = 'AI-powered web search (alias)'; Function = 'Invoke-BusBuddyTavilySearch' }
+            @{ Name = 'bb-ai-workflow'; Description = 'Start AI-enhanced development workflow'; Function = 'Start-BusBuddyAIWorkflow' }
+            @{ Name = 'bb-ai-help'; Description = 'Get AI assistance for development tasks'; Function = 'Get-BusBuddyAIAssistance' }
+            @{ Name = 'bb-context-search'; Description = 'Context-aware project search'; Function = 'Get-BusBuddyContextualSearch' }
+            @{ Name = 'bb-mentor'; Description = 'AI learning mentor'; Function = 'Get-BusBuddyMentor' }
+            @{ Name = 'bb-docs'; Description = 'Search official documentation'; Function = 'Search-OfficialDocs' }
+            @{ Name = 'bb-ref'; Description = 'Quick reference sheets'; Function = 'Get-QuickReference' }
         )
         'Fun'         = @(
             @{ Name = 'bb-happiness'; Description = 'Get motivational quotes'; Function = 'Get-BusBuddyHappiness' }
@@ -2502,6 +2512,18 @@ Set-Alias -Name 'bb-happiness' -Value 'Get-BusBuddyHappiness' -Description 'Moti
 Set-Alias -Name 'bb-commands' -Value 'Get-BusBuddyCommands' -Description 'List all commands'
 Set-Alias -Name 'bb-info' -Value 'Get-BusBuddyInfo' -Description 'Module information'
 
+# AI and Search aliases
+Set-Alias -Name 'bb-tavily-search' -Value 'Invoke-BusBuddyTavilySearch' -Description 'Search with Tavily Expert AI'
+Set-Alias -Name 'bb-search' -Value 'Invoke-BusBuddyTavilySearch' -Description 'AI-powered web search'
+Set-Alias -Name 'bb-ai-workflow' -Value 'Start-BusBuddyAIWorkflow' -Description 'Start AI-enhanced development workflow'
+Set-Alias -Name 'bb-ai-help' -Value 'Get-BusBuddyAIAssistance' -Description 'Get AI assistance for development tasks'
+Set-Alias -Name 'bb-context-search' -Value 'Get-BusBuddyContextualSearch' -Description 'Context-aware project search'
+
+# Learning and mentorship aliases
+Set-Alias -Name 'bb-mentor' -Value 'Get-BusBuddyMentor' -Description 'AI learning mentor'
+Set-Alias -Name 'bb-docs' -Value 'Search-OfficialDocs' -Description 'Search official documentation'
+Set-Alias -Name 'bb-ref' -Value 'Get-QuickReference' -Description 'Quick reference sheets'
+
 #endregion
 
 #region Module Initialization
@@ -2684,6 +2706,40 @@ function Initialize-BusBuddyModule {
         }
     }
 
+    # Add Tavily search functions and AI workflow functions
+    # Load enhanced AI functions
+    $aiFunctionsPath = Join-Path $ModuleRoot "Functions\AI"
+    if (Test-Path $aiFunctionsPath) {
+        $aiFiles = @(
+            'Invoke-BusBuddyTavilySearch.ps1',
+            'BusBuddy-AI-Workflows.ps1'
+        )
+
+        foreach ($aiFile in $aiFiles) {
+            $aiFilePath = Join-Path $aiFunctionsPath $aiFile
+            if (Test-Path $aiFilePath) {
+                try {
+                    . $aiFilePath
+                    if ($ShowDetails -or $settings.General.VerboseLogging) {
+                        Write-Host "Loaded AI function file: $aiFile" -ForegroundColor Green
+                    }
+                }
+                catch {
+                    Write-Warning "Failed to load AI function file $aiFile`: $($_.Exception.Message)"
+                }
+            }
+        }
+    }
+
+    $allLoadedFunctions += @(
+        'Invoke-BusBuddyTavilySearch',
+        'Format-TavilyResultsSummary',
+        'Format-TavilyResultsMarkdown',
+        'Start-BusBuddyAIWorkflow',
+        'Get-BusBuddyAIAssistance',
+        'Get-BusBuddyContextualSearch'
+    )
+
     $script:BusBuddyModuleConfig.LoadedFunctions = $allLoadedFunctions
 
     # Set project root (will be updated in Get-BusBuddyProjectRoot)
@@ -2714,7 +2770,8 @@ $script:BusBuddyModuleConfig = @{
         'Diagnostics',
         'Development',
         'Utilities',
-        'GitHub'
+        'GitHub',
+        'AI'
     )
     LoadedFunctions          = @()
     HappinessQuotes          = @(
@@ -5753,10 +5810,179 @@ $aliasesToExport = @(
     'bb-dev-workflow', 'bb-get-workflow-results', 'bb-warning-analysis',
     'bb-install-extensions', 'bb-validate-vscode',
     'bb-github-stage', 'bb-github-commit', 'bb-github-push', 'bb-github-workflow',
-    'bb-update-loader', 'bb-test-module'
+    'bb-update-loader', 'bb-test-module',
+    'bb-search', 'bb-tavily'
 )
 
 # Export functions and aliases
 Export-ModuleMember -Function $functionsToExport -Alias $aliasesToExport
+
+#endregion
+
+#region Tavily MCP Integration
+
+function Invoke-BusBuddyTavilySearch {
+    <#
+    .SYNOPSIS
+        Search the web using Tavily MCP integration for development research
+
+    .DESCRIPTION
+        Leverages Tavily Expert MCP to search for current information, documentation,
+        and development resources. Integrates with your existing BusBuddy development workflow.
+
+    .PARAMETER Query
+        Search query to send to Tavily
+
+    .PARAMETER Context
+        Optional context to add to the search (e.g., "development", "documentation", "debugging")
+
+    .PARAMETER Format
+        Output format: JSON, Markdown, or Summary (default: Summary)
+
+    .PARAMETER MaxResults
+        Maximum number of results to return (default: 5)
+
+    .EXAMPLE
+        bb-search "PowerShell 7.5 new features"
+
+    .EXAMPLE
+        bb-search "WPF MVVM best practices" -Context "development" -MaxResults 3
+
+    .EXAMPLE
+        bb-search "Entity Framework Core migrations" -Format JSON
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$Query,
+
+        [Parameter()]
+        [string]$Context = "",
+
+        [Parameter()]
+        [ValidateSet("JSON", "Markdown", "Summary")]
+        [string]$Format = "Summary",
+
+        [Parameter()]
+        [ValidateRange(1, 10)]
+        [int]$MaxResults = 5
+    )
+
+    begin {
+        Write-Host "🔍 Searching with Tavily Expert..." -ForegroundColor Cyan
+
+        # Check if TAVILY_API_KEY is available
+        $apiKey = $env:TAVILY_API_KEY
+        if (-not $apiKey -or $apiKey -eq "tvly-EXAMPLE-KEY") {
+            Write-Warning "TAVILY_API_KEY not found or using example key. Please set your actual API key."
+            Write-Host "Run: [Environment]::SetEnvironmentVariable('TAVILY_API_KEY', 'your-key', 'User')" -ForegroundColor Yellow
+            return
+        }
+    }
+
+    process {
+        try {
+            # Construct search query with context
+            $fullQuery = if ($Context) { "$Context`: $Query" } else { $Query }
+
+            # Prepare the request to Tavily API
+            $headers = @{
+                'Authorization' = "Bearer $apiKey"
+                'Content-Type' = 'application/json'
+            }
+
+            $body = @{
+                query = $fullQuery
+                max_results = $MaxResults
+                include_answer = $true
+                include_raw_content = $false
+                include_images = $false
+            } | ConvertTo-Json
+
+            Write-Host "📡 Querying: $fullQuery" -ForegroundColor Gray
+
+            # Make the API call
+            $response = Invoke-RestMethod -Uri "https://api.tavily.com/search" -Method POST -Headers $headers -Body $body -ErrorAction Stop
+
+            # Process and format results
+            switch ($Format) {
+                "JSON" {
+                    $response | ConvertTo-Json -Depth 10
+                }
+                "Markdown" {
+                    Format-TavilyResultsMarkdown -Response $response
+                }
+                default { # Summary
+                    Format-TavilyResultsSummary -Response $response
+                }
+            }
+
+            Write-Host "✅ Search completed successfully" -ForegroundColor Green
+        }
+        catch {
+            Write-Error "❌ Tavily search failed: $($_.Exception.Message)"
+            if ($_.Exception.Message -like "*401*" -or $_.Exception.Message -like "*403*") {
+                Write-Host "💡 Tip: Check your TAVILY_API_KEY environment variable" -ForegroundColor Yellow
+            }
+        }
+    }
+}
+
+function Format-TavilyResultsSummary {
+    [CmdletBinding()]
+    param([object]$Response)
+
+    Write-Host "`n🎯 Search Results Summary:" -ForegroundColor Cyan
+    Write-Host "=" * 50 -ForegroundColor Gray
+
+    if ($Response.answer) {
+        Write-Host "`n📝 AI Summary:" -ForegroundColor Yellow
+        Write-Host $Response.answer -ForegroundColor White
+        Write-Host ""
+    }
+
+    if ($Response.results) {
+        Write-Host "🔗 Top Results:" -ForegroundColor Yellow
+        for ($i = 0; $i -lt $Response.results.Count; $i++) {
+            $result = $Response.results[$i]
+            Write-Host "`n$($i + 1). " -NoNewline -ForegroundColor Cyan
+            Write-Host $result.title -ForegroundColor White
+            Write-Host "   🌐 $($result.url)" -ForegroundColor Gray
+            if ($result.content) {
+                $preview = $result.content.Substring(0, [Math]::Min(150, $result.content.Length))
+                Write-Host "   📄 $preview..." -ForegroundColor DarkGray
+            }
+        }
+    }
+}
+
+function Format-TavilyResultsMarkdown {
+    [CmdletBinding()]
+    param([object]$Response)
+
+    $markdown = "# Tavily Search Results`n`n"
+
+    if ($Response.answer) {
+        $markdown += "## AI Summary`n`n"
+        $markdown += "$($Response.answer)`n`n"
+    }
+
+    if ($Response.results) {
+        $markdown += "## Search Results`n`n"
+        for ($i = 0; $i -lt $Response.results.Count; $i++) {
+            $result = $Response.results[$i]
+            $markdown += "### $($i + 1). [$($result.title)]($($result.url))`n`n"
+            if ($result.content) {
+                $markdown += "$($result.content)`n`n"
+            }
+        }
+    }
+
+    Write-Output $markdown
+}
+
+# Add Tavily search to aliases
+Set-Alias -Name 'bb-search' -Value 'Invoke-BusBuddyTavilySearch' -Description 'Search with Tavily Expert'
+Set-Alias -Name 'bb-tavily' -Value 'Invoke-BusBuddyTavilySearch' -Description 'Tavily Expert search'
 
 #endregion

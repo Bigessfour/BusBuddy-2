@@ -2,8 +2,6 @@
   "settingsSync.keybindingsPerPlatform": false,
   "settingsSync.ignoredExtensions": [],
   "settingsSync.ignoredSettings": [],
-  // 🤖 AI-ASSISTANT SIMPLE REFERENCE - READ .vscode/ai-quick-reference.md
-  // Simple documentation-based approach - no complex enforcement
   "agentic.referenceFile": ".vscode/ai-quick-reference.md",
   "agentic.useWindowsPowerShell": true,
   "agentic.batchSimilarFixes": true,
@@ -123,7 +121,6 @@
     "BUSBUDDY_BB_COMMANDS_REQUIRED": "true",
     "BUSBUDDY_PHASE": "2"
   },
-  // 🚌 BusBuddy Workflow Enforcement Settings
   "busbuddy.enforceWorkflow": true,
   "busbuddy.requireBBCommands": true,
   "busbuddy.mandatoryHealthCheck": true,
@@ -134,7 +131,6 @@
   "busbuddy.requireFluentAssertions": true,
   "busbuddy.requirePowerShell75": true,
   "busbuddy.blockLegacyPowerShell": true,
-  // Task Explorer Configuration (MANDATORY)
   "taskExplorer.enable": true,
   "taskExplorer.showLastTasks": true,
   "taskExplorer.includeAnt": false,
@@ -168,7 +164,6 @@
   "dotnet.completion.showNameCompletionSuggestions": false,
   "dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "openFiles",
   "dotnet.backgroundAnalysis.compilerDiagnosticsScope": "openFiles",
-  // MSB3027/MSB3021 File Lock Prevention
   "dotnet.automaticallyCreateSolutionInWorkspace": false,
   "dotnet.experimental.emitCompilerDiagnostics": false,
   "dotnet.enableMsBuildLoadProjectsOnDemand": false,
@@ -379,5 +374,6 @@
       "parameter.readonly": "#4FC1FF"
     }
   },
-  // cSpell spell checker disabled: removed cSpell.words and related settings
+  "github.copilot.mcp.enabled": true,
+  "github.copilot.mcp.configPath": ".vscode/mcp.json"
 }

@@ -15,6 +15,8 @@ public static class ExceptionHelper
     /// </summary>
     public static string AnalyzeSqlException(SqlException ex)
     {
+        ArgumentNullException.ThrowIfNull(ex);
+
         var analysis = $"SQL Exception Analysis:\n";
         analysis += $"Error Number: {ex.Number}\n";
         analysis += $"Severity: {ex.Class}\n";

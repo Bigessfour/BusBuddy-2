@@ -20,6 +20,7 @@ public class BusBuddyDbContext : DbContext
     /// </summary>
     public static void SeedTestData(BusBuddyDbContext context, Action<BusBuddyDbContext> seedAction)
     {
+        ArgumentNullException.ThrowIfNull(seedAction);
         seedAction(context);
         context.SaveChanges();
     }

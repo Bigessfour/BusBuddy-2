@@ -18,6 +18,9 @@ namespace BusBuddy.Core.Extensions
             string user,
             Exception exception)
         {
+            ArgumentNullException.ThrowIfNull(logService);
+            ArgumentNullException.ThrowIfNull(exception);
+
             // Create a well-structured exception detail that focuses on the most important information
             // while staying within database column size limits
             string details = FormatExceptionForLogging(exception);
@@ -30,6 +33,7 @@ namespace BusBuddy.Core.Extensions
         /// </summary>
         public static async Task LogCreateAsync<T>(this IActivityLogService logService, string user, T entity) where T : class
         {
+            ArgumentNullException.ThrowIfNull(logService);
             await logService.LogEntityActionAsync("Created", user, entity);
         }
 
@@ -38,6 +42,7 @@ namespace BusBuddy.Core.Extensions
         /// </summary>
         public static async Task LogUpdateAsync<T>(this IActivityLogService logService, string user, T entity) where T : class
         {
+            ArgumentNullException.ThrowIfNull(logService);
             await logService.LogEntityActionAsync("Updated", user, entity);
         }
 
@@ -46,6 +51,7 @@ namespace BusBuddy.Core.Extensions
         /// </summary>
         public static async Task LogDeleteAsync<T>(this IActivityLogService logService, string user, T entity) where T : class
         {
+            ArgumentNullException.ThrowIfNull(logService);
             await logService.LogEntityActionAsync("Deleted", user, entity);
         }
 
@@ -54,6 +60,7 @@ namespace BusBuddy.Core.Extensions
         /// </summary>
         public static async Task LogViewAsync<T>(this IActivityLogService logService, string user, T entity) where T : class
         {
+            ArgumentNullException.ThrowIfNull(logService);
             await logService.LogEntityActionAsync("Viewed", user, entity);
         }
 

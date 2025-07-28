@@ -20,7 +20,7 @@ class FilesystemMCPServer {
 
     async listFiles(directory) {
         const fullPath = path.resolve(directory);
-        
+
         // Security check
         if (!this.allowedDirectories.some(allowed => fullPath.startsWith(path.resolve(allowed)))) {
             throw new Error('Directory access denied');
@@ -34,13 +34,13 @@ class FilesystemMCPServer {
                 path: path.join(fullPath, file.name)
             }));
         } catch (error) {
-            throw new Error(Failed to list files: ${error.message});
+            throw new Error(`Failed to list files: ${error.message}`);
         }
     }
 
     async readFile(filePath) {
         const fullPath = path.resolve(filePath);
-        
+
         // Security check
         if (!this.allowedDirectories.some(allowed => fullPath.startsWith(path.resolve(allowed)))) {
             throw new Error('File access denied');
@@ -54,13 +54,13 @@ class FilesystemMCPServer {
                 size: content.length
             };
         } catch (error) {
-            throw new Error(Failed to read file: ${error.message});
+            throw new Error(`Failed to read file: ${error.message}`);
         }
     }
 
     async writeFile(filePath, content) {
         const fullPath = path.resolve(filePath);
-        
+
         // Security check
         if (!this.allowedDirectories.some(allowed => fullPath.startsWith(path.resolve(allowed)))) {
             throw new Error('File write access denied');
@@ -74,7 +74,7 @@ class FilesystemMCPServer {
                 size: content.length
             };
         } catch (error) {
-            throw new Error(Failed to write file: ${error.message});
+            throw new Error(`Failed to write file: ${error.message}`);
         }
     }
 }
@@ -88,7 +88,7 @@ class MCPHandler {
     async handleRequest(request) {
         try {
             await this.server.initialize();
-            
+
             switch (request.method) {
                 case 'filesystem/list':
                     return await this.server.listFiles(request.params.directory || '.');
@@ -97,7 +97,7 @@ class MCPHandler {
                 case 'filesystem/write':
                     return await this.server.writeFile(request.params.path, request.params.content);
                 default:
-                    throw new Error(Unknown method: ${request.method});
+                    throw new Error(`Unknown method: ${request.method}`);
             }
         } catch (error) {
             return { error: error.message };
@@ -113,7 +113,7 @@ if (require.main === module) {
         cwd: process.cwd(),
         allowedDirs: process.env.ALLOWED_DIRECTORIES
     });
-    
+
     // Simple test
     handler.handleRequest({
         method: 'filesystem/list',

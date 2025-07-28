@@ -13,6 +13,7 @@ namespace BusBuddy.Core.Configuration
         /// </summary>
         public static bool IsDevelopment(IConfiguration configuration)
         {
+            ArgumentNullException.ThrowIfNull(configuration);
             var environment = configuration["Environment"] ?? "Production";
             return environment.Equals("Development", StringComparison.OrdinalIgnoreCase);
         }
@@ -22,6 +23,7 @@ namespace BusBuddy.Core.Configuration
         /// </summary>
         public static LogEventLevel GetOptimalLogLevel(IConfiguration configuration)
         {
+            ArgumentNullException.ThrowIfNull(configuration);
             return IsDevelopment(configuration) ? LogEventLevel.Debug : LogEventLevel.Information;
         }
 

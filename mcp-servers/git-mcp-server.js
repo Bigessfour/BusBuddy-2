@@ -20,7 +20,7 @@ class GitMCPServer {
 
     async executeGitCommand(command, repository = '.') {
         const fullPath = path.resolve(repository);
-        
+
         // Security check
         if (!this.allowedRepositories.some(allowed => fullPath.startsWith(path.resolve(allowed)))) {
             throw new Error('Repository access denied');
@@ -39,7 +39,7 @@ class GitMCPServer {
                 success: true
             };
         } catch (error) {
-            throw new Error(Git command failed: ${error.message});
+            throw new Error(`Git command failed: ${error.message}`);
         }
     }
 
@@ -48,7 +48,7 @@ class GitMCPServer {
     }
 
     async getLog(repository = '.', limit = 10) {
-        return await this.executeGitCommand(git log --oneline -n ${limit}, repository);
+        return await this.executeGitCommand(`git log --oneline -n ${limit}`, repository);
     }
 
     async getBranches(repository = '.') {
@@ -56,7 +56,7 @@ class GitMCPServer {
     }
 
     async getDiff(repository = '.', file = '') {
-        const command = file ? git diff ${file} : 'git diff';
+        const command = file ? `git diff ${file}` : 'git diff';
         return await this.executeGitCommand(command, repository);
     }
 }
@@ -70,7 +70,7 @@ class GitMCPHandler {
     async handleRequest(request) {
         try {
             await this.server.initialize();
-            
+
             switch (request.method) {
                 case 'git/status':
                     return await this.server.getStatus(request.params.repository);
@@ -83,7 +83,7 @@ class GitMCPHandler {
                 case 'git/command':
                     return await this.server.executeGitCommand(request.params.command, request.params.repository);
                 default:
-                    throw new Error(Unknown method: ${request.method});
+                    throw new Error(`Unknown method: ${request.method}`);
             }
         } catch (error) {
             return { error: error.message };
@@ -99,7 +99,7 @@ if (require.main === module) {
         cwd: process.cwd(),
         allowedRepos: process.env.ALLOWED_REPOSITORIES
     });
-    
+
     // Simple test
     handler.handleRequest({
         method: 'git/status',
