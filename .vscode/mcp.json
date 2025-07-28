@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "busbuddy-workspace-git": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\mcp-servers\\git-mcp-server.js"
+      ],
+      "env": {
+        "ALLOWED_REPOSITORIES": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy"
+      }
+    },
+    "busbuddy-workspace-fs": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy\\mcp-servers\\filesystem-mcp-server.js"
+      ],
+      "env": {
+        "ALLOWED_DIRECTORIES": "C:\\Users\\biges\\Desktop\\BusBuddy\\BusBuddy"
+      }
+    }
+  }
+}
