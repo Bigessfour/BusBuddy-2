@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 
@@ -36,61 +36,8 @@ namespace BusBuddy.Core.Services
     public class Phase2DataSeederService : IPhase2DataSeederService
     {
         private readonly BusBuddyContext _context;
-        private readonly ILogger<Phase2DataSeederService> _logger;
+        private static readonly ILogger Logger = Log.ForContext<Phase2DataSeederService>();
         private readonly Random _random = new Random(42); // Seeded for reproducible data
-
-        // CA1848: Use LoggerMessage.Define for high-performance logging
-        private static readonly Action<ILogger, Exception?> LogSeedingStarted =
-            LoggerMessage.Define(LogLevel.Information, new EventId(1, nameof(LogSeedingStarted)),
-                "🎯 Starting Phase 2 enhanced data seeding...");
-
-        private static readonly Action<ILogger, Exception?> LogSeedingCompleted =
-            LoggerMessage.Define(LogLevel.Information, new EventId(2, nameof(LogSeedingCompleted)),
-                "✅ Phase 2 enhanced data seeding completed successfully!");
-
-        private static readonly Action<ILogger, Exception?> LogDataAlreadyExists =
-            LoggerMessage.Define(LogLevel.Information, new EventId(3, nameof(LogDataAlreadyExists)),
-                "Enhanced Phase 2 data already exists. Skipping seeding.");
-
-        private static readonly Action<ILogger, Exception?> LogSeedingError =
-            LoggerMessage.Define(LogLevel.Error, new EventId(4, nameof(LogSeedingError)),
-                "❌ Error during Phase 2 data seeding");
-
-        private static readonly Action<ILogger, Exception?> LogEnhancedDataSeeding =
-            LoggerMessage.Define(LogLevel.Information, new EventId(5, nameof(LogEnhancedDataSeeding)),
-                "📊 Seeding enhanced real-world transportation data...");
-
-        private static readonly Action<ILogger, Exception?> LogDriverSeeding =
-            LoggerMessage.Define(LogLevel.Information, new EventId(6, nameof(LogDriverSeeding)),
-                "👥 Seeding 50 professional drivers...");
-
-        private static readonly Action<ILogger, Exception?> LogVehicleSeeding =
-            LoggerMessage.Define(LogLevel.Information, new EventId(7, nameof(LogVehicleSeeding)),
-                "🚌 Seeding 25 school buses with maintenance records...");
-
-        private static readonly Action<ILogger, Exception?> LogRouteSeeding =
-            LoggerMessage.Define(LogLevel.Information, new EventId(8, nameof(LogRouteSeeding)),
-                "🗺️ Seeding 100 diverse routes with geographical data...");
-
-        private static readonly Action<ILogger, Exception?> LogActivitySeeding =
-            LoggerMessage.Define(LogLevel.Information, new EventId(9, nameof(LogActivitySeeding)),
-                "📅 Seeding 200 scheduled activities with realistic patterns...");
-
-        private static readonly Action<ILogger, Exception?> LogEnhancedDataCompleted =
-            LoggerMessage.Define(LogLevel.Information, new EventId(10, nameof(LogEnhancedDataCompleted)),
-                "📊 Enhanced real-world data seeding completed.");
-
-        private static readonly Action<ILogger, Exception?> LogClearingExistingData =
-            LoggerMessage.Define(LogLevel.Information, new EventId(11, nameof(LogClearingExistingData)),
-                "Clearing existing activity data for fresh seeding...");
-
-        private static readonly Action<ILogger, string, Exception?> LogGatheringMetrics =
-            LoggerMessage.Define<string>(LogLevel.Information, new EventId(12, nameof(LogGatheringMetrics)),
-                "Gathering development metrics for component: {ComponentName}");
-
-        private static readonly Action<ILogger, string, Exception?> LogGatheringMetricsError =
-            LoggerMessage.Define<string>(LogLevel.Warning, new EventId(13, nameof(LogGatheringMetricsError)),
-                "Error gathering development metrics for {ComponentName}");
 
         private static readonly string[] FirstNames = {
             "Alice", "Bob", "Carlos", "Diana", "Ethan", "Fatima", "George", "Hannah", "Isaac", "Jessica",
@@ -125,17 +72,16 @@ namespace BusBuddy.Core.Services
             "Buchanan Middle School", "Lincoln High School", "Johnson Elementary", "Grant Academy", "Hayes Elementary"
         };
 
-        public Phase2DataSeederService(BusBuddyContext context, ILogger<Phase2DataSeederService> logger)
+        public Phase2DataSeederService(BusBuddyContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task SeedAsync()
         {
             try
             {
-                LogSeedingStarted(_logger, null);
+                Logger.Information("🎯 Starting Phase 2 enhanced data seeding...");
 
                 // Check if enhanced data already exists - CA1829: Use .Count property
                 var driverCount = await _context.Drivers.CountAsync();
@@ -144,29 +90,29 @@ namespace BusBuddy.Core.Services
 
                 if (driverCount >= 40 && vehicleCount >= 20 && activityCount >= 150)
                 {
-                    LogDataAlreadyExists(_logger, null);
+                    Logger.Information("Enhanced Phase 2 data already exists. Skipping seeding.");
                     return;
                 }
 
                 await SeedEnhancedRealWorldDataAsync();
 
-                LogSeedingCompleted(_logger, null);
+                Logger.Information("✅ Phase 2 enhanced data seeding completed successfully!");
             }
             catch (Exception ex)
             {
-                LogSeedingError(_logger, ex);
+                Logger.Error(ex, "❌ Error during Phase 2 data seeding");
                 throw;
             }
         }
 
         public async Task SeedEnhancedRealWorldDataAsync()
         {
-            LogEnhancedDataSeeding(_logger, null);
+            Logger.Information("📊 Seeding enhanced real-world transportation data...");
 
             // Clear existing data if needed
             if (await _context.Activities.AnyAsync())
             {
-                LogClearingExistingData(_logger, null);
+                Logger.Information("Clearing existing activity data for fresh seeding...");
                 _context.Activities.RemoveRange(_context.Activities);
                 await _context.SaveChangesAsync();
             }
@@ -185,12 +131,12 @@ namespace BusBuddy.Core.Services
 
             await _context.SaveChangesAsync();
 
-            LogEnhancedDataCompleted(_logger, null);
+            Logger.Information("📊 Enhanced real-world data seeding completed.");
         }
 
         private async Task<List<Driver>> SeedEnhancedDriversAsync()
         {
-            LogDriverSeeding(_logger, null);
+            Logger.Information("👥 Seeding 50 professional drivers...");
 
             var existingDrivers = await _context.Drivers.ToListAsync();
             var driversToAdd = new List<Driver>();
@@ -232,7 +178,7 @@ namespace BusBuddy.Core.Services
 
         private async Task<List<Vehicle>> SeedEnhancedVehiclesAsync()
         {
-            LogVehicleSeeding(_logger, null);
+            Logger.Information("🚌 Seeding 25 school buses with maintenance records...");
 
             var existingVehicles = await _context.Vehicles.ToListAsync();
             var vehiclesToAdd = new List<Vehicle>();
@@ -271,7 +217,7 @@ namespace BusBuddy.Core.Services
 
         private async Task<List<Route>> SeedEnhancedRoutesAsync()
         {
-            LogRouteSeeding(_logger, null);
+            Logger.Information("🗺️ Seeding 100 diverse routes with geographical data...");
 
             // Clear existing routes for fresh data
             if (await _context.Routes.AnyAsync())
@@ -318,7 +264,7 @@ namespace BusBuddy.Core.Services
 
         private async Task SeedEnhancedActivitiesAsync(List<Driver> drivers, List<Vehicle> vehicles, List<Route> routes)
         {
-            LogActivitySeeding(_logger, null);
+            Logger.Information("📅 Seeding 200 scheduled activities with realistic patterns...");
 
             var activities = new List<Activity>();
             var now = DateTime.Now;

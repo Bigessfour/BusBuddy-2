@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Context;
 using System;
@@ -32,10 +31,7 @@ namespace BusBuddy.Core.Configuration
             IConfiguration configuration,
             IHostEnvironment environment)
         {
-            if (environment == null)
-            {
-                throw new ArgumentNullException(nameof(environment));
-            }
+            ArgumentNullException.ThrowIfNull(environment);
 
             using (LogContext.PushProperty("Operation", "ServiceConfiguration"))
             using (LogContext.PushProperty("Environment", environment.EnvironmentName))
@@ -94,12 +90,9 @@ namespace BusBuddy.Core.Configuration
                     ConfigureSqlite(options, connectionString, environment);
                 }
 
-                // Configure logging integration
-                var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-                if (loggerFactory != null)
-                {
-                    options.UseLoggerFactory(loggerFactory);
-                }
+                // Configure Serilog integration
+                options.EnableServiceProviderCaching();
+                options.EnableSensitiveDataLogging(environment.IsDevelopment());
 
                 // Environment-specific configurations
                 ConfigureEnvironmentSpecific(options, environment);
@@ -319,7 +312,7 @@ namespace BusBuddy.Core.Configuration
             catch (Exception ex)
             {
                 Logger.Error(ex, "Automatic database seeding failed");
-                // Don't throw - allow application to continue
+                throw;
             }
         }
 

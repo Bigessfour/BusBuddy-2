@@ -28,6 +28,17 @@
     <!-- 🌐 GLOBALIZATION: Transportation system international support -->
     <InvariantGlobalization>false</InvariantGlobalization>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+
+    <!-- Code analysis configuration -->
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)BusBuddy-Practical.ruleset</CodeAnalysisRuleSet>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+
+    <!-- Suppress low-impact warnings project-wide -->
+    <NoWarn>$(NoWarn);CA1305;CA1860;CA1848;CA1851;CA1304</NoWarn>
+
+    <!-- Suppress nullable warnings for Phase 1 -->
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604</NoWarn>
   </PropertyGroup>
 
   <!-- PURE SERILOG: No Microsoft.Extensions dependencies -->
@@ -69,30 +80,10 @@
 
   <!-- INDUSTRY STANDARD: Entity Framework for Business Apps -->
   <ItemGroup Condition="'$(ProjectName)' == 'BusBuddy.Core' OR '$(ProjectName)' == 'BusBuddy.WPF'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkVersion)" />
   </ItemGroup>
-
-  <!-- Directory.Build.props settings -->
-  <PropertyGroup>
-    <!-- Global properties for all projects -->
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-
-    <!-- Code analysis configuration -->
-    <CodeAnalysisRuleSet>BusBuddy-Practical.ruleset</CodeAnalysisRuleSet>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>latest</AnalysisLevel>
-
-    <!-- Suppress low-impact warnings project-wide -->
-    <NoWarn>$(NoWarn);CA1305;CA1860;CA1848;CA1851;CA1304</NoWarn>
-
-    <!-- Suppress nullable warnings for Phase 1 -->
-    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604</NoWarn>
-  </PropertyGroup>
 
   <!-- Global package references -->
   <ItemGroup>
