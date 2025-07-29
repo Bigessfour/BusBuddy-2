@@ -116,6 +116,7 @@ namespace BusBuddy.Core.Extensions
             string user,
             string? details = null)
         {
+            ArgumentNullException.ThrowIfNull(logService);
             await logService.LogAsync($"System: {eventName}", user, details);
         }
 
@@ -128,6 +129,7 @@ namespace BusBuddy.Core.Extensions
             string? oldValue = null,
             string? newValue = null)
         {
+            ArgumentNullException.ThrowIfNull(logService);
             string details = $"Changed configuration in section: {configSection}";
 
             if (oldValue != null && newValue != null)

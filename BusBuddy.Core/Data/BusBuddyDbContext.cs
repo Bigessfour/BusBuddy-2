@@ -20,6 +20,7 @@ public class BusBuddyDbContext : DbContext
     /// </summary>
     public static void SeedTestData(BusBuddyDbContext context, Action<BusBuddyDbContext> seedAction)
     {
+        ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(seedAction);
         seedAction(context);
         context.SaveChanges();
@@ -79,6 +80,7 @@ public class BusBuddyDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         if (!optionsBuilder.IsConfigured)
         {
             var configuration = new ConfigurationBuilder()
@@ -142,6 +144,8 @@ public class BusBuddyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        ArgumentNullException.ThrowIfNull(modelBuilder);
+
         // ActivityLog entity
         modelBuilder.Entity<ActivityLog>(entity =>
         {
@@ -679,7 +683,7 @@ public class BusBuddyDbContext : DbContext
     /// <summary>
     /// Configure global query filters for soft deletes
     /// </summary>
-    private void ConfigureGlobalQueryFilters(ModelBuilder modelBuilder)
+    private static void ConfigureGlobalQueryFilters(ModelBuilder modelBuilder)
     {
         // TODO: Re-implement soft delete filter when entities inherit from BaseEntity
         // Apply soft delete filter to all entities that inherit from BaseEntity
@@ -700,7 +704,7 @@ public class BusBuddyDbContext : DbContext
         */
     }
 
-    private void ConfigureNullHandling(ModelBuilder modelBuilder)
+    private static void ConfigureNullHandling(ModelBuilder modelBuilder)
     {
         // Configure specific entities with NULL-safe defaults to prevent SqlNullValueException
         modelBuilder.Entity<Driver>(entity =>
@@ -775,7 +779,7 @@ public class BusBuddyDbContext : DbContext
         }
     }
 
-    private void SeedData(ModelBuilder modelBuilder)
+    private static void SeedData(ModelBuilder modelBuilder)
     {
         // Use static dates to avoid migration conflicts
         var seedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -878,7 +882,7 @@ public class BusBuddyDbContext : DbContext
     /// <summary>
     /// Handle database concurrency exceptions with detailed logging
     /// </summary>
-    private void HandleConcurrencyException(DbUpdateConcurrencyException ex)
+    private static void HandleConcurrencyException(DbUpdateConcurrencyException ex)
     {
         // Log the detailed concurrency information to help with debugging
         var failedEntries = ex.Entries.ToList();
@@ -911,7 +915,7 @@ public class BusBuddyDbContext : DbContext
     /// Apply audit fields to entities before saving
     /// TODO: Re-implement when entities inherit from BaseEntity
     /// </summary>
-    private void ApplyAuditFields()
+    private static void ApplyAuditFields()
     {
         // TODO: Re-implement audit fields when entities inherit from BaseEntity
         /*

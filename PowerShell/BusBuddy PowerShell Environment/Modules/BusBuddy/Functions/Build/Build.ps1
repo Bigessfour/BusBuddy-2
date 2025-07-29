@@ -12,7 +12,7 @@
     Copyright 2025 - BusBuddy
 #>
 
-function global:bb-build {
+function global:Invoke-BusBuddyBuild {
     param (
         [Parameter(Mandatory = $false)]
         [switch]$Clean,
@@ -42,7 +42,7 @@ function global:bb-build {
     }
 }
 
-function global:bb-run {
+function global:Start-BusBuddyApp {
     param (
         [Parameter(Mandatory = $false)]
         [switch]$Debug,
@@ -58,7 +58,7 @@ function global:bb-run {
 
     if (-not $NoBuild) {
         Write-Host "🔨 Building solution first..." -ForegroundColor Yellow
-        bb-build -Configuration $Configuration
+        Invoke-BusBuddyBuild -Configuration $Configuration
 
         if ($LASTEXITCODE -ne 0) {
             Write-Host "❌ Build failed, cannot run application" -ForegroundColor Red
@@ -82,7 +82,7 @@ function global:bb-run {
     }
 }
 
-function global:bb-clean {
+function global:Clear-BusBuddyBuild {
     param (
         [Parameter(Mandatory = $false)]
         [switch]$Deep,
@@ -123,5 +123,10 @@ function global:bb-clean {
     Write-Host "✅ Clean operation completed" -ForegroundColor Green
 }
 
+# Create aliases for backward compatibility
+Set-Alias -Name "bb-build" -Value Invoke-BusBuddyBuild
+Set-Alias -Name "bb-run" -Value Start-BusBuddyApp
+Set-Alias -Name "bb-clean" -Value Clear-BusBuddyBuild
+
 # Export functions
-Export-ModuleMember -Function bb-build, bb-run, bb-clean
+Export-ModuleMember -Function Invoke-BusBuddyBuild, Start-BusBuddyApp, Clear-BusBuddyBuild -Alias bb-build, bb-run, bb-clean

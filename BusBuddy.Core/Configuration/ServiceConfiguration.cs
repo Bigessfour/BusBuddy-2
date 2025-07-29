@@ -32,6 +32,11 @@ namespace BusBuddy.Core.Configuration
             IConfiguration configuration,
             IHostEnvironment environment)
         {
+            if (environment == null)
+            {
+                throw new ArgumentNullException(nameof(environment));
+            }
+
             using (LogContext.PushProperty("Operation", "ServiceConfiguration"))
             using (LogContext.PushProperty("Environment", environment.EnvironmentName))
             {

@@ -12,7 +12,7 @@
     Copyright 2025 - BusBuddy
 #>
 
-function global:bb-help {
+function global:Get-BusBuddyHelp {
     param (
         [Parameter(Position = 0, Mandatory = $false)]
         [string]$Command,
@@ -189,15 +189,15 @@ function global:bb-help {
             )
         },
         @{
-            Name = "bb-help"
+            Name = "Get-BusBuddyHelp"
             Description = "Show help information for BusBuddy commands"
             Category = "Utilities"
-            Usage = "bb-help [<CommandName>] [-List] [-Detailed] [-ShowExamples] [-OpenDocumentation]"
+            Usage = "Get-BusBuddyHelp [<CommandName>] [-List] [-Detailed] [-ShowExamples] [-OpenDocumentation]"
             Examples = @(
-                "bb-help",
-                "bb-help bb-build",
-                "bb-help -List -Detailed",
-                "bb-help -OpenDocumentation"
+                "Get-BusBuddyHelp",
+                "Get-BusBuddyHelp bb-build",
+                "Get-BusBuddyHelp -List -Detailed",
+                "Get-BusBuddyHelp -OpenDocumentation"
             )
         }
     )
@@ -251,8 +251,8 @@ function global:bb-help {
         }
 
         Write-Host ""
-        Write-Host "For detailed help on a specific command, run: bb-help <CommandName> -Detailed" -ForegroundColor Gray
-        Write-Host "To view full documentation, run: bb-help -OpenDocumentation" -ForegroundColor Gray
+        Write-Host "For detailed help on a specific command, run: Get-BusBuddyHelp <CommandName> -Detailed" -ForegroundColor Gray
+        Write-Host "To view full documentation, run: Get-BusBuddyHelp -OpenDocumentation" -ForegroundColor Gray
         return
     }
 
@@ -261,7 +261,7 @@ function global:bb-help {
 
         if ($null -eq $matchedCommand) {
             Write-Host "❌ Command '$Command' not found." -ForegroundColor Red
-            Write-Host "Run 'bb-help -List' to see all available commands." -ForegroundColor Yellow
+            Write-Host "Run 'Get-BusBuddyHelp -List' to see all available commands." -ForegroundColor Yellow
             return
         }
 
@@ -311,12 +311,16 @@ function global:bb-help {
     Write-Host "  [Utilities] - Utility commands" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Available Commands:" -ForegroundColor Gray
-    Write-Host "  Run 'bb-help -List' to see all available commands" -ForegroundColor White
-    Write-Host "  Run 'bb-help <CommandName>' for help on a specific command" -ForegroundColor White
-    Write-Host "  Run 'bb-help -List -Detailed' for detailed help on all commands" -ForegroundColor White
-    Write-Host "  Run 'bb-help -OpenDocumentation' to open the full documentation" -ForegroundColor White
+    Write-Host "  Run 'Get-BusBuddyHelp -List' to see all available commands" -ForegroundColor White
+    Write-Host "  Run 'Get-BusBuddyHelp <CommandName>' for help on a specific command" -ForegroundColor White
+    Write-Host "  Run 'Get-BusBuddyHelp -List -Detailed' for detailed help on all commands" -ForegroundColor White
+    Write-Host "  Run 'Get-BusBuddyHelp -OpenDocumentation' to open the full documentation" -ForegroundColor White
     Write-Host ""
 }
 
 # Export functions
-Export-ModuleMember -Function bb-help
+Export-ModuleMember -Function Get-BusBuddyHelp
+
+# Create aliases for backward compatibility
+New-Alias -Name bb-help -Value Get-BusBuddyHelp -Force
+Export-ModuleMember -Alias bb-help

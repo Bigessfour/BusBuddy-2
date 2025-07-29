@@ -66,6 +66,7 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<AIRouteRecommendations> AnalyzeRouteOptimizationAsync(RouteAnalysisRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
                 Logger.Information("Requesting xAI route optimization analysis");
@@ -103,6 +104,7 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<AIMaintenancePrediction> PredictMaintenanceNeedsAsync(MaintenanceAnalysisRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
                 Logger.Information("Requesting xAI maintenance prediction analysis");
@@ -140,6 +142,7 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<AISafetyAnalysis> AnalyzeSafetyRisksAsync(SafetyAnalysisRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
                 Logger.Information("Requesting xAI safety risk analysis");
@@ -177,6 +180,7 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<AIStudentOptimization> OptimizeStudentAssignmentsAsync(StudentOptimizationRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
                 Logger.Information("Requesting xAI student assignment optimization");
@@ -207,6 +211,15 @@ namespace BusBuddy.Core.Services
                 Logger.Error(ex, "Error in xAI student optimization");
                 return await GenerateMockStudentOptimization(request);
             }
+        }
+
+        /// <summary>
+        /// Returns the system prompt for logistics/student assignment optimization.
+        /// </summary>
+        private static string GetLogisticsExpertSystemPrompt()
+        {
+            // System prompt for xAI logistics/student assignment optimization
+            return "You are an expert in school transportation logistics, specializing in optimizing student assignments to buses for maximum efficiency, safety, and compliance with capacity and route constraints. Provide actionable, data-driven recommendations for student-to-bus assignments in a school transportation context.";
         }
 
         /// <summary>
@@ -241,7 +254,7 @@ namespace BusBuddy.Core.Services
                 };
 
                 var response = await CallXAIAPI(CHAT_COMPLETIONS_ENDPOINT, xaiRequest);
-                return response.Choices.FirstOrDefault()?.Message.Content ?? "I'm sorry, I couldn't process your request at the moment.";
+                return response.Choices?.FirstOrDefault()?.Message?.Content ?? "I'm sorry, I couldn't process your request at the moment.";
             }
             catch (Exception ex)
             {
@@ -251,6 +264,12 @@ namespace BusBuddy.Core.Services
             }
         }
 
+        private static string GetGeneralChatSystemPrompt()
+        {
+            // General system prompt for xAI chat, can be customized as needed
+            return "You are an expert assistant for school transportation management, specializing in providing helpful, accurate, and actionable responses for BusBuddy users. Focus on safety, efficiency, and best practices for school bus operations, maintenance, and route planning.";
+        }
+
         #region Phase 1 Program Management & Analytics
 
         /// <summary>
@@ -258,8 +277,11 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<PhaseAnalysisResult> AnalyzePhase1ProgressAsync(Phase1ProgressRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
+                Logger.Information("Requesting xAI Phase 1 progress analysis");
+
                 var prompt = BuildPhase1AnalysisPrompt(request);
                 var response = await SendChatMessageAsync(prompt, "Phase 1 Progress Analysis");
 
@@ -282,8 +304,11 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<DevelopmentInsights> GetDevelopmentInsightsAsync(DevelopmentStateRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
+                Logger.Information("Requesting xAI development insights for {ComponentName}", request.ComponentName);
+
                 var prompt = BuildDevelopmentInsightsPrompt(request);
                 var response = await SendChatMessageAsync(prompt, "Development Insights");
 
@@ -306,8 +331,11 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<PerformanceAnalysis> AnalyzePerformanceAsync(PerformanceDataRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
+                Logger.Information("Requesting xAI performance analysis for {ApplicationName}", request.ApplicationName);
+
                 var prompt = BuildPerformanceAnalysisPrompt(request);
                 var response = await SendChatMessageAsync(prompt, "Performance Analysis");
 
@@ -330,8 +358,11 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<GeneratedDataSet> GenerateMockDataAsync(MockDataRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
+                Logger.Information("Requesting xAI mock data generation for {DataType}", request.DataType);
+
                 var prompt = BuildMockDataPrompt(request);
                 var response = await SendChatMessageAsync(prompt, "Mock Data Generation");
 
@@ -354,8 +385,16 @@ namespace BusBuddy.Core.Services
         /// </summary>
         public async Task<ContextualHelp> GetContextualHelpAsync(HelpRequest request)
         {
+            ArgumentNullException.ThrowIfNull(request);
             try
             {
+                Logger.Information("Requesting xAI contextual help for {FeatureName}", request.Context);
+
+                if (!_isConfigured)
+                {
+                    return CreateBasicHelp(request);
+                }
+
                 var prompt = BuildContextualHelpPrompt(request);
                 var response = await SendChatMessageAsync(prompt, "Contextual Help");
 
@@ -413,24 +452,29 @@ namespace BusBuddy.Core.Services
             return topics.Take(3).ToArray();
         }
 
-        private static string[] ExtractActionableSteps(string content)
+        private static List<string> ExtractActionableSteps(string text)
         {
-            // Extract numbered steps or bullet points
-            var steps = new List<string>();
-            var lines = content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (string.IsNullOrWhiteSpace(text)) return new List<string>();
 
-            foreach (var line in lines)
-            {
-                var trimmed = line.Trim();
-                if (trimmed.StartsWith("1.") || trimmed.StartsWith("2.") ||
-                    trimmed.StartsWith("3.") || trimmed.StartsWith("-") ||
-                    trimmed.StartsWith("*"))
-                {
-                    steps.Add(trimmed);
-                }
-            }
+            return text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Trim())
+                .Where(trimmed => !string.IsNullOrEmpty(trimmed) &&
+                                  (trimmed.StartsWith("1.", StringComparison.Ordinal) || trimmed.StartsWith("2.", StringComparison.Ordinal) ||
+                                   trimmed.StartsWith("3.", StringComparison.Ordinal) || trimmed.StartsWith('-') ||
+                                   trimmed.StartsWith('*')))
+                .Select(line => Regex.Replace(line, @"^(\d+\.|\-|\*)\s*", "").Trim())
+                .ToList();
+        }
 
-            return steps.Take(5).ToArray();
+        private static string SanitizeForJson(string s)
+        {
+            return s.Replace("\\", "\\\\")
+                .Replace("\"", "\\\"")
+                .Replace("\b", "\\b")
+                .Replace("\f", "\\f")
+                .Replace("\n", "\\n")
+                .Replace("\r", "\\r")
+                .Replace("\t", "\\t");
         }
 
         #endregion
@@ -506,7 +550,7 @@ namespace BusBuddy.Core.Services
 
 ## Technical Metrics
 - **Build Status**: {request.BuildStatus}
-- **Tests**: {request.TestsPassingCount}/{request.TotalTestsCount} passing
+- **Tests**: {request.TestsPassingCount}/{request.TotalTestsPassingCount} passing
 - **Code Coverage**: {request.CodeCoverage:P1}
 - **Critical Issues**: {request.CriticalIssuesCount}
 - **Components**: {request.CompletedComponents}/{request.TotalComponents} completed
@@ -669,273 +713,131 @@ Focus on actionable insights for WPF .NET development.";
             return prompt;
         }
 
-        private async Task<DevelopmentStateRequest> GatherDevelopmentMetricsAsync(string componentName)
+        private async Task<string> GetChatCompletionAsync(string prompt, string systemPrompt)
         {
-            var request = new DevelopmentStateRequest
+            var xaiRequest = new XAIRequest
             {
-                ComponentName = componentName,
-                TechnologyStack = new List<string> { "WPF", ".NET 8.0", "Entity Framework Core", "Syncfusion", "Serilog" },
-                ComplexityLevel = "Medium",
-                LastModified = DateTime.Now,
-                FilesChanged = 0,
-                LinesAdded = 0,
-                LinesRemoved = 0,
-                MethodsCount = 0,
-                ClassesCount = 0,
-                RecentCommits = 0,
-                BugReports = 0,
-                FeatureRequests = 0,
-                PerformanceIssues = 0,
-                Dependencies = new List<string>(),
-                CurrentChallenges = new List<string>()
+                Model = _configuration["XAI:DefaultModel"] ?? "grok-4-latest",
+                Messages = new[]
+                {
+                    new XAIMessage { Role = "system", Content = systemPrompt },
+                    new XAIMessage { Role = "user", Content = prompt }
+                },
+                Temperature = _configuration.GetValue<double>("XAI:Temperature", 0.7),
+                MaxTokens = _configuration.GetValue<int>("XAI:MaxTokens", 128000)
             };
 
-            try
-            {
-                // In a real implementation, this would gather actual metrics
-                // For now, we'll return the basic structure
-                Logger.Information("Gathering development metrics for component: {ComponentName}", componentName);
+            var response = await CallXAIAPI(CHAT_COMPLETIONS_ENDPOINT, xaiRequest);
 
-                // Add await to make this actually async or remove async keyword
-                await Task.CompletedTask;
-            }
-            catch (Exception ex)
+            if (response?.Choices?.Any() != true || string.IsNullOrEmpty(response.Choices[0]?.Message?.Content))
             {
-                Logger.Warning(ex, "Error gathering development metrics for {ComponentName}", componentName);
+                return "I'm sorry, I couldn't process your request at the moment.";
             }
 
-            return request;
+            return response.Choices?.FirstOrDefault()?.Message?.Content ?? "I'm sorry, I couldn't process your request at the moment.";
         }
-
-        #endregion
-
-        #region Prompt Building Methods
-
-        private static string BuildRouteOptimizationPrompt(RouteAnalysisRequest request)
-        {
-            return $@"SCHOOL BUS ROUTE OPTIMIZATION ANALYSIS
-
-ROUTE DETAILS:
-- Route ID: {request.RouteId}
-- Current Distance: {request.CurrentDistance} miles
-- Student Count: {request.StudentCount}
-- Vehicle Capacity: {request.VehicleCapacity}
-
-TERRAIN DATA:
-- Elevation Range: {request.TerrainData?.MinElevation}m to {request.TerrainData?.MaxElevation}m
-- Average Slope: {request.TerrainData?.AverageSlope}°
-- Terrain Type: {request.TerrainData?.TerrainType}
-- Route Difficulty: {request.TerrainData?.RouteDifficulty}
-
-WEATHER CONDITIONS:
-- Current Condition: {request.WeatherData?.Condition ?? "Unknown"}
-- Temperature: {request.WeatherData?.Temperature ?? 0}°C
-- Visibility: {request.WeatherData?.Visibility ?? 0}km
-- Wind: {request.WeatherData?.WindCondition ?? "Unknown"}
-
-TRAFFIC STATUS:
-- Overall Condition: {request.TrafficData?.OverallCondition ?? "Unknown"}
-
-HISTORICAL PERFORMANCE:
-- Average Fuel Consumption: {request.HistoricalData?.AverageFuelConsumption} mpg
-- On-Time Performance: {request.HistoricalData?.OnTimePerformance}%
-- Safety Incidents: {request.HistoricalData?.SafetyIncidents} in last year
-
-OPTIMIZATION GOALS:
-1. Minimize fuel consumption
-2. Maximize safety
-3. Optimize time efficiency
-4. Reduce environmental impact
-5. Ensure student comfort
-
-Please provide comprehensive recommendations in JSON format with:
-- Optimal route suggestions
-- Risk assessment and mitigation strategies
-- Fuel efficiency optimization
-- Safety improvements
-- Environmental considerations
-- Cost-benefit analysis
-- Implementation timeline";
-        }
-
-        private static string BuildMaintenancePredictionPrompt(MaintenanceAnalysisRequest request)
-        {
-            return $@"PREDICTIVE MAINTENANCE ANALYSIS
-
-VEHICLE DETAILS:
-- Bus ID: {request.BusId}
-- Make/Model: {request.VehicleMake} {request.VehicleModel}
-- Year: {request.VehicleYear}
-- Current Mileage: {request.CurrentMileage}
-- Last Maintenance: {request.LastMaintenanceDate:yyyy-MM-dd}
-
-ROUTE USAGE PATTERNS:
-- Daily Miles: {request.DailyMiles}
-- Terrain Difficulty: {request.TerrainDifficulty}
-- Stop Frequency: {request.StopFrequency} stops per mile
-- Elevation Changes: {request.ElevationChanges}m average
-
-CURRENT CONDITIONS:
-- Engine Hours: {request.EngineHours}
-- Brake Usage: {request.BrakeUsage}
-- Tire Condition: {request.TireCondition}
-- Fluid Levels: {request.FluidLevels}
-
-Predict maintenance needs, component wear, optimal service intervals, and cost optimization strategies.";
-        }
-
-        private static string BuildSafetyAnalysisPrompt(SafetyAnalysisRequest request)
-        {
-            return $@"TRANSPORTATION SAFETY RISK ANALYSIS
-
-ROUTE CONDITIONS:
-- Route Type: {request.RouteType}
-- Traffic Density: {request.TrafficDensity}
-- Road Conditions: {request.RoadConditions}
-- Weather Impact: {request.WeatherConditions}
-
-STUDENT DEMOGRAPHICS:
-- Age Groups: {string.Join(", ", request.AgeGroups)}
-- Special Needs: {request.SpecialNeedsCount} students
-- Total Students: {request.TotalStudents}
-
-HISTORICAL SAFETY DATA:
-- Previous Incidents: {request.PreviousIncidents}
-- Near-Miss Reports: {request.NearMissReports}
-- Driver Safety Record: {request.DriverSafetyRecord}
-
-Analyze risks and provide safety enhancement recommendations.";
-        }
-
-        private static string BuildStudentOptimizationPrompt(StudentOptimizationRequest request)
-        {
-            return $@"STUDENT ASSIGNMENT OPTIMIZATION
-
-OPTIMIZATION PARAMETERS:
-- Total Students: {request.TotalStudents}
-- Available Buses: {request.AvailableBuses}
-- Geographic Constraints: {request.GeographicConstraints}
-- Special Requirements: {request.SpecialRequirements}
-
-EFFICIENCY GOALS:
-- Minimize total travel time
-- Balance bus capacity utilization
-- Optimize route efficiency
-- Ensure safety and comfort
-
-Provide optimal student-to-bus assignments with reasoning.";
-        }
-
-        #endregion
-
-        #region System Prompts
-
-        private static string GetTransportationExpertSystemPrompt()
-        {
-            return @"You are an expert transportation optimization specialist with decades of experience in school bus fleet management. You have deep knowledge of:
-- Route optimization algorithms
-- Fuel efficiency strategies
-- Safety protocols and risk assessment
-- Terrain analysis and vehicle performance
-- Weather impact on transportation
-- Cost optimization and budget management
-- Environmental sustainability
-- Student safety and comfort
-
-Provide detailed, actionable recommendations based on data analysis. Always prioritize safety while optimizing for efficiency and cost-effectiveness.";
-        }
-
-        private static string GetMaintenanceExpertSystemPrompt()
-        {
-            return @"You are a certified fleet maintenance expert specializing in school bus preventive maintenance and predictive analytics. Your expertise includes:
-- Predictive maintenance algorithms
-- Component lifecycle analysis
-- Wear pattern recognition
-- Cost-effective maintenance scheduling
-- Safety-critical system monitoring
-- Parts inventory optimization
-- Maintenance budget planning
-
-Provide precise maintenance predictions with confidence levels and cost justifications.";
-        }
-
-        private static string GetSafetyExpertSystemPrompt()
-        {
-            return @"You are a school transportation safety specialist with expertise in:
-- Risk assessment and mitigation
-- Student safety protocols
-- Driver safety training
-- Route safety analysis
-- Emergency procedures
-- Regulatory compliance
-- Incident prevention strategies
-
-Always prioritize student and driver safety. Provide comprehensive risk assessments with specific mitigation strategies.";
-        }
-
-        private static string GetLogisticsExpertSystemPrompt()
-        {
-            return @"You are a logistics optimization expert specializing in student transportation efficiency. Your expertise includes:
-- Student assignment algorithms
-- Capacity optimization
-- Geographic clustering analysis
-- Route balancing strategies
-- Special needs accommodation
-- Time window optimization
-- Resource allocation
-
-Provide mathematically sound optimization recommendations with clear implementation steps.";
-        }
-
-        private static string GetGeneralChatSystemPrompt()
-        {
-            return @"You are BusBuddy AI, an intelligent assistant for school transportation management. You help with:
-- Transportation planning and optimization
-- Student and route management
-- Safety protocols and compliance
-- Maintenance scheduling and tracking
-- Fuel management and cost optimization
-- General school transportation questions
-
-Be helpful, informative, and always prioritize student safety. Provide practical, actionable advice for school transportation challenges.";
-        }
-
-        #endregion
-
-        #region API Communication (Future Implementation)
 
         private async Task<XAIResponse> CallXAIAPI(string endpoint, XAIRequest request)
         {
             try
             {
-                var json = JsonSerializer.Serialize(request, ApiJsonOptions);
-                using var content = new StringContent(json, Encoding.UTF8, MediaTypeHeaderValue.Parse("application/json"));
+                var jsonRequest = JsonSerializer.Serialize(request, JsonOptions);
+                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                Logger.Debug("Calling xAI API: {Endpoint} with model: {Model}", endpoint, request.Model);
+                var httpResponse = await _httpClient.PostAsync(_baseUrl + endpoint, content);
 
-                var response = await _httpClient.PostAsync($"{_baseUrl}{endpoint}", content);
-                response.EnsureSuccessStatusCode();
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    var errorContent = await httpResponse.Content.ReadAsStringAsync();
+                    Logger.Error("xAI API call failed with status {StatusCode}: {ErrorContent}", httpResponse.StatusCode, errorContent);
+                    return new XAIResponse
+                    {
+                        Choices = new[]
+                        {
+                            new XAIChoice
+                            {
+                                Message = new XAIMessage
+                                {
+                                    Content = $"API Error: {httpResponse.StatusCode}"
+                                }
+                            }
+                        }
+                    };
+                }
 
-                var responseJson = await response.Content.ReadAsStringAsync();
-                Logger.Debug("xAI API response received: {ResponseLength} characters", responseJson.Length);
+                var jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+                var response = JsonSerializer.Deserialize<XAIResponse>(jsonResponse, JsonOptions);
 
-                var result = JsonSerializer.Deserialize<XAIResponse>(responseJson, ApiJsonOptions);
-                return result ?? new XAIResponse();
+                if (response?.Choices?.Any() != true)
+                {
+                    Logger.Warning("xAI response was empty or invalid. Response: {JsonResponse}", jsonResponse);
+                    return new XAIResponse
+                    {
+                        Choices = new[]
+                        {
+                            new XAIChoice
+                            {
+                                Message = new XAIMessage
+                                {
+                                    Content = "Invalid or empty response from AI."
+                                }
+                            }
+                        }
+                    };
+                }
+
+                return response;
             }
             catch (HttpRequestException ex)
             {
-                Logger.Error(ex, "HTTP error calling xAI API: {Message}", ex.Message);
-                throw;
+                Logger.Error(ex, "HTTP request to xAI API failed.");
+                return new XAIResponse
+                {
+                    Choices = new[]
+                    {
+                        new XAIChoice
+                        {
+                            Message = new XAIMessage
+                            {
+                                Content = "Network error connecting to AI service."
+                            }
+                        }
+                    }
+                };
             }
             catch (JsonException ex)
             {
-                Logger.Error(ex, "JSON parsing error from xAI API: {Message}", ex.Message);
-                throw;
+                Logger.Error(ex, "Failed to serialize or deserialize xAI JSON.");
+                return new XAIResponse
+                {
+                    Choices = new[]
+                    {
+                        new XAIChoice
+                        {
+                            Message = new XAIMessage
+                            {
+                                Content = "JSON processing error."
+                            }
+                        }
+                    }
+                };
             }
-            catch (Exception ex)
+            catch (TaskCanceledException ex)
             {
-                Logger.Error(ex, "Unexpected error calling xAI API: {Message}", ex.Message);
-                throw;
+                Logger.Error(ex, "xAI API call timed out.");
+                return new XAIResponse
+                {
+                    Choices = new[]
+                    {
+                        new XAIChoice
+                        {
+                            Message = new XAIMessage
+                            {
+                                Content = "Request to AI service timed out."
+                            }
+                        }
+                    }
+                };
             }
         }
 
@@ -1144,69 +1046,90 @@ Be helpful, informative, and always prioritize student safety. Provide practical
             }
         }
 
-        private static AIMaintenancePrediction ParseMaintenancePrediction(XAIResponse response)
+        private static AIMaintenancePrediction ParseMaintenancePrediction(XAIResponse aiResponse)
         {
+            if (aiResponse == null || aiResponse.Choices == null || !aiResponse.Choices.Any())
+            {
+                return new AIMaintenancePrediction
+                {
+                    PredictedMaintenanceDate = DateTime.Now.AddDays(30),
+                    Confidence = 0.75,
+                    ActionableRecommendations = new List<string> { "Review maintenance schedule", "Inspect critical components" },
+                    Reasoning = "Default reasoning due to empty AI response"
+                };
+            }
+
+            var content = aiResponse.Choices.First().Message.Content;
+
             try
             {
-                if (response?.Choices?.Length > 0)
+                var prediction = JsonSerializer.Deserialize<AIMaintenancePrediction>(content, JsonOptions);
+                if (prediction != null)
                 {
-                    var content = response.Choices[0].Message?.Content ?? string.Empty;
-                    Logger.Debug("Parsing xAI maintenance prediction response");
-
-                    return new AIMaintenancePrediction
-                    {
-                        PredictedMaintenanceDate = DateTime.Now.AddDays(ExtractNumericValue(content, "days", "maintenance", "service") ?? 45),
-                        ComponentPredictions = ExtractComponentPredictions(content),
-                        TotalEstimatedCost = (decimal)(ExtractNumericValue(content, "cost", "total", "price") ?? 1500),
-                        PotentialSavings = (decimal)(ExtractNumericValue(content, "savings", "save") ?? 500),
-                        Reasoning = content.Length > 300 ? content.Substring(0, 300) + "..." : content
-                    };
+                    prediction.Reasoning = string.IsNullOrWhiteSpace(prediction.Reasoning)
+                        ? content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
+                        : prediction.Reasoning;
+                    return prediction;
                 }
-
-                return new AIMaintenancePrediction();
             }
-            catch (Exception ex)
+            catch
             {
-                Logger.Error(ex, "Error parsing xAI maintenance prediction");
-                return new AIMaintenancePrediction();
+                // Fallback parsing if direct deserialization fails
+                return new AIMaintenancePrediction
+                {
+                    PredictedMaintenanceDate = DateTime.Now.AddDays(30),
+                    Confidence = 0.75,
+                    ActionableRecommendations = ExtractActionableSteps(content),
+                    Reasoning = content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
+                };
             }
         }
 
-        private static AISafetyAnalysis ParseSafetyAnalysis(XAIResponse response)
+        private static AISafetyAnalysis ParseSafetyAnalysis(XAIResponse aiResponse)
         {
+            if (aiResponse == null || aiResponse.Choices == null || !aiResponse.Choices.Any())
+            {
+                return new AISafetyAnalysis
+                {
+                    OverallRiskScore = 0.5,
+                    IdentifiedRisks = new List<IdentifiedRisk> { new IdentifiedRisk { Description = "General operational risks", Severity = "Medium" } },
+                    MitigationStrategies = new List<string> { "Review safety protocols", "Conduct driver safety training" },
+                    Reasoning = "Default reasoning due to empty AI response"
+                };
+            }
+
+            var content = aiResponse.Choices.First().Message.Content;
+
             try
             {
-                if (response?.Choices?.Length > 0)
+                var analysis = JsonSerializer.Deserialize<AISafetyAnalysis>(content, JsonOptions);
+                if (analysis != null)
                 {
-                    var content = response.Choices[0].Message?.Content ?? string.Empty;
-                    Logger.Debug("Parsing xAI safety analysis response");
-
-                    return new AISafetyAnalysis
-                    {
-                        OverallSafetyScore = ExtractNumericValue(content, "safety", "score") ?? 85.0,
-                        RiskFactors = ExtractSafetyRiskFactors(content),
-                        Recommendations = ExtractRecommendations(content),
-                        ComplianceStatus = ExtractComplianceStatus(content),
-                        ConfidenceLevel = 0.85
-                    };
+                    analysis.Reasoning = string.IsNullOrWhiteSpace(analysis.Reasoning)
+                        ? content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
+                        : analysis.Reasoning;
+                    return analysis;
                 }
-
-                return new AISafetyAnalysis();
             }
-            catch (Exception ex)
+            catch
             {
-                Logger.Error(ex, "Error parsing xAI safety analysis");
-                return new AISafetyAnalysis();
+                return new AISafetyAnalysis
+                {
+                    OverallRiskScore = 0.5,
+                    IdentifiedRisks = new List<IdentifiedRisk> { new IdentifiedRisk { Description = "General operational risks", Severity = "Medium" } },
+                    MitigationStrategies = ExtractActionableSteps(content),
+                    Reasoning = content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
+                };
             }
         }
 
-        private static AIStudentOptimization ParseStudentOptimization(XAIResponse response)
+        private static AIStudentOptimization ParseStudentOptimization(XAIResponse aiResponse)
         {
             try
             {
-                if (response?.Choices?.Length > 0)
+                if (aiResponse?.Choices?.Length > 0)
                 {
-                    var content = response.Choices[0].Message?.Content ?? string.Empty;
+                    var content = aiResponse.Choices[0].Message?.Content ?? string.Empty;
                     Logger.Debug("Parsing xAI student optimization response");
 
                     return new AIStudentOptimization

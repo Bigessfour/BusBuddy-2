@@ -197,6 +197,8 @@ namespace BusBuddy.Core.Models
         public decimal TotalEstimatedCost { get; set; }
         public decimal PotentialSavings { get; set; }
         public string Reasoning { get; set; } = string.Empty;
+        public double Confidence { get; set; }
+        public List<string> ActionableRecommendations { get; set; } = new();
     }
 
     public class ComponentPrediction
@@ -214,6 +216,16 @@ namespace BusBuddy.Core.Models
         public string[] Recommendations { get; set; } = Array.Empty<string>();
         public string ComplianceStatus { get; set; } = string.Empty;
         public double ConfidenceLevel { get; set; }
+        public List<IdentifiedRisk> IdentifiedRisks { get; set; } = new();
+        public List<string> MitigationStrategies { get; set; } = new();
+        public string Reasoning { get; set; } = string.Empty;
+        public double OverallRiskScore { get; set; }
+    }
+
+    public class IdentifiedRisk
+    {
+        public string? Description { get; set; }
+        public string? Severity { get; set; }
     }
 
     public class SafetyRiskFactor

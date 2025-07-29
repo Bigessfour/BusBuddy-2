@@ -31,23 +31,23 @@ namespace BusBuddy.Core
         private static readonly string[] IgnoredDriverProperties = { "AMRoutes", "PMRoutes" };
 
         // Core entities (Phase 1 compatible)
-        public DbSet<Driver> Drivers { get; set; }
-        public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<Activity> Activities { get; set; }
+        public DbSet<Driver> Drivers { get; set; } = null!;
+        public DbSet<Vehicle> Vehicles { get; set; } = null!;
+        public DbSet<Activity> Activities { get; set; } = null!;
 
         // Sports scheduling entities (Phase 2)
-        public DbSet<SportsEvent> SportsEvents { get; set; }
+        public DbSet<SportsEvent> SportsEvents { get; set; } = null!;
 
         // Extended entities (Production ready)
-        public DbSet<Bus> Buses { get; set; }
-        public DbSet<Route> Routes { get; set; }
-        public DbSet<RouteStop> RouteStops { get; set; }
-        public DbSet<Schedule> Schedules { get; set; }
-        public DbSet<Student> Students { get; set; }
-        public DbSet<Fuel> Fuels { get; set; }
-        public DbSet<ActivityLog> ActivityLogs { get; set; }
-        public DbSet<ActivitySchedule> ActivitySchedules { get; set; }
-        public DbSet<Destination> Destinations { get; set; }
+        public DbSet<Bus> Buses { get; set; } = null!;
+        public DbSet<Route> Routes { get; set; } = null!;
+        public DbSet<RouteStop> RouteStops { get; set; } = null!;
+        public DbSet<Schedule> Schedules { get; set; } = null!;
+        public DbSet<Student> Students { get; set; } = null!;
+        public DbSet<Fuel> Fuels { get; set; } = null!;
+        public DbSet<ActivityLog> ActivityLogs { get; set; } = null!;
+        public DbSet<ActivitySchedule> ActivitySchedules { get; set; } = null!;
+        public DbSet<Destination> Destinations { get; set; } = null!;
 
         // Default constructor for design-time and Phase 1 compatibility
         public BusBuddyContext() { }
@@ -64,6 +64,8 @@ namespace BusBuddy.Core
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            ArgumentNullException.ThrowIfNull(optionsBuilder, nameof(optionsBuilder));
+
             if (!optionsBuilder.IsConfigured)
             {
                 using (LogContext.PushProperty("DatabaseOperation", "Configuration"))
@@ -181,6 +183,8 @@ namespace BusBuddy.Core
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+
             using (LogContext.PushProperty("DatabaseOperation", "ModelCreation"))
             using (LogContext.PushProperty("Phase", "Phase1"))
             {
@@ -312,7 +316,7 @@ namespace BusBuddy.Core
             }
         }
 
-        private void seedDriverData(ModelBuilder modelBuilder)
+        private static void seedDriverData(ModelBuilder modelBuilder)
         {
             Logger.Debug("Seeding {Count} CDL-certified drivers with seed date {SeedDate}", 20, SeedDate);
 
@@ -340,7 +344,7 @@ namespace BusBuddy.Core
             );
         }
 
-        private void seedVehicleData(ModelBuilder modelBuilder)
+        private static void seedVehicleData(ModelBuilder modelBuilder)
         {
             Logger.Debug("Seeding {Count} school buses from major manufacturers", 15);
 
@@ -363,9 +367,11 @@ namespace BusBuddy.Core
             );
         }
 
-        private void seedDestinationData(ModelBuilder modelBuilder)
+        private static void seedDestinationData(ModelBuilder modelBuilder)
         {
-            Logger.Debug("Seeding {Count} real-world destinations with seed date {SeedDate}", 15, SeedDate); modelBuilder.Entity<Destination>().HasData(
+            Logger.Debug("Seeding {Count} real-world destinations with seed date {SeedDate}", 15, SeedDate);
+
+            modelBuilder.Entity<Destination>().HasData(
                     new Destination { DestinationId = 1, Name = "Natural History Museum", Address = "200 Central Park West", City = "New York", State = "NY", ZipCode = "10024", ContactName = "Education Director", ContactPhone = "212-769-5100", ContactEmail = "education@amnh.org", DestinationType = "Field Trip", MaxCapacity = 200, Latitude = 40.7813M, Longitude = -73.9740M, CreatedDate = SeedDate, CreatedBy = "System" },
                     new Destination { DestinationId = 2, Name = "Central High School", Address = "1234 Education Blvd", City = "Springfield", State = "IL", ZipCode = "62701", ContactName = "Athletic Director", ContactPhone = "217-555-0200", ContactEmail = "athletics@centralhs.edu", DestinationType = "Sports Event", MaxCapacity = 500, Latitude = 39.7817M, Longitude = -89.6501M, CreatedDate = SeedDate, CreatedBy = "System" },
                     new Destination { DestinationId = 3, Name = "University Campus Science Building", Address = "456 University Ave", City = "Champaign", State = "IL", ZipCode = "61820", ContactName = "Competition Coordinator", ContactPhone = "217-555-0300", ContactEmail = "competitions@university.edu", DestinationType = "Academic Competition", MaxCapacity = 150, Latitude = 40.1020M, Longitude = -88.2272M, CreatedDate = SeedDate, CreatedBy = "System" },
@@ -384,9 +390,11 @@ namespace BusBuddy.Core
                 );
         }
 
-        private void seedActivityData(ModelBuilder modelBuilder)
+        private static void seedActivityData(ModelBuilder modelBuilder)
         {
-            Logger.Debug("Seeding {Count} realistic school activities starting from {BaseActivityDate}", 30, BaseActivityDate); modelBuilder.Entity<Activity>().HasData(
+            Logger.Debug("Seeding {Count} realistic school activities starting from {BaseActivityDate}", 30, BaseActivityDate);
+
+            modelBuilder.Entity<Activity>().HasData(
                     new Activity { ActivityId = 1, ActivityType = "Field Trip", Destination = "Natural History Museum", Date = BaseActivityDate.AddDays(1), LeaveTime = new TimeSpan(8, 30, 0), EventTime = new TimeSpan(10, 0, 0), RequestedBy = "Mrs. Thompson", AssignedVehicleId = 1, DriverId = 1, StudentsCount = 45, CreatedDate = SeedDate },
                     new Activity { ActivityId = 2, ActivityType = "Sports Event", Destination = "Central High School", Date = BaseActivityDate.AddDays(1), LeaveTime = new TimeSpan(14, 0, 0), EventTime = new TimeSpan(15, 30, 0), RequestedBy = "Coach Martinez", AssignedVehicleId = 2, DriverId = 2, StudentsCount = 22, CreatedDate = SeedDate },
                     new Activity { ActivityId = 3, ActivityType = "Academic Competition", Destination = "University Campus", Date = BaseActivityDate.AddDays(2), LeaveTime = new TimeSpan(7, 45, 0), EventTime = new TimeSpan(9, 0, 0), RequestedBy = "Mr. Chen", AssignedVehicleId = 3, DriverId = 3, StudentsCount = 15, CreatedDate = SeedDate },

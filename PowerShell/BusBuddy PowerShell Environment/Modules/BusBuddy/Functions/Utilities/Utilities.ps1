@@ -12,7 +12,7 @@
     Copyright 2025 - BusBuddy
 #>
 
-function global:bb-environment {
+function global:Get-BusBuddyEnvironment {
     param (
         [Parameter(Mandatory = $false)]
         [switch]$List,
@@ -79,13 +79,13 @@ function global:bb-environment {
     }
 
     # Default behavior - show help
-    Write-Host "❓ bb-environment command usage:" -ForegroundColor Cyan
-    Write-Host "  bb-environment -List                 # List all BusBuddy environment variables" -ForegroundColor Yellow
-    Write-Host "  bb-environment -Set VAR VALUE        # Set a BusBuddy environment variable" -ForegroundColor Yellow
-    Write-Host "  bb-environment -Reset                # Reset environment variables to defaults" -ForegroundColor Yellow
+    Write-Host "❓ Get-BusBuddyEnvironment command usage:" -ForegroundColor Cyan
+    Write-Host "  Get-BusBuddyEnvironment -List                 # List all BusBuddy environment variables" -ForegroundColor Yellow
+    Write-Host "  Get-BusBuddyEnvironment -Set VAR VALUE        # Set a BusBuddy environment variable" -ForegroundColor Yellow
+    Write-Host "  Get-BusBuddyEnvironment -Reset                # Reset environment variables to defaults" -ForegroundColor Yellow
 }
 
-function global:bb-test {
+function global:Invoke-BusBuddyTest {
     param (
         [Parameter(Mandatory = $false)]
         [string]$Filter,
@@ -101,7 +101,7 @@ function global:bb-test {
 
     if (-not $NoBuild) {
         Write-Host "🔨 Building solution first..." -ForegroundColor Yellow
-        bb-build
+        Invoke-BusBuddyBuild
 
         if ($LASTEXITCODE -ne 0) {
             Write-Host "❌ Build failed, cannot run tests" -ForegroundColor Red
@@ -150,7 +150,7 @@ function global:Start-BusBuddyDevSession {
     Write-Host "🚀 Starting BusBuddy development session..." -ForegroundColor Cyan
 
     # Run health check
-    bb-health -Quick
+    Get-BusBuddyHealth -Quick
 
     # Initialize database if requested
     if ($InitDB) {
@@ -188,8 +188,10 @@ function global:Start-BusBuddyDevSession {
 }
 
 # Export functions
-Export-ModuleMember -Function bb-environment, bb-test, Start-BusBuddyDevSession
+Export-ModuleMember -Function Get-BusBuddyEnvironment, Invoke-BusBuddyTest, Start-BusBuddyDevSession
 
-# Create alias for backward compatibility
+# Create aliases for backward compatibility
+New-Alias -Name bb-environment -Value Get-BusBuddyEnvironment -Force
+New-Alias -Name bb-test -Value Invoke-BusBuddyTest -Force
 New-Alias -Name bb-dev-session -Value Start-BusBuddyDevSession -Force
-Export-ModuleMember -Alias bb-dev-session
+Export-ModuleMember -Alias bb-environment, bb-test, bb-dev-session

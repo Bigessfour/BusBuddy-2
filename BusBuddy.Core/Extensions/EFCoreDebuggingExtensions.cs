@@ -21,6 +21,7 @@ public static class EFCoreDebuggingExtensions
     public static DbContextOptionsBuilder EnableComprehensiveDebugging(
         this DbContextOptionsBuilder optionsBuilder)
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         return optionsBuilder
             .EnableSensitiveDataLogging() // Show parameter values in logs
             .EnableDetailedErrors() // Include detailed error information
@@ -36,6 +37,7 @@ public static class EFCoreDebuggingExtensions
     /// </summary>
     public static string GetChangeTrackerDebugInfo(this DbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         var debugInfo = new StringBuilder();
 
         debugInfo.AppendLine("=== Change Tracker Debug Information ===");
@@ -105,6 +107,8 @@ public static class EFCoreDebuggingExtensions
         Func<Task<T>> queryFunc,
         string? queryName = null)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(queryFunc);
         var stopwatch = Stopwatch.StartNew();
         var beforeTrackingInfo = context.ChangeTracker.Entries().Count();
 
@@ -146,6 +150,7 @@ public static class EFCoreDebuggingExtensions
     /// </summary>
     public static async Task<DatabaseDiagnostics> GetDatabaseDiagnosticsAsync(this DbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         var diagnostics = new DatabaseDiagnostics();
 
         try
@@ -222,6 +227,7 @@ public static class EFCoreDebuggingExtensions
     /// </summary>
     public static void ResetForDebugging(this DbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         context.ChangeTracker.Clear();
         context.ChangeTracker.AutoDetectChangesEnabled = true;
         context.ChangeTracker.LazyLoadingEnabled = false;
@@ -236,6 +242,7 @@ public static class EFCoreDebuggingExtensions
         string? fromMigration = null,
         string? toMigration = null)
     {
+        ArgumentNullException.ThrowIfNull(context);
         try
         {
             // For debugging purposes, generate a script that shows the current schema

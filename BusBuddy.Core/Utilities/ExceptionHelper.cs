@@ -48,6 +48,8 @@ public static class ExceptionHelper
     /// </summary>
     public static string AnalyzeEfException(DbUpdateException ex)
     {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+
         var analysis = $"Entity Framework Exception Analysis:\n";
         analysis += $"Message: {ex.Message}\n";
 
@@ -88,6 +90,8 @@ public static class ExceptionHelper
     /// </summary>
     public static string AnalyzeInvalidCastException(InvalidCastException ex)
     {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+
         var analysis = $"Invalid Cast Exception Analysis:\n";
         analysis += $"Message: {ex.Message}\n";
         analysis += $"Source: {ex.Source}\n\n";
@@ -114,6 +118,8 @@ public static class ExceptionHelper
     /// </summary>
     public static string AnalyzeArgumentException(ArgumentException ex)
     {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+
         var analysis = $"Argument Exception Analysis:\n";
         analysis += $"Message: {ex.Message}\n";
         analysis += $"Parameter Name: {ex.ParamName ?? "Unknown"}\n";
@@ -145,6 +151,8 @@ public static class ExceptionHelper
     /// </summary>
     public static string AnalyzeException(Exception ex)
     {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+
         var analysis = $"Exception Analysis Report\n";
         analysis += $"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n";
         analysis += new string('=', 50) + "\n\n";
@@ -190,6 +198,8 @@ public static class ExceptionHelper
     /// </summary>
     public static async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> operation, int maxRetries = 3)
     {
+        ArgumentNullException.ThrowIfNull(operation, nameof(operation));
+
         Exception? lastException = null;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++)
@@ -211,12 +221,12 @@ public static class ExceptionHelper
                 if (attempt == maxRetries)
                 {
                     var analysis = AnalyzeException(ex);
-                    throw new Exception($"Operation failed after {maxRetries} attempts.\n\n{analysis}", ex);
+                    throw new InvalidOperationException($"Operation failed after {maxRetries} attempts.\n\n{analysis}", ex);
                 }
             }
         }
 
-        throw lastException ?? new Exception("Operation failed with unknown error");
+        throw lastException ?? new InvalidOperationException("Operation failed with unknown error");
     }
 
     /// <summary>

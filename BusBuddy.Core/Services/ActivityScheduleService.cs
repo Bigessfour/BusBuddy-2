@@ -584,7 +584,7 @@ namespace BusBuddy.Core.Services
                     .ToDictionaryAsync(d => d.DriverId, d => $"{d.FirstName} {d.LastName}");
 
                 return driverStats.ToDictionary(
-                    s => driverNames.ContainsKey(s.DriverId) ? driverNames[s.DriverId] : $"Driver {s.DriverId}",
+                    s => driverNames.TryGetValue(s.DriverId, out var name) ? name : $"Driver {s.DriverId}",
                     s => s.Count);
             }
             catch (Exception ex)
@@ -611,7 +611,7 @@ namespace BusBuddy.Core.Services
                     .ToDictionaryAsync(v => v.VehicleId, v => $"{v.Make} {v.Model} ({v.BusNumber})");
 
                 return vehicleStats.ToDictionary(
-                    s => vehicleNames.ContainsKey(s.VehicleId) ? vehicleNames[s.VehicleId] : $"Vehicle {s.VehicleId}",
+                    s => vehicleNames.TryGetValue(s.VehicleId, out var name) ? name : $"Vehicle {s.VehicleId}",
                     s => s.Count);
             }
             catch (Exception ex)

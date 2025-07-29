@@ -1,28 +1,47 @@
-name: 🚀 Release - Build & Package
+name: 🚀 BusBuddy Release Pipeline
 
 on:
   push:
     tags:
       - 'v*.*.*'
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       version:
         description: 'Release version (e.g., v1.0.0)'
         required: true
         default: 'v1.0.0'
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
 
 env:
   DOTNET_VERSION: '9.0.x'
-  BUILD_CONFIGURATION: Release
+  SOLUTION_FILE: 'BusBuddy.sln'
+  BUILD_CONFIGURATION: 'Release'
 
 jobs:
   build-release:
     name: 🏗️ Build Release
     runs-on: windows-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    strategy:
+      matrix:
+        platform: [x64, x86]
+      fail-fast: false
 
     outputs:
       version: ${{ steps.version.outputs.version }}
-      artifact-name: ${{ steps.package.outputs.artifact-name }}
+      artifact-names: ${{ steps.package.outputs.artifact-names }}
+      zip-paths: ${{ steps.package.outputs.zip-paths }}
+      zip-sizes: ${{ steps.package.outputs.zip-sizes }}
+      is-production: ${{ steps.environment.outputs.is-production }}
 
     steps:
     - name: 📥 Checkout Code
@@ -43,6 +62,8 @@ jobs:
           $version = $env:GITHUB_REF -replace "refs/tags/", ""
         } elseif ($env:GITHUB_EVENT_NAME -eq "workflow_dispatch") {
           $version = "${{ github.event.inputs.version }}"
+        } elseif ($env:GITHUB_EVENT_NAME -eq "release") {
+          $version = "${{ github.event.release.tag_name }}"
         } else {
           $version = "v0.0.0-dev"
         }
@@ -50,32 +71,67 @@ jobs:
         Write-Host "Version: $version"
         echo "version=$version" >> $env:GITHUB_OUTPUT
 
+    - name: 🔧 Determine Environment
+      id: environment
+      shell: pwsh
+      run: |
+        $environment = "${{ github.event.inputs.environment || 'staging' }}"
+        $isProduction = ($environment -eq "production" -or "${{ github.event_name }}" -eq "release")
+
+        Write-Host "Environment: $environment (Production: $isProduction)"
+        echo "environment=$environment" >> $env:GITHUB_OUTPUT
+        echo "is-production=$isProduction" >> $env:GITHUB_OUTPUT
+
+    - name: 📦 Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.nuget/packages
+          ${{ github.workspace }}/**/obj/project.assets.json
+          ${{ github.workspace }}/**/obj/*.csproj.nuget.*
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
     - name: 📦 Restore Dependencies
-      run: dotnet restore BusBuddy.sln --verbosity minimal
+      run: dotnet restore ${{ env.SOLUTION_FILE }} --verbosity minimal
 
     - name: 🏗️ Build Solution
-      run: dotnet build BusBuddy.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --verbosity minimal
+      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --verbosity minimal
 
     - name: 🧪 Run Tests
-      run: dotnet test BusBuddy.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity minimal --logger trx
+      run: dotnet test ${{ env.SOLUTION_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity minimal --logger trx
       continue-on-error: false
 
     - name: 📦 Publish Application
       shell: pwsh
       run: |
-        Write-Host "🚀 Publishing BusBuddy application..." -ForegroundColor Cyan
+        Write-Host "🚀 Publishing BusBuddy application for ${{ matrix.platform }}..." -ForegroundColor Cyan
 
-        $publishDir = "publish"
+        $publishDir = "publish-${{ matrix.platform }}"
         $version = "${{ steps.version.outputs.version }}"
+        $isProduction = "${{ steps.environment.outputs.is-production }}" -eq "true"
+
+        $publishArgs = @(
+          "BusBuddy.WPF/BusBuddy.WPF.csproj",
+          "--configuration", "${{ env.BUILD_CONFIGURATION }}",
+          "--output", $publishDir,
+          "--no-build",
+          "--verbosity", "minimal",
+          "--self-contained", "false",
+          "--runtime", "win-${{ matrix.platform }}"
+        )
+
+        # Add production-specific arguments if needed
+        if ($isProduction) {
+          # Add any production-specific publish arguments here
+          Write-Host "🔒 Publishing for PRODUCTION environment" -ForegroundColor Yellow
+        } else {
+          Write-Host "📦 Publishing for STAGING environment" -ForegroundColor Cyan
+        }
 
         # Publish the WPF application
-        dotnet publish BusBuddy.WPF/BusBuddy.WPF.csproj `
-          --configuration ${{ env.BUILD_CONFIGURATION }} `
-          --output $publishDir `
-          --no-build `
-          --verbosity minimal `
-          --self-contained false `
-          --runtime win-x64
+        dotnet publish @publishArgs
 
         Write-Host "✅ Application published to $publishDir" -ForegroundColor Green
 
@@ -87,6 +143,9 @@ jobs:
           GitRef = $env:GITHUB_REF
           Workflow = $env:GITHUB_WORKFLOW
           RunNumber = $env:GITHUB_RUN_NUMBER
+          Environment = "${{ steps.environment.outputs.environment }}"
+          IsProduction = $isProduction
+          Platform = "${{ matrix.platform }}"
         }
 
         $versionInfo | ConvertTo-Json -Depth 3 | Out-File "$publishDir/version.json" -Encoding UTF8
@@ -96,49 +155,68 @@ jobs:
       id: package
       shell: pwsh
       run: |
-        Write-Host "📦 Creating application package..." -ForegroundColor Cyan
+        Write-Host "📦 Creating application package for ${{ matrix.platform }}..." -ForegroundColor Cyan
 
         $version = "${{ steps.version.outputs.version }}"
-        $artifactName = "BusBuddy-$version-win-x64"
+        $environment = "${{ steps.environment.outputs.environment }}"
+        $artifactName = "BusBuddy-$version-$environment-win-${{ matrix.platform }}"
         $zipPath = "$artifactName.zip"
 
         # Create ZIP package
-        Compress-Archive -Path "publish/*" -DestinationPath $zipPath -Force
+        Compress-Archive -Path "publish-${{ matrix.platform }}/*" -DestinationPath $zipPath -Force
 
         $zipSize = (Get-Item $zipPath).Length
         $zipSizeMB = [math]::Round($zipSize / 1MB, 2)
 
         Write-Host "✅ Package created: $zipPath ($zipSizeMB MB)" -ForegroundColor Green
+
+        # For matrix builds, we need to use arrays to store outputs for all platforms
+        $artifactNames = "BusBuddy-$version-$environment-win-${{ matrix.platform }}"
+        $zipPaths = $zipPath
+        $zipSizes = $zipSizeMB
+
         echo "artifact-name=$artifactName" >> $env:GITHUB_OUTPUT
         echo "zip-path=$zipPath" >> $env:GITHUB_OUTPUT
         echo "zip-size-mb=$zipSizeMB" >> $env:GITHUB_OUTPUT
+
+        # Store the aggregated output for use in subsequent jobs
+        echo "artifact-names=$artifactNames" >> $env:GITHUB_OUTPUT
+        echo "zip-paths=$zipPaths" >> $env:GITHUB_OUTPUT
+        echo "zip-sizes=$zipSizes" >> $env:GITHUB_OUTPUT
 
     - name: 📤 Upload Release Artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.package.outputs.artifact-name }}
         path: ${{ steps.package.outputs.zip-path }}
-        retention-days: 30
+        retention-days: 90
 
     - name: 📋 Create Release Notes
+      id: release-notes
       shell: pwsh
       run: |
         Write-Host "📝 Generating release notes..." -ForegroundColor Cyan
 
         $version = "${{ steps.version.outputs.version }}"
         $date = Get-Date -Format "yyyy-MM-dd"
+        $environment = "${{ steps.environment.outputs.environment }}"
+        $isProduction = "${{ steps.environment.outputs.is-production }}" -eq "true"
+
+        $envLabel = if ($isProduction) { "Production" } else { "Staging" }
 
         $releaseNotes = @"
-        # 🚌 BusBuddy $version Release
+        # 🚌 BusBuddy $version $envLabel Release
 
         **Release Date:** $date
         **Build:** ${{ github.run_number }}
         **Commit:** ${{ github.sha }}
+        **Environment:** $envLabel
+        **Platform:** ${{ matrix.platform }}
 
         ## What's Included
         - BusBuddy WPF Application - Modern transportation management system
         - Steve's Quick Data Summary - Interactive dashboard functionality
-        - Phase 1 Complete - Core features and foundation established
+        - Core features and foundation established
         - Global Coding Standards - 17 technology standards implemented
         - Development Tools - VS Code integration and build automation
 
@@ -151,7 +229,7 @@ jobs:
 
         ## Package Information
         - Size: ${{ steps.package.outputs.zip-size-mb }} MB
-        - Runtime: .NET 8.0 (Windows x64)
+        - Runtime: .NET 8.0 (Windows ${{ matrix.platform }})
         - UI Framework: WPF with Syncfusion controls
         - Database: Entity Framework Core with SQL Server
 
@@ -166,47 +244,80 @@ jobs:
         - Comprehensive Testing - Automated CI/CD validation
         - Standards Documentation - Complete language standards coverage
         - Steve's Happiness - Interactive button functionality delivered!
-
-        Special Thanks: This release represents the successful completion of Phase 1 goals with Steve's requested Quick Data Summary button working perfectly!
         "@
 
-        $releaseNotes | Out-File "RELEASE_NOTES.md" -Encoding UTF8
+        $notesFileName = "RELEASE_NOTES-${{ matrix.platform }}.md"
+        $releaseNotes | Out-File $notesFileName -Encoding UTF8
         Write-Host "✅ Release notes created" -ForegroundColor Green
+
+        echo "notes-file=$notesFileName" >> $env:GITHUB_OUTPUT
 
     - name: 📤 Upload Release Notes
       uses: actions/upload-artifact@v4
       with:
-        name: release-notes-${{ steps.version.outputs.version }}
-        path: RELEASE_NOTES.md
-        retention-days: 30
+        name: release-notes-${{ steps.version.outputs.version }}-${{ steps.environment.outputs.environment }}-${{ matrix.platform }}
+        path: ${{ steps.release-notes.outputs.notes-file }}
+        retention-days: 90
 
   create-github-release:
     name: 🎉 Create GitHub Release
     runs-on: ubuntu-latest
     needs: build-release
-    if: startsWith(github.ref, 'refs/tags/')
+    if: |
+      (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') ||
+      (github.event_name == 'workflow_dispatch' && needs.build-release.outputs.is-production == 'true')
 
     steps:
-    - name: 📥 Download Release Artifact
+    - name: 📥 Download All Release Artifacts
       uses: actions/download-artifact@v4
       with:
-        name: ${{ needs.build-release.outputs.artifact-name }}
+        pattern: BusBuddy-*
+        merge-multiple: true
+        path: release-artifacts
 
-    - name: 📥 Download Release Notes
+    - name: 📥 Download All Release Notes
       uses: actions/download-artifact@v4
       with:
-        name: release-notes-${{ needs.build-release.outputs.version }}
+        pattern: release-notes-*
+        merge-multiple: true
+        path: release-notes
+
+    - name: 🔄 Combine Release Notes
+      shell: bash
+      run: |
+        echo "📝 Combining release notes from all platforms..."
+
+        # Create a combined release notes file
+        cat > COMBINED_RELEASE_NOTES.md << 'EOL'
+        # 🚌 BusBuddy ${RELEASE_VERSION} Release
+
+        ## Multi-Platform Release
+
+        This release includes builds for multiple platforms:
+
+        - Windows x64 (64-bit)
+        - Windows x86 (32-bit)
+
+        Please download the appropriate version for your system.
+
+        EOL
+
+        # Append platform-specific notes
+        cat release-notes/*.md >> COMBINED_RELEASE_NOTES.md
+
+        echo "✅ Combined release notes created"
+      env:
+        RELEASE_VERSION: ${{ needs.build-release.outputs.version }}
 
     - name: 🎉 Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ needs.build-release.outputs.version }}
-        name: 🚌 BusBuddy ${{ needs.build-release.outputs.version }}
-        body_path: RELEASE_NOTES.md
-        files: |
-          ${{ needs.build-release.outputs.artifact-name }}.zip
+        name: 🚌 BusBuddy ${{ needs.build-release.outputs.version }} ${{ needs.build-release.outputs.is-production == 'true' && 'Production' || 'Staging' }}
+        body_path: COMBINED_RELEASE_NOTES.md
+        files: release-artifacts/*.zip
         draft: false
-        prerelease: ${{ contains(needs.build-release.outputs.version, '-') }}
+        prerelease: ${{ !needs.build-release.outputs.is-production == 'true' || contains(needs.build-release.outputs.version, '-') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -239,13 +350,27 @@ jobs:
           ReleaseVersion = "${{ needs.build-release.outputs.version }}"
           BuildDate = (Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC")
           WorkflowRunTime = "${{ github.run_number }}"
-          ArtifactSize = "${{ needs.build-release.outputs.zip-size-mb }} MB"
+          ArtifactSizes = "${{ needs.build-release.outputs.zip-sizes }}"
           GitCommit = "${{ github.sha }}"
+          Environment = "${{ github.event.inputs.environment || 'staging' }}"
+          IsProduction = "${{ needs.build-release.outputs.is-production }}"
           Status = "Success"
+          Platforms = "x64, x86"
         }
 
         Write-Host "✅ Release metrics:" -ForegroundColor Green
         $metrics | ConvertTo-Json -Depth 3 | Write-Host
+
+        echo "## 📊 Release Performance Metrics" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+        echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Version | ${{ needs.build-release.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Environment | ${{ github.event.inputs.environment || 'staging' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Is Production | ${{ needs.build-release.outputs.is-production }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Artifact Sizes | ${{ needs.build-release.outputs.zip-sizes }} MB |" >> $GITHUB_STEP_SUMMARY
+        echo "| Platforms | x64, x86 |" >> $GITHUB_STEP_SUMMARY
+        echo "| Status | ✅ Success |" >> $GITHUB_STEP_SUMMARY
 
 
 

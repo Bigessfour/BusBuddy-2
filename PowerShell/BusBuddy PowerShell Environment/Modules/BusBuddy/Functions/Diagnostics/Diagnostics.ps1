@@ -12,7 +12,34 @@
     Copyright 2025 - BusBuddy
 #>
 
-function global:bb-health {
+function global:Get-BusBuddyHealth {
+    <#
+    .SYNOPSIS
+        Performs a health check on the BusBuddy development environment.
+    .DESCRIPTION
+        This function evaluates the health of the BusBuddy development environment
+        by checking PowerShell version, .NET SDK version, project structure, and
+        database configuration. Results are color-coded and can be exported to a file.
+    .PARAMETER Quick
+        When specified, performs a minimal health check with basic diagnostics.
+    .PARAMETER Verbose
+        Provides more detailed output during the health check.
+    .PARAMETER Export
+        Specifies a file path to export the results as JSON.
+    .EXAMPLE
+        Get-BusBuddyHealth
+        Performs a standard health check with default settings.
+    .EXAMPLE
+        Get-BusBuddyHealth -Quick
+        Performs a quick health check with minimal diagnostics.
+    .EXAMPLE
+        Get-BusBuddyHealth -Export "health-report.json"
+        Performs a health check and exports the results to health-report.json.
+    .OUTPUTS
+        System.Collections.Hashtable containing the health check results.
+    .NOTES
+        This function is aliased to bb-health for backward compatibility.
+    #>
     param (
         [Parameter(Mandatory = $false)]
         [switch]$Quick,
@@ -25,6 +52,7 @@ function global:bb-health {
     )
 
     Write-Host "🩺 Running BusBuddy health check..." -ForegroundColor Cyan
+    $startTime = Get-Date
 
     # Basic health checks
     $results = @{}
@@ -41,17 +69,18 @@ function global:bb-health {
     # Check .NET SDK
     try {
         $dotnetVersion = (dotnet --version)
-        $dotnetVersionOk = $dotnetVersion.StartsWith("8.")
+        $dotnetVersionOk = [Version]::TryParse($dotnetVersion, [ref]$null) -and
+                           (($dotnetVersion.StartsWith("8.")) -or ($dotnetVersion.StartsWith("9.")))
         $results[".NET SDK"] = @{
             "Version" = "$dotnetVersion"
             "Status" = if ($dotnetVersionOk) { "OK" } else { "WARNING" }
-            "Message" = if ($dotnetVersionOk) { ".NET 8 SDK detected" } else { ".NET 8 SDK recommended" }
+            "Message" = if ($dotnetVersionOk) { ".NET 8 or 9 SDK detected" } else { ".NET 8 or 9 SDK recommended" }
         }
     } catch {
         $results[".NET SDK"] = @{
             "Version" = "Unknown"
             "Status" = "ERROR"
-            "Message" = "Could not detect .NET SDK"
+            "Message" = "Could not detect .NET SDK: $($_.Exception.Message)"
         }
     }
 
@@ -74,11 +103,65 @@ function global:bb-health {
         }
     }
 
+    # Check PATH environment for required tools
+    $pathEntries = $env:PATH -split ';'
+    $dotnetInPath = $pathEntries | Where-Object { Test-Path (Join-Path $_ "dotnet.exe") -ErrorAction SilentlyContinue }
+    $results["Environment PATH"] = @{
+        "Status" = if ($dotnetInPath) { "OK" } else { "WARNING" }
+        "Message" = if ($dotnetInPath) { ".NET SDK found in PATH" } else { ".NET SDK not found in PATH" }
+    }
+
     # Check database connection
     $dbConfigExists = Test-Path "BusBuddy.Core/appsettings.json"
     $results["Database Config"] = @{
         "Status" = if ($dbConfigExists) { "OK" } else { "WARNING" }
         "Message" = if ($dbConfigExists) { "Database configuration found" } else { "Database configuration missing" }
+    }
+
+    # Check required PowerShell modules
+    $requiredModules = @('PSScriptAnalyzer')
+    $modulesStatus = @{}
+
+    foreach ($module in $requiredModules) {
+        $moduleInstalled = Get-Module -Name $module -ListAvailable
+        $modulesStatus[$module] = @{
+            "Status" = if ($moduleInstalled) { "OK" } else { "WARNING" }
+            "Message" = if ($moduleInstalled) { "Module installed" } else { "Module not found" }
+        }
+    }
+
+    $results["PowerShell Modules"] = $modulesStatus
+
+    # Check MCP environment
+    $mcpConfigExists = Test-Path "$env:APPDATA\Claude\claude_desktop_config.json" -ErrorAction SilentlyContinue
+    $mcpServerFiles = Test-Path "mcp-servers\*.js" -ErrorAction SilentlyContinue
+    $mcpJsonExists = Test-Path "mcp.json" -ErrorAction SilentlyContinue
+    $busBuddyAIExists = Test-Path "$PSScriptRoot\..\..\..\BusBuddy.AI\BusBuddy.AI.psm1" -ErrorAction SilentlyContinue
+
+    # Load and test BusBuddy.AI module if not already loaded
+    $busBuddyAILoaded = $null -ne (Get-Module -Name "BusBuddy.AI" -ErrorAction SilentlyContinue)
+    if (-not $busBuddyAILoaded -and $busBuddyAIExists) {
+        try {
+            Import-Module "$PSScriptRoot\..\..\..\BusBuddy.AI\BusBuddy.AI.psm1" -ErrorAction Stop
+            $busBuddyAILoaded = $true
+        } catch {
+            $busBuddyAILoaded = $false
+        }
+    }
+
+    $results["MCP Environment"] = @{
+        "Status" = if ($mcpConfigExists -and $mcpServerFiles -and $mcpJsonExists -and $busBuddyAILoaded) { "OK" } else { "WARNING" }
+        "Message" = if ($mcpConfigExists -and $mcpServerFiles -and $mcpJsonExists -and $busBuddyAILoaded) {
+            "MCP environment properly configured"
+        } else {
+            "MCP environment incomplete or not properly configured"
+        }
+        "Details" = @{
+            "ConfigFile" = if ($mcpConfigExists) { "OK" } else { "Missing" }
+            "ServerFiles" = if ($mcpServerFiles) { "OK" } else { "Missing" }
+            "MCPJson" = if ($mcpJsonExists) { "OK" } else { "Missing" }
+            "BusBuddy.AI" = if ($busBuddyAILoaded) { "Loaded" } else { if ($busBuddyAIExists) { "Found but not loaded" } else { "Missing" } }
+        }
     }
 
     # Output results
@@ -87,30 +170,80 @@ function global:bb-health {
     Write-Host "=====================" -ForegroundColor Cyan
 
     $overallStatus = "OK"
+    $resultCategories = @{
+        "Critical" = @()
+        "Warning" = @()
+        "OK" = @()
+    }
 
     foreach ($key in $results.Keys) {
+        # Skip metadata in display
+        if ($key -eq "Metadata") { continue }
+
         $item = $results[$key]
-        $statusColor = switch ($item.Status) {
-            "OK" { "Green" }
-            "WARNING" { "Yellow" }
-            "ERROR" { "Red" }
-            default { "White" }
+
+        # Handle nested hashtables (like PowerShell Modules)
+        if ($item -is [hashtable] -and -not $item.ContainsKey("Status")) {
+            Write-Host "$($key):" -ForegroundColor Cyan
+
+            foreach ($subKey in $item.Keys) {
+                $subItem = $item[$subKey]
+                $statusColor = switch ($subItem.Status) {
+                    "OK" { "Green" }
+                    "WARNING" { "Yellow" }
+                    "ERROR" { "Red" }
+                    default { "White" }
+                }
+
+                Write-Host "  $subKey : " -NoNewline
+                Write-Host $subItem.Status -ForegroundColor $statusColor -NoNewline
+
+                if ($subItem.ContainsKey("Version")) {
+                    Write-Host " ($($subItem.Version))" -NoNewline
+                }
+
+                Write-Host " - $($subItem.Message)"
+
+                # Track overall status
+                if ($subItem.Status -eq "ERROR") {
+                    $overallStatus = "ERROR"
+                    $resultCategories["Critical"] += "$key - $subKey"
+                } elseif ($subItem.Status -eq "WARNING" -and $overallStatus -ne "ERROR") {
+                    $overallStatus = "WARNING"
+                    $resultCategories["Warning"] += "$key - $subKey"
+                } else {
+                    $resultCategories["OK"] += "$key - $subKey"
+                }
+            }
+
+            Write-Host ""
+        } else {
+            $statusColor = switch ($item.Status) {
+                "OK" { "Green" }
+                "WARNING" { "Yellow" }
+                "ERROR" { "Red" }
+                default { "White" }
+            }
+
+            if ($item.Status -eq "ERROR") {
+                $overallStatus = "ERROR"
+                $resultCategories["Critical"] += $key
+            } elseif ($item.Status -eq "WARNING" -and $overallStatus -ne "ERROR") {
+                $overallStatus = "WARNING"
+                $resultCategories["Warning"] += $key
+            } else {
+                $resultCategories["OK"] += $key
+            }
+
+            Write-Host "$key : " -NoNewline
+            Write-Host $item.Status -ForegroundColor $statusColor -NoNewline
+
+            if ($item.ContainsKey("Version")) {
+                Write-Host " ($($item.Version))" -NoNewline
+            }
+
+            Write-Host " - $($item.Message)"
         }
-
-        if ($item.Status -eq "ERROR") {
-            $overallStatus = "ERROR"
-        } elseif ($item.Status -eq "WARNING" -and $overallStatus -ne "ERROR") {
-            $overallStatus = "WARNING"
-        }
-
-        Write-Host "$key : " -NoNewline
-        Write-Host $item.Status -ForegroundColor $statusColor -NoNewline
-
-        if ($item.ContainsKey("Version")) {
-            Write-Host " ($($item.Version))" -NoNewline
-        }
-
-        Write-Host " - $($item.Message)"
     }
 
     Write-Host ""
@@ -123,6 +256,18 @@ function global:bb-health {
     }
     Write-Host $overallStatus -ForegroundColor $overallStatusColor
 
+    # Calculate and display execution time
+    $endTime = Get-Date
+    $executionTime = ($endTime - $startTime).TotalSeconds
+    Write-Host "Health check completed in $executionTime seconds" -ForegroundColor Cyan
+
+    # Add execution metadata to results
+    $results["Metadata"] = @{
+        "ExecutionTime" = $executionTime
+        "Timestamp" = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        "Mode" = if ($Quick) { "Quick" } else { "Full" }
+    }
+
     # Export results if requested
     if ($Export) {
         $results | ConvertTo-Json -Depth 5 | Set-Content -Path $Export
@@ -132,7 +277,7 @@ function global:bb-health {
     return $results
 }
 
-function global:bb-diagnostic {
+function global:Get-BusBuddyDiagnostic {
     param (
         [Parameter(Mandatory = $false)]
         [switch]$Full,
@@ -149,7 +294,7 @@ function global:bb-diagnostic {
     $diagnosticResults = @{}
 
     # Basic diagnostics
-    $diagnosticResults["BasicHealth"] = bb-health -Quick
+    $diagnosticResults["BasicHealth"] = Get-BusBuddyHealth -Quick
 
     # More detailed diagnostics if requested
     if ($Full) {
@@ -250,5 +395,9 @@ function global:bb-diagnostic {
     return $diagnosticResults
 }
 
+# Create aliases for backward compatibility
+Set-Alias -Name "bb-health" -Value Get-BusBuddyHealth
+Set-Alias -Name "bb-diagnostic" -Value Get-BusBuddyDiagnostic
+
 # Export functions
-Export-ModuleMember -Function bb-health, bb-diagnostic
+Export-ModuleMember -Function Get-BusBuddyHealth, Get-BusBuddyDiagnostic -Alias bb-health, bb-diagnostic

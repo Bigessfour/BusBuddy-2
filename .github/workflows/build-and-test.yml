@@ -21,6 +21,10 @@ jobs:
   build-and-test:
     runs-on: windows-latest
     timeout-minutes: 45
+    strategy:
+      matrix:
+        platform: [x64, x86]
+      fail-fast: false
 
     outputs:
       build-success: ${{ steps.build-step.outcome == 'success' }}
@@ -65,7 +69,7 @@ jobs:
       - name: 🏗️ Build solution
         id: build-step
         run: |
-          echo "🔨 Building Bus Buddy solution..."
+          echo "🔨 Building Bus Buddy solution for ${{ matrix.platform }}..."
           dotnet build ${{ env.SOLUTION_FILE }} --no-restore --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal
           echo "✅ Build completed successfully"
 
@@ -110,6 +114,7 @@ jobs:
           echo "   - XAML files: $xamlFiles"
           echo "   - Test coverage opportunity: High"
           echo "   - Recommended: Add unit tests for ViewModels, Services, and Core logic"
+
       - name: 📊 Generate coverage report
         id: coverage-step
         run: |
@@ -131,6 +136,12 @@ jobs:
             echo "coverage=0" >> $env:GITHUB_OUTPUT
             echo "⚠️ No coverage files found"
           }
+
+      - name: 📦 Publish WPF application
+        if: success() && github.event_name != 'pull_request'
+        run: |
+          echo "📦 Publishing WPF application for ${{ matrix.platform }}..."
+          dotnet publish BusBuddy.WPF/BusBuddy.WPF.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --output ./publish-${{ matrix.platform }} --runtime win-${{ matrix.platform }}
 
       - name: ☁️ Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
@@ -178,7 +189,7 @@ jobs:
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: "GitHub Actions Testing Platform Results"
+          name: "GitHub Actions Testing Platform Results (${{ matrix.platform }})"
           path: "**/TestResults/*.trx"
           reporter: "dotnet-trx"
           fail-on-error: false
@@ -188,10 +199,11 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: build-artifacts-${{ github.run_number }}
+          name: build-artifacts-${{ matrix.platform }}-${{ github.run_number }}
           path: |
             **/bin/Release/
             **/TestResults/
+            publish-${{ matrix.platform }}/
             **/*.log
           retention-days: 7
 
@@ -199,7 +211,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: test-failure-logs-${{ github.run_number }}
+          name: test-failure-logs-${{ matrix.platform }}-${{ github.run_number }}
           path: |
             **/logs/
             **/TestResults/
@@ -228,6 +240,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | ${{ matrix.platform }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Build Status | ${{ steps.build-step.outcome == 'success' && '✅ Success' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Testing Platform | ${{ steps.test-step.outcome == 'success' && '✅ Active' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Code Coverage | ${{ steps.coverage-step.outputs.coverage || '0' }}% |" >> $GITHUB_STEP_SUMMARY

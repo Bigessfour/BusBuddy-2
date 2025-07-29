@@ -310,7 +310,7 @@ if ($validationResults.Summary.MostCommonIssues.Count -gt 0) {
     Write-Host ""
 }
 
-if ($validationResults.Summary.CriticalFiles.Count -gt 0) {
+if ($validationResults.Summary.CriticalFiles -and $validationResults.Summary.CriticalFiles.Count -gt 0) {
     Write-Host "🚨 Files Requiring Immediate Attention:" -ForegroundColor Red
     foreach ($file in $validationResults.Summary.CriticalFiles) {
         Write-Host "   • $file" -ForegroundColor Red
