@@ -80,24 +80,27 @@ function Get-ProcessesLockingBusBuddyFiles {
     $currentPID = $PID
 
     # Based on MSBuild's KillProcessesFromRepo function
-    foreach ($process in Get-Process -ErrorAction SilentlyContinue | Where-Object { $KnownLockingProcesses -contains $_.Name }) {
+    $processes = Get-Process -ErrorAction SilentlyContinue | Where-Object { $KnownLockingProcesses -contains $_.Name }
 
-        if ([string]::IsNullOrEmpty($process.Path)) {
-            Write-MSBuildLog "Process $($process.Id) $($process.Name) has no path. Skipping." "Warning"
-            continue
-        }
+    if ($processes) {
+        foreach ($process in $processes) {
+            if ([string]::IsNullOrEmpty($process.Path)) {
+                Write-MSBuildLog "Process $($process.Id) $($process.Name) has no path. Skipping." "Warning"
+                continue
+            }
 
-        # Check if process is from our repo (like MSBuild does)
-        if ($process.Path.StartsWith($ProjectRoot, [StringComparison]::InvariantCultureIgnoreCase)) {
-            $isSelf = $process.Id -eq $currentPID
+            # Check if process is from our repo (like MSBuild does)
+            if ($process.Path.StartsWith($ProjectRoot, [StringComparison]::InvariantCultureIgnoreCase)) {
+                $isSelf = $process.Id -eq $currentPID
 
-            $lockingProcesses += [PSCustomObject]@{
-                Name = $process.Name
-                PID = $process.Id
-                Path = $process.Path
-                StartTime = $process.StartTime
-                IsSelf = $isSelf
-                CanKill = -not $isSelf -or -not $PreventSelfKill
+                $lockingProcesses += [PSCustomObject]@{
+                    Name = $process.Name
+                    PID = $process.Id
+                    Path = $process.Path
+                    StartTime = $process.StartTime
+                    IsSelf = $isSelf
+                    CanKill = -not $isSelf -or -not $PreventSelfKill
+                }
             }
         }
     }
@@ -165,7 +168,7 @@ function Clear-MSBuildArtifacts {
                 Write-MSBuildLog "Removed: $fullPath" "Success"
             }
             catch {
-                Write-MSBuildLog "Could not remove $fullPath: $($_.Exception.Message)" "Warning"
+                Write-MSBuildLog "Could not remove $fullPath because: $($_.Exception.Message)" "Warning"
             }
         }
     }
@@ -176,31 +179,50 @@ function Invoke-ExternalSessionCleanup {
 
     Write-MSBuildLog "Starting external PowerShell session for cleanup..." "Info"
 
-    $cleanupScript = @"
-Set-Location '$ProjectRoot'
-Write-Host 'External cleanup session started...'
+    # Escape the project root path for PowerShell string interpolation
+    $escapedProjectRoot = $ProjectRoot.Replace('\', '\\').Replace("'", "''")
 
+    # Build cleanup script using here-string for better handling
+    $cleanupScript = @"
+Set-Location '$escapedProjectRoot'
+Write-Host 'External cleanup session started...'
 # Kill all MSBuild-related processes from this project
-foreach (`$process in Get-Process -ErrorAction SilentlyContinue | Where-Object {'msbuild', 'dotnet', 'vbcscompiler', 'pwsh', 'powershell' -contains `$_.Name}) {
-    if (-not [string]::IsNullOrEmpty(`$process.Path) -and `$process.Path.StartsWith('$ProjectRoot', [StringComparison]::InvariantCultureIgnoreCase)) {
+`$processes = Get-Process -ErrorAction SilentlyContinue | Where-Object { @('msbuild', 'dotnet', 'vbcscompiler', 'pwsh', 'powershell') -contains `$_.Name }
+foreach (`$process in `$processes) {
+    if (-not [string]::IsNullOrEmpty(`$process.Path) -and `$process.Path.StartsWith('$escapedProjectRoot', [StringComparison]::InvariantCultureIgnoreCase)) {
         Write-Host "Killing `$(`$process.Name) (PID: `$(`$process.Id))"
-        taskkill /f /pid `$process.Id 2>`$null
+        try {
+            Stop-Process -Id `$process.Id -Force -ErrorAction SilentlyContinue
+        }
+        catch {
+            # Fallback to taskkill
+            taskkill /f /pid `$process.Id 2>`$null
+        }
     }
 }
-
 # Force garbage collection
 [System.GC]::Collect()
 [System.GC]::WaitForPendingFinalizers()
-
 Write-Host 'External cleanup completed'
 "@
 
     $tempScript = Join-Path $env:TEMP "BusBuddy-External-Cleanup-$(Get-Random).ps1"
-    $cleanupScript | Out-File -FilePath $tempScript -Encoding UTF8
 
     try {
+        $cleanupScript | Out-File -FilePath $tempScript -Encoding UTF8 -Force
+
+        if (-not (Test-Path $tempScript)) {
+            throw "Failed to create temporary cleanup script"
+        }
+
         $result = Start-Process -FilePath "pwsh" -ArgumentList "-ExecutionPolicy", "Bypass", "-File", $tempScript -Wait -PassThru -NoNewWindow
         Write-MSBuildLog "External cleanup completed with exit code: $($result.ExitCode)" "Success"
+
+        return $result.ExitCode -eq 0
+    }
+    catch {
+        Write-MSBuildLog "External cleanup failed: $($_.Exception.Message)" "Error"
+        return $false
     }
     finally {
         if (Test-Path $tempScript) {
@@ -215,7 +237,7 @@ function Test-BuildAfterCleanup {
     Write-MSBuildLog "Testing build after cleanup..." "Info"
 
     try {
-        Set-Location $ProjectRoot
+        Push-Location $ProjectRoot
 
         # Test with minimal build first
         $buildResult = & dotnet build "BusBuddy.sln" --verbosity minimal --nologo 2>&1
@@ -225,13 +247,18 @@ function Test-BuildAfterCleanup {
             return $true
         } else {
             Write-MSBuildLog "Build test FAILED:" "Error"
-            $buildResult | ForEach-Object { Write-MSBuildLog "  $_" "Error" }
+            if ($buildResult) {
+                $buildResult | ForEach-Object { Write-MSBuildLog "  $_" "Error" }
+            }
             return $false
         }
     }
     catch {
         Write-MSBuildLog "Build test ERROR: $($_.Exception.Message)" "Error"
         return $false
+    }
+    finally {
+        Pop-Location
     }
 }
 
@@ -240,46 +267,70 @@ try {
     Write-MSBuildLog "MSB3027/MSB3021 File Lock Solution Starting" "Info"
     Write-MSBuildLog "Mode: $Mode | Project: $ProjectRoot" "Info"
 
+    # Validate project root
+    if (-not (Test-Path $ProjectRoot)) {
+        throw "Project root path does not exist: $ProjectRoot"
+    }
+
     switch ($Mode) {
         "Analysis" {
             $processes = Get-ProcessesLockingBusBuddyFiles -ProjectRoot $ProjectRoot
-            Write-MSBuildLog "Found $($processes.Count) potentially locking processes:" "Info"
-            $processes | ForEach-Object {
-                $selfFlag = if ($_.IsSelf) { " (CURRENT SESSION)" } else { "" }
-                Write-MSBuildLog "  $($_.Name) (PID: $($_.PID))$selfFlag" "Info"
+            $processCount = $processes ? $processes.Count : 0
+            Write-MSBuildLog "Found $processCount potentially locking processes:" "Info"
+            if ($processCount -gt 0) {
+                $processes | ForEach-Object {
+                    $selfFlag = $_.IsSelf ? " (CURRENT SESSION)" : ""
+                    Write-MSBuildLog "  $($_.Name) (PID: $($_.PID))$selfFlag" "Info"
+                }
             }
         }
 
         "Kill" {
             $processes = Get-ProcessesLockingBusBuddyFiles -ProjectRoot $ProjectRoot
-            $result = Stop-MSBuildProcesses -Processes $processes -Force:$Force
-            Write-MSBuildLog "Killed: $($result.Killed.Count) | Skipped: $($result.Skipped.Count)" "Success"
+            if ($processes -and $processes.Count -gt 0) {
+                $result = Stop-MSBuildProcesses -Processes $processes -Force:$Force
+                Write-MSBuildLog "Killed: $($result.Killed.Count) | Skipped: $($result.Skipped.Count)" "Success"
+            } else {
+                Write-MSBuildLog "No processes found to kill" "Info"
+            }
         }
 
         "External" {
-            Invoke-ExternalSessionCleanup -ProjectRoot $ProjectRoot
+            $success = Invoke-ExternalSessionCleanup -ProjectRoot $ProjectRoot
+            if (-not $success) {
+                exit 1
+            }
         }
 
         "Complete" {
             # Full solution based on MSBuild's approach
             $processes = Get-ProcessesLockingBusBuddyFiles -ProjectRoot $ProjectRoot
-            Write-MSBuildLog "Found $($processes.Count) processes to clean up" "Info"
+            $processCount = $processes ? $processes.Count : 0
+            Write-MSBuildLog "Found $processCount processes to clean up" "Info"
 
             # Step 1: Kill other processes
-            $killable = $processes | Where-Object { $_.CanKill }
-            if ($killable.Count -gt 0) {
-                Stop-MSBuildProcesses -Processes $killable -Force:$Force
+            if ($processCount -gt 0) {
+                $killable = $processes | Where-Object { $_.CanKill }
+                if ($killable -and $killable.Count -gt 0) {
+                    Stop-MSBuildProcesses -Processes $killable -Force:$Force
+                }
             }
 
             # Step 2: Clear artifacts
             Clear-MSBuildArtifacts -ProjectRoot $ProjectRoot
 
             # Step 3: If current session was problematic, use external cleanup
-            $selfProcess = $processes | Where-Object { $_.IsSelf }
-            if ($selfProcess -and -not $PreventSelfKill) {
-                Write-MSBuildLog "Current session detected as locking files. Using external cleanup..." "Warning"
-                Invoke-ExternalSessionCleanup -ProjectRoot $ProjectRoot
-                return # External session will terminate this one
+            if ($processCount -gt 0) {
+                $selfProcess = $processes | Where-Object { $_.IsSelf }
+                if ($selfProcess -and -not $PreventSelfKill) {
+                    Write-MSBuildLog "Current session detected as locking files. Using external cleanup..." "Warning"
+                    $success = Invoke-ExternalSessionCleanup -ProjectRoot $ProjectRoot
+                    if ($success) {
+                        return # External session will terminate this one
+                    } else {
+                        Write-MSBuildLog "External cleanup failed, continuing with current session..." "Warning"
+                    }
+                }
             }
 
             # Step 4: Test build

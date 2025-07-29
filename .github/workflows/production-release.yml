@@ -11,7 +11,7 @@ on:
         type: string
 
 env:
-  DOTNET_VERSION: "8.0.x"
+  DOTNET_VERSION: "9.0.x"
   SOLUTION_FILE: "BusBuddy.sln"
   BUILD_CONFIGURATION: "Release"
 

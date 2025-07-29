@@ -12,7 +12,7 @@ on:
         default: 'v1.0.0'
 
 env:
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '9.0.x'
   BUILD_CONFIGURATION: Release
 
 jobs:
@@ -129,47 +129,46 @@ jobs:
         $date = Get-Date -Format "yyyy-MM-dd"
 
         $releaseNotes = @"
-# 🚌 BusBuddy $version Release
+        # 🚌 BusBuddy $version Release
 
-**📅 Release Date:** $date
-**🏗️ Build:** ${{ github.run_number }}
-**📋 Commit:** ${{ github.sha }}
+        **Release Date:** $date
+        **Build:** ${{ github.run_number }}
+        **Commit:** ${{ github.sha }}
 
-## ✅ What's Included
-- 🚌 **BusBuddy WPF Application** - Modern transportation management system
-- 📊 **Steve's Quick Data Summary** - Interactive dashboard functionality
-- 🎯 **Phase 1 Complete** - Core features and foundation established
-- 📚 **Global Coding Standards** - 17 technology standards implemented
-- 🔧 **Development Tools** - VS Code integration and build automation
+        ## What's Included
+        - BusBuddy WPF Application - Modern transportation management system
+        - Steve's Quick Data Summary - Interactive dashboard functionality
+        - Phase 1 Complete - Core features and foundation established
+        - Global Coding Standards - 17 technology standards implemented
+        - Development Tools - VS Code integration and build automation
 
-## 🎯 Key Features
-- **Driver Management** - Complete driver information and tracking
-- **Vehicle Management** - Fleet management and monitoring
-- **Activity Scheduling** - Transportation activity coordination
-- **Real-time Dashboard** - Interactive data visualization
-- **Standards Compliance** - Built with comprehensive coding standards
+        ## Key Features
+        - Driver Management - Complete driver information and tracking
+        - Vehicle Management - Fleet management and monitoring
+        - Activity Scheduling - Transportation activity coordination
+        - Real-time Dashboard - Interactive data visualization
+        - Standards Compliance - Built with comprehensive coding standards
 
-## 📦 Package Information
-- **Size:** ${{ steps.package.outputs.zip-size-mb }} MB
-- **Runtime:** .NET 8.0 (Windows x64)
-- **UI Framework:** WPF with Syncfusion controls
-- **Database:** Entity Framework Core with SQL Server
+        ## Package Information
+        - Size: ${{ steps.package.outputs.zip-size-mb }} MB
+        - Runtime: .NET 8.0 (Windows x64)
+        - UI Framework: WPF with Syncfusion controls
+        - Database: Entity Framework Core with SQL Server
 
-## 🚀 Installation
-1. Download the release package
-2. Extract to desired location
-3. Ensure .NET 8.0 Runtime is installed
-4. Run BusBuddy.WPF.exe
+        ## Installation
+        1. Download the release package
+        2. Extract to desired location
+        3. Ensure .NET 8.0 Runtime is installed
+        4. Run BusBuddy.WPF.exe
 
-## 🎉 Highlights
-- ✅ **Zero Build Errors** - Clean, professional codebase
-- ✅ **Comprehensive Testing** - Automated CI/CD validation
-- ✅ **Standards Documentation** - Complete language standards coverage
-- ✅ **Steve's Happiness** - Interactive button functionality delivered!
+        ## Highlights
+        - Zero Build Errors - Clean, professional codebase
+        - Comprehensive Testing - Automated CI/CD validation
+        - Standards Documentation - Complete language standards coverage
+        - Steve's Happiness - Interactive button functionality delivered!
 
----
-**💝 Special Thanks:** This release represents the successful completion of Phase 1 goals with Steve's requested Quick Data Summary button working perfectly!
-"@
+        Special Thanks: This release represents the successful completion of Phase 1 goals with Steve's requested Quick Data Summary button working perfectly!
+        "@
 
         $releaseNotes | Out-File "RELEASE_NOTES.md" -Encoding UTF8
         Write-Host "✅ Release notes created" -ForegroundColor Green
@@ -247,8 +246,6 @@ jobs:
 
         Write-Host "✅ Release metrics:" -ForegroundColor Green
         $metrics | ConvertTo-Json -Depth 3 | Write-Host
-
-        # Could be extended to store metrics in a database or file for tracking
 
 
 

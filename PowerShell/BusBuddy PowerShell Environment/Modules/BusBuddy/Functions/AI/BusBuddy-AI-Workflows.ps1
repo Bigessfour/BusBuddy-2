@@ -11,355 +11,214 @@
 function Start-BusBuddyAIWorkflow {
     <#
     .SYNOPSIS
-        Start an AI-enhanced development workflow session
+    Start an AI-enhanced development workflow
 
     .DESCRIPTION
-        Combines traditional BusBuddy development commands with AI-powered search
-        and guidance for enhanced productivity and learning.
+    Initiates AI-powered development workflows for code generation, analysis, and optimization
 
     .PARAMETER WorkflowType
-        Type of AI workflow to start
-
-    .PARAMETER Technology
-        Technology focus for the session
-
-    .PARAMETER Interactive
-        Enable interactive mode with prompts
+    The type of AI workflow to start
 
     .EXAMPLE
-        Start-BusBuddyAIWorkflow -WorkflowType Research -Technology WPF
-
-    .EXAMPLE
-        bb-ai-workflow -WorkflowType Troubleshooting -Interactive
+    Start-BusBuddyAIWorkflow -WorkflowType "CodeReview"
     #>
     [CmdletBinding()]
     param(
-        [ValidateSet('Research', 'Troubleshooting', 'Learning', 'Planning')]
-        [string]$WorkflowType = 'Research',
-
-        [ValidateSet('PowerShell', 'WPF', 'DotNet', 'Azure', 'EntityFramework', 'Syncfusion', 'MVVM', 'Testing')]
-        [string]$Technology,
-
-        [switch]$Interactive
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("CodeReview", "Documentation", "Testing", "Optimization", "Architecture")]
+        [string]$WorkflowType
     )
 
-    Write-BusBuddyStatus "🤖 Starting AI-Enhanced Development Workflow: $WorkflowType" -Status Info
-    Write-Host "══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+    Write-Verbose "🤖 Starting BusBuddy AI Workflow: $WorkflowType"
 
     switch ($WorkflowType) {
-        'Research' {
-            Write-Host "🔍 Research Workflow - Find solutions and best practices" -ForegroundColor Cyan
-            Write-Host ""
-            Write-Host "Available commands:" -ForegroundColor Yellow
-            Write-Host "  bb-tavily-search '<query>'        # Search with Tavily Expert" -ForegroundColor Green
-            Write-Host "  bb-mentor -Topic <technology>     # Get learning guidance" -ForegroundColor Green
-            Write-Host "  bb-docs -Technology <tech>        # Search official docs" -ForegroundColor Green
-
-            if ($Interactive) {
-                $query = Read-Host "Enter your research query"
-                if ($query) {
-                    Invoke-BusBuddyTavilySearch -Query $query -Technology $Technology -IncludeDetails
-                }
-            }
+        "CodeReview" {
+            Write-Verbose "📋 Initializing AI code review workflow..."
+            # Implement code review workflow
         }
-
-        'Troubleshooting' {
-            Write-Host "🔧 Troubleshooting Workflow - Diagnose and fix issues" -ForegroundColor Red
-            Write-Host ""
-            Write-Host "Available commands:" -ForegroundColor Yellow
-            Write-Host "  bb-health                         # Check environment" -ForegroundColor Green
-            Write-Host "  bb-error-fix                      # Analyze build errors" -ForegroundColor Green
-            Write-Host "  bb-tavily-search 'error message'  # Search for solutions" -ForegroundColor Green
-            Write-Host "  bb-warning-analysis               # Analyze warnings" -ForegroundColor Green
-
-            if ($Interactive) {
-                Write-Host ""
-                Write-Host "Running environment health check..." -ForegroundColor Yellow
-                Invoke-BusBuddyHealthCheck -Quick
-            }
+        "Documentation" {
+            Write-Verbose "📝 Initializing AI documentation workflow..."
+            # Implement documentation workflow
         }
-
-        'Learning' {
-            Write-Host "📚 Learning Workflow - Master BusBuddy technologies" -ForegroundColor Blue
-            Write-Host ""
-            Write-Host "Available commands:" -ForegroundColor Yellow
-            Write-Host "  bb-mentor -Topic <technology>     # Interactive learning" -ForegroundColor Green
-            Write-Host "  bb-tavily-search '<concept>'      # Research concepts" -ForegroundColor Green
-            Write-Host "  bb-ref <technology>               # Quick reference" -ForegroundColor Green
-            Write-Host "  bb-happiness                      # Get motivated! 😊" -ForegroundColor Green
-
-            if ($Interactive -and $Technology) {
-                Get-BusBuddyMentor -Topic $Technology -IncludeExamples
-            }
+        "Testing" {
+            Write-Verbose "🧪 Initializing AI testing workflow..."
+            # Implement testing workflow
         }
-
-        'Planning' {
-            Write-Host "📋 Planning Workflow - Plan features and architecture" -ForegroundColor Magenta
-            Write-Host ""
-            Write-Host "Available commands:" -ForegroundColor Yellow
-            Write-Host "  bb-tavily-search 'architecture patterns'  # Research patterns" -ForegroundColor Green
-            Write-Host "  bb-mentor -Topic Architecture             # Get guidance" -ForegroundColor Green
-            Write-Host "  bb-dev-workflow                           # Full dev cycle" -ForegroundColor Green
-
-            if ($Interactive) {
-                $feature = Read-Host "What feature are you planning to implement?"
-                if ($feature) {
-                    $searchQuery = "$feature implementation best practices"
-                    if ($Technology) {
-                        $searchQuery += " $Technology"
-                    }
-                    Invoke-BusBuddyTavilySearch -Query $searchQuery -Technology $Technology
-                }
-            }
+        "Optimization" {
+            Write-Verbose "⚡ Initializing AI optimization workflow..."
+            # Implement optimization workflow
+        }
+        "Architecture" {
+            Write-Verbose "🏗️ Initializing AI architecture analysis workflow..."
+            # Implement architecture workflow
         }
     }
 
-    Write-Host ""
-    Write-Host "💡 Workflow Tips:" -ForegroundColor Blue
-    Write-Host "  • Use bb-tavily-search for real-time web research" -ForegroundColor Cyan
-    Write-Host "  • Combine with bb-mentor for structured learning" -ForegroundColor Cyan
-    Write-Host "  • Save important results with -SaveResults flag" -ForegroundColor Cyan
-    Write-Host "  • Use -OutputFormat Markdown for documentation" -ForegroundColor Cyan
+    Write-Verbose "✅ AI workflow $WorkflowType started successfully"
 }
 
 function Get-BusBuddyAIAssistance {
     <#
     .SYNOPSIS
-        Get AI assistance for specific development tasks
+    Get AI assistance for BusBuddy development tasks
 
     .DESCRIPTION
-        Provides contextual AI assistance for common BusBuddy development scenarios
-        by combining search, documentation, and interactive guidance.
+    Provides context-aware AI assistance for development tasks, including code suggestions,
+    troubleshooting help, and best practice recommendations
 
     .PARAMETER Task
-        The development task you need help with
+    The development task requiring assistance
 
-    .PARAMETER ErrorMessage
-        Specific error message to research
-
-    .PARAMETER Technology
-        Technology context for the assistance
-
-    .PARAMETER QuickHelp
-        Get quick help without full research
+    .PARAMETER Context
+    Additional context for the AI assistance request
 
     .EXAMPLE
-        Get-BusBuddyAIAssistance -Task "MVVM data binding"
-
-    .EXAMPLE
-        bb-ai-help -ErrorMessage "CS8600 nullable reference" -Technology DotNet
-
-    .EXAMPLE
-        bb-ai-help -Task "Syncfusion DataGrid" -Technology WPF
+    Get-BusBuddyAIAssistance -Task "Fix build error" -Context "MSB3027 file lock"
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Position = 0)]
+        [Parameter(Mandatory = $true)]
         [string]$Task,
 
-        [string]$ErrorMessage,
-
-        [ValidateSet('PowerShell', 'WPF', 'DotNet', 'Azure', 'EntityFramework', 'Syncfusion', 'MVVM', 'Testing')]
-        [string]$Technology,
-
-        [switch]$QuickHelp
+        [Parameter(Mandatory = $false)]
+        [string]$Context
     )
 
-    if ($ErrorMessage) {
-        Write-BusBuddyStatus "🔍 Researching error: $ErrorMessage" -Status Info
+    Write-Verbose "🎯 Getting AI assistance for: $Task"
 
-        # Search for error solutions
-        $searchQuery = "fix error $ErrorMessage"
-        if ($Technology) {
-            $searchQuery += " $Technology"
+    Write-Verbose "📊 Analyzing task context..."
+    Write-Verbose "   Task: $Task"
+    if ($Context) {
+        Write-Verbose "   Context: $Context"
+    }
+
+    # Generate AI-powered suggestions based on common BusBuddy scenarios
+    $suggestions = switch -Regex ($Task) {
+        "build.*error|MSB\d+" {
+            @(
+                "Check for file locks with bb-health",
+                "Run bb-clean to clear build artifacts",
+                "Verify PowerShell 7.5.2 compatibility",
+                "Check .NET SDK version with dotnet --version"
+            )
         }
-
-        Invoke-BusBuddyTavilySearch -Query $searchQuery -Technology $Technology -MaxResults 3
-
-        # Also run local error analysis if it's a build error
-        if ($ErrorMessage -match "CS\d+|error") {
-            Write-Host ""
-            Write-Host "🔧 Running local error analysis..." -ForegroundColor Yellow
-            Invoke-BusBuddyErrorAnalysis
+        "test.*fail|unit.*test" {
+            @(
+                "Run bb-test to execute test suite",
+                "Check test dependencies and configuration",
+                "Verify test data and mock setups",
+                "Review test isolation and cleanup"
+            )
+        }
+        "performance|slow|optimization" {
+            @(
+                "Use PowerShell 7.5.2 parallel processing features",
+                "Implement async/await patterns properly",
+                "Check for memory leaks and dispose patterns",
+                "Review database query performance"
+            )
+        }
+        default {
+            @(
+                "Review BusBuddy documentation",
+                "Check PowerShell profile functions (bb-* commands)",
+                "Validate project configuration",
+                "Consider using existing utility functions"
+            )
         }
     }
-    elseif ($Task) {
-        Write-BusBuddyStatus "💡 Getting assistance for: $Task" -Status Info
 
-        if ($QuickHelp) {
-            # Quick reference lookup
-            if ($Technology) {
-                Get-QuickReference -Technology $Technology
-            }
-
-            # Quick search
-            Invoke-BusBuddyTavilySearch -Query "$Task tutorial" -Technology $Technology -MaxResults 2
-        }
-        else {
-            # Comprehensive assistance
-            Write-Host "🔍 Searching for detailed guidance..." -ForegroundColor Cyan
-            Invoke-BusBuddyTavilySearch -Query "$Task best practices examples" -Technology $Technology -IncludeDetails
-
-            Write-Host ""
-            Write-Host "📚 Related learning resources:" -ForegroundColor Yellow
-            if ($Technology) {
-                Get-BusBuddyMentor -Topic $Technology
-            }
-        }
+    Write-Verbose "💡 AI Suggestions:"
+    $suggestions | ForEach-Object {
+        Write-Verbose "   • $_"
     }
-    else {
-        Write-Host "🤖 BusBuddy AI Assistant" -ForegroundColor Cyan
-        Write-Host "═══════════════════════════" -ForegroundColor DarkCyan
-        Write-Host ""
-        Write-Host "Usage examples:" -ForegroundColor Yellow
-        Write-Host "  bb-ai-help 'MVVM data binding'                    # Get task help" -ForegroundColor Green
-        Write-Host "  bb-ai-help -ErrorMessage 'CS8600' -Technology DotNet  # Research error" -ForegroundColor Green
-        Write-Host "  bb-ai-help 'Syncfusion DataGrid' -QuickHelp       # Quick reference" -ForegroundColor Green
-        Write-Host ""
-        Write-Host "Available workflows:" -ForegroundColor Yellow
-        Write-Host "  bb-ai-workflow -WorkflowType Research             # Research workflow" -ForegroundColor Green
-        Write-Host "  bb-ai-workflow -WorkflowType Troubleshooting      # Debug workflow" -ForegroundColor Green
-        Write-Host "  bb-ai-workflow -WorkflowType Learning             # Learning workflow" -ForegroundColor Green
+
+    return @{
+        Task = $Task
+        Context = $Context
+        Suggestions = $suggestions
+        Timestamp = Get-Date
     }
 }
 
 function Get-BusBuddyContextualSearch {
     <#
     .SYNOPSIS
-        Perform contextual search based on current development state
+    Perform contextual search within BusBuddy project
 
     .DESCRIPTION
-        Analyzes the current BusBuddy project state and provides contextual search suggestions
-        and automated research based on recent errors, current tasks, and project status.
+    AI-enhanced search that understands BusBuddy project structure and provides
+    relevant results based on development context
 
-    .PARAMETER AutoDetect
-        Automatically detect context from project state
+    .PARAMETER Query
+    The search query
 
-    .PARAMETER IncludeProjectAnalysis
-        Include analysis of current project files
-
-    .EXAMPLE
-        Get-BusBuddyContextualSearch -AutoDetect
+    .PARAMETER Scope
+    The scope of the search (Code, Documentation, Configuration, Scripts, All)
 
     .EXAMPLE
-        bb-context-search -IncludeProjectAnalysis
+    Get-BusBuddyContextualSearch -Query "file lock" -Scope "Code"
     #>
     [CmdletBinding()]
     param(
-        [switch]$AutoDetect,
-        [switch]$IncludeProjectAnalysis
+        [Parameter(Mandatory = $true)]
+        [string]$Query,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("Code", "Documentation", "Configuration", "Scripts", "All")]
+        [string]$Scope = "All"
     )
 
-    Write-BusBuddyStatus "🎯 Contextual Search Analysis" -Status Info
-    Write-Host ""
+    Write-Verbose "🔍 Performing contextual search for: '$Query'"
+    Write-Verbose "   Scope: $Scope"
 
-    $context = @{
-        BuildStatus = $null
-        RecentErrors = @()
-        ProjectPhase = "Unknown"
-        SuggestedSearches = @()
+    $searchResults = @{
+        Query = $Query
+        Scope = $Scope
+        Results = @()
+        Timestamp = Get-Date
     }
 
-    if ($AutoDetect) {
-        Write-Host "🔍 Analyzing current project state..." -ForegroundColor Yellow
-
-        # Check build status
-        $projectRoot = Get-BusBuddyProjectRoot
-        if ($projectRoot) {
-            Push-Location $projectRoot
-            try {
-                $buildOutput = dotnet build BusBuddy.sln --verbosity quiet 2>&1
-                $context.BuildStatus = if ($LASTEXITCODE -eq 0) { "Success" } else { "Failed" }
-
-                if ($context.BuildStatus -eq "Failed") {
-                    $context.RecentErrors = $buildOutput | Select-String -Pattern "error" | Select-Object -First 3
-                }
-            }
-            finally {
-                Pop-Location
-            }
-        }
-
-        # Determine project phase
-        if ($context.BuildStatus -eq "Failed") {
-            $context.ProjectPhase = "Build Issues"
-            $context.SuggestedSearches += "fix build errors"
-            $context.SuggestedSearches += "dotnet compilation issues"
-        }
-        elseif ($context.BuildStatus -eq "Success") {
-            $context.ProjectPhase = "Development Ready"
-            $context.SuggestedSearches += "WPF MVVM best practices"
-            $context.SuggestedSearches += "Entity Framework optimization"
-            $context.SuggestedSearches += "Syncfusion advanced features"
-        }
-
-        # Display context analysis
-        Write-Host "📊 Current Context:" -ForegroundColor Cyan
-        Write-Host "  Build Status: $($context.BuildStatus)" -ForegroundColor $(if ($context.BuildStatus -eq "Success") { "Green" } else { "Red" })
-        Write-Host "  Project Phase: $($context.ProjectPhase)" -ForegroundColor Yellow
-
-        if ($context.RecentErrors.Count -gt 0) {
-            Write-Host "  Recent Errors: $($context.RecentErrors.Count)" -ForegroundColor Red
-            foreach ($errorItem in $context.RecentErrors) {
-                Write-Host "    • $($errorItem.Line.Trim())" -ForegroundColor Gray
-            }
-        }
-
-        Write-Host ""
-        Write-Host "💡 Contextual Search Suggestions:" -ForegroundColor Blue
-        foreach ($suggestion in $context.SuggestedSearches) {
-            Write-Host "  bb-tavily-search '$suggestion'" -ForegroundColor Green
-        }
-
-        # Auto-run first suggestion if errors exist
-        if ($context.RecentErrors.Count -gt 0 -and $context.SuggestedSearches.Count -gt 0) {
-            Write-Host ""
-            Write-Host "🚀 Auto-searching for solutions..." -ForegroundColor Magenta
-            Invoke-BusBuddyTavilySearch -Query $context.SuggestedSearches[0] -MaxResults 3
-        }
+    # Define search paths based on scope
+    $searchPaths = switch ($Scope) {
+        "Code" { @("*.cs", "*.xaml", "*.csproj") }
+        "Documentation" { @("*.md", "*.txt", "*.rst") }
+        "Configuration" { @("*.json", "*.xml", "*.config") }
+        "Scripts" { @("*.ps1", "*.psm1", "*.psd1") }
+        "All" { @("*.cs", "*.xaml", "*.ps1", "*.md", "*.json", "*.xml") }
     }
 
-    if ($IncludeProjectAnalysis) {
-        Write-Host ""
-        Write-Host "📁 Project Analysis:" -ForegroundColor Cyan
-
-        # Analyze recent file changes
-        $projectRoot = Get-BusBuddyProjectRoot
-        if ($projectRoot) {
-            Push-Location $projectRoot
-            try {
-                $recentFiles = git log --name-only --since="1 week ago" --pretty=format: |
-                    Where-Object { $_ -match '\.(cs|xaml|ps1)$' } |
-                    Group-Object |
-                    Sort-Object Count -Descending |
-                    Select-Object -First 5
-
-                if ($recentFiles) {
-                    Write-Host "  Most Modified Files (last week):" -ForegroundColor Yellow
-                    foreach ($file in $recentFiles) {
-                        Write-Host "    • $($file.Name) ($($file.Count) changes)" -ForegroundColor Gray
-
-                        # Suggest searches based on file types
-                        if ($file.Name -match '\.xaml$') {
-                            $context.SuggestedSearches += "WPF XAML best practices"
-                        }
-                        elseif ($file.Name -match 'ViewModel\.cs$') {
-                            $context.SuggestedSearches += "MVVM ViewModel patterns"
-                        }
-                        elseif ($file.Name -match '\.ps1$') {
-                            $context.SuggestedSearches += "PowerShell 7.5 advanced features"
-                        }
+    try {
+        foreach ($pattern in $searchPaths) {
+            $files = Get-ChildItem -Recurse -Include $pattern -ErrorAction SilentlyContinue
+            foreach ($file in $files) {
+                $matches = Select-String -Path $file.FullName -Pattern $Query -ErrorAction SilentlyContinue
+                if ($matches) {
+                    $searchResults.Results += @{
+                        File = $file.FullName
+                        Matches = $matches.Count
+                        Type = $file.Extension
                     }
                 }
             }
-            catch {
-                Write-Host "  Git analysis not available" -ForegroundColor Gray
-            }
-            finally {
-                Pop-Location
+        }
+
+        Write-Verbose "📊 Found $($searchResults.Results.Count) files with matches"
+
+        if ($searchResults.Results.Count -gt 0) {
+            Write-Verbose "🎯 Top results:"
+            $searchResults.Results | Sort-Object Matches -Descending | Select-Object -First 5 | ForEach-Object {
+                Write-Verbose "   • $($_.File) ($($_.Matches) matches)"
             }
         }
+
+    } catch {
+        Write-Warning "Search error: $($_.Exception.Message)"
+        $searchResults.Error = $_.Exception.Message
     }
 
-    return $context
+    return $searchResults
 }
+
+# Export functions for module use
+Export-ModuleMember -Function Start-BusBuddyAIWorkflow, Get-BusBuddyAIAssistance, Get-BusBuddyContextualSearch

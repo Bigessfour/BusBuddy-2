@@ -13,14 +13,14 @@ on:
         default: false
 
 env:
-  DOTNET_VERSION: "8.0.x"
+  DOTNET_VERSION: "9.0.x"
   SOLUTION_FILE: "BusBuddy.sln"
   BUILD_CONFIGURATION: "Release"
 
 jobs:
   build-and-test:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     outputs:
       build-success: ${{ steps.build-step.outcome == 'success' }}

@@ -169,7 +169,7 @@ Download the entire repository as a ZIP file:
 https://github.com/Bigessfour/BusBuddy-2/archive/refs/heads/main.zip
 ```
 
-## 📊 **Repository Statistics**
+## 📊 **Repository Statistics & Build Status (as of July 28, 2025)**
 - **Total Files**: 494+ files
 - **Primary Language**: C# (87%)
 - **Secondary Languages**: PowerShell, XAML, XML, JavaScript
@@ -179,6 +179,40 @@ https://github.com/Bigessfour/BusBuddy-2/archive/refs/heads/main.zip
 - **PowerShell Module**: 5,434 lines of PowerShell 7.5.2 code
 - **AI Integration**: xAI Grok-4, Tavily Search, MCP servers
 - **Development Environment**: Comprehensive PowerShell automation with 40+ bb-* commands
+
+### 🚨 **Current Build Status**
+- **Build**: ❌ Fails (86 errors, 126 warnings)
+- **Main Error Types**:
+  - CA1062: Validate parameters for null (add ArgumentNullException checks)
+  - CA2201: Exception type System.Exception is not sufficiently specific
+  - CA1822: Mark members as static if they do not access instance data
+  - CA1725: Parameter name mismatches between interface and implementation
+  - CA1854/CA1829/CA1861/CA1850/CA1866: Various code quality and performance suggestions
+- **Key Problem Files**:
+  - `BusBuddy.Core/Logging/QueryTrackingEnricher.cs`
+  - `BusBuddy.Core/Services/XAIService.cs`
+  - `BusBuddy.Core/Utilities/ExceptionHelper.cs`
+  - `BusBuddy.Core/Extensions/EFCoreDebuggingExtensions.cs`
+  - `BusBuddy.Core/Extensions/LoggingExtensions.cs`
+  - `BusBuddy.Core/Data/BusBuddyDbContext.cs`
+  - `BusBuddy.Core/Services/ActivityService.cs`
+  - `BusBuddy.Core/Services/StudentService.cs`
+  - `BusBuddy.Core/Services/BusService.cs`
+  - `BusBuddy.Core/Services/MaintenanceService.cs`
+  - `BusBuddy.Core/Services/SchedulingService.cs`
+  - `BusBuddy.Core/Extensions/ActivityLogServiceExtensions.cs`
+  - `BusBuddy.Core/Data/Repositories/StudentRepository.cs`
+  - ...and others
+- **Typical Fixes Needed**:
+  - Add null checks for all externally visible method parameters
+  - Use more specific exception types
+  - Mark stateless methods as static
+  - Align parameter names with interface definitions
+  - Refactor code to address code quality warnings
+
+**See build output for full error/warning details.**
+
+---
 
 ## 🔍 **Common Analysis Requests**
 

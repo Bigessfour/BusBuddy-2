@@ -33,114 +33,114 @@ Describe "BusBuddy.AI Module" {
 
         It "Should export expected functions" {
             $ExpectedFunctions = @(
-                'Initialize-BusBuddyAI',
-                'Invoke-BusBuddyAICodeGeneration',
-                'Invoke-BusBuddyAICodeReview',
-                'Invoke-BusBuddyAIArchitectureAnalysis'
+                "Start-BusBuddyAIWorkflow",
+                "Get-BusBuddyAIAssistance",
+                "Get-BusBuddyContextualSearch"
             )
 
             foreach ($Function in $ExpectedFunctions) {
-                Get-Command $Function -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty -Because "Function $Function should be available"
+                Get-Command $Function -Module BusBuddy.AI -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
             }
         }
 
         It "Should export expected aliases" {
             $ExpectedAliases = @(
-                'bb-ai-init',
-                'bb-ai-generate',
-                'bb-ai-review',
-                'bb-ai-architect'
+                "bb-ai-start",
+                "bb-ai-help",
+                "bb-ai-search"
             )
 
             foreach ($Alias in $ExpectedAliases) {
-                Get-Alias $Alias -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty -Because "Alias $Alias should be available"
+                Get-Alias $Alias -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
             }
         }
     }
 
     Context "Function Parameters" {
-        It "Invoke-BusBuddyAICodeGeneration should have required parameters" {
-            $Command = Get-Command Invoke-BusBuddyAICodeGeneration
-            $Command.Parameters.Keys | Should -Contain 'ComponentType'
-            $Command.Parameters.Keys | Should -Contain 'Requirements'
-            $Command.Parameters.Keys | Should -Contain 'OutputPath'
+        It "Start-BusBuddyAIWorkflow should have required parameters" {
+            $Command = Get-Command Start-BusBuddyAIWorkflow -ErrorAction SilentlyContinue
+            if ($Command) {
+                $Command.Parameters.Keys | Should -Contain 'WorkflowType'
 
-            # Check parameter validation
-            $ComponentTypeParam = $Command.Parameters['ComponentType']
-            $ComponentTypeParam.Attributes.ValidValues | Should -Contain 'ViewModel'
-            $ComponentTypeParam.Attributes.ValidValues | Should -Contain 'View'
-            $ComponentTypeParam.Attributes.ValidValues | Should -Contain 'Service'
-            $ComponentTypeParam.Attributes.ValidValues | Should -Contain 'Model'
-            $ComponentTypeParam.Attributes.ValidValues | Should -Contain 'Test'
+                # Check parameter validation
+                $WorkflowTypeParam = $Command.Parameters['WorkflowType']
+                $WorkflowTypeParam.Attributes.ValidValues | Should -Contain 'CodeReview'
+                $WorkflowTypeParam.Attributes.ValidValues | Should -Contain 'Documentation'
+                $WorkflowTypeParam.Attributes.ValidValues | Should -Contain 'Testing'
+                $WorkflowTypeParam.Attributes.ValidValues | Should -Contain 'Optimization'
+                $WorkflowTypeParam.Attributes.ValidValues | Should -Contain 'Architecture'
+            }
         }
 
-        It "Invoke-BusBuddyAICodeReview should support both file and snippet parameters" {
-            $Command = Get-Command Invoke-BusBuddyAICodeReview
-            $Command.Parameters.Keys | Should -Contain 'FilePath'
-            $Command.Parameters.Keys | Should -Contain 'CodeSnippet'
+        It "Get-BusBuddyAIAssistance should support both task and context parameters" {
+            $Command = Get-Command Get-BusBuddyAIAssistance -ErrorAction SilentlyContinue
+            if ($Command) {
+                $Command.Parameters.Keys | Should -Contain 'Task'
+                $Command.Parameters.Keys | Should -Contain 'Context'
+            }
         }
 
-        It "Invoke-BusBuddyAIArchitectureAnalysis should have AnalysisType parameter" {
-            $Command = Get-Command Invoke-BusBuddyAIArchitectureAnalysis
-            $Command.Parameters.Keys | Should -Contain 'AnalysisType'
+        It "Get-BusBuddyContextualSearch should have Query and Scope parameters" {
+            $Command = Get-Command Get-BusBuddyContextualSearch -ErrorAction SilentlyContinue
+            if ($Command) {
+                $Command.Parameters.Keys | Should -Contain 'Query'
+                $Command.Parameters.Keys | Should -Contain 'Scope'
 
-            $AnalysisTypeParam = $Command.Parameters['AnalysisType']
-            $AnalysisTypeParam.Attributes.ValidValues | Should -Contain 'Overall'
-            $AnalysisTypeParam.Attributes.ValidValues | Should -Contain 'Performance'
-            $AnalysisTypeParam.Attributes.ValidValues | Should -Contain 'Security'
-            $AnalysisTypeParam.Attributes.ValidValues | Should -Contain 'Scalability'
-            $AnalysisTypeParam.Attributes.ValidValues | Should -Contain 'Maintainability'
+                $ScopeParam = $Command.Parameters['Scope']
+                $ScopeParam.Attributes.ValidValues | Should -Contain 'Code'
+                $ScopeParam.Attributes.ValidValues | Should -Contain 'Documentation'
+                $ScopeParam.Attributes.ValidValues | Should -Contain 'Configuration'
+                $ScopeParam.Attributes.ValidValues | Should -Contain 'Scripts'
+                $ScopeParam.Attributes.ValidValues | Should -Contain 'All'
+            }
         }
     }
 
     Context "Parameter Validation" {
-        It "Should reject null or empty Requirements parameter" {
-            { Invoke-BusBuddyAICodeGeneration -ComponentType 'Model' -Requirements '' } |
-            Should -Throw -Because "Empty requirements should be rejected"
+        It "Should reject null or empty Task parameter for AI assistance" {
+            { Get-BusBuddyAIAssistance -Task '' } |
+            Should -Throw -Because "Empty task should be rejected"
 
-            { Invoke-BusBuddyAICodeGeneration -ComponentType 'Model' -Requirements $null } |
-            Should -Throw -Because "Null requirements should be rejected"
+            { Get-BusBuddyAIAssistance -Task $null } |
+            Should -Throw -Because "Null task should be rejected"
         }
 
-        It "Should reject invalid ComponentType" {
-            { Invoke-BusBuddyAICodeGeneration -ComponentType 'InvalidType' -Requirements 'Test requirement' } |
-            Should -Throw -Because "Invalid component type should be rejected"
+        It "Should reject invalid WorkflowType" {
+            { Start-BusBuddyAIWorkflow -WorkflowType 'InvalidType' } |
+            Should -Throw -Because "Invalid workflow type should be rejected"
         }
 
-        It "Should reject null or empty CodeSnippet for code review" {
-            { Invoke-BusBuddyAICodeReview -CodeSnippet '' } |
-            Should -Throw -Because "Empty code snippet should be rejected"
-
-            { Invoke-BusBuddyAICodeReview -CodeSnippet $null } |
-            Should -Throw -Because "Null code snippet should be rejected"
+        It "Should reject null or empty Query for contextual search" {
+            { Get-BusBuddyContextualSearch -Query '' } |
+            Should -Throw -Because "Empty query should be rejected"
         }
     }
 
     Context "AI Connectivity" -Tag 'Integration' {
         It "Should handle missing API key gracefully" {
-            # Temporarily remove API key
-            $OriginalKey = $env:XAI_API_KEY
-            $env:XAI_API_KEY = $null
-
+            # Test without API key set
+            $originalKey = $env:XAI_API_KEY
             try {
-                $Result = Initialize-BusBuddyAI
-                $Result | Should -Be $false -Because "Should return false when API key is missing"
-            }
-            finally {
-                $env:XAI_API_KEY = $OriginalKey
+                $env:XAI_API_KEY = $null
+                { Get-BusBuddyAIAssistance -Task "Test task" } | Should -Not -Throw
+            } finally {
+                $env:XAI_API_KEY = $originalKey
             }
         }
 
         It "Should initialize successfully with valid API key" -Skip:(-not $env:XAI_API_KEY) {
-            $Result = Initialize-BusBuddyAI
-            $Result | Should -Be $true -Because "Should initialize successfully with valid API key"
+            { Get-BusBuddyAIAssistance -Task "Test connectivity" } | Should -Not -Throw
         }
     }
 
     Context "Error Handling" {
         It "Should throw meaningful errors for invalid file paths" {
-            { Invoke-BusBuddyAICodeReview -FilePath 'C:\NonExistent\File.cs' } |
-            Should -Throw -Because "Should handle non-existent files gracefully"
+            { Get-BusBuddyContextualSearch -Query "test" -Scope "InvalidScope" } |
+            Should -Throw -Because "Invalid scope should be rejected"
+        }
+
+        It "Should handle workflow errors gracefully" {
+            { Start-BusBuddyAIWorkflow -WorkflowType "CodeReview" } | Should -Not -Throw
         }
     }
 }

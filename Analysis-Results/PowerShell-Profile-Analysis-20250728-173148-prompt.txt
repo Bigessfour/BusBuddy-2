@@ -1,3 +1,580 @@
+# PowerShell Profile Analysis Request
+
+## Context
+You are analyzing PowerShell profile files for the BusBuddy WPF application development environment. These files contain critical development automation, build management, and utility functions.
+
+## Analysis Requirements
+Please perform a comprehensive analysis of the provided PowerShell files focusing on:
+
+### 1. 🐛 Bug Detection & Fixes
+- Identify syntax errors, logic bugs, and potential runtime issues
+- Find undefined variables, incorrect parameter usage, and scope issues
+- Detect potential null reference exceptions and unhandled errors
+- Provide specific fixes for each identified issue
+
+### 2. ⚡ Performance Optimization  
+- Identify performance bottlenecks and inefficient code patterns
+- Suggest optimizations for PowerShell 7.5 features
+- Find opportunities to use parallel processing and threading
+- Recommend memory usage improvements
+
+### 3. 🔧 PowerShell 7.5 Compatibility
+- Ensure full compatibility with PowerShell 7.5.2 features
+- Identify deprecated functions or methods
+- Suggest modern PowerShell patterns and best practices
+- Validate .NET 8 runtime compatibility
+
+### 4. 🛡️ Error Handling & Reliability
+- Review error handling patterns and exception management
+- Identify missing try-catch blocks and proper error propagation
+- Suggest improvements for resilience and fault tolerance
+- Check for proper resource disposal and cleanup
+
+### 5. 🔒 Security Best Practices
+- Review for security vulnerabilities and unsafe practices
+- Check for proper input validation and sanitization
+- Validate secure handling of credentials and sensitive data
+- Ensure proper execution policy compliance
+
+### 6. 🧹 Code Quality & Maintainability
+- Review code organization, naming conventions, and documentation
+- Identify duplicate code and opportunities for refactoring
+- Suggest improvements for readability and maintainability
+- Check for proper module structure and exports
+
+## File Details
+Total Files: 2
+Combined Size: 267241 bytes
+Combined Lines: 6936 lines
+
+## Known Issues Context
+The development team has reported these specific issues:
+- File locking issues during builds
+- Module loading conflicts
+- Memory usage in long-running sessions
+- Potential race conditions in parallel operations
+
+
+## Output Format Required
+Please provide your analysis in JSON format with this structure:
+`json
+{
+  "analysisDate": "2025-07-28",
+  "overallAssessment": {
+    "severity": "Low|Medium|High|Critical",
+    "totalIssues": 0,
+    "priorityIssues": 0,
+    "recommendations": ["..."]
+  },
+  "fileAnalysis": [
+    {
+      "fileName": "file.ps1",
+      "issues": [
+        {
+          "type": "Bug|Performance|Security|Quality",
+          "severity": "Low|Medium|High|Critical", 
+          "line": 123,
+          "description": "Issue description",
+          "currentCode": "problematic code",
+          "fixedCode": "corrected code",
+          "explanation": "why this fixes the issue"
+        }
+      ],
+      "metrics": {
+        "codeQualityScore": 0-100,
+        "performanceScore": 0-100,
+        "securityScore": 0-100
+      }
+    }
+  ],
+  "actionableRecommendations": [
+    {
+      "priority": "High|Medium|Low",
+      "category": "...",
+      "description": "...",
+      "implementation": "step-by-step instructions"
+    }
+  ]
+}
+`
+
+## Files for Analysis:
+
+### File: load-bus-buddy-profiles.ps1
+**Path:** C:\Users\biges\Desktop\BusBuddy\BusBuddy\load-bus-buddy-profiles.ps1
+**Size:** 17280 bytes | **Lines:** 462 | **Modified:** 07/28/2025 17:27:20
+
+`powershell
+#!/usr/bin/env pwsh
+#Requires -Version 7.5
+# Disable PSScriptAnalyzer rule PSUseApprovedVerb for custom BusBuddy commands
+# PSScriptAnalyzer disable PSUseApprovedVerb
+
+<#
+.SYNOPSIS
+    BusBuddy PowerShell Environment Loader
+.DESCRIPTION
+    Loads the BusBuddy PowerShell environment with custom commands and modules
+.NOTES
+    File Name      : load-bus-buddy-profiles.ps1
+    Author         : BusBuddy Development Team
+    Prerequisite   : PowerShell 7.5.2
+    Copyright 2025 - BusBuddy
+#>
+
+<#
+.SCRIPT ANALYSIS (July 27, 2025)
+Status      : Analyzed and verified as production-ready with build reliability enhancements.
+Overview    : Loader defines core bb-* functions and mitigates file locks via Stop-OtherPwshSessions and module unloading.
+Key Functions and Aliases:
+  bb-help       - Displays help by invoking bb-help.ps1
+  bb-build      - Builds solution, cleans artifacts, and resolves DLL locks
+  bb-run        - Runs WPF app with optional build and debug support
+  bb-health     - Performs environment checks and exports results
+  bb-clean      - Cleans bin/obj directories
+  bb-db-switch  - Switches database providers
+  bb-stop       - Terminates other pwsh sessions to free file locks
+Usage       : Load with .\load-bus-buddy-profiles.ps1 [-Quiet], then run bb-health and bb-build.
+Long-Term   : Integrate bb-clean into CI/CD and expand health checks for licenses and connectivity.
+#>
+
+param (
+    [Parameter(Mandatory = $false)]
+    [switch]$Quiet
+)
+
+# PERMANENT FIX: Disable PowerShell paging to prevent "-- More --" prompts
+# This fixes GitHub CLI and other command output pagination issues
+$env:POWERSHELL_UPDATECHECK = 'Off'
+$PSDefaultParameterValues['Out-Host:Paging'] = $false
+$PSDefaultParameterValues['*:Paging'] = $false
+
+# Disable paging for common cmdlets that might page output
+if (Get-Command 'gh' -ErrorAction SilentlyContinue) {
+    $env:PAGER = ''
+    $env:GH_PAGER = ''
+}
+
+# Set console buffer to handle large outputs
+if ($Host.UI.RawUI.BufferSize) {
+    try {
+        $buffer = $Host.UI.RawUI.BufferSize
+        $buffer.Height = 9999
+        $Host.UI.RawUI.BufferSize = $buffer
+    }
+    catch {
+        # Ignore if buffer size cannot be set
+    }
+}
+
+# Script locations
+$scriptRoot = $PSScriptRoot
+$modulesRoot = Join-Path $scriptRoot "PowerShell\BusBuddy PowerShell Environment\Modules"
+$scriptsRoot = Join-Path $scriptRoot "Scripts"
+
+# Ensure the Scripts directory exists
+if (-not (Test-Path $scriptsRoot)) {
+    New-Item -ItemType Directory -Path $scriptsRoot -Force | Out-Null
+}
+
+# Function to load BusBuddy PowerShell functions
+function Import-BusBuddyFunctions {
+    # Common utility functions
+
+    # Define the Get-BusBuddyHelp function with bb-help alias
+    function global:Get-BusBuddyHelp {
+        param (
+            [Parameter(Position = 0, ValueFromRemainingArguments = $true)]
+            $args
+        )
+
+        # Use the current script's directory to find the help script
+        $currentScriptPath = $PSScriptRoot
+        if (-not $currentScriptPath) {
+            $currentScriptPath = Split-Path -Parent $script:MyInvocation.MyCommand.Path
+        }
+        $helpScriptPath = Join-Path $currentScriptPath "Scripts\bb-help.ps1"
+
+        if (-not (Test-Path $helpScriptPath)) {
+            Write-Host "❌ BusBuddy help script not found at: $helpScriptPath" -ForegroundColor Red
+            Write-Host "📋 Available BusBuddy Commands:" -ForegroundColor Yellow
+            Write-Host "  bb-build, bb-run, bb-test, bb-clean, bb-health" -ForegroundColor Gray
+            Write-Host "  bb-diagnostic, bb-happiness, bb-commands" -ForegroundColor Gray
+            return
+        }
+
+        & $helpScriptPath @args
+    }
+
+    # Create alias for backward compatibility
+    Set-Alias -Name "bb-help" -Value Get-BusBuddyHelp -Scope Global
+
+    # Define the Invoke-BusBuddyBuild function with bb-build alias
+    function global:Invoke-BusBuddyBuild {
+        param (
+            [Parameter(Mandatory = $false)]
+            [switch]$Clean,
+
+            [Parameter(Mandatory = $false)]
+            [switch]$Verbose,
+
+            [Parameter(Mandatory = $false)]
+            [string]$Configuration = "Debug"
+        )
+
+        # Immediate fix: terminate other PowerShell sessions to release locked files
+        Stop-OtherPwshSessions
+
+        # Unload BusBuddy PowerShell module to prevent Core DLL locking during build
+        if (Get-Module -Name BusBuddy -ErrorAction SilentlyContinue) {
+            Remove-Module -Name BusBuddy -Force -ErrorAction SilentlyContinue
+            [System.GC]::Collect()
+            [System.GC]::WaitForPendingFinalizers()
+        }
+        Write-Host "🔨 Building BusBuddy solution..." -ForegroundColor Cyan
+
+        if ($Clean) {
+            Write-Host "🧹 Cleaning solution first..." -ForegroundColor Yellow
+            dotnet clean "BusBuddy.sln" --configuration $Configuration --verbosity minimal
+        }
+
+        $verbosityLevel = if ($Verbose) { "detailed" } else { "minimal" }
+
+        dotnet build "BusBuddy.sln" --configuration $Configuration --verbosity $verbosityLevel
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Build completed successfully" -ForegroundColor Green
+        }
+        else {
+            Write-Host "❌ Build failed with exit code: $LASTEXITCODE" -ForegroundColor Red
+        }
+    }
+
+    # Create alias for backward compatibility
+    Set-Alias -Name "bb-build" -Value Invoke-BusBuddyBuild -Scope Global
+
+    # Create alias for bb-run
+    Set-Alias -Name "bb-run" -Value Start-BusBuddyRun -Scope Global
+
+    # Define the bb-run function
+    function global:Start-BusBuddyRun {
+        param (
+            [Parameter(Mandatory = $false)]
+            [switch]$Debug,
+
+            [Parameter(Mandatory = $false)]
+            [switch]$NoBuild,
+
+            [Parameter(Mandatory = $false)]
+            [string]$Configuration = "Debug"
+        )
+
+        Write-Host "🚌 Starting BusBuddy application..." -ForegroundColor Cyan
+
+        if (-not $NoBuild) {
+            Write-Host "🔨 Building solution first..." -ForegroundColor Yellow
+            bb-build -Configuration $Configuration
+
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "❌ Build failed, cannot run application" -ForegroundColor Red
+                return
+            }
+        }
+
+        $arguments = @("run", "--project", "BusBuddy.WPF\\BusBuddy.WPF.csproj", "--configuration", $Configuration)
+
+        if ($Debug) {
+            $arguments += "--launch-profile"
+            $arguments += "Debug"
+        }
+
+        & dotnet $arguments
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Application exited successfully" -ForegroundColor Green
+        }
+        else {
+            Write-Host "❌ Application exited with code: $LASTEXITCODE" -ForegroundColor Red
+        }
+    }
+
+    # Define the Test-BusBuddyHealth function
+    function global:Test-BusBuddyHealth {
+        param (
+            [Parameter(Mandatory = $false)]
+            [switch]$Quick,
+
+            [Parameter(Mandatory = $false)]
+            [switch]$Verbose,
+
+            [Parameter(Mandatory = $false)]
+            [string]$Export
+        )
+
+        Write-Host "🩺 Running BusBuddy health check..." -ForegroundColor Cyan
+
+        # Basic health checks
+        $results = @{}
+
+        # Check PowerShell version
+        $psVersion = $PSVersionTable.PSVersion
+        $psVersionOk = $psVersion.Major -ge 7 -and $psVersion.Minor -ge 5
+        $results["PowerShell"] = @{
+            "Version" = "$psVersion"
+            "Status"  = if ($psVersionOk) { "OK" } else { "WARNING" }
+            "Message" = if ($psVersionOk) { "PowerShell 7.5+ detected" } else { "PowerShell 7.5+ recommended" }
+        }
+
+        # Check .NET SDK
+        try {
+            $dotnetVersion = (dotnet --version)
+            $dotnetVersionOk = $dotnetVersion.StartsWith("8.")
+            $results[".NET SDK"] = @{
+                "Version" = "$dotnetVersion"
+                "Status"  = if ($dotnetVersionOk) { "OK" } else { "WARNING" }
+                "Message" = if ($dotnetVersionOk) { ".NET 8 SDK detected" } else { ".NET 8 SDK recommended" }
+            }
+        }
+        catch {
+            $results[".NET SDK"] = @{
+                "Version" = "Unknown"
+                "Status"  = "ERROR"
+                "Message" = "Could not detect .NET SDK"
+            }
+        }
+
+        # Check if solution file exists
+        $solutionExists = Test-Path "BusBuddy.sln"
+        $results["Solution File"] = @{
+            "Status"  = if ($solutionExists) { "OK" } else { "ERROR" }
+            "Message" = if ($solutionExists) { "BusBuddy.sln found" } else { "BusBuddy.sln not found" }
+        }
+
+        # Check if project files exist
+        $coreProjectExists = Test-Path "BusBuddy.Core/BusBuddy.Core.csproj"
+        $wpfProjectExists = Test-Path "BusBuddy.WPF/BusBuddy.WPF.csproj"
+        $results["Project Files"] = @{
+            "Status"  = if ($coreProjectExists -and $wpfProjectExists) { "OK" } else { "ERROR" }
+            "Message" = if ($coreProjectExists -and $wpfProjectExists) {
+                "Core and WPF projects found"
+            }
+            else {
+                "Missing project files"
+            }
+        }
+
+        # Check database connection
+        $dbConfigExists = Test-Path "BusBuddy.Core/appsettings.json"
+        $results["Database Config"] = @{
+            "Status"  = if ($dbConfigExists) { "OK" } else { "WARNING" }
+            "Message" = if ($dbConfigExists) { "Database configuration found" } else { "Database configuration missing" }
+        }
+
+        # Output results
+        Write-Host ""
+        Write-Host "Health Check Results:" -ForegroundColor Cyan
+        Write-Host "=====================" -ForegroundColor Cyan
+
+        $overallStatus = "OK"
+
+        foreach ($key in $results.Keys) {
+            $item = $results[$key]
+            $statusColor = switch ($item.Status) {
+                "OK" { "Green" }
+                "WARNING" { "Yellow" }
+                "ERROR" { "Red" }
+                default { "White" }
+            }
+
+            if ($item.Status -eq "ERROR") {
+                $overallStatus = "ERROR"
+            }
+            elseif ($item.Status -eq "WARNING" -and $overallStatus -ne "ERROR") {
+                $overallStatus = "WARNING"
+            }
+
+            Write-Host "$key : " -NoNewline
+            Write-Host $item.Status -ForegroundColor $statusColor -NoNewline
+
+            if ($item.ContainsKey("Version")) {
+                Write-Host " ($($item.Version))" -NoNewline
+            }
+
+            Write-Host " - $($item.Message)"
+        }
+
+        Write-Host ""
+        Write-Host "Overall Status: " -NoNewline
+        $overallStatusColor = switch ($overallStatus) {
+            "OK" { "Green" }
+            "WARNING" { "Yellow" }
+            "ERROR" { "Red" }
+            default { "White" }
+        }
+        Write-Host $overallStatus -ForegroundColor $overallStatusColor
+
+        # Export results if requested
+        if ($Export) {
+            try {
+                $exportDir = Split-Path -Path $Export -Parent
+                if (-not (Test-Path $exportDir)) {
+                    Write-Error "❌ Export directory does not exist: $exportDir"
+                }
+                else {
+                    $results | ConvertTo-Json -Depth 5 | Set-Content -Path $Export -ErrorAction Stop
+                    Write-Host "Results exported to: $Export" -ForegroundColor Cyan
+                }
+            }
+            catch {
+                Write-Error "❌ Failed to export results to $Export. Error: $_"
+            }
+        }
+
+        return $results
+        }
+
+        # Create alias for bb-health
+        Set-Alias -Name "bb-health" -Value Test-BusBuddyHealth -Scope Global
+
+        # Define the Clear-BusBuddySolution function (using approved verb Clear instead of Clean)
+        function global:Clear-BusBuddySolution {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory = $false)][switch]$Deep,
+            [Parameter(Mandatory = $false)][switch]$RemoveBin,
+            [Parameter(Mandatory = $false)][switch]$RemoveObj
+        )
+
+        Write-Host "🧹 Cleaning BusBuddy solution..." -ForegroundColor Cyan
+
+        # Standard clean
+        dotnet clean "BusBuddy.sln" --verbosity minimal
+        Write-Host "✅ Solution cleaned successfully" -ForegroundColor Green
+
+        if ($Deep -or $RemoveBin -or $RemoveObj) {
+            Write-Host "🧹 Performing deep clean..." -ForegroundColor Yellow
+
+            if ($Deep -or $RemoveBin) {
+                Get-ChildItem -Path . -Include "bin" -Recurse -Directory | ForEach-Object {
+                    Write-Host "Removing $($_.FullName)" -ForegroundColor Gray
+                    Remove-Item -Path $_.FullName -Recurse -Force
+                }
+                Write-Host "✅ Removed bin directories" -ForegroundColor Green
+            }
+
+            if ($Deep -or $RemoveObj) {
+                Get-ChildItem -Path . -Include "obj" -Recurse -Directory | ForEach-Object {
+                    Write-Host "Removing $($_.FullName)" -ForegroundColor Gray
+                    Remove-Item -Path $_.FullName -Recurse -Force
+                }
+                Write-Host "✅ Removed obj directories" -ForegroundColor Green
+            }
+        }
+
+        Write-Host "✅ Clean operation completed" -ForegroundColor Green
+    }
+    Set-Alias -Name bb-clean -Value Clean-BusBuddySolution -Scope Global
+
+    # Define the Set-BusBuddyDatabaseProvider function
+    function global:Set-BusBuddyDatabaseProvider {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory = $true)][ValidateSet("LocalDB", "Azure", "SQLite")][string]$Provider,
+            [Parameter(Mandatory = $false)][switch]$Configure
+        )
+
+        $switchScriptPath = Join-Path $scriptRoot "switch-database-provider.ps1"
+
+        if (-not (Test-Path $switchScriptPath)) {
+            Write-Error "❌ Database provider switch script not found at: $switchScriptPath"
+            return
+        }
+
+        & $switchScriptPath -Provider $Provider
+
+        if ($Configure) {
+            switch ($Provider) {
+                "LocalDB" {
+                    $setupScriptPath = Join-Path $scriptRoot "setup-localdb.ps1"
+                    if (Test-Path $setupScriptPath) {
+                        & $setupScriptPath
+                    }
+                    else {
+                        Write-Warning "LocalDB setup script not found at: $setupScriptPath"
+                    }
+                }
+                "Azure" {
+                    Write-Host "To configure Azure SQL, run the deploy-azure-sql.ps1 script with appropriate parameters" -ForegroundColor Yellow
+                }
+                "SQLite" {
+                    Write-Host "SQLite database will be created automatically when the application runs" -ForegroundColor Yellow
+                }
+            }
+        }
+    }
+    Set-Alias -Name bb-db-switch -Value Set-BusBuddyDatabaseProvider -Scope Global
+
+    # Define function to stop other pwsh sessions without killing this one
+    function global:Stop-OtherPwshSessions {
+        <#
+        .SYNOPSIS
+            Stops all other PowerShell processes except the current session.
+        #>
+        $currentId = $PID
+        Get-Process pwsh | Where-Object { $_.Id -ne $currentId } | Stop-Process -Force -ErrorAction SilentlyContinue
+        Write-Host "✅ Other PowerShell sessions terminated." -ForegroundColor Green
+    }
+    # Alias for ease of use
+    Set-Alias -Name bb-stop -Value Stop-OtherPwshSessions -Scope Global
+}
+
+# Main script execution
+
+if (-not $Quiet) {
+    Write-Host "🚌 Loading BusBuddy PowerShell Environment..." -ForegroundColor Cyan
+}
+
+# Import BusBuddy functions
+Import-BusBuddyFunctions
+
+# Import BusBuddy module if available
+$busBuddyModule = Join-Path $modulesRoot "BusBuddy\BusBuddy.psm1"
+if (Test-Path $busBuddyModule) {
+    try {
+        Import-Module $busBuddyModule -Force -ErrorAction Stop
+        if (-not $Quiet) {
+            Write-Host "✅ Loaded BusBuddy PowerShell module" -ForegroundColor Green
+        }
+    }
+    catch {
+        Write-Warning "Could not load BusBuddy PowerShell module: $_"
+    }
+}
+else {
+    if (-not $Quiet) {
+        Write-Host "⚠️ BusBuddy PowerShell module not found at: $busBuddyModule" -ForegroundColor Yellow
+        Write-Host "   Using basic commands only" -ForegroundColor Yellow
+    }
+}
+
+# Set environment variables
+$env:BUSBUDDY_PS_LOADED = "true"
+
+if (-not $Quiet) {
+    Write-Host "✅ BusBuddy PowerShell environment loaded successfully" -ForegroundColor Green
+    Write-Host "Available commands: bb-help, bb-build, bb-run, bb-health, bb-clean, bb-db-switch" -ForegroundColor Yellow
+    Write-Host "Run 'bb-help' for more information" -ForegroundColor Yellow
+    # PSScriptAnalyzer enable PSUseApprovedVerb
+}
+
+`
+
+
+### File: BusBuddy.psm1
+**Path:** C:\Users\biges\Desktop\BusBuddy\BusBuddy\PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1
+**Size:** 249961 bytes | **Lines:** 6474 | **Modified:** 07/28/2025 17:30:37
+
+`powershell
 #Requires -Version 7.5
 <#
 .SYNOPSIS
@@ -6471,3 +7048,9 @@ function Invoke-BusBuddyAutoFix {
 }
 
 #endregion
+
+`
+
+
+
+Please analyze these files thoroughly and provide actionable recommendations for improvement.

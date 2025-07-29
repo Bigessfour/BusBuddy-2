@@ -69,6 +69,9 @@ public static class DatabaseOperationExtensions
         string operationName = "Operation",
         bool useTransaction = true)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(operation);
+
         var logger = Log.ForContext<SafeDatabaseOperations>();
         if (useTransaction)
         {
@@ -156,6 +159,7 @@ public class SafeDatabaseOperations
     /// </summary>
     public async Task<List<Models.Bus>> GetBusesAsync(BusBuddyDbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         return await _resilienceService.ExecuteWithResilienceAsync(async () =>
         {
             return await context.SafeQueryAsync(
@@ -169,6 +173,7 @@ public class SafeDatabaseOperations
     /// </summary>
     public async Task<List<Models.Driver>> GetDriversAsync(BusBuddyDbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         return await _resilienceService.ExecuteWithResilienceAsync(async () =>
         {
             return await context.SafeQueryAsync(
@@ -178,10 +183,11 @@ public class SafeDatabaseOperations
     }
 
     /// <summary>
-    /// Safely retrieves routes with related data
+    /// Safely retrieves routes with enhanced error handling
     /// </summary>
     public async Task<List<Models.Route>> GetRoutesAsync(BusBuddyDbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         return await _resilienceService.ExecuteWithResilienceAsync(async () =>
         {
             try
@@ -250,6 +256,7 @@ public class SafeDatabaseOperations
     /// </summary>
     public async Task<DatabaseHealthResult> CheckDatabaseHealthAsync(BusBuddyDbContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
         return await _resilienceService.CheckDatabaseHealthAsync(context);
     }
 }

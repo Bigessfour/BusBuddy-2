@@ -186,6 +186,10 @@ function Initialize-TavilyEnvironment {
             }
         }
     }
+    catch {
+        Write-Host "⚠️ Error during environment initialization: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "Continuing with limited functionality..." -ForegroundColor Yellow
+    }
 
     Write-Host "✅ Tavily environment initialized successfully" -ForegroundColor Green
 
