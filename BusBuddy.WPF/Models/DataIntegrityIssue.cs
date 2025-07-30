@@ -10,27 +10,27 @@ namespace BusBuddy.WPF.Models
         /// <summary>
         /// Type of entity where the issue was found (Route, Activity, Student, Driver, Vehicle, System)
         /// </summary>
-        public string EntityType { get; set; }
+        public string EntityType { get; set; } = string.Empty;
 
         /// <summary>
         /// ID of the specific entity with the issue
         /// </summary>
-        public string EntityId { get; set; }
+        public string EntityId { get; set; } = string.Empty;
 
         /// <summary>
         /// Category of the issue (Missing Required Data, Invalid Data Format, Business Logic Violation, etc.)
         /// </summary>
-        public string IssueType { get; set; }
+        public string IssueType { get; set; } = string.Empty;
 
         /// <summary>
         /// Detailed description of the issue
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         /// <summary>
         /// Severity level: Critical, High, Medium, Low
         /// </summary>
-        public string Severity { get; set; }
+        public string Severity { get; set; } = string.Empty;
 
         /// <summary>
         /// When the issue was detected
@@ -40,7 +40,7 @@ namespace BusBuddy.WPF.Models
         /// <summary>
         /// Suggested action to resolve the issue
         /// </summary>
-        public string SuggestedAction { get; set; }
+        public string SuggestedAction { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether this issue blocks critical operations

@@ -641,8 +641,7 @@ namespace BusBuddy.Core.Services
         /// </summary>
         private static string ComputeCacheKey(string prompt)
         {
-            using var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(prompt));
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(prompt));
             return Convert.ToBase64String(hash);
         }
 

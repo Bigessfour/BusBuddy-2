@@ -381,7 +381,65 @@ BusBuddy includes advanced MCP server implementations for enhanced AI interactio
 - **UI Framework**: WPF with Syncfusion Essential Studio 30.1.42
 - **Backend**: .NET 9.0 with Entity Framework Core 9.0.7
 - **Database**: SQL Server LocalDB (dev), Azure SQL (prod), SQLite (legacy)
-- **Architecture**: MVVM pattern with clean separation of concerns
+- **Architecture**: **Production-Ready MVVM** with CommunityToolkit.Mvvm and comprehensive patterns
+
+### 🏗️ **MVVM Architecture Implementation**
+
+BusBuddy implements a sophisticated, production-ready MVVM architecture optimized for Syncfusion WPF controls and modern .NET development:
+
+#### **BaseViewModel Foundation**
+- **CommunityToolkit.Mvvm Integration**: Uses `ObservableObject` base class for optimal performance
+- **Structured Logging**: Comprehensive Serilog integration with correlation IDs and context enrichment
+- **Enhanced Data Loading**: `LoadDataAsync()` with automatic loading states and error handling
+- **Command Execution**: `ExecuteCommandAsync()` with performance monitoring and exception management
+- **Property Change Tracking**: Automatic logging of property changes for debugging and auditing
+
+#### **Advanced Command Pattern**
+```csharp
+// Production-ready command implementation with state management
+public ICommand LoadDriversCommand { get; }
+public ICommand RefreshCommand { get; }
+public ICommand EditDriverCommand { get; }
+
+// Initialized with proper CanExecute logic
+LoadDriversCommand = new RelayCommand(async _ => await LoadDriversAsync(), _ => !IsLoading);
+EditDriverCommand = new RelayCommand(EditDriver, _ => SelectedDriver != null && !IsLoading);
+```
+
+#### **Data Binding Excellence**
+- **ObservableCollection**: Automatic UI updates for list-based data
+- **Two-Way Binding**: Seamless property synchronization between View and ViewModel
+- **Search and Filtering**: Real-time data filtering with `FilteredDrivers` collections
+- **Selection Management**: Comprehensive selection handling with logging and state tracking
+
+#### **Syncfusion Integration Patterns**
+```xml
+<!-- Advanced Syncfusion SfDataGrid binding -->
+<syncfusion:SfDataGrid ItemsSource="{Binding FilteredDrivers}"
+                       SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
+                       AutoGenerateColumns="False"
+                       AllowResizingColumns="True"
+                       AllowSorting="True"
+                       AllowFiltering="True"
+                       ColumnSizer="Star" />
+```
+
+#### **Key MVVM Features**
+- **🎯 State Management**: Comprehensive loading, error, and selection state handling
+- **🔍 Search Functionality**: Real-time filtering with instant UI updates
+- **📊 Data Virtualization**: Optimized for large datasets with Syncfusion controls
+- **🔄 Command Patterns**: Full ICommand implementation with CanExecute logic
+- **📝 Validation**: Built-in validation support with error message display
+- **🔧 Dependency Injection**: Constructor injection for Entity Framework contexts
+- **📈 Performance Monitoring**: Built-in timing and performance logging
+- **🛡️ Error Resilience**: Comprehensive exception handling with user-friendly messages
+
+#### **ViewModel Structure Standards**
+- **Domain-Organized**: ViewModels grouped by business domain (Driver/, Bus/, Route/, Activity/)
+- **Mirrored Structure**: Views and ViewModels folders maintain identical organization
+- **Naming Conventions**: Consistent `*ViewModel.cs` and `*View.xaml` patterns
+- **Base Class Inheritance**: All ViewModels inherit from `BaseViewModel` for consistency
+- **Service Integration**: Clean integration with business services and data access layers
 
 ### 🤖 **AI & Machine Learning**
 - **xAI Grok-4 Integration**: Native API connectivity for intelligent route optimization

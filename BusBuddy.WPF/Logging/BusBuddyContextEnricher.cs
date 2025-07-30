@@ -74,7 +74,7 @@ namespace BusBuddy.WPF.Logging
             // This could be from HTTP headers in web scenarios, or custom context in desktop apps
 
             // For now, use a simple approach - you can enhance this based on your needs
-            return System.Threading.Thread.CurrentThread.ManagedThreadId.ToString();
+            return Environment.CurrentManagedThreadId.ToString();
         }
     }
 }

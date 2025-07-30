@@ -1005,7 +1005,7 @@ Focus on actionable insights for WPF .NET development.";
                     MitigationStrategies = ExtractMitigations(aiResponse)
                 },
                 ConfidenceLevel = 0.85,
-                Reasoning = aiResponse.Length > 500 ? aiResponse.Substring(0, 500) + "..." : aiResponse
+                Reasoning = aiResponse.Length > 500 ? string.Concat(aiResponse.AsSpan(0, 500), "...") : aiResponse
             };
         }
 
@@ -1158,7 +1158,7 @@ Focus on actionable insights for WPF .NET development.";
                             CapacityOptimization = ExtractNumericValue(content, "capacity", "utilization") ?? 0.8
                         },
                         ConfidenceLevel = 0.85,
-                        Reasoning = content.Length > 300 ? content.Substring(0, 300) + "..." : content
+                        Reasoning = content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
                     };
                 }
 

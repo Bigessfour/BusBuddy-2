@@ -50,7 +50,7 @@ namespace BusBuddy.Core.Services
                     AnalysisDate = DateTime.Now,
                     TotalRoutes = routes.Count(),
                     TotalBuses = buses.Count(),
-                    TotalStudents = students.Count()
+                    TotalStudents = students.Count
                 };
 
                 // Calculate efficiency metrics

@@ -15,7 +15,7 @@
 
     <!-- Phase 1: Essential Build Configuration -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <NoWarn>$(NoWarn);CA1416</NoWarn>
+    <NoWarn>$(NoWarn);CA1416;CA1845;CA1869;CA1859;CA1852;CA1836;CS1998</NoWarn>
 
     <!-- MSB3027/MSB3021 File Lock Prevention -->
     <UseSharedCompilation>false</UseSharedCompilation>
@@ -45,6 +45,9 @@
     </Compile>
     <Compile Update="Views\Driver\DriverManagementView.xaml.cs">
       <DependentUpon>DriverManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Driver\DriversView.xaml.cs">
+      <DependentUpon>DriversView.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\Route\RouteManagementView.xaml.cs">
       <DependentUpon>RouteManagementView.xaml</DependentUpon>
@@ -101,6 +104,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Driver\DriverManagementView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Driver\DriversView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Route\RouteManagementView.xaml">
@@ -194,3 +200,4 @@
   </ItemGroup>
 
 </Project>
+

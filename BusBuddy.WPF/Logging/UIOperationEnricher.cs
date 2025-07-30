@@ -40,7 +40,7 @@ namespace BusBuddy.WPF.Logging
                 // Add thread context - critical for WPF applications
                 var isUIThread = Application.Current?.Dispatcher?.CheckAccess() == true;
                 logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("IsUIThread", isUIThread));
-                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ThreadId", Thread.CurrentThread.ManagedThreadId));
+                logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ThreadId", Environment.CurrentManagedThreadId));
 
                 if (isUIThread)
                 {

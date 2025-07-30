@@ -27,7 +27,7 @@ namespace BusBuddy.WPF.ViewModels.Sports
     /// </summary>
     public class SportsSchedulerViewModel : BaseViewModel, IDisposable
     {
-        private static readonly ILogger Logger = Log.ForContext<SportsSchedulerViewModel>();
+        private static new readonly ILogger Logger = Log.ForContext<SportsSchedulerViewModel>();
         private readonly BusBuddyContext _context;
 
         #region Observable Collections

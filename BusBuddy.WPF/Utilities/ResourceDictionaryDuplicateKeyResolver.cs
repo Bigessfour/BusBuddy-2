@@ -68,12 +68,12 @@ namespace BusBuddy.WPF.Utilities
                             potentialConflictKeys.Add(key);
 
                             // Log recommendation to update references
-                            if (keyString.Equals("SurfaceBorder"))
+                            if (keyString.Equals("SurfaceBorder", StringComparison.Ordinal))
                             {
                                 Logger.Warning("Known problematic key 'SurfaceBorder' detected - this key conflicts with Syncfusion FluentDark theme");
                                 Logger.Information("References to 'SurfaceBorder' should be updated to use 'SurfaceBorderBrush' instead");
                             }
-                            else if (keyString.Equals("ProfessionalSurfaceBorder"))
+                            else if (keyString.Equals("ProfessionalSurfaceBorder", StringComparison.Ordinal))
                             {
                                 Logger.Warning("Known problematic key 'ProfessionalSurfaceBorder' detected - this key may conflict with Syncfusion theme");
                                 Logger.Information("References to 'ProfessionalSurfaceBorder' should be updated to use 'SurfaceBorderBrush' instead");

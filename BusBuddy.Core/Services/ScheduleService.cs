@@ -322,7 +322,7 @@ namespace BusBuddy.Core.Services
 
                     stopwatch.Stop();
                     Logger.Information("Successfully retrieved {ScheduleCount} schedules by category in {ElapsedMs}ms",
-                        schedules.Count(), stopwatch.ElapsedMilliseconds);
+                        schedules.Count, stopwatch.ElapsedMilliseconds);
 
                     // Log category breakdown for diagnostics
                     if (schedules.Count > 0)
@@ -384,7 +384,7 @@ namespace BusBuddy.Core.Services
 
                     // Check if it's an away game
                     if (location.Contains("away", StringComparison.OrdinalIgnoreCase) ||
-                        location.Contains("@", StringComparison.OrdinalIgnoreCase) ||
+                        location.Contains('@', StringComparison.OrdinalIgnoreCase) ||
                         location.Contains("at ", StringComparison.OrdinalIgnoreCase))
                     {
                         Logger.Debug("Detected away game from location");

@@ -58,7 +58,7 @@ namespace BusBuddy.WPF.Models
         /// <summary>
         /// Error message if validation failed
         /// </summary>
-        public string ValidationError { get; set; }
+        public string ValidationError { get; set; } = string.Empty;
 
         /// <summary>
         /// When the report was generated

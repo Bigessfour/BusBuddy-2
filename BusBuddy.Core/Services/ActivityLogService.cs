@@ -31,7 +31,7 @@ namespace BusBuddy.Core.Services
                 string? truncatedDetails = details;
                 if (details != null && details.Length > 995)
                 {
-                    truncatedDetails = details.Substring(0, 990) + "[...]";
+                    truncatedDetails = string.Concat(details.AsSpan(0, 990), "[...]");
                 }
 
                 var log = new ActivityLog
