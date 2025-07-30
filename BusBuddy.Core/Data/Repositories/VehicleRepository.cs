@@ -11,7 +11,7 @@ namespace BusBuddy.Core.Data.Repositories
     /// </summary>
     public class VehicleRepository : Repository<Bus>, IVehicleRepository
     {
-        private readonly IBusBuddyDbContextFactory _contextFactory;
+        private readonly IBusBuddyDbContextFactory ContextFactory;
         private static readonly ILogger Logger = Log.ForContext<VehicleRepository>();
 
         public VehicleRepository(
@@ -20,7 +20,7 @@ namespace BusBuddy.Core.Data.Repositories
             IBusBuddyDbContextFactory contextFactory)
             : base(context, userContextService)
         {
-            _contextFactory = contextFactory;
+            ContextFactory = contextFactory;
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace BusBuddy.Core.Data.Repositories
         {
             try
             {
-                using var context = _contextFactory.CreateDbContext();
+                using var context = ContextFactory.CreateDbContext();
 
                 // Use AsSplitQuery to avoid the cartesian explosion problem
                 return await context.Set<Bus>()
@@ -55,7 +55,7 @@ namespace BusBuddy.Core.Data.Repositories
         {
             try
             {
-                using var context = _contextFactory.CreateDbContext();
+                using var context = ContextFactory.CreateDbContext();
 
                 // Use AsSplitQuery to avoid the cartesian explosion problem
                 return await context.Set<Bus>()
@@ -84,7 +84,7 @@ namespace BusBuddy.Core.Data.Repositories
         {
             try
             {
-                using var context = _contextFactory.CreateDbContext();
+                using var context = ContextFactory.CreateDbContext();
 
                 return await context.Set<Bus>()
                     .Where(v => v.Status == "Active")
@@ -106,7 +106,7 @@ namespace BusBuddy.Core.Data.Repositories
             try
             {
                 var now = DateTime.UtcNow;
-                using var context = _contextFactory.CreateDbContext();
+                using var context = ContextFactory.CreateDbContext();
 
                 return await context.Set<Bus>()
                     .Where(v => v.Status == "Active" && v.NextMaintenanceDue != null && v.NextMaintenanceDue <= now)

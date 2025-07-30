@@ -228,7 +228,7 @@ public class DataIntegrityServiceTests
     public async Task ValidateAllDataAsync_ShouldHandleServiceExceptions()
     {
         // Arrange
-        _ = _mockDriverService!.Setup(s => s.GetAllDriversAsync()).ThrowsAsync(new Exception("Service error"));
+        _ = _mockDriverService!.Setup(s => s.GetAllDriversAsync()).ThrowsAsync(new InvalidOperationException("Service error"));
 
         // Act
         var report = await _dataIntegrityService!.ValidateAllDataAsync();

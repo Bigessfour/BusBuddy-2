@@ -26,7 +26,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         {
             Logger.Information("Retrieving all students with includeSchedules: {IncludeSchedules}", includeSchedules);
 
-            var query = _context.Students.AsQueryable();
+            var query = Context.Students.AsQueryable();
 
             if (includeSchedules)
             {
@@ -54,7 +54,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         {
             Logger.Information("Retrieving student with ID: {StudentId}, includeSchedules: {IncludeSchedules}", id, includeSchedules);
 
-            var query = _context.Students.AsQueryable();
+            var query = Context.Students.AsQueryable();
 
             if (includeSchedules)
             {
@@ -91,8 +91,8 @@ public class StudentRepository : Repository<Student>, IStudentRepository
             Logger.Information("Creating new student: {StudentName}", student.StudentName);
 
             student.CreatedDate = DateTime.Now;
-            _context.Students.Add(student);
-            await _context.SaveChangesAsync();
+            Context.Students.Add(student);
+            await Context.SaveChangesAsync();
 
             Logger.Information("Successfully created student: {StudentName} with ID: {StudentId}", student.StudentName, student.StudentId);
 
@@ -115,8 +115,8 @@ public class StudentRepository : Repository<Student>, IStudentRepository
             Logger.Information("Updating student: {StudentName} (ID: {StudentId})", student.StudentName, student.StudentId);
 
             student.UpdatedDate = DateTime.Now;
-            _context.Students.Update(student);
-            await _context.SaveChangesAsync();
+            Context.Students.Update(student);
+            await Context.SaveChangesAsync();
 
             Logger.Information("Successfully updated student: {StudentName} (ID: {StudentId})", student.StudentName, student.StudentId);
 
@@ -138,15 +138,15 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         {
             Logger.Information("Deleting student with ID: {StudentId}", id);
 
-            var student = await _context.Students.FindAsync(id);
+            var student = await Context.Students.FindAsync(id);
             if (student == null)
             {
                 Logger.Warning("Student with ID {StudentId} not found for deletion", id);
                 return false;
             }
 
-            _context.Students.Remove(student);
-            await _context.SaveChangesAsync();
+            Context.Students.Remove(student);
+            await Context.SaveChangesAsync();
 
             Logger.Information("Successfully deleted student: {StudentName} (ID: {StudentId})", student.StudentName, student.StudentId);
 
@@ -168,7 +168,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         {
             Logger.Information("Searching students with term: {SearchTerm}", searchTerm);
 
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => s.StudentName.Contains(searchTerm))
                 .Include(s => s.StudentSchedules)
                 .ToListAsync();
@@ -193,7 +193,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         {
             Logger.Information("Retrieving students for grade: {Grade}", grade);
 
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => s.Grade == grade)
                 .ToListAsync();
 
@@ -217,7 +217,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         {
             Logger.Information("Retrieving active students");
 
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => s.Active)
                 .ToListAsync();
 
@@ -248,7 +248,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         {
             Logger.Information("Retrieving students for route ID: {RouteId}", routeId);
 
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString())
                 .ToListAsync();
 
@@ -267,7 +267,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute))
                 .ToListAsync();
             return students;
@@ -283,7 +283,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            return await _context.Students.FirstOrDefaultAsync(s => s.StudentName == studentName);
+            return await Context.Students.FirstOrDefaultAsync(s => s.StudentName == studentName);
         }
         catch (Exception ex)
         {
@@ -302,7 +302,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => s.SpecialNeeds || !string.IsNullOrEmpty(s.MedicalNotes))
                 .ToListAsync();
             return students;
@@ -318,7 +318,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => !string.IsNullOrEmpty(s.MedicalNotes) || !string.IsNullOrEmpty(s.Medications))
                 .ToListAsync();
             return students;
@@ -334,7 +334,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => !string.IsNullOrEmpty(s.TransportationNotes) || s.SpecialNeeds)
                 .ToListAsync();
             return students;
@@ -350,7 +350,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => !string.IsNullOrEmpty(s.EmergencyPhone))
                 .ToListAsync();
             return students;
@@ -366,7 +366,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => string.IsNullOrEmpty(s.EmergencyPhone))
                 .ToListAsync();
             return students;
@@ -382,7 +382,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => s.TransportationNotes != null && s.TransportationNotes.Contains(transportationType))
                 .ToListAsync();
             return students;
@@ -398,7 +398,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var students = await _context.Students
+            var students = await Context.Students
                 .Where(s => s.Active && (string.IsNullOrEmpty(s.AMRoute) || string.IsNullOrEmpty(s.PMRoute)))
                 .ToListAsync();
             return students;
@@ -414,7 +414,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            return await _context.Students
+            return await Context.Students
                 .CountAsync(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
         }
         catch (Exception ex)
@@ -428,7 +428,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     {
         try
         {
-            var routes = await _context.Students
+            var routes = await Context.Students
                 .Where(s => !string.IsNullOrEmpty(s.AMRoute) || !string.IsNullOrEmpty(s.PMRoute))
                 .GroupBy(s => s.AMRoute ?? s.PMRoute)
                 .Select(g => new { Route = g.Key, Count = g.Count() })
@@ -442,12 +442,12 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         }
     }
 
-    public async Task<int> GetTotalStudentCountAsync() => await _context.Students.CountAsync();
-    public async Task<int> GetActiveStudentCountAsync() => await _context.Students.CountAsync(s => s.Active);
+    public async Task<int> GetTotalStudentCountAsync() => await Context.Students.CountAsync();
+    public async Task<int> GetActiveStudentCountAsync() => await Context.Students.CountAsync(s => s.Active);
 
     public async Task<Dictionary<string, int>> GetStudentCountByGradeAsync()
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => !string.IsNullOrEmpty(s.Grade))
             .GroupBy(s => s.Grade)
             .Select(g => new { Grade = g.Key, Count = g.Count() })
@@ -456,7 +456,7 @@ public class StudentRepository : Repository<Student>, IStudentRepository
 
     public async Task<Dictionary<string, int>> GetStudentCountByTransportationTypeAsync()
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => !string.IsNullOrEmpty(s.TransportationNotes))
             .GroupBy(s => s.TransportationNotes)
             .Select(g => new { Type = g.Key, Count = g.Count() })
@@ -469,69 +469,69 @@ public class StudentRepository : Repository<Student>, IStudentRepository
         var maxBirthDate = currentDate.AddYears(-minAge);
         var minBirthDate = currentDate.AddYears(-maxAge - 1);
 
-        return await _context.Students
+        return await Context.Students
             .Where(s => s.DateOfBirth.HasValue && s.DateOfBirth >= minBirthDate && s.DateOfBirth <= maxBirthDate)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsByParentEmailAsync(string email)
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => s.ParentGuardian != null && s.ParentGuardian.Contains(email))
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsByParentPhoneAsync(string phone)
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => s.HomePhone == phone || s.EmergencyPhone == phone || s.AlternativePhone == phone)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsWithIncompleteContactInfoAsync()
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => string.IsNullOrEmpty(s.ParentGuardian) || string.IsNullOrEmpty(s.HomePhone))
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsBySchoolAsync(string schoolName)
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => s.School == schoolName)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsWithActivityPermissionsAsync()
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => s.FieldTripPermission)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Student>> GetStudentsWithoutActivityPermissionsAsync()
     {
-        return await _context.Students
+        return await Context.Students
             .Where(s => !s.FieldTripPermission)
             .ToListAsync();
     }
 
     // Synchronous methods for Syncfusion data binding
-    public IEnumerable<Student> GetActiveStudents() => _context.Students.Where(s => s.Active);
-    public IEnumerable<Student> GetStudentsByGrade(string grade) => _context.Students.Where(s => s.Grade == grade);
-    public IEnumerable<Student> GetStudentsByRoute(int? routeId) => _context.Students.Where(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
-    public IEnumerable<Student> GetStudentsWithoutRoute() => _context.Students.Where(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute));
-    public IEnumerable<Student> GetStudentsWithSpecialNeeds() => _context.Students.Where(s => s.SpecialNeeds);
-    public IEnumerable<Student> SearchStudentsByName(string searchTerm) => _context.Students.Where(s => s.StudentName.Contains(searchTerm));
-    public int GetStudentCountByRoute(int routeId) => _context.Students.Count(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
+    public IEnumerable<Student> GetActiveStudents() => Context.Students.Where(s => s.Active);
+    public IEnumerable<Student> GetStudentsByGrade(string grade) => Context.Students.Where(s => s.Grade == grade);
+    public IEnumerable<Student> GetStudentsByRoute(int? routeId) => Context.Students.Where(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
+    public IEnumerable<Student> GetStudentsWithoutRoute() => Context.Students.Where(s => string.IsNullOrEmpty(s.AMRoute) && string.IsNullOrEmpty(s.PMRoute));
+    public IEnumerable<Student> GetStudentsWithSpecialNeeds() => Context.Students.Where(s => s.SpecialNeeds);
+    public IEnumerable<Student> SearchStudentsByName(string searchTerm) => Context.Students.Where(s => s.StudentName.Contains(searchTerm));
+    public int GetStudentCountByRoute(int routeId) => Context.Students.Count(s => s.AMRoute == routeId.ToString() || s.PMRoute == routeId.ToString());
 
     // IRepository<Student> implementation
     public override async Task<IEnumerable<Student>> GetAllAsync() => await GetAllAsync(false);
     public override async Task<Student?> GetByIdAsync(object id) => await GetByIdAsync((int)id, false);
     public override async Task<Student> AddAsync(Student entity) => await CreateAsync(entity);
     public async Task<bool> DeleteAsync(object id) => await DeleteAsync((int)id);
-    public async Task<bool> ExistsAsync(object id) => await _context.Students.AnyAsync(s => s.StudentId == (int)id);
-    public override IQueryable<Student> Query() => _context.Students.AsQueryable();
-    public override async Task<int> CountAsync() => await _context.Students.CountAsync();
-    public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
+    public async Task<bool> ExistsAsync(object id) => await Context.Students.AnyAsync(s => s.StudentId == (int)id);
+    public override IQueryable<Student> Query() => Context.Students.AsQueryable();
+    public override async Task<int> CountAsync() => await Context.Students.CountAsync();
+    public async Task SaveChangesAsync() => await Context.SaveChangesAsync();
 }

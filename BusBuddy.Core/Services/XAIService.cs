@@ -419,7 +419,7 @@ namespace BusBuddy.Core.Services
                 Topic = "AI Response",
                 HelpContent = response,
                 RelatedTopics = ExtractRelatedTopics(response),
-                ActionableSteps = ExtractActionableSteps(response)
+                ActionableSteps = ExtractActionableSteps(response).ToArray()
             };
         }
 
@@ -550,7 +550,7 @@ namespace BusBuddy.Core.Services
 
 ## Technical Metrics
 - **Build Status**: {request.BuildStatus}
-- **Tests**: {request.TestsPassingCount}/{request.TotalTestsPassingCount} passing
+- **Tests**: {request.TestsPassingCount}/{request.TotalTestsCount} passing
 - **Code Coverage**: {request.CodeCoverage:P1}
 - **Critical Issues**: {request.CriticalIssuesCount}
 - **Components**: {request.CompletedComponents}/{request.TotalComponents} completed
@@ -737,12 +737,12 @@ Focus on actionable insights for WPF .NET development.";
             return response.Choices?.FirstOrDefault()?.Message?.Content ?? "I'm sorry, I couldn't process your request at the moment.";
         }
 
-        private async Task<XAIResponse> CallXAIAPI(string endpoint, XAIRequest request)
+        private async Task<BusBuddy.Core.Models.XAIResponse> CallXAIAPI(string endpoint, XAIRequest request)
         {
             try
             {
                 var jsonRequest = JsonSerializer.Serialize(request, JsonOptions);
-                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                using var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
                 var httpResponse = await _httpClient.PostAsync(_baseUrl + endpoint, content);
 
@@ -750,13 +750,13 @@ Focus on actionable insights for WPF .NET development.";
                 {
                     var errorContent = await httpResponse.Content.ReadAsStringAsync();
                     Logger.Error("xAI API call failed with status {StatusCode}: {ErrorContent}", httpResponse.StatusCode, errorContent);
-                    return new XAIResponse
+                    return new BusBuddy.Core.Models.XAIResponse
                     {
                         Choices = new[]
                         {
-                            new XAIChoice
+                            new BusBuddy.Core.Models.XAIChoice
                             {
-                                Message = new XAIMessage
+                                Message = new BusBuddy.Core.Models.XAIMessage
                                 {
                                     Content = $"API Error: {httpResponse.StatusCode}"
                                 }
@@ -766,18 +766,18 @@ Focus on actionable insights for WPF .NET development.";
                 }
 
                 var jsonResponse = await httpResponse.Content.ReadAsStringAsync();
-                var response = JsonSerializer.Deserialize<XAIResponse>(jsonResponse, JsonOptions);
+                var response = JsonSerializer.Deserialize<BusBuddy.Core.Models.XAIResponse>(jsonResponse, JsonOptions);
 
                 if (response?.Choices?.Any() != true)
                 {
                     Logger.Warning("xAI response was empty or invalid. Response: {JsonResponse}", jsonResponse);
-                    return new XAIResponse
+                    return new BusBuddy.Core.Models.XAIResponse
                     {
                         Choices = new[]
                         {
-                            new XAIChoice
+                            new BusBuddy.Core.Models.XAIChoice
                             {
-                                Message = new XAIMessage
+                                Message = new BusBuddy.Core.Models.XAIMessage
                                 {
                                     Content = "Invalid or empty response from AI."
                                 }
@@ -791,13 +791,13 @@ Focus on actionable insights for WPF .NET development.";
             catch (HttpRequestException ex)
             {
                 Logger.Error(ex, "HTTP request to xAI API failed.");
-                return new XAIResponse
+                return new BusBuddy.Core.Models.XAIResponse
                 {
                     Choices = new[]
                     {
-                        new XAIChoice
+                        new BusBuddy.Core.Models.XAIChoice
                         {
-                            Message = new XAIMessage
+                            Message = new BusBuddy.Core.Models.XAIMessage
                             {
                                 Content = "Network error connecting to AI service."
                             }
@@ -808,13 +808,13 @@ Focus on actionable insights for WPF .NET development.";
             catch (JsonException ex)
             {
                 Logger.Error(ex, "Failed to serialize or deserialize xAI JSON.");
-                return new XAIResponse
+                return new BusBuddy.Core.Models.XAIResponse
                 {
                     Choices = new[]
                     {
-                        new XAIChoice
+                        new BusBuddy.Core.Models.XAIChoice
                         {
-                            Message = new XAIMessage
+                            Message = new BusBuddy.Core.Models.XAIMessage
                             {
                                 Content = "JSON processing error."
                             }
@@ -825,13 +825,13 @@ Focus on actionable insights for WPF .NET development.";
             catch (TaskCanceledException ex)
             {
                 Logger.Error(ex, "xAI API call timed out.");
-                return new XAIResponse
+                return new BusBuddy.Core.Models.XAIResponse
                 {
                     Choices = new[]
                     {
-                        new XAIChoice
+                        new BusBuddy.Core.Models.XAIChoice
                         {
-                            Message = new XAIMessage
+                            Message = new BusBuddy.Core.Models.XAIMessage
                             {
                                 Content = "Request to AI service timed out."
                             }
@@ -1009,7 +1009,7 @@ Focus on actionable insights for WPF .NET development.";
             };
         }
 
-        private static AIRouteRecommendations ParseRouteRecommendations(XAIResponse response)
+        private static AIRouteRecommendations ParseRouteRecommendations(BusBuddy.Core.Models.XAIResponse response)
         {
             try
             {
@@ -1046,7 +1046,7 @@ Focus on actionable insights for WPF .NET development.";
             }
         }
 
-        private static AIMaintenancePrediction ParseMaintenancePrediction(XAIResponse aiResponse)
+        private static AIMaintenancePrediction ParseMaintenancePrediction(BusBuddy.Core.Models.XAIResponse aiResponse)
         {
             if (aiResponse == null || aiResponse.Choices == null || !aiResponse.Choices.Any())
             {
@@ -1083,9 +1083,17 @@ Focus on actionable insights for WPF .NET development.";
                     Reasoning = content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
                 };
             }
+
+            return new AIMaintenancePrediction
+            {
+                PredictedMaintenanceDate = DateTime.Now.AddDays(30),
+                Confidence = 0.75,
+                ActionableRecommendations = ExtractActionableSteps(content),
+                Reasoning = content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
+            };
         }
 
-        private static AISafetyAnalysis ParseSafetyAnalysis(XAIResponse aiResponse)
+        private static AISafetyAnalysis ParseSafetyAnalysis(BusBuddy.Core.Models.XAIResponse aiResponse)
         {
             if (aiResponse == null || aiResponse.Choices == null || !aiResponse.Choices.Any())
             {
@@ -1121,9 +1129,17 @@ Focus on actionable insights for WPF .NET development.";
                     Reasoning = content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
                 };
             }
+
+            return new AISafetyAnalysis
+            {
+                OverallRiskScore = 0.5,
+                IdentifiedRisks = new List<IdentifiedRisk> { new IdentifiedRisk { Description = "General operational risks", Severity = "Medium" } },
+                MitigationStrategies = ExtractActionableSteps(content),
+                Reasoning = content.Length > 300 ? string.Concat(content.AsSpan(0, 300), "...") : content
+            };
         }
 
-        private static AIStudentOptimization ParseStudentOptimization(XAIResponse aiResponse)
+        private static AIStudentOptimization ParseStudentOptimization(BusBuddy.Core.Models.XAIResponse aiResponse)
         {
             try
             {
@@ -1412,6 +1428,91 @@ Focus on actionable insights for WPF .NET development.";
             WriteIndented = true,
             PropertyNameCaseInsensitive = true
         };
+
+        #endregion
+
+        #region Prompt Building Methods
+
+        private static string BuildRouteOptimizationPrompt(RouteAnalysisRequest request)
+        {
+            return $@"Analyze route optimization for transportation system:
+
+Route ID: {request.RouteId ?? "Unknown"}
+Current Distance: {request.CurrentDistance} miles
+Student Count: {request.StudentCount}
+Vehicle Capacity: {request.VehicleCapacity}
+Terrain Difficulty: {request.TerrainData?.RouteDifficulty ?? "Not specified"}
+
+Please provide specific optimization recommendations including:
+1. Route adjustments
+2. Timing improvements
+3. Resource allocation
+4. Risk mitigation strategies";
+        }
+
+        private static string GetTransportationExpertSystemPrompt()
+        {
+            return @"You are an expert transportation system analyst specializing in school bus fleet optimization.
+Provide detailed, actionable recommendations based on operational data, safety regulations, and efficiency best practices.
+Focus on practical solutions that can be implemented within typical school district constraints.";
+        }
+
+        private static string BuildMaintenancePredictionPrompt(MaintenanceAnalysisRequest request)
+        {
+            return $@"Analyze maintenance needs for vehicle fleet:
+
+Vehicle ID: {request.BusId}
+Vehicle: {request.VehicleYear} {request.VehicleMake} {request.VehicleModel}
+Current Mileage: {request.CurrentMileage}
+Last Service: {request.LastMaintenanceDate:yyyy-MM-dd}
+Daily Miles: {request.DailyMiles}
+Terrain Difficulty: {request.TerrainDifficulty}
+Engine Hours: {request.EngineHours}
+Brake Usage: {request.BrakeUsage}
+
+Predict upcoming maintenance requirements and priority levels.";
+        }
+
+        private static string GetMaintenanceExpertSystemPrompt()
+        {
+            return @"You are a fleet maintenance expert with extensive experience in school bus operations.
+Provide predictive maintenance recommendations based on vehicle data, usage patterns, and safety requirements.
+Prioritize safety-critical maintenance while optimizing operational costs.";
+        }
+
+        private static string BuildSafetyAnalysisPrompt(SafetyAnalysisRequest request)
+        {
+            return $@"Conduct safety analysis for transportation operations:
+
+Route Type: {request.RouteType}
+Traffic Density: {request.TrafficDensity}
+Road Conditions: {request.RoadConditions}
+Weather: {request.WeatherConditions}
+Students: {request.TotalStudents} (Special Needs: {request.SpecialNeedsCount})
+Driver Safety Record: {request.DriverSafetyRecord}
+Previous Incidents: {request.PreviousIncidents}
+
+Assess safety risks and provide mitigation strategies.";
+        }
+
+        private static string GetSafetyExpertSystemPrompt()
+        {
+            return @"You are a transportation safety expert specializing in school bus operations.
+Analyze safety data and provide comprehensive risk assessments with actionable mitigation strategies.
+Prioritize student safety while maintaining operational efficiency.";
+        }
+
+        private static string BuildStudentOptimizationPrompt(StudentOptimizationRequest request)
+        {
+            return $@"Optimize student transportation assignments:
+
+Total Students: {request.TotalStudents}
+Available Buses: {request.AvailableBuses}
+Geographic Constraints: {request.GeographicConstraints}
+Special Requirements: {request.SpecialRequirements}
+
+Provide optimal student-to-route assignments considering efficiency and safety.";
+        }
 
         #endregion
     }

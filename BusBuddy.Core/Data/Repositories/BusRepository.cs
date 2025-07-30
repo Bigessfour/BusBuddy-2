@@ -33,7 +33,7 @@ public class BusRepository : Repository<Bus>, IBusRepository
             return activeVehicles;
 
         // Get vehicles that don't have conflicting activities
-        var conflictingVehicleIds = await _context.Activities
+        var conflictingVehicleIds = await Context.Activities
             .Where(a => a.Date.Date == availabilityDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
@@ -231,7 +231,7 @@ public class BusRepository : Repository<Bus>, IBusRepository
             return activeVehicles;
 
         // Get vehicles that don't have conflicting activities
-        var conflictingVehicleIds = _context.Activities
+        var conflictingVehicleIds = Context.Activities
             .Where(a => a.Date.Date == availabilityDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||

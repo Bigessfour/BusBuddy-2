@@ -85,6 +85,20 @@ namespace BusBuddy.Core.Services
 
                 return reportResponse;
             }
+            catch (HttpRequestException ex)
+            {
+                var duration = DateTime.UtcNow - startTime;
+                Logger.Error(ex, "AI report generation failed due to HTTP error: {ReportType}, Duration: {Duration}ms, Operation: {OperationId}",
+                    reportType, duration.TotalMilliseconds, operationId);
+                throw;
+            }
+            catch (JsonException ex)
+            {
+                var duration = DateTime.UtcNow - startTime;
+                Logger.Error(ex, "AI report generation failed due to JSON parsing error: {ReportType}, Duration: {Duration}ms, Operation: {OperationId}",
+                    reportType, duration.TotalMilliseconds, operationId);
+                throw;
+            }
             catch (Exception ex)
             {
                 var duration = DateTime.UtcNow - startTime;
@@ -128,7 +142,6 @@ namespace BusBuddy.Core.Services
                     if (response.IsSuccessStatusCode)
                     {
                         var responseJson = await response.Content.ReadAsStringAsync();
-                        var apiResponse = JsonSerializer.Deserialize<dynamic>(responseJson);
 
                         return new AIApiResponse
                         {
@@ -158,9 +171,16 @@ namespace BusBuddy.Core.Services
                     await Task.Delay(retryDelay);
                     retryDelay = TimeSpan.FromSeconds(retryDelay.TotalSeconds * 2);
                 }
+                catch (TaskCanceledException ex) when (attempt < maxRetries)
+                {
+                    Logger.Warning(ex, "AI API call timed out, attempt {Attempt}/{MaxRetries}, retrying in {Delay}s",
+                        attempt, maxRetries, retryDelay.TotalSeconds);
+                    await Task.Delay(retryDelay);
+                    retryDelay = TimeSpan.FromSeconds(retryDelay.TotalSeconds * 2);
+                }
             }
 
-            throw new Exception($"AI API call failed after {maxRetries} attempts");
+            throw new InvalidOperationException($"AI API call failed after {maxRetries} attempts");
         }
 
         /// <summary>
@@ -189,7 +209,7 @@ namespace BusBuddy.Core.Services
             return _cache.TryGetValue(cacheKey, out cachedReport);
         }
 
-        private string ExtractContentFromResponse(string responseJson)
+        private static string ExtractContentFromResponse(string responseJson)
         {
             try
             {
@@ -200,14 +220,14 @@ namespace BusBuddy.Core.Services
                     .GetProperty("content")
                     .GetString() ?? "Error parsing AI response";
             }
-            catch (Exception ex)
+            catch (JsonException ex)
             {
                 Logger.Error(ex, "Failed to extract content from AI response");
                 return "Error parsing AI response";
             }
         }
 
-        private TokenUsage ExtractUsageFromResponse(string responseJson)
+        private static TokenUsage ExtractUsageFromResponse(string responseJson)
         {
             try
             {
@@ -220,7 +240,7 @@ namespace BusBuddy.Core.Services
                     TotalTokens = usage.GetProperty("total_tokens").GetInt32()
                 };
             }
-            catch (Exception ex)
+            catch (JsonException ex)
             {
                 Logger.Error(ex, "Failed to extract usage from AI response");
                 return new TokenUsage();
@@ -275,10 +295,9 @@ namespace BusBuddy.Core.Services
             Logger.Debug("Invalidated transportation context cache: {ContextId}", contextId);
         }
 
-        private Task<TransportationData> FetchContextDataFromSourceAsync(string contextId)
+        private static Task<TransportationData> FetchContextDataFromSourceAsync(string contextId)
         {
             // Simulate fetching real transportation data
-            // Removed async/await since this is just simulation
             var data = new TransportationData
             {
                 ContextId = contextId,
@@ -325,7 +344,7 @@ Please provide a comprehensive analysis with specific recommendations and action
             return Task.FromResult(fullPrompt);
         }
 
-        private string BuildContextSection(TransportationData context)
+        private static string BuildContextSection(TransportationData context)
         {
             return $@"- Fleet Size: {context.TotalBuses} buses across {context.TotalRoutes} routes
 - Student Population: {context.TotalStudents} students
@@ -335,7 +354,7 @@ Please provide a comprehensive analysis with specific recommendations and action
 - Traffic Status: {context.TrafficStatus}";
         }
 
-        private string BuildParametersSection(Dictionary<string, object> parameters)
+        private static string BuildParametersSection(Dictionary<string, object> parameters)
         {
             if (parameters == null || parameters.Count == 0)
             {

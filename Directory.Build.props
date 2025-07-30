@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <!-- Modern Versions for .NET 9.0 Environment -->
-    <SyncfusionVersion>30.1.40</SyncfusionVersion>
+    <SyncfusionVersion>30.1.42</SyncfusionVersion>
     <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
 
     <!-- INDUSTRY STANDARD: Practical Code Quality -->

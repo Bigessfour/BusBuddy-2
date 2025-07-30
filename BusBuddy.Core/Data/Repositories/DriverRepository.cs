@@ -33,7 +33,7 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
             return activeDrivers;
 
         // Get drivers that don't have conflicting activities
-        var conflictingDriverIds = await _context.Activities
+        var conflictingDriverIds = await Context.Activities
             .Where(a => a.Date.Date == checkDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
@@ -133,7 +133,7 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
 
     public async Task<bool> IsDriverAvailableAsync(int driverId, DateTime checkDate, TimeSpan startTime, TimeSpan endTime)
     {
-        var conflictingActivities = await _context.Activities
+        var conflictingActivities = await Context.Activities
             .AnyAsync(a => a.DriverId == driverId &&
                           a.Date.Date == checkDate.Date &&
                           ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
@@ -145,7 +145,7 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
 
     public async Task<IEnumerable<Driver>> GetDriversScheduledForDateAsync(DateTime checkDate)
     {
-        var driverIds = await _context.Activities
+        var driverIds = await Context.Activities
             .Where(a => a.Date.Date == checkDate.Date)
             .Select(a => a.DriverId)
             .Distinct()
@@ -159,7 +159,7 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
 
     public async Task<IEnumerable<Driver>> GetDriversWithNoScheduleAsync(DateTime checkDate)
     {
-        var scheduledDriverIds = await _context.Activities
+        var scheduledDriverIds = await Context.Activities
             .Where(a => a.Date.Date == checkDate.Date)
             .Select(a => a.DriverId)
             .Distinct()
@@ -258,7 +258,7 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
             return activeDrivers;
 
         // Get drivers that don't have conflicting activities
-        var conflictingDriverIds = _context.Activities
+        var conflictingDriverIds = Context.Activities
             .Where(a => a.Date.Date == checkDate.Date &&
                        ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||
                         (a.EventTime > startTime && a.EventTime <= endTime) ||
@@ -293,7 +293,7 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
 
     public bool IsDriverAvailable(int driverId, DateTime checkDate, TimeSpan startTime, TimeSpan endTime)
     {
-        var conflictingActivities = _context.Activities
+        var conflictingActivities = Context.Activities
             .Any(a => a.DriverId == driverId &&
                      a.Date.Date == checkDate.Date &&
                      ((a.LeaveTime >= startTime && a.LeaveTime < endTime) ||

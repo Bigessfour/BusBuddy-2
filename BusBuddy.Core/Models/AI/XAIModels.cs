@@ -72,6 +72,29 @@ namespace BusBuddy.Core.Models
         public string FluidLevels { get; set; } = string.Empty;
     }
 
+    public class RouteOptimizationRequest
+    {
+        public string RouteId { get; set; } = string.Empty;
+        public string CurrentPerformance { get; set; } = string.Empty;
+        public string TargetMetrics { get; set; } = string.Empty;
+        public List<string> Constraints { get; set; } = new();
+        public double CurrentEfficiency { get; set; }
+        public int StudentsServed { get; set; }
+        public double DistanceTraveled { get; set; }
+        public TimeSpan AverageTime { get; set; }
+    }
+
+    public class MaintenancePredictionRequest
+    {
+        public string VehicleId { get; set; } = string.Empty;
+        public int CurrentMileage { get; set; }
+        public DateTime LastServiceDate { get; set; }
+        public List<string> PerformanceIssues { get; set; } = new();
+        public int AgeInYears { get; set; }
+        public string MaintenanceHistory { get; set; } = string.Empty;
+        public string CriticalSystems { get; set; } = string.Empty;
+    }
+
     public class SafetyAnalysisRequest
     {
         public string RouteType { get; set; } = string.Empty;

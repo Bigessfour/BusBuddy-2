@@ -30,7 +30,7 @@ Modified `BusBuddyContext.cs` to:
 
 ### 4. Utility Scripts
 Created PowerShell scripts for database management:
-- `setup-localdb.ps1`: Sets up LocalDB for development
+- `Scripts\Setup\setup-localdb.ps1`: Sets up LocalDB for development
 - `deploy-azure-sql.ps1`: Deploys schema to Azure SQL
 - `switch-database-provider.ps1`: Switches between providers
 
@@ -39,7 +39,7 @@ Created PowerShell scripts for database management:
 ### Development Environment (LocalDB)
 ```powershell
 # Set up LocalDB
-.\setup-localdb.ps1
+.\Scripts\Setup\setup-localdb.ps1
 
 # Switch to LocalDB provider
 .\switch-database-provider.ps1 -Provider LocalDB

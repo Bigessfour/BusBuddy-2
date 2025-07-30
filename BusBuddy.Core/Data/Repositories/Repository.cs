@@ -14,17 +14,17 @@ namespace BusBuddy.Core.Data.Repositories;
 /// <typeparam name="T">Entity type</typeparam>
 public class Repository<T> : IRepository<T> where T : class
 {
-    protected readonly BusBuddyDbContext _context;
-    protected readonly DbSet<T> _dbSet;
-    protected readonly IUserContextService _userContextService;
+    protected BusBuddyDbContext Context { get; }
+    protected DbSet<T> DbSet { get; }
+    protected IUserContextService UserContextService { get; }
     private readonly bool _supportsSoftDelete;
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
     public Repository(BusBuddyDbContext context, IUserContextService userContextService)
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-        _userContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
-        _dbSet = _context.Set<T>();
+        Context = context ?? throw new ArgumentNullException(nameof(context));
+        UserContextService = userContextService ?? throw new ArgumentNullException(nameof(userContextService));
+        DbSet = Context.Set<T>();
         _supportsSoftDelete = typeof(BaseEntity).IsAssignableFrom(typeof(T)) ||
                              typeof(T).GetProperty("Active")?.PropertyType == typeof(bool);
     }
@@ -35,7 +35,7 @@ public class Repository<T> : IRepository<T> where T : class
     {
         try
         {
-            var entity = await _dbSet.FindAsync(id);
+            var entity = await DbSet.FindAsync(id);
 
             if (entity != null && _supportsSoftDelete)
             {
@@ -68,7 +68,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<T?> GetByIdAsync(object id)
     {
-        var entity = await _dbSet.FindAsync(id);
+        var entity = await DbSet.FindAsync(id);
 
         if (entity != null && _supportsSoftDelete)
         {
@@ -99,7 +99,7 @@ public class Repository<T> : IRepository<T> where T : class
         try
         {
             // Create a query with appropriate filters
-            IQueryable<T> query = _dbSet.AsNoTracking(); // Use AsNoTracking for better concurrency
+            IQueryable<T> query = DbSet.AsNoTracking(); // Use AsNoTracking for better concurrency
 
             if (_supportsSoftDelete)
             {
@@ -139,7 +139,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -151,7 +151,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -163,7 +163,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -175,7 +175,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<int> CountAsync()
     {
-        IQueryable<T> query = _dbSet;
+        IQueryable<T> query = DbSet;
 
         if (_supportsSoftDelete)
         {
@@ -187,7 +187,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<int> CountAsync(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -203,17 +203,17 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual T? GetById(int id)
     {
-        return _dbSet.Find(id);
+        return DbSet.Find(id);
     }
 
     public virtual T? GetById(object id)
     {
-        return _dbSet.Find(id);
+        return DbSet.Find(id);
     }
 
     public virtual IQueryable<T> GetAllQueryable()
     {
-        IQueryable<T> query = _dbSet;
+        IQueryable<T> query = DbSet;
 
         if (_supportsSoftDelete)
         {
@@ -230,7 +230,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual IEnumerable<T> Find(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -242,7 +242,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual T? FirstOrDefault(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -254,7 +254,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual bool Any(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -266,7 +266,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual int Count()
     {
-        IQueryable<T> query = _dbSet;
+        IQueryable<T> query = DbSet;
 
         if (_supportsSoftDelete)
         {
@@ -278,7 +278,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual int Count(Expression<Func<T, bool>> expression)
     {
-        IQueryable<T> query = _dbSet.Where(expression);
+        IQueryable<T> query = DbSet.Where(expression);
 
         if (_supportsSoftDelete)
         {
@@ -296,7 +296,7 @@ public class Repository<T> : IRepository<T> where T : class
     {
         if (entity == null) throw new ArgumentNullException(nameof(entity));
         SetAuditFields(entity, isUpdate: false);
-        var result = await _dbSet.AddAsync(entity);
+        var result = await DbSet.AddAsync(entity);
         return result.Entity;
     }
 
@@ -307,7 +307,7 @@ public class Repository<T> : IRepository<T> where T : class
         {
             SetAuditFields(entity, isUpdate: false);
         }
-        await _dbSet.AddRangeAsync(entityList);
+        await DbSet.AddRangeAsync(entityList);
         return entityList;
     }
 
@@ -315,7 +315,7 @@ public class Repository<T> : IRepository<T> where T : class
     {
         if (entity == null) throw new ArgumentNullException(nameof(entity));
         SetAuditFields(entity, isUpdate: false);
-        var result = _dbSet.Add(entity);
+        var result = DbSet.Add(entity);
         return result.Entity;
     }
 
@@ -326,13 +326,13 @@ public class Repository<T> : IRepository<T> where T : class
         {
             SetAuditFields(entity, isUpdate: false);
         }
-        _dbSet.AddRange(entityList);
+        DbSet.AddRange(entityList);
     }
 
     public virtual void Update(T entity)
     {
         SetAuditFields(entity, isUpdate: true);
-        _dbSet.Update(entity);
+        DbSet.Update(entity);
     }
 
     public virtual void UpdateRange(IEnumerable<T> entities)
@@ -341,17 +341,17 @@ public class Repository<T> : IRepository<T> where T : class
         {
             SetAuditFields(entity, isUpdate: true);
         }
-        _dbSet.UpdateRange(entities);
+        DbSet.UpdateRange(entities);
     }
 
     public virtual void Remove(T entity)
     {
-        _dbSet.Remove(entity);
+        DbSet.Remove(entity);
     }
 
     public virtual void RemoveRange(IEnumerable<T> entities)
     {
-        _dbSet.RemoveRange(entities);
+        DbSet.RemoveRange(entities);
     }
 
     public virtual async Task<bool> RemoveByIdAsync(int id)
@@ -405,7 +405,7 @@ public class Repository<T> : IRepository<T> where T : class
         {
             baseEntity.IsDeleted = true;
             SetAuditFields(entity, isUpdate: true);
-            _dbSet.Update(entity);
+            DbSet.Update(entity);
             return;
         }
 
@@ -415,7 +415,7 @@ public class Repository<T> : IRepository<T> where T : class
         {
             activeProperty.SetValue(entity, false);
             SetAuditFields(entity, isUpdate: true);
-            _dbSet.Update(entity);
+            DbSet.Update(entity);
             return;
         }
 
@@ -426,7 +426,7 @@ public class Repository<T> : IRepository<T> where T : class
     {
         if (!_supportsSoftDelete) return;
 
-        var entity = await _dbSet.FindAsync(id);
+        var entity = await DbSet.FindAsync(id);
         if (entity == null) return;
 
         Restore(entity);
@@ -436,7 +436,7 @@ public class Repository<T> : IRepository<T> where T : class
     {
         if (!_supportsSoftDelete) return;
 
-        var entity = await _dbSet.FindAsync(id);
+        var entity = await DbSet.FindAsync(id);
         if (entity == null) return;
 
         Restore(entity);
@@ -449,7 +449,7 @@ public class Repository<T> : IRepository<T> where T : class
         {
             baseEntity.IsDeleted = false;
             SetAuditFields(entity, isUpdate: true);
-            _dbSet.Update(entity);
+            DbSet.Update(entity);
             return;
         }
 
@@ -459,7 +459,7 @@ public class Repository<T> : IRepository<T> where T : class
         {
             activeProperty.SetValue(entity, true);
             SetAuditFields(entity, isUpdate: true);
-            _dbSet.Update(entity);
+            DbSet.Update(entity);
             return;
         }
 
@@ -472,7 +472,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
     {
-        IQueryable<T> query = _dbSet;
+        IQueryable<T> query = DbSet;
 
         if (_supportsSoftDelete)
         {
@@ -494,7 +494,7 @@ public class Repository<T> : IRepository<T> where T : class
         Expression<Func<T, bool>>? filter = null,
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
     {
-        IQueryable<T> query = _dbSet;
+        IQueryable<T> query = DbSet;
 
         if (_supportsSoftDelete)
         {
@@ -527,7 +527,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual IQueryable<T> Query()
     {
-        IQueryable<T> query = _dbSet;
+        IQueryable<T> query = DbSet;
 
         if (_supportsSoftDelete)
         {
@@ -555,7 +555,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual IQueryable<T> QueryNoTracking()
     {
-        IQueryable<T> query = _dbSet.AsNoTracking();
+        IQueryable<T> query = DbSet.AsNoTracking();
 
         if (_supportsSoftDelete)
         {
@@ -583,7 +583,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<IEnumerable<TResult>> SelectAsync<TResult>(Expression<Func<T, TResult>> selector)
     {
-        IQueryable<T> query = _dbSet;
+        IQueryable<T> query = DbSet;
 
         if (_supportsSoftDelete)
         {
@@ -597,7 +597,7 @@ public class Repository<T> : IRepository<T> where T : class
         Expression<Func<T, bool>> filter,
         Expression<Func<T, TResult>> selector)
     {
-        IQueryable<T> query = _dbSet.Where(filter);
+        IQueryable<T> query = DbSet.Where(filter);
 
         if (_supportsSoftDelete)
         {
@@ -661,7 +661,7 @@ public class Repository<T> : IRepository<T> where T : class
     private string? GetCurrentUser()
     {
         // Get the current authenticated user from the user context service
-        return _userContextService.GetCurrentUserForAudit();
+        return UserContextService.GetCurrentUserForAudit();
     }
 
     private string GetPrimaryKeyName()

@@ -533,10 +533,16 @@ bb-report               # Generate comprehensive project report
 
 - **Independent Tasks**: VS Code tasks are configured to run independently without chaining
 - **Build Process**: Clean → Restore → Build → Run as separate, non-dependent tasks
-- **Git Workflow**: Create backup commits before major changes, use descriptive commit messages
+- **Git Workflow Standards**: 
+  - **Selective Staging**: Use `git add <specific-files>` instead of `git add .`
+  - **Conventional Commits**: Follow `type(scope): description` format (feat, fix, docs, refactor, test, style)
+  - **Descriptive Messages**: Provide clear, actionable commit messages
+  - **Branch Specification**: Always specify branch in `git push origin main` and `git pull origin main`
+  - **Pre-commit Checks**: Run `git status` and `git diff` before committing
+  - **Backup Strategy**: Create feature branches for significant changes
 - **Incremental Development**: Test after each significant change, validate builds frequently
 - **Code Reviews**: Follow established code review practices and standards
-- **Branch Management**: Use appropriate branching strategies for feature development
+- **Branch Management**: Use feature branches with descriptive names (feature/driver-management, fix/build-errors)
 
 ## Security Standards
 

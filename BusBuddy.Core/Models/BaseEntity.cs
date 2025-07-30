@@ -34,7 +34,7 @@ namespace BusBuddy.Core.Models
         /// <summary>
         /// Soft delete flag — entity is marked as deleted but not physically removed
         /// </summary>
-        public bool IsDeleted { get; set; } = false;
+        public bool IsDeleted { get; set; }
 
         /// <summary>
         /// Timestamp when the entity was soft deleted (if applicable)

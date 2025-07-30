@@ -375,5 +375,13 @@
     }
   },
   "github.copilot.mcp.enabled": true,
-  "github.copilot.mcp.configPath": ".vscode/mcp.json"
+  "github.copilot.mcp.configPath": ".vscode/mcp.json",
+  "cSpell.words": [
+    "ASPNETCORE",
+    "localdb",
+    "MVVM",
+    "Serilog",
+    "Syncfusion",
+    "tavily"
+  ]
 }

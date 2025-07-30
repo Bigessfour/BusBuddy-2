@@ -153,20 +153,82 @@ Only if PowerShell environment cannot be loaded:
 
 **Remember**: Start with simple solutions before complex ones.
 
-## 🧰 **Git & Repository Tips**
+## 🧰 **Git & Repository Standards**
 
-### PowerShell Git Commands
+### Git CLI Best Practices for BusBuddy
+
+**Mandatory Git Workflow Standards:**
+
+```bash
+# 1. ALWAYS check status before making changes
+git status                                    # Required before any operation
+
+# 2. SELECTIVE STAGING (Preferred over git add .)
+git add <specific-files>                      # Stage individual files
+git add BusBuddy.Core/Services/              # Stage by component
+git add *.cs                                  # Stage by file type
+# AVOID: git add . (stages everything, including unwanted files)
+
+# 3. CONVENTIONAL COMMIT MESSAGES (Mandatory)
+git commit -m "feat: add driver management API"
+git commit -m "fix: resolve CS0103 compilation errors"
+git commit -m "docs: update setup instructions"
+git commit -m "refactor: organize PowerShell scripts"
+git commit -m "style: apply code formatting rules"
+git commit -m "test: add integration tests for routes"
+
+# 4. PROPER REMOTE OPERATIONS
+git fetch origin                              # Download remote changes
+git pull origin main                          # Fetch and merge (preferred)
+git push origin main                          # Push to specific branch
+
+# 5. BRANCH MANAGEMENT
+git checkout -b feature/bus-routing           # Create feature branch
+git checkout main                             # Switch to main
+git merge --no-ff feature/bus-routing         # Merge with merge commit
+git branch -d feature/bus-routing             # Delete merged branch
+```
+
+**PowerShell Git Commands (Windows-Optimized):**
+
 ```powershell
-# PowerShell-friendly git commands
-git status                                                 # Check repo status
-git add .                                                  # Stage all changes
-git commit -m "Add feature X"                              # Commit with message
-git push                                                   # Push to remote
-
-# PowerShell alternatives to Unix commands
-git ls-files | Where-Object { $_ -match "\.cs$" }          # Find C# files
+# PowerShell-enhanced git operations
 git status --porcelain | Where-Object { $_ -match "^.M" }  # Modified files only
+git ls-files | Where-Object { $_ -match "\.cs$" }          # Find C# files
 (git ls-files | Measure-Object).Count                      # Count tracked files
+git log --oneline -10                                      # Last 10 commits
+git diff --name-only HEAD~1                                # Files changed in last commit
+
+# File counting and analysis
+$TrackedFiles = git ls-files
+$CSharpFiles = $TrackedFiles | Where-Object { $_ -like "*.cs" }
+Write-Host "Tracked: $($TrackedFiles.Count), C#: $($CSharpFiles.Count)"
+
+# Staged vs unstaged analysis
+$StagedFiles = git diff --cached --name-only
+$UnstagedFiles = git diff --name-only
+Write-Host "Staged: $($StagedFiles.Count), Unstaged: $($UnstagedFiles.Count)"
+```
+
+**Forbidden Git Practices:**
+
+```bash
+# ❌ NEVER USE THESE COMMANDS
+git add .                                     # Too broad, stages unwanted files
+git commit -m "update"                        # Non-descriptive message
+git commit -m "fix"                           # Too vague
+git push                                      # Missing branch specification
+git pull                                      # Missing branch specification
+git reset --hard HEAD~5                      # Dangerous data loss
+git push --force                              # Can overwrite others' work
+
+# ✅ USE THESE INSTEAD
+git add BusBuddy.Core/Services/DriverService.cs  # Specific files
+git commit -m "feat: implement driver CRUD operations"  # Descriptive
+git push origin main                          # Explicit branch
+git pull origin main                          # Explicit branch
+git reset --soft HEAD~1                      # Safer rollback
+git push --force-with-lease                  # Safer force push
 ```
 
 ## 🧰 **VS Code Integration**
