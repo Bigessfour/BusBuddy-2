@@ -6,7 +6,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- Our custom MenuStyles.xaml -->
-                <ResourceDictionary Source="/BusBuddy.WPF;component/Resources/MenuStyles.xaml"/>
+                <ResourceDictionary Source="Resources/MenuStyles.xaml"/>
 
                 <!-- Phase 1: Simple resource loading - add Syncfusion themes later -->
                 <!-- <ResourceDictionary Source="pack://application:,,,/Syncfusion.Themes.FluentDark.WPF;component/ThemesStyles.xaml"/> -->
