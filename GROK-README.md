@@ -67,6 +67,7 @@
 ### 💾 PowerShell Development Environment
 - **[BusBuddy.psm1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/PowerShell/BusBuddy%20PowerShell%20Environment/Modules/BusBuddy/BusBuddy.psm1)** - *5,434 lines* - Main PowerShell module
 - **[load-bus-buddy-profiles.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/load-bus-buddy-profiles.ps1)** - Profile loading script
+- **[PowerShell-README.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/PowerShell-README.md)** - PowerShell script organization documentation
 
 ### ⚙️ Configuration & Setup
 - **[mcp.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-2/main/mcp.json)** - Model Context Protocol configuration
@@ -144,14 +145,20 @@ BusBuddy/
 ├── BusBuddy.Tests/            # Unit and integration tests
 ├── BusBuddy.UITests/          # UI automation tests
 ├── PowerShell/                # PowerShell development environment
-│   └── BusBuddy PowerShell Environment/
-│       ├── Modules/BusBuddy/   # 5,434-line PowerShell module
-│       ├── Scripts/            # Automation scripts
-│       └── Utilities/          # PowerShell utilities
-├── Scripts/                   # Build and maintenance scripts
+│   ├── BusBuddy PowerShell Environment/
+│   │   └── Modules/BusBuddy/   # 5,434-line PowerShell module
+│   └── Scripts/                # Organized PowerShell scripts
+│       ├── Build/              # Build automation scripts
+│       ├── Configuration/      # System configuration scripts
+│       ├── Maintenance/        # Maintenance utilities
+│       ├── Testing/            # Test automation scripts
+│       └── Utilities/          # General utility scripts
+├── load-bus-buddy-profiles.ps1 # Main PowerShell environment entry point
+├── build-busbuddy-simple.ps1   # Simple build script entry point
+├── run-with-error-capture.ps1  # Error capture workflow
+├── PowerShell-README.md        # PowerShell documentation
 ├── Documentation/             # Project documentation
-├── AI-Core/                   # AI integration components
-└── mcp-servers/               # Model Context Protocol servers
+├── mcp-servers/               # Model Context Protocol servers
 ```
 
 ### 🔑 Critical Files for AI Analysis
