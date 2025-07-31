@@ -1210,6 +1210,122 @@
       },
       "detail": "🔧 REPAIR: Fix .NET 9.0 SDK installation error 0x80070643 and fallback to stable .NET 8.0",
       "problemMatcher": []
+    },
+    {
+      "label": "🐛 CRITICAL: Exception-Only Debugger",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& { $ErrorActionPreference = 'Continue'; Set-Location '${workspaceFolder}'; Write-Host '🐛 CRITICAL EXCEPTION DEBUGGER - Only showing exceptions and critical errors' -ForegroundColor Red; Write-Host ''; $env:DOTNET_CLI_TELEMETRY_OPTOUT='1'; $env:DOTNET_NOLOGO='1'; try { dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' --verbosity quiet 2>&1 | Where-Object { $_ -match '(Exception|Error|Critical|Fatal|Unhandled|StackTrace|at\\s+\\w+\\.|System\\.|Microsoft\\.)' -and $_ -notmatch '(Syncfusion license|Build\\s+succeeded|Build\\s+FAILED)' } | ForEach-Object { if ($_ -match 'Exception|Fatal|Critical|Unhandled') { Write-Host \"🚨 CRITICAL: $_\" -ForegroundColor Red } elseif ($_ -match 'Error') { Write-Host \"❌ ERROR: $_\" -ForegroundColor Yellow } else { Write-Host \"📍 TRACE: $_\" -ForegroundColor Gray } } } catch { Write-Host \"🚨 LAUNCH EXCEPTION: $($_.Exception.Message)\" -ForegroundColor Red; Write-Host \"📍 STACK: $($_.Exception.StackTrace)\" -ForegroundColor Gray } }"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🐛 CRITICAL: Shows ONLY exceptions, critical errors, and stack traces - filters out all noise",
+      "problemMatcher": []
+    },
+    {
+      "label": "🔥 REALTIME: Live Exception Monitor",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& { $ErrorActionPreference = 'Continue'; Set-Location '${workspaceFolder}'; Write-Host '🔥 LIVE EXCEPTION MONITOR - Real-time critical error detection' -ForegroundColor Magenta; Write-Host 'Monitoring application for exceptions and critical failures...' -ForegroundColor Cyan; Write-Host ''; $env:DOTNET_CLI_TELEMETRY_OPTOUT='1'; $env:DOTNET_NOLOGO='1'; $job = Start-Job -ScriptBlock { param($wsFolder) Set-Location $wsFolder; dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' --verbosity minimal } -ArgumentList $PWD; do { Start-Sleep -Milliseconds 500; $output = Receive-Job $job -ErrorAction SilentlyContinue; if ($output) { $output | Where-Object { $_ -match '(Exception|Error:|Critical|Fatal|Unhandled|StackTrace|\\s+at\\s+)' -and $_ -notmatch '(license|Build\\s+succeeded)' } | ForEach-Object { $timestamp = Get-Date -Format 'HH:mm:ss.fff'; if ($_ -match 'Exception|Fatal|Critical|Unhandled') { Write-Host \"[$timestamp] 🚨 $_\" -ForegroundColor Red } elseif ($_ -match 'Error:') { Write-Host \"[$timestamp] ❌ $_\" -ForegroundColor Yellow } else { Write-Host \"[$timestamp] 📍 $_\" -ForegroundColor DarkGray } } } } while ($job.State -eq 'Running'); Write-Host ''; Write-Host '🔥 Monitor session ended' -ForegroundColor Magenta }"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🔥 REALTIME: Live monitoring with timestamps - only critical errors and exceptions",
+      "problemMatcher": []
+    },
+    {
+      "label": "🎯 SMART: Exception Analyzer & Auto-Fix",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& { $ErrorActionPreference = 'Continue'; Set-Location '${workspaceFolder}'; Write-Host '🎯 SMART EXCEPTION ANALYZER - Auto-categorizing and suggesting fixes' -ForegroundColor Green; Write-Host ''; $env:DOTNET_CLI_TELEMETRY_OPTOUT='1'; $env:DOTNET_NOLOGO='1'; $exceptions = @(); $errors = @(); try { $output = dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' --verbosity normal 2>&1; $output | Where-Object { $_ -match '(Exception|Error:|Critical|Fatal|Unhandled)' -and $_ -notmatch '(license|Build\\s+succeeded)' } | ForEach-Object { if ($_ -match 'NullReferenceException') { $exceptions += \"NULL_REF: $_\"; Write-Host \"🚨 NULL REFERENCE: $_\" -ForegroundColor Red; Write-Host \"💡 FIX: Check for null objects before accessing properties\" -ForegroundColor Cyan } elseif ($_ -match 'ArgumentException|ArgumentNullException') { $exceptions += \"ARG_ERR: $_\"; Write-Host \"🚨 ARGUMENT ERROR: $_\" -ForegroundColor Red; Write-Host \"💡 FIX: Validate method parameters before use\" -ForegroundColor Cyan } elseif ($_ -match 'FileNotFoundException|DirectoryNotFoundException') { $exceptions += \"FILE_ERR: $_\"; Write-Host \"🚨 FILE/PATH ERROR: $_\" -ForegroundColor Red; Write-Host \"💡 FIX: Verify file paths and ensure files exist\" -ForegroundColor Cyan } elseif ($_ -match 'SqlException|DatabaseException') { $exceptions += \"DB_ERR: $_\"; Write-Host \"🚨 DATABASE ERROR: $_\" -ForegroundColor Red; Write-Host \"💡 FIX: Check connection strings and database availability\" -ForegroundColor Cyan } elseif ($_ -match 'XamlParseException|XamlException') { $exceptions += \"XAML_ERR: $_\"; Write-Host \"🚨 XAML ERROR: $_\" -ForegroundColor Red; Write-Host \"💡 FIX: Check XAML syntax and binding paths\" -ForegroundColor Cyan } else { $errors += $_; Write-Host \"❌ OTHER ERROR: $_\" -ForegroundColor Yellow } }; Write-Host ''; Write-Host \"📊 SUMMARY: $($exceptions.Count) exceptions, $($errors.Count) other errors\" -ForegroundColor Magenta } catch { Write-Host \"🚨 ANALYZER EXCEPTION: $($_.Exception.Message)\" -ForegroundColor Red } }"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🎯 SMART: Categorizes exceptions and provides auto-fix suggestions for common issues",
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ MINIMAL: Silent Critical Monitor",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& { $ErrorActionPreference = 'SilentlyContinue'; Set-Location '${workspaceFolder}'; $env:DOTNET_CLI_TELEMETRY_OPTOUT='1'; $env:DOTNET_NOLOGO='1'; $criticalCount = 0; Write-Host '⚡ MINIMAL CRITICAL MONITOR - Silent until critical issue detected' -ForegroundColor DarkCyan; dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' --verbosity quiet 2>&1 | ForEach-Object { if ($_ -match '(Exception|Fatal|Critical|Unhandled|System\\..*Exception)' -and $_ -notmatch 'license') { $criticalCount++; Write-Host \"⚡[$criticalCount] $_\" -ForegroundColor Red } } | Out-Null; if ($criticalCount -eq 0) { Write-Host '✅ NO CRITICAL ISSUES DETECTED' -ForegroundColor Green } else { Write-Host \"🚨 DETECTED $criticalCount CRITICAL ISSUES\" -ForegroundColor Red } }"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "⚡ MINIMAL: Silent operation - only shows critical issues, perfect for CI/CD",
+      "problemMatcher": []
     }
   ]
 }

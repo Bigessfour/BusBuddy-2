@@ -95,7 +95,7 @@ function Write-BusBuddyError {
     param(
         [string]$Message,
         [string]$RecommendedAction,
-        [Exception]$Exception
+        [System.Exception]$Exception
     )
 
     $errorRecord = [System.Management.Automation.ErrorRecord]::new(

@@ -459,7 +459,7 @@ function Write-BusBuddyError {
 
         [string]$RecommendedAction,
 
-        [Exception]$Exception,
+        [System.Exception]$Exception,
 
         [System.Management.Automation.ErrorCategory]$Category = [System.Management.Automation.ErrorCategory]::InvalidOperation
     )

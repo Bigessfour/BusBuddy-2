@@ -71,7 +71,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Serilog" Version="4.1.0" />
+    <PackageReference Include="Serilog" Version="4.0.2" />
   </ItemGroup>
 </Project>
 ```
@@ -124,7 +124,7 @@
 
 <ItemGroup Label="Logging and Utilities">
   <!-- Explicit version numbers for stable dependencies -->
-  <PackageReference Include="Serilog" Version="4.1.0" />
+  <PackageReference Include="Serilog" Version="4.0.2" />
   <PackageReference Include="AutoMapper" Version="12.0.1" />
 </ItemGroup>
 ```

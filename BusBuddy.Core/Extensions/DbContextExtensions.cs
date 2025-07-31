@@ -6,11 +6,11 @@ using System.Diagnostics;
 namespace BusBuddy.Core.Extensions
 {
     /// <summary>
-    /// Extensions for DbContext to improve logging and performance tracking
+    /// Extensions for BusBuddyDbContext to improve logging and performance tracking
     /// </summary>
     public static class DbContextExtensions
     {
-        private static readonly ILogger Logger = Log.ForContext("SourceContext", "DbContextExtensions");
+        private static readonly ILogger Logger = Log.ForContext("SourceContext", "BusBuddyDbContextExtensions");
 
         /// <summary>
         /// Executes a query with detailed performance logging

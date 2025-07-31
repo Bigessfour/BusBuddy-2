@@ -42,16 +42,32 @@ namespace BusBuddy.WPF
             // Phase 2: Enhanced error handling and logging
             try
             {
+                // Configure Serilog first
+                ConfigureSerilog();
+
+                Log.Information("BusBuddy application starting up");
+
+                // Validate working directory and file paths
+                ValidateApplicationPaths();
+
                 // Run async initialization on UI thread
                 InitializeApplicationAsync(e).Wait();
             }
+            catch (FileNotFoundException ex)
+            {
+                Log.Error(ex, "File not found during application startup: {FileName}", ex.FileName);
+                HandleStartupFileError(ex);
+            }
             catch (Exception ex)
             {
-                HandleStartupError(ex);
+                Log.Fatal(ex, "Critical error during application startup");
+                MessageBox.Show($"Critical startup error: {ex.Message}", "BusBuddy Startup Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(1);
             }
         }
 
-        private async Task InitializeApplicationAsync(StartupEventArgs e)
+        private void ConfigureSerilog()
         {
             // CRITICAL: Initialize Serilog logging first
             var logsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
@@ -59,33 +75,66 @@ namespace BusBuddy.WPF
             Log.Logger = new LoggerConfiguration()
                 .ConfigureUILogging(logsDirectory)
                 .CreateLogger();
+        }
 
-            Log.Information("🚌 BusBuddy application starting up...");
+        private void ValidateApplicationPaths()
+        {
+            var currentDirectory = Directory.GetCurrentDirectory();
+            Log.Information("Current working directory: {Directory}", currentDirectory);
 
-            // Register Syncfusion license (Phase 1 requirement)
-            try
+            // Ensure database directory exists
+            var databasePath = Path.Combine(currentDirectory, "Data");
+            if (!Directory.Exists(databasePath))
             {
-                var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY");
-                if (!string.IsNullOrEmpty(licenseKey))
-                {
-                    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
-                    Log.Information("✅ Syncfusion license registered successfully");
-                    Console.WriteLine("✅ Syncfusion license registered successfully");
-                }
-                else
-                {
-                    Log.Warning("⚠️ No Syncfusion license key found in environment variables");
-                    Console.WriteLine("⚠️ No Syncfusion license key found in environment variables");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Phase 1: Simple error handling
-                Log.Error(ex, "❌ Syncfusion license error: {ErrorMessage}", ex.Message);
-                Console.WriteLine($"❌ Syncfusion license error: {ex.Message}");
-                MessageBox.Show($"Syncfusion license error: {ex.Message}", "Warning");
+                Directory.CreateDirectory(databasePath);
+                Log.Information("Created database directory: {Path}", databasePath);
             }
 
+            // Validate that required assemblies are accessible
+            var assemblyLocation = typeof(App).Assembly.Location;
+            var assemblyDirectory = Path.GetDirectoryName(assemblyLocation);
+
+            if (string.IsNullOrEmpty(assemblyDirectory) || !Directory.Exists(assemblyDirectory))
+            {
+                Log.Warning("Assembly directory not found or invalid: {Directory}", assemblyDirectory);
+            }
+            else
+            {
+                Log.Information("Assembly directory validated: {Directory}", assemblyDirectory);
+            }
+        }
+
+        private void HandleStartupFileError(FileNotFoundException ex)
+        {
+            var errorMessage = ex.FileName switch
+            {
+                var f when f?.Contains("BusBuddy.db") == true =>
+                    "Database file not found. A new database will be created.",
+                var f when f?.Contains(".dll") == true =>
+                    $"Required library missing: {Path.GetFileName(f)}. Please reinstall the application.",
+                var f when f?.Contains("appsettings") == true =>
+                    "Configuration file missing. Using default settings.",
+                _ => $"Required file missing: {ex.FileName ?? "Unknown file"}"
+            };
+
+            Log.Warning("Handling file not found: {Message}", errorMessage);
+
+            if (ex.FileName?.Contains(".dll") == true)
+            {
+                MessageBox.Show(errorMessage, "Missing Component",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                Shutdown(1);
+            }
+            else
+            {
+                // Continue with warning for non-critical files
+                MessageBox.Show(errorMessage, "File Warning",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private async Task InitializeApplicationAsync(StartupEventArgs e)
+        {
             Log.Information("🏗️ Building dependency injection host...");
             Console.WriteLine("🏗️ Building dependency injection host...");
 
@@ -109,9 +158,19 @@ namespace BusBuddy.WPF
                     Log.Information("📦 Registering services...");
                     Console.WriteLine("📦 Registering services...");
 
-                    // Phase 1: Register database context
+                    // Phase 1: Register database context with explicit naming to avoid conflicts
                     services.AddDbContext<BusBuddyDbContext>(options =>
-                        options.UseSqlite("Data Source=BusBuddy.db"));
+                    {
+                        var connectionString = context.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=BusBuddy.db";
+                        options.UseSqlite(connectionString);
+
+                        // Configure for better error reporting
+                        options.EnableDetailedErrors();
+                        if (System.Diagnostics.Debugger.IsAttached)
+                        {
+                            options.EnableSensitiveDataLogging();
+                        }
+                    });
 
                     // Phase 1: Register Phase 1 services including data seeding
                     services.AddPhase1Services();

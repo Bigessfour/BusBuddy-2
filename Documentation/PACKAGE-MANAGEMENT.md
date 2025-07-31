@@ -155,7 +155,7 @@ public partial class App : Application
     <!-- Package Versions -->
     <SyncfusionVersion>30.1.40</SyncfusionVersion>
     <EntityFrameworkVersion>8.0.0</EntityFrameworkVersion>
-    <SerilogVersion>3.1.1</SerilogVersion>
+    <SerilogVersion>4.0.2</SerilogVersion>
   </PropertyGroup>
 </Project>
 ```

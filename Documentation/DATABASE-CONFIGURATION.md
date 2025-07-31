@@ -22,11 +22,12 @@ Enhanced the `EnvironmentHelper` class with methods to:
 - Select appropriate connection string
 
 ### 3. Database Context
-Modified `BusBuddyContext.cs` to:
+Modified `BusBuddyDbContext.cs` to:
 - Support SQL Server LocalDB for development
 - Optimize Azure SQL for production
-- Maintain SQLite for backward compatibility
+- Maintain SQLite for legacy support (Phase 1 compatibility)
 - Configure provider-specific optimizations
+- Eliminate duplicate context factories that cause EF conflicts
 
 ### 4. Utility Scripts
 Created PowerShell scripts for database management:

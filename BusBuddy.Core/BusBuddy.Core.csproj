@@ -24,10 +24,6 @@
   <ItemGroup>
     <!-- Database and EF Core (Versions managed by Directory.Build.props) -->
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EntityFrameworkVersion)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="$(EntityFrameworkVersion)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EntityFrameworkVersion)" />
 
     <!-- Google Earth Engine Integration -->
     <PackageReference Include="Google.Apis.Auth" Version="1.70.0" />

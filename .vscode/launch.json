@@ -2,46 +2,46 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run and Debug BusBuddy.WPF",
+      "name": "Launch BusBuddy (WPF)",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "PS Fixed: Build Solution",
-      "postDebugTask": "PS Fixed: Clean Build",
-      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net9.0-windows/BusBuddy.WPF.exe",
       "args": [],
-      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
       "stopAtEntry": false,
-      "console": "integratedTerminal",
-      "justMyCode": true,
-      "env": {
-        "BUSBUDDY_DEBUG_ENABLED": "true",
-        "SYNCFUSION_DEBUG": "true"
-      },
       "symbolOptions": {
+        "searchPaths": [
+          "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net9.0-windows",
+          "${workspaceFolder}/BusBuddy.Core/bin/Debug/net9.0"
+        ],
         "searchMicrosoftSymbolServer": true,
         "searchNuGetOrgSymbolServer": true,
-        "requireExactSource": false
-      }
-    },
-    {
-      "name": "Debug Tests",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "PS Fixed: Build Solution",
-      "postDebugTask": "PS Fixed: Clean Build",
-      "program": "dotnet",
-      "args": [
-        "test",
-        "${workspaceFolder}/BusBuddy.Tests/BusBuddy.Tests.csproj",
-        "--logger",
-        "console;verbosity=detailed"
-      ],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
+        "moduleFilter": {
+          "mode": "loadAllButExcluded",
+          "excludedModules": [
+            "System.Private.CoreLib.dll",
+            "PresentationFramework.dll",
+            "WindowsBase.dll",
+            "System.Runtime.dll",
+            "System.Xaml.dll"
+          ]
+        }
+      },
       "justMyCode": false,
+      "enableStepFiltering": false,
+      "suppressJITOptimizations": true,
+      "exceptionSettings": {
+        "System.IO.FileNotFoundException": "userHandled"
+      },
+      "preLaunchTask": "shell: Direct: Build Solution (CMD)",
       "env": {
-        "BUSBUDDY_DEBUG_ENABLED": "true"
+        "DOTNET_EnableWriteXorExecute": "0",
+        "COMPLUS_ForceENC": "1"
       }
+    }
+  ]
+}
     },
     {
       "name": "Debug Null Handling Tests",
@@ -164,6 +164,133 @@
       "env": {
         "BUSBUDDY_DEBUG_ENABLED": "true"
       }
+    },
+    {
+      "name": "🐛 CRITICAL: Exception Debug (Break on All)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Direct: Build Solution (CMD)",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net9.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "enableStepFiltering": false,
+      "suppressJITOptimizations": true,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true,
+        "requireExactSource": false
+      },
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": false,
+        "programOutput": true,
+        "diagnosticsLog": {
+          "protocolMessages": false
+        }
+      }
+    },
+    {
+      "name": "🔥 REALTIME: Exception Monitor Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Direct: Build Solution (CMD)",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net9.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "enableStepFiltering": true,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true,
+        "requireExactSource": false
+      },
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": false,
+        "programOutput": true,
+        "diagnosticsLog": {
+          "protocolMessages": false
+        }
+      }
+    },
+    {
+      "name": "🎯 SMART: Exception Analysis Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Direct: Build Solution (CMD)",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net9.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "enableStepFiltering": false,
+      "suppressJITOptimizations": true,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true,
+        "requireExactSource": false
+      },
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": false,
+        "programOutput": true,
+        "diagnosticsLog": {
+          "protocolMessages": true
+        }
+      }
+    },
+    {
+      "name": "⚡ MINIMAL: Silent Debug (Critical Only)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Direct: Build Solution (CMD)",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net9.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "stopAtEntry": false,
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "enableStepFiltering": true,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": false,
+        "searchNuGetOrgSymbolServer": false,
+        "requireExactSource": true
+      },
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": false,
+        "programOutput": false,
+        "diagnosticsLog": {
+          "protocolMessages": false
+        }
+      }
+    },
+    {
+      "name": "🚀 ATTACH: Exception Hunter",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "justMyCode": false,
+      "enableStepFiltering": false,
+      "symbolOptions": {
+        "searchMicrosoftSymbolServer": true,
+        "searchNuGetOrgSymbolServer": true,
+        "requireExactSource": false
+      },
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": false,
+        "programOutput": true,
+        "diagnosticsLog": {
+          "protocolMessages": false
+        }
+      }
     }
   ],
   "compounds": [
@@ -209,6 +336,46 @@
         "Run and Debug BusBuddy.WPF with Workflows",
         "GitHub: Analyze Workflow Run"
       ]
+    },
+    {
+      "name": "🐛 CRITICAL DEBUG SESSION: Exception Focus",
+      "configurations": [
+        "🐛 CRITICAL: Exception Debug (Break on All)"
+      ],
+      "preLaunchTask": "🐛 CRITICAL: Exception-Only Debugger",
+      "stopAll": true
+    },
+    {
+      "name": "🔥 REALTIME DEBUG SESSION: Live Monitor",
+      "configurations": [
+        "🔥 REALTIME: Exception Monitor Debug"
+      ],
+      "preLaunchTask": "🔥 REALTIME: Live Exception Monitor",
+      "stopAll": true
+    },
+    {
+      "name": "🎯 SMART DEBUG SESSION: Analysis & Fix",
+      "configurations": [
+        "🎯 SMART: Exception Analysis Debug"
+      ],
+      "preLaunchTask": "🎯 SMART: Exception Analyzer & Auto-Fix",
+      "stopAll": true
+    },
+    {
+      "name": "⚡ MINIMAL DEBUG SESSION: Silent Monitor",
+      "configurations": [
+        "⚡ MINIMAL: Silent Debug (Critical Only)"
+      ],
+      "preLaunchTask": "⚡ MINIMAL: Silent Critical Monitor",
+      "stopAll": true
+    },
+    {
+      "name": "🚀 FULL EXCEPTION DEBUGGING SUITE",
+      "configurations": [
+        "🐛 CRITICAL: Exception Debug (Break on All)",
+        "🔥 REALTIME: Exception Monitor Debug"
+      ],
+      "stopAll": false
     }
   ]
 }
