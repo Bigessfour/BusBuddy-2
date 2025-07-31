@@ -64,9 +64,8 @@ try {
     if (Test-Path $aiModulePath) {
         Write-Host "🤖 Loading BusBuddy AI Module..." -ForegroundColor Yellow
 
-        # Check for PSAISuite dependency
-        if (-not (Get-Module -ListAvailable -Name PSAISuite)) {
-            Write-Warning "⚠️ PSAISuite module not found. Install with: Install-Module PSAISuite"
+        # AI features removed for simplified operation
+        Write-Verbose "AI integration disabled - focusing on core BusBuddy functionality"
             Write-Host "Skipping AI module load..." -ForegroundColor Yellow
         }
         else {

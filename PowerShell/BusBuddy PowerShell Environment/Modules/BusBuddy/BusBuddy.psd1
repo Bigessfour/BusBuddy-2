@@ -53,7 +53,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules      = @('PSAISuite')  # AI integration module for enhanced BusBuddy functionality
+    # RequiredModules      = @()  # PSAISuite is optional for AI features
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()

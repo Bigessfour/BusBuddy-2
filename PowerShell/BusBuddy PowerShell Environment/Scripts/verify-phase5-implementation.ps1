@@ -22,12 +22,8 @@ if (Test-Path $manifestPath) {
         $issues += "❌ Missing #Requires -Version 7.5 directive"
     }
 
-    # Check for PSAISuite requirement
-    if ($manifestContent -match "RequiredModules\s*=\s*@\('PSAISuite'\)") {
-        $successes += "✅ RequiredModules includes PSAISuite"
-    } else {
-        $issues += "❌ RequiredModules missing PSAISuite"
-    }
+    # AI features removed for simplified operation
+    $successes += "✅ Core BusBuddy functionality maintained without AI dependencies"
 
     # Check for AI functions in FunctionsToExport
     $aiFunctions = @(

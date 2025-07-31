@@ -3,124 +3,42 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:BusBuddy.WPF.Controls"
-             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="600">
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <Style x:Key="ValidationMessageStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#D32F2F" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="Margin" Value="0,5,0,5" />
-        </Style>
-        <Style x:Key="SuccessMessageStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#388E3C" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="Margin" Value="0,5,0,5" />
-        </Style>
-    </UserControl.Resources>
-
+             d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Validation Button and Status -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Text="{Binding ValidationMessage}"
-                       Visibility="{Binding ShowValidationMessage, Converter={StaticResource BooleanToVisibilityConverter}}"
-                       Style="{StaticResource ValidationMessageStyle}"
-                       Grid.Column="0"
-                       VerticalAlignment="Center" />
-
+        <!-- Address Input Section -->
+        <StackPanel Grid.Row="0" Margin="10">
+            <Label Content="Address:" FontWeight="Bold"/>
+            <TextBox x:Name="AddressTextBox" Margin="0,5" Padding="5"/>
             <Button Content="Validate Address"
                     Click="ValidateAddress_Click"
-                    IsEnabled="{Binding IsValidating, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}"
-                    Grid.Column="1"
+                    Margin="0,10"
                     Padding="10,5"
-                    Margin="5,0,0,0" />
-        </Grid>
+                    HorizontalAlignment="Left"/>
+        </StackPanel>
 
-        <!-- Nearby Bus Stops (shown when validation succeeds) -->
-        <Grid Grid.Row="1"
-              Visibility="{Binding IsValidated, Converter={StaticResource BooleanToVisibilityConverter}}"
-              Margin="0,10,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <!-- Results Section -->
+        <StackPanel Grid.Row="1" Margin="10">
+            <Label Content="Validation Results:" FontWeight="Bold"/>
+            <TextBlock x:Name="ResultsTextBlock"
+                       TextWrapping="Wrap"
+                       Margin="0,5"
+                       Text="No validation performed yet."/>
+        </StackPanel>
 
-            <TextBlock Text="Nearby Bus Stops:"
-                       Grid.Column="0"
-                       VerticalAlignment="Center"
-                       Margin="0,0,10,0" />
-
-            <ComboBox ItemsSource="{Binding NearbyBusStops}"
-                      SelectedItem="{Binding SelectedBusStop, Mode=TwoWay}"
-                      Grid.Column="1"
-                      IsEnabled="{Binding HasNearbyBusStops}" />
-
-            <TextBlock Text="Distance:"
-                       Grid.Column="2"
-                       VerticalAlignment="Center"
-                       Margin="10,0,5,0"
-                       Visibility="{Binding HasNearbyBusStops, Converter={StaticResource BooleanToVisibilityConverter}}" />
-
-            <TextBlock Grid.Column="3"
-                       VerticalAlignment="Center"
-                       Visibility="{Binding HasNearbyBusStops, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0:0.00} miles">
-                        <Binding Path="DistanceToBusStop" />
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
-        </Grid>
-
-        <!-- Validation Progress Indicator -->
-        <syncfusion:SfBusyIndicator Grid.Row="2"
-                                    IsBusy="{Binding IsValidating}"
-                                    AnimationType="SingleCircle"
-                                    Visibility="{Binding IsValidating, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                    HorizontalAlignment="Center"
-                                    Height="24"
-                                    Width="24"
-                                    Margin="0,10,0,0"
-                                     />
-
-        <!-- Normalized Address Display -->
-        <Grid Grid.Row="3"
-              Visibility="{Binding IsValidated, Converter={StaticResource BooleanToVisibilityConverter}}"
-              Margin="0,10,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Text="Normalized Address:"
-                       Grid.Column="0"
-                       VerticalAlignment="Center"
-                       Margin="0,0,10,0" />
-
-            <TextBlock Text="{Binding NormalizedAddress}"
-                       Grid.Column="1"
-                       VerticalAlignment="Center"
-                       TextWrapping="Wrap" />
-        </Grid>
+        <!-- Progress Section -->
+        <StackPanel Grid.Row="2" Margin="10" HorizontalAlignment="Center">
+            <TextBlock x:Name="ProgressTextBlock"
+                       Text=""
+                       HorizontalAlignment="Center"
+                       Margin="0,10"/>
+        </StackPanel>
     </Grid>
 </UserControl>
 

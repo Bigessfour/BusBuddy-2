@@ -94,6 +94,9 @@
     <Compile Update="Views\Schedule\ScheduleDetailsDialog.xaml.cs">
       <DependentUpon>ScheduleDetailsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Controls\QuickActionsPanel.xaml.cs">
+      <DependentUpon>QuickActionsPanel.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -152,6 +155,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Schedule\ScheduleDetailsDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Controls\QuickActionsPanel.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

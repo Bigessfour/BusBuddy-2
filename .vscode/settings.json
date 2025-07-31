@@ -378,18 +378,23 @@
   "github.copilot.mcp.configPath": ".vscode/mcp.json",
   "cSpell.words": [
     "ASPNETCORE",
+    "Bigessfour",
     "busbaddyadmin",
     "BUSBUDDY",
     "Fetchability",
     "hotfixes",
+    "LASTEXITCODE",
     "localdb",
     "MVVM",
+    "nologo",
+    "oneline",
     "pwsh",
     "Serilog",
     "subword",
     "Syncfusion",
     "syncfusionskin",
     "tavily",
-    "viewmodel"
+    "viewmodel",
+    "vscdb"
   ]
 }

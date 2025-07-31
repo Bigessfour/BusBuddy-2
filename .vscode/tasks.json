@@ -79,7 +79,7 @@
         "-ExecutionPolicy",
         "Bypass",
         "-Command",
-        "Write-Host '=== BusBuddy Diagnostic Check ===' -ForegroundColor Cyan; Write-Host 'PowerShell Version:' $PSVersionTable.PSVersion -ForegroundColor Yellow; Write-Host 'Current Location:' $PWD -ForegroundColor Yellow; Write-Host '.NET SDK:' (dotnet --version 2>$null) -ForegroundColor Yellow; Write-Host 'Solution File:' (Test-Path 'BusBuddy.sln') -ForegroundColor Yellow; Write-Host 'Profile Script:' (Test-Path 'load-bus-buddy-profiles.ps1') -ForegroundColor Yellow"
+        "Write-Host '=== BusBuddy Diagnostic Check ===' -ForegroundColor Cyan; Write-Host 'PowerShell Version:' $PSVersionTable.PSVersion -ForegroundColor Yellow; Write-Host 'Current Location:' $PWD -ForegroundColor Yellow; Write-Host '.NET SDK:' $(try { dotnet --version } catch { 'Not installed' }) -ForegroundColor Yellow; Write-Host 'Solution File:' (Test-Path 'BusBuddy.sln') -ForegroundColor Yellow; Write-Host 'Profile Script:' (Test-Path 'load-bus-buddy-profiles.ps1') -ForegroundColor Yellow"
       ],
       "group": "test",
       "options": {
@@ -120,6 +120,34 @@
       "problemMatcher": [
         "$msCompile"
       ]
+    },
+    {
+      "label": "🎨 BB: Form Build (WPF Only)",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "BusBuddy.WPF/BusBuddy.WPF.csproj",
+        "--verbosity",
+        "normal",
+        "--nologo"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "detail": "🎨 Build WPF project only for form development and UI testing"
     },
     {
       "label": "� BB: Mandatory PowerShell 7.5.2 Syntax Check",

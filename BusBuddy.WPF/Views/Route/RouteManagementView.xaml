@@ -8,6 +8,10 @@
              d:DesignHeight="800"
              d:DesignWidth="1200">
 
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+  </UserControl.Resources>
+
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
@@ -88,7 +92,7 @@
                      VerticalAlignment="Center"
                      FontSize="16"
                      Foreground="Gray"
-                     Visibility="{Binding IsRouteSelected, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                     Visibility="{Binding IsRouteNotSelected, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
           <!-- Route details content would go here -->
         </Grid>

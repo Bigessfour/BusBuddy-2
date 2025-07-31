@@ -20,21 +20,54 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         private ObservableCollection<Bus> _vehicles = new();
 
         [ObservableProperty]
+        private ObservableCollection<Bus> _filteredVehicles = new();
+
+        [ObservableProperty]
         private Bus? _selectedVehicle;
 
         [ObservableProperty]
         private string _searchText = string.Empty;
 
         [ObservableProperty]
-        private bool _isLoading;
+        private string _selectedStatusFilter = "All Status";
+
+        [ObservableProperty]
+        private bool _isBusy;
 
         [ObservableProperty]
         private string _statusMessage = string.Empty;
 
+        // Status filter options for the ComboBox
+        public List<string> StatusFilterOptions { get; } = new()
+        {
+            "All Status",
+            "Active",
+            "InService",
+            "Maintenance",
+            "OutOfService",
+            "Retired"
+        };
+
+        // Operational status options for vehicle form
+        public List<string> OperationalStatusOptions { get; } = new()
+        {
+            "Active",
+            "InService",
+            "Maintenance",
+            "OutOfService",
+            "Retired"
+        };
+
+        // Total vehicle count for status bar
+        public int TotalVehicleCount => FilteredVehicles?.Count ?? 0;
+
         public ICommand LoadVehiclesCommand { get; }
         public ICommand AddVehicleCommand { get; }
+        public ICommand EditVehicleCommand { get; }
         public ICommand UpdateVehicleCommand { get; }
+        public ICommand SaveVehicleCommand { get; }
         public ICommand DeleteVehicleCommand { get; }
+        public ICommand CancelEditCommand { get; }
         public ICommand SearchVehiclesCommand { get; }
         public ICommand RefreshCommand { get; }
 
@@ -43,9 +76,12 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
             _busService = busService ?? throw new ArgumentNullException(nameof(busService));
 
             LoadVehiclesCommand = new AsyncRelayCommand(LoadVehiclesAsync);
-            AddVehicleCommand = new AsyncRelayCommand(AddVehicleAsync, CanAddVehicle);
+            AddVehicleCommand = new AsyncRelayCommand(AddVehicleAsync);
+            EditVehicleCommand = new AsyncRelayCommand(EditVehicleAsync, CanEditVehicle);
             UpdateVehicleCommand = new AsyncRelayCommand(UpdateVehicleAsync, CanUpdateVehicle);
+            SaveVehicleCommand = new AsyncRelayCommand(SaveVehicleAsync, CanSaveVehicle);
             DeleteVehicleCommand = new AsyncRelayCommand(DeleteVehicleAsync, CanDeleteVehicle);
+            CancelEditCommand = new RelayCommand(CancelEdit);
             SearchVehiclesCommand = new AsyncRelayCommand(SearchVehiclesAsync);
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
 
@@ -60,7 +96,7 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         {
             try
             {
-                IsLoading = true;
+                IsBusy = true;
                 StatusMessage = "Loading vehicles...";
 
                 var vehicles = await _busService.GetAllBusesAsync();
@@ -71,16 +107,91 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
                     Vehicles.Add(vehicle);
                 }
 
+                ApplyFilters();
                 StatusMessage = $"Loaded {Vehicles.Count} vehicles";
             }
             catch (Exception ex)
             {
                 StatusMessage = $"Error loading vehicles: {ex.Message}";
+                // Load sample data if service fails (for MVP Phase 1)
+                LoadSampleData();
             }
             finally
             {
-                IsLoading = false;
+                IsBusy = false;
             }
+        }
+
+        /// <summary>
+        /// Load sample data for MVP testing
+        /// </summary>
+        private void LoadSampleData()
+        {
+            var sampleVehicles = new List<Bus>
+            {
+                new() { VehicleId = 1, BusNumber = "BUS001", Make = "Ford", Model = "Transit", LicenseNumber = "ABC-123", SeatingCapacity = 40, Status = "Active", Year = 2020 },
+                new() { VehicleId = 2, BusNumber = "BUS002", Make = "Chevrolet", Model = "Express", LicenseNumber = "DEF-456", SeatingCapacity = 35, Status = "InService", Year = 2019 },
+                new() { VehicleId = 3, BusNumber = "BUS003", Make = "Mercedes", Model = "Sprinter", LicenseNumber = "GHI-789", SeatingCapacity = 20, Status = "Maintenance", Year = 2021 },
+                new() { VehicleId = 4, BusNumber = "BUS004", Make = "Ford", Model = "E-Series", LicenseNumber = "JKL-012", SeatingCapacity = 45, Status = "Active", Year = 2018 },
+                new() { VehicleId = 5, BusNumber = "BUS005", Make = "Isuzu", Model = "NPR", LicenseNumber = "MNO-345", SeatingCapacity = 30, Status = "OutOfService", Year = 2017 }
+            };
+
+            Vehicles.Clear();
+            foreach (var vehicle in sampleVehicles)
+            {
+                Vehicles.Add(vehicle);
+            }
+
+            ApplyFilters();
+            StatusMessage = "Sample data loaded (database unavailable)";
+        }
+
+        /// <summary>
+        /// Apply search and status filters
+        /// </summary>
+        private void ApplyFilters()
+        {
+            if (Vehicles == null) return;
+
+            var filtered = Vehicles.AsEnumerable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                var searchLower = SearchText.ToLower();
+                filtered = filtered.Where(v =>
+                    (v.Make?.ToLower().Contains(searchLower, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (v.Model?.ToLower().Contains(searchLower, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (v.LicenseNumber?.ToLower().Contains(searchLower, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (v.BusNumber?.ToLower().Contains(searchLower, StringComparison.OrdinalIgnoreCase) == true));
+            }
+
+            // Apply status filter
+            if (!string.IsNullOrWhiteSpace(SelectedStatusFilter) && SelectedStatusFilter != "All Status")
+            {
+                filtered = filtered.Where(v => v.Status == SelectedStatusFilter);
+            }
+
+            FilteredVehicles.Clear();
+            foreach (var vehicle in filtered)
+            {
+                FilteredVehicles.Add(vehicle);
+            }
+
+            OnPropertyChanged(nameof(TotalVehicleCount));
+        }
+
+        /// <summary>
+        /// Property change handlers to trigger filtering
+        /// </summary>
+        partial void OnSearchTextChanged(string value)
+        {
+            ApplyFilters();
+        }
+
+        partial void OnSelectedStatusFilterChanged(string value)
+        {
+            ApplyFilters();
         }
 
         /// <summary>
@@ -88,18 +199,24 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         /// </summary>
         private async Task AddVehicleAsync()
         {
-            if (SelectedVehicle == null) return;
-
             try
             {
-                IsLoading = true;
-                StatusMessage = "Adding vehicle...";
+                IsBusy = true;
+                StatusMessage = "Adding new vehicle...";
 
-                var addedVehicle = await _busService.AddBusAsync(SelectedVehicle);
-                Vehicles.Add(addedVehicle);
+                var newVehicle = new Bus
+                {
+                    BusNumber = $"BUS{(Vehicles.Count + 1):000}",
+                    Make = "",
+                    Model = "",
+                    LicenseNumber = "",
+                    SeatingCapacity = 40,
+                    Year = DateTime.Now.Year,
+                    Status = "Active"
+                };
 
-                SelectedVehicle = new Bus(); // Reset for next entry
-                StatusMessage = "Vehicle added successfully";
+                SelectedVehicle = newVehicle;
+                StatusMessage = "Ready to add new vehicle - fill in details and click Save";
             }
             catch (Exception ex)
             {
@@ -107,7 +224,65 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
             }
             finally
             {
-                IsLoading = false;
+                IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Edit selected vehicle
+        /// </summary>
+        private async Task EditVehicleAsync()
+        {
+            if (SelectedVehicle == null) return;
+            StatusMessage = $"Editing vehicle {SelectedVehicle.BusNumber}";
+        }
+
+        /// <summary>
+        /// Save vehicle (add or update)
+        /// </summary>
+        private async Task SaveVehicleAsync()
+        {
+            if (SelectedVehicle == null) return;
+
+            try
+            {
+                IsBusy = true;
+                StatusMessage = "Saving vehicle...";
+
+                // Basic validation
+                if (string.IsNullOrWhiteSpace(SelectedVehicle.BusNumber))
+                {
+                    StatusMessage = "Bus Number is required";
+                    return;
+                }
+
+                if (SelectedVehicle.VehicleId == 0)
+                {
+                    // New vehicle - for MVP Phase 1, just add to collection
+                    SelectedVehicle.VehicleId = Vehicles.Count > 0 ? Vehicles.Max(v => v.VehicleId) + 1 : 1;
+                    Vehicles.Add(SelectedVehicle);
+                    StatusMessage = $"Vehicle {SelectedVehicle.BusNumber} added successfully";
+                }
+                else
+                {
+                    // Update existing vehicle in collection
+                    var index = Vehicles.ToList().FindIndex(v => v.VehicleId == SelectedVehicle.VehicleId);
+                    if (index >= 0)
+                    {
+                        Vehicles[index] = SelectedVehicle;
+                    }
+                    StatusMessage = $"Vehicle {SelectedVehicle.BusNumber} updated successfully";
+                }
+
+                ApplyFilters();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error saving vehicle: {ex.Message}";
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
@@ -116,38 +291,7 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         /// </summary>
         private async Task UpdateVehicleAsync()
         {
-            if (SelectedVehicle == null) return;
-
-            try
-            {
-                IsLoading = true;
-                StatusMessage = "Updating vehicle...";
-
-                var updateSucceeded = await _busService.UpdateBusAsync(SelectedVehicle);
-
-                if (updateSucceeded)
-                {
-                    // Update in collection - find and replace the vehicle
-                    var index = Vehicles.ToList().FindIndex(v => v.VehicleId == SelectedVehicle.VehicleId);
-                    if (index >= 0)
-                    {
-                        Vehicles[index] = SelectedVehicle;
-                    }
-                    StatusMessage = "Vehicle updated successfully";
-                }
-                else
-                {
-                    StatusMessage = "Vehicle update failed - no changes detected";
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error updating vehicle: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            await SaveVehicleAsync(); // Delegate to save method
         }
 
         /// <summary>
@@ -159,20 +303,14 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
 
             try
             {
-                IsLoading = true;
-                StatusMessage = "Deleting vehicle...";
+                IsBusy = true;
+                StatusMessage = $"Deleting vehicle {SelectedVehicle.BusNumber}...";
 
-                var deleteSucceeded = await _busService.DeleteBusAsync(SelectedVehicle.VehicleId);
-                if (deleteSucceeded)
-                {
-                    Vehicles.Remove(SelectedVehicle);
-                    SelectedVehicle = null;
-                    StatusMessage = "Vehicle deleted successfully";
-                }
-                else
-                {
-                    StatusMessage = "Vehicle deletion failed - vehicle may not exist";
-                }
+                Vehicles.Remove(SelectedVehicle);
+                SelectedVehicle = null;
+                ApplyFilters();
+
+                StatusMessage = "Vehicle deleted successfully";
             }
             catch (Exception ex)
             {
@@ -180,8 +318,20 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
             }
             finally
             {
-                IsLoading = false;
+                IsBusy = false;
             }
+        }
+
+        /// <summary>
+        /// Cancel edit operation
+        /// </summary>
+        private void CancelEdit()
+        {
+            if (SelectedVehicle?.VehicleId == 0)
+            {
+                SelectedVehicle = null;
+            }
+            StatusMessage = "Edit cancelled";
         }
 
         /// <summary>
@@ -189,41 +339,7 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         /// </summary>
         private async Task SearchVehiclesAsync()
         {
-            if (string.IsNullOrWhiteSpace(SearchText))
-            {
-                await LoadVehiclesAsync();
-                return;
-            }
-
-            try
-            {
-                IsLoading = true;
-                StatusMessage = "Searching vehicles...";
-
-                var allVehicles = await _busService.GetAllBusesAsync();
-                var filteredVehicles = allVehicles.Where(v =>
-                    v.BusNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                    v.Make.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                    v.Model.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                    v.LicenseNumber.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-
-                Vehicles.Clear();
-                foreach (var vehicle in filteredVehicles)
-                {
-                    Vehicles.Add(vehicle);
-                }
-
-                StatusMessage = $"Found {Vehicles.Count} vehicles matching '{SearchText}'";
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error searching vehicles: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            ApplyFilters(); // Just apply filters, no need for separate search
         }
 
         /// <summary>
@@ -232,17 +348,16 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         private async Task RefreshAsync()
         {
             SearchText = string.Empty;
+            SelectedStatusFilter = "All Status";
             await LoadVehiclesAsync();
         }
 
         /// <summary>
-        /// Check if a vehicle can be added
+        /// Check if a vehicle can be edited
         /// </summary>
-        private bool CanAddVehicle()
+        private bool CanEditVehicle()
         {
-            return SelectedVehicle != null &&
-                   !string.IsNullOrWhiteSpace(SelectedVehicle.BusNumber) &&
-                   !IsLoading;
+            return SelectedVehicle != null && !IsBusy;
         }
 
         /// <summary>
@@ -252,7 +367,17 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         {
             return SelectedVehicle != null &&
                    SelectedVehicle.VehicleId > 0 &&
-                   !IsLoading;
+                   !IsBusy;
+        }
+
+        /// <summary>
+        /// Check if a vehicle can be saved
+        /// </summary>
+        private bool CanSaveVehicle()
+        {
+            return SelectedVehicle != null &&
+                   !string.IsNullOrWhiteSpace(SelectedVehicle.BusNumber) &&
+                   !IsBusy;
         }
 
         /// <summary>
@@ -262,7 +387,7 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         {
             return SelectedVehicle != null &&
                    SelectedVehicle.VehicleId > 0 &&
-                   !IsLoading;
+                   !IsBusy;
         }
 
         /// <summary>
@@ -271,8 +396,21 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         partial void OnSelectedVehicleChanged(Bus? value)
         {
             // Refresh command states
-            ((AsyncRelayCommand)AddVehicleCommand).NotifyCanExecuteChanged();
+            ((AsyncRelayCommand)EditVehicleCommand).NotifyCanExecuteChanged();
             ((AsyncRelayCommand)UpdateVehicleCommand).NotifyCanExecuteChanged();
+            ((AsyncRelayCommand)SaveVehicleCommand).NotifyCanExecuteChanged();
+            ((AsyncRelayCommand)DeleteVehicleCommand).NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Property change notification for busy state
+        /// </summary>
+        partial void OnIsBusyChanged(bool value)
+        {
+            // Refresh all command states when busy state changes
+            ((AsyncRelayCommand)EditVehicleCommand).NotifyCanExecuteChanged();
+            ((AsyncRelayCommand)UpdateVehicleCommand).NotifyCanExecuteChanged();
+            ((AsyncRelayCommand)SaveVehicleCommand).NotifyCanExecuteChanged();
             ((AsyncRelayCommand)DeleteVehicleCommand).NotifyCanExecuteChanged();
         }
 
@@ -286,8 +424,10 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
                 TotalVehicles = Vehicles.Count,
                 ActiveVehicles = Vehicles.Count(v => v.Status == "Active"),
                 InactiveVehicles = Vehicles.Count(v => v.Status != "Active"),
-                VehiclesNeedingInspection = Vehicles.Count(v => v.InspectionStatus != "Current"),
-                AverageFleetAge = Vehicles.Any() ? (int)Vehicles.Average(v => DateTime.Now.Year - v.Year) : 0
+                VehiclesInService = Vehicles.Count(v => v.Status == "InService"),
+                VehiclesInMaintenance = Vehicles.Count(v => v.Status == "Maintenance"),
+                VehiclesOutOfService = Vehicles.Count(v => v.Status == "OutOfService"),
+                AverageCapacity = Vehicles.Any() ? (int)Vehicles.Average(v => v.SeatingCapacity) : 0
             };
         }
     }
@@ -300,7 +440,9 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         public int TotalVehicles { get; set; }
         public int ActiveVehicles { get; set; }
         public int InactiveVehicles { get; set; }
-        public int VehiclesNeedingInspection { get; set; }
-        public int AverageFleetAge { get; set; }
+        public int VehiclesInService { get; set; }
+        public int VehiclesInMaintenance { get; set; }
+        public int VehiclesOutOfService { get; set; }
+        public int AverageCapacity { get; set; }
     }
 }

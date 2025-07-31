@@ -24,6 +24,19 @@ namespace BusBuddy.WPF
     {
         private IHost? _host;
 
+        public App()
+        {
+            // Register Syncfusion license before any UI initialization
+            // TODO: Set license key from environment variable
+            // Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");
+
+            // Initialize Serilog logger
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File("logs/busbuddy-.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             // Phase 2: Enhanced error handling and logging

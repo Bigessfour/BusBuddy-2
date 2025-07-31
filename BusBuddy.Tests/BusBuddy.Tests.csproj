@@ -7,14 +7,11 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
 
-    <!-- MSB3027/MSB3021 File Lock Prevention -->
-    <UseSharedCompilation>false</UseSharedCompilation>
-    <BuildInParallel>false</BuildInParallel>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <ShadowCopyFiles>false</ShadowCopyFiles>
-    <ProduceOnlyReferenceAssembly>false</ProduceOnlyReferenceAssembly>
+    <!-- MSB4181 Prevention -->
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <EnableDefaultItems>true</EnableDefaultItems>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 

@@ -22,29 +22,37 @@ Write-Host "📊 Following mandatory .vscode/instructions.md workflow patterns" 
 Write-Host "🎯 Launch → Wait → Monitor → Capture → Report" -ForegroundColor Green
 Write-Host ""
 
-# Step 1: Launch BusBuddy Application using BusBuddy PowerShell workflow
+# Step 1: Launch BusBuddy Application using Microsoft PowerShell 7.5.2 pattern
 Write-Host "🚀 Step 1: Launching BusBuddy Application..." -ForegroundColor Cyan
-Write-Host "Using bb-run -EnableDebug for enhanced logging..." -ForegroundColor Gray
+Write-Host "Using Microsoft PowerShell 7.5.2 multi-threading pattern..." -ForegroundColor Gray
 
-# Start the application in background
-$appJob = Start-Job -ScriptBlock {
-    Set-Location $using:PWD
-    if (Get-Command bb-run -ErrorAction SilentlyContinue) {
-        bb-run -EnableDebug
-    }
-    else {
-        # Load BusBuddy module first
-        if (Test-Path ".\PowerShell\Load-BusBuddyModule.ps1") {
-            . ".\PowerShell\Load-BusBuddyModule.ps1" -Force
+# Create task for progressive operation (Microsoft pattern)
+$launchTask = @{
+    Id = 1
+    Name = "BusBuddy Application Launch"
+    ScriptBlock = {
+        Set-Location $using:PWD
+        if (Get-Command bb-run -ErrorAction SilentlyContinue) {
             bb-run -EnableDebug
         }
         else {
-            dotnet run --project "BusBuddy.WPF\BusBuddy.WPF.csproj"
+            # Load BusBuddy module first
+            if (Test-Path ".\PowerShell\Load-BusBuddyModule.ps1") {
+                . ".\PowerShell\Load-BusBuddyModule.ps1" -Force
+                bb-run -EnableDebug
+            }
+            else {
+                dotnet run --project "BusBuddy.WPF\BusBuddy.WPF.csproj"
+            }
         }
     }
 }
 
-Write-Host "✅ Application launch initiated (Job ID: $($appJob.Id))" -ForegroundColor Green
+# Start application with proper progress tracking
+Write-BusBuddyProgress -Activity "Launching BusBuddy" -Status "Starting application..." -PercentComplete 0 -Id 1
+$appJob = Start-BusBuddyProgressiveOperation -Tasks @($launchTask) -ThrottleLimit 1
+
+Write-Host "✅ Application launch initiated with progress tracking" -ForegroundColor Green
 
 # Step 2: Wait for Application to be Ready
 Write-Host ""

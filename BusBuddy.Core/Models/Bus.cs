@@ -382,7 +382,10 @@ public class Bus : INotifyPropertyChanged
     [NotMapped]
     public virtual ICollection<Route> Routes => AMRoutes.Concat(PMRoutes).ToList();
 
+    public decimal? Capacity { get; set; }
+
     // INotifyPropertyChanged implementation for Syncfusion data binding
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)

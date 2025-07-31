@@ -1,106 +1,282 @@
 #Requires -Version 7.5
 <#
 .SYNOPSIS
-    BusBuddy PowerShell Module - Optimized for PowerShell 7.5
+    BusBuddy PowerShell Module - PowerShell 7.5.2 Compliant
 
 .DESCRIPTION
     Professional PowerShell module for Bus Buddy WPF development environment.
-    Leverages PowerShell 7.5 features including performance improvements, enhanced JSON handling,
-    and advanced error reporting for optimal development workflow automation.
+    Follows Microsoft PowerShell 7.5.2 guidelines and best practices.
+
+    Reference: https://learn.microsoft.com/en-us/powershell/scripting/learn/shell/creating-profiles
 
 .NOTES
     File Name      : BusBuddy.psm1
     Author         : Bus Buddy Development Team
-    Prerequisite   : PowerShell 7.5+ (for optimal performance and features)
+    Prerequisite   : PowerShell 7.5+ (Microsoft Standard)
     Copyright      : (c) 2025 Bus Buddy Project
-    PS Version     : Optimized for PowerShell 7.5 with .NET 8 runtime
+    PS Version     : PowerShell 7.5.2 Compliant
 
 .EXAMPLE
-    Import-Module .\PowerShell\BusBuddy.psm1
+    Import-Module BusBuddy
     Get-BusBuddyCommands
 
 .EXAMPLE
     bb-build -Clean
     bb-run
-    Get-BusBuddyHappiness
+    bb-health
 #>
 
-#region Module Variables and Configuration
+#region Module Initialization (PowerShell 7.5.2 Standard)
 
-# Module configuration
-$script:BusBuddyModuleConfig = @{
+## Module metadata (PowerShell 7.5.2 pattern)
+$script:ModuleConfig = @{
     Name                     = 'BusBuddy'
-    Version                  = '1.0.0'
+    Version                  = [Version]'1.0.0'
     Author                   = 'Bus Buddy Development Team'
+    PowerShellVersion        = [Version]'7.5.0'
     ProjectRoot              = $PSScriptRoot
-    LoadedComponents         = @()
+    LoadedComponents         = [System.Collections.Generic.List[string]]::new()
     BusBuddyCoreAssemblyPath = $null
-    HappinessQuotes          = @(
-        "You're doing great... or at least better than that bus that's always late.",
-        "Your code compiles! That puts you ahead of 73% of developers today.",
-        "Remember: Even the best buses need maintenance. Your code probably needs it too.",
-        "Transportation fact: Your debugging skills are faster than city traffic.",
-        "Like a reliable bus route, your persistence will get you where you need to go.",
-        "Error 404: Motivation not found. But hey, at least your builds are working!",
-        "Your code is like public transit: occasionally delayed, but it gets people places.",
-        "Fun fact: You've solved more problems today than the city's road maintenance department.",
-        "Keep going! You're more reliable than weekend bus schedules.",
-        "Your debugging session is more efficient than rush hour traffic patterns."
-    )
 }
+
+## Validate PowerShell version (Microsoft recommended)
+if ($PSVersionTable.PSVersion -lt $script:ModuleConfig.PowerShellVersion) {
+    throw "This module requires PowerShell $($script:ModuleConfig.PowerShellVersion) or later. Current version: $($PSVersionTable.PSVersion)"
+}
+
+## Error handling preferences (PowerShell 7.5.2 best practice)
+$ErrorActionPreference = 'Stop'
+# ProgressPreference managed by profile - enable multi-threading progress support
 
 #endregion
 
-#region Module Loading Functions
+#region Module Loading Functions (PowerShell 7.5.2 Compliant)
 
 function Import-BusBuddyFunction {
+    <#
+    .SYNOPSIS
+        Import individual BusBuddy function files
+    .DESCRIPTION
+        PowerShell 7.5.2 compliant function loader with proper error handling
+    .PARAMETER FunctionPath
+        Path to the PowerShell function file
+    .EXAMPLE
+        Import-BusBuddyFunction -FunctionPath ".\Functions\Build.ps1"
+    #>
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidateScript({ Test-Path $_ -PathType Leaf })]
         [string]$FunctionPath
     )
 
-    if (Test-Path $FunctionPath) {
-        . $FunctionPath
-        return $true
-    }
-    else {
-        Write-Warning "Function file not found: $FunctionPath"
-        return $false
+    process {
+        try {
+            . $FunctionPath
+            $script:ModuleConfig.LoadedComponents.Add((Split-Path $FunctionPath -Leaf))
+            Write-Verbose "Loaded function: $FunctionPath"
+            return $true
+        }
+        catch {
+            Write-Error "Failed to load function '$FunctionPath': $($_.Exception.Message)"
+            return $false
+        }
     }
 }
 
 function Import-BusBuddyFunctionCategory {
+    <#
+    .SYNOPSIS
+        Import all functions from a category directory
+    .DESCRIPTION
+        PowerShell 7.5.2 compliant batch function loader
+    .PARAMETER Category
+        Function category name (e.g., 'Build', 'Utilities')
+    .EXAMPLE
+        Import-BusBuddyFunctionCategory -Category 'Build'
+    #>
+    [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Category
     )
 
-    $categoryPath = Join-Path -Path $script:BusBuddyModuleConfig.ProjectRoot -ChildPath "Functions\$Category"
+    $categoryPath = Join-Path -Path $script:ModuleConfig.ProjectRoot -ChildPath "Functions\$Category"
 
-    if (-not (Test-Path $categoryPath)) {
+    if (-not (Test-Path $categoryPath -PathType Container)) {
         Write-Warning "Function category directory not found: $categoryPath"
         return @()
     }
 
-    $functionFiles = Get-ChildItem -Path $categoryPath -Filter "*.ps1"
-    $loadedFiles = @()
+    try {
+        $functionFiles = Get-ChildItem -Path $categoryPath -Filter "*.ps1" -ErrorAction Stop
+        $loadedFiles = [System.Collections.Generic.List[string]]::new()
 
-    foreach ($file in $functionFiles) {
-        $loaded = Import-BusBuddyFunction -FunctionPath $file.FullName
-        if ($loaded) {
-            $loadedFiles += $file.Name
+        foreach ($file in $functionFiles) {
+            if (Import-BusBuddyFunction -FunctionPath $file.FullName) {
+                $loadedFiles.Add($file.Name)
+            }
         }
-    }
 
-    return $loadedFiles
+        Write-Verbose "Loaded $($loadedFiles.Count) functions from category '$Category'"
+        return $loadedFiles.ToArray()
+    }
+    catch {
+        Write-Error "Failed to load functions from category '$Category': $($_.Exception.Message)"
+        return @()
+    }
 }
 
-# Initialize BusBuddy.Core assembly path with relative pathing
+#endregion
+
+#region PowerShell 7.5.2 Multi-Threading Support (Microsoft Pattern)
+
+function Start-BusBuddyProgressiveOperation {
+    <#
+    .SYNOPSIS
+        Execute operations with Microsoft PowerShell 7.5.2 multi-threading progress pattern
+    .DESCRIPTION
+        Implements Microsoft's recommended synchronized hashtable pattern for progress tracking
+        across multiple threads using ForEach-Object -Parallel
+    .PARAMETER Tasks
+        Array of task objects with Id, Name, and ScriptBlock properties
+    .PARAMETER ThrottleLimit
+        Maximum number of parallel threads (Microsoft recommends 3-8)
+    .EXAMPLE
+        $tasks = @(
+            @{ Id = 1; Name = "Build"; ScriptBlock = { dotnet build } },
+            @{ Id = 2; Name = "Test"; ScriptBlock = { dotnet test } }
+        )
+        Start-BusBuddyProgressiveOperation -Tasks $tasks -ThrottleLimit 3
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [Array]$Tasks,
+
+        [ValidateRange(1, 16)]
+        [int]$ThrottleLimit = 3
+    )
+
+    try {
+        # Create synchronized hashtable (Microsoft pattern)
+        $origin = @{}
+        $Tasks | ForEach-Object { $origin.($_.Id) = @{} }
+        $sync = [System.Collections.Hashtable]::Synchronized($origin)
+
+        Write-Verbose "Starting $($Tasks.Count) tasks with ThrottleLimit $ThrottleLimit"
+
+        # Execute parallel operations with progress tracking
+        $job = $Tasks | ForEach-Object -ThrottleLimit $ThrottleLimit -AsJob -Parallel {
+            $syncCopy = $Using:sync
+            $process = $syncCopy.$($PSItem.Id)
+
+            try {
+                # Initialize progress
+                $process.Id = $PSItem.Id
+                $process.Activity = "Starting $($PSItem.Name)"
+                $process.Status = "Initializing"
+                $process.PercentComplete = 0
+
+                # Execute the task
+                $process.Activity = "Executing $($PSItem.Name)"
+                $process.Status = "Running"
+                $process.PercentComplete = 50
+
+                $result = & $PSItem.ScriptBlock
+
+                # Mark completion
+                $process.Status = "Completed"
+                $process.PercentComplete = 100
+                $process.Completed = $true
+
+                return $result
+            }
+            catch {
+                $process.Status = "Failed: $($_.Exception.Message)"
+                $process.PercentComplete = 100
+                $process.Completed = $true
+                $process.Error = $_.Exception.Message
+                throw
+            }
+        }
+
+        # Progress display loop (Microsoft pattern)
+        while ($job.State -eq 'Running') {
+            $sync.Keys | ForEach-Object {
+                if (![string]::IsNullOrEmpty($sync.$_.Keys)) {
+                    $param = $sync.$_
+                    if ($param.Activity) {
+                        Write-Progress @param
+                    }
+                }
+            }
+            Start-Sleep -Milliseconds 100
+        }
+
+        # Clear progress indicators
+        $sync.Keys | ForEach-Object {
+            Write-Progress -Id $_ -Completed
+        }
+
+        # Get results
+        $results = Receive-Job -Job $job -Wait
+        Remove-Job -Job $job
+
+        Write-Verbose "All tasks completed"
+        return $results
+    }
+    catch {
+        Write-Error "Progressive operation failed: $($_.Exception.Message)"
+        throw
+    }
+}
+
+function Write-BusBuddyProgress {
+    <#
+    .SYNOPSIS
+        PowerShell 7.5.2 compliant progress reporting
+    .DESCRIPTION
+        Thread-safe progress reporting that works in both single and multi-threaded contexts
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Activity,
+
+        [string]$Status = "Processing",
+
+        [ValidateRange(0, 100)]
+        [int]$PercentComplete = 0,
+
+        [int]$Id = 1,
+
+        [switch]$Completed
+    )
+
+    $progressParams = @{
+        Id               = $Id
+        Activity         = $Activity
+        Status           = $Status
+        PercentComplete  = $PercentComplete
+    }
+
+    if ($Completed) {
+        $progressParams.Completed = $true
+    }
+
+    Write-Progress @progressParams
+}
+
+#endregion
+
+#region Assembly Initialization (PowerShell 7.5.2 Compliant)
+
 function Initialize-BusBuddyCoreAssembly {
     <#
     .SYNOPSIS
-        Initialize and load the BusBuddy.Core assembly for .NET interop
-
+        Initialize BusBuddy.Core assembly for .NET interop
     .DESCRIPTION
         Locates and loads the BusBuddy.Core.dll using relative paths from the PowerShell module location.
         Ensures proper .NET interop for AI services and other core functionality.
@@ -109,7 +285,7 @@ function Initialize-BusBuddyCoreAssembly {
     param()
 
     try {
-        $moduleRoot = $script:BusBuddyModuleConfig.ProjectRoot
+        $moduleRoot = $script:ModuleConfig.ProjectRoot
         if (-not $moduleRoot) {
             $moduleRoot = Get-BusBuddyProjectRoot
         }
@@ -127,7 +303,7 @@ function Initialize-BusBuddyCoreAssembly {
 
             foreach ($path in $possiblePaths) {
                 if (Test-Path $path) {
-                    $script:BusBuddyModuleConfig.BusBuddyCoreAssemblyPath = $path
+                    $script:ModuleConfig.BusBuddyCoreAssemblyPath = $path
                     Add-Type -Path $path -ErrorAction SilentlyContinue
                     Write-Verbose "Loaded BusBuddy.Core assembly from: $path"
                     return $true
@@ -202,7 +378,7 @@ function Get-BusBuddyProjectRoot {
 }
 
 # Now initialize the project root after the function is defined
-$script:BusBuddyModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
+$script:ModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
 
 #Requires -Version 7.5
 function Write-BusBuddyStatus {
@@ -1133,10 +1309,11 @@ function Start-BusBuddyRepositoryAlignment {
 function Invoke-BusBuddyBuild {
     <#
     .SYNOPSIS
-        Build the Bus Buddy solution
+        Build the Bus Buddy solution with enhanced problem capture and analysis
 
     .DESCRIPTION
-        Compiles the Bus Buddy solution with enhanced error reporting and logging
+        Compiles the Bus Buddy solution with comprehensive error reporting, problem capture from VS Code,
+        and automated analysis for fix recommendations. Integrates with BusBuddy's error analysis system.
 
     .PARAMETER Configuration
         Build configuration (Debug/Release)
@@ -1158,6 +1335,27 @@ function Invoke-BusBuddyBuild {
 
     .PARAMETER AnalysisSeverity
         Analysis severity levels to check (Error, Warning, Information)
+
+    .PARAMETER CaptureProblemList
+        Capture problems from VS Code's problem list for analysis
+
+    .PARAMETER AnalyzeProblems
+        Analyze captured problems and provide fix recommendations
+
+    .PARAMETER ExportResults
+        Export build results and problem analysis to files
+
+    .PARAMETER ExportPath
+        Path to export analysis results (default: .\logs\build-analysis)
+
+    .PARAMETER AutoFix
+        Attempt to automatically fix common problems
+
+    .EXAMPLE
+        bb-build -CaptureProblemList -AnalyzeProblems -ExportResults
+
+    .EXAMPLE
+        bb-build -Configuration Release -Clean -Restore -RunAnalysis -CaptureProblemList
     #>
     [CmdletBinding()]
     param(
@@ -1168,12 +1366,18 @@ function Invoke-BusBuddyBuild {
         [switch]$Restore,
         [switch]$NoLogo,
         [switch]$RunAnalysis,
+        [switch]$CaptureProblemList,
+        [switch]$AnalyzeProblems,
+        [switch]$ExportResults,
+        [switch]$AutoFix,
 
         [ValidateSet('quiet', 'minimal', 'normal', 'detailed', 'diagnostic')]
-        [string]$Verbosity = 'minimal',
+        [string]$BuildVerbosity = 'minimal',
 
         [ValidateSet('Error', 'Warning', 'Information')]
-        [string[]]$AnalysisSeverity = @('Error', 'Warning')
+        [string[]]$AnalysisSeverity = @('Error', 'Warning'),
+
+        [string]$ExportPath = ".\logs\build-analysis"
     )
 
     $projectRoot = Get-BusBuddyProjectRoot
@@ -1184,8 +1388,34 @@ function Invoke-BusBuddyBuild {
 
     Push-Location $projectRoot
 
+    # Initialize enhanced build tracking
+    $startTime = Get-Date
+    $buildResults = @{
+        Success = $false
+        Configuration = $Configuration
+        StartTime = $startTime
+        Duration = $null
+        WarningCount = 0
+        ErrorCount = 0
+        Problems = @()
+        Analysis = @{}
+        BuildOutput = @()
+    }
+
     try {
-        Write-BusBuddyStatus "🔨 Building BusBuddy solution..." -Status Build
+        Write-BusBuddyStatus "🔨 Building BusBuddy solution with enhanced problem capture..." -Status Build
+
+        # Step 1: Capture pre-build problems from VS Code (if requested)
+        if ($CaptureProblemList) {
+            Write-Host "🔍 Capturing VS Code problem list..." -ForegroundColor Cyan
+            $preProblems = Get-BusBuddyProblemsFromVSCode
+            if ($preProblems -and $preProblems.Count -gt 0) {
+                Write-Host "   Found $($preProblems.Count) pre-build problems" -ForegroundColor Yellow
+                $buildResults.Problems += $preProblems
+            } else {
+                Write-Host "   No pre-build problems detected" -ForegroundColor Green
+            }
+        }
 
         # Clean if requested
         if ($Clean) {
@@ -1207,28 +1437,44 @@ function Invoke-BusBuddyBuild {
             }
         }
 
-        # Build solution with enhanced output analysis
-        $buildArgs = @('build', 'BusBuddy.sln', '--configuration', $Configuration, '--verbosity', $Verbosity)
+        # Build solution with enhanced output analysis and problem capture
+        $buildArgs = @('build', 'BusBuddy.sln', '--configuration', $Configuration, '--verbosity', $BuildVerbosity)
         if ($NoLogo) { $buildArgs += '--nologo' }
 
         Write-Host "🔨 Building solution with configuration: $Configuration" -ForegroundColor Green
         $buildOutput = & dotnet @buildArgs 2>&1
+        $buildResults.BuildOutput = $buildOutput
+
+        # Capture and analyze problems from build output
+        $buildProblems = Get-BusBuddyProblemsFromBuildOutput -BuildOutput $buildOutput
+        if ($buildProblems -and $buildProblems.Count -gt 0) {
+            $buildResults.Problems += $buildProblems
+            $buildResults.ErrorCount = ($buildProblems | Where-Object { $_.Severity -eq 'Error' }).Count
+            $buildResults.WarningCount = ($buildProblems | Where-Object { $_.Severity -eq 'Warning' }).Count
+        }
 
         if ($LASTEXITCODE -eq 0) {
+            $buildResults.Success = $true
+
             # Analyze build output for warnings and success metrics
             $warnings = $buildOutput | Select-String -Pattern "warning" -AllMatches
             $warningCount = ($warnings | Measure-Object).Count
+            if ($buildResults.WarningCount -eq 0) {
+                $buildResults.WarningCount = $warningCount
+            }
 
             Write-Host "✅ Build completed successfully!" -ForegroundColor Green
             Write-Host "📊 Build Summary:" -ForegroundColor Cyan
             Write-Host "   • Configuration: $Configuration" -ForegroundColor Gray
-            Write-Host "   • Warnings: $warningCount" -ForegroundColor $(if ($warningCount -eq 0) { "Green" } else { "Yellow" })
+            Write-Host "   • Warnings: $($buildResults.WarningCount)" -ForegroundColor $(if ($buildResults.WarningCount -eq 0) { "Green" } else { "Yellow" })
+            Write-Host "   • Errors: $($buildResults.ErrorCount)" -ForegroundColor $(if ($buildResults.ErrorCount -eq 0) { "Green" } else { "Red" })
+            Write-Host "   • Total Problems: $($buildResults.Problems.Count)" -ForegroundColor $(if ($buildResults.Problems.Count -eq 0) { "Green" } else { "Yellow" })
 
-            if ($warningCount -gt 0 -and $Verbosity -ne 'quiet') {
+            if ($buildResults.WarningCount -gt 0 -and $BuildVerbosity -ne 'quiet') {
                 Write-Host "⚠️  Build warnings detected:" -ForegroundColor Yellow
                 $warnings | Select-Object -First 5 | ForEach-Object { Write-Host "   $($_.Line)" -ForegroundColor DarkYellow }
-                if ($warningCount -gt 5) {
-                    Write-Host "   ... and $($warningCount - 5) more warnings" -ForegroundColor DarkYellow
+                if ($buildResults.WarningCount -gt 5) {
+                    Write-Host "   ... and $($buildResults.WarningCount - 5) more warnings" -ForegroundColor DarkYellow
                 }
             }
 
@@ -1256,25 +1502,448 @@ function Invoke-BusBuddyBuild {
                 }
             }
 
+            # Analyze captured problems if requested
+            if ($AnalyzeProblems -and $buildResults.Problems.Count -gt 0) {
+                Write-Host ""
+                Write-Host "🔍 Analyzing captured problems..." -ForegroundColor Cyan
+                $analysis = Invoke-BusBuddyProblemAnalysis -Problems $buildResults.Problems
+                $buildResults.Analysis = $analysis
+
+                Write-Host "📋 Problem Analysis Summary:" -ForegroundColor Blue
+                Write-Host "   • Total Problems: $($analysis.TotalProblems)" -ForegroundColor Gray
+                Write-Host "   • Auto-fixable: $(($analysis.Recommendations | Where-Object { $_.AutoFixable }).Count)" -ForegroundColor Green
+                Write-Host "   • Files Affected: $($analysis.FileGroups.Keys.Count)" -ForegroundColor Gray
+
+                # Show top recommendations
+                if ($analysis.Recommendations -and $analysis.Recommendations.Count -gt 0) {
+                    Write-Host "💡 Top Recommendations:" -ForegroundColor Blue
+                    $topRecs = $analysis.Recommendations | Sort-Object {
+                        if ($_.Priority -eq 'High') { 1 }
+                        elseif ($_.Priority -eq 'Medium') { 2 }
+                        else { 3 }
+                    } | Select-Object -First 3
+
+                    foreach ($rec in $topRecs) {
+                        $icon = if ($rec.AutoFixable) { "🤖" } else { "💡" }
+                        Write-Host "   $icon [$($rec.Priority)] $($rec.Description)" -ForegroundColor Yellow
+                        if ($rec.AutoFixable -and $rec.Command) {
+                            Write-Host "      Command: $($rec.Command)" -ForegroundColor Gray
+                        }
+                    }
+                }
+
+                # Auto-fix if requested and possible
+                if ($AutoFix) {
+                    $autoFixableRecs = $analysis.Recommendations | Where-Object { $_.AutoFixable -and $_.Command }
+                    if ($autoFixableRecs -and $autoFixableRecs.Count -gt 0) {
+                        Write-Host ""
+                        Write-Host "🤖 Attempting automatic fixes..." -ForegroundColor Green
+                        foreach ($fixRec in $autoFixableRecs) {
+                            Write-Host "   Applying: $($fixRec.Description)" -ForegroundColor Yellow
+                            try {
+                                # Execute the auto-fix command if it exists
+                                if (Get-Command $fixRec.Command -ErrorAction SilentlyContinue) {
+                                    & $fixRec.Command
+                                    Write-Host "   ✅ Applied: $($fixRec.Description)" -ForegroundColor Green
+                                } else {
+                                    Write-Host "   ⚠️ Command not found: $($fixRec.Command)" -ForegroundColor Yellow
+                                }
+                            }
+                            catch {
+                                Write-Host "   ❌ Auto-fix failed: $($_.Exception.Message)" -ForegroundColor Red
+                            }
+                        }
+                    }
+                }
+            }
+
+            # Export results if requested
+            if ($ExportResults) {
+                Write-Host ""
+                Write-Host "📄 Exporting build results..." -ForegroundColor Cyan
+                $buildResults.Duration = (Get-Date) - $startTime
+                $exportSuccess = Export-BusBuddyBuildResults -BuildResults $buildResults -ExportPath $ExportPath
+                if ($exportSuccess) {
+                    Write-Host "   ✅ Results exported to: $ExportPath" -ForegroundColor Green
+                } else {
+                    Write-Host "   ⚠️ Export failed" -ForegroundColor Yellow
+                }
+            }
+
             Write-BusBuddyStatus "Build completed successfully" -Status Success
-            return $true
+            return $buildResults
         }
         else {
+            $buildResults.Success = $false
             Write-BusBuddyStatus "Build failed with exit code $LASTEXITCODE" -Status Error
-            if ($Verbosity -ne 'quiet') {
-                $buildOutput | ForEach-Object { Write-Host $_ -ForegroundColor Red }
+
+            # Analyze build failures
+            if ($BuildResults.ErrorCount -gt 0) {
+                Write-Host "❌ Build errors detected:" -ForegroundColor Red
+                $errorProblems = $BuildResults.Problems | Where-Object { $_.Severity -eq 'Error' } | Select-Object -First 3
+                foreach ($error in $errorProblems) {
+                    $relativePath = $error.File -replace [regex]::Escape($projectRoot), '.'
+                    Write-Host "   • $($error.Code) in $relativePath`:$($error.Line) - $($error.Message)" -ForegroundColor Red
+                }
+                if ($BuildResults.ErrorCount -gt 3) {
+                    Write-Host "   ... and $($BuildResults.ErrorCount - 3) more errors" -ForegroundColor Red
+                }
             }
-            return $false
+
+            if ($BuildVerbosity -ne 'quiet') {
+                Write-Host ""
+                Write-Host "📋 Full build output:" -ForegroundColor Yellow
+                $buildOutput | ForEach-Object { Write-Host $_ -ForegroundColor Gray }
+            }
+
+            # Export failed build results if requested
+            if ($ExportResults) {
+                $buildResults.Duration = (Get-Date) - $startTime
+                Export-BusBuddyBuildResults -BuildResults $buildResults -ExportPath $ExportPath | Out-Null
+            }
+
+            return $buildResults
         }
     }
     catch {
         Write-BusBuddyStatus "Build process error: $($_.Exception.Message)" -Status Error
-        return $false
+        $buildResults.Success = $false
+        $buildResults.Duration = (Get-Date) - $startTime
+
+        # Add exception details to build results
+        $buildResults.Problems += @{
+            File = "Build Process"
+            Line = 0
+            Column = 0
+            Severity = 'Error'
+            Code = 'BUILD_EXCEPTION'
+            Message = $_.Exception.Message
+            Source = 'PowerShell'
+        }
+
+        if ($ExportResults) {
+            Export-BusBuddyBuildResults -BuildResults $buildResults -ExportPath $ExportPath | Out-Null
+        }
+
+        return $buildResults
     }
     finally {
         Pop-Location
     }
 }
+
+#region Enhanced Build Helper Functions
+
+function Get-BusBuddyProblemsFromVSCode {
+    <#
+    .SYNOPSIS
+        Capture problems from VS Code's problem list and workspace analysis
+    #>
+
+    $problems = @()
+
+    try {
+        # Check if VS Code is running
+        $vscodeProcesses = Get-Process -Name "Code" -ErrorAction SilentlyContinue
+        if (-not $vscodeProcesses) {
+            Write-Host "   VS Code not running - skipping problem list capture" -ForegroundColor Gray
+            return @()
+        }
+
+        # Analyze workspace files for common C# problems
+        $projectRoot = Get-Location
+        $csharpFiles = Get-ChildItem -Path $projectRoot -Recurse -Filter "*.cs" -ErrorAction SilentlyContinue | Select-Object -First 20
+
+        foreach ($file in $csharpFiles) {
+            try {
+                $content = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
+                if ($content) {
+                    # Check for common issues
+                    $lines = $content -split "`n"
+                    for ($i = 0; $i -lt $lines.Count; $i++) {
+                        $line = $lines[$i]
+
+                        # Check for potential missing using statements
+                        if ($line -match '^\s*([A-Z][a-zA-Z0-9_]*)\s+\w+' -and $line -notmatch '^\s*(public|private|protected|internal|static|readonly|const|var|string|int|bool|double|decimal|float|DateTime|Task|void|class|interface|struct|enum)') {
+                            $typeName = $matches[1]
+                            if ($typeName -notin @('String', 'Int32', 'Boolean', 'Double', 'Decimal', 'Single', 'Object')) {
+                                $problems += @{
+                                    File = $file.FullName
+                                    Line = $i + 1
+                                    Column = 1
+                                    Severity = 'Warning'
+                                    Code = 'CS0246'
+                                    Message = "Potential missing using statement for type '$typeName'"
+                                    Source = 'VS Code Analysis'
+                                }
+                            }
+                        }
+
+                        # Check for TODO/FIXME comments
+                        if ($line -match '(TODO|FIXME|HACK|XXX)') {
+                            $problems += @{
+                                File = $file.FullName
+                                Line = $i + 1
+                                Column = 1
+                                Severity = 'Information'
+                                Code = 'TODO'
+                                Message = "Code comment requires attention: $($matches[1])"
+                                Source = 'VS Code Analysis'
+                            }
+                        }
+                    }
+                }
+            }
+            catch {
+                # Skip problematic files
+            }
+        }
+
+        return $problems
+    }
+    catch {
+        Write-Host "   Warning: VS Code problem capture failed: $($_.Exception.Message)" -ForegroundColor Yellow
+        return @()
+    }
+}
+
+function Get-BusBuddyProblemsFromBuildOutput {
+    <#
+    .SYNOPSIS
+        Parse build output for errors, warnings, and problems
+    #>
+    param(
+        [string[]]$BuildOutput
+    )
+
+    $problems = @()
+
+    if (-not $BuildOutput) {
+        return $problems
+    }
+
+    foreach ($line in $BuildOutput) {
+        # Parse MSBuild error/warning format
+        # Example: "C:\path\to\file.cs(12,34): error CS0103: The name 'variable' does not exist"
+        if ($line -match '^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s*([A-Z]+\d+):\s*(.+)$') {
+            $problems += @{
+                File = $matches[1].Trim()
+                Line = [int]$matches[2]
+                Column = [int]$matches[3]
+                Severity = if ($matches[4] -eq 'error') { 'Error' } else { 'Warning' }
+                Code = $matches[5]
+                Message = $matches[6].Trim()
+                Source = 'MSBuild'
+            }
+        }
+        # Parse NuGet package errors
+        elseif ($line -match 'error\s+(NU\d+):\s*(.+)$') {
+            $problems += @{
+                File = "NuGet"
+                Line = 1
+                Column = 1
+                Severity = 'Error'
+                Code = $matches[1]
+                Message = $matches[2].Trim()
+                Source = 'NuGet'
+            }
+        }
+        # Parse general errors
+        elseif ($line -match '^(.+?):\s*(error|warning):\s*(.+)$') {
+            $problems += @{
+                File = $matches[1].Trim()
+                Line = 1
+                Column = 1
+                Severity = if ($matches[2] -eq 'error') { 'Error' } else { 'Warning' }
+                Code = 'UNKNOWN'
+                Message = $matches[3].Trim()
+                Source = 'Generic'
+            }
+        }
+    }
+
+    return $problems
+}
+
+function Invoke-BusBuddyProblemAnalysis {
+    <#
+    .SYNOPSIS
+        Analyze captured problems and provide fix recommendations
+    #>
+    param(
+        [array]$Problems
+    )
+
+    if (-not $Problems -or $Problems.Count -eq 0) {
+        return @{
+            TotalProblems = 0
+            ErrorCount = 0
+            WarningCount = 0
+            FileGroups = @{}
+            CodeGroups = @{}
+            Recommendations = @()
+        }
+    }
+
+    $analysis = @{
+        TotalProblems = $Problems.Count
+        ErrorCount = ($Problems | Where-Object { $_.Severity -eq 'Error' }).Count
+        WarningCount = ($Problems | Where-Object { $_.Severity -eq 'Warning' }).Count
+        FileGroups = @{}
+        CodeGroups = @{}
+        Recommendations = @()
+    }
+
+    # Group problems by file and code
+    foreach ($problem in $Problems) {
+        $file = $problem.File
+        if (-not $analysis.FileGroups.ContainsKey($file)) {
+            $analysis.FileGroups[$file] = @()
+        }
+        $analysis.FileGroups[$file] += $problem
+
+        $code = $problem.Code
+        if (-not $analysis.CodeGroups.ContainsKey($code)) {
+            $analysis.CodeGroups[$code] = @()
+        }
+        $analysis.CodeGroups[$code] += $problem
+    }
+
+    # Generate recommendations based on problem patterns
+    foreach ($codeGroup in $analysis.CodeGroups.Keys) {
+        $codeProblems = $analysis.CodeGroups[$codeGroup]
+        $count = $codeProblems.Count
+
+        switch ($codeGroup) {
+            'CS0103' {
+                $analysis.Recommendations += @{
+                    Type = 'Automated Fix'
+                    Priority = 'High'
+                    Description = "Fix $count undefined variable/method errors"
+                    Action = 'Add missing using statements or fix variable names'
+                    AutoFixable = $true
+                    Command = 'bb-restore'  # Package restore often fixes these
+                }
+            }
+            'CS0246' {
+                $analysis.Recommendations += @{
+                    Type = 'Package Reference'
+                    Priority = 'High'
+                    Description = "Fix $count missing type/namespace errors"
+                    Action = 'Add missing package references or using statements'
+                    AutoFixable = $true
+                    Command = 'bb-restore'
+                }
+            }
+            'NU1605' {
+                $analysis.Recommendations += @{
+                    Type = 'NuGet Conflict'
+                    Priority = 'High'
+                    Description = "Fix $count NuGet package version conflicts"
+                    Action = 'Update package references to compatible versions'
+                    AutoFixable = $true
+                    Command = 'bb-restore'
+                }
+            }
+            'TODO' {
+                $analysis.Recommendations += @{
+                    Type = 'Code Quality'
+                    Priority = 'Low'
+                    Description = "Review $count TODO/FIXME comments"
+                    Action = 'Address pending code improvements'
+                    AutoFixable = $false
+                    Command = $null
+                }
+            }
+            default {
+                $analysis.Recommendations += @{
+                    Type = 'Manual Review'
+                    Priority = 'Medium'
+                    Description = "Review $count $codeGroup issues"
+                    Action = 'Manual code review and fixing required'
+                    AutoFixable = $false
+                    Command = $null
+                }
+            }
+        }
+    }
+
+    return $analysis
+}
+
+function Export-BusBuddyBuildResults {
+    <#
+    .SYNOPSIS
+        Export build results and problem analysis to files
+    #>
+    param(
+        [hashtable]$BuildResults,
+        [string]$ExportPath
+    )
+
+    try {
+        # Ensure export directory exists
+        if (-not (Test-Path $ExportPath)) {
+            New-Item -Path $ExportPath -ItemType Directory -Force | Out-Null
+        }
+
+        $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+        $success = $BuildResults.Success
+        $status = if ($success) { "success" } else { "failed" }
+
+        # Export main results to JSON
+        $resultsFile = Join-Path $ExportPath "build-results-$status-$timestamp.json"
+        $BuildResults | ConvertTo-Json -Depth 10 | Out-File $resultsFile -Encoding UTF8
+
+        # Create summary report
+        $summaryFile = Join-Path $ExportPath "build-summary-$status-$timestamp.md"
+        $summary = @"
+# BusBuddy Build Analysis Report
+Generated: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+
+## Build Summary
+- **Status**: $(if ($BuildResults.Success) { 'SUCCESS ✅' } else { 'FAILED ❌' })
+- **Configuration**: $($BuildResults.Configuration)
+- **Duration**: $([math]::Round($BuildResults.Duration.TotalSeconds, 1))s
+- **Problems Found**: $($BuildResults.Problems.Count)
+- **Errors**: $($BuildResults.ErrorCount)
+- **Warnings**: $($BuildResults.WarningCount)
+
+## Problem Analysis
+"@
+
+        if ($BuildResults.Analysis -and $BuildResults.Analysis.Recommendations) {
+            $summary += "`n### Recommendations"
+            foreach ($rec in $BuildResults.Analysis.Recommendations) {
+                $icon = if ($rec.AutoFixable) { "🤖" } else { "💡" }
+                $summary += "`n- $icon **$($rec.Type)** [$($rec.Priority)]: $($rec.Description)"
+                if ($rec.Command) {
+                    $summary += "`n  - Command: ``$($rec.Command)``"
+                }
+            }
+        }
+
+        if ($BuildResults.Problems -and $BuildResults.Problems.Count -gt 0) {
+            $summary += "`n`n### Top Problems"
+            $topProblems = $BuildResults.Problems | Where-Object { $_.Severity -eq 'Error' } | Select-Object -First 5
+            foreach ($problem in $topProblems) {
+                $relativePath = $problem.File -replace [regex]::Escape((Get-Location).Path), '.'
+                $summary += "`n- **$($problem.Severity)** $($problem.Code): $($problem.Message)"
+                $summary += "`n  - File: $relativePath`:$($problem.Line)"
+            }
+        }
+
+        $summary | Out-File $summaryFile -Encoding UTF8
+
+        return $true
+    }
+    catch {
+        Write-Host "   Export error: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+#endregion
 
 #Requires -Version 7.5
 function Invoke-BusBuddyRun {
@@ -1938,7 +2607,7 @@ function Get-BusBuddyHappiness {
         [string]$Theme = 'General'
     )
 
-    $quotes = $script:BusBuddyModuleConfig.HappinessQuotes
+    $quotes = $script:ModuleConfig.HappinessQuotes
 
     # Add theme-specific quotes
     $themeQuotes = switch ($Theme) {
@@ -2100,7 +2769,7 @@ function Get-BusBuddyInfo {
     [CmdletBinding()]
     param()
 
-    $config = $script:BusBuddyModuleConfig
+    $config = $script:ModuleConfig
     $projectRoot = Get-BusBuddyProjectRoot
 
     Write-Host ""
@@ -2692,7 +3361,7 @@ function Initialize-BusBuddyModule {
 
         [switch]$ShowDetails
     )    # Define module configuration
-    $script:BusBuddyModuleConfig = @{
+    $script:ModuleConfig = @{
         Version                  = '2.0.0'
         Author                   = 'Bus Buddy Development Team'
         ProjectRoot              = $null
@@ -2732,7 +3401,7 @@ function Initialize-BusBuddyModule {
     # Initialize categories
     $allLoadedFunctions = @()
 
-    foreach ($category in $script:BusBuddyModuleConfig.FunctionCategories) {
+    foreach ($category in $script:ModuleConfig.FunctionCategories) {
         $categoryPath = Join-Path $categoriesRoot $category
 
         if (Test-Path $categoryPath) {
@@ -2784,10 +3453,10 @@ function Initialize-BusBuddyModule {
         'Get-BusBuddyContextualSearch'
     )
 
-    $script:BusBuddyModuleConfig.LoadedFunctions = $allLoadedFunctions
+    $script:ModuleConfig.LoadedFunctions = $allLoadedFunctions
 
     # Set project root (will be updated in Get-BusBuddyProjectRoot)
-    $script:BusBuddyModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
+    $script:ModuleConfig.ProjectRoot = Get-BusBuddyProjectRoot
 
     # Initialize core assembly
     if ($settings.Advanced.LoadDotNetAssemblies) {
@@ -2796,14 +3465,14 @@ function Initialize-BusBuddyModule {
 
     if ($ShowDetails -or $settings.General.VerboseLogging) {
         Write-Host "Bus Buddy Module Initialization Complete" -ForegroundColor Green
-        Write-Host "Loaded $($allLoadedFunctions.Count) functions across $($script:BusBuddyModuleConfig.FunctionCategories.Count) categories" -ForegroundColor Green
+        Write-Host "Loaded $($allLoadedFunctions.Count) functions across $($script:ModuleConfig.FunctionCategories.Count) categories" -ForegroundColor Green
     }
 
-    return $script:BusBuddyModuleConfig
+    return $script:ModuleConfig
 }
 
 # Display welcome message when module loads
-$script:BusBuddyModuleConfig = @{
+$script:ModuleConfig = @{
     Version                  = '2.0.0'
     Author                   = 'Bus Buddy Development Team'
     ProjectRoot              = $null
@@ -2843,7 +3512,7 @@ Initialize-BusBuddyModule -ModuleRoot $PSScriptRoot -ShowDetails:($settings.Gene
 if ($settings.General.ShowWelcomeMessage) {
     $welcomeMessage = @"
 
-🚌 Bus Buddy PowerShell Module v$($script:BusBuddyModuleConfig.Version) Loaded Successfully!
+🚌 Bus Buddy PowerShell Module v$($script:ModuleConfig.Version) Loaded Successfully!
 ═══════════════════════════════════════════════════
 
 Quick Commands:
@@ -3374,7 +4043,7 @@ function Get-BusBuddyWorkflowResults {
     [CmdletBinding()]
     param(
         [int]$Count = 5,
-        [string]$Repository = "Bigessfour/BusBuddy-2",
+        [string]$Repository = "Bigessfour/BusBuddy-WPF",
         [ValidateSet('completed', 'in_progress', 'queued', 'all')]
         [string]$Status = 'all',
         [switch]$Detailed
@@ -5368,7 +6037,7 @@ function Invoke-BusBuddyAIChat {
             # Prepare context data
             $contextData = @{
                 Context     = $Context
-                ProjectRoot = $script:BusBuddyModuleConfig.ProjectRoot
+                ProjectRoot = $script:ModuleConfig.ProjectRoot
                 Timestamp   = Get-Date
             }
 
@@ -5803,7 +6472,7 @@ Set-Alias -Name 'bb-github-workflow' -Value 'Invoke-BusBuddyCompleteGitHubWorkfl
 #region Module Exports
 
 # Export all public functions
-$functionsToExport = $script:BusBuddyModuleConfig.LoadedFunctions
+$functionsToExport = $script:ModuleConfig.LoadedFunctions
 
 # Core development aliases
 Set-Alias -Name 'bb-build' -Value 'Invoke-BusBuddyBuild' -Description 'Build Bus Buddy solution'

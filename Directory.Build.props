@@ -41,6 +41,41 @@
     <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604</NoWarn>
   </PropertyGroup>
 
+  <!-- Global Build Performance Optimization -->
+  <PropertyGroup>
+    <UseSharedCompilation>true</UseSharedCompilation>
+    <BuildInParallel>true</BuildInParallel>
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+
+    <!-- MSB4181 Prevention -->
+    <MSBuildAllProjects Condition="'$(MSBuildAllProjects)' == ''">$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <EnableDefaultItems>true</EnableDefaultItems>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
+    <!-- .NET 9.0 Optimization -->
+    <LangVersion>12</LangVersion>
+    <WarningsAsErrors />
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Package Version Management -->
+  <PropertyGroup>
+    <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
+    <SyncfusionVersion>30.1.42</SyncfusionVersion>
+    <SerilogVersion>4.0.2</SerilogVersion>
+  </PropertyGroup>
+
+  <!-- Test Project Specific Settings -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <UseSharedCompilation>false</UseSharedCompilation>
+    <BuildInParallel>false</BuildInParallel>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <ShadowCopyFiles>false</ShadowCopyFiles>
+    <ProduceOnlyReferenceAssembly>false</ProduceOnlyReferenceAssembly>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
   <!-- PURE SERILOG: No Microsoft.Extensions dependencies -->
   <ItemGroup>
     <!-- Pure Serilog Configuration -->
