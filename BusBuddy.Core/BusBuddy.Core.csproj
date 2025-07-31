@@ -15,9 +15,11 @@
     <!-- MSB3027/MSB3021 File Lock Prevention -->
     <UseSharedCompilation>false</UseSharedCompilation>
     <BuildInParallel>false</BuildInParallel>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ShadowCopyFiles>false</ShadowCopyFiles>
     <ProduceOnlyReferenceAssembly>false</ProduceOnlyReferenceAssembly>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <!-- Core Business Logic Packages -->
@@ -41,11 +43,19 @@
     <!-- Azure Authentication (Optional for Azure SQL Managed Identity) -->
     <PackageReference Include="Azure.Identity" Version="1.13.0" />
 
-    <!-- Serilog Extensions (Core Serilog packages defined in Directory.Build.props) -->
+    <!-- Serilog Extensions -->
+    <PackageReference Include="Serilog" Version="$(SerilogVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
 
     <!-- 📄 Syncfusion PDF Generation for Core Services -->
     <PackageReference Include="Syncfusion.Pdf.NET" Version="$(SyncfusionVersion)" />
+
+    <!-- EF Core Providers -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
   </ItemGroup>
 
   <ItemGroup>

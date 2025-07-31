@@ -168,6 +168,8 @@ function Invoke-BuildWithPowerShell {
 }
 
 function Invoke-BuildWithDotnet {
+    param($ProjectFiles)
+
     Write-BuildStatus "Using direct dotnet commands..." "Command"
 
     if ($CleanFirst) {
@@ -178,12 +180,28 @@ function Invoke-BuildWithDotnet {
         }
     }
 
-    Write-BuildStatus "Building solution..." "Process" 1
+    Write-BuildStatus "Building $($ProjectFiles.Count) projects in parallel..." "Process" 1
     $verbosityLevel = if ($Verbose) { "normal" } else { "minimal" }
-    dotnet build BusBuddy.sln --verbosity $verbosityLevel
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Build failed with exit code: $LASTEXITCODE"
+    # The script block for ForEach-Object -Parallel runs in a separate process.
+    # We use the $using: scope modifier to access variables from the parent scope.
+    $results = $ProjectFiles | ForEach-Object -Parallel {
+        $projectPath = $_.FullName
+        # Note: Write-Host from here might not display in the console in order,
+        # but it's useful for logging.
+        dotnet build $projectPath --verbosity $using:verbosityLevel
+        if ($LASTEXITCODE -ne 0) {
+            [pscustomobject]@{ Success = $false; Project = $projectPath }
+        } else {
+            [pscustomobject]@{ Success = $true; Project = $projectPath }
+        }
+    } -ThrottleLimit 5 # Limit to 5 concurrent builds to avoid overwhelming the system
+
+    $failedProjects = $results | Where-Object { -not $_.Success }
+
+    if ($failedProjects) {
+        $failedList = ($failedProjects.Project | ForEach-Object { "- $_" }) -join "`n"
+        throw "Build failed for the following projects:`n$failedList"
     }
 }
 
@@ -239,7 +257,8 @@ try {
     if ($selectedMode -eq "PowerShell") {
         Invoke-BuildWithPowerShell -ProfileInfo $profileInfo
     } else {
-        Invoke-BuildWithDotnet
+        $projectFiles = Get-ChildItem -Path . -Recurse -Filter *.csproj -Exclude 'BusBuddy.Tests\*','BusBuddy.UITests\*','**/bin/**','**/obj/**'
+        Invoke-BuildWithDotnet -ProjectFiles $projectFiles
     }
 
     $duration = (Get-Date) - $startTime

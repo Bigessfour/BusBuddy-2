@@ -1164,12 +1164,12 @@
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "${workspaceFolder}\\Scripts\\Simple-Error-Capture-Runner.ps1",
+        "${workspaceFolder}\\Scripts\\Interactive-Runtime-Error-Capture.ps1",
         "-ShowRealTime"
       ],
       "group": {
         "kind": "build",
-        "isDefault": true
+        "isDefault": false
       },
       "runOptions": {
         "instanceLimit": 1

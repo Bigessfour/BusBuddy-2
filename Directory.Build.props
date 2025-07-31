@@ -7,8 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
 
     <!-- Modern Versions for .NET 9.0 Environment -->
-    <SyncfusionVersion>30.2.12</SyncfusionVersion>
+    <SyncfusionVersion>30.1.42</SyncfusionVersion>
     <EntityFrameworkVersion>9.0.0-preview.6.24327.4</EntityFrameworkVersion>
+    <SerilogVersion>4.0.2</SerilogVersion>
 
     <!-- INDUSTRY STANDARD: Practical Code Quality -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -46,6 +47,9 @@
     <UseSharedCompilation>true</UseSharedCompilation>
     <BuildInParallel>true</BuildInParallel>
     <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
 
     <!-- MSB4181 Prevention -->
@@ -57,13 +61,6 @@
     <LangVersion>12</LangVersion>
     <WarningsAsErrors />
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <!-- Package Version Management -->
-  <PropertyGroup>
-    <EntityFrameworkVersion>9.0.0-preview.6.24327.4</EntityFrameworkVersion>
-    <SyncfusionVersion>30.2.12</SyncfusionVersion>
-    <SerilogVersion>4.0.2</SerilogVersion>
   </PropertyGroup>
 
   <!-- Test Project Specific Settings -->
@@ -79,15 +76,16 @@
   <!-- PURE SERILOG: No Microsoft.Extensions dependencies -->
   <ItemGroup>
     <!-- Pure Serilog Configuration -->
-    <PackageReference Include="Serilog" Version="4.0.2" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Serilog" Version="$(SerilogVersion)" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" ExcludeAssets="None" PrivateAssets="None" />
     <!-- Serilog Enrichments for Pure Serilog Environment -->
-    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
-    <PackageReference Include="Serilog.Enrichers.Process" Version="3.0.0" />
-    <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.1.2" />
-    <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="3.0.1" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.0.3" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="3.0.1" ExcludeAssets="None" PrivateAssets="None" />
   </ItemGroup>
 
   <!-- INDUSTRY STANDARD: Essential WPF behaviors -->

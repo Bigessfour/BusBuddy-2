@@ -42,6 +42,7 @@ $sessionId = (Get-Date).ToString("yyyyMMdd-HHmmss")
 $captureFile = Join-Path $CaptureDirectory "runtime-errors-$sessionId.json"
 $summaryFile = Join-Path $CaptureDirectory "error-summary-$sessionId.md"
 $logFile = Join-Path $CaptureDirectory "session-log-$sessionId.txt"
+$errorCaptureFile = Join-Path $CaptureDirectory "error-stream-$sessionId.log"
 
 # Ensure capture directory exists
 if (-not (Test-Path $CaptureDirectory)) {
@@ -51,7 +52,6 @@ if (-not (Test-Path $CaptureDirectory)) {
 # Global error tracking
 $Global:CapturedErrors = @()
 $Global:ProcessPID = $null
-$Global:BackgroundJob = $null
 $Global:AppStartTime = $null
 
 # Color scheme for output
@@ -84,134 +84,111 @@ function Show-Header {
     Write-ColorMessage "🚌 BusBuddy Interactive Runtime Error Capture System" -Color $Colors.Title
     Write-ColorMessage "═══════════════════════════════════════════════════════════════════" -Color "DarkGray"
     Write-ColorMessage "📋 Session ID: $sessionId" -Color $Colors.Info
-    Write-ColorMessage "📁 Capture Directory: $CaptureDirectory" -Color $Colors.Info
+    Write-ColorMessage "📂 Capture Directory: $CaptureDirectory" -Color $Colors.Info
+    Write-ColorMessage "🔥 Error Log: $errorCaptureFile" -Color $Colors.Info
     Write-ColorMessage "⏰ Timeout: $TimeoutMinutes minutes" -Color $Colors.Info
     Write-ColorMessage ""
-}
-
-function Start-BackgroundErrorWatcher {
-    Write-ColorMessage "🔍 Starting background runtime error watcher..." -Color $Colors.Info
-
-    $Global:BackgroundJob = Start-Job -ScriptBlock {
-        param($CaptureFile, $LogFile)
-
-        # Error patterns to watch for
-        $ErrorPatterns = @(
-            ".*Exception.*",
-            ".*Error.*",
-            ".*Failed.*",
-            ".*XAML.*error.*",
-            ".*Binding.*error.*",
-            ".*Cannot.*find.*",
-            ".*Could not.*",
-            ".*Unable to.*",
-            ".*Null reference.*",
-            ".*Index out of range.*",
-            ".*Invalid.*operation.*",
-            ".*Argument.*exception.*",
-            ".*Syncfusion.*error.*",
-            ".*Style.*not found.*",
-            ".*Resource.*not found.*"
-        )
-
-        $CapturedErrors = @()
-        $StartTime = Get-Date
-
-        # Monitor for application process and capture errors
-        while ($true) {
-            Start-Sleep -Milliseconds 500
-
-            # Check for dotnet processes (BusBuddy application)
-            $Processes = Get-Process -Name "dotnet" -ErrorAction SilentlyContinue
-
-            if ($Processes) {
-                foreach ($Process in $Processes) {
-                    try {
-                        # Try to read from process error stream or debug output
-                        # This is a simplified approach - in practice, you'd use more sophisticated methods
-
-                        # Check Windows Event Log for application errors
-                        $RecentErrors = Get-WinEvent -FilterHashtable @{LogName = "Application"; Level = 2; StartTime = (Get-Date).AddMinutes(-1) } -ErrorAction SilentlyContinue
-
-                        foreach ($Event in $RecentErrors) {
-                            # Check if error message matches our patterns
-                            $ErrorMessage = $Event.Message
-                            $MatchedPattern = $ErrorPatterns | Where-Object { $ErrorMessage -match $_ } | Select-Object -First 1
-
-                            if ($MatchedPattern) {
-                                $ErrorEntry = @{
-                                    Timestamp   = $Event.TimeCreated.ToString("yyyy-MM-dd HH:mm:ss.fff")
-                                    ProcessId   = $Process.Id
-                                    ProcessName = $Process.ProcessName
-                                    Type        = "RuntimeError"
-                                    Message     = $ErrorMessage
-                                    StackTrace  = $Event.LevelDisplayName
-                                    Source      = $Event.ProviderName
-                                    Severity    = "High"
-                                    Pattern     = $MatchedPattern
-                                }
-
-                                $CapturedErrors += $ErrorEntry
-                            }
-                        }
-
-                        # Save to file periodically
-                        if ($CapturedErrors.Count % 10 -eq 0) {
-                            $CapturedErrors | ConvertTo-Json -Depth 10 | Out-File -FilePath $CaptureFile -Force
-                        }
-
-                    }
-                    catch {
-                        # Continue monitoring even if error capture fails
-                    }
-                }
-            }
-
-            # Check if we should continue monitoring
-            if ((Get-Date) -gt $StartTime.AddMinutes(30)) {
-                break
-            }
-        }
-
-        # Final save
-        $CapturedErrors | ConvertTo-Json -Depth 10 | Out-File -FilePath $CaptureFile -Force
-        return $CapturedErrors.Count
-
-    } -ArgumentList $captureFile, $logFile
-
-    Write-ColorMessage "✅ Background error watcher started (Job ID: $($Global:BackgroundJob.Id))" -Color $Colors.Success
 }
 
 function Start-BusBuddyApplication {
     Write-ColorMessage "🚀 Starting BusBuddy application..." -Color $Colors.Info
     Write-ColorMessage "   Command: dotnet run --project BusBuddy.WPF\BusBuddy.WPF.csproj" -Color "Gray"
+    Write-ColorMessage "   Stderr is being redirected to: $errorCaptureFile" -Color "Gray"
 
     $Global:AppStartTime = Get-Date
 
-    # Start the application in a separate process
-    $StartInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $StartInfo.FileName = "dotnet"
-    $StartInfo.Arguments = "run --project BusBuddy.WPF\BusBuddy.WPF.csproj"
-    $StartInfo.WorkingDirectory = Get-Location
-    $StartInfo.UseShellExecute = $false
-    $StartInfo.RedirectStandardOutput = $true
-    $StartInfo.RedirectStandardError = $true
-    $StartInfo.CreateNoWindow = $false
+    # Start the application in a separate process and redirect stderr
+    $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $processInfo.FileName = "dotnet"
+    $processInfo.Arguments = "run --project BusBuddy.WPF\BusBuddy.WPF.csproj --verbosity quiet"
+
+    # Determine project root directory - handle multiple possible structures
+    $scriptDir = $PSScriptRoot
+    $projectRoot = $null
+
+    # Try multiple relative paths to find the project root
+    $possiblePaths = @(
+        (Get-Item $scriptDir).Parent.Parent.FullName,  # Regular structure
+        (Join-Path (Get-Item $scriptDir).Parent.Parent.FullName ".."),  # One level up
+        (Get-Item $scriptDir).Parent.Parent.Parent.FullName  # Alternative structure
+    )
+
+    foreach ($path in $possiblePaths) {
+        if (Test-Path (Join-Path $path "BusBuddy.sln")) {
+            $projectRoot = $path
+            break
+        }
+    }
+
+    # If we still don't have a root, use the current directory
+    if (-not $projectRoot) {
+        $projectRoot = (Get-Location).Path
+        Write-ColorMessage "⚠️ Could not determine project root, using current directory: $projectRoot" -Color $Colors.Warning
+    }
+    else {
+        Write-ColorMessage "🏠 Found project root: $projectRoot" -Color $Colors.Info
+    }
+
+    $processInfo.WorkingDirectory = $projectRoot
+    $processInfo.UseShellExecute = $false
+    $processInfo.RedirectStandardError = $true
+    $processInfo.CreateNoWindow = $true
 
     try {
-        $Process = [System.Diagnostics.Process]::Start($StartInfo)
-        $Global:ProcessPID = $Process.Id
+        $process = [System.Diagnostics.Process]::Start($processInfo)
+        $Global:ProcessPID = $process.Id
+
+        # Instead of using event handler, create a file to capture error output
+        $errorReader = $process.StandardError
+
+        # Create a background job to read error output
+        $errorCaptureJob = Start-ThreadJob -ScriptBlock {
+            param($reader, $filePath, $colors)
+
+            # Import functions from parent scope
+            function Write-ColorMessage {
+                param([string]$Message, [string]$Color = "White", [switch]$NoNewLine)
+                if ($NoNewLine) {
+                    Write-Host $Message -ForegroundColor $Color -NoNewline
+                } else {
+                    Write-Host $Message -ForegroundColor $Color
+                }
+            }
+
+            try {
+                # Read the stream until it's closed
+                while (-not $reader.EndOfStream) {
+                    $line = $reader.ReadLine()
+                    if (-not [string]::IsNullOrEmpty($line)) {
+                        Add-Content -Path $filePath -Value $line -ErrorAction SilentlyContinue
+                        Write-ColorMessage "   ERROR DETECTED: $line" -Color $colors.Error
+                    }
+                }
+            }
+            catch {
+                # Handle any exceptions in the background job
+                Add-Content -Path $filePath -Value "Error reading stream: $($_.Exception.Message)" -ErrorAction SilentlyContinue
+            }
+        } -ArgumentList $errorReader, $errorCaptureFile, $Colors
+
+        # Store a reference to the error capture job
+        $script:errorCaptureJob = $errorCaptureJob
 
         Write-ColorMessage "✅ Application started successfully (PID: $($Global:ProcessPID))" -Color $Colors.Success
-        return $true
+        return $process
     }
     catch {
         Write-ColorMessage "❌ Failed to start application: $($_.Exception.Message)" -Color $Colors.Error
-        return $false
+        return $null
     }
 }
 
 function Wait-ForUserInteraction {
+    param(
+        $Process,
+        $ErrorCaptureJob = $null
+    )
+
     Write-ColorMessage ""
     Write-ColorMessage "📱 APPLICATION IS NOW RUNNING" -Color $Colors.Accent
     Write-ColorMessage "════════════════════════════════════════════" -Color "DarkGray"
@@ -225,46 +202,22 @@ function Wait-ForUserInteraction {
     Write-ColorMessage ""
 
     # Monitor for application closure
-    $DotCount = 0
-    while ($true) {
-        Start-Sleep -Seconds 2
+    Write-ColorMessage "Monitoring application process (PID: $($Process.Id))...", $Colors.Dots
+    $Process.WaitForExit($TimeoutMinutes * 60 * 1000) # Wait for exit with timeout
 
-        # Check if process is still running
-        $IsRunning = $false
-        if ($Global:ProcessPID) {
-            try {
-                $Process = Get-Process -Id $Global:ProcessPID -ErrorAction SilentlyContinue
-                $IsRunning = $null -ne $Process
-            }
-            catch {
-                $IsRunning = $false
-            }
-        }
+    if ($Process.HasExited) {
+        Write-ColorMessage "`n✅ Application has been closed." -Color $Colors.Success
+    }
+    else {
+        Write-ColorMessage "`n⏰ Timeout reached. Stopping process..." -Color $Colors.Warning
+        try { $Process.Kill() } catch { }
+    }
 
-        if (-not $IsRunning) {
-            Write-ColorMessage ""
-            Write-ColorMessage "✅ Application has been closed" -Color $Colors.Success
-            break
-        }
-
-        # Show activity dots
-        $DotCount++
-        if ($DotCount % 15 -eq 0) {
-            Write-ColorMessage " ●15 [Monitoring...]" -Color $Colors.Dots
-        }
-        elseif ($DotCount % 5 -eq 0) {
-            Write-ColorMessage "●$($DotCount % 15)" -Color $Colors.Dots -NoNewLine
-        }
-        else {
-            Write-ColorMessage "●" -Color $Colors.Dots -NoNewLine
-        }
-
-        # Timeout check
-        if ($Global:AppStartTime -and ((Get-Date) -gt $Global:AppStartTime.AddMinutes($TimeoutMinutes))) {
-            Write-ColorMessage ""
-            Write-ColorMessage "⏰ Timeout reached. Stopping monitoring..." -Color $Colors.Warning
-            break
-        }
+    # Wait a moment for the error capture job to complete
+    if ($ErrorCaptureJob) {
+        Write-ColorMessage "Completing error capture..." -Color $Colors.Info
+        Wait-Job -Job $ErrorCaptureJob -Timeout 5 | Out-Null
+        Remove-Job -Job $ErrorCaptureJob -Force
     }
 }
 
@@ -288,67 +241,105 @@ function Show-ContinuePrompt {
 
 function Get-CapturedErrors {
     Write-ColorMessage ""
-    Write-ColorMessage "📊 Compiling captured runtime errors..." -Color $Colors.Info
+    Write-ColorMessage "📊 Compiling captured runtime errors from '$errorCaptureFile'..." -Color $Colors.Info
 
-    # Stop the background job and collect results
-    if ($Global:BackgroundJob) {
-        Write-ColorMessage "⏹️ Stopping background error watcher..." -Color $Colors.Info
-
-        # Wait for job to complete (with timeout)
-        $JobResult = Wait-Job -Job $Global:BackgroundJob -Timeout 10
-        if ($JobResult) {
-            $ErrorCount = Receive-Job -Job $Global:BackgroundJob
-            Remove-Job -Job $Global:BackgroundJob
-            Write-ColorMessage "✅ Background job completed. Captured $ErrorCount errors" -Color $Colors.Success
-        }
-        else {
-            Stop-Job -Job $Global:BackgroundJob
-            Remove-Job -Job $Global:BackgroundJob
-            Write-ColorMessage "⚠️ Background job timed out, but continuing..." -Color $Colors.Warning
-        }
+    if (-not (Test-Path $errorCaptureFile)) {
+        Write-ColorMessage "⚠️ Error log file not found." -Color $Colors.Warning
+        return @()
     }
 
-    # Read captured errors from file
-    $CapturedErrors = @()
-    if (Test-Path $captureFile) {
-        try {
-            $Content = Get-Content -Path $captureFile -Raw
-            if ($Content) {
-                $CapturedErrors = $Content | ConvertFrom-Json
+    $content = Get-Content -Path $errorCaptureFile -Raw
+    if ([string]::IsNullOrWhiteSpace($content)) {
+        Write-ColorMessage "✅ No errors captured in the log file." -Color $Colors.Success
+        return @()
+    }
+
+    # Enhanced parsing of stack traces to create structured error objects
+    $ErrorPatterns = @(
+        # Standard exception pattern
+        '(?<Type>\w+Exception):\s*(?<Message>[^\r\n]+)',
+        # XAML parsing errors
+        'XamlParseException:\s*(?<Message>[^\r\n]+)',
+        # SQL errors
+        'SqlException:\s*(?<Message>[^\r\n]+)',
+        # General error pattern (may not be an exception)
+        'Error:\s*(?<Message>[^\r\n]+)'
+    )
+    $regex = [regex]($ErrorPatterns -join "|")
+    $matches = $regex.Matches($content)
+
+    # Also look for stack traces
+    $stackTraceRegex = [regex]'(?:   at .+\n)+'
+    $stackTraces = $stackTraceRegex.Matches($content)
+
+    # Create a more comprehensive collection of error objects with improved context
+    $CapturedErrors = [System.Collections.ArrayList]::new()
+
+    # Process each exception match
+    foreach ($match in $matches) {
+        $errorType = if ($match.Groups["Type"].Success) { $match.Groups["Type"].Value } else { "UnknownError" }
+        $errorMessage = $match.Groups["Message"].Value.Trim()
+
+        # Find if there's an associated stack trace near this error (within next 500 characters)
+        $errorPos = $match.Index
+        $errorStackTrace = ""
+        foreach ($trace in $stackTraces) {
+            # If stack trace is within reasonable distance of the error
+            if ([Math]::Abs($trace.Index - $errorPos) -lt 500) {
+                $errorStackTrace = $trace.Value
+                break
             }
         }
-        catch {
-            Write-ColorMessage "⚠️ Could not parse captured errors: $($_.Exception.Message)" -Color $Colors.Warning
+
+        # Determine severity based on error type and content
+        $severity = "Medium"
+        if ($errorType -match "Null|ArgumentNull|IndexOutOfRange|ArgumentOutOfRange") {
+            $severity = "Critical"
         }
+        elseif ($errorType -match "Sql|Xaml|IO|File|Network") {
+            $severity = "High"
+        }
+
+        # Create action recommendation based on error type
+        $recommendation = ""
+        switch -Regex ($errorType) {
+            "NullReference" { $recommendation = "Check for null object references before property/method access" }
+            "ArgumentNull|ArgumentException" { $recommendation = "Ensure all method parameters have valid values" }
+            "Xaml" { $recommendation = "Verify XAML syntax, bindings, and resources in UI elements" }
+            "Sql|Database" { $recommendation = "Verify database connection and query syntax" }
+            "IO|File" { $recommendation = "Ensure file paths exist and application has proper permissions" }
+            default { $recommendation = "Review stack trace for more context on the error source" }
+        }
+
+        # Create and add the error object
+        $errorObject = [pscustomobject]@{
+            Timestamp                = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fff")
+            Type                     = $errorType
+            Message                  = $errorMessage
+            Source                   = "Runtime Log"
+            Severity                 = $severity
+            ActionableRecommendation = $recommendation
+            StackTrace               = if ([string]::IsNullOrWhiteSpace($errorStackTrace)) { $match.Value } else { $errorStackTrace }
+        }
+
+        $null = $CapturedErrors.Add($errorObject)
     }
 
-    # Add simulated errors for demonstration (remove in production)
-    $CapturedErrors += @(
-        @{
+    # If no structured errors were found but there is content, add a generic entry
+    if ($CapturedErrors.Count -eq 0 -and -not [string]::IsNullOrWhiteSpace($content)) {
+        # Create a generic error entry with the first few lines of the log
+        $firstFewLines = ($content -split '\r?\n')[0..5] -join "`n"
+        $genericError = [pscustomobject]@{
             Timestamp                = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fff")
-            Type                     = "XamlParseException"
-            Message                  = "Cannot find resource 'PrimaryButtonStyle'"
-            Source                   = "MainWindow.xaml"
-            Severity                 = "High"
-            ActionableRecommendation = "Add missing style to ResourceDictionary"
-        },
-        @{
-            Timestamp                = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fff")
-            Type                     = "NullReferenceException"
-            Message                  = "Object reference not set to an instance of an object"
-            Source                   = "DriversViewModel.LoadDriversAsync()"
-            Severity                 = "Critical"
-            ActionableRecommendation = "Add null checks before property access"
-        },
-        @{
-            Timestamp                = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss.fff")
-            Type                     = "SqlException"
-            Message                  = "Invalid column name 'IsActive'"
-            Source                   = "BusBuddyContext.Drivers"
-            Severity                 = "High"
-            ActionableRecommendation = "Update database schema or fix LINQ query"
+            Type                     = "UnstructuredError"
+            Message                  = "Unstructured error output detected (see log for details)"
+            Source                   = "Runtime Log"
+            Severity                 = "Medium"
+            ActionableRecommendation = "Review complete error log for details"
+            StackTrace               = $firstFewLines
         }
-    )
+        $null = $CapturedErrors.Add($genericError)
+    }
 
     Write-ColorMessage "📈 Analysis Results:" -Color $Colors.Accent
     Write-ColorMessage "   Total Errors: $($CapturedErrors.Count)" -Color $Colors.Info
@@ -406,7 +397,7 @@ This report contains runtime errors captured during interactive testing of the B
 4. Re-test to verify fixes
 
 ## Files
-- **Raw Data:** $captureFile
+- **Raw Data:** $errorCaptureFile
 - **Session Log:** $logFile
 - **This Report:** $summaryFile
 "@
@@ -416,7 +407,7 @@ This report contains runtime errors captured during interactive testing of the B
 
     Write-ColorMessage "✅ Error report generated:" -Color $Colors.Success
     Write-ColorMessage "   📄 Summary Report: $summaryFile" -Color $Colors.Info
-    Write-ColorMessage "   📊 Raw Data: $captureFile" -Color $Colors.Info
+    Write-ColorMessage "   🔥 Raw Error Log: $errorCaptureFile" -Color $Colors.Info
     Write-ColorMessage "   📝 Session Log: $logFile" -Color $Colors.Info
 
     return $summaryFile
@@ -465,33 +456,32 @@ function Invoke-AutoFix {
 try {
     Show-Header
 
-    # Step 1: Start background error watcher
-    Start-BackgroundErrorWatcher
-    Start-Sleep -Seconds 2
-
-    # Step 2: Start BusBuddy application
-    $AppStarted = Start-BusBuddyApplication
-    if (-not $AppStarted) {
+    # Step 1: Start BusBuddy application and capture errors
+    $process = Start-BusBuddyApplication
+    if (-not $process) {
         throw "Failed to start BusBuddy application"
     }
 
-    # Step 3: Wait for user interaction and application closure
-    Wait-ForUserInteraction
+    # Store reference to the error capture job
+    $global:errorCaptureJob = $errorCaptureJob
 
-    # Step 4: Show continue prompt
+    # Step 2: Wait for user interaction and application closure
+    Wait-ForUserInteraction -Process $process -ErrorCaptureJob $errorCaptureJob
+
+    # Step 3: Show continue prompt
     $ContinueAnalysis = Show-ContinuePrompt
     if (-not $ContinueAnalysis) {
         Write-ColorMessage "❌ Analysis cancelled by user" -Color $Colors.Warning
         exit 0
     }
 
-    # Step 5: Compile captured errors
+    # Step 4: Compile captured errors
     $CapturedErrors = Get-CapturedErrors
 
-    # Step 6: Generate analysis report
+    # Step 5: Generate analysis report
     $ReportFile = New-ErrorReport -Errors $CapturedErrors
 
-    # Step 7: Invoke auto-fix if requested
+    # Step 6: Invoke auto-fix if requested
     Invoke-AutoFix -Errors $CapturedErrors -ReportFile $ReportFile
 
     # Final summary
@@ -512,8 +502,8 @@ try {
     # Offer to open the report
     Write-ColorMessage "Open the error report now? [Y/N]: " -Color $Colors.Warning -NoNewLine
     $OpenReport = Read-Host
-    if ($OpenReport -eq "Y" -or $OpenReport -eq "y") {
-        Start-Process "notepad.exe" -ArgumentList $ReportFile
+    if ($OpenReport -match 'y') {
+        Invoke-Item $ReportFile
     }
 
 }
@@ -524,11 +514,13 @@ catch {
     exit 1
 }
 finally {
-    # Cleanup
-    if ($Global:BackgroundJob) {
-        Stop-Job -Job $Global:BackgroundJob -ErrorAction SilentlyContinue
-        Remove-Job -Job $Global:BackgroundJob -ErrorAction SilentlyContinue
+    # Cleanup any remaining jobs
+    Get-Job | Where-Object { $_.Name -like "*ErrorCapture*" -or $_.State -ne "Completed" } | Remove-Job -Force -ErrorAction SilentlyContinue
+
+    # Clean up any global variables we created
+    if (Get-Variable -Name errorCaptureJob -Scope Global -ErrorAction SilentlyContinue) {
+        Remove-Variable -Name errorCaptureJob -Scope Global -ErrorAction SilentlyContinue
     }
 
-    Write-ColorMessage "🧹 Cleanup completed" -Color $Colors.Info
+    Write-ColorMessage "🧹 Session finished." -Color $Colors.Info
 }
