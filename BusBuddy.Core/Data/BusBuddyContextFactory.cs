@@ -129,12 +129,13 @@ namespace BusBuddy.Core.Data
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = "Data Source=BusBuddy.db";
-                Logger.Warning("No connection string found, using default SQLite: {ConnectionString}", connectionString);
+                // Use environment variable or safe default
+                connectionString = Environment.GetEnvironmentVariable("BUSBUDDY_DB_CONNECTION") ?? "Data Source=:memory:";
+                Logger.Warning("No connection string configured, using environment variable or in-memory database");
             }
             else
             {
-                Logger.Debug("Using configured connection string");
+                Logger.Debug("Using configured connection string from configuration");
             }
 
             return connectionString;
@@ -184,7 +185,12 @@ namespace BusBuddy.Core.Data
         private static string GetConnectionType(string connectionString)
         {
             if (IsAzureSqlConnection(connectionString)) return "Azure SQL";
-            if (IsSqlServerConnection(connectionString)) return "SQL Server";
+            if (IsSqlServerConnection(connectionString))
+            {
+                return "SQL Server";
+            }
+
+
             return "SQLite";
         }
 
