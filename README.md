@@ -182,7 +182,7 @@ Git: Latest version for version control
 - **Testing**: Minimum 80% code coverage across all projects
 - **Performance**: Optimized builds completing in under 3 seconds
 
-### 🚀 **PowerShell Commands Available**
+### **🚀 PowerShell Commands Available**
 ```powershell
 # Core Development
 bb-build       # Optimized solution build
@@ -284,12 +284,12 @@ bb-report      # Generate comprehensive project reports
    ```powershell
    pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
    ```
-   This loads the comprehensive 5,434-line PowerShell module with AI workflows and development automation.
+   This loads the comprehensive PowerShell module with development automation.
 
-3. **Verify AI Integration** (Optional):
+3. **Verify Integration** (Core functionality):
    ```powershell
-   bb-health          # System health check with AI workflow validation
-   bb-diagnostic      # Comprehensive environment and AI integration analysis
+   bb-health          # System health check
+   bb-diagnostic      # Comprehensive environment analysis
    ```
 
 3. **Set Database Provider** (Choose one):
@@ -318,13 +318,13 @@ bb-report      # Generate comprehensive project reports
 6. **Health Check and Diagnostics**:
    ```powershell
    bb-health     # System health verification with detailed reporting
-   bb-diagnostic # Comprehensive diagnostics with AI integration validation
+   bb-diagnostic # Comprehensive diagnostics
    ```
 
-7. **AI Workflow Testing** (Optional):
+7. **Development Testing**:
    ```powershell
-   bb-ai-workflow -Mode Troubleshooting  # Test AI-powered development assistance
-   bb-tavily-search "PowerShell best practices"  # Test Tavily search integration
+   bb-health     # System health verification with detailed reporting
+   bb-diagnostic # Comprehensive diagnostics
    ```
 
 ### Option 2: Direct Commands (Alternative)
@@ -688,7 +688,7 @@ pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
 bb-build        # Enhanced build with error analysis
 
 # Run the application
-bb-run          # Run with diagnostics and monitoring
+bb-run          # Run with monitoring and diagnostics
 
 # Check system health
 bb-health       # Comprehensive health check
@@ -1025,10 +1025,10 @@ BusBuddy/
 
 ### 🌟 **Tool Integration Highlights**
 - **🛠️ bb-* Commands**: Core development tools (`bb-build`, `bb-run`, `bb-test`, `bb-health`, `bb-diagnostic`)
-- **🔗 MCP Servers**: Zero-auth AI access via Git and filesystem protocol servers
-- **🔍 Tavily Tools**: Search-driven workflows with comprehensive PowerShell integration
-- **⚡ VS Code Integration**: Efficiency enforcement through unified MCP configurations
-- **🚀 Phase 2 Ready**: Optimized for bus route simulation and activity scheduling
+- **MCP Servers**: Zero-auth AI access via `git-mcp-server.js` and `filesystem-mcp-server.js` in `mcp-servers/`
+- **Tavily Integration**: Search-driven workflows via `tavily-tool.ps1` and comprehensive documentation
+- **VS Code Integration**: Efficiency enforcement through `.vscode/mcp.json` and `mcp-unified.json` configurations
+- **Phase 2 Ready**: Tools optimized for bus route simulation and activity scheduling workflows
 │       ├── Scripts/       # Advanced workflow scripts
 │       └── Utilities/     # PowerShell utilities and syntax enforcement
 ├── mcp-servers/           # 🤖 Model Context Protocol servers

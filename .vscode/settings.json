@@ -44,8 +44,8 @@
   "powershell.integratedConsole.forceClearScrollbackBuffer": false,
   "powershell.integratedConsole.executeInCurrentScope": true,
   "powershell.analyzeOpenDocumentsOnly": false,
-  "powershell.debugging.createTemporaryIntegratedConsole": false,
-  "powershell.developer.editorServicesLogLevel": "Information",
+  "powershell.debugging.createTemporaryIntegratedConsole": true,
+  "powershell.developer.editorServicesLogLevel": "Debug",
   "powershell.developer.waitForSessionFileTimeoutSeconds": 240,
   "powershell.buttons.showRunButtons": true,
   "powershell.buttons.showPanelMovementButtons": true,
@@ -54,6 +54,9 @@
   "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
   "powershell.scriptAnalysis.enableReferencesCodeLens": false,
   "powershell.scriptAnalysis.enableDiagnosticSuppression": true,
+  "powershell.scriptAnalysis.excludeRules": [
+    "PSUseApprovedVerbs"
+  ],
   "powershell.scriptAnalysis.excludePatterns": [
     "**/*.Tests.ps1",
     "**/bin/**",
@@ -75,39 +78,40 @@
   "powershell.verboseAction": "SilentlyContinue",
   "powershell.debugAction": "SilentlyContinue",
   "terminal.integrated.profiles.windows": {
-    "PowerShell 7.5.2 (BusBuddy)": {
-      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "PowerShell 7.5.2": {
+      "path": "pwsh.exe",
       "args": [
         "-NoExit",
+        "-ExecutionPolicy", "Bypass",
         "-Command",
-        "& { Write-Host 'Checking .NET environment...' -ForegroundColor Yellow; try { $dotnetVersion = dotnet --version 2>$null; Write-Host \".NET SDK: $dotnetVersion\" -ForegroundColor Green; if (Test-Path '${workspaceFolder}\\load-bus-buddy-profiles.ps1') { & '${workspaceFolder}\\load-bus-buddy-profiles.ps1' } } catch { Write-Host 'Run task: Fix .NET Installation if build issues occur' -ForegroundColor Red } }"
+        "& { Set-Location 'C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy'; Write-Host '🚌 Loading BusBuddy PowerShell Environment...' -ForegroundColor Cyan; try { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ BusBuddy profiles loaded successfully!' -ForegroundColor Green; Write-Host '🎯 Ready for development. Try: bb-health, bb-build, bb-run' -ForegroundColor Yellow } catch { Write-Host '❌ Profile loading failed: ' -ForegroundColor Red -NoNewline; Write-Host $_.Exception.Message -ForegroundColor Yellow; Write-Host '💡 Try manual import: Import-Module .\\PowerShell\\BusBuddy` PowerShell` Environment\\Modules\\BusBuddy\\BusBuddy.psm1' -ForegroundColor Cyan } }"
       ],
       "icon": "terminal-powershell",
       "color": "terminal.ansiGreen"
     },
     "PowerShell 7.5.2 (Clean)": {
-      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "path": "pwsh.exe",
       "args": [
         "-NoProfile"
       ],
       "icon": "terminal-powershell",
       "color": "terminal.ansiCyan"
     },
-    "PowerShell 7.5.2 (Build-Isolated)": {
-      "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "PowerShell 7.5.2 (Direct Module)": {
+      "path": "pwsh.exe",
       "args": [
-        "-NoProfile",
-        "-NonInteractive",
+        "-NoExit",
+        "-ExecutionPolicy", "Bypass",
         "-Command",
-        "& { Write-Host 'Preparing build environment...' -ForegroundColor Yellow; try { . '${workspaceFolder}\\load-bus-buddy-profiles.ps1' -Quiet; bb-clean -Deep; Write-Host 'Build environment ready' -ForegroundColor Green } catch { Write-Host 'Basic clean performed' -ForegroundColor Yellow; [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers() } }"
+        "& { Set-Location 'C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy'; Write-Host '📦 Loading BusBuddy Module Directly...' -ForegroundColor Magenta; Import-Module -Force '.\\PowerShell\\BusBuddy` PowerShell` Environment\\Modules\\BusBuddy\\BusBuddy.psm1'; Write-Host '✅ BusBuddy module loaded!' -ForegroundColor Green; Get-Command bb-* | Select-Object Name | Write-Host }"
       ],
-      "icon": "tools",
-      "color": "terminal.ansiYellow"
+      "icon": "library",
+      "color": "terminal.ansiMagenta"
     }
   },
-  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2 (BusBuddy)",
+  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2",
   "terminal.integrated.automationProfile.windows": {
-    "path": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "path": "pwsh.exe",
     "args": [
       "-NoProfile",
       "-NonInteractive"

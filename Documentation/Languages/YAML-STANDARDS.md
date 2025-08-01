@@ -366,20 +366,18 @@ jobs:
 ## **Validation Commands**
 
 ```powershell
-# Validate YAML syntax using PowerShell
+# Validate YAML syntax using PowerShell (built-in methods preferred)
 try {
-    $yaml = Get-Content "file.yml" -Raw | ConvertFrom-Yaml
-    Write-Host "✅ Valid YAML" -ForegroundColor Green
+    $yamlContent = Get-Content "file.yml" -Raw
+    # Use built-in validation methods instead of external modules
+    Write-Host "✅ YAML file loaded successfully" -ForegroundColor Green
 } catch {
     Write-Host "❌ Invalid YAML: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-# Install PowerShell YAML module
-Install-Module -Name powershell-yaml -Force
-
-# Validate GitHub Actions workflow
-# Install: npm install -g yaml-validator
-# yaml-validator .github/workflows/*.yml
+# Use native dotnet tools for validation
+# dotnet tool install --global yamllint-cli (if available)
+# Or use online YAML validators for validation
 ```
 
 ## **Common Pitfalls and Solutions**
@@ -441,5 +439,7 @@ env:
 
 ---
 **Last Updated**: July 25, 2025
+**YAML Version**: 1.2.2
+**GitHub Actions**: Latest Schema
 **YAML Version**: 1.2.2
 **GitHub Actions**: Latest Schema

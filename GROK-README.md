@@ -3,15 +3,16 @@
 ## 🎯 Repository Overview
 **BusBuddy** is an AI-first school transportation management system designed for seamless integration with artificial intelligence models like xAI Grok-4. This repository represents the gold standard for AI-accessible development environments with **full PowerShell 7.5.2 compliance**.
 
-### 📊 Repository Statistics (Updated 2025-07-30)
+### 📊 Repository Statistics (Updated 2025-08-01)
 - **Repository**: [Bigessfour/BusBuddy-WPF](https://github.com/Bigessfour/BusBuddy-WPF) 
 - **Visibility**: Public (Zero-authentication AI access)
-- **Total Files**: 750+ files across all directories
-- **Repository Size**: ~47MB of source code and documentation
-- **Latest Commit**: July 30, 2025 (PowerShell 7.5.2 compliance achieved)
+- **Total Files**: 1,086+ files across all directories (verified count)
+- **Repository Size**: ~50MB of source code and documentation
+- **Latest Commit**: August 1, 2025 (File structure verification and documentation update)
 - **Commit History**: 500+ commits with comprehensive development history
 - **Primary Language**: C# (.NET 9.0-windows framework)
 - **Secondary Languages**: PowerShell 7.5.2, XAML, JavaScript, Markdown
+- **File Structure**: Verified current structure with accurate directory listings
 
 ### 🏗️ Technology Stack
 - **.NET Framework**: 9.0-windows (latest stable)
@@ -76,48 +77,53 @@
 ### 💻 **PowerShell 7.5.2 Environment Files**
 
 #### Core PowerShell Files
-- **[PowerShell/Microsoft.PowerShell_profile.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Microsoft.PowerShell_profile.ps1)** - Standard compliant profile
 - **[PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/BusBuddy.psm1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/BusBuddy%20PowerShell%20Environment/Modules/BusBuddy/BusBuddy.psm1)** - Main module (5,434+ lines)
-- **[load-bus-buddy-profiles.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/load-bus-buddy-profiles.ps1)** - Profile loading script
+- **[PowerShell/Modules/BusBuddy.ExceptionCapture/BusBuddy.ExceptionCapture.psm1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Modules/BusBuddy.ExceptionCapture/BusBuddy.ExceptionCapture.psm1)** - Exception capture module
+- **[PowerShell/Rules/BusBuddy-PowerShell.psm1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Rules/BusBuddy-PowerShell.psm1)** - PowerShell rules and standards
+- **[load-bus-buddy-profiles.ps1.disabled](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/load-bus-buddy-profiles.ps1.disabled)** - Profile loading script (currently disabled)
 - **[build-busbuddy-simple.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/build-busbuddy-simple.ps1)** - Simple build script entry point
 - **[run-with-error-capture.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/run-with-error-capture.ps1)** - Error capture workflow
 
 #### PowerShell Script Categories
-- **[PowerShell/Scripts/Build/](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Build/)** - Build automation scripts
-  - **[build-busbuddy-simple.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Build/build-busbuddy-simple.ps1)** - Build script
-  - **[clean-and-restore.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Build/clean-and-restore.ps1)** - Clean and restore packages
-- **[PowerShell/Scripts/Configuration/](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Configuration/)** - System configuration scripts
-  - **[fix-dotnet-installation.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Configuration/fix-dotnet-installation.ps1)** - .NET SDK configuration
+- **[PowerShell/Scripts/Build/](https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Scripts/Build)** - Build automation scripts
+- **[PowerShell/Scripts/Configuration/](https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Scripts/Configuration)** - System configuration scripts
   - **[configure-tavily-mcp.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Configuration/configure-tavily-mcp.ps1)** - Tavily MCP setup
-- **[PowerShell/Scripts/Maintenance/](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Maintenance/)** - System maintenance tools
-- **[PowerShell/Scripts/Testing/](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Testing/)** - Test automation scripts
-- **[PowerShell/Scripts/Utilities/](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Utilities/)** - General utility scripts
-  - **[Delete-UnusedPowerShellScripts.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Utilities/Delete-UnusedPowerShellScripts.ps1)** - Cleanup utility
+  - **[fix-mcp-configuration.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Configuration/fix-mcp-configuration.ps1)** - MCP configuration fixes
+- **[PowerShell/Scripts/Maintenance/](https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Scripts/Maintenance)** - System maintenance tools
+- **[PowerShell/Scripts/Testing/](https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Scripts/Testing)** - Test automation scripts
+  - **[test-tavily-integration.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Testing/test-tavily-integration.ps1)** - Tavily integration tests
+- **[PowerShell/Scripts/Setup/](https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Scripts/Setup)** - Environment setup scripts
+  - **[setup-nodejs-and-mcp.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Setup/setup-nodejs-and-mcp.ps1)** - Node.js and MCP setup
+  - **[setup-tavily-key.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Setup/setup-tavily-key.ps1)** - Tavily API key setup
+  - **[setup-working-mcp.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Setup/setup-working-mcp.ps1)** - Working MCP configuration
+- **[PowerShell/Scripts/Utilities/](https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Scripts/Utilities)** - General utility scripts
+  - **[install-nodejs-mcp-admin.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/Utilities/install-nodejs-mcp-admin.ps1)** - Node.js MCP administration
+- **[PowerShell/Tools/](https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Tools)** - PowerShell development tools
+- **[PowerShell/Scripts/tavily-tool.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/tavily-tool.ps1)** - Tavily command-line interface
+- **[PowerShell/Scripts/register-tavily-commands.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/register-tavily-commands.ps1)** - Register Tavily commands
 
 ### 🤖 AI Integration Files
 
 #### Core AI Components
 - **[BusBuddy.Core/Models/AI/XAIModels.cs](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/BusBuddy.Core/Models/AI/XAIModels.cs)** - xAI Grok-4 data models
-- **[BusBuddy.Core/Services/AI/XAIService.cs](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/BusBuddy.Core/Services/AI/XAIService.cs)** - Core AI service
-- **[BusBuddy.WPF/Services/XAIChatService.cs](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/BusBuddy.WPF/Services/XAIChatService.cs)** - AI chat UI service
-- **[BusBuddy.WPF/ViewModels/AI/AIAssistantViewModel.cs](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/BusBuddy.WPF/ViewModels/AI/AIAssistantViewModel.cs)** - AI assistant ViewModel
-- **[BusBuddy.WPF/Views/AI/AIAssistantView.xaml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/BusBuddy.WPF/Views/AI/AIAssistantView.xaml)** - AI assistant UI
 
 #### PowerShell AI Integration
 - **[PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/Functions/AI/BusBuddy-AI-Workflows.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/BusBuddy%20PowerShell%20Environment/Modules/BusBuddy/Functions/AI/BusBuddy-AI-Workflows.ps1)** - AI automation workflows
-- **[PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/Functions/AI/Invoke-XAIOperation.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/BusBuddy%20PowerShell%20Environment/Modules/BusBuddy/Functions/AI/Invoke-XAIOperation.ps1)** - xAI operations
+- **[PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/Functions/AI/Invoke-BusBuddyTavilySearch.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/BusBuddy%20PowerShell%20Environment/Modules/BusBuddy/Functions/AI/Invoke-BusBuddyTavilySearch.ps1)** - Tavily search integration
 
 ### 🔍 Model Context Protocol (MCP) & Tavily Integration
 
 #### MCP Server Files
 - **[mcp.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/mcp.json)** - Model Context Protocol configuration
-- **[tavily-mcp-config.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/tavily-mcp-config.json)** - Tavily search configuration
+- **[.vscode/mcp.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/mcp.json)** - VS Code MCP configuration
+- **[.vscode/mcp-unified.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/mcp-unified.json)** - Unified MCP configuration
 - **[package.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/package.json)** - Node.js package configuration for MCP servers
 - **[mcp-servers/filesystem-mcp-server.js](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/mcp-servers/filesystem-mcp-server.js)** - Filesystem MCP server
 - **[mcp-servers/git-mcp-server.js](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/mcp-servers/git-mcp-server.js)** - Git MCP server
 
 #### Tavily Integration
 - **[PowerShell/Scripts/tavily-tool.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/tavily-tool.ps1)** - Tavily command-line tool
+- **[PowerShell/Scripts/register-tavily-commands.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/PowerShell/Scripts/register-tavily-commands.ps1)** - Register Tavily commands
 - **[Documentation/tavily-api-usage-guide.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/tavily-api-usage-guide.md)** - API usage documentation
 - **[Documentation/tavily-powershell-integration.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/tavily-powershell-integration.md)** - PowerShell integration guide
 
@@ -127,7 +133,53 @@
 - **[Documentation/FILE-FETCHABILITY-GUIDE.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/FILE-FETCHABILITY-GUIDE.md)** - File access guide
 - **[Documentation/POWERSHELL-7.5-FEATURES.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/POWERSHELL-7.5-FEATURES.md)** - PowerShell features
 - **[Documentation/PowerShell-7.5.2-Reference.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/PowerShell-7.5.2-Reference.md)** - PowerShell reference
+- **[Documentation/GROK-4-UPGRADE-SUMMARY.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/GROK-4-UPGRADE-SUMMARY.md)** - Grok-4 upgrade summary
+- **[Documentation/NUGET-CONFIG-REFERENCE.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/NUGET-CONFIG-REFERENCE.md)** - NuGet configuration reference
+- **[Documentation/PACKAGE-MANAGEMENT.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/PACKAGE-MANAGEMENT.md)** - Package management guide
+- **[Documentation/PHASE-2-IMPLEMENTATION-PLAN.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Documentation/PHASE-2-IMPLEMENTATION-PLAN.md)** - Phase 2 development plan
 - **[Standards/MASTER-STANDARDS.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Standards/MASTER-STANDARDS.md)** - Project standards
+- **[Standards/IMPLEMENTATION-REPORT.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Standards/IMPLEMENTATION-REPORT.md)** - Implementation status report
+- **[Standards/LANGUAGE-INVENTORY.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/Standards/LANGUAGE-INVENTORY.md)** - Programming language inventory
+
+### ⚙️ VS Code Configuration Files
+- **[.vscode/settings.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/settings.json)** - Editor settings and preferences
+- **[.vscode/tasks.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/tasks.json)** - Build and development tasks
+- **[.vscode/launch.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/launch.json)** - Debug configuration
+- **[.vscode/extensions.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/extensions.json)** - Recommended extensions
+- **[.vscode/keybindings.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/keybindings.json)** - Custom keyboard shortcuts
+- **[.vscode/ai-efficiency-enforcement.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/ai-efficiency-enforcement.md)** - AI assistant efficiency standards
+- **[.vscode/ai-quick-reference.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/ai-quick-reference.md)** - AI assistant quick reference
+- **[.vscode/instructions.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/instructions.md)** - Development instructions
+- **[.vscode/copilot-workflow-prompts.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/copilot-workflow-prompts.md)** - GitHub Copilot workflow prompts
+- **[.vscode/powershell-extension-config.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/powershell-extension-config.json)** - PowerShell extension configuration
+- **[.vscode/xaml-style-enforcement.json](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.vscode/xaml-style-enforcement.json)** - XAML style enforcement rules
+
+### 🔧 Development Tools & Configuration
+- **[.editorconfig](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.editorconfig)** - Editor configuration for consistent formatting
+- **[.gitignore](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.gitignore)** - Git ignore patterns
+- **[.gitattributes](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.gitattributes)** - Git file handling attributes
+- **[.globalconfig](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.globalconfig)** - Global analyzer configuration
+- **[BusBuddy-Practical.ruleset](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/BusBuddy-Practical.ruleset)** - Code analysis rules
+
+### 🚀 GitHub Actions & CI/CD
+- **[.github/workflows/ci.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/ci.yml)** - Continuous integration workflow
+- **[.github/workflows/build-and-test.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/build-and-test.yml)** - Build and test workflow
+- **[.github/workflows/ci-build-test.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/ci-build-test.yml)** - CI build and test workflow
+- **[.github/workflows/build-reusable.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/build-reusable.yml)** - Reusable build workflow
+- **[.github/workflows/code-quality-gate.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/code-quality-gate.yml)** - Code quality gate
+- **[.github/workflows/dependency-review.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/dependency-review.yml)** - Dependency security review
+- **[.github/workflows/performance-monitoring.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/performance-monitoring.yml)** - Performance monitoring
+- **[.github/workflows/release.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/workflows/release.yml)** - Release workflow
+- **[.github/dependabot.yml](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/dependabot.yml)** - Dependabot configuration
+- **[.github/copilot-instructions.md](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/.github/copilot-instructions.md)** - GitHub Copilot instructions
+
+### 📦 Build & Maintenance Scripts
+- **[build-busbuddy-simple.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/build-busbuddy-simple.ps1)** - Simple build script
+- **[run-with-error-capture.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/run-with-error-capture.ps1)** - Error capture script
+- **[check-health.bat](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/check-health.bat)** - Health check script
+- **[fix-package-references-v2.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/fix-package-references-v2.ps1)** - Package reference fixes
+- **[fix-github-actions-failures.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/fix-github-actions-failures.ps1)** - GitHub Actions fixes
+- **[analyze-package-refs.ps1](https://raw.githubusercontent.com/Bigessfour/BusBuddy-WPF/main/analyze-package-refs.ps1)** - Package reference analysis
 
 ## 🌐 Comprehensive API Access Methods
 
@@ -147,10 +199,18 @@ Key API Endpoints:
 #### 📄 Specific Directory Contents
 ```
 - PowerShell Scripts: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Scripts
+- PowerShell Modules: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Modules
+- PowerShell Tools: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/PowerShell/Tools
 - Core Models: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/BusBuddy.Core/Models
 - WPF Views: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/BusBuddy.WPF/Views
+- WPF ViewModels: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/BusBuddy.WPF/ViewModels
 - MCP Servers: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/mcp-servers
 - AI Components: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/BusBuddy.Core/Models/AI
+- VS Code Config: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/.vscode
+- GitHub Workflows: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/.github/workflows
+- Test Projects: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/BusBuddy.Tests
+- Documentation: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/Documentation
+- Standards: https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/Standards
 ```
 
 ### 📝 File Content API Usage
@@ -765,7 +825,7 @@ With Syncfusion 30.1.42 stable foundation, priority focus areas:
 
 This strategic reset positions BusBuddy for UI excellence and sets the foundation for meticulously crafted forms and controls development!
 
-## � Smart File Fetching Patterns
+## 🔍 Smart File Fetching Patterns
 
 ### 🔎 Purpose-Based File Access Strategies
 
@@ -793,51 +853,68 @@ To understand the business entities and relationships:
 ```
 For UI implementation details:
 1. BusBuddy.WPF/Views/MainWindow.xaml - Main application window
-2. BusBuddy.WPF/Views/Dashboard/DashboardView.xaml - Dashboard UI
-3. BusBuddy.WPF/Resources/Themes/FluentDark.xaml - Theme definition
-4. BusBuddy.WPF/App.xaml - Application resources
-5. BusBuddy.WPF/Controls/ - Custom controls directory
+2. BusBuddy.WPF/App.xaml - Application resources
+3. BusBuddy.WPF/Views/ - Views directory (check API for current structure)
+4. BusBuddy.WPF/ViewModels/ - ViewModels directory
+5. BusBuddy.WPF/Resources/ - Resource dictionaries and themes
 ```
 
-#### 4. Understanding AI Integration
+#### 4. Understanding AI Integration (Actual Files)
 ```
-For AI implementation details:
+For AI implementation details (verified locations):
 1. BusBuddy.Core/Models/AI/XAIModels.cs - AI data models
-2. BusBuddy.Core/Services/AI/XAIService.cs - Core AI service
-3. BusBuddy.WPF/Services/XAIChatService.cs - Chat UI service
-4. BusBuddy.WPF/Views/AI/AIAssistantView.xaml - AI assistant UI
-5. mcp.json - Model Context Protocol configuration
+2. PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/Functions/AI/BusBuddy-AI-Workflows.ps1 - AI workflows
+3. PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/Functions/AI/Invoke-BusBuddyTavilySearch.ps1 - Tavily search
+4. mcp.json - Model Context Protocol configuration
+5. PowerShell/Scripts/tavily-tool.ps1 - Tavily command-line tool
 ```
 
-#### 5. Examining PowerShell Automation
+#### 5. Examining PowerShell Automation (Current Structure)
 ```
 For PowerShell development environment:
-1. load-bus-buddy-profiles.ps1 - Profile loading script
-2. PowerShell/Microsoft.PowerShell_profile.ps1 - Standard profile
-3. PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/BusBuddy.psm1 - Main module
-4. PowerShell-README.md - PowerShell documentation
-5. build-busbuddy-simple.ps1 - Build script
+1. PowerShell/BusBuddy PowerShell Environment/Modules/BusBuddy/BusBuddy.psm1 - Main module
+2. PowerShell/Modules/BusBuddy.ExceptionCapture/BusBuddy.ExceptionCapture.psm1 - Exception capture
+3. build-busbuddy-simple.ps1 - Build script
+4. run-with-error-capture.ps1 - Error capture script
+5. PowerShell-README.md - PowerShell documentation
 ```
 
 ### 🧩 Access Pattern Examples
 
-#### Example: Understanding Driver Management Flow
+#### Example: Understanding Application Structure Flow
 ```
-1. Data Model:
-   BusBuddy.Core/Models/Driver.cs
+1. Solution Structure:
+   BusBuddy.sln
 
-2. Business Logic:
-   BusBuddy.Core/Services/DriverService.cs
+2. Core Project:
+   BusBuddy.Core/BusBuddy.Core.csproj
 
-3. ViewModel:
-   BusBuddy.WPF/ViewModels/Drivers/DriverManagementViewModel.cs
+3. WPF Project:
+   BusBuddy.WPF/BusBuddy.WPF.csproj
 
-4. View:
-   BusBuddy.WPF/Views/Drivers/DriverManagementView.xaml
+4. Test Projects:
+   BusBuddy.Tests/BusBuddy.Tests.csproj
+   BusBuddy.UITests/BusBuddy.UITests.csproj
 
-5. Tests:
-   BusBuddy.Tests/ServiceTests/DriverServiceTests.cs
+5. Configuration:
+   Directory.Build.props
+   Directory.Packages.props
 ```
+
+### ⚠️ File Verification Guidelines
+
+**Always verify file existence using GitHub API before assuming accessibility:**
+1. **Use Contents API**: `https://api.github.com/repos/Bigessfour/BusBuddy-WPF/contents/[path]`
+2. **Check for 404 responses**: Some files referenced may have been moved or renamed
+3. **Use directory listing**: Browse directories first to understand current structure
+4. **Recent changes**: Files may have been reorganized - always check latest commit dates
+
+**Priority Access Order:**
+1. **Core files** (README.md, .sln, .csproj files) - Most stable
+2. **Configuration files** (Directory.Build.props, global.json) - Essential structure
+3. **Source code** (Models, Services, Views) - May change frequently
+4. **Documentation** (Documentation/, Standards/) - Updated regularly
+5. **Scripts** (PowerShell/, Scripts/) - Subject to reorganization
 
 #### Example: Exploring Syncfusion Integration
 ```

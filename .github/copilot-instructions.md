@@ -514,7 +514,6 @@ bb-report               # Generate comprehensive project report
   - BusBuddy-specific implementation examples
 - **Usage Pattern**: Reference this documentation when implementing PowerShell 7.5.2 features in Phase 2 development
 - **Maintenance**: Update reference file when new PowerShell features are implemented in BusBuddy modules
-- **Integration**: All Phase 2 PowerShell modules should reference this documentation for feature implementation
 - **Update Command**: Run `Update-PowerShellReference` from the conversion script to regenerate from PDF
 
 ### Performance and Optimization
@@ -528,56 +527,10 @@ bb-report               # Generate comprehensive project report
 - **Stream Processing**: Use pipeline streaming for large data sets to reduce memory footprint
 
 ### Development Workflow Integration
-- **IDE Agnostic**: PowerShell functions work from any terminal, not just VS Code
-- **Cross-Session**: Functions available across all PowerShell sessions in the project
-- **State Management**: Maintain development session state across PowerShell restarts
-- **Documentation**: Use comprehensive help documentation with examples for all functions
-- **Version Control**: Include PowerShell profiles in version control for team consistency
-
-## Development Workflow Standards
-
-- **Independent Tasks**: VS Code tasks are configured to run independently without chaining
-- **Build Process**: Clean → Restore → Build → Run as separate, non-dependent tasks
-- **Git Workflow Standards**: 
-  - **Selective Staging**: Use `git add <specific-files>` instead of `git add .`
-  - **Conventional Commits**: Follow `type(scope): description` format (feat, fix, docs, refactor, test, style)
-  - **Descriptive Messages**: Provide clear, actionable commit messages
-  - **Branch Specification**: Always specify branch in `git push origin main` and `git pull origin main`
-  - **Pre-commit Checks**: Run `git status` and `git diff` before committing
-  - **Backup Strategy**: Create feature branches for significant changes
-- **Incremental Development**: Test after each significant change, validate builds frequently
-- **Code Reviews**: Follow established code review practices and standards
-- **Branch Management**: Use feature branches with descriptive names (feature/driver-management, fix/build-errors)
-
-## Security Standards
-
-- **Connection String Security**: Never hardcode sensitive connection strings
-- **Environment Variables**: Use environment variables for sensitive configuration
-- **Input Validation**: Validate all user inputs at multiple layers
-- **SQL Injection Prevention**: Use parameterized queries and Entity Framework properly
-- **Authentication**: Implement proper authentication and authorization patterns
-- **Data Protection**: Encrypt sensitive data at rest and in transit
-- **Audit Logging**: Log security-relevant events for compliance and monitoring
-
-## Performance Standards
-
-- **Async Operations**: Use async/await for all I/O operations
-- **Lazy Loading**: Implement lazy loading for expensive operations
-- **Caching Strategies**: Use appropriate caching for frequently accessed data
-- **Database Optimization**: Use proper indexing and query optimization
-- **Memory Management**: Monitor memory usage and implement proper disposal patterns
-- **UI Performance**: Optimize UI updates and data binding performance
-- **Background Processing**: Use background tasks for long-running operations
-
-## Best Practices
-
-- When suggesting changes, ensure they align with the established patterns in the codebase
-- Prioritize maintainability and readability over clever or complex solutions
-- When working with XAML UI elements, consider accessibility implications
-- Validate that changes don't break existing functionality
-- **Service Layer Design**: Keep services focused and follow single responsibility principle
-- **Error Recovery**: Implement graceful error recovery where possible
-- **Monitoring**: Include appropriate monitoring and telemetry for production systems
+- **Direct Commands**: Use native .NET CLI commands for reliability
+- **PowerShell Automation**: Leverage bb-* commands for enhanced workflows
+- **Zero Dependencies**: No external API dependencies for core functionality
+- **Simple and Fast**: Optimized for speed and reliability over complexity
 
 ## MVP Batch Command Integration
 

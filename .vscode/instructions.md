@@ -64,44 +64,35 @@ BusBuddy is a transportation management system designed to help school districts
 
 ## � **Development Environment Setup**
 
-BusBuddy uses PowerShell tools to streamline development, but direct commands always work too.
+BusBuddy emphasizes direct, simple development approaches over complex automation.
 
-### Standard Approach (Works Anywhere)
+### Standard Approach (Recommended)
 ```powershell
-# Build the solution
+# Build the solution (direct and reliable)
 dotnet build BusBuddy.sln
 
-# Run the application
+# Run the application (direct execution)
 dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
 
-# Clean the solution
+# Clean the solution (when needed)
 dotnet clean BusBuddy.sln
 ```
 
-### Enhanced Development Environment (REQUIRED)
-The BusBuddy PowerShell profile is REQUIRED for all development activities:
+### Direct Development Workflow
+The BusBuddy development workflow prioritizes simplicity and directness:
 
 ```powershell
-# REQUIRED: Load the PowerShell environment (gives access to bb-* commands)
-pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
+# Direct build approach (no complex automation needed)
+dotnet build BusBuddy.sln
 
-# Health check
-bb-health
+# Direct run approach
+dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
 
-# Build and run with enhanced monitoring
-bb-build
-bb-run
+# Direct test approach (when tests are available)
+dotnet test
 ```
 
-### PowerShell Profile Benefits
-The BusBuddy PowerShell profile (`PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1`) provides:
-- Health check and diagnostic tools
-- Build process with enhanced error detection
-- Comprehensive error analysis and troubleshooting
-- AI code generation integration
-- Development workflow automation
-
-**Note**: These tools are REQUIRED for consistent development workflow. Only use standard .NET commands as emergency fallbacks.
+**Note**: Complex PowerShell automation has been simplified in favor of direct .NET CLI commands for reliability and simplicity.
 
 ## � **Problem Resolution Approaches**
 
@@ -431,31 +422,40 @@ bb-dev-session # Complete development session setup
 **Remember**: Always use the PowerShell environment for consistent development workflow.
 ### 📝 **PowerShell Coding Standards**
 
-BusBuddy enforces strict PowerShell coding standards through PSScriptAnalyzer:
+BusBuddy uses simple, direct PowerShell approaches:
 
-#### 🔄 **Approved PowerShell Verbs**
+#### 🔄 **Direct PowerShell Approach**
 
-All PowerShell functions MUST use approved verbs as defined in Microsoft's documentation:
-[PowerShell Approved Verbs](https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/useapprovedverbs)
+Focus on simple, reliable PowerShell functions:
 
 ```powershell
-# Approved verb groups and examples:
-# Common: Get, Set, New, Remove, Enable, Disable, Start, Stop, Read, Write
-# Data: Backup, Restore, Import, Export, Sync, Update, Convert
-# Lifecycle: Install, Uninstall, Register, Unregister, Request, Resume
-# Security: Grant, Revoke, Block, Unblock, Protect, Unprotect
+# Direct approach - preferred
+function Get-BusBuddyStatus {
+    if (Test-Path "BusBuddy.sln") {
+        Write-Host "✅ BusBuddy project found" -ForegroundColor Green
+        return $true
+    } else {
+        Write-Host "❌ BusBuddy project not found" -ForegroundColor Red
+        return $false
+    }
+}
+
+# Simple build function
+function Build-BusBuddy {
+    param([string]$Configuration = "Debug")
+    
+    Write-Host "🔨 Building BusBuddy in $Configuration mode..." -ForegroundColor Cyan
+    $result = & dotnet build BusBuddy.sln --configuration $Configuration
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ Build successful" -ForegroundColor Green
+        return $true
+    } else {
+        Write-Host "❌ Build failed" -ForegroundColor Red
+        return $false
+    }
+}
 ```
-
-❌ **AVOID these non-approved verbs:**
-- Display/Show (use `Write-*` or `Format-*` instead)
-- Build (use `New-*` or `ConvertTo-*` instead)
-- Execute (use `Invoke-*` instead)
-- Parse (use `ConvertFrom-*` instead)
-
-✅ **CORRECT function naming:**
-```powershell
-function Write-DependencySummary { ... }  # NOT Show-DependencySummary
-function New-ProjectTemplate { ... }      # NOT Build-ProjectTemplate
 function Invoke-BuildProcess { ... }      # NOT Execute-BuildProcess
 function Get-SystemHealth { ... }         # NOT Check-SystemHealth
 ```

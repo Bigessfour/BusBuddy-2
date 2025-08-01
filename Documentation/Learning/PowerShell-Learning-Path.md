@@ -336,7 +336,7 @@ function Get-CodeLineCount {
 
 #### **.NET Integration**
 ```powershell
-# Using .NET classes directly
+# Using .NET classes directly (preferred approach)
 $date = [System.DateTime]::Now
 $guid = [System.Guid]::NewGuid()
 $path = [System.IO.Path]::Combine("C:", "BusBuddy", "output.txt")

@@ -177,8 +177,9 @@ public int TotalBuses
 # What we meant:
 Get-Process | Where-Object {$_.Name -eq "BusBuddy"}
 
-# What we typed:
-Get-Process | Remove-Process  # Oops, killed everything
+# What we typed (simplified approach now preferred):
+# Direct .NET CLI usage instead of complex PowerShell process management
+dotnet build BusBuddy.sln  # Simple and reliable
 ```
 
 ### **The XAML Mystery**
