@@ -1,105 +1,96 @@
-#Requires -Version 7.0
+#Requires -Version 7.5
 <#
 .SYNOPSIS
-Simplified BusBuddy build script for troubleshooting
-
+    Simple build script for BusBuddy
 .DESCRIPTION
-Step-by-step build process with error handling and verbose output
+    Builds the BusBuddy solution with error handling, ensuring the core DLL is available
+.PARAMETER SkipProfiles
+    Skip loading PowerShell profiles for a clean build
+.PARAMETER Verbose
+    Show verbose output during build process
+.EXAMPLE
+    .\build-busbuddy-simple.ps1 -Verbose
 #>
 
 param(
-    [switch]$Verbose,
-    [switch]$SkipProfiles
+    [switch]$SkipProfiles,
+    [switch]$Verbose
 )
 
-# Set error handling
-$ErrorActionPreference = "Stop"
+# Setup
+$ErrorActionPreference = "Continue"
+$VerbosityLevel = if ($Verbose) { "normal" } else { "quiet" }
+$StartTime = Get-Date
 
-try {
-    Write-Host "=== BusBuddy Build Script ===" -ForegroundColor Cyan
-    Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)" -ForegroundColor Gray
-    Write-Host "Working Directory: $PWD" -ForegroundColor Gray
-    Write-Host ""
-
-    # Step 1: Set location
-    Write-Host "Step 1: Setting location..." -ForegroundColor Yellow
-    Set-Location 'C:\Users\biges\Desktop\BusBuddy\BusBuddy'
-    Write-Host "✅ Location set to: $PWD" -ForegroundColor Green
-    Write-Host ""
-
-    # Step 2: Check .NET SDK
-    Write-Host "Step 2: Checking .NET SDK..." -ForegroundColor Yellow
-    $dotnetVersion = dotnet --version 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ .NET SDK Version: $dotnetVersion" -ForegroundColor Green
-    } else {
-        throw ".NET SDK not found or not working"
-    }
-    Write-Host ""
-
-    # Step 3: Check solution file
-    Write-Host "Step 3: Checking solution file..." -ForegroundColor Yellow
-    if (Test-Path 'BusBuddy.sln') {
-        Write-Host "✅ BusBuddy.sln found" -ForegroundColor Green
-    } else {
-        throw "BusBuddy.sln not found"
-    }
-    Write-Host ""
-
-    # Step 4: Load profiles (optional)
-    if (-not $SkipProfiles) {
-        Write-Host "Step 4: Checking for BusBuddy profiles..." -ForegroundColor Yellow
-        if (Test-Path '.\load-bus-buddy-profiles.ps1') {
-            Write-Host "Found load-bus-buddy-profiles.ps1, attempting to load..." -ForegroundColor Cyan
-            try {
-                & '.\load-bus-buddy-profiles.ps1' -ErrorAction Stop
-                Write-Host "✅ Profiles loaded successfully" -ForegroundColor Green
-
-                # Check for bb-build command
-                if (Get-Command bb-build -ErrorAction SilentlyContinue) {
-                    Write-Host "✅ bb-build command available" -ForegroundColor Green
-                    $useBbBuild = $true
-                } else {
-                    Write-Host "⚠️ bb-build command not found, using dotnet build" -ForegroundColor Yellow
-                    $useBbBuild = $false
-                }
-            } catch {
-                Write-Host "❌ Error loading profiles: $($_.Exception.Message)" -ForegroundColor Red
-                Write-Host "Continuing with direct dotnet build..." -ForegroundColor Yellow
-                $useBbBuild = $false
-            }
-        } else {
-            Write-Host "⚠️ load-bus-buddy-profiles.ps1 not found" -ForegroundColor Yellow
-            $useBbBuild = $false
-        }
-    } else {
-        Write-Host "Step 4: Skipping profile loading (SkipProfiles flag set)" -ForegroundColor Yellow
-        $useBbBuild = $false
-    }
-    Write-Host ""
-
-    # Step 5: Build
-    Write-Host "Step 5: Building solution..." -ForegroundColor Yellow
-    if ($useBbBuild) {
-        Write-Host "🔨 Using bb-build from profile..." -ForegroundColor Cyan
-        bb-build
-    } else {
-        Write-Host "🔨 Using direct dotnet build..." -ForegroundColor Cyan
-        $verbosityLevel = if ($Verbose) { "normal" } else { "minimal" }
-        dotnet build BusBuddy.sln --verbosity $verbosityLevel
-    }
-
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host ""
-        Write-Host "✅ Build completed successfully!" -ForegroundColor Green
-    } else {
-        throw "Build failed with exit code: $LASTEXITCODE"
-    }
-
-} catch {
-    Write-Host ""
-    Write-Host "❌ Build failed: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "PowerShell Version: $($PSVersionTable.PSVersion)" -ForegroundColor Gray
-    Write-Host "Working Directory: $PWD" -ForegroundColor Gray
-    exit 1
+function Write-Status {
+    param([string]$Message, [string]$Color = "White")
+    Write-Host $Message -ForegroundColor $Color
 }
+
+Write-Status "🔨 Building BusBuddy solution..." -Color Cyan
+
+# 1. Clean solution first
+Write-Status "   Cleaning solution..." -Color Gray
+dotnet clean BusBuddy.sln --verbosity $VerbosityLevel
+if ($LASTEXITCODE -ne 0) {
+    Write-Status "❌ Clean failed with exit code $LASTEXITCODE" -Color Red
+    exit $LASTEXITCODE
+}
+
+# 2. Restore packages
+Write-Status "   Restoring packages..." -Color Gray
+dotnet restore BusBuddy.sln --verbosity $VerbosityLevel
+if ($LASTEXITCODE -ne 0) {
+    Write-Status "❌ Package restore failed with exit code $LASTEXITCODE" -Color Red
+    exit $LASTEXITCODE
+}
+
+# 3. Build solution
+Write-Status "   Building solution..." -Color Gray
+dotnet build BusBuddy.sln --verbosity $VerbosityLevel --no-restore
+if ($LASTEXITCODE -ne 0) {
+    Write-Status "❌ Build failed with exit code $LASTEXITCODE" -Color Red
+    exit $LASTEXITCODE
+}
+
+# 4. Verify core DLL exists - search in multiple possible locations
+$possiblePaths = @(
+    "BusBuddy.Core\bin\Debug\net9.0-windows\BusBuddy.Core.dll",
+    ".\BusBuddy.Core\bin\Debug\net9.0-windows\BusBuddy.Core.dll",
+    "BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll",
+    ".\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll",
+    "BusBuddy.Core\bin\Debug\net8.0\BusBuddy.Core.dll",
+    ".\BusBuddy.Core\bin\Debug\net8.0\BusBuddy.Core.dll"
+)
+
+$dllExists = $false
+$foundPath = ""
+
+foreach ($path in $possiblePaths) {
+    if (Test-Path $path) {
+        $dllExists = $true
+        $foundPath = $path
+        break
+    }
+}
+
+if ($dllExists) {
+    Write-Status "✅ Build completed successfully - Core DLL found at: $foundPath" -Color Green
+}
+else {
+    Write-Status "❓ Looking for DLL in all bin directories..." -Color Yellow
+    # Search for the DLL in all bin directories
+    $searchResults = Get-ChildItem -Path . -Recurse -Filter "BusBuddy.Core.dll" -ErrorAction SilentlyContinue
+    if ($searchResults.Count -gt 0) {
+        Write-Status "✅ Found Core DLL at: $($searchResults[0].FullName)" -Color Green
+        $dllExists = $true
+    }
+    else {
+        Write-Status "❌ Build completed but Core DLL not found!" -Color Red
+        Write-Status "   Tried paths: $($possiblePaths -join ', ')" -Color Yellow
+        exit 1
+    }
+}
+
+$duration = (Get-Date) - $StartTime
+Write-Status "⏱️ Build duration: $($duration.TotalSeconds.ToString('0.00')) seconds" -Color Cyan
