@@ -1306,6 +1306,16 @@ function Start-BusBuddyRepositoryAlignment {
 #region Build and Development Functions
 
 #Requires -Version 7.5
+<#
+.SYNOPSIS
+    Build the Bus Buddy solution with enhanced problem capture and analysis.
+
+.DESCRIPTION
+    Compiles the Bus Buddy solution with comprehensive error reporting, problem capture from VS Code,
+    and automated analysis for fix recommendations. Integrates with BusBuddy's error analysis system.
+    The build process includes WPF form compilation, XAML validation, resource embedding, code analysis,
+    incremental compilation, and detailed diagnostics. After the build completes, the solution is ready to run using bb-run.
+#>
 function Invoke-BusBuddyBuild {
     <#
     .SYNOPSIS
@@ -1315,20 +1325,29 @@ function Invoke-BusBuddyBuild {
         Compiles the Bus Buddy solution with comprehensive error reporting, problem capture from VS Code,
         and automated analysis for fix recommendations. Integrates with BusBuddy's error analysis system.
 
+        The build process includes:
+        - WPF form compilation and XAML validation
+        - Resource embedding and localization
+        - Code analysis and enforcement of coding standards
+        - Incremental compilation for faster builds
+        - Detailed error reporting and diagnostics
+
+        After the build completes, the solution is ready to run using bb-run.
+
     .PARAMETER Configuration
         Build configuration (Debug/Release)
 
     .PARAMETER Clean
-        Clean before building
+        Clean before building to ensure a fresh build
 
     .PARAMETER Restore
-        Restore packages before building
+        Restore packages before building to ensure all dependencies are available
 
     .PARAMETER Verbosity
-        MSBuild verbosity level
+        MSBuild verbosity level (quiet, minimal, normal, detailed, diagnostic)
 
     .PARAMETER NoLogo
-        Suppress logo and startup banner
+        Suppress logo and startup banner for cleaner output
 
     .PARAMETER RunAnalysis
         Run PowerShell static analysis after successful build
@@ -1338,6 +1357,19 @@ function Invoke-BusBuddyBuild {
 
     .PARAMETER CaptureProblemList
         Capture problems from VS Code's problem list for analysis
+
+    .EXAMPLE
+        bb-build
+        # Standard build with default settings
+
+    .EXAMPLE
+        bb-build -Clean -Restore
+        # Full rebuild with package restoration
+
+    .EXAMPLE
+        bb-build -Configuration Release -RunAnalysis
+        # Release build with static analysis
+    #>
 
     .PARAMETER AnalyzeProblems
         Analyze captured problems and provide fix recommendations
@@ -1949,22 +1981,36 @@ Generated: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 function Invoke-BusBuddyRun {
     <#
     .SYNOPSIS
-        Run the Bus Buddy WPF application
+        Run the Bus Buddy WPF application with interactive forms
 
     .DESCRIPTION
-        Launches the Bus Buddy WPF application with optional build and debugging options
+        Launches the Bus Buddy WPF application with optional build and debugging options.
+        This command displays the full UI with interactive forms and visual components,
+        enabling complete functionality testing.
 
     .PARAMETER Configuration
-        Build configuration to run
+        Build configuration to run (Debug or Release)
 
     .PARAMETER NoBuild
-        Skip building before running
+        Skip building before running - use when you've already built the solution
 
-    .PARAMETER Debug
-        Run with debugging enabled
+    .PARAMETER EnableDebug
+        Run with debugging enabled for detailed runtime diagnostics
 
     .PARAMETER Arguments
         Additional arguments to pass to the application
+
+    .EXAMPLE
+        bb-run
+        # Launches the BusBuddy application with default settings
+
+    .EXAMPLE
+        bb-run -NoBuild
+        # Launches the application without rebuilding (faster when developing UI)
+
+    .EXAMPLE
+        bb-run -EnableDebug -Configuration Release
+        # Launches the application in release mode with debugging enabled
     #>
     [CmdletBinding()]
     param(
@@ -1998,7 +2044,7 @@ function Invoke-BusBuddyRun {
         # Build first unless skipped
         if (-not $NoBuild) {
             Write-Host "🔨 Building before launch..." -ForegroundColor Yellow
-            $buildSuccess = Invoke-BusBuddyBuild -Configuration $Configuration -Verbosity quiet
+            $buildSuccess = InvokeBusBuddyBuild -Configuration $Configuration -Verbosity quiet
             if (-not $buildSuccess) {
                 Write-BusBuddyStatus "Build failed, cannot run application" -Status Error
                 return $false
@@ -2039,22 +2085,43 @@ function Invoke-BusBuddyRun {
 function Invoke-BusBuddyTest {
     <#
     .SYNOPSIS
-        Run Bus Buddy tests
+        Run Bus Buddy automated test suite
 
     .DESCRIPTION
-        Executes the test suite with comprehensive reporting and coverage options
+        Executes the test suite with comprehensive reporting and coverage options.
+        This command runs unit tests, integration tests, and UI tests with configurable
+        filters and output formats. Supports both automated CI/CD pipelines and
+        interactive development workflows.
+
+        Test categories include:
+        - Core service tests
+        - WPF form validation
+        - Data layer integration
+        - End-to-end scenarios
 
     .PARAMETER Configuration
-        Test configuration
+        Test configuration (Debug/Release)
 
     .PARAMETER Filter
-        Test filter expression
+        Test filter expression to run specific tests (e.g., "Category=UnitTest")
 
     .PARAMETER Coverage
-        Generate code coverage report
+        Generate code coverage report showing test coverage metrics
 
     .PARAMETER Logger
-        Test logger configuration
+        Test logger configuration for output formatting
+
+    .EXAMPLE
+        bb-test
+        # Run all tests with default configuration
+
+    .EXAMPLE
+        bb-test -Filter "FullyQualifiedName~UITest"
+        # Run only UI-related tests
+
+    .EXAMPLE
+        bb-test -Coverage -Configuration Release
+        # Run tests in release mode with code coverage report
     #>
     [CmdletBinding()]
     param(
@@ -2234,7 +2301,7 @@ function Start-BusBuddyDevSession {
     # Optional build
     if (-not $SkipBuild) {
         Write-BusBuddyStatus "Building solution..." -Status Build
-        $buildResult = Invoke-BusBuddyBuild -Configuration Debug -Restore
+        $buildResult = InvokeBusBuddyBuild -Configuration Debug -Restore
         if (-not $buildResult) {
             Write-BusBuddyStatus "Build failed - development session incomplete" -Status Error
             return $false
@@ -2271,13 +2338,36 @@ function Invoke-BusBuddyHealthCheck {
         Perform comprehensive health check of the Bus Buddy project
 
     .DESCRIPTION
-        Analyzes project structure, dependencies, code quality, and configuration
+        Analyzes project structure, dependencies, code quality, and configuration.
+        This command verifies that all components are properly connected and
+        identifies potential issues before they affect development or deployment.
+
+        Health checks include:
+        - Solution integrity
+        - Project references
+        - NuGet package consistency
+        - Build environment
+        - WPF forms validation
+        - PowerShell execution policy
+        - Git repository state
 
     .PARAMETER Quick
-        Perform quick health check only
+        Perform quick health check only (faster but less comprehensive)
 
     .PARAMETER Detailed
-        Include detailed analysis and recommendations
+        Include detailed analysis and recommendations for all components
+
+    .EXAMPLE
+        bb-health
+        # Run standard health check with balanced speed and thoroughness
+
+    .EXAMPLE
+        bb-health -Quick
+        # Run fast health check for quick verification
+
+    .EXAMPLE
+        bb-health -Detailed
+        # Run comprehensive health check with in-depth analysis and recommendations
     #>
     [CmdletBinding()]
     param(
@@ -3186,7 +3276,7 @@ function Invoke-BusBuddyErrorAnalysis {
 #region Module Aliases and Exports
 
 # Core development aliases
-Set-Alias -Name 'bb-build' -Value 'Invoke-BusBuddyBuild' -Description 'Build Bus Buddy solution'
+Set-Alias -Name 'bb-build' -Value 'InvokeBusBuddyBuild' -Description 'Build Bus Buddy solution'
 Set-Alias -Name 'bb-run' -Value 'Invoke-BusBuddyRun' -Description 'Run Bus Buddy application'
 Set-Alias -Name 'bb-test' -Value 'Invoke-BusBuddyTest' -Description 'Run Bus Buddy tests'
 Set-Alias -Name 'bb-clean' -Value 'Invoke-BusBuddyClean' -Description 'Clean build artifacts'
@@ -3807,7 +3897,7 @@ function Invoke-BusBuddyDevWorkflow {
         }
 
         # Build with enhanced analysis
-        $buildResult = Invoke-BusBuddyBuild -Configuration Debug -Restore -Verbosity normal
+        $buildResult = InvokeBusBuddyBuild -Configuration Debug -Restore -Verbosity normal
         $workflowResults.BuildSuccess = $buildResult
 
         if (-not $buildResult) {
@@ -4870,6 +4960,7 @@ function Get-BusBuddyMentor {
     .DESCRIPTION
         Provides contextual learning assistance, documentation links, and interactive tutorials
         for mastering BusBuddy technologies including PowerShell, WPF, Entity Framework, and Azure.
+        The mentor is self-documenting and provides integrated help for all BusBuddy commands.
 
     .PARAMETER Topic
         Technology or concept to learn about (PowerShell, WPF, EntityFramework, Azure, MVVM, etc.)
@@ -4888,6 +4979,18 @@ function Get-BusBuddyMentor {
 
     .PARAMETER Interactive
         Start an interactive learning session
+
+    .EXAMPLE
+        bb-mentor WPF
+        # Shows documentation and guidance for WPF development
+
+    .EXAMPLE
+        bb-mentor -Topic Forms -IncludeExamples
+        # Provides examples of working with WPF forms
+
+    .EXAMPLE
+        bb-mentor PowerShell -AdvancedMode
+        # Displays advanced PowerShell techniques for BusBuddy
 
     .EXAMPLE
         Get-BusBuddyMentor -Topic "PowerShell"

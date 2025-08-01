@@ -399,5 +399,161 @@ function global:Get-BusBuddyDiagnostic {
 Set-Alias -Name "bb-health" -Value Get-BusBuddyHealth
 Set-Alias -Name "bb-diagnostic" -Value Get-BusBuddyDiagnostic
 
+function global:Enable-BusBuddyUIDebug {
+    <#
+    .SYNOPSIS
+        Toggles WPF UI debug mode using Syncfusion SfSkinManager themes
+    .DESCRIPTION
+        This function enables or disables UI debugging features for BusBuddy WPF application.
+        It can toggle the visibility of UI elements, change themes for debugging, and enable
+        performance visualization to help diagnose UI-related issues.
+    .PARAMETER Mode
+        Specifies the UI debug mode to enable:
+        - Normal: Standard UI with no debug overlays
+        - Layout: Shows layout boundaries and grid lines
+        - Performance: Shows performance metrics for UI elements
+        - Verbose: Maximum debug information shown
+        - Toggle: Cycles through debug modes
+    .PARAMETER Theme
+        Specifies the Syncfusion theme to use:
+        - FluentDark: Default dark theme (default)
+        - FluentLight: Light theme for better visibility of some elements
+        - Material: Material design theme for contrast testing
+        - Office2019: Office theme for comparison
+    .PARAMETER OutputToFile
+        When specified, outputs debug information to a file
+    .PARAMETER EnableLogging
+        Enables additional UI-related logging
+    .EXAMPLE
+        Enable-BusBuddyUIDebug -Mode Layout
+        Shows layout boundaries and grid lines for UI debugging
+    .EXAMPLE
+        Enable-BusBuddyUIDebug -Mode Toggle -Theme FluentLight
+        Cycles to next debug mode with FluentLight theme
+    .OUTPUTS
+        PSObject with current debug settings
+    .NOTES
+        This function requires BusBuddy WPF application to be running
+        This function is aliased to bb-debug-ui for convenience
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Normal', 'Layout', 'Performance', 'Verbose', 'Toggle')]
+        [string]$Mode = 'Toggle',
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('FluentDark', 'FluentLight', 'Material', 'Office2019')]
+        [string]$Theme = 'FluentDark',
+
+        [Parameter(Mandatory = $false)]
+        [switch]$OutputToFile,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$EnableLogging
+    )
+
+    Write-Host "🎨 BusBuddy UI Debug Mode" -ForegroundColor Cyan
+    Write-Host "════════════════════════" -ForegroundColor DarkGray
+
+    $processName = "BusBuddy.WPF"
+    $process = Get-Process -Name $processName -ErrorAction SilentlyContinue
+
+    if (-not $process) {
+        Write-Host "❌ BusBuddy WPF application is not running." -ForegroundColor Red
+        Write-Host "💡 Start the application first with 'bb-run'" -ForegroundColor Yellow
+        return $false
+    }
+
+    Write-Host "✅ BusBuddy WPF application detected (PID: $($process.Id))" -ForegroundColor Green
+
+    # Construct debug settings
+    $debugSettings = @{
+        Mode = $Mode
+        Theme = $Theme
+        EnableLogging = $EnableLogging.IsPresent
+        ProcessId = $process.Id
+        Timestamp = Get-Date
+    }
+
+    try {
+        # Find current directory to place temp file for IPC
+        $projectRoot = Get-BusBuddyProjectRoot
+        if (-not $projectRoot) {
+            $projectRoot = [System.IO.Path]::GetTempPath()
+        }
+
+        $debugCommandFile = Join-Path $projectRoot "bb_ui_debug_command.json"
+        $debugResponseFile = Join-Path $projectRoot "bb_ui_debug_response.json"
+
+        # Write command file for the application to pick up
+        $debugSettings | ConvertTo-Json | Out-File -FilePath $debugCommandFile -Encoding UTF8 -Force
+
+        # Notify the application
+        Write-Host "📤 Sending debug command to BusBuddy application..." -ForegroundColor Yellow
+
+        # We need to use the DebugHelper class in the application via command line arguments
+        # Start a separate monitoring process to capture the response
+        $monitorScript = @"
+`$debugResponseFile = '$debugResponseFile'
+`$maxWaitTime = 10  # seconds
+`$waitCount = 0
+
+while (-not (Test-Path `$debugResponseFile) -and `$waitCount -lt `$maxWaitTime) {
+    Start-Sleep -Seconds 1
+    `$waitCount++
+}
+
+if (Test-Path `$debugResponseFile) {
+    `$response = Get-Content `$debugResponseFile -Raw | ConvertFrom-Json
+    `$response
+    Remove-Item `$debugResponseFile -Force
+} else {
+    @{ Success = `$false; Error = "Timeout waiting for application response" }
+}
+"@
+
+        # Create a temporary script file
+        $monitorScriptPath = Join-Path $projectRoot "bb_ui_debug_monitor.ps1"
+        $monitorScript | Out-File -FilePath $monitorScriptPath -Encoding UTF8 -Force
+
+        # Start the monitor process
+        $monitorJob = Start-Job -ScriptBlock {
+            param($scriptPath)
+            & pwsh -NoProfile -ExecutionPolicy Bypass -File $scriptPath
+        } -ArgumentList $monitorScriptPath
+
+        # Wait for the response
+        Write-Host "⏳ Waiting for application response..." -ForegroundColor Yellow
+        $response = $monitorJob | Wait-Job -Timeout 10 | Receive-Job
+
+        # Clean up
+        Remove-Item $monitorScriptPath -Force -ErrorAction SilentlyContinue
+        Remove-Item $debugCommandFile -Force -ErrorAction SilentlyContinue
+
+        if ($response -and $response.Success) {
+            Write-Host "✅ UI Debug mode successfully set to '$($response.ActiveMode)' with theme '$($response.ActiveTheme)'" -ForegroundColor Green
+
+            if ($OutputToFile) {
+                $outputPath = Join-Path $projectRoot "BusBuddy_UI_Debug_$(Get-Date -Format 'yyyyMMdd_HHmmss').json"
+                $response | ConvertTo-Json -Depth 3 | Out-File -FilePath $outputPath -Encoding UTF8
+                Write-Host "📄 Debug information saved to: $outputPath" -ForegroundColor Blue
+            }
+
+            return $response
+        } else {
+            Write-Host "❌ Failed to set UI Debug mode: $($response.Error)" -ForegroundColor Red
+            return $false
+        }
+    }
+    catch {
+        Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Stack Trace: $($_.ScriptStackTrace)" -ForegroundColor DarkGray
+        return $false
+    }
+}
+
+Set-Alias -Name "bb-debug-ui" -Value Enable-BusBuddyUIDebug
+
 # Export functions
-Export-ModuleMember -Function Get-BusBuddyHealth, Get-BusBuddyDiagnostic -Alias bb-health, bb-diagnostic
+Export-ModuleMember -Function Get-BusBuddyHealth, Get-BusBuddyDiagnostic, Enable-BusBuddyUIDebug -Alias bb-health, bb-diagnostic, bb-debug-ui

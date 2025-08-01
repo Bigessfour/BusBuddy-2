@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:analytics="clr-namespace:BusBuddy.WPF.Views.Analytics"
+        xmlns:local="clr-namespace:BusBuddy.WPF.Views"
         mc:Ignorable="d"
         Title="🚌 Bus Buddy - Transportation Management"
         Height="800"
@@ -87,8 +88,8 @@
 
             <!-- Content Area -->
             <Frame Grid.Column="1"
-                    x:Name="ContentFrame"
-                    NavigationUIVisibility="Hidden"/>
+                   x:Name="ContentFrame"
+                   NavigationUIVisibility="Hidden" />
         </Grid>
 
         <!-- Status Bar -->

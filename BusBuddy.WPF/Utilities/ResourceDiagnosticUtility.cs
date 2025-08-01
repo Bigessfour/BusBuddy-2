@@ -16,7 +16,6 @@ namespace BusBuddy.WPF.Utilities
         /// Logs all embedded resources found in the specified assembly
         /// </summary>
         /// <param name="assemblyName">The name of the assembly to inspect</param>
-        /// <param name="logger">Logger instance for output</param>
         public static void LogAllEmbeddedResources(string assemblyName)
         {
             try
@@ -70,7 +69,6 @@ namespace BusBuddy.WPF.Utilities
         /// <param name="assemblyName">The name of the assembly containing the resource</param>
         /// <param name="resourceName">The name of the resource to extract</param>
         /// <param name="outputPath">The path where the resource should be saved</param>
-        /// <param name="logger">Logger instance for output</param>
         /// <returns>True if successful, false otherwise</returns>
         public static bool ExtractResourceToFile(string assemblyName, string resourceName, string outputPath)
         {
@@ -110,7 +108,6 @@ namespace BusBuddy.WPF.Utilities
         /// <summary>
         /// Logs information about all loaded assemblies in the current AppDomain
         /// </summary>
-        /// <param name="logger">Logger instance for output</param>
         public static void LogLoadedAssemblies()
         {
             try

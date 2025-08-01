@@ -30,6 +30,7 @@
 
   <!-- 🏗️ CORE PROJECT REFERENCE -->
   <ItemGroup>
+    <!-- MainWindow.xaml and MainWindow.xaml.cs are handled by default WPF build targets. Removed explicit entries to fix duplicate compile items error. -->
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
   </ItemGroup>
 
@@ -183,7 +184,7 @@
 
     <!-- 📄 PDF AND DOCUMENT PACKAGES -->
     <PackageReference Include="Syncfusion.SfSpreadsheet.WPF" Version="$(SyncfusionVersion)" />
-    <PackageReference Include="Syncfusion.Edit.WPF" Version="$(SyncfusionVersion)" />
+    <!-- Removed Syncfusion.Edit.WPF - not needed for MVP Phase 1, causing MetadataLoadContext version conflicts -->
 
     <!-- 🗂️ LEGACY GRID SUPPORT -->
     <PackageReference Include="Syncfusion.Grid.WPF" Version="$(SyncfusionVersion)" />
@@ -195,7 +196,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
-    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.1" />
+    <!-- Removed direct reference to System.Reflection.MetadataLoadContext to resolve version conflict with Syncfusion.Edit.WPF -->
   </ItemGroup>
 
   <!-- 🧹 CLEAN CONFIGURATION -->
@@ -212,4 +213,7 @@
     <!-- No need for Thread enricher here - it's in Directory.Build.props -->
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Removed manual WPF references; these are included automatically by <UseWPF>true> and the SDK -->
+  </ItemGroup>
 </Project>
