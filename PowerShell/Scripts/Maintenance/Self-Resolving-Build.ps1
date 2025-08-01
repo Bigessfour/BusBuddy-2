@@ -51,9 +51,20 @@ function Test-SelfLockScenario {
     Write-SelfResolveStatus "Checking for self-lock scenario..." "Process"
 
     $currentPID = $PID
-    $dllPath = ".\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll"
+    $possibleDllPaths = @(
+        ".\BusBuddy.Core\bin\Debug\net9.0-windows\BusBuddy.Core.dll",
+        ".\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll"
+    )
 
-    if (-not (Test-Path $dllPath)) {
+    $dllPath = $null
+    foreach ($path in $possibleDllPaths) {
+        if (Test-Path $path) {
+            $dllPath = $path
+            break
+        }
+    }
+
+    if (-not $dllPath) {
         Write-SelfResolveStatus "Target DLL not found, no self-lock possible" "Success"
         return $false
     }

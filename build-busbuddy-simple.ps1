@@ -55,9 +55,12 @@ if ($LASTEXITCODE -ne 0) {
 
 # 4. Verify core DLL exists - search in multiple possible locations
 $possiblePaths = @(
+    "BusBuddy.Core\bin\Debug\net9.0-windows\BusBuddy.Core.dll",
+    ".\BusBuddy.Core\bin\Debug\net9.0-windows\BusBuddy.Core.dll",
+    "BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll",
+    ".\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll",
     "BusBuddy.Core\bin\Debug\net8.0\BusBuddy.Core.dll",
-    ".\BusBuddy.Core\bin\Debug\net8.0\BusBuddy.Core.dll",
-    "..\BusBuddy.Core\bin\Debug\net8.0\BusBuddy.Core.dll"
+    ".\BusBuddy.Core\bin\Debug\net8.0\BusBuddy.Core.dll"
 )
 
 $dllExists = $false
