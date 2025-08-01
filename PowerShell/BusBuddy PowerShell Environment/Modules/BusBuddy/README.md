@@ -85,5 +85,5 @@ To add new functions:
 ## Requirements
 
 - PowerShell 7.5.2 or later
-- .NET 8.0 or later
+- .NET 9.0 or later
 - Windows OS
