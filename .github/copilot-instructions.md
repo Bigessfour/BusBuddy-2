@@ -1,57 +1,51 @@
-# GitHub Copilot Custom Instructions - Phase 1 Focused
+# GitHub Copilot Custom Instructions - BusBuddy MVP Focus
 
 This file contains custom instructions for GitHub Copilot when working with this repository.
 
-## 🎯 **PHASE 1 PRIORITY OVERRIDE**
+## 🎯 **MVP/PHASE 1 PRIORITY OVERRIDE**
 
-**CRITICAL: All instructions below are SECONDARY to Phase 1 Core Goals**
+**CRITICAL: All instructions below are SECONDARY to MVP Core Goals**
 
-### **Phase 1 Mission (30 Minutes)**
+### **MVP Mission (30 Minutes)**
 - **PRIMARY GOAL**: MainWindow → Dashboard → 3 Core Views (Drivers, Vehicles, Activity Schedule) with real-world data
 - **FUNCTIONAL OVER PERFECT**: Get it working first, optimize later
 - **NO COMPREHENSIVE REWRITES**: Fix specific issues, build incrementally
 - **PRESERVE EXISTING WORK**: Enhance and repair rather than replace
 
-### **Phase 1 Development Standards**
+### **MVP Development Standards**
 - ✅ **Build without errors** - Priority #1
-- 🔒 **MANDATORY PowerShell 7.5.2 Syntax** - All PowerShell scripts MUST pass syntax validation
-- 🤖 **MANDATORY AI Integration** - Use PSAISuite with xAI Grok-4-0709 for ALL code generation (see Documentation/AI-TOOLS-USAGE-STANDARDS.md)
-- ✅ **Basic data display** - ListView/DataGrid sufficient for now
+- ✅ **Simple UI Pattern** - Implement only basic MainWindow → Dashboard → 3 Core Views
+- ✅ **Basic data display** - Syncfusion DataGrid/ListView sufficient for Phase 1
+- ✅ **Direct data access** - Use simple DbContext with basic EF queries
 - ✅ **Real transportation data** - 15-20 drivers, 10-15 vehicles, 25-30 activities
+- ✅ **Basic error handling** - Try/catch blocks with MessageBox.Show for user feedback
 - ⚠️ **Defer to Phase 2**: Advanced MVVM, comprehensive testing, performance optimization
 - ⚠️ **Defer to Phase 2**: Advanced styling, complex validation, external integrations
+- ⚠️ **Defer to Phase 2**: AI/Grok integration through C# services (not PowerShell)
 
-### **MANDATORY PowerShell 7.5.2 Enforcement**
-- **Syntax Enforcer**: Use `Tools\Scripts\PowerShell-7.5.2-Syntax-Enforcer.ps1` for ALL PowerShell scripts
-- **Build Integration**: Syntax validation is automatically run in all build pipelines
-- **No Exceptions**: All PowerShell scripts MUST include `#Requires -Version 7.5` directive
-- **Template Usage**: Use `New-PowerShell752Template` for all new PowerShell scripts
-- **Validation Command**: `Invoke-MandatorySyntaxCheck -Path . -ExitOnFail` blocks deployment on failures
+### **MVP Batch Commands and .NET CLI**
+- **Direct Build**: Use `dotnet build BusBuddy.WPF/BusBuddy.WPF.csproj` for builds
+- **Direct Run**: Use `dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj` for running
+- **Error Capture**: Use `run-with-error-capture.bat` to capture runtime errors
+- **Health Check**: Use `check-health.bat` for quick project health validation
+- **Clean Build**: Use `dotnet clean BusBuddy.sln && dotnet restore BusBuddy.sln && dotnet build BusBuddy.sln`
 
-### **MANDATORY PowerShell 7.5.2 Profile Loading**
-- **Main Profile**: Always load `PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1` (5434 lines)
-- **Loading Command**: `pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"`
-- **Module Features**: Parallel processing, enhanced error handling, threading, and comprehensive workflow automation
-- **Integration**: All build tasks, debug operations, and development workflows depend on this profile
-- **Size**: 5,434 lines of PowerShell 7.5.2 code fully optimized for .NET 8 runtime
+### **MVP Common Build Fixes**
+- **For NU1605 Package Errors**: Update `Directory.Packages.props` versions
+- **For NU1601 Package Warnings**: Match versions in central props with actual restored
+- **For MSB3277 Assembly Conflicts**: Standardize versions in `Directory.Packages.props`
+- **For XamlParseException**: Check namespaces and XAML syntax
+- **Syncfusion Version**: Current Syncfusion version is 30.1.42
+- **For NuGet Cache Issues**: Run `dotnet nuget locals all --clear`
 
-### **Enhanced Task Monitoring Standards**
-- **Enhanced Task Monitor**: Use `enhanced-task-monitor-fixed.ps1` for ALL builds/runs
-- **Output Capture**: All task output saved to timestamped log files in `logs/` directory
-- **Real-time Feedback**: Show build/run progress with comprehensive error capture
-- **Process Completion Detection**: Wait for process completion and capture full output
-- **Incremental Fixes**: Use captured output to make targeted repairs, not rewrites
-
-### **Phase 1 Task Monitoring Commands**
-```powershell
-# Test the enhanced task monitor
-pwsh -ExecutionPolicy Bypass -File "enhanced-task-monitor-fixed.ps1" -TaskName "Build Test" -Command "dotnet" -Arguments "build","BusBuddy.sln" -WaitForCompletion -CaptureOutput -ShowRealTime
-
-# Use the helper functions
-& "enhanced-task-monitor-fixed.ps1"; Start-BusBuddyTask -TaskType Build
-& "enhanced-task-monitor-fixed.ps1"; Start-BusBuddyTask -TaskType Run
-& "enhanced-task-monitor-fixed.ps1"; Start-BusBuddyTask -TaskType Health
-```
+### **MVP Application Structure**
+- **MainWindow**: Entry point with navigation buttons to all core views
+- **Dashboard**: Shows metrics (driver/vehicle counts) and recent activities
+- **Drivers View**: Shows driver list with basic CRUD operations
+- **Vehicles View**: Shows vehicle list with basic CRUD operations  
+- **Activities View**: Shows activity schedule with basic CRUD operations
+- **Simple Navigation**: Direct `ContentFrame.Navigate(new DriversView())` calls
+- **Basic ViewModels**: Simple `ObservableCollection<T>` and direct EF queries
 
 ### **Phase 1 Problem Resolution Approach**
 - **Incremental fixes first** - Always attempt targeted edits before complete rebuilds
@@ -95,6 +89,17 @@ catch (Exception ex)
 - Ensure no XML comment ends with a dash character (`-`) by adding a space or period if needed
 - Always validate XML comment syntax to ensure it's well-formed
 - When adding new comments, use em dashes (`—`) instead of double dashes
+
+## MVP Milestones - Phase 1
+
+- ✅ **Build Without Errors**: Fix all build errors and warnings
+- ✅ **Main Application Window**: Create functional MainWindow with navigation
+- ✅ **Dashboard View**: Create Dashboard view with basic metrics
+- ✅ **Drivers View**: Implement Drivers view with basic CRUD operations
+- ✅ **Vehicles View**: Implement Vehicles view with basic CRUD operations
+- ✅ **Activities View**: Implement Activities view with basic CRUD operations
+- ✅ **Real Data**: Populate views with real transportation data
+- ✅ **Basic Error Handling**: Implement simple try/catch blocks with user feedback
 
 ## File Organization and Structure Standards
 
@@ -352,18 +357,18 @@ var drivers = await context.Drivers.ToListAsync();
 
 ## Syncfusion Integration Standards
 
-- **Version 30.1.40**: This project uses Syncfusion Essential Studio for WPF version 30.1.40
+- **Version 30.1.42**: This project uses Syncfusion Essential Studio for WPF version 30.1.42
 - **Official Documentation**: [Syncfusion WPF Documentation](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf)
 - **Theme Documentation**: [FluentDark Theme Guide](https://help.syncfusion.com/wpf/themes/fluent-dark-theme)
 - **Control References**: [WPF Control Gallery](https://help.syncfusion.com/wpf/control-gallery)
 - **Migration Guides**: [Version Migration Documentation](https://help.syncfusion.com/wpf/upgrade-guide)
+- **Target Framework**: WPF projects targeting .NET 9.0-windows
 
-### Control-Specific Documentation Links
-- **DockingManager**: [DockingManager Documentation](https://help.syncfusion.com/wpf/docking/getting-started)
-- **NavigationDrawer**: [NavigationDrawer Documentation](https://help.syncfusion.com/wpf/navigation-drawer/getting-started)
-- **SfDataGrid**: [DataGrid Documentation](https://help.syncfusion.com/wpf/datagrid/getting-started)
-- **SfChart**: [Chart Documentation](https://help.syncfusion.com/wpf/charts/getting-started)
-- **RibbonControl**: [Ribbon Documentation](https://help.syncfusion.com/wpf/ribbon/getting-started)
+### MVP Core Controls for Phase 1
+- **SfDataGrid**: [DataGrid Documentation](https://help.syncfusion.com/wpf/datagrid/getting-started) - Used for all tabular data display
+- **DockingManager**: [DockingManager Documentation](https://help.syncfusion.com/wpf/docking/getting-started) - Used for main UI layout
+- **NavigationDrawer**: [NavigationDrawer Documentation](https://help.syncfusion.com/wpf/navigation-drawer/getting-started) - Used for side navigation
+- **SfChart**: [Chart Documentation](https://help.syncfusion.com/wpf/charts/getting-started) - Used for dashboard metrics
 
 ### Implementation Standards
 - **Theme Consistency**: Use FluentDark/FluentLight themes consistently across all Syncfusion controls
@@ -574,57 +579,55 @@ bb-report               # Generate comprehensive project report
 - **Error Recovery**: Implement graceful error recovery where possible
 - **Monitoring**: Include appropriate monitoring and telemetry for production systems
 
+## MVP Batch Command Integration
+
+### Quick Build and Run Commands
+```batch
+@REM Quick build
+dotnet build BusBuddy.WPF/BusBuddy.WPF.csproj
+
+@REM Quick run
+dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
+
+@REM Clean build
+dotnet clean BusBuddy.sln && dotnet restore BusBuddy.sln && dotnet build BusBuddy.sln
+```
+
+### Error Capture Commands
+```batch
+@REM Capture runtime errors
+check-health.bat
+
+@REM Run with error capture
+run-with-error-capture.bat
+```
+
+### Common Build Fixes
+```batch
+@REM Fix package cache issues
+dotnet nuget locals all --clear
+
+@REM Fix package restore issues
+dotnet restore BusBuddy.sln --force --no-cache
+
+@REM Validate build health
+dotnet build BusBuddy.sln --verbosity minimal
+```
+
 ## Troubleshooting Guide
-
-### Common PowerShell Errors and Solutions
-
-#### Execution Policy Errors
-```powershell
-# Error: Execution policy does not allow this script to run
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-#### Module Import Failures
-```powershell
-# Error: Module not found or cannot be imported
-Import-Module -Name ModuleName -Force -Verbose
-Get-Module -ListAvailable | Where-Object { $_.Name -like "*ModuleName*" }
-```
-
-#### Path Resolution Issues
-```powershell
-# Error: Path not found or cannot be resolved
-Test-Path -Path $variablePath -PathType Container
-Resolve-Path -Path $relativePath -ErrorAction SilentlyContinue
-```
-
-#### Parallel Execution Errors
-```powershell
-# Error: Parallel execution throttling or timeout
-$files | ForEach-Object -Parallel {
-    $using:function
-} -ThrottleLimit 2 -TimeoutSeconds 30
-```
-
-#### JSON Conversion Issues
-```powershell
-# Error: JSON depth exceeded or invalid JSON
-ConvertTo-Json -InputObject $data -Depth 10 -Compress
-ConvertFrom-Json -InputObject $jsonString -ErrorAction Stop
-```
 
 ### Common Build and Development Issues
 
 #### NuGet Package Restore Failures
 - **Solution**: Clear NuGet cache and restore packages
-  ```powershell
+  ```batch
   dotnet nuget locals all --clear
   dotnet restore --force --no-cache
   ```
 
 #### Entity Framework Migration Issues
 - **Solution**: Validate database connection and reset migrations if needed
-  ```powershell
+  ```batch
   dotnet ef database drop --force
   dotnet ef database update
   ```
@@ -642,46 +645,45 @@ ConvertFrom-Json -InputObject $jsonString -ErrorAction Stop
   xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
   ```
 
-#### Debug Output Filter Issues
-- **Solution**: Restart debug filter and validate configuration
-  ```powershell
-  bb-debug-start -Force
-  bb-health -Verbose
+#### Build Error Analysis
+- **Solution**: Use check-health.bat to analyze build errors
+  ```batch
+  check-health.bat
   ```
 
 ### Performance Troubleshooting
 
 #### High Memory Usage
-- **Monitor**: Use `bb-diagnostic` to check memory consumption patterns
+- **Monitor**: Use runtime monitoring with error capture
 - **Solution**: Implement proper disposal patterns and weak references
 - **Tools**: Use dotMemory or PerfView for detailed analysis
 
 #### Slow UI Response
 - **Monitor**: Check UI thread blocking and async operation completion
 - **Solution**: Move long-running operations to background threads
-- **Validation**: Use `BaseViewModel.ExecuteCommandAsync()` patterns
+- **Validation**: Use async/await patterns consistently in UI operations
 
 #### Database Connection Issues
 - **Monitor**: Enable EF Core logging and connection resilience metrics
-- **Solution**: Use `DatabaseOperationExtensions.SafeQueryAsync()` patterns
-- **Recovery**: Implement retry policies and circuit breaker patterns
+- **Solution**: Use proper error handling for database operations
+- **Recovery**: Implement retry policies for transient failures
 
 ### Development Environment Issues
 
-#### VS Code Task Failures
-- **Solution**: Use Task Explorer exclusively, avoid direct terminal commands
+#### Build Task Failures
+- **Solution**: Use direct .NET CLI commands for reliability
 - **Validation**: Check task configuration in `.vscode/tasks.json`
-- **Debugging**: Use `bb-diagnostic` to validate environment setup
+- **Debugging**: Use check-health.bat to validate project status
 
-#### PowerShell Profile Loading Issues
-- **Solution**: Validate profile paths and execution policies
-  ```powershell
-  Test-Path -Path $PROFILE.CurrentUserAllHosts
-  Get-ExecutionPolicy -List
+#### Environment Setup Issues
+- **Solution**: Verify .NET SDK installation and versions
+  ```batch
+  dotnet --info
+  dotnet --version
   ```
 
 #### Extension Compatibility Problems
-- **Required Extensions**: XAML Styler, Task Explorer, PowerShell
+- **Required Extensions**: XAML Styler, Task Explorer
 - **Solution**: Update extensions and validate compatibility with VS Code version
 - **Alternative**: Use VS Code Insiders for latest extension support
 
@@ -697,35 +699,18 @@ ConvertFrom-Json -InputObject $jsonString -ErrorAction Stop
 - **Check**: Ensure structured logging patterns with message templates
 - **Validation**: Use `Logger.Information()` instead of `Console.WriteLine()`
 
+### Error Capture with Batch Files
+
+#### Using run-with-error-capture.bat
+- **Purpose**: Captures application errors during runtime
+- **Usage**: Run directly from command prompt or VS Code task
+- **Output**: Saves errors to app_errors.log for analysis
+- **Benefits**: Provides clean error output without console clutter
+
+#### Using check-health.bat
+- **Purpose**: Performs comprehensive build health check
+- **Usage**: Run after build failures to analyze issues
+- **Output**: Displays formatted report of build errors
+- **Benefits**: Identifies common build issues and suggested fixes
+
 These instructions help maintain consistent code quality, architecture, and development practices throughout the project.
-
-## 🔒 **PowerShell 7.5.2 Development Environment (MANDATORY)**
-
-### Primary PowerShell Profile (5434 lines)
-- **File**: `PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1`
-- **Loading Script**: `load-bus-buddy-profiles.ps1` in project root
-- **Size**: 5,434 lines of advanced PowerShell 7.5.2 code
-- **Features**: Parallel processing, error handling, threading, comprehensive workflow automation
-- **Command Set**: 40+ specialized bb-* commands for development workflow
-
-### Loading Instructions
-- **REQUIRED**: Load at the beginning of EVERY development session:
-```powershell
-pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"
-```
-
-### Key Components
-- **Core Module**: 5,434-line BusBuddy.psm1 with complete workflow functionality
-- **Syntax Enforcer**: PowerShell-7.5.2-Syntax-Enforcer.ps1 for PowerShell 7.5.2 compliance
-- **AI Integration**: BusBuddy.AI module with xAI Grok-4-0709 connections
-- **Command Structure**: All commands follow bb-* naming convention
-
-### Integration Requirements
-- **Terminal Profile**: Configure VS Code terminal profile to auto-load PowerShell profile
-- **Task System**: All tasks should leverage PowerShell 7.5.2 profile functionality
-- **Error Handling**: All scripts must use PowerShell 7.5.2 error handling patterns
-- **Syntax Compliance**: All PowerShell code must pass Syntax Enforcer validation
-
-### Documentation Reference
-- **Comprehensive Reference**: `Documentation/PowerShell-7.5.2-Reference.md`
-- **Standards Guide**: `Documentation/POWERSHELL-7.5-FEATURES.md`

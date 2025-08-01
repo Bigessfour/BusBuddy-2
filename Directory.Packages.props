@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Global package versions -->
+  <PropertyGroup>
+    <!-- Framework versions -->
+    <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
+    <SerilogVersion>4.3.0</SerilogVersion>
+    <SyncfusionVersion>30.1.42</SyncfusionVersion>
+    <CsvHelperVersion>31.0.1</CsvHelperVersion>
+
+    <!-- Restore behavior to avoid duplicates -->
+    <UpdatePackageDependencies>false</UpdatePackageDependencies>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="System.Reflection.MetadataLoadContext" Version="9.0.1" />
+  </ItemGroup>
+</Project>

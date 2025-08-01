@@ -195,6 +195,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.1" />
   </ItemGroup>
 
   <!-- 🧹 CLEAN CONFIGURATION -->
@@ -206,17 +207,9 @@
 
   <!-- Fix for missing Serilog dependency -->
   <ItemGroup>
-    <!-- Complete Serilog stack with explicit references -->
-    <PackageReference Include="Serilog" Version="$(SerilogVersion)" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <!-- Debug sink not included in Directory.Build.props -->
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.2.0" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
-    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
-    <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.0.3" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
+    <!-- No need for Thread enricher here - it's in Directory.Build.props -->
   </ItemGroup>
 
 </Project>

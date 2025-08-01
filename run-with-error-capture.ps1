@@ -1,41 +1,48 @@
-#Requires -Version 7.5
-<#
-.SYNOPSIS
-    Complete build and error capture workflow for BusBuddy
-.DESCRIPTION
-    Builds the BusBuddy solution and then runs the error capture system
-.EXAMPLE
-    .\run-with-error-capture.ps1
-#>
+# PowerShell wrapper function for run-with-error-capture.bat
+# Adds this to BusBuddy's PowerShell toolkit while maintaining compatibility
 
-param(
-    [switch]$AutoFix,
-    [int]$TimeoutMinutes = 30
-)
+function Invoke-BusBuddyRunWithErrorCapture {
+    [CmdletBinding()]
+    param (
+        [switch]$ShowOutputLog,
+        [switch]$ShowErrorLog,
+        [switch]$SummaryOnly
+    )
 
-$ErrorActionPreference = "Continue"
+    Write-Host "Running BusBuddy with batch error capture..." -ForegroundColor Cyan
 
-# Step 1: Build the solution first
-Write-Host "🔨 Step 1: Building BusBuddy solution..." -ForegroundColor Cyan
-Write-Host "═══════════════════════════════════════════" -ForegroundColor DarkGray
+    # Run the batch file
+    $batchPath = Join-Path $PSScriptRoot "run-with-error-capture.bat"
+    $exitCode = cmd.exe /c "$batchPath" 2>&1
 
-& "$PSScriptRoot\build-busbuddy-simple.ps1"
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Build failed with exit code $LASTEXITCODE - cannot proceed with error capture" -ForegroundColor Red
-    exit $LASTEXITCODE
+    # Get the latest log files
+    $latestOutputLog = Get-ChildItem -Path "logs\app_output_*.log" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $latestErrorLog = Get-ChildItem -Path "logs\app_errors_*.log" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    if (-not $SummaryOnly) {
+        Write-Host "`nResults:" -ForegroundColor Yellow
+        Write-Host "  Output Log: $($latestOutputLog.FullName)" -ForegroundColor Gray
+        Write-Host "  Error Log:  $($latestErrorLog.FullName)" -ForegroundColor Gray
+        Write-Host "  Exit Code:  $exitCode" -ForegroundColor $(if ($exitCode -eq 0) { "Green" } else { "Red" })
+    }
+
+    # Show log content if requested
+    if ($ShowOutputLog -and $latestOutputLog) {
+        Write-Host "`n=== OUTPUT LOG ===" -ForegroundColor Yellow
+        Get-Content $latestOutputLog.FullName
+    }
+
+    if ($ShowErrorLog -and $latestErrorLog) {
+        Write-Host "`n=== ERROR LOG ===" -ForegroundColor Yellow
+        Get-Content $latestErrorLog.FullName
+    }
+
+    # Return the exit code
+    return [int]$exitCode
 }
 
-# Step 2: Run the error capture system
-Write-Host ""
-Write-Host "🔍 Step 2: Starting BusBuddy error capture system..." -ForegroundColor Cyan
-Write-Host "═══════════════════════════════════════════" -ForegroundColor DarkGray
+# Create alias
+Set-Alias -Name bb-run-batch -Value Invoke-BusBuddyRunWithErrorCapture
 
-$errorCaptureParams = @{
-    CaptureDirectory = "logs/runtime-errors"
-    TimeoutMinutes = $TimeoutMinutes
-}
-if ($AutoFix) {
-    $errorCaptureParams.Add("AutoFix", $true)
-}
-
-& "$PSScriptRoot\PowerShell\Scripts\Interactive-Runtime-Error-Capture.ps1" @errorCaptureParams
+# Export the function
+Export-ModuleMember -Function Invoke-BusBuddyRunWithErrorCapture -Alias bb-run-batch

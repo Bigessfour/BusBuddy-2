@@ -2,14 +2,17 @@
   <!-- 🚌 BusBuddy - Modern Foundation Configuration (.NET 9.0) -->
 
   <PropertyGroup>
+    <!-- Target Framework — Standardized for MVP stability -->
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
-    <!-- Modern Versions for .NET 9.0 Environment -->
+    <!-- Syncfusion Version — Standardized for MVP stability -->
     <SyncfusionVersion>30.1.42</SyncfusionVersion>
-    <EntityFrameworkVersion>9.0.0-preview.6.24327.4</EntityFrameworkVersion>
-    <SerilogVersion>4.0.2</SerilogVersion>
+    <!-- Entity Framework Version — Confirmed for .NET 9 compatibility -->
+    <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
+    <!-- Serilog Version — Pure Serilog, no Microsoft.Extensions -->
+    <SerilogVersion>4.3.0</SerilogVersion>
 
     <!-- INDUSTRY STANDARD: Practical Code Quality -->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -17,7 +20,8 @@
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)BusBuddy-Practical.ruleset</CodeAnalysisRuleSet>
 
     <!-- INDUSTRY STANDARD: Single-user desktop app settings -->
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- Documentation file generation enabled for public APIs — MVP compliance -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <!-- Temporarily relaxed null safety for development; re-enable later -->
     <!-- <WarningsAsErrors>CS8600;CS8601;CS8602;CS8618</WarningsAsErrors> -->
@@ -38,11 +42,11 @@
     <!-- Suppress low-impact warnings project-wide -->
     <NoWarn>$(NoWarn);CA1305;CA1860;CA1848;CA1851;CA1304</NoWarn>
 
-    <!-- Suppress nullable warnings for Phase 1 -->
+    <!-- Suppress nullable warnings for Phase 1 — MVP only -->
     <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8603;CS8604</NoWarn>
   </PropertyGroup>
 
-  <!-- Global Build Performance Optimization -->
+  <!-- Global Build Performance Optimization — MVP stability -->
   <PropertyGroup>
     <UseSharedCompilation>true</UseSharedCompilation>
     <BuildInParallel>true</BuildInParallel>
@@ -63,7 +67,7 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <!-- Test Project Specific Settings -->
+  <!-- Test Project Specific Settings — MVP stability -->
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
     <UseSharedCompilation>false</UseSharedCompilation>
     <BuildInParallel>false</BuildInParallel>
@@ -73,7 +77,7 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <!-- PURE SERILOG: No Microsoft.Extensions dependencies -->
+  <!-- PURE SERILOG: No Microsoft.Extensions dependencies — MVP stability -->
   <ItemGroup>
     <!-- Pure Serilog Configuration -->
     <PackageReference Include="Serilog" Version="$(SerilogVersion)" ExcludeAssets="None" PrivateAssets="None" />
@@ -84,16 +88,16 @@
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" ExcludeAssets="None" PrivateAssets="None" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" ExcludeAssets="None" PrivateAssets="None" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" ExcludeAssets="None" PrivateAssets="None" />
-    <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.0.3" ExcludeAssets="None" PrivateAssets="None" />
+    <PackageReference Include="Serilog.Enrichers.ClientInfo" Version="2.3.0" ExcludeAssets="None" PrivateAssets="None" />
     <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="3.0.1" ExcludeAssets="None" PrivateAssets="None" />
   </ItemGroup>
 
-  <!-- INDUSTRY STANDARD: Essential WPF behaviors -->
+  <!-- INDUSTRY STANDARD: Essential WPF behaviors — MVP stability -->
   <ItemGroup Condition="'$(UseWPF)' == 'true'">
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
   </ItemGroup>
 
-  <!-- INDUSTRY STANDARD: Syncfusion Professional Setup (WPF Projects Only) -->
+  <!-- INDUSTRY STANDARD: Syncfusion Professional Setup (WPF Projects Only) — MVP stability -->
   <ItemGroup Condition="'$(UseWPF)' == 'true'">
     <!-- Core Syncfusion - REQUIRED -->
     <PackageReference Include="Syncfusion.Licensing" Version="$(SyncfusionVersion)" />
@@ -111,14 +115,14 @@
     <PackageReference Include="Syncfusion.Themes.FluentDark.WPF" Version="$(SyncfusionVersion)" />
   </ItemGroup>
 
-  <!-- INDUSTRY STANDARD: Entity Framework for Business Apps -->
+  <!-- INDUSTRY STANDARD: Entity Framework for Business Apps — MVP stability -->
   <ItemGroup Condition="'$(ProjectName)' == 'BusBuddy.Core' OR '$(ProjectName)' == 'BusBuddy.WPF'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EntityFrameworkVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EntityFrameworkVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkVersion)" />
   </ItemGroup>
 
-  <!-- Global package references -->
+  <!-- Global package references — MVP stability -->
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" PrivateAssets="all" />

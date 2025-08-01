@@ -43,12 +43,8 @@
     <!-- Azure Authentication (Optional for Azure SQL Managed Identity) -->
     <PackageReference Include="Azure.Identity" Version="1.13.0" />
 
-    <!-- Serilog Extensions -->
-    <PackageReference Include="Serilog" Version="$(SerilogVersion)" />
+    <!-- Serilog Extensions - Extensions.Logging only, rest in Directory.Build.props -->
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
 
     <!-- 📄 Syncfusion PDF Generation for Core Services -->
     <PackageReference Include="Syncfusion.Pdf.NET" Version="$(SyncfusionVersion)" />

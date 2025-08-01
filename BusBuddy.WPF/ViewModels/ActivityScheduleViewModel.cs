@@ -191,8 +191,8 @@ namespace BusBuddy.WPF.ViewModels
                 Logger.Information("📅 Loading activity schedules...");
 
                 var schedules = await _context.ActivitySchedules
-                    .Include(a => a.ScheduledDriver)
-                    .Include(a => a.ScheduledVehicle)
+                    .Include("ScheduledDriver")
+                    .Include("ScheduledVehicle")
                     .OrderBy(a => a.ScheduledDate)
                     .ThenBy(a => a.ScheduledLeaveTime)
                     .ToListAsync();

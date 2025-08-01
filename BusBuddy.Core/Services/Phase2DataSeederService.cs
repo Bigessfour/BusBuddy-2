@@ -39,6 +39,10 @@ namespace BusBuddy.Core.Services
         private static readonly ILogger Logger = Log.ForContext<Phase2DataSeederService>();
         private readonly Random _random = new Random(42); // Seeded for reproducible data
 
+        /// <summary>
+        /// Constructor for Phase2DataSeederService that accepts either BusBuddyContext or BusBuddyDbContext
+        /// </summary>
+
         private static readonly string[] FirstNames = {
             "Alice", "Bob", "Carlos", "Diana", "Ethan", "Fatima", "George", "Hannah", "Isaac", "Jessica",
             "Kevin", "Linda", "Michael", "Nancy", "Oliver", "Patricia", "Quincy", "Rachel", "Samuel", "Teresa",

@@ -246,9 +246,32 @@ bb-report      # Generate comprehensive project reports
 
 ## 🚀 **Quick Start Guide**
 
-### RECOMMENDED: BusBuddy PowerShell Environment
+### Basic Development Setup (5 Minutes)
 
-**✅ FULLY OPERATIONAL**: The BusBuddy development environment is now completely restored and ready for use. The specialized PowerShell 7.5.2 environment provides enhanced error reporting, automated diagnostics, and standardized workflows.
+1. **Open the Project**:
+   ```
+   Open VS Code → Open Folder → Navigate to BusBuddy folder
+   ```
+
+2. **Build the Solution**:
+   - Use VS Code Task: `⌨️ Ctrl+Shift+P → "Tasks: Run Task" → "Direct: Build Solution (CMD)"`
+   - Or use PowerShell: `dotnet build BusBuddy.sln`
+
+3. **Run the Application**:
+   - Use VS Code Task: `⌨️ Ctrl+Shift+P → "Tasks: Run Task" → "Direct: Run Application (FIXED)"`
+   - Or use PowerShell: `dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj`
+
+4. **Load PowerShell Profile (REQUIRED)**:
+   - Open a PowerShell 7.5.2 terminal in VS Code
+   - Run: `pwsh -ExecutionPolicy Bypass -File "load-bus-buddy-profiles.ps1"`
+   - Verify: You should see "Bus Buddy Development Environment Loaded"
+
+5. **PowerShell Helpers** (Now Available):
+   ```powershell
+   bb-health -Quick
+   ```
+
+**Important**: The PowerShell profile MUST be loaded for most development tasks to work.
 
 ### Option 1: Enhanced PowerShell Workflow (Recommended)
 
@@ -459,12 +482,11 @@ All commands use the `bb-*` prefix for easy access:
 - **bb-schedule-activity**: 🚀 **NEW** Phase 2 activity scheduling with AI optimization
 - **bb-optimize-route**: 🚀 **NEW** AI-enhanced route optimization using Grok-4
 - **bb-warn-check**: 🚀 **NEW** Proactive warning detection for zero-build-error philosophy
-- **bb-happiness**: 🚀 **NEW** Developer motivation boost during Phase 2 development
-- **bb-roadmap**: 🚀 **NEW** Display comprehensive Phase 2 development roadmap and timeline
 - **bb-mcp-status**: 🚀 **NEW** MCP server and AI integration health monitoring
 - **bb-optimize-route**: 🚀 **NEW** AI-enhanced route optimization using Grok-4
 - **bb-warn-check**: 🚀 **NEW** Proactive warning detection for zero-build-error philosophy
 - **bb-happiness**: 🚀 **NEW** Developer motivation boost during Phase 2 development
+- **bb-roadmap**: 🚀 **NEW** Display comprehensive Phase 2 development roadmap and timeline
 - **bb-mcp-status**: 🚀 **NEW** MCP server and AI integration health monitoring
 
 ### **Key Features**
@@ -994,35 +1016,11 @@ BusBuddy/
 │   │   └── XAIChatService.cs  # 🤖 AI chat interface
 │   └── Utilities/         # UI utilities and debug helpers
 ├── BusBuddy.Tests/        # Comprehensive test suite
-├── PowerShell/            # 🤖 Advanced PowerShell development environment
-│   └── BusBuddy PowerShell Environment/
-│       ├── Modules/BusBuddy/  # 5,989-line PowerShell module
-│       │   └── Functions/
-│       │       ├── AI/        # 🤖 AI workflow automation (BusBuddy-AI-Workflows.ps1)
-│       │       ├── Build/     # 🛠️ Build automation (bb-build, bb-run, bb-clean)
-│       │       ├── Database/  # Database management
-│       │       ├── Diagnostics/  # 🔍 System diagnostics (bb-health, bb-diagnostic)
-│       │       └── Utilities/ # Development utilities (bb-help, bb-test)
-│       ├── Scripts/       # Advanced workflow scripts
-│       └── Utilities/     # PowerShell utilities and syntax enforcement
-├── mcp-servers/           # 🔗 Model Context Protocol servers (STANDOUT)
-│   ├── git-mcp-server.js     # 🚀 Git integration server (116 lines)
-│   └── filesystem-mcp-server.js  # 📁 File system server (130 lines)
-├── Scripts/               # Build and maintenance scripts
-│   ├── tavily-tool.ps1   # 🔍 Tavily search integration (468 lines) (STANDOUT)
-│   └── Maintenance/       # Advanced build workflows and issue resolution
-├── Documentation/         # Comprehensive project documentation
-│   ├── tavily-api-usage-guide.md     # 🤖 Tavily API documentation (STANDOUT)
-│   └── tavily-powershell-integration.md  # 🤖 PowerShell integration (STANDOUT)
-├── .vscode/               # VS Code configuration with efficiency enforcement
-│   ├── instructions.md    # Development guidelines
-│   ├── ai-efficiency-enforcement.md  # 🤖 AI assistance standards
-│   ├── mcp.json          # 🔗 MCP server configuration (STANDOUT)
-│   └── mcp-unified.json  # 🔗 Unified MCP configuration (STANDOUT)
-├── AI-Core/               # 🤖 AI configuration and workflows
-├── GROK-REPOSITORY-ACCESS.md  # 🤖 Comprehensive AI access guide
-├── tavily-expert-mcp-guide.md  # 🤖 Tavily MCP implementation (STANDOUT)
-└── load-bus-buddy-profiles.ps1  # PowerShell environment loader
+├── BusBuddy.UITests/      # Automated UI testing framework
+├── 🤖 GROK-REPOSITORY-ACCESS.md # AI access documentation
+├── 🤖 sitemap.xml           # AI navigation sitemap
+├── 🤖 file-access-urls.txt  # Direct file access URLs
+└── Documentation/          # Project documentation
 ```
 
 ### 🌟 **Tool Integration Highlights**
@@ -1050,49 +1048,6 @@ BusBuddy/
 ├── GROK-REPOSITORY-ACCESS.md  # 🤖 Comprehensive AI access guide
 ├── tavily-expert-mcp-guide.md  # 🤖 Tavily MCP implementation
 └── load-bus-buddy-profiles.ps1  # PowerShell environment loader
-```
-
-## 🏆 **Development Achievements (July 2025)**
-
-### **🤖 AI Integration Breakthrough**
-- **Complete xAI Grok-4 Integration**: Native API connectivity with intelligent route optimization
-- **Comprehensive AI Accessibility**: Zero-authentication repository access for AI models
-- **Advanced PowerShell AI Environment**: 5,434-line module with 40+ specialized commands
-- **MCP Server Implementation**: Git and filesystem servers for enhanced AI interactions
-- **Tavily Search Integration**: Real-time web search capabilities for development assistance
-
-### **🚀 Development Environment Excellence**
-- **PowerShell 7.5.2 Compliance**: Mandatory syntax enforcement across all scripts
-- **Intelligent Build System**: AI-guided error resolution and automated issue detection
-- **Comprehensive Task Integration**: 20+ VS Code tasks with enhanced monitoring
-- **Multi-Environment Database Support**: LocalDB, Azure SQL, and SQLite with automated switching
-- **Advanced Error Handling**: Structured exception management with actionable recommendations
-
-### **📊 Repository Health and Accessibility**
-- **Complete Git Repository Restoration**: Resolved corruption issues with full functionality
-- **494+ Files Accessible**: All files available via GitHub API, raw URLs, and multiple access methods
-- **Comprehensive Documentation**: AI-readable structure guides and access documentation
-- **Clean Development Workflow**: Streamlined Git operations with automated staging and monitoring
-- **Cross-Platform Compatibility**: Enhanced support for various development environments
-
-BusBuddy represents a cutting-edge fusion of traditional school transportation management with advanced AI capabilities, providing both operational excellence and a sophisticated development environment optimized for AI-assisted software development.
-│   ├── Services/           # Business services
-│   │   ├── XAIService.cs   # 🤖 Direct Grok-4 integration
-│   │   └── AIEnhancedRouteService.cs # 🤖 Smart route optimization
-│   ├── Data/               # Data access
-│   └── Migrations/         # EF Core migrations
-├── BusBuddy.WPF/           # Presentation layer
-│   ├── ViewModels/         # MVVM ViewModels
-│   ├── Views/              # XAML Views
-│   ├── Controls/           # Custom controls
-│   └── Services/           # UI services
-│       └── XAIChatService.cs # 🤖 AI chat interface
-├── BusBuddy.Tests/         # Unit & integration tests
-├── BusBuddy.UITests/       # UI automation tests
-├── 🤖 GROK-REPOSITORY-ACCESS.md # AI access documentation
-├── 🤖 sitemap.xml           # AI navigation sitemap
-├── 🤖 file-access-urls.txt  # Direct file access URLs
-└── Documentation/          # Project documentation
 ```
 
 ## 🤖 **AI Integration Showcase**

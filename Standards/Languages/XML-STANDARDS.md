@@ -1,134 +1,134 @@
 # 🔧 XML Standards for BusBuddy
 
-## 📋 **Overview**
-This document defines the XML standards for the BusBuddy project, covering MSBuild project files, configuration files, and XML documentation standards.
+## Core XML Principles
 
-## 🎯 **General XML Standards**
+- **Well-Formed XML**: All XML must be well-formed with proper nesting and closing tags
+- **XML Declaration**: Include XML declaration with version and encoding
+- **Meaningful Element Names**: Use descriptive, clear element names
+- **Attributes vs. Elements**: Use attributes for metadata, elements for data
+- **Consistent Naming**: Use PascalCase for elements, camelCase for attributes
+- **Namespace Usage**: Use XML namespaces for all WPF XAML files
+- **Comment Documentation**: Include comprehensive comments for complex sections
 
-### **Formatting**
-- **Indentation**: 2 spaces (no tabs)
-- **Line Endings**: LF (Unix-style)
-- **Encoding**: UTF-8 with BOM for MSBuild files
-- **File Extension**: `.xml`, `.config`, `.csproj`, `.props`
+## Tools and Validation
 
-### **Structure**
-- **XML Declaration**: Include for standalone XML files
-- **Root Element**: Single root element required
-- **Namespace Declaration**: Include appropriate namespaces
-- **Comments**: Use `<!-- -->` for documentation
+- **XMLSpy**: Advanced XML editing and validation
+- **VS Code Extensions**: XML Tools, XML (Red Hat) for validation
+- **PowerShell Validation**: Use `Test-BusBuddyXmlSyntax` script for batch validation
+- **XML Linting**: Pre-commit validation with XML linting
+- **Schema Validation**: Use XSD for schema validation where applicable
 
-## 📁 **File-Specific Standards**
+## XAML-Specific Standards
 
-### **MSBuild Project Files (.csproj)**
+- **Resource Dictionary Organization**: Group similar resources in dedicated dictionaries
+- **Namespace Declarations**: All XAML files must include proper namespaces
+- **Syncfusion Integration**: Include Syncfusion namespace declarations consistently
+- **WPF Binding Syntax**: Follow consistent pattern for bindings
+- **Element Formatting**: One attribute per line for elements with multiple attributes
+- **Style Definitions**: Use explicit keys for all styles
+- **Resource Keys**: Use descriptive, hierarchical naming for resource keys
 
-#### **BusBuddy.WPF.csproj Example**
+## XML File Organization
+
+- **Indentation**: 2 or 4 spaces (consistent per file type)
+- **Line Length**: Keep lines under 120 characters when practical
+- **Element Ordering**: Consistent element ordering in similar files
+- **Comments**: Use XML comments with meaningful descriptions
+
+## Configuration Files
+
+- **AppSettings**: Use hierarchical structure for app settings
+- **Connection Strings**: Store connection strings in dedicated section
+- **Environment Variables**: Use environment placeholders for sensitive values
+- **Deployment Configuration**: Separate production vs development settings
+
+## Common XML Patterns
+
 ```xml
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AssemblyTitle>BusBuddy WPF Application</AssemblyTitle>
-    <AssemblyDescription>School Transportation Management System</AssemblyDescription>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
-    <PackageReference Include="Serilog.AspNetCore" Version="4.0.2" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="30.1.40" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
-  </ItemGroup>
-
-</Project>
-```
-
-#### **Directory.Build.props Example**
-```xml
-<Project>
-
-  <PropertyGroup>
-    <LangVersion>13.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)BusBuddy-Practical.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Company>BusBuddy Transportation Solutions</Company>
-    <Product>BusBuddy</Product>
-    <Copyright>Copyright © 2025 BusBuddy Transportation Solutions</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" PrivateAssets="all" />
-  </ItemGroup>
-
-</Project>
-```
-
-### **Configuration Files (app.config)**
-
-#### **WPF App.config Example**
-```xml
-<?xml version="1.0" encoding="utf-8"?>
+<!-- Config File Pattern -->
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <startup>
-    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
-  </startup>
-  
-  <connectionStrings>
-    <add name="DefaultConnection" 
-         connectionString="Data Source=BusBuddy.db" 
-         providerName="Microsoft.Data.Sqlite" />
-  </connectionStrings>
-  
+  <!-- Application Settings -->
   <appSettings>
-    <add key="Environment" value="Development" />
-    <add key="EnableLogging" value="true" />
-    <add key="LogLevel" value="Information" />
+    <add key="Setting1" value="Value1" />
+    <add key="Setting2" value="Value2" />
   </appSettings>
   
+  <!-- Connection Strings -->
+  <connectionStrings>
+    <add name="DefaultConnection" 
+         connectionString="Server=.;Database=BusBuddy;Trusted_Connection=True;" 
+         providerName="System.Data.SqlClient" />
+  </connectionStrings>
 </configuration>
 ```
 
-### **Code Analysis Rules (.ruleset)**
-
-#### **BusBuddy-Practical.ruleset Example**
 ```xml
-<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="BusBuddy Practical Rules" 
-         Description="Practical code analysis rules for BusBuddy development" 
-         ToolsVersion="16.0">
+<!-- XAML Pattern -->
+<Window x:Class="BusBuddy.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BusBuddy.WPF"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+        mc:Ignorable="d"
+        Title="BusBuddy Transportation Management" 
+        Height="600" 
+        Width="800">
   
-  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
-    <Rule Id="CS8618" Action="Warning" />
-    <Rule Id="CS8625" Action="Warning" />
-    <Rule Id="CS8629" Action="Warning" />
-  </Rules>
+  <!-- Resource dictionaries -->
+  <Window.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/BusBuddy.WPF;component/Resources/FluentDarkTheme.xaml" />
+        <ResourceDictionary Source="/BusBuddy.WPF;component/Resources/CommonStyles.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Window.Resources>
   
-  <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
-    <Rule Id="CA1001" Action="Warning" />
-    <Rule Id="CA1031" Action="Info" />
-    <Rule Id="CA1062" Action="Info" />
-  </Rules>
-  
-</RuleSet>
+  <!-- Main content -->
+  <Grid>
+    <!-- Grid definitions with comments -->
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    
+    <!-- Header content -->
+    <StackPanel Grid.Row="0">
+      <!-- Header elements -->
+    </StackPanel>
+    
+    <!-- Main content area -->
+    <syncfusion:SfDataGrid Grid.Row="1"
+                           AutoGenerateColumns="False"
+                           ItemsSource="{Binding GridData}">
+      <!-- Column definitions -->
+    </syncfusion:SfDataGrid>
+    
+    <!-- Footer status bar -->
+    <StatusBar Grid.Row="2">
+      <!-- Status items -->
+    </StatusBar>
+  </Grid>
+</Window>
 ```
 
+## Validation and Enforcement
+
+- **Pre-commit Hooks**: Use Git hooks to validate XML before commit
+- **Build Integration**: Include XML validation in build process
+- **Documentation**: Include XML standards in developer onboarding
+- **Schema Enforcement**: Use XSD schemas for validation where appropriate
+
+## XML Security Considerations
+
+- **Sensitive Data**: Never store passwords or keys in plain text
+- **External Entities**: Disable XXE processing for security
+- **Input Validation**: Always validate XML input from external sources
+- **Error Handling**: Implement proper error handling for XML parsing
 ## 🔧 **XML Documentation Standards**
 
 ### **C# XML Documentation**

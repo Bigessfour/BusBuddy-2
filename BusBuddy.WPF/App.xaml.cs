@@ -27,8 +27,16 @@ namespace BusBuddy.WPF
         public App()
         {
             // Register Syncfusion license before any UI initialization
-            // TODO: Set license key from environment variable
-            // Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY");
+            try
+            {
+                var licenseKey = Environment.GetEnvironmentVariable("SYNCFUSION_LICENSE_KEY") ?? "YOUR_LICENSE_KEY";
+                Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Syncfusion license registration failed: {ex.Message}");
+                // Continue without license for development
+            }
 
             // Initialize Serilog logger
             Log.Logger = new LoggerConfiguration()
@@ -158,18 +166,28 @@ namespace BusBuddy.WPF
                     Log.Information("📦 Registering services...");
                     Console.WriteLine("📦 Registering services...");
 
-                    // Phase 1: Register database context with explicit naming to avoid conflicts
-                    services.AddDbContext<BusBuddyDbContext>(options =>
+                    // Register single database context to avoid conflicts
+                    services.AddDbContext<BusBuddy.Core.Data.BusBuddyDbContext>(options =>
                     {
-                        var connectionString = context.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=BusBuddy.db";
+                        // Always use SQLite for MVP Phase 1 to avoid connection issues
+                        var connectionString = "Data Source=BusBuddy.db";
+                        Log.Information($"Using database connection: {connectionString}");
+                        Console.WriteLine($"Using database connection: {connectionString}");
                         options.UseSqlite(connectionString);
 
                         // Configure for better error reporting
                         options.EnableDetailedErrors();
-                        if (System.Diagnostics.Debugger.IsAttached)
-                        {
-                            options.EnableSensitiveDataLogging();
-                        }
+                        options.EnableSensitiveDataLogging(); // Enable for all builds in MVP Phase 1
+                    });
+
+                    // Register as both types for compatibility
+                    services.AddScoped<BusBuddy.Core.BusBuddyContext>(sp =>
+                    {
+                        // Create new instance directly to avoid type conversion issues
+                        var dbContext = sp.GetRequiredService<BusBuddy.Core.Data.BusBuddyDbContext>();
+                        var optionsBuilder = new DbContextOptionsBuilder<BusBuddy.Core.BusBuddyContext>();
+                        optionsBuilder.UseSqlite(dbContext.Database.GetConnectionString());
+                        return new BusBuddy.Core.BusBuddyContext(optionsBuilder.Options);
                     });
 
                     // Phase 1: Register Phase 1 services including data seeding
@@ -199,22 +217,39 @@ namespace BusBuddy.WPF
             Log.Information("✅ Host built successfully");
             Console.WriteLine("✅ Host built successfully");
 
-            // Phase 1: Initialize data seeding
-            Log.Information("🗂️ Initializing Phase 1 data...");
-            Console.WriteLine("🗂️ Initializing Phase 1 data...");
-            await _host.Services.InitializePhase1Async();
-            // Phase 2: Seed enhanced Phase 2 real-world data
-            Log.Information("🗂️ Initializing Phase 2 enhanced real-world data...");
-            Console.WriteLine("🗂️ Initializing Phase 2 enhanced real-world data...");
+            // For MVP Phase 1, prioritize basic data seeding and handle errors gracefully
             try
             {
-                await _host.Services.GetRequiredService<IPhase2DataSeederService>().SeedAsync();
-                Log.Information("✅ Phase 2 data seeding completed successfully");
+                // Phase 1: Initialize data seeding first - CRITICAL
+                Log.Information("🗂️ Initializing Phase 1 data...");
+                Console.WriteLine("🗂️ Initializing Phase 1 data...");
+                await _host.Services.InitializePhase1Async();
+                Log.Information("✅ Phase 1 data seeding completed successfully");
+                Console.WriteLine("✅ Phase 1 data seeding completed successfully");
+
+                // Phase 2: Only attempt if Phase 1 succeeds
+                try
+                {
+                    Log.Information("🗂️ Initializing Phase 2 enhanced real-world data...");
+                    Console.WriteLine("🗂️ Initializing Phase 2 enhanced real-world data...");
+                    await _host.Services.GetRequiredService<IPhase2DataSeederService>().SeedAsync();
+                    Log.Information("✅ Phase 2 data seeding completed successfully");
+                    Console.WriteLine("✅ Phase 2 data seeding completed successfully");
+                }
+                catch (Exception ex)
+                {
+                    // Non-critical Phase 2 error - log but continue
+                    Log.Warning(ex, "⚠️ Phase 2 data seeding failed (non-critical): {ErrorMessage}", ex.Message);
+                    Console.WriteLine($"⚠️ Phase 2 data seeding failed (continuing with Phase 1 data): {ex.Message}");
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "❌ Phase 2 data seeding failed: {ErrorMessage}", ex.Message);
-                MessageBox.Show($"Phase 2 data seeding failed: {ex.Message}", "Data Seeding Error");
+                // Critical Phase 1 error - show message but attempt to continue
+                Log.Error(ex, "❌ Critical Phase 1 data seeding failed: {ErrorMessage}", ex.Message);
+                Console.WriteLine($"❌ Critical data seeding error: {ex.Message}");
+                MessageBox.Show($"Data initialization error: {ex.Message}\n\nThe application will attempt to continue, but some features may not work correctly.",
+                               "Data Initialization Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             base.OnStartup(e);

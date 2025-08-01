@@ -32,6 +32,7 @@
 
     <!-- Entity Framework In-Memory Database for testing -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
