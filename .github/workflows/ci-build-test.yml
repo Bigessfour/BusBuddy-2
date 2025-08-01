@@ -10,6 +10,7 @@ jobs:
   build-and-test:
     name: 🏗️ Build & Test
     runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
     - name: 📥 Checkout Code
@@ -58,6 +59,7 @@ jobs:
   standards-validation:
     name: 📚 Standards Validation
     runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
     - name: 📥 Checkout Code
@@ -193,6 +195,7 @@ jobs:
   repository-health:
     name: 🏥 Repository Health Check
     runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
     - name: 📥 Checkout Code
@@ -245,6 +248,7 @@ jobs:
   security-scan:
     name: 🔒 Security Scan
     runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
     - name: 📥 Checkout Code
@@ -297,6 +301,7 @@ jobs:
   notify-completion:
     name: 📢 Workflow Completion
     runs-on: windows-latest
+    timeout-minutes: 30
     needs: [build-and-test, standards-validation, repository-health, security-scan]
     if: always()
 
@@ -310,6 +315,8 @@ jobs:
         Write-Host "  📚 Standards: ${{ needs.standards-validation.result }}" -ForegroundColor $(if ('${{ needs.standards-validation.result }}' -eq 'success') { 'Green' } else { 'Red' })
         Write-Host "  🏥 Repository: ${{ needs.repository-health.result }}" -ForegroundColor $(if ('${{ needs.repository-health.result }}' -eq 'success') { 'Green' } else { 'Red' })
         Write-Host "  🔒 Security: ${{ needs.security-scan.result }}" -ForegroundColor $(if ('${{ needs.security-scan.result }}' -eq 'success') { 'Green' } else { 'Red' })
+
+
 
 
 

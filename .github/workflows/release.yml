@@ -30,6 +30,7 @@ jobs:
   build-release:
     name: 🏗️ Build Release
     runs-on: windows-latest
+    timeout-minutes: 30
     environment: ${{ github.event.inputs.environment || 'staging' }}
     strategy:
       matrix:
@@ -262,6 +263,7 @@ jobs:
   create-github-release:
     name: 🎉 Create GitHub Release
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: build-release
     if: |
       (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release') ||
@@ -324,6 +326,7 @@ jobs:
   repository-health-check:
     name: 🏥 Post-Release Health Check
     runs-on: windows-latest
+    timeout-minutes: 30
     needs: build-release
 
     steps:
@@ -371,6 +374,7 @@ jobs:
         echo "| Artifact Sizes | ${{ needs.build-release.outputs.zip-sizes }} MB |" >> $GITHUB_STEP_SUMMARY
         echo "| Platforms | x64, x86 |" >> $GITHUB_STEP_SUMMARY
         echo "| Status | ✅ Success |" >> $GITHUB_STEP_SUMMARY
+
 
 
 

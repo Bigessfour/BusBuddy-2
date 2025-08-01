@@ -1287,3 +1287,7 @@ phd-mentor-error.log
 # Dependency Management for Azure Packages
 !dependency-management.ps1
 !NuGet.config
+
+# Validation Reports
+*Validation-Report*.json
+*-Report-*.json

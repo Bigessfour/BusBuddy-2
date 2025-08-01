@@ -7,7 +7,3 @@
     "Microsoft.Build.Traversal": "3.4.0"
   }
 }
-  "msbuild-sdks": {
-    "Microsoft.Build.Traversal": "3.4.0"
-  }
-}
