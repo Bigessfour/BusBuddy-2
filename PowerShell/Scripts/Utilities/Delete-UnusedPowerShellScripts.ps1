@@ -21,11 +21,11 @@ $filesToDelete = @(
     "PowerShell\Scripts\Maintenance\MSB3027-File-Lock-Solution.ps1",
     # Redundant Scripts
     "PowerShell\Load-BusBuddy-ExceptionCapture.ps1",
-    "PowerShell\BusBuddy PowerShell Environment\Enhanced-Build-With-Problem-Capture.ps1",
+    "PowerShell\Scripts\Build\Enhanced-Build-With-Problem-Capture.ps1",
     # Legacy Test Scripts
-    "PowerShell\BusBuddy PowerShell Environment\Scripts\simple-form-monitoring.ps1",
-    "PowerShell\BusBuddy PowerShell Environment\Scripts\enhanced-form-monitoring.ps1",
-    "PowerShell\BusBuddy PowerShell Environment\Scripts\coordinated-monitoring.ps1",
+    "PowerShell\Scripts\Utilities\simple-form-monitoring.ps1",
+    "PowerShell\Scripts\Utilities\enhanced-form-monitoring.ps1",
+    "PowerShell\Scripts\Utilities\coordinated-monitoring.ps1",
     # Duplicate Utilities
     "PowerShell\Scripts\bb-help.ps1",
     "PowerShell\Scripts\fix-file-encodings.ps1",

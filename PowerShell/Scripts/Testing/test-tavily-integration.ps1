@@ -84,8 +84,8 @@ try {
         Write-Host "✅ BusBuddy module loaded: v$($busBuddyModule.Version)" -ForegroundColor Green
     } else {
         Write-Host "⚠️ BusBuddy module not loaded, attempting to load..." -ForegroundColor Yellow
-        if (Test-Path ".\PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1") {
-            Import-Module ".\PowerShell\BusBuddy PowerShell Environment\Modules\BusBuddy\BusBuddy.psm1" -Force
+        if (Test-Path ".\PowerShell\Modules\BusBuddy\BusBuddy.psm1") {
+            Import-Module ".\PowerShell\Modules\BusBuddy\BusBuddy.psm1" -Force
             Write-Host "✅ BusBuddy module loaded successfully" -ForegroundColor Green
         }
     }

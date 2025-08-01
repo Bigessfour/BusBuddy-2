@@ -101,5 +101,5 @@ if ($commandsAvailable -eq $essentialCommands.Count) {
     Write-Host ""
     Write-Host "⚠️ Some commands are missing. Profile loading may need troubleshooting." -ForegroundColor Yellow
     Write-Host "Try reloading VS Code or running manually:" -ForegroundColor Cyan
-    Write-Host "  Import-Module .\PowerShell\BusBuddy` PowerShell` Environment\Modules\BusBuddy\BusBuddy.psm1" -ForegroundColor Gray
+    Write-Host "  Import-Module .\PowerShell\Modules\BusBuddy\BusBuddy.psm1" -ForegroundColor Gray
 }

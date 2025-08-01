@@ -84,7 +84,7 @@
         "-NoExit",
         "-ExecutionPolicy", "Bypass",
         "-Command",
-        "& { Set-Location 'C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy'; Write-Host '🚌 Loading BusBuddy PowerShell Environment...' -ForegroundColor Cyan; try { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ BusBuddy profiles loaded successfully!' -ForegroundColor Green; Write-Host '🎯 Ready for development. Try: bb-health, bb-build, bb-run' -ForegroundColor Yellow } catch { Write-Host '❌ Profile loading failed: ' -ForegroundColor Red -NoNewline; Write-Host $_.Exception.Message -ForegroundColor Yellow; Write-Host '💡 Try manual import: Import-Module .\\PowerShell\\BusBuddy` PowerShell` Environment\\Modules\\BusBuddy\\BusBuddy.psm1' -ForegroundColor Cyan } }"
+        "& { Set-Location 'C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy'; Write-Host '🚌 Loading BusBuddy PowerShell Environment...' -ForegroundColor Cyan; try { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ BusBuddy profiles loaded successfully!' -ForegroundColor Green; Write-Host '🎯 Ready for development. Try: bb-health, bb-build, bb-run' -ForegroundColor Yellow } catch { Write-Host '❌ Profile loading failed: ' -ForegroundColor Red -NoNewline; Write-Host $_.Exception.Message -ForegroundColor Yellow; Write-Host '💡 Try manual import: Import-Module .\\PowerShell\\Modules\\BusBuddy\\BusBuddy.psm1' -ForegroundColor Cyan } }"
       ],
       "icon": "terminal-powershell",
       "color": "terminal.ansiGreen"
@@ -103,7 +103,7 @@
         "-NoExit",
         "-ExecutionPolicy", "Bypass",
         "-Command",
-        "& { Set-Location 'C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy'; Write-Host '📦 Loading BusBuddy Module Directly...' -ForegroundColor Magenta; Import-Module -Force '.\\PowerShell\\BusBuddy` PowerShell` Environment\\Modules\\BusBuddy\\BusBuddy.psm1'; Write-Host '✅ BusBuddy module loaded!' -ForegroundColor Green; Get-Command bb-* | Select-Object Name | Write-Host }"
+        "& { Set-Location 'C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy'; Write-Host '📦 Loading BusBuddy Module Directly...' -ForegroundColor Magenta; Import-Module -Force '.\\PowerShell\\Modules\\BusBuddy\\BusBuddy.psm1'; Write-Host '✅ BusBuddy module loaded!' -ForegroundColor Green; Get-Command bb-* | Select-Object Name | Write-Host }"
       ],
       "icon": "library",
       "color": "terminal.ansiMagenta"

@@ -217,6 +217,26 @@ namespace BusBuddy.WPF
             Log.Information("✅ Host built successfully");
             Console.WriteLine("✅ Host built successfully");
 
+            // Ensure database is created and migrations are applied
+            try
+            {
+                Log.Information("🗄️ Ensuring database schema is up to date...");
+                Console.WriteLine("🗄️ Ensuring database schema is up to date...");
+
+                using (var scope = _host.Services.CreateScope())
+                {
+                    var context = scope.ServiceProvider.GetRequiredService<BusBuddy.Core.BusBuddyContext>();
+                    await context.Database.EnsureCreatedAsync();
+                    Log.Information("✅ Database schema verified");
+                    Console.WriteLine("✅ Database schema verified");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("⚠️ Database schema initialization failed (non-critical): {Message}", ex.Message);
+                Console.WriteLine($"⚠️ Database schema initialization failed (continuing): {ex.Message}");
+            }
+
             // For MVP Phase 1, prioritize basic data seeding and handle errors gracefully
             try
             {

@@ -45,6 +45,7 @@
       "type": "shell",
       "command": "pwsh.exe",
       "args": [
+        "-NoProfile",
         "-ExecutionPolicy",
         "Bypass",
         "-File",
@@ -253,6 +254,7 @@
       "type": "shell",
       "command": "pwsh.exe",
       "args": [
+        "-NoProfile",
         "-ExecutionPolicy",
         "Bypass",
         "-File",
@@ -275,6 +277,38 @@
       },
       "isBackground": false,
       "detail": "🏗️ RECOMMENDED: Profile-aligned comprehensive build & run pipeline with full logging and environment validation",
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    },
+    {
+      "label": "🔒 BB: No-Profile Build (File Lock Safe)",
+      "type": "shell",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\PowerShell\\Scripts\\Build\\build-no-profile.ps1"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": false,
+      "detail": "🔒 SAFE: Build without profile loading to prevent .NET assembly file locks - ideal for CI/CD",
       "problemMatcher": [
         "$msCompile"
       ]
@@ -369,7 +403,7 @@
         "-ExecutionPolicy",
         "Bypass",
         "-Command",
-        "& { $ErrorActionPreference = 'Stop'; Set-Location '${workspaceFolder}'; Write-Host '🚌 Loading Bus Buddy profiles...' -ForegroundColor Cyan; try { if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ Profiles loaded' -ForegroundColor Green } else { Write-Host '⚠️ Profiles not found, using direct command' -ForegroundColor Yellow }; Write-Host '🚌 Starting BusBuddy application...' -ForegroundColor Cyan; if (Get-Command bb-run -ErrorAction SilentlyContinue) { bb-run } else { dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' } } finally { Write-Host '🧹 Cleaning up processes...' -ForegroundColor Yellow; Get-Process pwsh -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID -and $_.ProcessName -eq 'pwsh' } | Stop-Process -Force -ErrorAction SilentlyContinue; [System.GC]::Collect(); Write-Host '✅ Cleanup completed' -ForegroundColor Green } }"
+        "& { $ErrorActionPreference = 'Stop'; Set-Location '${workspaceFolder}'; $env:NoBusBuddyProfile = 'false'; Write-Host '🚌 Loading Bus Buddy profiles...' -ForegroundColor Cyan; try { if (Test-Path '.\\load-bus-buddy-profiles.ps1') { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ Profiles loaded' -ForegroundColor Green } else { Write-Host '⚠️ Profiles not found, using direct command' -ForegroundColor Yellow }; Write-Host '🚌 Starting BusBuddy application...' -ForegroundColor Cyan; if (Get-Command bb-run -ErrorAction SilentlyContinue) { bb-run } else { dotnet run --project 'BusBuddy.WPF\\BusBuddy.WPF.csproj' } } finally { Write-Host '🧹 Cleaning up processes...' -ForegroundColor Yellow; Get-Process pwsh -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID -and $_.ProcessName -eq 'pwsh' } | Stop-Process -Force -ErrorAction SilentlyContinue; [System.GC]::Collect(); Write-Host '✅ Cleanup completed' -ForegroundColor Green } }"
       ],
       "group": "build",
       "runOptions": {
