@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <!-- Target Framework — Standardized for MVP stability -->
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
@@ -28,7 +28,7 @@
 
     <!-- INDUSTRY STANDARD: WPF debugging -->
     <UseWPF>true</UseWPF>
-    <OutputType>WinExe</OutputType>
+    <!-- OutputType set in individual project files to avoid conflicts -->
 
     <!-- 🌐 GLOBALIZATION: Transportation system international support -->
     <InvariantGlobalization>false</InvariantGlobalization>

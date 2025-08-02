@@ -4,17 +4,17 @@
 
   <!-- 🚌 BusBuddy WPF - Greenfield Foundation Phase 1 -->
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <ProjectName>BusBuddy.WPF</ProjectName>
+    <IntermediateOutputPath>$(MSBuildProjectDirectory)\obj\Debug\</IntermediateOutputPath>
 
     <!-- Stable .NET 9.0 Configuration -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
     <!-- Phase 1: Essential Build Configuration -->
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <NoWarn>$(NoWarn);CA1416;CA1845;CA1869;CA1859;CA1852;CA1836;CS1998;CA1016</NoWarn>
 
     <!-- MSB3027/MSB3021 File Lock Prevention -->
@@ -31,7 +31,7 @@
     <!-- Note: EnableDefaultItems=true is required for WPF Main method generation -->
     <EnableDefaultItems>true</EnableDefaultItems>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 
     <!-- .NET 9 WPF: Enhanced Analysis for Early Issue Detection -->
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
@@ -51,10 +51,7 @@
   </Target>
 
   <!-- 🌐 .NET 9 Framework References with Globalization Support -->
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
-    <!-- Note: System.Runtime and System.Globalization are included in .NET 9 by default -->
-  </ItemGroup>
+
 
   <ItemGroup>
     <Compile Update="Views\Dashboard\DashboardView.xaml.cs">
