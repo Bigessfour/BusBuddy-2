@@ -4,32 +4,33 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="300"
+             d:DesignWidth="500">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Address Input Section -->
         <StackPanel Grid.Row="0" Margin="10">
-            <Label Content="Address:" FontWeight="Bold"/>
-            <TextBox x:Name="AddressTextBox" Margin="0,5" Padding="5"/>
+            <TextBlock Text="Address Validation" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <TextBox x:Name="AddressTextBox"
+                     Text="{Binding Street, Mode=TwoWay}"
+                     Margin="0,0,0,10"/>
+
             <Button Content="Validate Address"
                     Click="ValidateAddress_Click"
-                    Margin="0,10"
-                    Padding="10,5"
-                    HorizontalAlignment="Left"/>
+                    Margin="0,0,0,10"/>
         </StackPanel>
 
-        <!-- Results Section -->
         <StackPanel Grid.Row="1" Margin="10">
             <Label Content="Validation Results:" FontWeight="Bold"/>
             <TextBlock x:Name="ResultsTextBlock"
+                       Text="{Binding ValidationMessage}"
                        TextWrapping="Wrap"
-                       Margin="0,5"
-                       Text="No validation performed yet."/>
+                       Margin="0,5"/>
         </StackPanel>
 
         <!-- Progress Section -->

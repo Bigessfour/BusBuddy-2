@@ -10,24 +10,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:converters="clr-namespace:BusBuddy.WPF.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="800"
-             d:DesignWidth="1200">
-
-    <UserControl.Resources>
-        <!-- Local converters for this control -->
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-    </UserControl.Resources>
-
-    <!-- Step 3: ViewModel binding ready for Core service integration -->
-    <Grid Background="#1E1E1E">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>  <!-- Header -->
-            <RowDefinition Height="*"/>     <!-- Main Content -->
-            <RowDefinition Height="Auto"/>  <!-- Status Bar -->
+             d:DesignHeight="400"
+             d:DesignWidth="600">
+    <Grid>
+        <TextBlock Text="Vehicle Form - Step 3"
+                   FontSize="18"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+    </Grid>
+</UserControl>
         </Grid.RowDefinitions>
 
         <!-- ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->

@@ -1,7 +1,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 using System.Windows;
+using System.IO;
+using Serilog;
+using Serilog.Events;
 using BusBuddy.WPF.ViewModels;
 using BusBuddy.WPF.Logging;
 using BusBuddy.WPF.Extensions;
@@ -10,9 +14,6 @@ using BusBuddy.Core;
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Services;
 using BusBuddy.Core.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using System.IO;
 
 namespace BusBuddy.WPF
 {

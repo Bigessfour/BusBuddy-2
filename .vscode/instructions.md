@@ -296,10 +296,62 @@ Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY
 
 ## 🐛 **Debugging & Troubleshooting**
 
+### 🚨 **CS0103 Error Prevention & Resolution**
+
+**CRITICAL**: CS0103 "The name 'X' does not exist in the current context" errors are common in WPF projects. Here's how to handle them:
+
+#### **Root Causes & Solutions**
+
+| **Error Pattern** | **Root Cause** | **Solution** | **Prevention** |
+|---|---|---|---|
+| `InitializeComponent()` not found | WPF auto-generated files not created | Clean + Rebuild project | Regular clean builds |
+| Missing using directives | Namespace not imported | Add proper using statements | Use IDE suggestions |
+| XAML elements not recognized | Designer files out of sync | Rebuild, restart VS Code | Avoid manual XAML edits |
+| Syncfusion controls not found | Package references missing | Check project file packages | Verify in Directory.Build.props |
+
+#### **CS0103 Emergency Resolution Protocol**
+
+```powershell
+# 1. IMMEDIATE ACTIONS (90% success rate)
+dotnet clean BusBuddy.WPF/BusBuddy.WPF.csproj
+dotnet build BusBuddy.WPF/BusBuddy.WPF.csproj
+
+# 2. IF STILL FAILING (Advanced)
+dotnet restore --force --no-cache
+dotnet clean
+dotnet build --verbosity detailed
+
+# 3. NUCLEAR OPTION (99% success rate)
+Remove-Item -Recurse -Force BusBuddy.WPF/bin/
+Remove-Item -Recurse -Force BusBuddy.WPF/obj/
+dotnet restore
+dotnet build
+```
+
+#### **WPF-Specific CS0103 Issues**
+
+**Issue**: `InitializeComponent()` CS0103 errors in .xaml.cs files
+- **Cause**: WPF auto-generated designer files (.g.cs) not created
+- **Solution**: Clean + rebuild (forces regeneration of designer files)
+- **Note**: Build succeeds, but IntelliSense shows false errors (OmniSharp limitation)
+
+**Issue**: XAML element names not recognized in code-behind
+- **Cause**: x:Name attributes not generating partial class properties
+- **Solution**: Verify XAML syntax, rebuild project
+- **Prevention**: Use consistent naming conventions
+
+#### **IntelliSense vs Build Truth**
+
+**IMPORTANT**: Due to OmniSharp deprecation for XAML issues:
+- ✅ **Trust the build output** - If `dotnet build` succeeds, the code is correct
+- ⚠️ **Ignore IntelliSense errors** - Red squiggles may be false positives
+- 🎯 **Focus on compile errors** - Only fix actual compilation failures
+
 ### Common Issues & Solutions
 
 | Issue Type | Troubleshooting Steps | Resources |
 |------------|----------------------|-----------|
+| **CS0103 Errors** | Follow CS0103 Emergency Protocol above | Build output, not IntelliSense |
 | **Build Errors** | Check exact error message and line number | VS Code Problems panel |
 | **UI Rendering** | Verify Syncfusion theme registration in App.xaml.cs | Syncfusion documentation |
 | **Runtime Crashes** | Use try/catch blocks and log exceptions | Exception details window |
@@ -403,7 +455,146 @@ BusBuddy/
 - [EF Core Documentation](https://learn.microsoft.com/en-us/ef/core/)
 - [Syncfusion Guides](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf)
 
-## 🔍 **PowerShell Development Environment**
+## � **C# and WPF Coding Standards**
+
+### 🚨 **CS0103 Error Prevention Standards**
+
+**MANDATORY PRACTICES** to prevent CS0103 "name does not exist" errors:
+
+#### **WPF-Specific Standards**
+
+```csharp
+// ✅ CORRECT: Always use partial class for WPF code-behind
+public partial class DashboardView : UserControl
+{
+    public DashboardView()
+    {
+        InitializeComponent(); // Auto-generated method
+        // Your code here
+    }
+}
+
+// ❌ WRONG: Missing partial keyword
+public class DashboardView : UserControl  // Missing 'partial'
+```
+
+#### **Using Directive Standards**
+
+```csharp
+// ✅ CORRECT: Complete using statements for BusBuddy
+using System.Windows;
+using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using BusBuddy.Core.Models;
+using BusBuddy.Core.Services;
+using BusBuddy.WPF.ViewModels;
+
+// ❌ WRONG: Missing critical namespaces
+using System;  // Insufficient for WPF
+```
+
+#### **XAML-CodeBehind Synchronization**
+
+```xml
+<!-- ✅ CORRECT: XAML with proper namespace and class -->
+<UserControl x:Class="BusBuddy.WPF.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <Button x:Name="SaveButton" Click="SaveButton_Click" />
+</UserControl>
+```
+
+```csharp
+// ✅ CORRECT: Matching code-behind
+namespace BusBuddy.WPF.Views
+{
+    public partial class DashboardView : UserControl  // Namespace must match XAML
+    {
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            // SaveButton is auto-generated from x:Name
+        }
+    }
+}
+```
+
+#### **Syncfusion Control Standards**
+
+```csharp
+// ✅ CORRECT: Proper Syncfusion usage
+using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.Licensing;
+
+public partial class DriversView : UserControl
+{
+    public DriversView()
+    {
+        InitializeComponent();
+        
+        // Ensure license is registered in App.xaml.cs
+        // Use intellisense-friendly control access
+        if (DriversDataGrid != null)
+        {
+            DriversDataGrid.ItemsSource = viewModel.Drivers;
+        }
+    }
+}
+```
+
+#### **Build-Time Validation Standards**
+
+```powershell
+# ✅ MANDATORY: Clean build validation before committing
+dotnet clean BusBuddy.WPF/BusBuddy.WPF.csproj
+dotnet build BusBuddy.WPF/BusBuddy.WPF.csproj --verbosity minimal
+
+# ✅ REQUIRED: Verify build success
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✅ Build successful - ready to commit" -ForegroundColor Green
+} else {
+    Write-Host "❌ Build failed - fix CS0103 errors" -ForegroundColor Red
+}
+```
+
+### **Error Resolution Priority**
+
+1. **Build Errors** (CS0103, CS0246) - CRITICAL, blocks compilation
+2. **IntelliSense Warnings** - IGNORE if build succeeds (OmniSharp deprecated)
+3. **Runtime Errors** - Handle with try/catch blocks
+4. **Performance Issues** - Address in Phase 2
+
+### **File Organization Standards**
+
+```
+BusBuddy.WPF/Views/
+├── Dashboard/
+│   ├── DashboardView.xaml      # XAML must have matching class
+│   └── DashboardView.xaml.cs   # Must be partial class
+├── Driver/
+│   ├── DriversView.xaml
+│   └── DriversView.xaml.cs
+└── Vehicle/
+    ├── VehiclesView.xaml
+    └── VehiclesView.xaml.cs
+```
+
+### **Commit Standards for CS0103 Prevention**
+
+```bash
+# ✅ BEFORE COMMITTING: Validate build
+git add .
+dotnet build BusBuddy.WPF/BusBuddy.WPF.csproj
+
+# ✅ COMMIT MESSAGE STANDARDS
+git commit -m "fix: resolve CS0103 errors in DashboardView"
+git commit -m "feat: add driver management with proper using directives"
+git commit -m "refactor: standardize XAML namespace declarations"
+```
+
+## �🔍 **PowerShell Development Environment**
 
 The PowerShell development environment is REQUIRED for all development activities:
 

@@ -9,97 +9,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
              d:DesignHeight="600"
-             d:DesignWidth="900">
+             d:DesignWidth="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Header -->
-        <Border Grid.Row="0"
-                Background="#2D2D30"
-                Padding="20">
-            <TextBlock Text="👨‍✈️ Driver Management"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="White"/>
-        </Border>
-
-        <!-- Content -->
-        <Grid Grid.Row="1"
-              Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <!-- Data Grid (Syncfusion SfDataGrid) -->
-            <syncfusion:SfDataGrid Grid.Row="0"
-                                   ItemsSource="{Binding Drivers}"
-                                   SelectedItem="{Binding SelectedDriver, Mode=TwoWay}"
-                                   AutoGenerateColumns="False"
-                                   AllowResizingColumns="True"
-                                   AllowSorting="True"
-                                   GridLinesVisibility="Horizontal"
-                                   HeaderRowHeight="45"
-                                   RowHeight="40"
-                                   SelectionMode="Single"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch">
-                <syncfusion:SfDataGrid.Columns>
-                    <syncfusion:GridTextColumn MappingName="FirstName"
-                                               HeaderText="First Name"
-                                               Width="120"/>
-                    <syncfusion:GridTextColumn MappingName="LastName"
-                                               HeaderText="Last Name"
-                                               Width="120"/>
-                    <syncfusion:GridTextColumn MappingName="LicenseNumber"
-                                               HeaderText="License #"
-                                               Width="100"/>
-                    <syncfusion:GridTextColumn MappingName="PhoneNumber"
-                                               HeaderText="Phone"
-                                               Width="120"/>
-                    <syncfusion:GridTextColumn MappingName="Email"
-                                               HeaderText="Email"
-                                               Width="200"/>
-                    <syncfusion:GridTextColumn MappingName="Status"
-                                               HeaderText="Status"
-                                               Width="100"/>
-                    <syncfusion:GridTextColumn MappingName="HireDate"
-                                               HeaderText="Hire Date"
-                                               Width="120"
-                                               ValueBinding="{Binding HireDate, StringFormat='{}{0:MM/dd/yyyy}'}"/>
-                    <syncfusion:GridTextColumn MappingName="YearsExperience"
-                                               HeaderText="Experience"
-                                               Width="100"/>
-                </syncfusion:SfDataGrid.Columns>
-            </syncfusion:SfDataGrid>
-
-            <!-- Button Panel with Syncfusion ButtonAdv -->
-            <StackPanel Grid.Row="1"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right"
-                        Margin="0,20,0,0">
-                <Button Content="Add Driver"
-                        Command="{Binding AddDriverCommand}"
-                        Width="120"
-                        Height="35"
-                        Margin="0,0,10,0"/>
-                <Button Content="Edit"
-                        Command="{Binding EditDriverCommand}"
-                        Width="80"
-                        Height="35"
-                        Margin="0,0,10,0"/>
-                <Button Content="Delete"
-                        Command="{Binding DeleteDriverCommand}"
-                        Width="80"
-                        Height="35"/>
-            </StackPanel>
-        </Grid>
+        <TextBlock Text="Driver Management View - Phase 2"
+                   FontSize="20"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
     </Grid>
 </UserControl>

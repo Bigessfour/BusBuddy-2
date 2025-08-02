@@ -1,7 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- ...existing code... -->
-  <!-- Removed explicit Page Includes for ActivityScheduleView, DriversView, VehiclesView, DashboardView to fix duplicate compile items error -->
-
   <!-- 🚌 BusBuddy WPF - Greenfield Foundation Phase 1 -->
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -10,7 +7,7 @@
     <ProjectName>BusBuddy.WPF</ProjectName>
     <IntermediateOutputPath>$(MSBuildProjectDirectory)\obj\Debug\</IntermediateOutputPath>
 
-    <!-- Stable .NET 9.0 Configuration -->
+    <!-- Stable .NET 8.0 Configuration -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -23,170 +20,34 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ShadowCopyFiles>false</ShadowCopyFiles>
     <ProduceOnlyReferenceAssembly>false</ProduceOnlyReferenceAssembly>
-    <!-- Enable binding redirects to handle assembly version conflicts -->
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
     <!-- CS0103 Prevention: Enhanced Build Reliability -->
-    <!-- Note: EnableDefaultItems=true is required for WPF Main method generation -->
     <EnableDefaultItems>true</EnableDefaultItems>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 
-    <!-- .NET 9 WPF: Enhanced Analysis for Early Issue Detection -->
+    <!-- .NET 8 WPF: Enhanced Analysis for Early Issue Detection -->
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors> <!-- Keep false for MVP Phase 1 -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <!-- 🏗️ CORE PROJECT REFERENCE -->
   <ItemGroup>
-    <!-- MainWindow.xaml and MainWindow.xaml.cs are handled by default WPF build targets. Removed explicit entries to fix duplicate compile items error. -->
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
   </ItemGroup>
 
-  <!-- CS0103 Prevention: Custom target to clean before build (prevents stale .g.cs) -->
+  <!-- CS0103 Prevention: Clean before build to prevent stale .g.cs files -->
   <Target Name="CleanBeforeBuild" BeforeTargets="Build">
     <RemoveDir Directories="$(BaseIntermediateOutputPath);$(BaseOutputPath)" Condition="Exists('$(BaseIntermediateOutputPath)') OR Exists('$(BaseOutputPath)')" />
   </Target>
 
-  <!-- 🌐 .NET 9 Framework References with Globalization Support -->
-
-
+  <!-- WPF-Specific Syncfusion Packages -->
   <ItemGroup>
-    <Compile Update="Views\Dashboard\DashboardView.xaml.cs">
-      <DependentUpon>DashboardView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Bus\BusManagementView.xaml.cs">
-      <DependentUpon>BusManagementView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Driver\DriverManagementView.xaml.cs">
-      <DependentUpon>DriverManagementView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Driver\DriversView.xaml.cs">
-      <DependentUpon>DriversView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Route\RouteManagementView.xaml.cs">
-      <DependentUpon>RouteManagementView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Schedule\ScheduleManagementView.xaml.cs">
-      <DependentUpon>ScheduleManagementView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Student\StudentManagementView.xaml.cs">
-      <DependentUpon>StudentManagementView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Student\StudentEditView.xaml.cs">
-      <DependentUpon>StudentEditView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Student\StudentEditDialog.xaml.cs">
-      <DependentUpon>StudentEditDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Maintenance\MaintenanceTrackingView.xaml.cs">
-      <DependentUpon>MaintenanceTrackingView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Fuel\FuelManagementView.xaml.cs">
-      <DependentUpon>FuelManagementView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Activity\ActivityLoggingView.xaml.cs">
-      <DependentUpon>ActivityLoggingView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ticket\TicketManagementView.xaml.cs">
-      <DependentUpon>TicketManagementView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Settings\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\StudentDetailView.xaml.cs">
-      <DependentUpon>StudentDetailView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\StudentListView.xaml.cs">
-      <DependentUpon>StudentListView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Settings\XaiChatView.xaml.cs">
-      <DependentUpon>XaiChatView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Student\AssignRouteDialog.xaml.cs">
-      <DependentUpon>AssignRouteDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Schedule\ScheduleDetailsDialog.xaml.cs">
-      <DependentUpon>ScheduleDetailsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Controls\QuickActionsPanel.xaml.cs">
-      <DependentUpon>QuickActionsPanel.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Views\Dashboard\DashboardView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Bus\BusManagementView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Driver\DriverManagementView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Driver\DriversView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Route\RouteManagementView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Schedule\ScheduleManagementView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Student\StudentManagementView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Student\StudentEditView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Student\StudentEditDialog.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Student\AssignRouteDialog.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Maintenance\MaintenanceTrackingView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Fuel\FuelManagementView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Activity\ActivityLoggingView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Ticket\TicketManagementView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Settings\SettingsView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\StudentDetailView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Settings\XaiChatView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\StudentListView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\Schedule\ScheduleDetailsDialog.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Controls\QuickActionsPanel.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- WPF-Specific Packages (Beyond Directory.Build.props) -->
-    <!-- Syncfusion.SfChart.WPF is already included in Directory.Build.props -->
     <PackageReference Include="Syncfusion.SfNavigationDrawer.WPF" Version="$(SyncfusionVersion)" />
-    <!-- Removed duplicates: SfBusyIndicator and SfProgressBar are in Directory.Build.props -->
     <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="$(SyncfusionVersion)" />
-
-    <!-- 🎛️ SPECIALIZED CONTROL PACKAGES -->
     <PackageReference Include="Syncfusion.SfChat.WPF" Version="$(SyncfusionVersion)" />
     <PackageReference Include="Syncfusion.SfRichTextBoxAdv.WPF" Version="$(SyncfusionVersion)" />
     <PackageReference Include="Syncfusion.SfScheduler.WPF" Version="$(SyncfusionVersion)" />
@@ -194,12 +55,7 @@
     <PackageReference Include="Syncfusion.SfAccordion.WPF" Version="$(SyncfusionVersion)" />
     <PackageReference Include="Syncfusion.SfMaps.WPF" Version="$(SyncfusionVersion)" />
     <PackageReference Include="Syncfusion.PdfViewer.WPF" Version="$(SyncfusionVersion)" />
-
-    <!-- 📄 PDF AND DOCUMENT PACKAGES -->
     <PackageReference Include="Syncfusion.SfSpreadsheet.WPF" Version="$(SyncfusionVersion)" />
-    <!-- Removed Syncfusion.Edit.WPF - not needed for MVP Phase 1, causing MetadataLoadContext version conflicts -->
-
-    <!-- 🗂️ LEGACY GRID SUPPORT -->
     <PackageReference Include="Syncfusion.Grid.WPF" Version="$(SyncfusionVersion)" />
   </ItemGroup>
 
@@ -209,26 +65,27 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
-    <!-- Removed direct reference to System.Reflection.MetadataLoadContext to resolve version conflict with Syncfusion.Edit.WPF -->
 
-    <!-- Note: Microsoft.CodeAnalysis.Analyzers is defined in Directory.Build.props -->
+    <!-- Microsoft.Extensions packages for dependency injection and hosting -->
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(EntityFrameworkVersion)" />
+
+    <!-- SQLite Entity Framework packages -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="$(EntityFrameworkVersion)" />
+
+    <!-- Serilog Debug sink -->
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
   </ItemGroup>
 
-  <!-- 🧹 CLEAN CONFIGURATION -->
+  <!-- Application Configuration -->
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  <!-- Fix for missing Serilog dependency -->
-  <ItemGroup>
-    <!-- Debug sink not included in Directory.Build.props -->
-    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
-    <!-- No need for Thread enricher here - it's in Directory.Build.props -->
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Removed manual WPF references; these are included automatically by <UseWPF>true> and the SDK -->
-  </ItemGroup>
 </Project>
