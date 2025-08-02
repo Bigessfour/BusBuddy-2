@@ -28,6 +28,19 @@
 
 #region Module Initialization (PowerShell 7.5.2 Standard)
 
+# 🎨 Modern WPF Assembly Loading for PowerShell UI Prototyping
+# Based on 2011 MSDN Magazine: PowerShell with WPF techniques
+# Enables direct XAML validation and UI development in PowerShell
+try {
+    Add-Type -AssemblyName PresentationFramework
+    Add-Type -AssemblyName PresentationCore
+    Add-Type -AssemblyName WindowsBase
+    Add-Type -AssemblyName System.Xaml
+    Write-Verbose "✅ WPF assemblies loaded for PowerShell UI development"
+} catch {
+    Write-Warning "⚠️ WPF assemblies not available - UI features limited"
+}
+
 ## Module metadata (PowerShell 7.5.2 pattern)
 $script:ModuleConfig = @{
     Name                     = 'BusBuddy'
@@ -509,6 +522,150 @@ function Test-BusBuddyConfiguration {
     catch {
         Write-BusBuddyError -Message "Error validating configuration: $($_.Exception.Message)" -RecommendedAction "Verify file permissions and JSON syntax" -Exception $_.Exception
         return $null
+    }
+}
+
+#Requires -Version 7.5
+function Test-BusBuddyXml {
+    <#
+    .SYNOPSIS
+        Enhanced XML/XAML validation for BusBuddy files using modern .NET XML classes
+
+    .DESCRIPTION
+        Validates XML and XAML files for well-formedness and optional schema compliance.
+        Supports MSBuild files (.csproj, .props, .targets), XAML files, and configuration files.
+        Uses modern .NET System.Xml classes compatible with PowerShell 7.5.2 and .NET 9.0.
+
+    .PARAMETER FilePath
+        Path to the XML/XAML file to validate
+
+    .PARAMETER SchemaPath
+        Optional path to XSD schema file for validation (e.g., Microsoft.Build.xsd for MSBuild files)
+
+    .PARAMETER ValidationHandler
+        Custom scriptblock for handling validation warnings and errors
+
+    .EXAMPLE
+        Test-BusBuddyXml -FilePath "BusBuddy.WPF/App.xaml"
+
+    .EXAMPLE
+        Test-BusBuddyXml -FilePath "Directory.Build.props" -SchemaPath "Microsoft.Build.xsd"
+
+    .EXAMPLE
+        Test-BusBuddyXml -FilePath "NuGet.config" -ValidationHandler { param($sender, $args) Write-Warning $args.Exception.Message }
+
+    .NOTES
+        Supports common BusBuddy file types: .xml, .xaml, .csproj, .props, .config, .ruleset, .targets
+        Falls back to well-formed check if schema validation fails
+        Compatible with PowerShell 7.5.2 and .NET 9.0
+        Based on Microsoft XML documentation and community best practices
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$FilePath,
+
+        [string]$SchemaPath = $null,
+
+        [scriptblock]$ValidationHandler = {
+            param($ValidationSender, $ValidationArgs)
+            Write-Warning "XML Validation Warning in ${FilePath}: $($ValidationArgs.Exception.Message)"
+        }
+    )
+
+    if (-not (Test-Path $FilePath)) {
+        Write-BusBuddyError -Message "XML file not found: $FilePath" -RecommendedAction "Ensure the XML file exists and is accessible"
+        return [PSCustomObject]@{
+            IsValid = $false
+            Errors = @("File not found: $FilePath")
+        }
+    }
+
+    $isValid = $true
+    $validationErrors = @()
+
+    try {
+        # Create XML reader settings with modern validation approach
+        $xmlReaderSettings = New-Object System.Xml.XmlReaderSettings
+        $xmlReaderSettings.ValidationType = [System.Xml.ValidationType]::Schema
+        $xmlReaderSettings.ValidationFlags = [System.Xml.Schema.XmlSchemaValidationFlags]::ReportValidationWarnings
+        $xmlReaderSettings.XmlResolver = $null  # Security: Disable external resource resolution
+
+        # Add schema validation if schema path is provided and exists
+        if ($SchemaPath -and (Test-Path $SchemaPath)) {
+            try {
+                $xmlReaderSettings.Schemas.Add($null, $SchemaPath) | Out-Null
+                Write-Verbose "Schema validation enabled using: $SchemaPath"
+            }
+            catch {
+                Write-Warning "Could not load schema from $SchemaPath, falling back to well-formed validation: $($_.Exception.Message)"
+                $xmlReaderSettings.ValidationType = [System.Xml.ValidationType]::None
+            }
+        }
+        else {
+            # No schema provided, just check well-formedness
+            $xmlReaderSettings.ValidationType = [System.Xml.ValidationType]::None
+        }
+
+        # Set up validation event handler using modern approach
+        $validationEventHandler = {
+            param($ValidationSender, $ValidationArgs)
+            $script:isValid = $false
+            $script:validationErrors += $ValidationArgs
+            & $ValidationHandler $ValidationSender $ValidationArgs
+        }
+
+        # Register validation event handler on settings
+        $xmlReaderSettings.add_ValidationEventHandler($validationEventHandler)
+
+        # Create XML reader and load document
+        $xmlReader = [System.Xml.XmlReader]::Create($FilePath, $xmlReaderSettings)
+
+        try {
+            # Read through the entire document to trigger validation
+            while ($xmlReader.Read()) {
+                # Reading triggers validation events
+            }
+        }
+        finally {
+            $xmlReader.Close()
+            $xmlReader.Dispose()
+        }
+
+        if ($isValid) {
+            Write-BusBuddyStatus "XML validation successful: $FilePath" -Status Success
+            if ($xmlReaderSettings.ValidationType -eq [System.Xml.ValidationType]::Schema) {
+                Write-Verbose "Schema validation passed"
+            } else {
+                Write-Verbose "Well-formed check passed"
+            }
+        } else {
+            $errorMessages = $validationErrors | ForEach-Object { $_.Exception.Message }
+            Write-BusBuddyStatus "XML validation failed for: $FilePath" -Status Error
+            Write-Verbose "Validation errors: $($errorMessages -join '; ')"
+        }
+
+    }
+    catch [System.Xml.XmlException] {
+        $isValid = $false
+        $validationErrors += [PSCustomObject]@{
+            Exception = $_.Exception
+            Message = $_.Exception.Message
+        }
+        Write-BusBuddyError -Message "XML parsing error in ${FilePath}: $($_.Exception.Message)" -RecommendedAction "Fix XML syntax errors, check for malformed tags or invalid characters" -Exception $_.Exception
+    }
+    catch {
+        $isValid = $false
+        $validationErrors += [PSCustomObject]@{
+            Exception = $_.Exception
+            Message = $_.Exception.Message
+        }
+        Write-BusBuddyError -Message "Unexpected error validating XML file ${FilePath}: $($_.Exception.Message)" -RecommendedAction "Verify file permissions and XML content" -Exception $_.Exception
+    }
+
+    return [PSCustomObject]@{
+        IsValid = $isValid
+        Errors = $validationErrors
     }
 }
 
@@ -3046,6 +3203,7 @@ function Get-BusBuddyCommands {
         'Environment' = @(
             @{ Name = 'bb-install-extensions'; Description = 'Install VS Code extensions'; Function = 'Install-BusBuddyVSCodeExtensions' }
             @{ Name = 'bb-validate-vscode'; Description = 'Validate VS Code setup'; Function = 'Test-BusBuddyVSCodeSetup' }
+            @{ Name = 'bb-validate-xml'; Description = 'Validate XML/XAML files'; Function = 'Test-BusBuddyXml' }
         )
         'AI'          = @(
             @{ Name = 'bb-tavily-search'; Description = 'Search with Tavily Expert AI'; Function = 'Invoke-BusBuddyTavilySearch' }
@@ -6188,6 +6346,7 @@ Export-ModuleMember -Function @(
     'Write-BusBuddyStatus',
     'Write-BusBuddyError',
     'Test-BusBuddyConfiguration',
+    'Test-BusBuddyXml',
     'Test-BusBuddyEnvironment',
 
     # PowerShell 7.5 enhancements

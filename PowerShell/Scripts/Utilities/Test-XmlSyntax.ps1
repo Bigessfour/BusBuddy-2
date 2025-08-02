@@ -791,7 +791,7 @@ if ($GenerateReport) {
 # Return status code
 if ($stats.InvalidFiles -gt 0) {
     exit 1
-}
-else {
+} else {
     exit 0
+}
 

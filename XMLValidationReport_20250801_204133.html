@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Validation Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; color: #333; }
+        h1, h2, h3 { color: #0066cc; }
+        .summary { background-color: #f0f0f0; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .stat-box { background-color: #fff; padding: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex: 1; min-width: 150px; }
+        .valid { color: green; }
+        .invalid { color: red; }
+        .warning { color: orange; }
+        .file-result { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+        .file-valid { border-left: 5px solid green; }
+        .file-invalid { border-left: 5px solid red; }
+        .file-warning { border-left: 5px solid orange; }
+        .error, .warning-item { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .error { background-color: rgba(255,0,0,0.1); }
+        .warning-item { background-color: rgba(255,165,0,0.1); }
+        .file-header { display: flex; justify-content: space-between; align-items: center; }
+        .context { font-family: monospace; padding: 10px; background-color: #f8f8f8; border-left: 3px solid #ddd; margin: 5px 0 5px 15px; overflow-x: auto; }
+        .context-line.highlight { font-weight: bold; color: red; }
+        .expand-btn { background-color: #0066cc; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>XML Validation Report</h1>
+    <div class="summary">
+        <h2>Summary</h2>
+        <div class="stats">
+            <div class="stat-box">
+                <h3>Files Checked</h3>
+                <p></p>
+            </div>
+            <div class="stat-box">
+                <h3>Valid Files</h3>
+                <p class="valid"></p>
+            </div>
+            <div class="stat-box">
+                <h3>Invalid Files</h3>
+                <p class="invalid"></p>
+            </div>
+            <div class="stat-box">
+                <h3>Files with Warnings</h3>
+                <p class="warning">25</p>
+            </div>
+            <div class="stat-box">
+                <h3>Files Fixed</h3>
+                <p></p>
+            </div>
+        </div>
+    </div><h2>File Results</h2><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-valid">
+    <div class="file-header">
+        <h3> <span class='valid'>✅ Valid</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: none">    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-valid">
+    <div class="file-header">
+        <h3> <span class='valid'>✅ Valid</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: none">    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div><div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-valid">
+    <div class="file-header">
+        <h3> <span class='valid'>✅ Valid</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: none">    </div>
+</div><div class="file-result file-valid">
+    <div class="file-header">
+        <h3> <span class='valid'>✅ Valid</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: none">    </div>
+</div><div class="file-result file-warning">
+    <div class="file-header">
+        <h3> <span class='warning'>⚠️ Valid with Warnings</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: block">        <h4>Warnings ()</h4>
+        <div class="warning-item">
+    <strong>Warning:</strong> <br>
+    <strong>Type:</strong> 
+</div>    </div>
+</div><div class="file-result file-valid">
+    <div class="file-header">
+        <h3> <span class='valid'>✅ Valid</span></h3>
+        <button class="expand-btn">Hide Details</button>
+    </div>
+    <p></p>
+    <div class="details" style="display: none">    </div>
+</div>    <script>
+        document.querySelectorAll('.expand-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const details = this.closest('.file-result').querySelector('.details');
+                if (details.style.display === 'none') {
+                    details.style.display = 'block';
+                    this.textContent = 'Hide Details';
+                } else {
+                    details.style.display = 'none';
+                    this.textContent = 'Show Details';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
