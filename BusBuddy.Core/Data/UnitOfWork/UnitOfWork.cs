@@ -250,7 +250,11 @@ public class UnitOfWork : IUnitOfWork
     public async Task<int> BulkInsertAsync<T>(IEnumerable<T> entities) where T : class
     {
         var entityList = entities.ToList();
-        if (entityList.Count == 0) return 0;
+        if (entityList.Count == 0)
+        {
+            return 0;
+        }
+
 
         await _context.Set<T>().AddRangeAsync(entityList);
         return await SaveChangesAsync();
@@ -259,7 +263,11 @@ public class UnitOfWork : IUnitOfWork
     public async Task<int> BulkUpdateAsync<T>(IEnumerable<T> entities) where T : class
     {
         var entityList = entities.ToList();
-        if (entityList.Count == 0) return 0;
+        if (entityList.Count == 0)
+        {
+            return 0;
+        }
+
 
         _context.Set<T>().UpdateRange(entityList);
         return await SaveChangesAsync();
@@ -268,7 +276,11 @@ public class UnitOfWork : IUnitOfWork
     public async Task<int> BulkDeleteAsync<T>(IEnumerable<T> entities) where T : class
     {
         var entityList = entities.ToList();
-        if (entityList.Count == 0) return 0;
+        if (entityList.Count == 0)
+        {
+            return 0;
+        }
+
 
         _context.Set<T>().RemoveRange(entityList);
         return await SaveChangesAsync();
@@ -383,10 +395,14 @@ public class UnitOfWork : IUnitOfWork
                     var createdDateProperty = entityType.GetProperty("CreatedDate");
 
                     if (createdByProperty != null && createdByProperty.CanWrite)
+                    {
                         createdByProperty.SetValue(entry.Entity, currentUser);
+                    }
 
                     if (createdDateProperty != null && createdDateProperty.CanWrite)
+                    {
                         createdDateProperty.SetValue(entry.Entity, currentTime);
+                    }
                 }
                 else if (entry.State == EntityState.Modified)
                 {
@@ -395,10 +411,15 @@ public class UnitOfWork : IUnitOfWork
                     var updatedDateProperty = entityType.GetProperty("UpdatedDate");
 
                     if (updatedByProperty != null && updatedByProperty.CanWrite)
+                    {
                         updatedByProperty.SetValue(entry.Entity, currentUser);
+                    }
 
                     if (updatedDateProperty != null && updatedDateProperty.CanWrite)
+                    {
                         updatedDateProperty.SetValue(entry.Entity, currentTime);
+                    }
+
                 }
             }
         }
@@ -477,7 +498,12 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public async Task<IEnumerable<Student>> GetStudentsByGradeAsync(string grade) => await FindAsync(s => s.Grade == grade);
     public async Task<IEnumerable<Student>> GetStudentsByRouteAsync(int? routeId)
     {
-        if (routeId == null) return new List<Student>();
+        if (routeId == null)
+        {
+            return new List<Student>();
+        }
+
+
         string routeStr = routeId.Value.ToString();
         return await FindAsync(s => s.AMRoute == routeStr || s.PMRoute == routeStr);
     }
@@ -510,7 +536,12 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public IEnumerable<Student> GetStudentsByGrade(string grade) => Find(s => s.Grade == grade);
     public IEnumerable<Student> GetStudentsByRoute(int? routeId)
     {
-        if (routeId == null) return new List<Student>();
+        if (routeId == null)
+        {
+            return new List<Student>();
+        }
+
+
         string routeStr = routeId.Value.ToString();
         return Find(s => s.AMRoute == routeStr || s.PMRoute == routeStr);
     }

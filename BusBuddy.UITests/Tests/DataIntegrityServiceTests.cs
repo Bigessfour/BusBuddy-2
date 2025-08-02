@@ -68,7 +68,10 @@ public class DataIntegrityServiceTests
 
     private void SeedTestDataWithIntegrityIssues()
     {
-        if (_context == null) return;
+        if (_context == null)
+        {
+            return;
+        }
 
         // Create drivers with various issues
         var drivers = new[]

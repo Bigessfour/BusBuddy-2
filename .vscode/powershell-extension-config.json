@@ -1,7 +1,7 @@
 {
   "_description": "PowerShell Extension v2025.6.1 Advanced Configuration",
   "_version": "2025.6.1",
-  "_lastUpdated": "June 30, 2025",
+  "_lastUpdated": "August 1, 2025",
   "extensionFeatures": {
     "intelliSense": {
       "enabled": true,

@@ -110,9 +110,18 @@ public class StudentScheduleService : IStudentScheduleService
             var activitySchedule = await context.ActivitySchedule.FindAsync(activityScheduleId);
 
             if (student == null)
+            {
+
                 throw new ArgumentException($"Student with ID {studentId} not found");
+            }
+
+
             if (activitySchedule == null)
+            {
+
                 throw new ArgumentException($"Activity schedule with ID {activityScheduleId} not found");
+            }
+
 
             var studentSchedule = new StudentSchedule
             {
@@ -150,7 +159,11 @@ public class StudentScheduleService : IStudentScheduleService
             // Verify schedule exists
             var schedule = await context.Schedules.FindAsync(scheduleId);
             if (schedule == null)
+            {
+
                 throw new ArgumentException($"Schedule with ID {scheduleId} not found");
+            }
+
 
             var studentSchedules = new List<StudentSchedule>();
 

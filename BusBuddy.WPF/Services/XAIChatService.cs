@@ -68,9 +68,12 @@ namespace BusBuddy.WPF.Services
             try
             {
                 if (_isInitialized)
+                {
                     return;
+                }
 
                 // Simulate initialization
+
                 await Task.Delay(500);
 
                 _isInitialized = true;

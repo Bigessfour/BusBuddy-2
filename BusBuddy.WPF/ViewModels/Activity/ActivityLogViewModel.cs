@@ -29,7 +29,10 @@ namespace BusBuddy.WPF.ViewModels
                 // Use the optimized paged method instead of getting all logs
                 var logs = await _activityLogService.GetLogsPagedAsync(1, 50); // Load first 50 logs
                 foreach (var log in logs)
+                {
                     Logs.Add(log);
+                }
+
 
                 Logger.Information("Loaded {LogCount} activity logs using pagination", Logs.Count);
             }

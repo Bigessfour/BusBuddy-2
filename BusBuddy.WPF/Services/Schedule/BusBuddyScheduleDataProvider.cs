@@ -99,7 +99,12 @@ public class BusBuddyScheduleDataProvider
 
     public void CommitChanges()
     {
-        if (!_isDirty) return;
+        if (!_isDirty)
+        {
+            return;
+        }
+
+
         try
         {
             Logger.Information("Committing schedule changes to database");

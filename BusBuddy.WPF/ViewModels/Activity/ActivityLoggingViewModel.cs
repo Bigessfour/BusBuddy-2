@@ -206,7 +206,11 @@ namespace BusBuddy.WPF.ViewModels
 
         private void ViewLogDetails()
         {
-            if (SelectedLog == null) return;
+            if (SelectedLog == null)
+            {
+                return;
+            }
+
 
             var details = $"Log ID: {SelectedLog.Id}\n" +
                          $"Timestamp: {SelectedLog.Timestamp:yyyy-MM-dd HH:mm:ss}\n" +

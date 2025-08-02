@@ -295,7 +295,10 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                if (SelectedActivity == null) return;
+                if (SelectedActivity == null)
+                {
+                    return;
+                }
 
                 Logger.Information($"✏️ Editing activity: {SelectedActivity.Subject}");
                 // TODO: Open Edit Activity dialog/window
@@ -314,7 +317,10 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                if (SelectedActivity == null) return;
+                if (SelectedActivity == null)
+                {
+                    return;
+                }
 
                 Logger.Information($"👁️ Viewing activity details: {SelectedActivity.Subject}");
                 var details = $"Activity Details:\n\n" +
@@ -343,7 +349,10 @@ namespace BusBuddy.WPF.ViewModels
         {
             try
             {
-                if (SelectedActivity == null) return;
+                if (SelectedActivity == null)
+                {
+                    return;
+                }
 
                 Logger.Information($"🔄 Updating activity status to: {newStatus}");
 

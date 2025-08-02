@@ -62,9 +62,13 @@ public class Phase2ComprehensiveTestImplementation
 
     private void SeedPhase2TestData()
     {
-        if (_context == null) return;
+        if (_context == null)
+        {
+            return;
+        }
 
         // Enhanced test data for Phase 2 comprehensive testing
+
         var drivers = new[]
         {
             new Driver { DriverId = 1, DriverName = "John Smith", Status = "Active", DriversLicenceType = "D123456" },
@@ -100,7 +104,11 @@ public class Phase2ComprehensiveTestImplementation
 
     private void InitializeViewModels()
     {
-        if (_context == null) return;
+        if (_context == null)
+        {
+            return;
+        }
+
 
         _driversViewModel = new DriversViewModel(_context);
         _vehiclesViewModel = new BusBuddy.WPF.ViewModels.Vehicle.VehiclesViewModel();

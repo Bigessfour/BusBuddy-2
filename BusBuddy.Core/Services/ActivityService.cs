@@ -918,21 +918,32 @@ public class ActivityService : IActivityService
 
             // Check required fields
             if (string.IsNullOrEmpty(activity.ActivityType))
+            {
                 errors.Add("Activity type is required");
+            }
 
             if (string.IsNullOrEmpty(activity.Description))
+            {
                 errors.Add("Description is required");
+            }
 
             if (string.IsNullOrEmpty(activity.Destination))
+            {
                 errors.Add("Destination is required");
+            }
 
             if (activity.LeaveTime >= activity.ReturnTime)
+            {
                 errors.Add("Leave time must be before return time");
+            }
 
             if (activity.Date.Date < DateTime.Today)
+            {
                 errors.Add("Activity date cannot be in the past");
+            }
 
             // Check for schedule conflicts
+
             if (activity.DriverId > 0 || activity.AssignedVehicleId > 0)
             {
                 var conflicts = await DetectScheduleConflictsAsync(activity);
@@ -940,10 +951,16 @@ public class ActivityService : IActivityService
                 if (conflicts.Count > 0)
                 {
                     if (conflicts.Any(c => c.DriverId == activity.DriverId && activity.DriverId > 0))
+                    {
                         errors.Add("Driver is already scheduled during this time");
+                    }
+
 
                     if (conflicts.Any(c => c.AssignedVehicleId == activity.AssignedVehicleId && activity.AssignedVehicleId > 0))
+                    {
                         errors.Add("Vehicle is already scheduled during this time");
+                    }
+
                 }
             }
 
@@ -952,9 +969,15 @@ public class ActivityService : IActivityService
             {
                 var driver = await _context.Drivers.FindAsync(activity.DriverId);
                 if (driver == null)
+                {
                     errors.Add("Selected driver does not exist");
+                }
+
                 else if (driver.Status != "Active")
+                {
                     errors.Add("Selected driver is not active");
+                }
+
             }
 
             // Check if vehicle exists and is active
@@ -962,9 +985,15 @@ public class ActivityService : IActivityService
             {
                 var vehicle = await _context.Vehicles.FindAsync(activity.AssignedVehicleId);
                 if (vehicle == null)
+                {
                     errors.Add("Selected vehicle does not exist");
+                }
+
                 else if (vehicle.Status != "Active")
+                {
                     errors.Add("Selected vehicle is not active");
+                }
+
             }
 
             Logger.Information("Activity validation complete with {Count} errors", errors.Count);
@@ -1141,7 +1170,11 @@ public class ActivityService : IActivityService
     private string EscapeCsvField(string? field)
     {
         if (string.IsNullOrEmpty(field))
+        {
+
             return string.Empty;
+        }
+
 
         bool needsQuotes = field.Contains(',') || field.Contains('"') || field.Contains('\n');
         if (needsQuotes)

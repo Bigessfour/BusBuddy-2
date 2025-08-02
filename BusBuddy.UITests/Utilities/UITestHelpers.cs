@@ -83,22 +83,9 @@ public static class UITestHelpers
         }).ToList();
         context.Vehicles.AddRange(buses);
 
-        // Add test activities (convert ActivitySchedule to Activity for BusBuddyDbContext)
-        var activitySchedules = ActivityScheduleTestDataBuilder.CreateWeeklySchedule(7);
-        var activityList = activitySchedules.Select(s => new Activity
-        {
-            ActivityId = s.ActivityScheduleId,
-            Date = s.ScheduledDate,
-            ActivityType = s.TripType,
-            Destination = s.ScheduledDestination,
-            LeaveTime = s.ScheduledLeaveTime,
-            EventTime = s.ScheduledEventTime,
-            AssignedVehicleId = s.ScheduledVehicleId,
-            DriverId = s.ScheduledDriverId,
-            RequestedBy = "Test User",
-            Status = "Scheduled"
-        }).ToList();
-        context.Activities.AddRange(activityList);
+        // Add test activities using proper ActivityTestDataBuilder
+        var activities = ActivityTestDataBuilder.CreateTestActivities(7);
+        context.Activities.AddRange(activities);
 
         context.SaveChanges();
     }
@@ -116,7 +103,9 @@ public static class UITestHelpers
             {
                 var element = parent.FindFirstDescendant(cf => cf.ByAutomationId(automationId));
                 if (element != null)
+                {
                     return element;
+                }
             }
             catch
             {
@@ -142,7 +131,9 @@ public static class UITestHelpers
             {
                 var element = parent.FindFirstDescendant(cf => cf.ByName(name));
                 if (element != null)
+                {
                     return element;
+                }
             }
             catch
             {
@@ -198,7 +189,9 @@ public static class UITestHelpers
         {
             var element = elementGetter();
             if (element != null && element.IsAvailable)
+            {
                 return true;
+            }
 
             Thread.Sleep(100);
         }
@@ -237,13 +230,19 @@ public static class UITestHelpers
             {
                 // Try different ways to get text
                 if (!string.IsNullOrEmpty(element.Name))
+                {
                     return element.Name;
+                }
 
                 if (element.Patterns.Text.IsSupported)
+                {
                     return element.Patterns.Text.Pattern.DocumentRange.GetText(-1);
+                }
 
                 if (element.Patterns.Value.IsSupported)
+                {
                     return element.Patterns.Value.Pattern.Value;
+                }
             }
             catch (Exception ex)
             {

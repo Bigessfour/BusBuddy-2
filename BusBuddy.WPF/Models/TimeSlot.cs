@@ -50,7 +50,11 @@ namespace BusBuddy.WPF.Models
         {
             var fieldInfo = timeSlot.GetType().GetField(timeSlot.ToString());
             if (fieldInfo == null)
+            {
+
                 return timeSlot.ToString();
+            }
+
 
             var attributes = (DisplayAttribute[])fieldInfo.GetCustomAttributes(typeof(DisplayAttribute), false);
 
@@ -64,7 +68,11 @@ namespace BusBuddy.WPF.Models
         {
             var fieldInfo = timeSlot.GetType().GetField(timeSlot.ToString());
             if (fieldInfo == null)
+            {
+
                 return timeSlot.ToString();
+            }
+
 
             var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
 

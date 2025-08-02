@@ -227,13 +227,13 @@ public class DashboardTests
     public void TestDataBuilders_ShouldCreateValidActivityData()
     {
         // Act
-        var activity = ActivityScheduleTestDataBuilder.CreateTodayFieldTrip(77);
+        var activity = ActivityTestDataBuilder.CreateTodayFieldTrip(77);
 
         // Assert
-        activity.ActivityScheduleId.Should().Be(77);
-        activity.ScheduledDate.Date.Should().Be(DateTime.Today);
-        activity.TripType.Should().Be("Field Trip");
-        activity.ScheduledDestination.Should().Be("Science Museum");
+        activity.ActivityId.Should().Be(77);
+        activity.Date.Date.Should().Be(DateTime.Today);
+        activity.ActivityType.Should().Be("Field Trip");
+        activity.Destination.Should().Be("Science Museum");
     }
 
     [Test]
@@ -246,14 +246,14 @@ public class DashboardTests
         // Arrange - Test that we can create a complete scenario
         var testDrivers = DriverTestDataBuilder.CreateDriversList(3);
         var testVehicles = VehicleTestDataBuilder.CreateVehicleFleet(2);
-        var testActivities = ActivityScheduleTestDataBuilder.CreateWeeklySchedule(5);
+        var testActivities = ActivityTestDataBuilder.CreateWeeklySchedule(5);
 
         // Act - Simulate dashboard data aggregation
         var totalDrivers = testDrivers.Count;
         var totalVehicles = testVehicles.Count;
         var totalActivities = testActivities.Count;
         var activeDrivers = testDrivers.Count(d => d.Status == "Active");
-        var todayActivities = testActivities.Count(a => a.ScheduledDate.Date == DateTime.Today);
+        var todayActivities = testActivities.Count(a => a.Date.Date == DateTime.Today);
 
         // Assert - Validate business logic
         totalDrivers.Should().BeGreaterThan(0, "Should have drivers");
@@ -263,7 +263,7 @@ public class DashboardTests
         todayActivities.Should().BeGreaterOrEqualTo(0, "Today activities count should be valid");
 
         // Validate data relationships make sense
-        testActivities.All(a => a.ScheduledVehicleId <= totalVehicles).Should().BeTrue("All activities should reference valid vehicles");
+        testActivities.All(a => a.AssignedVehicleId <= totalVehicles).Should().BeTrue("All activities should reference valid vehicles");
         testActivities.All(a => a.RequestedBy != null).Should().BeTrue("All activities should have a requester");
     }
 }

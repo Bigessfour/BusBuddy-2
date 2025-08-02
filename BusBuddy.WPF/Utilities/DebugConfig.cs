@@ -18,7 +18,10 @@ namespace BusBuddy.WPF.Utilities
         public static void WriteIf(bool condition, string category, string message)
         {
             if (condition)
+            {
                 Debug.WriteLine($"[{category}] {message}");
+            }
+
         }
 
         public static void WriteStudent(string message)

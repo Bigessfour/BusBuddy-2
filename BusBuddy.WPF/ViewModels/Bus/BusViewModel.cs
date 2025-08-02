@@ -139,7 +139,12 @@ namespace BusBuddy.WPF.ViewModels
         {
             get
             {
-                if (!DateLastInspection.HasValue) return "Overdue";
+                if (!DateLastInspection.HasValue)
+                {
+                    return "Overdue";
+                }
+
+
                 var daysSinceInspection = (DateTime.Now - DateLastInspection.Value).TotalDays;
                 var monthsSinceInspection = daysSinceInspection / 30.0;
                 return monthsSinceInspection switch
@@ -156,7 +161,12 @@ namespace BusBuddy.WPF.ViewModels
         {
             get
             {
-                if (!InsuranceExpiryDate.HasValue) return "Unknown";
+                if (!InsuranceExpiryDate.HasValue)
+                {
+                    return "Unknown";
+                }
+
+
                 var daysUntilExpiry = (InsuranceExpiryDate.Value - DateTime.Now).Days;
                 return daysUntilExpiry switch
                 {

@@ -13,6 +13,7 @@
     "redhat.vscode-xml",
     "rogalmic.vscode-xml-complete",
     // Testing and Test Explorer
+    "ms-dotnettools.dotnet-interactive-vscode",
     "ms-vscode.test-adapter-converter",
     // PowerShell Development (v2025.2.0 — Latest Stable)
     "ms-vscode.powershell",
@@ -23,8 +24,8 @@
     // AI-Native Development (BusBuddy's AI-first approach)
     "github.copilot",
     "github.copilot-chat",
-    // Syncfusion Development Support
-    "syncfusioninc.maui-vscode-extensions",
+    // WPF Development Support (Syncfusion WPF-specific, not MAUI)
+    // NOTE: Removed MAUI extension as BusBuddy is WPF-only
     // Task Management (EXCLUSIVE METHOD)
     "spmeesseman.vscode-taskexplorer",
     // Enhanced Productivity

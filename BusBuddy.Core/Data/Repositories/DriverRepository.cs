@@ -30,7 +30,9 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
         var activeDrivers = await GetActiveDriversAsync();
 
         if (!startTime.HasValue || !endTime.HasValue)
+        {
             return activeDrivers;
+        }
 
         // Get drivers that don't have conflicting activities
         var conflictingDriverIds = await Context.Activities
@@ -57,7 +59,9 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
     public async Task<IEnumerable<Driver>> SearchDriversAsync(string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
+        {
             return await GetActiveDriversAsync();
+        }
 
         return await Query()
             .Where(d => d.Status == "Active" &&
@@ -255,7 +259,9 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
         var activeDrivers = GetActiveDrivers();
 
         if (!startTime.HasValue || !endTime.HasValue)
+        {
             return activeDrivers;
+        }
 
         // Get drivers that don't have conflicting activities
         var conflictingDriverIds = Context.Activities
@@ -311,7 +317,9 @@ public class DriverRepository : Repository<Driver>, IDriverRepository
     public IEnumerable<Driver> SearchDrivers(string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
+        {
             return GetActiveDrivers();
+        }
 
         return Query()
             .Where(d => d.Status == "Active" &&

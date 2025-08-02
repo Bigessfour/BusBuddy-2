@@ -25,7 +25,10 @@ namespace BusBuddy.WPF.Services
                 for (int i = 0; i < 7; i++)
                 {
                     if (driver.Status == "Active")
+                    {
                         availableDates.Add(today.AddDays(i));
+                    }
+
                 }
                 result.Add(new DriverAvailabilityInfo
                 {

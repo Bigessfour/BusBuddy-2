@@ -59,7 +59,11 @@ namespace BusBuddy.Configuration
         public string GetFullUrl(string relativePath)
         {
             if (string.IsNullOrEmpty(relativePath))
+            {
+
                 return BaseUrl;
+            }
+
 
             return $"{BaseUrl.TrimEnd('/')}{relativePath}";
         }
@@ -115,7 +119,11 @@ namespace BusBuddy.Configuration
                 foreach (var url in urlsToCheck)
                 {
                     if (!Uri.TryCreate(url, UriKind.Absolute, out _))
+                    {
+
                         return false;
+                    }
+
                 }
 
                 return true;

@@ -101,7 +101,9 @@ namespace BusBuddy.Core.Services
         public async Task AddScheduleAsync(Schedule schedule)
         {
             if (schedule == null)
+            {
                 throw new ArgumentNullException(nameof(schedule));
+            }
 
             using (LogContext.PushProperty("Operation", "AddScheduleAsync"))
             using (LogContext.PushProperty("SportsCategory", schedule.SportsCategory))
@@ -165,7 +167,9 @@ namespace BusBuddy.Core.Services
         public async Task UpdateScheduleAsync(Schedule schedule)
         {
             if (schedule == null)
+            {
                 throw new ArgumentNullException(nameof(schedule));
+            }
 
             using (LogContext.PushProperty("Operation", "UpdateScheduleAsync"))
             using (LogContext.PushProperty("ScheduleId", schedule.ScheduleId))

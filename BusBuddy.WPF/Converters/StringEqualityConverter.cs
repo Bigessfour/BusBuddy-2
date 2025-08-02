@@ -13,7 +13,11 @@ namespace BusBuddy.WPF.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null || parameter == null)
+            {
+
                 return false;
+            }
+
 
             var stringValue = value.ToString();
             var parameterValue = parameter.ToString();

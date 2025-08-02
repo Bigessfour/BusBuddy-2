@@ -294,7 +294,12 @@ public class Driver : INotifyPropertyChanged
         get
         {
             if (!string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName))
+            {
+
                 return $"{FirstName} {LastName}";
+            }
+
+
             return DriverName;
         }
     }
@@ -316,9 +321,24 @@ public class Driver : INotifyPropertyChanged
     {
         get
         {
-            if (!TrainingComplete) return "Training Required";
-            if (LicenseExpiryDate.HasValue && LicenseExpiryDate.Value < DateTime.Now) return "License Expired";
-            if (LicenseExpiryDate.HasValue && LicenseExpiryDate.Value < DateTime.Now.AddDays(30)) return "License Expiring";
+            if (!TrainingComplete)
+            {
+                return "Training Required";
+            }
+
+
+            if (LicenseExpiryDate.HasValue && LicenseExpiryDate.Value < DateTime.Now)
+            {
+                return "License Expired";
+            }
+
+
+            if (LicenseExpiryDate.HasValue && LicenseExpiryDate.Value < DateTime.Now.AddDays(30))
+            {
+                return "License Expiring";
+            }
+
+
             return "Qualified";
         }
     }
@@ -329,7 +349,12 @@ public class Driver : INotifyPropertyChanged
     {
         get
         {
-            if (!LicenseExpiryDate.HasValue) return "Unknown";
+            if (!LicenseExpiryDate.HasValue)
+            {
+                return "Unknown";
+            }
+
+
             var daysUntilExpiry = (LicenseExpiryDate.Value - DateTime.Now).Days;
             return daysUntilExpiry switch
             {

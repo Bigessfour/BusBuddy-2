@@ -52,7 +52,11 @@ namespace BusBuddy.WPF.Utilities
         /// <returns>Formatted time string or empty if null</returns>
         public static string FormatTime(TimeSpan? time)
         {
-            if (!time.HasValue) return string.Empty;
+            if (!time.HasValue)
+            {
+                return string.Empty;
+            }
+
 
             DateTime dateTime = DateTime.Today.Add(time.Value);
             return dateTime.ToString(TimeFormat, CultureInfo.CurrentCulture);
@@ -66,11 +70,19 @@ namespace BusBuddy.WPF.Utilities
         public static string FormatStatus(string? status)
         {
             if (string.IsNullOrWhiteSpace(status))
+            {
+
                 return "Unknown";
+            }
 
             // Capitalize first letter
+
             if (status.Length == 1)
+            {
+
                 return status.ToUpper();
+            }
+
 
             return char.ToUpper(status[0]) + status.Substring(1).ToLower();
         }
@@ -95,7 +107,11 @@ namespace BusBuddy.WPF.Utilities
         /// <returns>Formatted numeric string or empty if null</returns>
         public static string FormatDecimal(decimal? value, int decimalPlaces = 1)
         {
-            if (!value.HasValue) return string.Empty;
+            if (!value.HasValue)
+            {
+                return string.Empty;
+            }
+
 
             string format = "N" + decimalPlaces;
             return value.Value.ToString(format, CultureInfo.CurrentCulture);
@@ -120,7 +136,11 @@ namespace BusBuddy.WPF.Utilities
         /// <returns>Formatted mileage with "mi" suffix or empty if null</returns>
         public static string FormatMileage(decimal? miles)
         {
-            if (!miles.HasValue) return string.Empty;
+            if (!miles.HasValue)
+            {
+                return string.Empty;
+            }
+
 
             return $"{miles.Value.ToString(MileageFormat, CultureInfo.CurrentCulture)} mi";
         }
@@ -132,15 +152,26 @@ namespace BusBuddy.WPF.Utilities
         /// <returns>Formatted duration as hours and minutes</returns>
         public static string FormatDuration(int? minutes)
         {
-            if (!minutes.HasValue || minutes.Value <= 0) return string.Empty;
+            if (!minutes.HasValue || minutes.Value <= 0)
+            {
+                return string.Empty;
+            }
+
 
             int hours = minutes.Value / 60;
             int mins = minutes.Value % 60;
 
             if (hours > 0)
+            {
+
                 return $"{hours}h {mins}m";
+            }
             else
+            {
+
                 return $"{mins}m";
+            }
+
         }
 
         /// <summary>
@@ -151,9 +182,13 @@ namespace BusBuddy.WPF.Utilities
         public static string FormatPhoneNumber(string? phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+
                 return string.Empty;
+            }
 
             // Remove any non-digit characters
+
             string digitsOnly = new string(phoneNumber.Where(char.IsDigit).ToArray());
 
             // Format as (XXX) XXX-XXXX if 10 digits

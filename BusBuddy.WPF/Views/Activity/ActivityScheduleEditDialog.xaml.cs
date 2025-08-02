@@ -328,27 +328,45 @@ namespace BusBuddy.WPF.Views.Activity
 
             // Subject validation
             if (string.IsNullOrWhiteSpace(Subject))
+            {
                 errors.Add("Subject is required");
+            }
 
             // Date validation
+
             if (ScheduledDate < DateTime.Today)
+            {
                 errors.Add("Scheduled date cannot be in the past");
+            }
 
             // Time validation
+
             if (ScheduledEventTime <= ScheduledLeaveTime)
+            {
                 errors.Add("Event time must be after leave time");
+            }
 
             // Destination validation
+
             if (string.IsNullOrWhiteSpace(ScheduledDestination))
+            {
                 errors.Add("Destination is required");
+            }
 
             // Riders validation
+
             if (ScheduledRiders < 1)
+            {
                 errors.Add("Number of riders must be at least 1");
+            }
 
             // Vehicle capacity validation
+
             if (SelectedVehicle != null && ScheduledRiders > SelectedVehicle.Capacity)
+            {
                 errors.Add($"Number of riders ({ScheduledRiders}) exceeds vehicle capacity ({SelectedVehicle.Capacity})");
+            }
+
 
             if (errors.Count > 0)
             {

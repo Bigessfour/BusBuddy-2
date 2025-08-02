@@ -131,7 +131,11 @@ namespace BusBuddy.WPF.Utilities
         /// </summary>
         public static void Initialize(LoggingMode initialMode = LoggingMode.Standard)
         {
-            if (_isInitialized) return;
+            if (_isInitialized)
+            {
+                return;
+            }
+
 
             _globalMode = initialMode;
             _isInitialized = true;
@@ -281,7 +285,11 @@ namespace BusBuddy.WPF.Utilities
         /// <param name="duration">Duration of the operation in milliseconds</param>
         public static void TrackPerformanceImpact(string operationType, double duration)
         {
-            if (_globalMode == LoggingMode.Light) return; // Skip tracking in light mode
+            if (_globalMode == LoggingMode.Light)
+            {
+                return; // Skip tracking in light mode
+            }
+
 
             _operationCounts.AddOrUpdate(operationType, 1, (key, count) => count + 1);
             _totalDurations.AddOrUpdate(operationType, duration, (key, total) => total + duration);
@@ -452,7 +460,11 @@ namespace BusBuddy.WPF.Utilities
 
             public void Dispose()
             {
-                if (_disposed) return;
+                if (_disposed)
+                {
+                    return;
+                }
+
 
                 _stopwatch.Stop();
 
@@ -485,42 +497,61 @@ namespace BusBuddy.WPF.Utilities
             public void LogVerbose(string messageTemplate, params object[] propertyValues)
             {
                 if (IsEnabled(LogEventLevel.Verbose, _contextId))
+                {
                     _logger.Verbose(messageTemplate, propertyValues);
+                }
+
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void LogDebug(string messageTemplate, params object[] propertyValues)
             {
                 if (IsEnabled(LogEventLevel.Debug, _contextId))
+                {
                     _logger.Debug(messageTemplate, propertyValues);
+                }
+
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void LogInformation(string messageTemplate, params object[] propertyValues)
             {
                 if (IsEnabled(LogEventLevel.Information, _contextId))
+                {
                     _logger.Information(messageTemplate, propertyValues);
+                }
+
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void LogWarning(string messageTemplate, params object[] propertyValues)
             {
                 if (IsEnabled(LogEventLevel.Warning, _contextId))
+                {
                     _logger.Warning(messageTemplate, propertyValues);
+                }
+
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void LogError(string messageTemplate, params object[] propertyValues)
             {
                 if (IsEnabled(LogEventLevel.Error, _contextId))
+                {
                     _logger.Error(messageTemplate, propertyValues);
+                }
+
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void LogError(Exception exception, string messageTemplate, params object[] propertyValues)
             {
                 if (IsEnabled(LogEventLevel.Error, _contextId))
+                {
+
                     _logger.Error(exception, messageTemplate, propertyValues);
+                }
+
             }
         }
     }

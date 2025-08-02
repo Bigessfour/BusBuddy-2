@@ -65,9 +65,23 @@ namespace BusBuddy.WPF.Converters
             if (value is double efficiency)
             {
                 // Syncfusion chart color palette
-                if (efficiency >= 90) return new SolidColorBrush(Color.FromRgb(76, 175, 80));   // Material Green
-                if (efficiency >= 70) return new SolidColorBrush(Color.FromRgb(255, 235, 59));  // Material Yellow
-                if (efficiency >= 50) return new SolidColorBrush(Color.FromRgb(255, 152, 0));   // Material Orange
+                if (efficiency >= 90)
+                {
+                    return new SolidColorBrush(Color.FromRgb(76, 175, 80));   // Material Green
+                }
+
+                if (efficiency >= 70)
+                {
+                    return new SolidColorBrush(Color.FromRgb(255, 235, 59));  // Material Yellow
+                }
+
+
+                if (efficiency >= 50)
+                {
+                    return new SolidColorBrush(Color.FromRgb(255, 152, 0));   // Material Orange
+                }
+
+
                 return new SolidColorBrush(Color.FromRgb(244, 67, 54));                        // Material Red
             }
             return new SolidColorBrush(Color.FromRgb(158, 158, 158)); // Material Gray

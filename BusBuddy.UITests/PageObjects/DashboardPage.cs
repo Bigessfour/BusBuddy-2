@@ -136,7 +136,11 @@ public class DashboardPage
     public (string Date, string Activity, string Destination) GetRecentActivityInfo(int index)
     {
         var grid = RecentActivitiesGrid;
-        if (grid == null) return (string.Empty, string.Empty, string.Empty);
+        if (grid == null)
+        {
+            return (string.Empty, string.Empty, string.Empty);
+        }
+
 
         var date = grid.GetDataGridCellValue(index, 0);
         var activity = grid.GetDataGridCellValue(index, 1);

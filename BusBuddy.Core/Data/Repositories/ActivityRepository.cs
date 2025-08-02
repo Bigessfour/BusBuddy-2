@@ -161,10 +161,14 @@ public class ActivityRepository : Repository<Activity>, IActivityRepository
         var query = Query();
 
         if (startDate.HasValue)
+        {
             query = query.Where(a => a.Date >= startDate.Value);
+        }
 
         if (endDate.HasValue)
+        {
             query = query.Where(a => a.Date <= endDate.Value);
+        }
 
         return await query
             .GroupBy(a => a.ActivityType)

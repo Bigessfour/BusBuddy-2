@@ -176,13 +176,28 @@ namespace BusBuddy.Core.Models.Trips
             get
             {
                 if (VehicleId.HasValue && DriverId.HasValue)
+                {
+
                     return "Fully Assigned";
+                }
+
                 else if (!VehicleId.HasValue && !DriverId.HasValue)
+                {
+
                     return "Unassigned";
+                }
+
                 else if (!VehicleId.HasValue)
+                {
+
                     return "Need Vehicle";
+                }
                 else
+                {
+
                     return "Need Driver";
+                }
+
             }
         }
 

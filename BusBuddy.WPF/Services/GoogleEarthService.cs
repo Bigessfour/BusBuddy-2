@@ -26,9 +26,12 @@ namespace BusBuddy.WPF.Services
             try
             {
                 if (_isInitialized)
+                {
                     return;
+                }
 
                 // Simulate Google Earth initialization
+
                 await Task.Delay(2000);
 
                 _isInitialized = true;

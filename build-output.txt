@@ -1,0 +1,13 @@
+  BusBuddy.Core -> C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\bin\Debug\net9.0-windows\BusBuddy.Core.dll
+  BusBuddy.WPF -> C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\bin\Debug\net9.0-windows\BusBuddy.WPF.dll
+C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.UITests\Tests\VehicleModelTests.cs(206,35): error CS1061: 'BooleanAssertions' does not contain a definition for 'NotBeNull' and no accessible extension method 'NotBeNull' accepting a first argument of type 'BooleanAssertions' could be found (are you missing a using directive or an assembly reference?) [C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.UITests\BusBuddy.UITests.csproj]
+
+Build FAILED.
+
+C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.UITests\Tests\VehicleModelTests.cs(206,35): error CS1061: 'BooleanAssertions' does not contain a definition for 'NotBeNull' and no accessible extension method 'NotBeNull' accepting a first argument of type 'BooleanAssertions' could be found (are you missing a using directive or an assembly reference?) [C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.UITests\BusBuddy.UITests.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:02.10
+
+Workload updates are available. Run `dotnet workload list` for more information.

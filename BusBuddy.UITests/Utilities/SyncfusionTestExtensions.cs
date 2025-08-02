@@ -149,7 +149,11 @@ public static class SyncfusionTestExtensions
         {
             var rowCount = dataGrid.GetDataGridRowCount();
             if (rowCount >= expectedMinimumRows)
+            {
+
                 return true;
+            }
+
 
             Thread.Sleep(100);
         }
@@ -244,7 +248,11 @@ public static class SyncfusionTestExtensions
             foreach (var control in syncfusionControls)
             {
                 if (!control.IsAvailable)
+                {
+
                     return false;
+                }
+
             }
 
             return syncfusionControls.Length > 0;

@@ -90,7 +90,11 @@ public class DatabaseResilienceService
     /// </summary>
     private static bool ShouldRetry(Exception ex, int currentAttempt, int maxRetries)
     {
-        if (currentAttempt >= maxRetries) return false;
+        if (currentAttempt >= maxRetries)
+        {
+            return false;
+        }
+
 
         return ex switch
         {
@@ -157,7 +161,11 @@ public class DatabaseResilienceService
     /// </summary>
     private bool IsCircuitBreakerOpen()
     {
-        if (_consecutiveFailures < MaxConsecutiveFailures) return false;
+        if (_consecutiveFailures < MaxConsecutiveFailures)
+        {
+            return false;
+        }
+
 
         if (DateTime.UtcNow - _lastFailureTime > _circuitBreakerTimeout)
         {

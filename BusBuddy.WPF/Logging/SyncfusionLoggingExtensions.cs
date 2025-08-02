@@ -101,20 +101,29 @@ namespace BusBuddy.WPF.Logging
                 if (itemCount.HasValue)
                 {
                     using (LogContext.PushProperty("ItemCount", itemCount.Value))
+                    {
                         logProperties.Add($"Items: {itemCount.Value}");
+                    }
+
                 }
 
                 if (!string.IsNullOrEmpty(dataSourceType))
                 {
                     using (LogContext.PushProperty("DataSourceType", dataSourceType))
+                    {
                         logProperties.Add($"Source: {dataSourceType}");
+                    }
+
                 }
 
                 if (duration.HasValue)
                 {
                     var durationMs = duration.Value.TotalMilliseconds;
                     using (LogContext.PushProperty("DurationMs", durationMs))
+                    {
                         logProperties.Add($"Duration: {durationMs:F1}ms");
+                    }
+
 
                     if (durationMs > 500)
                     {

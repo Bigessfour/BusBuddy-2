@@ -379,9 +379,13 @@ namespace BusBuddy.WPF.Logging
 
         public void Dispose()
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
 
             // Log any remaining active operations
+
             foreach (var kvp in _activeOperations)
             {
                 kvp.Value.Stop();

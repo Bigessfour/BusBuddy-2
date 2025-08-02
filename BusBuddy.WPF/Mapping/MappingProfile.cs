@@ -83,16 +83,31 @@ namespace BusBuddy.WPF.Mapping
         // Helper methods for name extraction
         private string ExtractFirstName(string fullName)
         {
-            if (string.IsNullOrEmpty(fullName)) return string.Empty;
+            if (string.IsNullOrEmpty(fullName))
+            {
+                return string.Empty;
+            }
+
+
             var parts = fullName.Split(' ');
             return parts.FirstOrDefault() ?? string.Empty;
         }
 
         private string ExtractLastName(string fullName)
         {
-            if (string.IsNullOrEmpty(fullName)) return string.Empty;
+            if (string.IsNullOrEmpty(fullName))
+            {
+                return string.Empty;
+            }
+
+
             var parts = fullName.Split(' ');
-            if (parts.Length <= 1) return string.Empty;
+            if (parts.Length <= 1)
+            {
+                return string.Empty;
+            }
+
+
             return string.Join(" ", parts.Skip(1));
         }
 
@@ -100,15 +115,27 @@ namespace BusBuddy.WPF.Mapping
         private string GetMaintenanceStatus(DateTime? lastMaintenanceDate, int? currentOdometer)
         {
             if (!lastMaintenanceDate.HasValue)
+            {
+
                 return "Unknown";
+            }
 
             // If maintenance was over 6 months ago
+
             if (lastMaintenanceDate.Value.AddMonths(6) < DateTime.Now)
+            {
+
                 return "Maintenance Required";
+            }
 
             // If maintenance is due within a month
+
             if (lastMaintenanceDate.Value.AddMonths(5) < DateTime.Now)
+            {
+
                 return "Maintenance Soon";
+            }
+
 
             return "Good";
         }
@@ -116,13 +143,25 @@ namespace BusBuddy.WPF.Mapping
         private string GetLicenseStatus(DateTime? licenseExpiryDate)
         {
             if (!licenseExpiryDate.HasValue)
+            {
+
                 return "Unknown";
+            }
+
 
             if (licenseExpiryDate.Value < DateTime.Now)
+            {
+
                 return "Expired";
+            }
+
 
             if (licenseExpiryDate.Value < DateTime.Now.AddDays(30))
+            {
+
                 return "Expiring Soon";
+            }
+
 
             return "Valid";
         }
@@ -130,9 +169,13 @@ namespace BusBuddy.WPF.Mapping
         private int? CalculateDurationMinutes(TimeSpan? amTime, TimeSpan? pmTime)
         {
             if (!amTime.HasValue || !pmTime.HasValue)
+            {
+
                 return null;
+            }
 
             // Assuming PM time is later than AM time in a school day
+
             var amMinutes = amTime.Value.TotalMinutes;
             var pmMinutes = pmTime.Value.TotalMinutes;
 
@@ -143,23 +186,44 @@ namespace BusBuddy.WPF.Mapping
         private string FormatAddress(string? address, string? city, string? state, string? zipCode)
         {
             if (string.IsNullOrWhiteSpace(address))
+            {
+
                 return "No address on file";
+            }
+
 
             var parts = new List<string>();
             if (!string.IsNullOrWhiteSpace(address))
+            {
                 parts.Add(address);
+            }
+
 
             var cityStateParts = new List<string>();
             if (!string.IsNullOrWhiteSpace(city))
+            {
                 cityStateParts.Add(city);
+            }
+
+
             if (!string.IsNullOrWhiteSpace(state))
+            {
                 cityStateParts.Add(state);
+            }
+
 
             if (cityStateParts.Count > 0)
+            {
                 parts.Add(string.Join(", ", cityStateParts));
+            }
+
 
             if (!string.IsNullOrWhiteSpace(zipCode))
+            {
+
                 parts.Add(zipCode);
+            }
+
 
             return string.Join(" ", parts);
         }

@@ -151,7 +151,10 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         /// </summary>
         private void ApplyFilters()
         {
-            if (Vehicles == null) return;
+            if (Vehicles == null)
+            {
+                return;
+            }
 
             var filtered = Vehicles.AsEnumerable();
 
@@ -233,7 +236,11 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         /// </summary>
         private async Task EditVehicleAsync()
         {
-            if (SelectedVehicle == null) return;
+            if (SelectedVehicle == null)
+            {
+                return;
+            }
+
             StatusMessage = $"Editing vehicle {SelectedVehicle.BusNumber}";
         }
 
@@ -242,7 +249,10 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         /// </summary>
         private async Task SaveVehicleAsync()
         {
-            if (SelectedVehicle == null) return;
+            if (SelectedVehicle == null)
+            {
+                return;
+            }
 
             try
             {
@@ -299,7 +309,10 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
         /// </summary>
         private async Task DeleteVehicleAsync()
         {
-            if (SelectedVehicle == null) return;
+            if (SelectedVehicle == null)
+            {
+                return;
+            }
 
             try
             {

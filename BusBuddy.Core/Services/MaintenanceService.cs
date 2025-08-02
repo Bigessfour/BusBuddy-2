@@ -56,7 +56,11 @@ public class MaintenanceService : IMaintenanceService
         using var context = _contextFactory.CreateWriteDbContext();
         var maintenance = await context.MaintenanceRecords.FindAsync(id);
         if (maintenance == null)
+        {
+
             return false;
+        }
+
 
         context.MaintenanceRecords.Remove(maintenance);
         await context.SaveChangesAsync();
@@ -100,10 +104,17 @@ public class MaintenanceService : IMaintenanceService
             .Where(m => m.VehicleId == vehicleId && m.RepairCost > 0);
 
         if (startDate.HasValue)
+        {
             query = query.Where(m => m.Date >= startDate.Value);
+        }
+
 
         if (endDate.HasValue)
+        {
+
             query = query.Where(m => m.Date <= endDate.Value);
+        }
+
 
         return await query.SumAsync(m => m.RepairCost);
     }

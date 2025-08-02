@@ -43,9 +43,13 @@ public class Phase1ValidationTests
 
     private void SeedTestData()
     {
-        if (_context == null) return;
+        if (_context == null)
+        {
+            return;
+        }
 
         // Add test drivers
+
         var drivers = new[]
         {
             new Driver { DriverId = 1, DriverName = "John Smith", Status = "Active", LicenseNumber = "D123456" },

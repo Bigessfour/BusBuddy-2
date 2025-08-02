@@ -36,10 +36,18 @@ public class FuelService : IFuelService
     public async Task<Fuel> CreateFuelRecordAsync(Fuel fuel)
     {
         if (fuel == null)
+        {
+
             throw new ArgumentException("Fuel record cannot be null.", nameof(fuel));
+        }
+
 
         if (fuel.Gallons.HasValue && fuel.Gallons.Value < 0)
+        {
+
             throw new ArgumentException("Gallons cannot be negative.", nameof(fuel));
+        }
+
 
         using var context = _contextFactory.CreateWriteDbContext();
         context.FuelRecords.Add(fuel);
@@ -60,7 +68,11 @@ public class FuelService : IFuelService
         using var context = _contextFactory.CreateWriteDbContext();
         var fuel = await context.FuelRecords.FindAsync(id);
         if (fuel == null)
+        {
+
             return false;
+        }
+
 
         context.FuelRecords.Remove(fuel);
         await context.SaveChangesAsync();
@@ -94,10 +106,15 @@ public class FuelService : IFuelService
             .Where(f => f.VehicleFueledId == vehicleId && f.TotalCost.HasValue);
 
         if (startDate.HasValue)
+        {
             query = query.Where(f => f.FuelDate >= startDate.Value);
+        }
 
         if (endDate.HasValue)
+        {
             query = query.Where(f => f.FuelDate <= endDate.Value);
+        }
+
 
         return await query.SumAsync(f => f.TotalCost ?? 0);
     }
@@ -109,10 +126,15 @@ public class FuelService : IFuelService
             .Where(f => f.VehicleFueledId == vehicleId && f.Gallons.HasValue);
 
         if (startDate.HasValue)
+        {
             query = query.Where(f => f.FuelDate >= startDate.Value);
+        }
 
         if (endDate.HasValue)
+        {
             query = query.Where(f => f.FuelDate <= endDate.Value);
+        }
+
 
         return await query.SumAsync(f => f.Gallons ?? 0);
     }

@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch (WPF)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "🏗️ BB: Build & Run (Default)",
+      "program": "${workspaceFolder}/BusBuddy.WPF/bin/Debug/net8.0-windows/BusBuddy.WPF.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.WPF",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "env": {
+        "BUSBUDDY_AI_MODE": "enabled",
+        "BUSBUDDY_PHASE": "2"
+      }
+    },
+    {
+      "name": ".NET Core Launch (Console Debug)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "🏗️ BB: Build Core Only",
+      "program": "${workspaceFolder}/BusBuddy.Core/bin/Debug/net8.0/BusBuddy.Core.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/BusBuddy.Core",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ]
+}

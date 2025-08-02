@@ -80,7 +80,11 @@ namespace BusBuddy.Core.Extensions
             foreach (var _ in entities)
             {
                 count++;
-                if (count > 100) break; // Limit counting to avoid performance issues
+                if (count > 100)
+                {
+                    break; // Limit counting to avoid performance issues
+                }
+
             }
 
             string countDisplay = count > 100 ? "100+" : count.ToString();

@@ -266,24 +266,48 @@ namespace BusBuddy.WPF.ViewModels
             action = action.ToLower();
 
             if (action.Contains("creat") || action.Contains("add") || action.Contains("new"))
+            {
+
                 return "Create";
+            }
+
 
             if (action.Contains("updat") || action.Contains("edit") || action.Contains("modif") || action.Contains("chang"))
+            {
+
                 return "Update";
+            }
+
 
             if (action.Contains("delet") || action.Contains("remov"))
+            {
+
                 return "Delete";
+            }
+
 
             if (action.Contains("view") || action.Contains("get") || action.Contains("fetch") || action.Contains("load") || action.Contains("read"))
+            {
+
                 return "Read";
+            }
+
 
             if (action.Contains("login") || action.Contains("logout") || action.Contains("auth"))
+            {
+
                 return "Login";
+            }
+
 
             if (action.Contains("error") || action.Contains("except") || action.Contains("fail"))
+            {
+
                 return "Error";
+            }
 
             // Default to system events
+
             return "System";
         }
     }

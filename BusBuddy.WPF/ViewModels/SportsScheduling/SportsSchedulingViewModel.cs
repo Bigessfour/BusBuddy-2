@@ -248,7 +248,10 @@ namespace BusBuddy.WPF.ViewModels.SportsScheduling
 
         private async Task CreateEventAsync()
         {
-            if (!CanCreateEvent()) return;
+            if (!CanCreateEvent())
+            {
+                return;
+            }
 
             try
             {
@@ -395,7 +398,10 @@ namespace BusBuddy.WPF.ViewModels.SportsScheduling
 
         private async Task LoadAvailableResourcesAsync()
         {
-            if (SelectedEvent == null) return;
+            if (SelectedEvent == null)
+            {
+                return;
+            }
 
             try
             {

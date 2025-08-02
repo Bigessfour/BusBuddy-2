@@ -117,7 +117,11 @@ namespace BusBuddy.Core.Services
         public async Task<ActivitySchedule> UpdateActivityScheduleAsync(ActivitySchedule activitySchedule)
         {
             if (activitySchedule == null)
+            {
+
                 throw new ArgumentNullException(nameof(activitySchedule));
+            }
+
 
             try
             {
@@ -523,7 +527,11 @@ namespace BusBuddy.Core.Services
         public async Task<bool> HasConflictsAsync(ActivitySchedule activitySchedule)
         {
             if (activitySchedule == null)
+            {
+
                 throw new ArgumentNullException(nameof(activitySchedule));
+            }
+
 
             try
             {
@@ -697,7 +705,11 @@ namespace BusBuddy.Core.Services
         private string EscapeCsvField(string? field)
         {
             if (string.IsNullOrEmpty(field))
+            {
+
                 return string.Empty;
+            }
+
 
             bool needsQuotes = field.Contains(',') || field.Contains('"') || field.Contains('\n');
             if (needsQuotes)

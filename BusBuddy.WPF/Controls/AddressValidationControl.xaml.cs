@@ -33,7 +33,10 @@ namespace BusBuddy.WPF.Controls
                 if (string.IsNullOrEmpty(address))
                 {
                     if (resultsTextBlock != null)
+                    {
                         resultsTextBlock.Text = "Please enter an address to validate.";
+                    }
+
                     return;
                 }
 
@@ -48,7 +51,9 @@ namespace BusBuddy.WPF.Controls
                 Logger.Error(ex, "Error during address validation button click");
                 var resultsTextBlock = this.FindName("ResultsTextBlock") as TextBlock;
                 if (resultsTextBlock != null)
+                {
                     resultsTextBlock.Text = $"Error: {ex.Message}";
+                }
             }
         }
     }

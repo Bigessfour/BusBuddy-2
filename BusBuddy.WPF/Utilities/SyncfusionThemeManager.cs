@@ -68,7 +68,11 @@ namespace BusBuddy.WPF.Utilities
         public static bool ValidateThemeResources()
         {
             if (Application.Current == null)
+            {
+
                 return false;
+            }
+
 
             var resources = Application.Current.Resources;
             string[] criticalResources = { "MenuItemStyle", "MenuSeparatorStyle", "ContextMenuStyle" };

@@ -4,14 +4,59 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:analytics="clr-namespace:BusBuddy.WPF.Views.Analytics"
         xmlns:local="clr-namespace:BusBuddy.WPF.Views.Main"
+        xmlns:nav="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         mc:Ignorable="d"
         Title="🚌 Bus Buddy - Transportation Management"
         Height="800"
         Width="1200"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized">
+
+    <Window.Resources>
+        <!-- Navigation Button Style -->
+        <Style x:Key="NavigationButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#2D3748"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ContentPresenter x:Name="contentPresenter"
+                                            Focusable="False"
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            Margin="{TemplateBinding Padding}"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#F0F7FF"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#3182CE"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" TargetName="border" Value="#E2E8F0"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" TargetName="border" Value="#F7FAFC"/>
+                                <Setter Property="Foreground" Value="#A0AEC0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -38,58 +83,123 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Navigation Menu -->
+            <!-- Enhanced Navigation Menu -->
             <Border Grid.Column="0"
                     Background="#F7FAFC"
                     BorderBrush="#E2E8F0"
                     BorderThickness="0,0,1,0">
-                <StackPanel Margin="10">
-                    <TextBlock Text="Navigation"
-                            FontWeight="Bold"
-                            FontSize="16"
-                            Margin="0,0,0,10"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="Navigation"
+                                FontWeight="Bold"
+                                FontSize="16"
+                                Margin="0,0,0,15"
+                                Foreground="#2D3748"/>
 
-                    <Button Name="DashboardButton"
-                            Content="📊 Dashboard"
-                            Padding="10,8"
-                            Margin="0,2"
-                            HorizontalAlignment="Stretch"
-                            Click="DashboardButton_Click"/>
+                        <!-- Core Navigation -->
+                        <TextBlock Text="Core Functions"
+                                FontWeight="SemiBold"
+                                FontSize="12"
+                                Margin="0,0,0,5"
+                                Foreground="#4A5568"/>
 
-                    <Button Name="AnalyticsButton"
-                            Content="📈 Analytics"
-                            Padding="10,8"
-                            Margin="0,2"
-                            HorizontalAlignment="Stretch"
-                            Click="AnalyticsButton_Click"/>
+                        <Button Name="DashboardButton"
+                                Content="📊 Dashboard"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="DashboardButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
 
-                    <Button Name="DriversButton"
-                            Content="👤 Drivers"
-                            Padding="10,8"
-                            Margin="0,2"
-                            HorizontalAlignment="Stretch"
-                            Click="DriversButton_Click"/>
+                        <Button Name="DriversButton"
+                                Content="👤 Drivers"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="DriversButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
 
-                    <Button Name="VehiclesButton"
-                            Content="🚐 Vehicles"
-                            Padding="10,8"
-                            Margin="0,2"
-                            HorizontalAlignment="Stretch"
-                            Click="VehiclesButton_Click"/>
+                        <Button Name="VehiclesButton"
+                                Content="🚌 Vehicles"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="VehiclesButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
 
-                    <Button Name="ActivitiesButton"
-                            Content="📅 Activities"
-                            Padding="10,8"
-                            Margin="0,2"
-                            HorizontalAlignment="Stretch"
-                            Click="ActivitiesButton_Click"/>
-                </StackPanel>
+                        <Button Name="ActivitiesButton"
+                                Content="📅 Activities"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="ActivitiesButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
+
+                        <!-- Analytics &amp; Reports -->
+                        <Separator Margin="0,15,0,10"/>
+                        <TextBlock Text="Analytics &amp; Reports"
+                                FontWeight="SemiBold"
+                                FontSize="12"
+                                Margin="0,0,0,5"
+                                Foreground="#4A5568"/>
+
+                        <Button Name="AnalyticsButton"
+                                Content="📈 Analytics"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="AnalyticsButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
+
+                        <!-- Additional Features -->
+                        <Separator Margin="0,15,0,10"/>
+                        <TextBlock Text="Additional Features"
+                                FontWeight="SemiBold"
+                                FontSize="12"
+                                Margin="0,0,0,5"
+                                Foreground="#4A5568"/>
+
+                        <Button Name="RouteManagementButton"
+                                Content="🗺️ Route Management"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="RouteManagementButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
+
+                        <Button Name="FuelManagementButton"
+                                Content="⛽ Fuel Management"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="FuelManagementButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
+
+                        <!-- Settings &amp; Tools -->
+                        <Separator Margin="0,15,0,10"/>
+                        <TextBlock Text="Settings &amp; Tools"
+                                FontWeight="SemiBold"
+                                FontSize="12"
+                                Margin="0,0,0,5"
+                                Foreground="#4A5568"/>
+
+                        <Button Name="SettingsButton"
+                                Content="⚙️ Settings"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="SettingsButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
+
+                    </StackPanel>
+                </ScrollViewer>
             </Border>
 
             <!-- Content Area -->
             <Frame Grid.Column="1"
                    x:Name="ContentFrame"
-                   NavigationUIVisibility="Hidden" />
+                   NavigationUIVisibility="Hidden"
+                   Source="{x:Null}" />
         </Grid>
 
         <!-- Status Bar -->

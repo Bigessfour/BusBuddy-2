@@ -55,9 +55,23 @@ namespace BusBuddy.WPF.Converters
         {
             if (value is int daysRemaining)
             {
-                if (daysRemaining < 0) return new SolidColorBrush(Color.FromRgb(244, 67, 54));   // Red - Expired
-                if (daysRemaining <= 7) return new SolidColorBrush(Color.FromRgb(255, 152, 0));  // Orange - Critical
-                if (daysRemaining <= 30) return new SolidColorBrush(Color.FromRgb(255, 193, 7)); // Yellow - Warning
+                if (daysRemaining < 0)
+                {
+                    return new SolidColorBrush(Color.FromRgb(244, 67, 54));   // Red - Expired
+                }
+
+                if (daysRemaining <= 7)
+                {
+                    return new SolidColorBrush(Color.FromRgb(255, 152, 0));  // Orange - Critical
+                }
+
+
+                if (daysRemaining <= 30)
+                {
+                    return new SolidColorBrush(Color.FromRgb(255, 193, 7)); // Yellow - Warning
+                }
+
+
                 return new SolidColorBrush(Color.FromRgb(46, 125, 50));                         // Green - Good
             }
             return new SolidColorBrush(Colors.Gray);

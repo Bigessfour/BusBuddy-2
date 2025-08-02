@@ -294,7 +294,11 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<T> AddAsync(T entity)
     {
-        if (entity == null) throw new ArgumentNullException(nameof(entity));
+        if (entity == null)
+        {
+            throw new ArgumentNullException(nameof(entity));
+        }
+
         SetAuditFields(entity, isUpdate: false);
         var result = await DbSet.AddAsync(entity);
         return result.Entity;
@@ -313,7 +317,11 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual T Add(T entity)
     {
-        if (entity == null) throw new ArgumentNullException(nameof(entity));
+        if (entity == null)
+        {
+            throw new ArgumentNullException(nameof(entity));
+        }
+
         SetAuditFields(entity, isUpdate: false);
         var result = DbSet.Add(entity);
         return result.Entity;
@@ -357,7 +365,10 @@ public class Repository<T> : IRepository<T> where T : class
     public virtual async Task<bool> RemoveByIdAsync(int id)
     {
         var entity = await GetByIdAsync(id);
-        if (entity == null) return false;
+        if (entity == null)
+        {
+            return false;
+        }
 
         Remove(entity);
         return true;
@@ -366,7 +377,10 @@ public class Repository<T> : IRepository<T> where T : class
     public virtual async Task<bool> RemoveByIdAsync(object id)
     {
         var entity = await GetByIdAsync(id);
-        if (entity == null) return false;
+        if (entity == null)
+        {
+            return false;
+        }
 
         Remove(entity);
         return true;
@@ -378,10 +392,16 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<bool> SoftDeleteAsync(int id)
     {
-        if (!_supportsSoftDelete) return false;
+        if (!_supportsSoftDelete)
+        {
+            return false;
+        }
 
         var entity = await GetByIdAsync(id);
-        if (entity == null) return false;
+        if (entity == null)
+        {
+            return false;
+        }
 
         SoftDelete(entity);
         return true;
@@ -389,10 +409,16 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task<bool> SoftDeleteAsync(object id)
     {
-        if (!_supportsSoftDelete) return false;
+        if (!_supportsSoftDelete)
+        {
+            return false;
+        }
 
         var entity = await GetByIdAsync(id);
-        if (entity == null) return false;
+        if (entity == null)
+        {
+            return false;
+        }
 
         SoftDelete(entity);
         return true;
@@ -424,20 +450,32 @@ public class Repository<T> : IRepository<T> where T : class
 
     public virtual async Task RestoreAsync(int id)
     {
-        if (!_supportsSoftDelete) return;
+        if (!_supportsSoftDelete)
+        {
+            return;
+        }
 
         var entity = await DbSet.FindAsync(id);
-        if (entity == null) return;
+        if (entity == null)
+        {
+            return;
+        }
 
         Restore(entity);
     }
 
     public virtual async Task RestoreAsync(object id)
     {
-        if (!_supportsSoftDelete) return;
+        if (!_supportsSoftDelete)
+        {
+            return;
+        }
 
         var entity = await DbSet.FindAsync(id);
-        if (entity == null) return;
+        if (entity == null)
+        {
+            return;
+        }
 
         Restore(entity);
     }
@@ -642,9 +680,14 @@ public class Repository<T> : IRepository<T> where T : class
             var createdByProp = entityType.GetProperty("CreatedBy");
 
             if (createdDateProp?.PropertyType == typeof(DateTime))
+            {
                 createdDateProp.SetValue(entity, currentTime);
+            }
+
             if (createdByProp?.PropertyType == typeof(string))
+            {
                 createdByProp.SetValue(entity, currentUser);
+            }
         }
         else
         {
@@ -652,9 +695,14 @@ public class Repository<T> : IRepository<T> where T : class
             var updatedByProp = entityType.GetProperty("UpdatedBy");
 
             if (updatedDateProp?.PropertyType == typeof(DateTime?))
+            {
                 updatedDateProp.SetValue(entity, currentTime);
+            }
+
             if (updatedByProp?.PropertyType == typeof(string))
+            {
                 updatedByProp.SetValue(entity, currentUser);
+            }
         }
     }
 
@@ -670,11 +718,30 @@ public class Repository<T> : IRepository<T> where T : class
         var entityType = typeof(T);
 
         // Check for common patterns
-        if (entityType.Name == "Student") return "StudentId";
-        if (entityType.Name == "Driver") return "DriverId";
-        if (entityType.Name == "Bus") return "VehicleId";
-        if (entityType.Name == "Route") return "RouteId";
-        if (entityType.Name == "Activity") return "ActivityId";
+        if (entityType.Name == "Student")
+        {
+            return "StudentId";
+        }
+
+        if (entityType.Name == "Driver")
+        {
+            return "DriverId";
+        }
+
+        if (entityType.Name == "Bus")
+        {
+            return "VehicleId";
+        }
+
+        if (entityType.Name == "Route")
+        {
+            return "RouteId";
+        }
+
+        if (entityType.Name == "Activity")
+        {
+            return "ActivityId";
+        }
 
         // Default to "Id" for BaseEntity types
         return "Id";

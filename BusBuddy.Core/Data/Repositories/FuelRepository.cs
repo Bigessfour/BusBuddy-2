@@ -45,20 +45,28 @@ public class FuelRepository : Repository<Fuel>, IFuelRepository
         var query = Query().Where(f => f.VehicleFueledId == vehicleId && f.Gallons.HasValue && f.Gallons.Value > 0);
 
         if (startDate.HasValue)
+        {
             query = query.Where(f => f.FuelDate >= startDate.Value.Date);
+        }
 
         if (endDate.HasValue)
+        {
             query = query.Where(f => f.FuelDate <= endDate.Value.Date);
+        }
 
         var records = await query.ToListAsync();
 
         if (!records.Any())
+        {
             return 0;
+        }
 
         // Calculate efficiency from odometer readings and gallons
         var recordsWithData = records.Where(f => f.Gallons.HasValue && f.Gallons.Value > 0).ToList();
         if (!recordsWithData.Any())
+        {
             return 0;
+        }
 
         // Simple average for now - could be enhanced with actual mileage calculation
         return recordsWithData.Average(f => f.VehicleOdometerReading / f.Gallons!.Value);

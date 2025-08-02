@@ -63,7 +63,9 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             .Where(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
 
         if (targetDate.HasValue)
+        {
             query = query.Where(r => r.Date.Date == targetDate.Value.Date);
+        }
 
         return await query
             .OrderByDescending(r => r.Date)
@@ -76,7 +78,9 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             .Where(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
 
         if (targetDate.HasValue)
+        {
             query = query.Where(r => r.Date.Date == targetDate.Value.Date);
+        }
 
         return await query
             .OrderByDescending(r => r.Date)
@@ -127,13 +131,20 @@ public class RouteRepository : Repository<Route>, IRouteRepository
         var query = Query().Where(r => r.RouteName == routeName && r.IsActive);
 
         if (startDate.HasValue)
+        {
             query = query.Where(r => r.Date >= startDate.Value.Date);
+        }
 
         if (endDate.HasValue)
+        {
             query = query.Where(r => r.Date <= endDate.Value.Date);
+        }
 
         var routes = await query.ToListAsync();
-        if (routes.Count == 0) return 0;
+        if (routes.Count == 0)
+        {
+            return 0;
+        }
 
         var totalRiders = routes.Sum(r => (r.AMRiders ?? 0) + (r.PMRiders ?? 0));
         return routes.Count > 0 ? (decimal)totalRiders / routes.Count : 0;
@@ -181,16 +192,24 @@ public class RouteRepository : Repository<Route>, IRouteRepository
         foreach (var route in routes.Where(r => r.IsActive))
         {
             if (!route.AMVehicleId.HasValue && !route.PMVehicleId.HasValue)
+            {
                 errors.Add($"Route '{route.RouteName}' has no vehicle assignments");
+            }
 
             if (!route.AMDriverId.HasValue && !route.PMDriverId.HasValue)
+            {
                 errors.Add($"Route '{route.RouteName}' has no driver assignments");
+            }
 
             if (route.AMBeginMiles.HasValue && route.AMEndMiles.HasValue && route.AMEndMiles < route.AMBeginMiles)
+            {
                 errors.Add($"Route '{route.RouteName}' AM: End miles less than begin miles");
+            }
 
             if (route.PMBeginMiles.HasValue && route.PMEndMiles.HasValue && route.PMEndMiles < route.PMBeginMiles)
+            {
                 errors.Add($"Route '{route.RouteName}' PM: End miles less than begin miles");
+            }
         }
 
         return errors;
@@ -201,10 +220,14 @@ public class RouteRepository : Repository<Route>, IRouteRepository
         var query = Query().Where(r => r.IsActive);
 
         if (startDate.HasValue)
+        {
             query = query.Where(r => r.Date >= startDate.Value.Date);
+        }
 
         if (endDate.HasValue)
+        {
             query = query.Where(r => r.Date <= endDate.Value.Date);
+        }
 
         return await query
             .Where(r =>
@@ -289,7 +312,9 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             .Where(r => r.AMVehicleId == vehicleId || r.PMVehicleId == vehicleId);
 
         if (targetDate.HasValue)
+        {
             query = query.Where(r => r.Date.Date == targetDate.Value.Date);
+        }
 
         return query
             .OrderByDescending(r => r.Date)
@@ -302,7 +327,9 @@ public class RouteRepository : Repository<Route>, IRouteRepository
             .Where(r => r.AMDriverId == driverId || r.PMDriverId == driverId);
 
         if (targetDate.HasValue)
+        {
             query = query.Where(r => r.Date.Date == targetDate.Value.Date);
+        }
 
         return query
             .OrderByDescending(r => r.Date)

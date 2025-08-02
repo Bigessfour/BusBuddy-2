@@ -99,7 +99,10 @@ namespace BusBuddy.WPF.ViewModels
                     FuelRecords.Clear();
                     var records = await _fuelService.GetAllFuelRecordsAsync();
                     foreach (var record in records)
+                    {
                         FuelRecords.Add(record);
+                    }
+
 
                     CalculateTrends();
 

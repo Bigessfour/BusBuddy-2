@@ -256,19 +256,27 @@ namespace BusBuddy.WPF.ViewModels.Sports
                     // Update UI collections
                     SportsActivities.Clear();
                     foreach (var activity in sportsActivities)
+                    {
                         SportsActivities.Add(activity);
+                    }
 
                     AvailableVehicles.Clear();
                     foreach (var vehicle in vehicles)
+                    {
                         AvailableVehicles.Add(vehicle);
+                    }
 
                     AvailableDrivers.Clear();
                     foreach (var driver in drivers)
+                    {
                         AvailableDrivers.Add(driver);
+                    }
 
                     SportsDestinations.Clear();
                     foreach (var destination in destinations)
+                    {
                         SportsDestinations.Add(destination);
+                    }
 
                     // Apply initial filters
                     await ApplyFiltersAsync();
@@ -308,7 +316,9 @@ namespace BusBuddy.WPF.ViewModels.Sports
                 {
                     FilteredActivities.Clear();
                     foreach (var activity in filtered)
+                    {
                         FilteredActivities.Add(activity);
+                    }
                 });
             });
         }
@@ -333,7 +343,10 @@ namespace BusBuddy.WPF.ViewModels.Sports
         /// </summary>
         private async Task AssignVehicleAsync()
         {
-            if (SelectedActivity == null || SelectedVehicle == null) return;
+            if (SelectedActivity == null || SelectedVehicle == null)
+            {
+                return;
+            }
 
             try
             {
@@ -353,7 +366,9 @@ namespace BusBuddy.WPF.ViewModels.Sports
                             MessageBoxImage.Warning);
 
                         if (result == MessageBoxResult.No)
+                        {
                             return;
+                        }
                     }
 
                     // Update assignment
@@ -380,7 +395,10 @@ namespace BusBuddy.WPF.ViewModels.Sports
         /// </summary>
         private async Task AssignDriverAsync()
         {
-            if (SelectedActivity == null || SelectedDriver == null) return;
+            if (SelectedActivity == null || SelectedDriver == null)
+            {
+                return;
+            }
 
             try
             {
@@ -400,7 +418,9 @@ namespace BusBuddy.WPF.ViewModels.Sports
                             MessageBoxImage.Warning);
 
                         if (result == MessageBoxResult.No)
+                        {
                             return;
+                        }
                     }
 
                     // Update assignment
@@ -472,14 +492,18 @@ namespace BusBuddy.WPF.ViewModels.Sports
                     {
                         var vehicleConflict = await CheckVehicleConflictAsync(activity.AssignedVehicle, activity);
                         if (vehicleConflict)
+                        {
                             conflicts.Add($"Vehicle {activity.AssignedVehicle.BusNumber} conflict on {activity.Date:MM/dd} - {activity.ActivityType}");
+                        }
                     }
 
                     if (activity.Driver != null)
                     {
                         var driverConflict = await CheckDriverConflictAsync(activity.Driver, activity);
                         if (driverConflict)
+                        {
                             conflicts.Add($"Driver {activity.Driver.FirstName} {activity.Driver.LastName} conflict on {activity.Date:MM/dd} - {activity.ActivityType}");
+                        }
                     }
                 }
 
@@ -517,14 +541,20 @@ namespace BusBuddy.WPF.ViewModels.Sports
 
         private async Task EditActivityAsync()
         {
-            if (SelectedActivity == null) return;
+            if (SelectedActivity == null)
+            {
+                return;
+            }
             // Implementation for editing activity
             MessageBox.Show($"Edit activity: {SelectedActivity.ActivityType} - to be implemented", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private async Task DeleteActivityAsync()
         {
-            if (SelectedActivity == null) return;
+            if (SelectedActivity == null)
+            {
+                return;
+            }
 
             var result = MessageBox.Show(
                 $"Are you sure you want to delete the activity '{SelectedActivity.ActivityType}' on {SelectedActivity.Date:MM/dd/yyyy}?",

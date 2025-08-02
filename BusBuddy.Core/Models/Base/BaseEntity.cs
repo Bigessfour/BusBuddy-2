@@ -175,13 +175,20 @@ public abstract class BaseEntity : INotifyPropertyChanged
         {
             var created = $"Created {CreatedDate:MM/dd/yyyy}";
             if (!string.IsNullOrEmpty(CreatedBy))
+            {
                 created += $" by {CreatedBy}";
+            }
+
 
             if (UpdatedDate.HasValue)
             {
                 var updated = $", Updated {UpdatedDate.Value:MM/dd/yyyy}";
                 if (!string.IsNullOrEmpty(UpdatedBy))
+                {
                     updated += $" by {UpdatedBy}";
+                }
+
+
                 created += updated;
             }
 
@@ -221,7 +228,11 @@ public abstract class BaseEntity : INotifyPropertyChanged
     protected bool SetProperty<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value))
+        {
+
             return false;
+        }
+
 
         field = value;
         OnPropertyChanged(propertyName);

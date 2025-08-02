@@ -11,7 +11,11 @@ namespace BusBuddy.WPF.Extensions
         /// </summary>
         public static TimeSpan? GetTime(this TextBox textBox)
         {
-            if (textBox == null) return null;
+            if (textBox == null)
+            {
+                return null;
+            }
+
 
             if (textBox.Tag is TimeSpan timeSpan)
             {
@@ -33,7 +37,11 @@ namespace BusBuddy.WPF.Extensions
         /// </summary>
         public static void SetTime(this TextBox textBox, TimeSpan value)
         {
-            if (textBox == null) return;
+            if (textBox == null)
+            {
+                return;
+            }
+
 
             textBox.Tag = value;
             textBox.Text = value.ToString(@"hh\:mm");

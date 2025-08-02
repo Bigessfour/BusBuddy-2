@@ -30,7 +30,9 @@ public class BusRepository : Repository<Bus>, IBusRepository
         var activeVehicles = await GetActiveVehiclesAsync();
 
         if (!startTime.HasValue || !endTime.HasValue)
+        {
             return activeVehicles;
+        }
 
         // Get vehicles that don't have conflicting activities
         var conflictingVehicleIds = await Context.Activities
@@ -136,7 +138,9 @@ public class BusRepository : Repository<Bus>, IBusRepository
         var query = Query().Where(v => v.SeatingCapacity >= minCapacity);
 
         if (maxCapacity.HasValue)
+        {
             query = query.Where(v => v.SeatingCapacity <= maxCapacity.Value);
+        }
 
         return await query.OrderBy(v => v.SeatingCapacity).ToListAsync();
     }
@@ -228,7 +232,9 @@ public class BusRepository : Repository<Bus>, IBusRepository
         var activeVehicles = GetActiveVehicles();
 
         if (!startTime.HasValue || !endTime.HasValue)
+        {
             return activeVehicles;
+        }
 
         // Get vehicles that don't have conflicting activities
         var conflictingVehicleIds = Context.Activities

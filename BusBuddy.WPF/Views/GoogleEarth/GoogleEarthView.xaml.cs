@@ -109,7 +109,10 @@ namespace BusBuddy.WPF.Views.GoogleEarth
             }
 
             if (string.IsNullOrEmpty(layerTypeToApply))
+            {
                 return;
+            }
+
 
             var correlationId = Guid.NewGuid().ToString("N")[..8];
 

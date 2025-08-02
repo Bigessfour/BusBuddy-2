@@ -103,7 +103,11 @@ public class DriversPage
     public bool SelectDriverByName(string driverName)
     {
         var grid = DriversGrid;
-        if (grid == null) return false;
+        if (grid == null)
+        {
+            return false;
+        }
+
 
         var row = grid.FindDataGridRowByContent(driverName, 0); // Assuming name is in first column
         return UITestHelpers.SafeClick(row);
@@ -115,7 +119,11 @@ public class DriversPage
     public (string Name, string Phone, string Email, string Status) GetDriverInfo(int rowIndex)
     {
         var grid = DriversGrid;
-        if (grid == null) return (string.Empty, string.Empty, string.Empty, string.Empty);
+        if (grid == null)
+        {
+            return (string.Empty, string.Empty, string.Empty, string.Empty);
+        }
+
 
         var name = grid.GetDataGridCellValue(rowIndex, 0);
         var phone = grid.GetDataGridCellValue(rowIndex, 1);
@@ -246,7 +254,11 @@ public class DriversPage
     {
         var results = new List<int>();
         var grid = DriversGrid;
-        if (grid == null) return results;
+        if (grid == null)
+        {
+            return results;
+        }
+
 
         var rowCount = grid.GetDataGridRowCount();
         var columnCount = grid.GetDataGridColumnCount();

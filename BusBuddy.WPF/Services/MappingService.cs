@@ -33,7 +33,11 @@ namespace BusBuddy.WPF.Services
         public TDestination Map<TSource, TDestination>(TSource source)
         {
             if (source == null)
+            {
+
                 throw new ArgumentNullException(nameof(source));
+            }
+
 
             var stopwatch = Stopwatch.StartNew();
             try
@@ -60,11 +64,19 @@ namespace BusBuddy.WPF.Services
         public IEnumerable<TDestination> MapCollection<TSource, TDestination>(IEnumerable<TSource> source)
         {
             if (source == null)
+            {
+
                 throw new ArgumentNullException(nameof(source));
+            }
 
             // For empty collections, avoid unnecessary overhead
+
             if (!source.Any())
+            {
+
                 return Enumerable.Empty<TDestination>();
+            }
+
 
             var stopwatch = Stopwatch.StartNew();
             try
@@ -92,9 +104,18 @@ namespace BusBuddy.WPF.Services
         public void Map<TSource, TDestination>(TSource source, TDestination destination)
         {
             if (source == null)
+            {
+
                 throw new ArgumentNullException(nameof(source));
+            }
+
+
             if (destination == null)
+            {
+
                 throw new ArgumentNullException(nameof(destination));
+            }
+
 
             var stopwatch = Stopwatch.StartNew();
             try

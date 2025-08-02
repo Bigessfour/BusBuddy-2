@@ -91,9 +91,12 @@ namespace BusBuddy.WPF.ViewModels
                 // Update the collection
                 Buses.Clear();
                 foreach (var b in result.Buses)
+                {
                     Buses.Add(b);
+                }
 
                 // Update pagination information
+
                 TotalRecords = result.TotalCount;
                 TotalPages = (int)Math.Ceiling(TotalRecords / (double)PageSize);
 

@@ -130,7 +130,11 @@ namespace BusBuddy.WPF.ViewModels
         // ✏️ Phase 2+ Enhancement: Edit driver (placeholder for future dialog)
         private void EditDriver(object? parameter)
         {
-            if (SelectedDriver == null) return;
+            if (SelectedDriver == null)
+            {
+                return;
+            }
+
 
             Logger.Information("✏️ Edit driver requested: {DriverName} (ID: {DriverId})",
                 SelectedDriver.DriverName, SelectedDriver.DriverId);
@@ -143,7 +147,11 @@ namespace BusBuddy.WPF.ViewModels
         // 🗑️ Phase 2+ Enhancement: Delete driver with confirmation
         private async Task DeleteDriverAsync()
         {
-            if (SelectedDriver == null) return;
+            if (SelectedDriver == null)
+            {
+                return;
+            }
+
 
             var result = MessageBox.Show(
                 $"Are you sure you want to delete driver '{SelectedDriver.DriverName}'?\n\nThis action cannot be undone.",

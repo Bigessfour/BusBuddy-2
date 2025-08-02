@@ -55,7 +55,11 @@ namespace BusBuddy.Core.Logging
         /// <param name="result">Optional result information</param>
         public void Complete(string? result = null)
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
+
 
             _stopwatch.Stop();
             var elapsed = _stopwatch.ElapsedMilliseconds;
@@ -88,7 +92,11 @@ namespace BusBuddy.Core.Logging
         /// <param name="exception">The exception that occurred</param>
         public void Error(Exception exception)
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
+
 
             _stopwatch.Stop();
             var elapsed = _stopwatch.ElapsedMilliseconds;
@@ -118,9 +126,13 @@ namespace BusBuddy.Core.Logging
         /// </summary>
         public void Dispose()
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
 
             // Complete the operation if not already completed
+
             if (_stopwatch.IsRunning)
             {
                 Complete("Disposed without explicit completion");

@@ -172,7 +172,11 @@ namespace BusBuddy.WPF.Views.Fuel
 
         private void PricePerGallon_ValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (_isUpdatingCost) return;
+            if (_isUpdatingCost)
+            {
+                return;
+            }
+
 
             _isUpdatingCost = true;
             if (Fuel.Gallons.HasValue && Fuel.Gallons.Value > 0 && Fuel.PricePerGallon.HasValue)
@@ -185,7 +189,11 @@ namespace BusBuddy.WPF.Views.Fuel
 
         private void TotalCost_ValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (_isUpdatingCost) return;
+            if (_isUpdatingCost)
+            {
+                return;
+            }
+
 
             _isUpdatingCost = true;
             if (Fuel.Gallons.HasValue && Fuel.Gallons.Value > 0 && Fuel.TotalCost.HasValue)

@@ -55,7 +55,11 @@ namespace BusBuddy.WPF.Utilities
         private void ConsolidateScatteredLogs()
         {
             var solutionRoot = Directory.GetParent(_logsDirectory)?.FullName;
-            if (solutionRoot == null) return;
+            if (solutionRoot == null)
+            {
+                return;
+            }
+
 
             var logFiles = Directory.GetFiles(solutionRoot, "*.log", SearchOption.AllDirectories)
                 .Where(f => !f.StartsWith(_logsDirectory)) // Exclude files already in logs directory
@@ -192,7 +196,11 @@ Generated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         public LogConsolidationStats GetLogStats()
         {
             if (!Directory.Exists(_logsDirectory))
+            {
+
                 return new LogConsolidationStats();
+            }
+
 
             var allLogFiles = Directory.GetFiles(_logsDirectory, "*.log");
             var activeLogFiles = allLogFiles.Where(f => !Path.GetFileName(f).StartsWith("archived-")).ToArray();

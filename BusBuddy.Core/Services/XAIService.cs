@@ -454,7 +454,10 @@ namespace BusBuddy.Core.Services
 
         private static List<string> ExtractActionableSteps(string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) return new List<string>();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return new List<string>();
+            }
 
             return text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => line.Trim())

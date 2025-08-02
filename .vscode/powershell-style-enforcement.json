@@ -95,6 +95,23 @@
       "Handle-*",
       "Manage-*"
     ],
+    "styleViolations": {
+      "bracelessIfStatements": {
+        "pattern": "if\\s*\\([^)]+\\)\\s*[^{\\n]",
+        "description": "If statements without braces are forbidden",
+        "correction": "Always use braces: if (condition) { statement }"
+      },
+      "bracelessElseStatements": {
+        "pattern": "else\\s+[^{\\n]",
+        "description": "Else statements without braces are forbidden",
+        "correction": "Always use braces: else { statement }"
+      },
+      "bracelessLoops": {
+        "pattern": "(for|foreach|while)\\s*\\([^)]+\\)\\s*[^{\\n]",
+        "description": "Loop statements without braces are forbidden",
+        "correction": "Always use braces for loop bodies"
+      }
+    },
     "actionBasedThinking": {
       "description": "Functions named based on what they DO rather than what they RETURN",
       "examples": [
@@ -113,13 +130,35 @@
         "PSUseApprovedVerbs": "Error",
         "PSUseSingularNouns": "Error",
         "PSReservedCmdletChar": "Error",
-        "PSReservedParams": "Error"
+        "PSReservedParams": "Error",
+        "PSAvoidUsingCmdletAliases": "Error",
+        "PSUseCmdletCorrectly": "Error"
       },
       "customRules": [
         "NoActionBasedFunctionNames",
         "RequireApprovedVerbPatterns",
         "EnforceReturnValueNaming"
       ]
+    },
+
+    "codeStyle": {
+      "bracesRequired": {
+        "ifStatements": "mandatory",
+        "elseStatements": "mandatory",
+        "forLoops": "mandatory",
+        "whileLoops": "mandatory",
+        "foreachLoops": "mandatory",
+        "description": "All control flow statements must use braces even for single statements"
+      },
+      "indentation": {
+        "spaces": 4,
+        "tabsAllowed": false,
+        "consistencyRequired": true
+      },
+      "lineLength": {
+        "maximum": 120,
+        "recommendation": 100
+      }
     },
 
     "vscodeSnippets": {

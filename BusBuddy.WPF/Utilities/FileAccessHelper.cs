@@ -17,7 +17,9 @@ namespace BusBuddy.WPF.Utilities
         public static bool SafeFileExists(string? filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
+            {
                 return false;
+            }
 
             try
             {
@@ -36,7 +38,9 @@ namespace BusBuddy.WPF.Utilities
         public static string? SafeGetFullPath(string? path)
         {
             if (string.IsNullOrWhiteSpace(path))
+            {
                 return null;
+            }
 
             try
             {
