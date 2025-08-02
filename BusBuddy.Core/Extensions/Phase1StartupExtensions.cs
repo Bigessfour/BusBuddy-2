@@ -1,4 +1,5 @@
 using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -45,6 +46,16 @@ public static class Phase1StartupExtensions
     public static IServiceCollection AddPhase1Services(this IServiceCollection services)
     {
         services.AddScoped<Phase1DataSeedingService>();
+
+        // Register GeoDataService with placeholder configuration
+        services.AddScoped<IGeoDataService>(serviceProvider =>
+        {
+            // TODO: Replace with actual configuration values
+            var geeApiBaseUrl = "https://earthengine.googleapis.com";
+            var geeAccessToken = Environment.GetEnvironmentVariable("GEE_ACCESS_TOKEN") ?? "placeholder_token";
+            return new GeoDataService(geeApiBaseUrl, geeAccessToken);
+        });
+
         return services;
     }
 }

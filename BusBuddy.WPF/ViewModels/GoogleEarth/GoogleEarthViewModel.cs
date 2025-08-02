@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
-using BusBuddy.Core.Services;
+using BusBuddy.Core.Services.Interfaces;
 using BusBuddy.WPF.ViewModels.Base;
 using BusBuddy.Core.Models;
 using RouteModel = BusBuddy.Core.Models.Route;
@@ -263,18 +263,6 @@ namespace BusBuddy.WPF.ViewModels.GoogleEarth
 
             // Simple error display for now
             StatusMessage = $"Error: {message}";
-        }
-    }
-}
-                    RouteId = 3,
-                    RouteName = "Route 3 - High School",
-                    Description = "High school morning route",
-                    StartTime = new TimeSpan(7, 15, 0),
-                    EndTime = new TimeSpan(8, 30, 0),
-                    Status = RouteStatus.Active,
-                    School = "Central High School"
-                }
-            };
         }
 
         #endregion

@@ -1,9 +1,11 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
+using BusBuddy.Core.Models;
+using BusBuddy.Core.Services.Interfaces;
 
 namespace BusBuddy.Core.Services
 {
-    public class GeoDataService : IDisposable
+    public class GeoDataService : IGeoDataService, IDisposable
     {
         private readonly HttpClient _httpClient;
         private readonly string _geeApiBaseUrl;
@@ -27,6 +29,52 @@ namespace BusBuddy.Core.Services
             response.EnsureSuccessStatusCode();
             var geoJson = await response.Content.ReadAsStringAsync();
             return geoJson;
+        }
+
+        public async Task<List<Route>> GetRoutesWithGeoDataAsync()
+        {
+            // TODO: Implement actual database query to get routes with geo data
+            // For now, return sample data to prevent compilation errors
+            await Task.Delay(10); // Simulate async operation
+
+            return new List<Route>
+            {
+                new Route
+                {
+                    RouteId = 1,
+                    RouteName = "Route 1 - Elementary",
+                    Description = "Elementary school morning route",
+                    Date = DateTime.Today,
+                    IsActive = true,
+                    School = "Maple Elementary"
+                },
+                new Route
+                {
+                    RouteId = 2,
+                    RouteName = "Route 2 - Middle School",
+                    Description = "Middle school afternoon route",
+                    Date = DateTime.Today,
+                    IsActive = true,
+                    School = "Oak Middle School"
+                }
+            };
+        }
+
+        public async Task<Route?> GetRouteGeoDataAsync(int routeId)
+        {
+            // TODO: Implement actual database query to get specific route with geo data
+            // For now, return sample data to prevent compilation errors
+            await Task.Delay(10); // Simulate async operation
+
+            return new Route
+            {
+                RouteId = routeId,
+                RouteName = $"Route {routeId}",
+                Description = $"Sample route {routeId} with geo data",
+                Date = DateTime.Today,
+                IsActive = true,
+                School = "Sample School"
+            };
         }
 
         /// <summary>

@@ -206,6 +206,7 @@ namespace BusBuddy.WPF
                     services.AddTransient<DriversViewModel>();
                     services.AddTransient<VehiclesViewModel>();
                     services.AddTransient<ActivityScheduleViewModel>();
+                    services.AddTransient<BusBuddy.WPF.ViewModels.GoogleEarth.GoogleEarthViewModel>();
 
                     // Phase 2: Add UI logging services
                     services.AddUILogging();
