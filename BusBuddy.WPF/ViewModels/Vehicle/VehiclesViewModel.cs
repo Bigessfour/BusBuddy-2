@@ -1,3 +1,4 @@
+using BusBuddy.Core.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,23 +11,24 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
     /// <summary>
     /// Phase 1 ViewModel for Vehicle Management - Simple and functional
     /// </summary>
-    public class VehiclesViewModel : INotifyPropertyChanged
+    public class VehiclesViewModel : BaseViewModel
     {
         #region Fields
-        private VehicleRecord? _selectedVehicle;
+        private ObservableCollection<Bus> _vehicles = new();
+        private Bus? _selectedVehicle;
         #endregion
 
         #region Properties
-        public ObservableCollection<VehicleRecord> Vehicles { get; set; } = new();
+        public ObservableCollection<Bus> Vehicles
+        {
+            get => _vehicles;
+            set => SetProperty(ref _vehicles, value);
+        }
 
-        public VehicleRecord? SelectedVehicle
+        public Bus? SelectedVehicle
         {
             get => _selectedVehicle;
-            set
-            {
-                _selectedVehicle = value;
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _selectedVehicle, value);
         }
         #endregion
 
@@ -166,15 +168,6 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
                 Console.WriteLine($"Error loading vehicle data: {ex.Message}");
                 MessageBox.Show($"Error loading vehicle data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        #endregion
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
     }

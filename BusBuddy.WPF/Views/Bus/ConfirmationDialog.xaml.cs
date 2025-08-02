@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 
 namespace BusBuddy.WPF.Views.Bus
 {
@@ -8,7 +9,12 @@ namespace BusBuddy.WPF.Views.Bus
         {
             InitializeComponent();
             Title = title;
-            MessageText.Text = message;
+
+            // Find the MessageText element and set its content
+            if (FindName("MessageText") is TextBlock messageTextBlock)
+            {
+                messageTextBlock.Text = message;
+            }
         }
 
         private void YesButton_Click(object sender, RoutedEventArgs e)

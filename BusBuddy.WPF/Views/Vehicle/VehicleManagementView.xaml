@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
@@ -135,48 +136,47 @@
             </Grid.ColumnDefinitions>
 
             <!-- Vehicle List -->
-            <DataGrid Grid.Column="0"
-                     x:Name="VehicleDataGrid"
-                     ItemsSource="{Binding FilteredVehicles}"
-                     SelectedItem="{Binding SelectedVehicle}"
-                     AutoGenerateColumns="False"
-                     IsReadOnly="True"
-                     CanUserAddRows="False"
-                     CanUserDeleteRows="False"
-                     SelectionMode="Single"
-                     GridLinesVisibility="Horizontal"
-                     HeadersVisibility="Column"
-                     Background="White"
-                     RowBackground="White"
-                     AlternatingRowBackground="#F5F5F5">
+            <syncfusion:SfDataGrid Grid.Column="0"
+                                   x:Name="VehicleDataGrid"
+                                   ItemsSource="{Binding FilteredVehicles}"
+                                   SelectedItem="{Binding SelectedVehicle}"
+                                   AutoGenerateColumns="False"
+                                   AllowEditing="False"
+                                   AllowSorting="True"
+                                   AllowFiltering="True"
+                                   ShowRowHeader="True"
+                                   SelectionMode="Single"
+                                   GridLinesVisibility="Both"
+                                   HeaderLinesVisibility="All"
+                                   ColumnSizer="Star">
 
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID"
-                                       Binding="{Binding VehicleId}"
-                                       Width="60"/>
-                    <DataGridTextColumn Header="Bus Number"
-                                       Binding="{Binding BusNumber}"
-                                       Width="100"/>
-                    <DataGridTextColumn Header="Make"
-                                       Binding="{Binding Make}"
-                                       Width="120"/>
-                    <DataGridTextColumn Header="Model"
-                                       Binding="{Binding Model}"
-                                       Width="120"/>
-                    <DataGridTextColumn Header="License Number"
-                                       Binding="{Binding LicenseNumber}"
-                                       Width="120"/>
-                    <DataGridTextColumn Header="Capacity"
-                                       Binding="{Binding SeatingCapacity}"
-                                       Width="80"/>
-                    <DataGridTextColumn Header="Status"
-                                       Binding="{Binding Status}"
-                                       Width="100"/>
-                    <DataGridTextColumn Header="Year"
-                                       Binding="{Binding Year}"
-                                       Width="70"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                <syncfusion:SfDataGrid.Columns>
+                    <syncfusion:GridTextColumn HeaderText="ID"
+                                             MappingName="VehicleId"
+                                             Width="60"/>
+                    <syncfusion:GridTextColumn HeaderText="Bus Number"
+                                             MappingName="BusNumber"
+                                             Width="100"/>
+                    <syncfusion:GridTextColumn HeaderText="Make"
+                                             MappingName="Make"
+                                             Width="120"/>
+                    <syncfusion:GridTextColumn HeaderText="Model"
+                                             MappingName="Model"
+                                             Width="120"/>
+                    <syncfusion:GridTextColumn HeaderText="License Number"
+                                             MappingName="LicenseNumber"
+                                             Width="120"/>
+                    <syncfusion:GridTextColumn HeaderText="Capacity"
+                                             MappingName="SeatingCapacity"
+                                             Width="80"/>
+                    <syncfusion:GridTextColumn HeaderText="Status"
+                                             MappingName="Status"
+                                             Width="100"/>
+                    <syncfusion:GridTextColumn HeaderText="Year"
+                                             MappingName="Year"
+                                             Width="70"/>
+                </syncfusion:SfDataGrid.Columns>
+            </syncfusion:SfDataGrid>
 
             <!-- Splitter -->
             <GridSplitter Grid.Column="1"

@@ -1,7 +1,11 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using BusBuddy.WPF.Views; // Added reference to Views namespace
+using BusBuddy.WPF.ViewModels;
+using BusBuddy.WPF.Views.Dashboard;
+using BusBuddy.WPF.Views.Student;
+using BusBuddy.WPF.Views.Analytics;
+using BusBuddy.WPF.Views.Route;
 
 namespace BusBuddy.WPF.Views.Main
 {
@@ -14,6 +18,8 @@ namespace BusBuddy.WPF.Views.Main
         public MainWindow()
         {
             InitializeComponent();
+            // Use direct instantiation for MVP if DI is not set up
+            DataContext = new MainWindowViewModel();
             StatusText.Text = "BusBuddy Ready - Select a section to begin";
         }
 
@@ -87,8 +93,8 @@ namespace BusBuddy.WPF.Views.Main
             try
             {
                 StatusText.Text = "Loading Drivers...";
-                ContentFrame.Navigate(new DriversView());
-                StatusText.Text = "Drivers view loaded successfully";
+                ContentFrame.Navigate(new DashboardView()); // MVP fallback
+                StatusText.Text = "Drivers view - Available in full version";
                 UpdateNavigationSelection(sender as Button);
             }
             catch (Exception ex)
@@ -103,8 +109,8 @@ namespace BusBuddy.WPF.Views.Main
             try
             {
                 StatusText.Text = "Loading Vehicles...";
-                ContentFrame.Navigate(new VehiclesView());
-                StatusText.Text = "Vehicles view loaded successfully";
+                ContentFrame.Navigate(new DashboardView()); // MVP fallback
+                StatusText.Text = "Vehicles view - Available in full version";
                 UpdateNavigationSelection(sender as Button);
             }
             catch (Exception ex)
@@ -119,14 +125,30 @@ namespace BusBuddy.WPF.Views.Main
             try
             {
                 StatusText.Text = "Loading Activities...";
-                ContentFrame.Navigate(new ActivityScheduleView());
-                StatusText.Text = "Activities view loaded successfully";
+                ContentFrame.Navigate(new DashboardView()); // MVP fallback
+                StatusText.Text = "Activities view - Available in full version";
                 UpdateNavigationSelection(sender as Button);
             }
             catch (Exception ex)
             {
                 StatusText.Text = "Error loading Activities";
                 MessageBox.Show($"Error loading Activities view: {ex.Message}", "Navigation Error");
+            }
+        }
+
+        private void StudentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                StatusText.Text = "Loading Students...";
+                ContentFrame.Navigate(new StudentForm());
+                StatusText.Text = "Students view loaded successfully";
+                UpdateNavigationSelection(sender as Button);
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Error loading Students";
+                MessageBox.Show($"Error loading Students view: {ex.Message}", "Navigation Error");
             }
         }
 

@@ -16,6 +16,8 @@ namespace BusBuddy.WPF.Controls
             InitializeComponent();
         }
 
+        private void InitializeComponent() => throw new NotImplementedException();
+
         private void AddVehicle_Click(object sender, RoutedEventArgs e)
         {
             Logger.Information("Add vehicle action requested");

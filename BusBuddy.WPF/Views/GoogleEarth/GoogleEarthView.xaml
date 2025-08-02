@@ -2,11 +2,11 @@
 ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 ║                                                      🌍 GOOGLE EARTH INTEGRATION 🌍                                                ║
 ║                                                    [GEOSPATIAL MAPPING INTERFACE]                                                  ║
-║  ✨ SYNCFUSION FLUENTDARK THEME: Professional mapping interface with advanced controls                                             ║
-║  🎯 GOOGLE EARTH ENGINE: Advanced mapping and geospatial analysis capabilities                                                    ║
-║  🎭 ROUTE VISUALIZATION: Interactive route mapping with real-time bus tracking                                                    ║
-║  📊 GEOSPATIAL ANALYTICS: Advanced location-based analytics and reporting                                                         ║
-║  🌐 REAL-TIME TRACKING: Live bus tracking with professional mapping interface                                                     ║
+║  ✨ MVP PHASE 1: Standard WPF controls for basic functionality                                                                     ║
+║  🎯 GOOGLE EARTH ENGINE: Placeholder for advanced mapping capabilities                                                             ║
+║  🎭 ROUTE VISUALIZATION: Interactive route mapping interface preparation                                                           ║
+║  📊 GEOSPATIAL ANALYTICS: Basic location-based interface                                                                          ║
+║  🌐 REAL-TIME TRACKING: Live bus tracking interface with standard controls                                                        ║
 ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 -->
 <UserControl x:Class="BusBuddy.WPF.Views.GoogleEarth.GoogleEarthView"
@@ -16,14 +16,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BusBuddy.WPF.Views.GoogleEarth"
              xmlns:viewModels="clr-namespace:BusBuddy.WPF.ViewModels"
-             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-             xmlns:syncfusionskin="clr-namespace:Syncfusion.SfSkinManager;assembly=Syncfusion.SfSkinManager.WPF"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
-             d:DataContext="{d:DesignInstance viewModels:GoogleEarthViewModel}"
-             >
+             d:DataContext="{d:DesignInstance viewModels:GoogleEarthViewModel}">
 
-    <Grid Background="{DynamicResource SurfaceBackground}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Background="#F5F5F5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -31,7 +32,7 @@
 
         <!-- Header -->
         <Border Grid.Row="0"
-                Background="{DynamicResource BrandPrimaryBrush}"
+                Background="#2D3748"
                 Padding="24,16">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -40,7 +41,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Border Background="{DynamicResource BrandSchoolBusYellowBrush}"
+                    <Border Background="#FFD700"
                             Width="48" Height="48"
                             CornerRadius="24"
                             Margin="0,0,16,0">
@@ -54,44 +55,42 @@
                         <TextBlock Text="Google Earth Integration"
                                    FontSize="28"
                                    FontWeight="Bold"
-                                   Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+                                   Foreground="White"/>
                         <TextBlock Text="Advanced Geospatial Mapping and Route Visualization"
                                    FontSize="14"
-                                   Foreground="{DynamicResource ProfessionalTextSecondary}"
+                                   Foreground="#CCCCCC"
                                    Margin="0,4,0,0"/>
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="{DynamicResource BrandFleetGreenBrush}"
+                    <Border Background="#2ECC71"
                             CornerRadius="16"
                             Padding="12,6"
                             Margin="8,0">
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Width="10" Height="10"
-                                     Fill="{DynamicResource ProfessionalTextPrimary}"
+                                     Fill="White"
                                      VerticalAlignment="Center"
                                      Margin="0,0,8,0"/>
                             <TextBlock Text="GPS Active"
                                        FontSize="12"
                                        FontWeight="SemiBold"
-                                       Foreground="{DynamicResource ProfessionalTextPrimary}"/>
+                                       Foreground="White"/>
                         </StackPanel>
                     </Border>
 
-                    <syncfusion:ComboBoxAdv x:Name="MapLayerComboBox"
-                                            Width="150"
-                                            Height="32"
-                                            Style="{StaticResource StandardComboBoxStyle}"
-                                            Margin="16,0"
-                                            SelectedIndex="0"
-                                            SelectionChanged="MapLayerComboBox_SelectionChanged"
-                                            >
-                        <syncfusion:ComboBoxItemAdv>Satellite</syncfusion:ComboBoxItemAdv>
-                        <syncfusion:ComboBoxItemAdv>Terrain</syncfusion:ComboBoxItemAdv>
-                        <syncfusion:ComboBoxItemAdv>Hybrid</syncfusion:ComboBoxItemAdv>
-                        <syncfusion:ComboBoxItemAdv>Roadmap</syncfusion:ComboBoxItemAdv>
-                    </syncfusion:ComboBoxAdv>
+                    <ComboBox x:Name="MapLayerComboBox"
+                              Width="150"
+                              Height="32"
+                              Margin="16,0"
+                              SelectedIndex="0"
+                              SelectionChanged="MapLayerComboBox_SelectionChanged">
+                        <ComboBoxItem Content="Satellite"/>
+                        <ComboBoxItem Content="Terrain"/>
+                        <ComboBoxItem Content="Hybrid"/>
+                        <ComboBoxItem Content="Roadmap"/>
+                    </ComboBox>
                 </StackPanel>
             </Grid>
         </Border>
@@ -105,14 +104,16 @@
 
             <!-- Control Panel -->
             <Border Grid.Column="0"
-                    Background="{DynamicResource ProfessionalSurfaceLight}"
-                    BorderBrush="{DynamicResource SurfaceBorderBrush}"
+                    Background="White"
+                    BorderBrush="#E2E8F0"
                     BorderThickness="0,0,1,0">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               Padding="16">
                     <StackPanel>
                         <!-- Map Controls -->
-                        <Border Background="{DynamicResource ContentBackground}"
+                        <Border Background="#F8F9FA"
+                                BorderBrush="#DEE2E6"
+                                BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="16"
                                 Margin="0,0,0,16">
@@ -120,37 +121,51 @@
                                 <TextBlock Text="Map Controls"
                                            FontSize="16"
                                            FontWeight="SemiBold"
-                                           Foreground="{DynamicResource ContentForeground}"
+                                           Foreground="#2D3748"
                                            Margin="0,0,0,12"/>
 
-                                <syncfusion:ButtonAdv Content="📍 Center on Fleet"
-                                                      Style="{StaticResource PrimaryButtonAdvStyle}"
-                                                      Command="{Binding CenterOnFleetCommand}"
-                                                      Margin="0,4"
-                                                      HorizontalAlignment="Stretch"/>
+                                <Button Content="📍 Center on Fleet"
+                                        Command="{Binding CenterOnFleetCommand}"
+                                        Background="#007ACC"
+                                        Foreground="White"
+                                        Padding="10,8"
+                                        Margin="0,4"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Stretch"/>
 
-                                <syncfusion:ButtonAdv Content="🚌 Show All Buses"
-                                                      Style="{StaticResource SecondaryButtonAdvStyle}"
-                                                      Command="{Binding ShowAllBusesCommand}"
-                                                      Margin="0,4"
-                                                      HorizontalAlignment="Stretch"/>
+                                <Button Content="🚌 Show All Buses"
+                                        Command="{Binding ShowAllBusesCommand}"
+                                        Background="#6C757D"
+                                        Foreground="White"
+                                        Padding="10,8"
+                                        Margin="0,4"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Stretch"/>
 
-                                <syncfusion:ButtonAdv Content="🛣️ Show Routes"
-                                                      Style="{StaticResource SecondaryButtonAdvStyle}"
-                                                      Command="{Binding ShowRoutesCommand}"
-                                                      Margin="0,4"
-                                                      HorizontalAlignment="Stretch"/>
+                                <Button Content="🛣️ Show Routes"
+                                        Command="{Binding ShowRoutesCommand}"
+                                        Background="#6C757D"
+                                        Foreground="White"
+                                        Padding="10,8"
+                                        Margin="0,4"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Stretch"/>
 
-                                <syncfusion:ButtonAdv Content="🏫 Show Schools"
-                                                      Style="{StaticResource SecondaryButtonAdvStyle}"
-                                                      Command="{Binding ShowSchoolsCommand}"
-                                                      Margin="0,4"
-                                                      HorizontalAlignment="Stretch"/>
+                                <Button Content="🏫 Show Schools"
+                                        Command="{Binding ShowSchoolsCommand}"
+                                        Background="#6C757D"
+                                        Foreground="White"
+                                        Padding="10,8"
+                                        Margin="0,4"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Stretch"/>
                             </StackPanel>
                         </Border>
 
                         <!-- Live Tracking -->
-                        <Border Background="{DynamicResource ContentBackground}"
+                        <Border Background="#F8F9FA"
+                                BorderBrush="#DEE2E6"
+                                BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="16"
                                 Margin="0,0,0,16">
@@ -158,7 +173,7 @@
                                 <TextBlock Text="Live Tracking"
                                            FontSize="16"
                                            FontWeight="SemiBold"
-                                           Foreground="{DynamicResource ContentForeground}"
+                                           Foreground="#2D3748"
                                            Margin="0,0,0,12"/>
 
                                 <Grid>
@@ -170,7 +185,7 @@
                                     <TextBlock Grid.Column="0"
                                                Text="Real-time Updates"
                                                FontSize="14"
-                                               Foreground="{DynamicResource ContentForeground}"
+                                               Foreground="#2D3748"
                                                VerticalAlignment="Center"/>
 
                                     <CheckBox Grid.Column="1"
@@ -182,57 +197,62 @@
 
                                 <TextBlock Text="Update Frequency"
                                            FontSize="12"
-                                           Foreground="{DynamicResource ContentForeground}"
+                                           Foreground="#2D3748"
                                            Margin="0,0,0,4"/>
 
-                                <syncfusion:ComboBoxAdv SelectedIndex="1"
-                                                        Style="{StaticResource StandardComboBoxStyle}"
-                                                        >
-                                    <syncfusion:ComboBoxItemAdv>5 seconds</syncfusion:ComboBoxItemAdv>
-                                    <syncfusion:ComboBoxItemAdv>10 seconds</syncfusion:ComboBoxItemAdv>
-                                    <syncfusion:ComboBoxItemAdv>30 seconds</syncfusion:ComboBoxItemAdv>
-                                    <syncfusion:ComboBoxItemAdv>1 minute</syncfusion:ComboBoxItemAdv>
-                                </syncfusion:ComboBoxAdv>
+                                <ComboBox SelectedIndex="1">
+                                    <ComboBoxItem Content="5 seconds"/>
+                                    <ComboBoxItem Content="10 seconds"/>
+                                    <ComboBoxItem Content="30 seconds"/>
+                                    <ComboBoxItem Content="1 minute"/>
+                                </ComboBox>
                             </StackPanel>
                         </Border>
 
                         <!-- Bus List -->
-                        <Border Background="{DynamicResource ContentBackground}"
+                        <Border Background="#F8F9FA"
+                                BorderBrush="#DEE2E6"
+                                BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="16">
                             <StackPanel>
                                 <TextBlock Text="Active Buses"
                                            FontSize="16"
                                            FontWeight="SemiBold"
-                                           Foreground="{DynamicResource ContentForeground}"
+                                           Foreground="#2D3748"
                                            Margin="0,0,0,12"/>
 
-                                <syncfusion:SfDataGrid x:Name="BusListGrid"
-                                                       ItemsSource="{Binding ActiveBuses}"
-                                                       Style="{StaticResource StandardDataGridStyle}"
-                                                       Height="200"
-                                                       AutoGenerateColumns="False"
-                                                       SelectionMode="Single"
-                                                       SelectedItem="{Binding SelectedBus}"
-                                                       >
-                                    <syncfusion:SfDataGrid.Columns>
-                                        <syncfusion:GridTextColumn HeaderText="Bus #"
-                                                                   MappingName="BusNumber"
-                                                                   Width="60"/>
-                                        <syncfusion:GridTextColumn HeaderText="Route"
-                                                                   MappingName="RouteNumber"
-                                                                   Width="60"/>
-                                        <syncfusion:GridTextColumn HeaderText="Status"
-                                                                   MappingName="Status"
-                                                                   Width="80"/>
-                                    </syncfusion:SfDataGrid.Columns>
-                                </syncfusion:SfDataGrid>
+                                <DataGrid x:Name="BusListGrid"
+                                          ItemsSource="{Binding ActiveBuses}"
+                                          SelectedItem="{Binding SelectedBus}"
+                                          Height="200"
+                                          AutoGenerateColumns="False"
+                                          HeadersVisibility="Column"
+                                          GridLinesVisibility="None"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Bus #"
+                                                            Binding="{Binding BusNumber}"
+                                                            Width="60"/>
+                                        <DataGridTextColumn Header="Route"
+                                                            Binding="{Binding RouteNumber}"
+                                                            Width="60"/>
+                                        <DataGridTextColumn Header="Status"
+                                                            Binding="{Binding Status}"
+                                                            Width="80"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
 
-                                <syncfusion:ButtonAdv Content="📍 Track Selected"
-                                                      Style="{StaticResource PrimaryButtonAdvStyle}"
-                                                      Command="{Binding TrackSelectedBusCommand}"
-                                                      Margin="0,8,0,0"
-                                                      HorizontalAlignment="Stretch"/>
+                                <Button Content="📍 Track Selected"
+                                        Command="{Binding TrackSelectedBusCommand}"
+                                        Background="#007ACC"
+                                        Foreground="White"
+                                        Padding="10,8"
+                                        Margin="0,8,0,0"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Stretch"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -241,15 +261,15 @@
 
             <!-- Map Display Area -->
             <Border Grid.Column="1"
-                    Background="{DynamicResource ContentBackground}"
-                    BorderBrush="{DynamicResource SurfaceBorderBrush}"
+                    Background="White"
+                    BorderBrush="#E2E8F0"
                     BorderThickness="1"
                     Margin="0"
                     MinHeight="400">
                 <Grid>
                     <!-- Map Container -->
                     <Border x:Name="MapContainer"
-                            Background="{DynamicResource SurfaceBackground}"
+                            Background="#1a1a1a"
                             CornerRadius="8"
                             Margin="16"
                             MinHeight="400">
@@ -266,42 +286,55 @@
                                     <TextBlock Text="Google Earth Integration"
                                                FontSize="24"
                                                FontWeight="Bold"
-                                               Foreground="{DynamicResource ContentForeground}"
+                                               Foreground="White"
                                                HorizontalAlignment="Center"
                                                Margin="0,0,0,8"/>
                                     <TextBlock Text="Interactive mapping and route visualization"
                                                FontSize="14"
-                                               Foreground="{DynamicResource ContentForeground}"
+                                               Foreground="#CCCCCC"
                                                HorizontalAlignment="Center"
                                                Margin="0,0,0,24"/>
-                                    <syncfusion:ButtonAdv Content="Initialize Google Earth"
-                                                          Style="{StaticResource PrimaryButtonAdvStyle}"
-                                                          Command="{Binding InitializeMapCommand}"
-                                                          Width="200"/>
+                                    <Button Content="Initialize Google Earth"
+                                            Command="{Binding InitializeMapCommand}"
+                                            Background="#007ACC"
+                                            Foreground="White"
+                                            Padding="15,10"
+                                            BorderThickness="0"
+                                            Width="200"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- Map Loading Indicator -->
-                            <syncfusion:SfBusyIndicator x:Name="MapLoadingIndicator"
-                                                        IsBusy="{Binding IsMapLoading}"
-                                                        AnimationType="Gear"
-                                                        ViewboxWidth="50"
-                                                        ViewboxHeight="50"
-                                                        Style="{StaticResource LoadingIndicatorStyle}"
-                                                        Background="#80000000"
-                                                        >
-                                <syncfusion:SfBusyIndicator.Content>
-                                    <Grid>
-                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <TextBlock Text="Loading Map..."
-                                                       FontSize="16"
-                                                       Foreground="White"
-                                                       HorizontalAlignment="Center"
-                                                       Margin="0,16,0,0"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </syncfusion:SfBusyIndicator.Content>
-                            </syncfusion:SfBusyIndicator>
+                            <Border x:Name="MapLoadingIndicator"
+                                    Background="#80000000"
+                                    Visibility="{Binding IsMapLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="⚙️"
+                                               FontSize="50"
+                                               HorizontalAlignment="Center"
+                                               Foreground="White"
+                                               Margin="0,0,0,16">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform x:Name="LoadingRotation" CenterX="25" CenterY="25"/>
+                                        </TextBlock.RenderTransform>
+                                        <TextBlock.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard RepeatBehavior="Forever">
+                                                        <DoubleAnimation Storyboard.TargetName="LoadingRotation"
+                                                                         Storyboard.TargetProperty="Angle"
+                                                                         From="0" To="360" Duration="0:0:2"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </TextBlock.Triggers>
+                                    </TextBlock>
+                                    <TextBlock Text="Loading Map..."
+                                               FontSize="16"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
                         </Grid>
                     </Border>
 
@@ -310,21 +343,31 @@
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
                                 Margin="32,32,32,0">
-                        <syncfusion:ButtonAdv Content="+"
-                                              Style="{StaticResource IconButtonAdvStyle}"
-                                              Command="{Binding ZoomInCommand}"
-                                              Width="40" Height="40"
-                                              Margin="4,0"/>
-                        <syncfusion:ButtonAdv Content="-"
-                                              Style="{StaticResource IconButtonAdvStyle}"
-                                              Command="{Binding ZoomOutCommand}"
-                                              Width="40" Height="40"
-                                              Margin="4,0"/>
-                        <syncfusion:ButtonAdv Content="🏠"
-                                              Style="{StaticResource IconButtonAdvStyle}"
-                                              Command="{Binding ResetViewCommand}"
-                                              Width="40" Height="40"
-                                              Margin="4,0"/>
+                        <Button Content="+"
+                                Command="{Binding ZoomInCommand}"
+                                Background="#007ACC"
+                                Foreground="White"
+                                Width="40" Height="40"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                BorderThickness="0"
+                                Margin="4,0"/>
+                        <Button Content="-"
+                                Command="{Binding ZoomOutCommand}"
+                                Background="#007ACC"
+                                Foreground="White"
+                                Width="40" Height="40"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                BorderThickness="0"
+                                Margin="4,0"/>
+                        <Button Content="🏠"
+                                Command="{Binding ResetViewCommand}"
+                                Background="#007ACC"
+                                Foreground="White"
+                                Width="40" Height="40"
+                                BorderThickness="0"
+                                Margin="4,0"/>
                     </StackPanel>
                 </Grid>
             </Border>

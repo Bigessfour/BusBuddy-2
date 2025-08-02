@@ -21,6 +21,7 @@ namespace BusBuddy.WPF.Views.Activity
         public ActivityScheduleEditDialog(ActivitySchedule? activityToEdit = null)
         {
             InitializeComponent();
+
             ViewModel = new ActivityScheduleEditDialogViewModel(activityToEdit);
             DataContext = ViewModel;
 

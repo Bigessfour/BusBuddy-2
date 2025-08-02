@@ -1,62 +1,118 @@
-# GitHub Copilot Custom Instructions - BusBuddy MVP Focus
+# GitHub Copilot Custom Instructions - Documentation-First Development
 
-This file contains custom instructions for GitHub Copilot when working with this repository.
+This file contains custom instructions for GitHub Copilot when working with any repository.
 
-## 🎯 **MVP/PHASE 1 PRIORITY OVERRIDE**
+## 📋 **Repository-Specific Integration**
 
-**CRITICAL: All instructions below are SECONDARY to MVP Core Goals**
+**This file defines HOW to build software following Microsoft standards.**
 
-### **MVP Mission (30 Minutes)**
-- **PRIMARY GOAL**: MainWindow → Dashboard → 3 Core Views (Drivers, Vehicles, Activity Schedule) with real-world data
-- **FUNCTIONAL OVER PERFECT**: Get it working first, optimize later
-- **NO COMPREHENSIVE REWRITES**: Fix specific issues, build incrementally
-- **PRESERVE EXISTING WORK**: Enhance and repair rather than replace
+**For BusBuddy-specific requirements, also reference:**
+- **`vscode-userdata\BusBuddy.instructions.md`** - BusBuddy domain knowledge and MVP requirements
+- **Integration Note**: BusBuddy MVP phase allows balanced approach between speed and documentation compliance
+- **Post-MVP**: All BusBuddy development must fully comply with documentation-first standards below
 
-### **MVP Development Standards**
-- ✅ **Build without errors** - Priority #1
-- ✅ **Simple UI Pattern** - Implement only basic MainWindow → Dashboard → 3 Core Views
-- ✅ **Basic data display** - Syncfusion DataGrid/ListView sufficient for Phase 1
-- ✅ **Direct data access** - Use simple DbContext with basic EF queries
-- ✅ **Real transportation data** - 15-20 drivers, 10-15 vehicles, 25-30 activities
-- ✅ **Basic error handling** - Try/catch blocks with MessageBox.Show for user feedback
-- ⚠️ **Defer to Phase 2**: Advanced MVVM, comprehensive testing, performance optimization
-- ⚠️ **Defer to Phase 2**: Advanced styling, complex validation, external integrations
-- ⚠️ **Defer to Phase 2**: AI/Grok integration through C# services (not PowerShell)
+## 🛠️ **Technology Stack & Versions**
 
-### **MVP Batch Commands and .NET CLI**
-- **Direct Build**: Use `dotnet build BusBuddy.WPF/BusBuddy.WPF.csproj` for builds
-- **Direct Run**: Use `dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj` for running
-- **Error Capture**: Use `run-with-error-capture.bat` to capture runtime errors
-- **Health Check**: Use `check-health.bat` for quick project health validation
-- **Clean Build**: Use `dotnet clean BusBuddy.sln && dotnet restore BusBuddy.sln && dotnet build BusBuddy.sln`
+### **Global Tools & SDK Versions**
+- **PowerShell**: 7.5.2 (Required minimum version)
+- **.NET SDK**: 9.0.303 (per `global.json`)
+- **Target Framework**: .NET 8.0-windows (WPF projects)
+- **MSBuild SDK**: Microsoft.Build.Traversal 3.4.0
+- **Roll Forward Policy**: latestMinor (per `global.json`)
 
-### **MVP Common Build Fixes**
-- **For NU1605 Package Errors**: Update `Directory.Packages.props` versions
-- **For NU1601 Package Warnings**: Match versions in central props with actual restored
-- **For MSB3277 Assembly Conflicts**: Standardize versions in `Directory.Packages.props`
-- **For XamlParseException**: Check namespaces and XAML syntax
-- **Syncfusion Version**: Current Syncfusion version is 30.1.42
-- **For NuGet Cache Issues**: Run `dotnet nuget locals all --clear`
+### **Package Versions (Directory.Build.props)**
+- **Syncfusion WPF**: 30.1.42 (Essential Studio for WPF)
+- **Entity Framework Core**: 9.0.7 (.NET 9 compatible)
+- **Serilog**: 4.3.0 (Pure Serilog implementation)
+- **Code Analysis**: Enabled with Recommended analysis mode
+- **Practical Ruleset**: `BusBuddy-Practical.ruleset` for MVP development
 
-### **MVP Application Structure**
-- **MainWindow**: Entry point with navigation buttons to all core views
-- **Dashboard**: Shows metrics (driver/vehicle counts) and recent activities
-- **Drivers View**: Shows driver list with basic CRUD operations
-- **Vehicles View**: Shows vehicle list with basic CRUD operations  
-- **Activities View**: Shows activity schedule with basic CRUD operations
-- **Simple Navigation**: Direct `ContentFrame.Navigate(new DriversView())` calls
-- **Basic ViewModels**: Simple `ObservableCollection<T>` and direct EF queries
+### **Database Configuration Standards**
+- **Development**: LocalDB with SQL Server LocalDB instance
+- **Production**: Azure SQL Database with secure connection strings
+- **Connection Strings**: Environment variable substitution for credentials
+- **Database Provider**: Configurable via `appsettings.json` DatabaseProvider setting
 
-### **Phase 1 Problem Resolution Approach**
-- **Incremental fixes first** - Always attempt targeted edits before complete rebuilds
-- **Assess corruption level** - Check actual errors and their scope before deciding approach
-- **User consultation** - Let the user decide on complete overhauls vs. targeted fixes
-- **Error analysis** - Identify root causes (missing methods, property name mismatches, duplicates)
-- **Minimal viable fix** - Use the smallest change that resolves the issue
-- **Escalation path**:
-  1. First: Targeted edits for specific errors
-  2. Second: Consult user if issues appear complex
-  3. Last resort: Complete rebuild only with user approval
+**Database Connection Examples:**
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=[Project];Integrated Security=True;MultipleActiveResultSets=True",
+    "AzureConnection": "Server=tcp:[server].database.windows.net,1433;Initial Catalog=[database];Persist Security Info=False;User ID=${AZURE_SQL_USER};Password=${AZURE_SQL_PASSWORD};MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  },
+  "DatabaseProvider": "LocalDB"
+}
+```
+
+### **External Service Integrations**
+- **Google Earth Engine**: Project-based authentication with service account keys
+- **Azure Services**: Environment-based credential management
+- **Syncfusion Licensing**: Environment variable `${SYNCFUSION_LICENSE_KEY}`
+
+### **Build Configuration Standards**
+- **Nullable Reference Types**: Enabled throughout solution
+- **Implicit Usings**: Enabled for common namespace imports
+- **Documentation Generation**: XML documentation files for all public APIs
+- **Code Analysis**: .NET analyzers with practical ruleset for MVP development
+- **Warning Treatment**: Warnings allowed during MVP, errors enforced in production
+
+## ⚠️ **DOCUMENTATION-FIRST MANDATE - ZERO TOLERANCE**
+
+**ABSOLUTE REQUIREMENT: NO CODE WITHOUT OFFICIAL DOCUMENTATION REFERENCE**
+
+All development MUST follow official documentation standards:
+- **Microsoft PowerShell**: Reference official docs for ALL PowerShell code
+- **Syncfusion WPF**: Reference official docs for ALL UI components  
+- **Microsoft .NET**: Reference official docs for ALL C# development
+- **Entity Framework**: Reference official docs for ALL data access
+
+**Current Status**: Module compliance analysis required - Zero tolerance for code without proper documentation reference before any new development.
+
+## 🚫 **CRITICAL: MANDATORY DOCUMENTATION COMPLIANCE**
+
+**NO CODE WITHOUT PROPER DOCUMENTATION REFERENCE - ZERO TOLERANCE POLICY**
+
+### **Documentation-First Development - ABSOLUTE REQUIREMENT**
+- ❌ **FORBIDDEN**: Writing ANY code without referencing official documentation first
+- ❌ **FORBIDDEN**: Implementing features based on assumptions or "common patterns"
+- ❌ **FORBIDDEN**: Building PowerShell modules without Microsoft PowerShell standards compliance
+- ❌ **FORBIDDEN**: Using Syncfusion controls without official Syncfusion documentation reference
+- ❌ **FORBIDDEN**: Creating "quick fixes" that violate established standards and best practices
+
+### **MANDATORY DOCUMENTATION SOURCES**
+- **Microsoft PowerShell**: [Official PowerShell Documentation](https://docs.microsoft.com/en-us/powershell/) - Required for ALL PowerShell development
+- **Microsoft .NET**: [Official .NET Documentation](https://docs.microsoft.com/en-us/dotnet/) - Required for ALL C# development  
+- **Syncfusion WPF**: [Official Syncfusion Documentation](https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf) - Required for ALL UI components
+- **Entity Framework**: [Official EF Core Documentation](https://docs.microsoft.com/en-us/ef/core/) - Required for ALL data access
+- **WPF Framework**: [Official WPF Documentation](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/) - Required for ALL WPF development
+
+### **CRITICAL LESSONS LEARNED FROM POWERSHELL ANALYSIS**
+- **Module Analysis**: Large monolithic modules often fail Microsoft compliance standards
+- **Write-Host Violations**: Anti-pattern Write-Host usage instead of proper output streams
+- **Module Structure**: Architectural violations against Microsoft modularization guidelines
+- **Error Handling**: Inconsistent patterns violating Microsoft exception handling standards
+- **Export Violations**: Missing Export-ModuleMember declarations required by Microsoft standards
+
+### **MANDATORY DEVELOPMENT PROCESS**
+1. **FIRST**: Search and read official documentation for the specific technology/feature
+2. **SECOND**: Find documented examples and implementation patterns in official docs
+3. **THIRD**: Implement ONLY using documented, officially supported methods
+4. **FOURTH**: Validate implementation against official standards and best practices
+5. **NEVER**: Proceed without documentation reference or with "I think this works" approaches
+
+### **ZERO TOLERANCE VIOLATIONS**
+- **Write-Host in PowerShell**: Use Write-Output, Write-Information, Write-Verbose instead
+- **Undocumented Syncfusion patterns**: Only use officially documented control implementations
+- **Custom "enhanced" wrappers**: Use official APIs exactly as documented
+- **Assumed parameter combinations**: Verify all parameters exist in official API documentation
+- **Legacy or deprecated patterns**: Use current, officially supported implementations only
+
+### **DOCUMENTATION VERIFICATION REQUIREMENTS**
+- **Before ANY PowerShell code**: Reference Microsoft PowerShell standards documentation
+- **Before ANY Syncfusion control**: Reference specific control documentation page  
+- **Before ANY .NET feature**: Reference official .NET API documentation
+- **Include documentation links**: Always provide link to specific documentation page used
+- **Code comments**: Include reference to documentation source in code comments
 
 ---
 
@@ -90,25 +146,14 @@ catch (Exception ex)
 - Always validate XML comment syntax to ensure it's well-formed
 - When adding new comments, use em dashes (`—`) instead of double dashes
 
-## MVP Milestones - Phase 1
-
-- ✅ **Build Without Errors**: Fix all build errors and warnings
-- ✅ **Main Application Window**: Create functional MainWindow with navigation
-- ✅ **Dashboard View**: Create Dashboard view with basic metrics
-- ✅ **Drivers View**: Implement Drivers view with basic CRUD operations
-- ✅ **Vehicles View**: Implement Vehicles view with basic CRUD operations
-- ✅ **Activities View**: Implement Activities view with basic CRUD operations
-- ✅ **Real Data**: Populate views with real transportation data
-- ✅ **Basic Error Handling**: Implement simple try/catch blocks with user feedback
-
 ## File Organization and Structure Standards
 
 ### Solution Structure
-- **BusBuddy.Core**: Core business logic, models, services, and data access
-- **BusBuddy.WPF**: WPF presentation layer with Views, ViewModels, and UI-specific services
-- **BusBuddy.Tests**: Comprehensive test suite for all layers
+- **[Project].Core**: Core business logic, models, services, and data access
+- **[Project].WPF**: WPF presentation layer with Views, ViewModels, and UI-specific services
+- **[Project].Tests**: Comprehensive test suite for all layers
 
-### WPF Project Organization (BusBuddy.WPF)
+### WPF Project Organization ([Project].WPF)
 - **Assets/**: Static resources (images, fonts, icons)
 - **Controls/**: Custom user controls and control templates
 - **Converters/**: Value converters for data binding
@@ -122,11 +167,11 @@ catch (Exception ex)
 - **Views/**: XAML views organized by feature
 
 ### Feature-Based Organization
-- **Domain Folders**: Group related files by business domain (Activity, Bus, Dashboard, Driver, etc.)
+- **Domain Folders**: Group related files by business domain 
 - **Paired Files**: Keep View and ViewModel files in corresponding folders
-- **Naming Convention**: Use consistent naming patterns (e.g., `BusManagementView.xaml` / `BusManagementViewModel.cs`)
+- **Naming Convention**: Use consistent naming patterns (e.g., `[Entity]ManagementView.xaml` / `[Entity]ManagementViewModel.cs`)
 
-### Core Project Organization (BusBuddy.Core)
+### Core Project Organization ([Project].Core)
 - **Configuration/**: App configuration and settings
 - **Data/**: Entity Framework contexts and configurations
 - **Extensions/**: Core extension methods
@@ -137,8 +182,8 @@ catch (Exception ex)
 - **Utilities/**: Core utility classes and helpers
 
 ### File Naming Conventions
-- **ViewModels**: Use descriptive names ending with `ViewModel` (e.g., `BusManagementViewModel.cs`)
-- **Views**: Use descriptive names ending with `View` (e.g., `BusManagementView.xaml`)
+- **ViewModels**: Use descriptive names ending with `ViewModel` (e.g., `[Entity]ManagementViewModel.cs`)
+- **Views**: Use descriptive names ending with `View` (e.g., `[Entity]ManagementView.xaml`)
 - **Services**: Use descriptive names ending with `Service` (e.g., `NavigationService.cs`)
 - **Interfaces**: Prefix with `I` (e.g., `INavigationService.cs`)
 - **Base Classes**: Use `Base` prefix (e.g., `BaseViewModel.cs`)
@@ -160,11 +205,11 @@ catch (Exception ex)
 
 ## Debug Helper Integration Patterns
 
-- **App.xaml.cs Integration**: The `DebugHelper` class in `BusBuddy.WPF.Utilities` provides debug functionality accessible via PowerShell
+- **App.xaml.cs Integration**: Debug helper classes provide debug functionality accessible via PowerShell
 - **Command Line Arguments**: Application supports debug arguments (`--start-debug-filter`, `--export-debug-json`, etc.)
-- **Real-time Filtering**: Use `DebugOutputFilter` for live debug output analysis and filtering
-- **Actionable Error Detection**: Implement `HasCriticalIssues()` and priority-based error categorization
-- **PowerShell Bridge**: All debug methods accessible via `bb-debug-*` PowerShell commands
+- **Real-time Filtering**: Use debug output filters for live debug output analysis and filtering
+- **Actionable Error Detection**: Implement critical issue detection and priority-based error categorization
+- **PowerShell Bridge**: All debug methods accessible via custom PowerShell commands
 
 ### Debug Helper Method Patterns
 - **Static Methods**: All debug helper methods are static and accessible without instantiation
@@ -176,16 +221,16 @@ catch (Exception ex)
 ### PowerShell Debug Command Patterns
 ```powershell
 # Start debug filter
-bb-debug-start          # Calls DebugHelper.StartAutoFilter()
+[prefix]-debug-start    # Calls DebugHelper.StartAutoFilter()
 
 # Export debug data
-bb-debug-export         # Calls DebugHelper.ExportToJson()
+[prefix]-debug-export   # Calls DebugHelper.ExportToJson()
 
 # Health monitoring
-bb-health              # Calls DebugHelper.HealthCheck()
+[prefix]-health         # Calls DebugHelper.HealthCheck()
 
 # Test functionality
-bb-debug-test          # Calls DebugHelper.TestAutoFilter()
+[prefix]-debug-test     # Calls DebugHelper.TestAutoFilter()
 ```
 
 ### Debug Output Standards
@@ -227,29 +272,29 @@ bb-debug-test          # Calls DebugHelper.TestAutoFilter()
 ### **Phase 1 Quick Patterns**
 ```csharp
 // Quick ViewModel pattern for Phase 1
-public class DriversViewModel : INotifyPropertyChanged
+public class EntitiesViewModel : INotifyPropertyChanged
 {
-    public ObservableCollection<Driver> Drivers { get; set; } = new();
+    public ObservableCollection<Entity> Entities { get; set; } = new();
 
-    public async Task LoadDriversAsync()
+    public async Task LoadEntitiesAsync()
     {
         try
         {
-            using var context = new BusBuddyContext();
-            var drivers = await context.Drivers.ToListAsync();
-            Drivers.Clear();
-            foreach(var driver in drivers) Drivers.Add(driver);
+            using var context = new AppContext();
+            var entities = await context.Entities.ToListAsync();
+            Entities.Clear();
+            foreach(var entity in entities) Entities.Add(entity);
         }
         catch (Exception ex)
         {
             // Basic error handling for Phase 1
-            MessageBox.Show($"Error loading drivers: {ex.Message}");
+            MessageBox.Show($"Error loading entities: {ex.Message}");
         }
     }
 }
 
 // Quick navigation pattern for Phase 1
-private void NavigateToDrivers() => ContentFrame.Navigate(new DriversView());
+private void NavigateToEntities() => ContentFrame.Navigate(new EntitiesView());
 ```
 
 ## MVVM Implementation Standards - Phase 1 Focused
@@ -264,8 +309,8 @@ private void NavigateToDrivers() => ContentFrame.Navigate(new DriversView());
 ### **Phase 1 Data Binding**
 ```xml
 <!-- Simple data binding for Phase 1 -->
-<DataGrid ItemsSource="{Binding Drivers}" AutoGenerateColumns="True" />
-<TextBox Text="{Binding SelectedDriver.Name, Mode=TwoWay}" />
+<DataGrid ItemsSource="{Binding Entities}" AutoGenerateColumns="True" />
+<TextBox Text="{Binding SelectedEntity.Name, Mode=TwoWay}" />
 ```
 
 ## Database and Entity Framework Standards - Phase 1 Simplified
@@ -274,27 +319,50 @@ private void NavigateToDrivers() => ContentFrame.Navigate(new DriversView());
 - ✅ **Basic DbContext**: Simple context with DbSet properties
 - ✅ **Direct Queries**: Basic LINQ queries, defer complex repositories
 - ✅ **Simple Migrations**: Basic EF migrations, defer complex schema management
-- ✅ **Basic Connection**: Simple connection string, defer advanced resilience
+- ✅ **Configurable Connection**: Support LocalDB for dev, Azure SQL for production
 - ⚠️ **Defer**: Advanced patterns, connection pooling, complex error handling
 
-### **Phase 1 Database Pattern**
+### **Database Configuration Patterns**
 ```csharp
-// Simple context for Phase 1
-public class BusBuddyContext : DbContext
+// Multi-environment DbContext configuration
+public class AppContext : DbContext
 {
-    public DbSet<Driver> Drivers { get; set; }
-    public DbSet<Vehicle> Vehicles { get; set; }
-    public DbSet<Activity> Activities { get; set; }
+    private readonly IConfiguration _configuration;
+    
+    public AppContext(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    
+    public DbSet<Entity1> Entity1s { get; set; }
+    public DbSet<Entity2> Entity2s { get; set; }
+    public DbSet<Entity3> Entity3s { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Data Source=BusBuddy.db");
+        var provider = _configuration["DatabaseProvider"];
+        var connectionString = provider switch
+        {
+            "Azure" => _configuration.GetConnectionString("AzureConnection"),
+            "LocalDB" => _configuration.GetConnectionString("DefaultConnection"),
+            _ => _configuration.GetConnectionString("LocalConnection")
+        };
+        
+        optionsBuilder.UseSqlServer(connectionString);
     }
 }
 
 // Simple query pattern for Phase 1
-var drivers = await context.Drivers.ToListAsync();
+var entities = await context.Entity1s.ToListAsync();
 ```
+
+### **Azure SQL Database Standards**
+- **Connection String Format**: Use environment variables for sensitive data
+- **Security**: Enable encryption and certificate validation
+- **Connection Timeout**: Set appropriate timeout values (30 seconds)
+- **Environment Variables**: `${AZURE_SQL_USER}` and `${AZURE_SQL_PASSWORD}`
+- **Multi-Active Result Sets**: Enable for complex operations
+- **Connection Pooling**: Leverage EF Core default pooling for production
 
 ## Error Handling and Resilience Standards
 
@@ -362,7 +430,7 @@ var drivers = await context.Drivers.ToListAsync();
 - **Theme Documentation**: [FluentDark Theme Guide](https://help.syncfusion.com/wpf/themes/fluent-dark-theme)
 - **Control References**: [WPF Control Gallery](https://help.syncfusion.com/wpf/control-gallery)
 - **Migration Guides**: [Version Migration Documentation](https://help.syncfusion.com/wpf/upgrade-guide)
-- **Target Framework**: WPF projects targeting .NET 9.0-windows
+- **Target Framework**: WPF projects targeting .NET 8.0-windows (per Directory.Build.props)
 
 ### MVP Core Controls for Phase 1
 - **SfDataGrid**: [DataGrid Documentation](https://help.syncfusion.com/wpf/datagrid/getting-started) - Used for all tabular data display
@@ -372,12 +440,470 @@ var drivers = await context.Drivers.ToListAsync();
 
 ### Implementation Standards
 - **Theme Consistency**: Use FluentDark/FluentLight themes consistently across all Syncfusion controls
-- **Assembly Management**: Reference precompiled .NET 8.0 assemblies with proper HintPath configurations
+- **Assembly Management**: Reference Syncfusion.SfGrid.WPF 30.1.42 and theme assemblies
 - **Control Standards**: Follow established patterns for DockingManager, NavigationDrawer, and other controls
 - **Resource Organization**: Maintain organized resource dictionaries for themes and styles
-- **Validation Utilities**: Use `SyncfusionValidationUtility` for runtime validation of control properties
-- **DateTime Patterns**: Use validated DateTimePattern values to prevent runtime errors
+- **License Management**: Use environment variable `${SYNCFUSION_LICENSE_KEY}` for licensing
 - **Performance Optimization**: Use appropriate control settings for optimal performance
+
+### **🚫 CRITICAL: NO SYNCFUSION REGRESSION POLICY**
+
+**ABSOLUTE PROHIBITION: Never Replace Syncfusion Components with Standard WPF Controls**
+- ❌ **NEVER replace SfDataGrid with DataGrid** - Fix namespace/reference issues instead
+- ❌ **NEVER replace Syncfusion ComboBox with standard ComboBox** - Resolve compilation errors properly
+- ❌ **NEVER downgrade working Syncfusion components** - Hard-earned progress must be preserved
+- ❌ **NO SHORTCUTS** - Compilation errors must be fixed through proper namespace resolution, not component replacement
+- ❌ **NO REGRESSION JUSTIFICATION** - "Fixing errors" is never a valid reason to replace Syncfusion components
+- ❌ **UPGRADE, DON'T DOWNGRADE** - Standard DataGrid found in legacy code should be upgraded to SfDataGrid
+
+**MANDATORY ERROR RESOLUTION APPROACH:**
+1. **First**: Check namespace declarations and assembly references
+2. **Second**: Verify Syncfusion package versions and licensing
+3. **Third**: Consult Syncfusion documentation for proper usage patterns
+4. **Fourth**: Add missing using statements or update project references
+5. **NEVER**: Replace Syncfusion components with standard WPF controls
+
+**SPECIFIC DATAGRIDS POLICY:**
+- **Standard DataGrid found**: Replace with SfDataGrid using official Syncfusion patterns
+- **Unknown DataGrid elements**: Fix by adding proper Syncfusion namespace declarations
+- **DataGrid compilation errors**: Resolve by ensuring Syncfusion.SfGrid.WPF package is properly referenced
+- **Never downgrade**: SfDataGrid is always preferred over standard DataGrid for consistency
+
+**HARD-EARNED PROGRESS PROTECTION:**
+- **Syncfusion WPF 30.1.42** components represent significant implementation effort
+- **Working Syncfusion implementations** must be preserved at all costs
+- **Professional UI standards** require maintaining Syncfusion component consistency
+- **Technical debt** is created by mixing Syncfusion and standard WPF controls
+
+**ERROR RESOLUTION WITHOUT REGRESSION:**
+- **Missing namespaces**: Add `xmlns:syncfusion="http://schemas.syncfusion.com/wpf"`
+- **Assembly references**: Verify Syncfusion package installation and versions
+- **Licensing issues**: Check license key registration in App.xaml.cs
+- **API changes**: Consult migration guides for version-specific updates
+
+**EXAMPLES OF PROPER ERROR RESOLUTION (NO REGRESSION):**
+```xml
+<!-- ❌ WRONG: Replacing SfDataGrid with DataGrid due to compilation errors -->
+<DataGrid ItemsSource="{Binding Students}" />
+
+<!-- ✅ CORRECT: Fix namespace and keep SfDataGrid -->
+<syncfusion:SfDataGrid ItemsSource="{Binding Students}" 
+                       AutoGenerateColumns="False"
+                       AllowSorting="True" />
+```
+
+### **📚 COMPREHENSIVE SYNCFUSION WPF 30.1.42 ERROR RESOLUTION EXAMPLES**
+
+**Reference Documentation**: https://help.syncfusion.com/wpf/datagrid/getting-started
+
+#### **Error Type 1: "Unknown element type 'syncfusion:SfDataGrid'"**
+
+**❌ WRONG APPROACH - Regression to DataGrid:**
+```xml
+<!-- DON'T DO THIS - This is regression! -->
+<DataGrid ItemsSource="{Binding Vehicles}" AutoGenerateColumns="False">
+    <DataGrid.Columns>
+        <DataGridTextColumn Header="Bus Number" Binding="{Binding BusNumber}"/>
+    </DataGrid.Columns>
+</DataGrid>
+```
+
+**✅ CORRECT APPROACH - Fix namespace declaration:**
+```xml
+<!-- Step 1: Add Syncfusion namespace (if missing) -->
+<UserControl xmlns:syncfusion="http://schemas.syncfusion.com/wpf">
+
+<!-- Step 2: Use official SfDataGrid pattern from Syncfusion docs -->
+<syncfusion:SfDataGrid ItemsSource="{Binding Vehicles}"
+                       AutoGenerateColumns="False"
+                       AllowEditing="False"
+                       AllowSorting="True"
+                       AllowFiltering="True"
+                       SelectionMode="Single">
+    <syncfusion:SfDataGrid.Columns>
+        <syncfusion:GridTextColumn HeaderText="Bus Number" 
+                                 MappingName="BusNumber" 
+                                 Width="100"/>
+    </syncfusion:SfDataGrid.Columns>
+</syncfusion:SfDataGrid>
+```
+**Documentation Reference**: https://help.syncfusion.com/cr/wpf/Syncfusion.UI.Xaml.Grid.SfDataGrid.html
+
+#### **Error Type 2: "StaticResource 'BooleanToVisibilityConverter' not found"**
+
+**❌ WRONG APPROACH - Remove binding:**
+```xml
+<!-- DON'T DO THIS - Loses functionality! -->
+<Border Visibility="Visible">
+```
+
+**✅ CORRECT APPROACH - Add required converter:**
+```xml
+<!-- Step 1: Add converter to UserControl.Resources -->
+<UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+</UserControl.Resources>
+
+<!-- Step 2: Use converter as documented -->
+<Border Visibility="{Binding IsMapLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+```
+
+#### **Error Type 3: "Unknown x:Class type" Compilation Error**
+
+**❌ WRONG APPROACH - Remove code-behind functionality:**
+```xml
+<!-- DON'T DO THIS - Breaks MVVM pattern! -->
+<UserControl>
+```
+
+**✅ CORRECT APPROACH - Verify namespace and class:**
+```csharp
+// Step 1: Ensure code-behind file exists with correct namespace
+namespace BusBuddy.WPF.Views.GoogleEarth
+{
+    public partial class GoogleEarthView : UserControl
+    {
+        public GoogleEarthView()
+        {
+            InitializeComponent();
+        }
+    }
+}
+```
+
+```xml
+<!-- Step 2: Match XAML x:Class to code-behind -->
+<UserControl x:Class="BusBuddy.WPF.Views.GoogleEarth.GoogleEarthView">
+```
+
+#### **Error Type 4: Missing Event Handler**
+
+**❌ WRONG APPROACH - Remove event binding:**
+```xml
+<!-- DON'T DO THIS - Loses interactive functionality! -->
+<ComboBox x:Name="MapLayerComboBox">
+```
+
+**✅ CORRECT APPROACH - Implement event handler:**
+```csharp
+// Step 1: Add event handler to code-behind
+private void MapLayerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    // Implementation following Microsoft WPF patterns
+    if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
+    {
+        // Handle selection change
+    }
+}
+```
+
+```xml
+<!-- Step 2: Keep event binding intact -->
+<ComboBox x:Name="MapLayerComboBox"
+          SelectionChanged="MapLayerComboBox_SelectionChanged">
+```
+
+#### **Error Type 5: Syncfusion Package Reference Issues**
+
+**❌ WRONG APPROACH - Remove Syncfusion controls:**
+```xml
+<!-- DON'T DO THIS - Massive regression! -->
+<StackPanel>
+    <TextBlock Text="No data grid available"/>
+</StackPanel>
+```
+
+**✅ CORRECT APPROACH - Fix package references:**
+
+**Step 1: Verify package installation**
+```xml
+<!-- In .csproj file -->
+<PackageReference Include="Syncfusion.SfGrid.WPF" Version="30.1.42" />
+<PackageReference Include="Syncfusion.Themes.FluentDark.WPF" Version="30.1.42" />
+```
+
+**Step 2: Register license (App.xaml.cs)**
+```csharp
+protected override void OnStartup(StartupEventArgs e)
+{
+    // Register Syncfusion license BEFORE InitializeComponent
+    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("LICENSE_KEY");
+    
+    base.OnStartup(e);
+}
+```
+
+**Step 3: Use documented SfDataGrid pattern**
+```xml
+<syncfusion:SfDataGrid ItemsSource="{Binding Data}"
+                       AutoGenerateColumns="False"
+                       AllowSorting="True">
+    <!-- Column definitions as per Syncfusion docs -->
+</syncfusion:SfDataGrid>
+```
+
+#### **Error Type 6: DataGrid to SfDataGrid Conversion (Upgrading Legacy Code)**
+
+**❌ WRONG APPROACH - Keep standard DataGrid:**
+```xml
+<!-- DON'T DO THIS - Inconsistent with Syncfusion standards! -->
+<DataGrid ItemsSource="{Binding Vehicles}">
+    <DataGrid.Columns>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+    </DataGrid.Columns>
+</DataGrid>
+```
+
+**✅ CORRECT APPROACH - Upgrade to SfDataGrid using official patterns:**
+
+**From Syncfusion Documentation: https://help.syncfusion.com/wpf/datagrid/columns**
+
+```xml
+<!-- Step 1: Add Syncfusion namespace -->
+xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+
+<!-- Step 2: Convert using official column mapping patterns -->
+<syncfusion:SfDataGrid ItemsSource="{Binding Vehicles}"
+                       AutoGenerateColumns="False"
+                       AllowEditing="False"
+                       AllowSorting="True"
+                       AllowFiltering="True"
+                       ShowRowHeader="True"
+                       SelectionMode="Single"
+                       GridLinesVisibility="Both"
+                       HeaderLinesVisibility="All"
+                       ColumnSizer="Star">
+    
+    <syncfusion:SfDataGrid.Columns>
+        <!-- Convert DataGridTextColumn to GridTextColumn -->
+        <syncfusion:GridTextColumn HeaderText="Vehicle Name" 
+                                 MappingName="Name" 
+                                 Width="150"/>
+        <syncfusion:GridTextColumn HeaderText="Status" 
+                                 MappingName="Status" 
+                                 Width="100"/>
+    </syncfusion:SfDataGrid.Columns>
+</syncfusion:SfDataGrid>
+```
+
+### **MANDATORY VERIFICATION STEPS FOR ALL FIXES:**
+
+1. **Documentation Check**: Every Syncfusion property/method MUST exist in official docs
+2. **Example Validation**: Copy patterns exactly from Syncfusion sample browser
+3. **API Verification**: Use https://help.syncfusion.com/cr/wpf/Syncfusion.html for API reference
+4. **No Custom Code**: Never invent Syncfusion patterns not shown in documentation
+5. **Preserve Functionality**: All fixes must maintain or enhance existing functionality
+
+**EXISTING HARD-EARNED SYNCFUSION IMPLEMENTATIONS TO PROTECT:**
+- **StudentsView.xaml**: Working SfDataGrid with proper column configuration
+- **FuelReconciliationDialog.xaml**: Working SfDataGrid with custom styling  
+- **VehicleManagementView.xaml**: RECENTLY UPGRADED to SfDataGrid - maintain this progress!
+- **Multiple Views**: 20+ SfDataGrid instances already successfully implemented
+- **Resource Dictionaries**: Validated Syncfusion V30 styling and themes
+
+### **🛡️ BUSBUDDY PROJECT SPECIFIC SYNCFUSION PROTECTION**
+
+**CRITICAL PROJECT STATUS - SYNCFUSION WPF 30.1.42 IMPLEMENTATIONS:**
+
+✅ **SUCCESSFULLY IMPLEMENTED (PRESERVE AT ALL COSTS):**
+```xml
+<!-- StudentsView.xaml - Perfect SfDataGrid implementation -->
+<syncfusion:SfDataGrid Grid.Row="2"
+                       Name="StudentsDataGrid"
+                       ItemsSource="{Binding Students}"
+                       SelectedItem="{Binding SelectedStudent, Mode=TwoWay}"
+                       AutoGenerateColumns="False"
+                       AllowEditing="False"
+                       AllowSorting="True"
+                       AllowFiltering="True"
+                       SelectionMode="Single">
+    <syncfusion:SfDataGrid.Columns>
+        <syncfusion:GridTextColumn HeaderText="Student ID" MappingName="StudentNumber"/>
+        <syncfusion:GridTextColumn HeaderText="Name" MappingName="StudentName"/>
+    </syncfusion:SfDataGrid.Columns>
+</syncfusion:SfDataGrid>
+```
+
+✅ **RECENTLY UPGRADED (MAJOR PROGRESS):**
+```xml
+<!-- VehicleManagementView.xaml - Successfully converted from DataGrid -->
+<syncfusion:SfDataGrid Grid.Column="0"
+                       x:Name="VehicleDataGrid"
+                       ItemsSource="{Binding FilteredVehicles}"
+                       SelectedItem="{Binding SelectedVehicle}"
+                       AutoGenerateColumns="False"
+                       AllowEditing="False"
+                       AllowSorting="True"
+                       AllowFiltering="True">
+    <syncfusion:SfDataGrid.Columns>
+        <syncfusion:GridTextColumn HeaderText="Bus Number" MappingName="BusNumber"/>
+        <syncfusion:GridTextColumn HeaderText="Make" MappingName="Make"/>
+    </syncfusion:SfDataGrid.Columns>
+</syncfusion:SfDataGrid>
+```
+
+⚠️ **REQUIRES SIMILAR UPGRADE (NO REGRESSION ALLOWED):**
+- Any remaining DataGrid instances should be upgraded to SfDataGrid using above patterns
+- GoogleEarthView.xaml DataGrid → Convert to SfDataGrid following VehicleManagementView pattern
+- VehiclesView.xaml → Add Syncfusion namespace and implement SfDataGrid
+- VehicleForm.xaml → Any data display should use SfDataGrid patterns
+
+**BusBuddy-Specific Syncfusion Patterns to Follow:**
+1. **Always include**: `AllowSorting="True"`, `AllowFiltering="True"`, `SelectionMode="Single"`
+2. **Use MappingName**: Instead of Binding, use MappingName for GridTextColumn
+3. **Namespace Standard**: `xmlns:syncfusion="http://schemas.syncfusion.com/wpf"`
+4. **Width Management**: Use explicit widths or ColumnSizer="Star" for responsive design
+
+### **🏗️ Syncfusion Implementation Requirements**
+
+**CRITICAL RULE: Only Use Official Syncfusion Documentation**
+- **Reference ONLY**: https://help.syncfusion.com/wpf/welcome-to-syncfusion-essential-wpf
+- **WPF API Reference**: https://help.syncfusion.com/cr/wpf/Syncfusion.html
+- **No custom fixes**: Use only documented Syncfusion APIs, methods, and examples
+- **No invented code**: Every Syncfusion implementation must be found in official docs
+- **Verify before implementing**: Search documentation first, implement only documented patterns
+- **API Reference**: Use Syncfusion's complete WPF API reference for all controls and methods
+
+**Documentation-First Development Process:**
+1. **Search Syncfusion WPF docs** for the specific control/feature needed
+2. **Find official examples** in the documentation or sample browser
+3. **Copy exact patterns** from Syncfusion's documented examples
+4. **Test with documented parameters** and properties only
+5. **No modifications** to documented patterns without verifying in docs
+
+**Common Syncfusion WPF Controls - Documentation Required:**
+- **SfDataGrid**: Follow documented binding and column configuration patterns
+- **DockingManager**: Use DockingStyle enum for docking operations  
+- **SfChart**: Use only documented series types and properties
+- **NavigationDrawer**: Follow documented navigation patterns
+- **SfButton**: Apply only documented style properties and themes
+
+**Forbidden Practices:**
+- ❌ **NO custom Syncfusion extensions** or helper methods
+- ❌ **NO invented property combinations** not shown in docs
+- ❌ **NO assumed API patterns** based on other frameworks
+- ❌ **NO "enhanced" wrappers** around Syncfusion controls
+- ❌ **NO undocumented parameters** or method calls
+- ❌ **ABSOLUTELY NO REGRESSION** from Syncfusion controls to standard WPF controls
+- ❌ **NO REPLACEMENT** of working Syncfusion components with DataGrid, ComboBox, or other standard controls
+- ❌ **NO SHORTCUTS** - Fix compilation errors by proper namespace/reference resolution, not by component downgrade
+
+### **📖 SYNCFUSION WPF 30.1.42 OFFICIAL DOCUMENTATION PATTERNS**
+
+**CRITICAL: Use ONLY these documented patterns from https://help.syncfusion.com/wpf/datagrid/getting-started**
+
+#### **SfDataGrid Official Basic Pattern:**
+```xml
+<!-- From official Syncfusion documentation -->
+<syncfusion:SfDataGrid x:Name="dataGrid"
+                       ItemsSource="{Binding OrderInfoCollection}"
+                       AutoGenerateColumns="False">
+    <syncfusion:SfDataGrid.Columns>
+        <syncfusion:GridTextColumn MappingName="OrderID" HeaderText="Order ID"/>
+        <syncfusion:GridTextColumn MappingName="CustomerID" HeaderText="Customer ID"/>
+    </syncfusion:SfDataGrid.Columns>
+</syncfusion:SfDataGrid>
+```
+
+#### **SfDataGrid Column Configuration (Official Pattern):**
+```xml
+<!-- Column types from Syncfusion docs -->
+<syncfusion:SfDataGrid.Columns>
+    <syncfusion:GridTextColumn MappingName="CustomerName" HeaderText="Customer Name" Width="120"/>
+    <syncfusion:GridNumericColumn MappingName="UnitPrice" HeaderText="Unit Price" Width="100"/>
+    <syncfusion:GridDateTimeColumn MappingName="OrderDate" HeaderText="Order Date" Width="130"/>
+    <syncfusion:GridCheckBoxColumn MappingName="IsClosed" HeaderText="Is Closed" Width="100"/>
+</syncfusion:SfDataGrid.Columns>
+```
+
+#### **SfDataGrid Selection and Interaction (Official Pattern):**
+```xml
+<!-- Selection patterns from Syncfusion documentation -->
+<syncfusion:SfDataGrid SelectionMode="Single"
+                       AllowEditing="True"
+                       AllowSorting="True"
+                       AllowFiltering="True"
+                       ShowRowHeader="True"
+                       ColumnSizer="Star">
+```
+
+#### **SfDataGrid Styling (Official Pattern):**
+```xml
+<!-- Official styling approach -->
+<syncfusion:SfDataGrid GridLinesVisibility="Both"
+                       HeaderLinesVisibility="All"
+                       RowHeight="35"
+                       HeaderRowHeight="40">
+```
+
+**Reference Links for Each Pattern:**
+- **Basic Setup**: https://help.syncfusion.com/wpf/datagrid/getting-started
+- **Column Types**: https://help.syncfusion.com/wpf/datagrid/columns
+- **Selection**: https://help.syncfusion.com/wpf/datagrid/selection
+- **Styling**: https://help.syncfusion.com/wpf/datagrid/styles-and-templates
+- **API Reference**: https://help.syncfusion.com/cr/wpf/Syncfusion.UI.Xaml.Grid.SfDataGrid.html
+
+**MANDATORY RULE**: Every SfDataGrid implementation MUST follow one of these documented patterns exactly.
+
+### **🚨 FINAL ENFORCEMENT: ZERO TOLERANCE ANTI-REGRESSION POLICY**
+
+**IMMEDIATE STOP ACTIONS when encountering compilation errors:**
+1. ❌ **NEVER** type `<DataGrid` as a solution to SfDataGrid errors
+2. ❌ **NEVER** remove `syncfusion:` namespace prefix to "fix" errors
+3. ❌ **NEVER** replace working Syncfusion components with standard WPF alternatives
+4. ❌ **NEVER** justify regression with "it's faster" or "simpler" reasoning
+
+**MANDATORY FIRST STEPS for any XAML compilation error:**
+1. ✅ **CHECK**: Is the Syncfusion namespace declared? `xmlns:syncfusion="http://schemas.syncfusion.com/wpf"`
+2. ✅ **VERIFY**: Are Syncfusion packages referenced in the project?
+3. ✅ **CONSULT**: Official Syncfusion documentation for the exact control usage
+4. ✅ **UPGRADE**: Convert any legacy DataGrid to SfDataGrid using documented patterns
+
+**ZERO TOLERANCE VIOLATIONS:**
+- **Write-Host in PowerShell**: Use Write-Output, Write-Information, Write-Verbose instead
+- **Undocumented Syncfusion patterns**: Only use officially documented control implementations
+- **Custom "enhanced" wrappers**: Use official APIs exactly as documented
+- **Assumed parameter combinations**: Verify all parameters exist in official API documentation
+- **Legacy or deprecated patterns**: Use current, officially supported implementations only
+- **DataGrid regression**: Any DataGrid found should be immediately upgraded to SfDataGrid
+
+**DOCUMENTATION VERIFICATION REQUIREMENTS:**
+- **Before ANY PowerShell code**: Reference Microsoft PowerShell standards documentation
+- **Before ANY Syncfusion control**: Reference specific control documentation page  
+- **Before ANY .NET feature**: Reference official .NET API documentation
+- **Include documentation links**: Always provide link to specific documentation page used
+- **Code comments**: Include reference to documentation source in code comments
+
+**SUCCESS METRICS:**
+- ✅ **100% Syncfusion consistency** across all data grids
+- ✅ **Zero DataGrid instances** in new development
+- ✅ **Documentation links** provided for all Syncfusion implementations
+- ✅ **Working SfDataGrid patterns** preserved and replicated
+
+**Required Verification Steps:**
+1. **Before any Syncfusion WPF code**: Search help.syncfusion.com/wpf for exact usage
+2. **Cross-reference examples**: Find matching code in Syncfusion's WPF sample browser
+3. **API validation**: Verify all properties/methods exist in official WPF API reference
+4. **Documentation links**: Include reference to specific Syncfusion WPF doc page used
+
+**Documentation Resources (USE THESE ONLY):**
+- **Main WPF API Reference**: https://help.syncfusion.com/cr/wpf/Syncfusion.html
+- **Getting Started Guides**: Component-specific WPF documentation
+- **Sample Browser**: WPF code examples and demonstrations
+- **Knowledge Base**: Official solutions to common WPF issues
+
+**Example of Correct Documentation-Based Implementation:**
+```csharp
+// Based on official Syncfusion RibbonControlAdv documentation
+var tabItem = new TabHost
+{
+    Text = "Dashboard"
+};
+_ribbonControl.Header.AddMainItem(tabItem); // Documented method
+
+// Based on official DockingManager documentation  
+_dockingManager.DockControl(panel, this, DockingStyle.Left, 280); // Documented enum
+```
 
 ### License Management
 - **License Registration**: Always register Syncfusion license in App constructor before UI initialization
@@ -405,8 +931,8 @@ var drivers = await context.Drivers.ToListAsync();
   "PowerShell 7.5.2": {
     "path": "pwsh.exe",
     "args": ["-NoProfile", "-NoExit", "-Command",
-      "& 'C:\\path\\to\\BusBuddy-PowerShell-Profile.ps1';
-       & 'C:\\path\\to\\BusBuddy-Advanced-Workflows.ps1'"]
+      "& 'C:\\path\\to\\Project-PowerShell-Profile.ps1';
+       & 'C:\\path\\to\\Project-Advanced-Workflows.ps1'"]
   }
 }
 ```
@@ -433,15 +959,62 @@ bb-diagnostic           # Full environment and project health check
 bb-report               # Generate comprehensive project report
 ```
 
-## PowerShell Development Environment Integration
+## PowerShell Development Environment Integration - MICROSOFT STANDARDS MANDATORY
 
 - **PowerShell Core 7.5.2**: Use PowerShell Core for all development scripting and task automation
+- **MICROSOFT COMPLIANCE REQUIRED**: ALL PowerShell code MUST follow Microsoft PowerShell Development Guidelines
 - **VS Code Integration**: Use robust `code` command integration with automatic VS Code/VS Code Insiders detection
 - **Task Explorer Exclusive**: Task Explorer is the ONLY method for task management - no direct terminal commands for builds
 - **Debug Helper Integration**: All `DebugHelper` methods from `App.xaml.cs` accessible via PowerShell commands
 
+### **CRITICAL: Microsoft PowerShell Standards Compliance**
+- **REFERENCE REQUIRED**: [Microsoft PowerShell Cmdlet Development Guidelines](https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/cmdlet-development-guidelines)
+- **Module Standards**: [Microsoft PowerShell Module Guidelines](https://docs.microsoft.com/en-us/powershell/scripting/developer/module/writing-a-windows-powershell-module)
+- **Error Handling**: [Microsoft PowerShell Error Handling](https://docs.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-exceptions)
+- **Output Streams**: [Microsoft PowerShell Output Streams](https://docs.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-output-streams)
+
+### **FORBIDDEN POWERSHELL ANTI-PATTERNS**
+- ❌ **Write-Host**: Use Write-Output, Write-Information, Write-Verbose, Write-Debug instead
+- ❌ **Monolithic modules**: Break large modules into focused, single-responsibility modules
+- ❌ **Missing Export-ModuleMember**: Always explicitly declare exported functions
+- ❌ **Inconsistent error handling**: Use consistent try-catch-throw patterns throughout
+- ❌ **Hard-coded paths**: Use proper parameter binding and validation attributes
+- ❌ **Direct console output**: Use proper PowerShell output streams and formatting
+
+### **MANDATORY POWERSHELL PATTERNS**
+- ✅ **Write-Output**: For pipeline-compatible object output
+- ✅ **Write-Information**: For informational messages with -InformationAction support
+- ✅ **Write-Verbose**: For detailed operation information with -Verbose support
+- ✅ **Write-Debug**: For debugging information with -Debug support
+- ✅ **Write-Warning**: For non-terminating warnings
+- ✅ **Write-Error**: For terminating and non-terminating errors
+- ✅ **Proper parameter attributes**: [Parameter(Mandatory=$true)] for required parameters
+- ✅ **Module manifests**: .psd1 files with proper metadata and export declarations
+
+### **BusBuddy Module Violations - IMMEDIATE REMEDIATION REQUIRED**
+- **BusBuddy.psm1**: 7,866-line monolithic violation of Microsoft modularization standards
+- **Compliance Score**: 45% FAILING - Required (40%), Strongly Encouraged (35%), Advisory (60%)
+- **Write-Host Count**: 50+ violations of Microsoft output stream standards
+- **Architecture**: Violates single-responsibility principle and Microsoft module design guidelines
+- **Export Declarations**: Missing required Export-ModuleMember statements throughout
+- **Error Handling**: Inconsistent patterns violating Microsoft exception handling standards
+
+### **MANDATORY REMEDIATION ACTIONS**
+1. **BEFORE ANY NEW POWERSHELL CODE**: Fix existing violations in BusBuddy.psm1
+2. **Write-Host Replacement**: Replace ALL Write-Host with appropriate output streams
+3. **Module Breakup**: Split monolithic module into focused, single-purpose modules
+4. **Export Declarations**: Add proper Export-ModuleMember statements for all public functions
+5. **Error Standardization**: Implement consistent Microsoft-compliant error handling patterns
+6. **Documentation Links**: Add Microsoft documentation references to all functions
+
+### **NO NEW POWERSHELL WITHOUT COMPLIANCE**
+- **Zero Tolerance**: No new PowerShell development until existing violations are fixed
+- **Documentation First**: Every PowerShell change must reference Microsoft standards
+- **Compliance Validation**: Use Microsoft guidelines to validate all PowerShell implementations
+- **Professional Standards**: BusBuddy must meet enterprise PowerShell development standards
+
 ### PowerShell Profile Standards
-- **Profile Location**: `BusBuddy-PowerShell-Profile.ps1` in project root for core functionality
+- **Profile Location**: `Project-PowerShell-Profile.ps1` in project root for core functionality
 - **Advanced Workflows**: `BusBuddy-Advanced-Workflows.ps1` for comprehensive development automation
 - **Auto-Loading**: VS Code terminal profiles automatically load both PowerShell files
 - **Function Naming**: Use `Verb-BusBuddyNoun` pattern for all Bus Buddy specific functions
@@ -537,13 +1110,13 @@ bb-report               # Generate comprehensive project report
 ### Quick Build and Run Commands
 ```batch
 @REM Quick build
-dotnet build BusBuddy.WPF/BusBuddy.WPF.csproj
+dotnet build [Project].WPF/[Project].WPF.csproj
 
 @REM Quick run
-dotnet run --project BusBuddy.WPF/BusBuddy.WPF.csproj
+dotnet run --project [Project].WPF/[Project].WPF.csproj
 
 @REM Clean build
-dotnet clean BusBuddy.sln && dotnet restore BusBuddy.sln && dotnet build BusBuddy.sln
+dotnet clean [Project].sln && dotnet restore [Project].sln && dotnet build [Project].sln
 ```
 
 ### Error Capture Commands
@@ -561,10 +1134,10 @@ run-with-error-capture.bat
 dotnet nuget locals all --clear
 
 @REM Fix package restore issues
-dotnet restore BusBuddy.sln --force --no-cache
+dotnet restore [Project].sln --force --no-cache
 
 @REM Validate build health
-dotnet build BusBuddy.sln --verbosity minimal
+dotnet build [Project].sln --verbosity minimal
 ```
 
 ## Troubleshooting Guide
@@ -666,4 +1239,694 @@ dotnet build BusBuddy.sln --verbosity minimal
 - **Output**: Displays formatted report of build errors
 - **Benefits**: Identifies common build issues and suggested fixes
 
-These instructions help maintain consistent code quality, architecture, and development practices throughout the project.
+These instructions define **HOW** to build quality software following Microsoft standards and best practices. They are technology and methodology focused, not business domain specific.
+
+**Project-specific requirements (WHAT to build) should be documented separately in:**
+- Requirements documents
+- User stories  
+- Business logic specifications
+- Domain model definitions
+- Feature specifications
+
+**These instructions cover the technical HOW:**
+- Documentation-first development methodology
+- Microsoft compliance standards
+- Code quality patterns
+- Build and deployment processes
+- Error handling approaches
+- Testing strategies
+
+---
+
+## PowerShell 7.5.2 Advanced Features and Standards
+
+### **PowerShell 7.5.2 Core Requirements**
+- **Version**: PowerShell Core 7.5.2 minimum required
+- **Profile Standard**: Microsoft.PowerShell_profile.ps1 in PowerShell/Profiles/
+- **Module Standards**: Microsoft PowerShell Module Guidelines compliance
+- **Reference Documentation**: Documentation/PowerShell-7.5.2-Reference.md
+
+### **Threading and Parallel Processing**
+```powershell
+# ForEach-Object -Parallel Best Practices
+$results = $items | ForEach-Object -Parallel {
+    param($item)
+    try {
+        # Process item with proper error handling
+        return [PSCustomObject]@{
+            Item = $item
+            Result = "Success"
+            Output = $processedData
+        }
+    } catch {
+        return [PSCustomObject]@{
+            Item = $item
+            Result = "Failed"
+            Error = $_.Exception.Message
+        }
+    }
+} -ThrottleLimit 4
+
+# Start-ThreadJob for Background Tasks
+$job = Start-ThreadJob -ScriptBlock {
+    param($inputData)
+    # Long-running background task
+    return $result
+} -ArgumentList $data
+```
+
+### **Enhanced Error Handling Patterns**
+```powershell
+# Structured Error Information
+try {
+    # Operation
+    $result = Invoke-Operation
+    Write-Output $result
+} catch {
+    $errorInfo = [PSCustomObject]@{
+        Command = $MyInvocation.MyCommand.Name
+        Error = $_.Exception.Message
+        Line = $_.InvocationInfo.ScriptLineNumber
+        Timestamp = Get-Date
+    }
+    Write-Error -ErrorRecord $_ -CategoryActivity "Operation"
+    Write-Information $errorInfo -InformationAction Continue
+}
+
+# Pipeline Chain Operators (7.5.2)
+dotnet build && dotnet test || Write-Error "Build or test failed"
+```
+
+### **Advanced String and Data Processing**
+```powershell
+# Null Conditional Operators
+$config = $settings?.Environment?.Database?.ConnectionString
+
+# Ternary Operators
+$mode = $isProduction ? "Release" : "Debug"
+
+# Enhanced JSON Processing
+$data = Get-Content config.json | ConvertFrom-Json -Depth 10
+$output = $data | ConvertTo-Json -Depth 10 -Compress
+```
+
+### **Module Development Standards**
+```powershell
+# Proper Module Structure
+#requires -Version 7.5
+
+[CmdletBinding()]
+param()
+
+# Export only public functions
+Export-ModuleMember -Function Get-ProjectInfo, Set-ProjectConfig
+
+# Use proper parameter validation
+function Get-ProjectInfo {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$ProjectPath
+    )
+    
+    begin {
+        Write-Verbose "Starting project analysis"
+    }
+    
+    process {
+        # Implementation with proper output streams
+        Write-Information "Processing $ProjectPath" -InformationAction Continue
+    }
+    
+    end {
+        Write-Verbose "Project analysis complete"
+    }
+}
+```
+
+### **Performance Optimization Patterns**
+```powershell
+# Memory Management
+[System.GC]::Collect() # Use sparingly
+
+# Stream Processing for Large Data
+Get-Content large-file.txt | ForEach-Object {
+    # Process line by line to avoid loading entire file
+    if ($_ -match $pattern) {
+        Write-Output $_
+    }
+}
+
+# Efficient Collection Processing
+$results = [System.Collections.Generic.List[PSObject]]::new()
+foreach ($item in $collection) {
+    $results.Add($processedItem)
+}
+```
+
+---
+
+## XAML Development Standards
+
+### **XAML Formatting and Structure**
+```xml
+<!-- Standard XAML Document Structure -->
+<UserControl x:Class="Project.Views.EntityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <Grid>
+        <!-- Content organized with proper indentation -->
+    </Grid>
+</UserControl>
+```
+
+### **XAML Coding Standards**
+- **Indentation**: 4 spaces per level (as defined in .editorconfig)
+- **Namespace Order**: Standard WPF namespaces first, then third-party (Syncfusion)
+- **Attribute Organization**: Class and namespace on first line, MC/Design on separate lines
+- **Resource References**: Use StaticResource for styles, DynamicResource for themes
+- **Naming Convention**: PascalCase for all element names and properties
+
+### **Data Binding Best Practices**
+```xml
+<!-- Proper Data Binding Patterns -->
+<DataGrid ItemsSource="{Binding Entities}" 
+          SelectedItem="{Binding SelectedEntity, Mode=TwoWay}"
+          AutoGenerateColumns="False">
+    <DataGrid.Columns>
+        <DataGridTextColumn Header="Name" 
+                           Binding="{Binding Name}" 
+                           Width="*" />
+        <DataGridTextColumn Header="Status" 
+                           Binding="{Binding Status}" 
+                           Width="Auto" />
+    </DataGrid.Columns>
+</DataGrid>
+
+<!-- Command Binding -->
+<Button Content="Save" 
+        Command="{Binding SaveCommand}"
+        IsEnabled="{Binding CanSave}"
+        Style="{StaticResource PrimaryButtonStyle}" />
+```
+
+### **Syncfusion XAML Integration**
+```xml
+<!-- Syncfusion Control Usage -->
+<syncfusion:SfDataGrid ItemsSource="{Binding Entities}"
+                       SelectionMode="Single"
+                       AllowEditing="True"
+                       AllowSorting="True"
+                       AllowFiltering="True">
+    <syncfusion:SfDataGrid.Columns>
+        <syncfusion:GridTextColumn MappingName="Name" 
+                                  HeaderText="Entity Name" />
+        <syncfusion:GridDateTimeColumn MappingName="CreatedDate" 
+                                      HeaderText="Created" />
+    </syncfusion:SfDataGrid.Columns>
+</syncfusion:SfDataGrid>
+```
+
+### **Resource Dictionary Organization**
+```xml
+<!-- Theme Resource Dictionary Structure -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- Colors Section -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#007ACC" />
+    <SolidColorBrush x:Key="SecondaryBrush" Color="#F0F0F0" />
+    
+    <!-- Styles Section -->
+    <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Padding" Value="10,5" />
+    </Style>
+    
+    <!-- Templates Section -->
+    <DataTemplate x:Key="EntityTemplate">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+        </StackPanel>
+    </DataTemplate>
+    
+</ResourceDictionary>
+```
+
+---
+
+## C# Development Standards
+
+### **C# Language Version and Features**
+- **Language Version**: C# 12 (as defined in Directory.Build.props)
+- **Target Framework**: .NET 8.0-windows (WPF projects)
+- **Nullable Reference Types**: Enabled throughout (Directory.Build.props)
+- **Implicit Usings**: Enabled for common namespaces
+
+### **Code Formatting Standards** (from .editorconfig)
+```csharp
+// Proper C# Formatting
+public class EntityService : IEntityService
+{
+    private readonly ILogger<EntityService> _logger;
+    private readonly AppContext _context;
+
+    public EntityService(ILogger<EntityService> logger, AppContext context)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    public async Task<List<Entity>> GetEntitiesAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Retrieving entities from database");
+            
+            var entities = await _context.Entities
+                .Where(e => e.IsActive)
+                .OrderBy(e => e.Name)
+                .ToListAsync();
+                
+            _logger.LogInformation("Retrieved {Count} entities", entities.Count);
+            return entities;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving entities");
+            throw;
+        }
+    }
+}
+```
+
+### **Nullable Reference Types Implementation**
+```csharp
+// Proper Nullable Implementation
+public class Entity
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty; // Non-nullable with default
+    public string? Description { get; set; }         // Nullable
+    public DateTime CreatedDate { get; set; }
+    
+    // Collections initialized to prevent null reference
+    public List<RelatedEntity> RelatedEntities { get; set; } = new();
+}
+
+// Method with nullable parameters
+public Entity? FindEntity(string? name)
+{
+    if (string.IsNullOrEmpty(name))
+        return null;
+        
+    return _entities.FirstOrDefault(e => 
+        e.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+}
+```
+
+### **Async/Await Patterns**
+```csharp
+// Proper Async Implementation
+public async Task<Result<Entity>> CreateEntityAsync(CreateEntityRequest request)
+{
+    using var activity = _logger.BeginScope("CreateEntity");
+    
+    try
+    {
+        // Validate input
+        if (request is null)
+            return Result<Entity>.Failure("Request cannot be null");
+            
+        // Async operation
+        var entity = new Entity
+        {
+            Name = request.Name,
+            Description = request.Description,
+            CreatedDate = DateTime.UtcNow
+        };
+        
+        _context.Entities.Add(entity);
+        await _context.SaveChangesAsync();
+        
+        _logger.LogInformation("Entity {Name} created with ID {Id}", 
+            entity.Name, entity.Id);
+            
+        return Result<Entity>.Success(entity);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Failed to create entity {Name}", request.Name);
+        return Result<Entity>.Failure($"Creation failed: {ex.Message}");
+    }
+}
+```
+
+### **MVVM ViewModel Patterns**
+```csharp
+// Proper ViewModel Implementation
+public class EntityViewModel : BaseViewModel
+{
+    private readonly IEntityService _entityService;
+    private ObservableCollection<Entity> _entities = new();
+    private Entity? _selectedEntity;
+
+    public EntityViewModel(IEntityService entityService)
+    {
+        _entityService = entityService;
+        LoadEntitiesCommand = new RelayCommand(async () => await LoadEntitiesAsync());
+        SaveEntityCommand = new RelayCommand(async () => await SaveEntityAsync(), CanSaveEntity);
+    }
+
+    public ObservableCollection<Entity> Entities
+    {
+        get => _entities;
+        set => SetProperty(ref _entities, value);
+    }
+
+    public Entity? SelectedEntity
+    {
+        get => _selectedEntity;
+        set
+        {
+            if (SetProperty(ref _selectedEntity, value))
+            {
+                SaveEntityCommand.NotifyCanExecuteChanged();
+            }
+        }
+    }
+
+    public RelayCommand LoadEntitiesCommand { get; }
+    public RelayCommand SaveEntityCommand { get; }
+
+    private async Task LoadEntitiesAsync()
+    {
+        try
+        {
+            IsLoading = true;
+            var entities = await _entityService.GetEntitiesAsync();
+            Entities.Clear();
+            foreach (var entity in entities)
+            {
+                Entities.Add(entity);
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Failed to load entities: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private bool CanSaveEntity() => SelectedEntity is not null && !IsLoading;
+}
+```
+
+---
+
+## YAML Configuration Standards
+
+### **GitHub Actions YAML Structure**
+```yaml
+# Standard GitHub Actions Format
+name: 🚌 Project CI Pipeline
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: "Enable debug mode for troubleshooting"
+        default: false
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  SOLUTION_FILE: "Project.sln"
+  BUILD_CONFIGURATION: "Release"
+
+jobs:
+  build-and-test:
+    name: 🏗️ Build & Test
+    runs-on: windows-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: ⚙️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: 📦 Restore Dependencies
+        run: dotnet restore ${{ env.SOLUTION_FILE }}
+        
+      - name: 🏗️ Build Solution
+        run: dotnet build ${{ env.SOLUTION_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        
+      - name: 🧪 Run Tests
+        run: dotnet test ${{ env.SOLUTION_FILE }} --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
+```
+
+### **YAML Formatting Standards** (from .editorconfig)
+- **Indentation**: 2 spaces per level
+- **Line Endings**: CRLF (Windows)
+- **UTF-8 Encoding**: With BOM
+- **Trailing Whitespace**: Trimmed
+- **Final Newline**: Required
+
+### **Dependabot Configuration**
+```yaml
+# .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "project-maintainer"
+    labels:
+      - "dependencies"
+      - "automerge"
+```
+
+---
+
+## Configuration File Standards
+
+### **Directory.Build.props Standards**
+- **Centralized Configuration**: All project-wide settings in single file
+- **Version Management**: Centralized package versions
+- **Build Optimization**: Performance and compilation settings
+- **Code Analysis**: Practical ruleset with reduced noise
+- **Nullable Reference Types**: Enabled with Phase 1 suppressions
+
+### **EditorConfig Implementation**
+```editorconfig
+# .editorconfig - Code Style Standards
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{cs,csx}]
+# C# Formatting Rules
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_indent_case_contents = true
+csharp_space_after_cast = false
+
+# Diagnostic Configuration
+dotnet_diagnostic.CA2007.severity = suggestion
+dotnet_diagnostic.CS1061.severity = error
+```
+
+### **Global.json Configuration**
+```json
+{
+  "sdk": {
+    "version": "9.0.303",
+    "rollForward": "latestMinor"
+  },
+  "msbuild-sdks": {
+    "Microsoft.Build.Traversal": "3.4.0"
+  }
+}
+```
+
+### **NuGet.config Standards**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+    <add key="syncfusion" value="https://nuget.syncfusion.com/nuget_packages/package.svc/" />
+  </packageSources>
+  
+  <packageManagement>
+    <add key="format" value="0" />
+    <add key="disabled" value="False" />
+  </packageManagement>
+</configuration>
+```
+
+---
+
+## Build Configuration Standards
+
+### **MSBuild Property Standards**
+- **TargetFramework**: net8.0-windows for WPF projects
+- **LangVersion**: 12 (C# 12 features)
+- **Nullable**: enable (nullable reference types)
+- **ImplicitUsings**: enable (common namespace imports)
+- **GenerateDocumentationFile**: true (XML documentation)
+
+### **Code Analysis Configuration**
+- **EnableNETAnalyzers**: true
+- **AnalysisMode**: Recommended
+- **Custom Ruleset**: Project-Practical.ruleset
+- **Practical Suppression**: Low-impact warnings suppressed for MVP
+
+### **Performance Optimization Settings**
+```xml
+<PropertyGroup>
+  <UseSharedCompilation>true</UseSharedCompilation>
+  <BuildInParallel>true</BuildInParallel>
+  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+</PropertyGroup>
+```
+
+### **Test Project Configuration**
+```xml
+<PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+  <UseSharedCompilation>false</UseSharedCompilation>
+  <BuildInParallel>false</BuildInParallel>
+  <GenerateDocumentationFile>false</GenerateDocumentationFile>
+</PropertyGroup>
+```
+
+---
+
+## VS Code Integration Standards
+
+### **Extensions Requirements**
+- **C# Dev Kit**: ms-dotnettools.csdevkit
+- **XAML Styler**: ms-dotnettools.xaml
+- **Task Explorer**: spmeesseman.vscode-taskexplorer
+- **PowerShell**: ms-vscode.powershell
+
+### **Settings Configuration**
+```json
+{
+  "terminal.integrated.profiles.windows": {
+    "PowerShell 7.5.2": {
+      "path": "pwsh.exe",
+      "args": ["-NoProfile", "-NoExit", "-Command", 
+               "& 'PowerShell/Profiles/Microsoft.PowerShell_profile.ps1'"]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell 7.5.2",
+  "omnisharp.useModernNet": true,
+  "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true
+}
+```
+
+### **Task Configuration Standards**
+```json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/Project.sln"],
+      "group": "build",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
+```
+
+---
+
+## File Management and Cleanup Best Practices
+
+### **🧹 Temporary File Cleanup**
+Always clean up temporary files created during development:
+
+- **Remove `.new`, `.bak`, `.backup`, `.old` files** after successful operations
+- **Delete `*_temp`, `*_tmp`, `*_test` files** when no longer needed
+- **Clean up `Migration_Backups/` directories** after migration completion
+- **Remove duplicate files** (e.g., `file.cs` and `file_new.cs`)
+
+### **🚫 Files to Always Remove**
+- Build artifacts: `bin/`, `obj/`, `TestResults/`
+- IDE files: `.vs/`, `*.user`, `*.suo`
+- Temporary downloads: `*.crdownload`, `*.tmp`
+- Backup files: `*.backup_*`, `*_backup*`
+- Empty directories that serve no purpose
+
+### **📝 Git Repository Hygiene**
+- Use `.gitignore` to prevent tracking build artifacts
+- Remove large binary files from git history if accidentally committed
+- Stage only source files, never build artifacts
+- Clean up redundant documentation after project phases complete
+- **Remove trailing whitespace** at the end of lines and files
+- **Ensure files end with a single newline** character
+- **Use consistent line endings** (CRLF on Windows, LF on Unix)
+
+### **✨ Code Formatting Standards**
+- **No trailing whitespace** - remove spaces/tabs at line endings
+- **Consistent indentation** - use spaces or tabs consistently (prefer spaces)
+- **File endings** - ensure files end with exactly one newline
+- **Line length** - keep lines under 120 characters when practical
+- **Empty lines** - use sparingly and consistently for logical separation
+- **No nullable reference types** - avoid using nullable properties, parameters, or return types in new code
+
+### **🔄 Development Workflow**
+When creating temporary files:
+1. Use descriptive names with clear temporary indicators
+2. Set reminders to clean up after task completion  
+3. Add temporary patterns to `.gitignore` if needed
+4. Use `git clean -fd` to remove untracked files periodically
+
+**File Corruption Assessment Protocol:**
+1. **First Check**: Identify specific error messages and their line numbers
+2. **Scope Analysis**: Determine if errors are localized (missing method, typo) or systemic
+3. **Impact Assessment**: Count affected files and error types
+4. **User Consultation**: For 3+ files or complex structural issues, ask user before rebuilding
+5. **Documentation**: Always report what was found before proposing solution approach
+

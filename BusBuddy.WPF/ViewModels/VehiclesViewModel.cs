@@ -5,20 +5,21 @@ using System.Threading.Tasks;
 using BusBuddy.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Windows;
+using BusBuddy.Core.Models;
 
 namespace BusBuddy.WPF.ViewModels
 {
     /// <summary>
     /// Phase 1 Vehicles ViewModel - Clean and functional
     /// </summary>
-    public class VehiclesViewModel : INotifyPropertyChanged
+    public class VehiclesViewModel : BaseViewModel
     {
-        public ObservableCollection<BusBuddy.Core.Models.Vehicle> Vehicles { get; set; } = new();
-        public event PropertyChangedEventHandler? PropertyChanged;
+        private ObservableCollection<Bus> _vehicles = new();
 
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        public ObservableCollection<Bus> Vehicles
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get => _vehicles;
+            set => SetProperty(ref _vehicles, value);
         }
 
         public async Task LoadVehiclesAsync()

@@ -9,6 +9,14 @@ namespace BusBuddy.Core.Models
         [Key]
         public int Id { get; set; }
 
+        // Add VehicleId property for compatibility
+        [NotMapped]
+        public int VehicleId
+        {
+            get => Id;
+            set => Id = value;
+        }
+
         public string Make { get; set; } = string.Empty;
         public string Model { get; set; } = string.Empty;
         public string PlateNumber { get; set; } = string.Empty;
@@ -38,6 +46,15 @@ namespace BusBuddy.Core.Models
         /// <summary>
         /// Current operational status of the vehicle
         /// </summary>
-        public string OperationalStatus { get; set; } = "Operational";
+        public string Status { get; set; } = "Active";
+
+        /// <summary>
+        /// Operational status alias for compatibility
+        /// </summary>
+        public string OperationalStatus
+        {
+            get => Status;
+            set => Status = value;
+        }
     }
 }

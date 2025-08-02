@@ -11,6 +11,7 @@ namespace BusBuddy.WPF.Views
         public ActivityScheduleView()
         {
             InitializeComponent();
+
             var viewModel = new ActivityScheduleViewModel();
             DataContext = viewModel;
 

@@ -4,6 +4,7 @@ using BusBuddy.Core.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Text;
+using RecurrenceType = BusBuddy.Core.Models.RecurrenceType;
 
 namespace BusBuddy.Core.Services;
 
@@ -545,88 +546,64 @@ public class ActivityService : IActivityService
         }
     }
 
-    public async Task<IEnumerable<Activity>> CreateRecurringActivitiesAsync(Activity baseActivity, DateTime startDate, DateTime endDate, RecurrenceType recurrenceType, int recurrenceInterval, List<DayOfWeek>? daysOfWeek = null)
+    public async Task<List<Activity>> CreateRecurringActivitiesAsync(
+        Activity templateActivity,
+        DateTime startDate,
+        DateTime endDate,
+        BusBuddy.Core.Services.Interfaces.RecurrenceType recurrenceType,
+        int intervalDays = 1,
+        List<DayOfWeek>? daysOfWeek = null)
     {
+        var activities = new List<Activity>();
+
         try
         {
-            Logger.Information("Creating recurring activities from {StartDate} to {EndDate} with {RecurrenceType} recurrence",
-                startDate, endDate, recurrenceType);
-
-            var activities = new List<Activity>();
-            var currentDate = startDate.Date;
-
-            while (currentDate <= endDate.Date)
+            var currentDate = startDate;
+            while (currentDate <= endDate)
             {
-                bool includeDate = false;
-
-                switch (recurrenceType)
+                bool shouldCreateActivity = recurrenceType switch
                 {
-                    case RecurrenceType.Daily:
-                        // Include every N days
-                        includeDate = (currentDate - startDate).Days % recurrenceInterval == 0;
-                        break;
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Daily => true,
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Weekly => daysOfWeek?.Contains(currentDate.DayOfWeek) ?? true,
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Monthly => currentDate.Day == startDate.Day,
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Yearly => currentDate.DayOfYear == startDate.DayOfYear,
+                    _ => false
+                };
 
-                    case RecurrenceType.Weekly:
-                        // If days of week specified, include only those days
-                        if (daysOfWeek != null && daysOfWeek.Count > 0)
-                        {
-                            includeDate = daysOfWeek.Contains(currentDate.DayOfWeek) &&
-                                         (((currentDate - startDate).Days / 7) % recurrenceInterval == 0);
-                        }
-                        else
-                        {
-                            // Include every N weeks on same day of week as start date
-                            includeDate = currentDate.DayOfWeek == startDate.DayOfWeek &&
-                                         (((currentDate - startDate).Days / 7) % recurrenceInterval == 0);
-                        }
-                        break;
-
-                    case RecurrenceType.Monthly:
-                        // Include every N months on same day of month
-                        includeDate = currentDate.Day == startDate.Day &&
-                                     ((currentDate.Month - startDate.Month +
-                                      (currentDate.Year - startDate.Year) * 12) % recurrenceInterval == 0);
-                        break;
-
-                    case RecurrenceType.Yearly:
-                        // Include every N years on same day of year
-                        includeDate = currentDate.Day == startDate.Day &&
-                                     currentDate.Month == startDate.Month &&
-                                     ((currentDate.Year - startDate.Year) % recurrenceInterval == 0);
-                        break;
-                }
-
-                if (includeDate)
+                if (shouldCreateActivity)
                 {
                     var newActivity = new Activity
                     {
-                        ActivityType = baseActivity.ActivityType,
-                        Date = currentDate,
-                        Description = baseActivity.Description,
-                        Destination = baseActivity.Destination,
-                        LeaveTime = baseActivity.LeaveTime,
-                        ReturnTime = baseActivity.ReturnTime,
-                        DriverId = baseActivity.DriverId,
-                        AssignedVehicleId = baseActivity.AssignedVehicleId,
-                        RouteId = baseActivity.RouteId,
-                        RequestedBy = baseActivity.RequestedBy,
-                        Status = baseActivity.Status,
-                        ExpectedPassengers = baseActivity.ExpectedPassengers,
-                        Notes = baseActivity.Notes,
-                        RecurringSeriesId = baseActivity.ActivityId, // Use base activity ID as series ID
-                        CreatedDate = DateTime.UtcNow
+                        ActivityName = templateActivity.ActivityName,
+                        Destination = templateActivity.Destination,
+                        ActivityDate = currentDate,
+                        DepartureTime = templateActivity.DepartureTime,
+                        EstimatedArrival = templateActivity.EstimatedArrival,
+                        RequestedBy = templateActivity.RequestedBy,
+                        AssignedVehicleId = templateActivity.AssignedVehicleId,
+                        AssignedDriverId = templateActivity.AssignedDriverId,
+                        Notes = templateActivity.Notes,
+                        CreatedDate = DateTime.UtcNow,
+                        UpdatedDate = DateTime.UtcNow
                     };
 
                     _context.Activities.Add(newActivity);
                     activities.Add(newActivity);
                 }
 
-                currentDate = currentDate.AddDays(1);
+                currentDate = recurrenceType switch
+                {
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Daily => currentDate.AddDays(intervalDays),
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Weekly => currentDate.AddDays(7),
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Monthly => currentDate.AddMonths(1),
+                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Yearly => currentDate.AddYears(1),
+                    _ => currentDate.AddDays(1)
+                };
             }
 
             await _context.SaveChangesAsync();
+            Logger.Information("Created {Count} recurring activities", activities.Count);
 
-            Logger.Information("Successfully created {Count} recurring activities", activities.Count);
             return activities;
         }
         catch (Exception ex)

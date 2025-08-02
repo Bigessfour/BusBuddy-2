@@ -16,6 +16,7 @@ param(
     [string]$ResourceGroup,
 
     [Parameter(Mandatory = $false)]
+    [HelpMessage("If specified, creates the server and database if they don't exist")]
     [switch]$CreateIfNotExists
 )
 

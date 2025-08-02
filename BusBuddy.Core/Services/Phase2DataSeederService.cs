@@ -223,6 +223,20 @@ namespace BusBuddy.Core.Services
         {
             Logger.Information("🗺️ Seeding 100 diverse routes with geographical data...");
 
+            // School names for route assignments
+            var schoolNames = new[]
+            {
+                "Lincoln Elementary",
+                "Washington Middle School",
+                "Central High School",
+                "Roosevelt Elementary",
+                "Jefferson Middle School",
+                "Madison High School",
+                "Wilson Elementary",
+                "Kennedy Middle School",
+                "Adams High School"
+            };
+
             // Clear existing routes for fresh data
             if (await _context.Routes.AnyAsync())
             {
@@ -254,7 +268,8 @@ namespace BusBuddy.Core.Services
                     StudentCount = studentCount,
                     StopCount = stopCount,
                     BusNumber = busNumber,
-                    IsActive = isActive
+                    IsActive = isActive,
+                    School = schoolNames[_random.Next(schoolNames.Length)]
                 };
 
                 routes.Add(route);

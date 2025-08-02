@@ -38,56 +38,33 @@ namespace BusBuddy.Core.Services
                         RouteName = r.RouteName,
                         Date = r.Date,
                         Description = r.Description,
-                        IsActive = r.IsActive,
-                        Distance = r.Distance,
-                        EstimatedDuration = r.EstimatedDuration,
-                        StudentCount = r.StudentCount,
-
-                        // AM details
-                        AMVehicleId = r.AMVehicleId,
-                        AMDriverId = r.AMDriverId,
-                        AMBeginMiles = r.AMBeginMiles,
+                        School = r.School ?? string.Empty,
                         AMEndMiles = r.AMEndMiles,
                         AMRiders = r.AMRiders,
                         AMBeginTime = r.AMBeginTime,
-
-                        // PM details
-                        PMVehicleId = r.PMVehicleId,
-                        PMDriverId = r.PMDriverId,
-                        PMBeginMiles = r.PMBeginMiles,
                         PMEndMiles = r.PMEndMiles,
                         PMRiders = r.PMRiders,
                         PMBeginTime = r.PMBeginTime,
-
-                        // Basic reference data for display
                         BusNumber = r.BusNumber,
                         DriverName = r.DriverName,
-
-                        // Join to minimal vehicle info
                         AMVehicle = r.AMVehicleId != null ? new Bus
                         {
                             VehicleId = (int)r.AMVehicleId,
                             BusNumber = r.AMVehicle != null ? r.AMVehicle.BusNumber : string.Empty,
                             Status = r.AMVehicle != null ? r.AMVehicle.Status : "Unknown"
                         } : null,
-
-                        // Join to minimal driver info
                         AMDriver = r.AMDriverId != null ? new Driver
                         {
                             DriverId = (int)r.AMDriverId,
                             DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty,
                             Status = r.AMDriver != null ? r.AMDriver.Status : "Unknown"
                         } : null,
-
-                        // Join to minimal vehicle info for PM
                         PMVehicle = r.PMVehicleId != null ? new Bus
                         {
                             VehicleId = (int)r.PMVehicleId,
                             BusNumber = r.PMVehicle != null ? r.PMVehicle.BusNumber : string.Empty,
                             Status = r.PMVehicle != null ? r.PMVehicle.Status : "Unknown"
                         } : null,
-
-                        // Join to minimal driver info for PM
                         PMDriver = r.PMDriverId != null ? new Driver
                         {
                             DriverId = (int)r.PMDriverId,
@@ -237,6 +214,7 @@ namespace BusBuddy.Core.Services
                     Distance = r.Distance,
                     EstimatedDuration = r.EstimatedDuration,
                     StudentCount = r.StudentCount,
+                    School = r.School ?? string.Empty,
 
                     // AM/PM basics
                     AMVehicleId = r.AMVehicleId,
@@ -252,25 +230,26 @@ namespace BusBuddy.Core.Services
                     AMVehicle = r.AMVehicleId != null ? new Bus
                     {
                         VehicleId = (int)r.AMVehicleId,
-                        BusNumber = r.AMVehicle != null ? r.AMVehicle.BusNumber : string.Empty
+                        BusNumber = r.AMVehicle != null ? r.AMVehicle.BusNumber : string.Empty,
+                        Status = r.AMVehicle != null ? r.AMVehicle.Status : "Unknown"
                     } : null,
-
                     AMDriver = r.AMDriverId != null ? new Driver
                     {
                         DriverId = (int)r.AMDriverId,
-                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty
+                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty,
+                        Status = r.AMDriver != null ? r.AMDriver.Status : "Unknown"
                     } : null,
-
                     PMVehicle = r.PMVehicleId != null ? new Bus
                     {
                         VehicleId = (int)r.PMVehicleId,
-                        BusNumber = r.PMVehicle != null ? r.PMVehicle.BusNumber : string.Empty
+                        BusNumber = r.PMVehicle != null ? r.PMVehicle.BusNumber : string.Empty,
+                        Status = r.PMVehicle != null ? r.PMVehicle.Status : "Unknown"
                     } : null,
-
                     PMDriver = r.PMDriverId != null ? new Driver
                     {
                         DriverId = (int)r.PMDriverId,
-                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty
+                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty,
+                        Status = r.PMDriver != null ? r.PMDriver.Status : "Unknown"
                     } : null
                 })
                 .OrderBy(r => r.RouteName)
@@ -292,6 +271,7 @@ namespace BusBuddy.Core.Services
                     IsActive = r.IsActive,
                     Distance = r.Distance,
                     EstimatedDuration = r.EstimatedDuration,
+                    School = r.School ?? string.Empty,
 
                     // AM/PM basics - focus on the bus we're filtering by
                     AMVehicleId = r.AMVehicleId,
@@ -308,13 +288,14 @@ namespace BusBuddy.Core.Services
                     AMDriver = r.AMVehicleId == busId && r.AMDriverId != null ? new Driver
                     {
                         DriverId = (int)r.AMDriverId,
-                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty
+                        DriverName = r.AMDriver != null ? r.AMDriver.DriverName : string.Empty,
+                        Status = r.AMDriver != null ? r.AMDriver.Status : "Unknown"
                     } : null,
-
                     PMDriver = r.PMVehicleId == busId && r.PMDriverId != null ? new Driver
                     {
                         DriverId = (int)r.PMDriverId,
-                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty
+                        DriverName = r.PMDriver != null ? r.PMDriver.DriverName : string.Empty,
+                        Status = r.PMDriver != null ? r.PMDriver.Status : "Unknown"
                     } : null
                 })
                 .OrderBy(r => r.Date)

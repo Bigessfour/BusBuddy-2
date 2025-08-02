@@ -1,0 +1,17 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  BusBuddy.Core -> C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Core\bin\Debug\net8.0-windows\BusBuddy.Core.dll
+C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\Views\ActivityScheduleView.xaml(17,18): error MC3000: 'Data at the root level is invalid. Line 17, position 18.' XML is not valid. [C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\BusBuddy.WPF.csproj]
+C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\Views\DashboardView.xaml(16,11): error MC3000: 'Unexpected end tag. Line 16, position 11.' XML is not valid. [C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\BusBuddy.WPF.csproj]
+  BusBuddy.Tests -> C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.Tests\bin\Debug\net8.0-windows\BusBuddy.Tests.dll
+
+Build FAILED.
+
+C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\Views\ActivityScheduleView.xaml(17,18): error MC3000: 'Data at the root level is invalid. Line 17, position 18.' XML is not valid. [C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\BusBuddy.WPF.csproj]
+C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\Views\DashboardView.xaml(16,11): error MC3000: 'Unexpected end tag. Line 16, position 11.' XML is not valid. [C:\Users\steve.mckitrick\Desktop\BusBuddy\BusBuddy.WPF\BusBuddy.WPF.csproj]
+    0 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:06.50
+
+Workload updates are available. Run `dotnet workload list` for more information.

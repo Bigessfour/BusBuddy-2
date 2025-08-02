@@ -584,6 +584,7 @@ namespace BusBuddy.Core.Services
                         EstimatedDuration = r.EstimatedDuration,
                         StudentCount = r.StudentCount,
                         StopCount = r.StopCount,
+                        School = r.School ?? string.Empty,
 
                         // AM details
                         AMVehicleId = r.AMVehicleId,

@@ -6,35 +6,35 @@ function Invoke-BusBuddyGitPush {
     param(
         [Parameter(Mandatory = $false)]
         [string]$CommitMessage = "Auto-commit: BusBuddy development progress",
-        
+
         [Parameter(Mandatory = $false)]
         [string]$Branch = "main",
-        
+
         [Parameter(Mandatory = $false)]
         [switch]$Force,
-        
+
         [Parameter(Mandatory = $false)]
         [switch]$DryRun,
-        
+
         [Parameter(Mandatory = $false)]
         [switch]$ValidateFirst
     )
-    
+
     Write-Host "🚌 BusBuddy GitHub Push Protocol" -ForegroundColor Cyan
     Write-Host "Repository: BusBuddy Development Session" -ForegroundColor Gray
     Write-Host "Timestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Gray
     Write-Host ""
-    
+
     # Validate we're in the correct directory
     if (-not (Test-Path "BusBuddy.sln")) {
         Write-Error "❌ Not in BusBuddy root directory. Navigate to project root first."
         return
     }
-    
+
     # Pre-push validation if requested
     if ($ValidateFirst) {
         Write-Host "🔍 Running pre-push validation..." -ForegroundColor Yellow
-        
+
         # Check build status
         Write-Host "   • Checking build status..."
         $buildResult = dotnet build BusBuddy.sln --verbosity quiet 2>&1
@@ -45,7 +45,7 @@ function Invoke-BusBuddyGitPush {
         } else {
             Write-Host "   ✅ Build successful" -ForegroundColor Green
         }
-        
+
         # Check for large files
         Write-Host "   • Checking for large files..."
         $largeFiles = Get-ChildItem -Recurse -File | Where-Object { $_.Length -gt 10MB }
@@ -53,7 +53,7 @@ function Invoke-BusBuddyGitPush {
             Write-Warning "⚠️  Large files detected:"
             $largeFiles | ForEach-Object { Write-Host "     $($_.FullName) ($([math]::Round($_.Length/1MB, 2)) MB)" }
         }
-        
+
         # Check git status
         Write-Host "   • Checking git status..."
         $gitStatus = git status --porcelain
@@ -63,12 +63,12 @@ function Invoke-BusBuddyGitPush {
         }
         Write-Host "   📝 Changes detected: $($gitStatus.Count) files" -ForegroundColor Cyan
     }
-    
+
     # Show current status
     Write-Host "📊 Current Git Status:" -ForegroundColor Cyan
     git status --short
     Write-Host ""
-    
+
     # Stage changes
     Write-Host "📦 Staging changes..." -ForegroundColor Yellow
     if ($DryRun) {
@@ -82,7 +82,7 @@ function Invoke-BusBuddyGitPush {
             return
         }
     }
-    
+
     # Create enhanced commit message with context
     $enhancedMessage = @"
 $CommitMessage
@@ -107,7 +107,7 @@ Files Modified:
 - Multiple XAML files: Fixed XML parsing errors
 - GROK-README.md: Updated with current session status
 "@
-    
+
     # Commit changes
     Write-Host "💾 Committing changes..." -ForegroundColor Yellow
     if ($DryRun) {
@@ -122,7 +122,7 @@ Files Modified:
             return
         }
     }
-    
+
     # Push to remote
     Write-Host "🚀 Pushing to remote..." -ForegroundColor Yellow
     if ($DryRun) {
@@ -133,7 +133,7 @@ Files Modified:
         } else {
             git push origin $Branch
         }
-        
+
         if ($LASTEXITCODE -eq 0) {
             Write-Host "   ✅ Successfully pushed to origin/$Branch" -ForegroundColor Green
         } else {
@@ -155,7 +155,7 @@ Files Modified:
             }
         }
     }
-    
+
     # Success summary
     Write-Host ""
     Write-Host "🎉 GitHub Push Protocol Complete!" -ForegroundColor Green
@@ -180,11 +180,11 @@ function bb-git-status {
     Write-Host "🚌 BusBuddy Git Status" -ForegroundColor Cyan
     Write-Host "Repository: $(Split-Path -Leaf (Get-Location))" -ForegroundColor Gray
     Write-Host ""
-    
+
     # Current branch
     $currentBranch = git branch --show-current
     Write-Host "📍 Current Branch: $currentBranch" -ForegroundColor Green
-    
+
     # Status summary
     $status = git status --porcelain
     if ($status) {
@@ -193,12 +193,12 @@ function bb-git-status {
     } else {
         Write-Host "✅ Working directory clean" -ForegroundColor Green
     }
-    
+
     # Remote status
     git fetch origin --quiet 2>$null
     $ahead = git rev-list --count origin/$currentBranch..HEAD 2>$null
     $behind = git rev-list --count HEAD..origin/$currentBranch 2>$null
-    
+
     if ($ahead -gt 0) {
         Write-Host "⬆️  Ahead of remote by $ahead commits" -ForegroundColor Cyan
     }

@@ -83,8 +83,7 @@
       "args": [
         "-NoExit",
         "-ExecutionPolicy", "Bypass",
-        "-Command",
-        "& { Set-Location 'C:\\Users\\steve.mckitrick\\Desktop\\BusBuddy'; Write-Host '🚌 Loading BusBuddy PowerShell Environment...' -ForegroundColor Cyan; try { & '.\\load-bus-buddy-profiles.ps1' -Quiet; Write-Host '✅ BusBuddy profiles loaded successfully!' -ForegroundColor Green; Write-Host '🎯 Ready for development. Try: bb-health, bb-build, bb-run' -ForegroundColor Yellow } catch { Write-Host '❌ Profile loading failed: ' -ForegroundColor Red -NoNewline; Write-Host $_.Exception.Message -ForegroundColor Yellow; Write-Host '💡 Try manual import: Import-Module .\\PowerShell\\Modules\\BusBuddy\\BusBuddy.psm1' -ForegroundColor Cyan } }"
+        "-File", "${workspaceFolder}\\PowerShell\\Profiles\\Microsoft.PowerShell_profile.ps1"
       ],
       "icon": "terminal-powershell",
       "color": "terminal.ansiGreen"
@@ -385,6 +384,7 @@
   },
   "github.copilot.mcp.enabled": true,
   "github.copilot.mcp.configPath": ".vscode/mcp.json",
+  "github.copilot.ignoredLanguages": ["json"],
   "git.autofetch": true,
   "git.autofetchPeriod": 180,
   "git.confirmSync": false,

@@ -214,10 +214,26 @@ namespace BusBuddy.Tests.Utilities
         public static void AssertValidVehicle(Vehicle vehicle, string because = "vehicle should be valid")
         {
             vehicle.Should().NotBeNull(because);
-            vehicle.PlateNumber.Should().NotBeNullOrEmpty($"{because} and should have a plate number");
-            vehicle.Model.Should().NotBeNullOrEmpty($"{because} and should have a model");
-            vehicle.Make.Should().NotBeNullOrEmpty($"{because} and should have a make");
-            vehicle.Capacity.Should().BeGreaterThan(0, $"{because} and should have positive capacity");
+            vehicle.Id.Should().BePositive($"{because} and have a valid ID");
+            vehicle.BusNumber.Should().NotBeNullOrEmpty($"{because} and have a bus number");
+            vehicle.Make.Should().NotBeNullOrEmpty($"{because} and have a make");
+            vehicle.Model.Should().NotBeNullOrEmpty($"{because} and have a model");
+            vehicle.Status.Should().NotBeNullOrEmpty($"{because} and have a status");
+            vehicle.Capacity.Should().BePositive($"{because} and have a positive capacity");
+        }
+
+        /// <summary>
+        /// Assertion helper for validating bus data
+        /// </summary>
+        public static void AssertValidBus(Bus bus, string because = "bus should be valid")
+        {
+            bus.Should().NotBeNull(because);
+            bus.VehicleId.Should().BePositive($"{because} and have a valid vehicle ID");
+            bus.BusNumber.Should().NotBeNullOrEmpty($"{because} and have a bus number");
+            bus.Make.Should().NotBeNullOrEmpty($"{because} and have a make");
+            bus.Model.Should().NotBeNullOrEmpty($"{because} and have a model");
+            bus.Status.Should().NotBeNullOrEmpty($"{because} and have a status");
+            bus.SeatingCapacity.Should().BePositive($"{because} and have a positive seating capacity");
         }
 
         /// <summary>

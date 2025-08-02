@@ -22,7 +22,7 @@
       "enableDataBreakpoints": true,
       "enableLogPoints": true,
       "temporaryConsole": false,
-      "startupScript": "${workspaceFolder}/BusBuddy-PowerShell-Profile.ps1",
+      "startupScript": "${workspaceFolder}/PowerShell/Profiles/Microsoft.PowerShell_profile.ps1",
       "env": {
         "BUSBUDDY_DEBUG_ENABLED": "true"
       }
@@ -32,7 +32,7 @@
       "enableOnSave": true,
       "severity": "Warning",
       "customRules": true,
-      "settingsPath": "${workspaceFolder}/PSScriptAnalyzerSettings.psd1"
+      "settingsPath": "${workspaceFolder}/PowerShell/PSScriptAnalyzerSettings.psd1"
     },
     "formatting": {
       "preset": "OTBS",
@@ -52,8 +52,8 @@
   },
   "projectIntegration": {
     "busbuddy": {
-      "profileScript": "BusBuddy-PowerShell-Profile.ps1",
-      "workflowScript": "BusBuddy-Advanced-Workflows.ps1",
+      "profileScript": "PowerShell/Profiles/Microsoft.PowerShell_profile.ps1",
+      "workflowScript": "PowerShell/Modules/BusBuddy/BusBuddy.psm1",
       "taskExplorerIntegration": true,
       "debuggerIntegration": true
     }

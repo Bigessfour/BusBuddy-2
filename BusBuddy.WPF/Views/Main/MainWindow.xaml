@@ -103,7 +103,7 @@
                                 Margin="0,0,0,5"
                                 Foreground="#4A5568"/>
 
-                        <Button Name="DashboardButton"
+                        <Button x:Name="DashboardButton"
                                 Content="📊 Dashboard"
                                 Padding="12,10"
                                 Margin="0,2"
@@ -111,7 +111,7 @@
                                 Click="DashboardButton_Click"
                                 Style="{StaticResource NavigationButtonStyle}"/>
 
-                        <Button Name="DriversButton"
+                        <Button x:Name="DriversButton"
                                 Content="👤 Drivers"
                                 Padding="12,10"
                                 Margin="0,2"
@@ -119,7 +119,7 @@
                                 Click="DriversButton_Click"
                                 Style="{StaticResource NavigationButtonStyle}"/>
 
-                        <Button Name="VehiclesButton"
+                        <Button x:Name="VehiclesButton"
                                 Content="🚌 Vehicles"
                                 Padding="12,10"
                                 Margin="0,2"
@@ -127,12 +127,20 @@
                                 Click="VehiclesButton_Click"
                                 Style="{StaticResource NavigationButtonStyle}"/>
 
-                        <Button Name="ActivitiesButton"
+                        <Button x:Name="ActivitiesButton"
                                 Content="📅 Activities"
                                 Padding="12,10"
                                 Margin="0,2"
                                 HorizontalAlignment="Stretch"
                                 Click="ActivitiesButton_Click"
+                                Style="{StaticResource NavigationButtonStyle}"/>
+
+                        <Button x:Name="StudentsButton"
+                                Content="🎓 Students"
+                                Padding="12,10"
+                                Margin="0,2"
+                                HorizontalAlignment="Stretch"
+                                Click="StudentsButton_Click"
                                 Style="{StaticResource NavigationButtonStyle}"/>
 
                         <!-- Analytics &amp; Reports -->
@@ -143,7 +151,7 @@
                                 Margin="0,0,0,5"
                                 Foreground="#4A5568"/>
 
-                        <Button Name="AnalyticsButton"
+                        <Button x:Name="AnalyticsButton"
                                 Content="📈 Analytics"
                                 Padding="12,10"
                                 Margin="0,2"
@@ -159,7 +167,7 @@
                                 Margin="0,0,0,5"
                                 Foreground="#4A5568"/>
 
-                        <Button Name="RouteManagementButton"
+                        <Button x:Name="RouteManagementButton"
                                 Content="🗺️ Route Management"
                                 Padding="12,10"
                                 Margin="0,2"
@@ -167,7 +175,7 @@
                                 Click="RouteManagementButton_Click"
                                 Style="{StaticResource NavigationButtonStyle}"/>
 
-                        <Button Name="FuelManagementButton"
+                        <Button x:Name="FuelManagementButton"
                                 Content="⛽ Fuel Management"
                                 Padding="12,10"
                                 Margin="0,2"
@@ -183,7 +191,7 @@
                                 Margin="0,0,0,5"
                                 Foreground="#4A5568"/>
 
-                        <Button Name="SettingsButton"
+                        <Button x:Name="SettingsButton"
                                 Content="⚙️ Settings"
                                 Padding="12,10"
                                 Margin="0,2"

@@ -62,20 +62,20 @@ public class BusBuddyDbContext : DbContext
     public string GetCurrentAuditUser() => _currentAuditUser;
 
     // DbSets for all entities
-    public virtual DbSet<Bus> Vehicles { get; set; }
-    public virtual DbSet<ActivityLog> ActivityLogs { get; set; }
-    public virtual DbSet<Driver> Drivers { get; set; }
-    public virtual DbSet<Route> Routes { get; set; }
-    public virtual DbSet<Activity> Activities { get; set; }
-    public virtual DbSet<Fuel> FuelRecords { get; set; }
-    public virtual DbSet<Maintenance> MaintenanceRecords { get; set; }
-    public virtual DbSet<Student> Students { get; set; }
-    public virtual DbSet<Schedule> Schedules { get; set; }
-    public virtual DbSet<StudentSchedule> StudentSchedules { get; set; }
-    public virtual DbSet<TripEvent> TripEvents { get; set; }
-    public virtual DbSet<RouteStop> RouteStops { get; set; }
-    public virtual DbSet<SchoolCalendar> SchoolCalendar { get; set; }
-    public virtual DbSet<ActivitySchedule> ActivitySchedule { get; set; }
+    public virtual DbSet<Bus> Vehicles { get; set; } = null!;
+    public virtual DbSet<ActivityLog> ActivityLogs { get; set; } = null!;
+    public virtual DbSet<Driver> Drivers { get; set; } = null!;
+    public virtual DbSet<Route> Routes { get; set; } = null!;
+    public virtual DbSet<Activity> Activities { get; set; } = null!;
+    public virtual DbSet<Fuel> FuelRecords { get; set; } = null!;
+    public virtual DbSet<Maintenance> MaintenanceRecords { get; set; } = null!;
+    public virtual DbSet<Student> Students { get; set; } = null!;
+    public virtual DbSet<Schedule> Schedules { get; set; } = null!;
+    public virtual DbSet<StudentSchedule> StudentSchedules { get; set; } = null!;
+    public virtual DbSet<TripEvent> TripEvents { get; set; } = null!;
+    public virtual DbSet<RouteStop> RouteStops { get; set; } = null!;
+    public virtual DbSet<SchoolCalendar> SchoolCalendar { get; set; } = null!;
+    public virtual DbSet<ActivitySchedule> ActivitySchedule { get; set; } = null!;
     // REMOVED: DbSet<Ticket> Tickets - deprecated module
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -67,7 +67,7 @@ namespace BusBuddy.Core.Services.Interfaces
         Task<Dictionary<string, object>> GetScheduleOperationMetricsAsync();
 #endif
     }
-
+}
     /// <summary>
     /// Defines recurrence types for recurring activities
     /// </summary>

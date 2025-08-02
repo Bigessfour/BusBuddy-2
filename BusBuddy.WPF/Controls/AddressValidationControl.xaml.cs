@@ -25,32 +25,28 @@ namespace BusBuddy.WPF.Controls
                 Logger.Information("Validate Address button clicked");
 
                 // Get the address from the text box (find control by name)
-                var addressTextBox = this.FindName("AddressTextBox") as TextBox;
-                var resultsTextBlock = this.FindName("ResultsTextBlock") as TextBlock;
-
-                var address = addressTextBox?.Text?.Trim();
-
-                if (string.IsNullOrEmpty(address))
+                if (this.FindName("AddressTextBox") is TextBox addressTextBox &&
+                    this.FindName("ResultsTextBlock") is TextBlock resultsTextBlock)
                 {
-                    if (resultsTextBlock != null)
+                    var address = addressTextBox.Text.Trim();
+
+                    if (string.IsNullOrEmpty(address))
                     {
                         resultsTextBlock.Text = "Please enter an address to validate.";
+                        return;
                     }
 
-                    return;
+                    // Update the address properties from the text box
+                    Street = address;
+
+                    // Call the validation method from the main implementation
+                    await ValidateAddressAsync();
                 }
-
-                // Update the address properties from the text box
-                Street = address;
-
-                // Call the validation method from the main implementation
-                await ValidateAddressAsync();
             }
             catch (System.Exception ex)
             {
                 Logger.Error(ex, "Error during address validation button click");
-                var resultsTextBlock = this.FindName("ResultsTextBlock") as TextBlock;
-                if (resultsTextBlock != null)
+                if (this.FindName("ResultsTextBlock") is TextBlock resultsTextBlock)
                 {
                     resultsTextBlock.Text = $"Error: {ex.Message}";
                 }

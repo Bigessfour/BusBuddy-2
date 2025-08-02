@@ -46,8 +46,7 @@ namespace BusBuddy.WPF.Utilities
                     stream.Position = 0;
 
                     // Use XamlReader.Load instead of Parse to handle stream directly
-                    var resourceDict = XamlReader.Load(stream) as ResourceDictionary;
-                    if (resourceDict == null)
+                    if (XamlReader.Load(stream) is not ResourceDictionary resourceDict)
                     {
                         Logger.Error("Failed to parse XAML content as ResourceDictionary from {SourcePath}", sourcePath);
                         return null;
@@ -77,7 +76,6 @@ namespace BusBuddy.WPF.Utilities
                             {
                                 Logger.Warning("Known problematic key 'ProfessionalSurfaceBorder' detected - this key may conflict with Syncfusion theme");
                                 Logger.Information("References to 'ProfessionalSurfaceBorder' should be updated to use 'SurfaceBorderBrush' instead");
-                            }
                         }
                     }
 
@@ -188,4 +186,5 @@ namespace BusBuddy.WPF.Utilities
         /// </summary>
         Rename
     }
+}
 }

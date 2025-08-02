@@ -13,18 +13,27 @@ namespace BusBuddy.WPF.ViewModels.Vehicle
     /// VehicleViewModel - Core service integration following Step 3 workflow
     /// Exposes properties/commands bound to Core services (BusService.cs)
     /// </summary>
-    public partial class VehicleViewModel : ObservableObject
+    public partial class VehicleViewModel : BaseViewModel
     {
         private readonly IBusService _busService;
         private readonly ILogger<VehicleViewModel> _logger;
 
         #region Properties - MVVM Binding Ready
 
-        [ObservableProperty]
-        private ObservableCollection<Bus> _vehicles = new();
-
-        [ObservableProperty]
         private Bus? _selectedVehicle;
+        private IEnumerable<Bus> _vehicles = new List<Bus>();
+
+        public Bus? SelectedVehicle
+        {
+            get => _selectedVehicle;
+            set => SetProperty(ref _selectedVehicle, value);
+        }
+
+        public IEnumerable<Bus> Vehicles
+        {
+            get => _vehicles;
+            set => SetProperty(ref _vehicles, value);
+        }
 
         [ObservableProperty]
         private Bus _currentVehicle = new();

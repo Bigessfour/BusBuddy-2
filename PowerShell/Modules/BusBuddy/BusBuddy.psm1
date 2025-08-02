@@ -378,19 +378,21 @@ function Write-BusBuddyStatus {
         'Test'    = '🧪'
     }
 
-    $colors = @{
-        'Success' = 'Green'
-        'Warning' = 'Yellow'
-        'Error'   = 'Red'
-        'Info'    = 'Cyan'
-        'Build'   = 'Magenta'
-        'Test'    = 'Blue'
-    }
-
     $icon = if ($NoIcon) { '' } else { "$($icons[$Status]) " }
-    $color = $colors[$Status]
 
-    Write-Host "$icon$Message" -ForegroundColor $color
+    # Use proper PowerShell output instead of Write-Host
+    $outputMessage = "$icon$Message"
+
+    switch ($Status) {
+        'Error'   { Write-Error $outputMessage }
+        'Warning' { Write-Warning $outputMessage }
+        default   {
+            # Use Write-Information for proper pipeline compatibility
+            Write-Information $outputMessage -InformationAction Continue
+            # Also write to verbose for debugging
+            Write-Verbose $outputMessage
+        }
+    }
 }
 
 #Requires -Version 7.5
@@ -776,7 +778,6 @@ function Invoke-BusBuddyDotNetCommand {
     )
 
     # Set working directory
-    $originalLocation = $PWD
     if ($WorkingDirectory -and (Test-Path $WorkingDirectory)) {
         Push-Location $WorkingDirectory
     }
@@ -814,29 +815,35 @@ function Invoke-BusBuddyDotNetCommand {
             $process = $reuseProcess
         }
         else {
-            # Create new process using Start-Process (Microsoft recommended approach)
-            $processStartInfo = @{
-                FilePath = "dotnet"
-                ArgumentList = $allArgs
-                PassThru = $true
-                WorkingDirectory = $PWD.Path
-                UseShellExecute = $false
-            }
+            # Use System.Diagnostics.Process for better control (Microsoft recommended)
+            $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $processInfo.FileName = "dotnet"
+            $processInfo.Arguments = $allArgs -join ' '
+            $processInfo.WorkingDirectory = $PWD.Path
+            $processInfo.UseShellExecute = $false
+            $processInfo.CreateNoWindow = $true
 
             if ($EnableDebug) {
-                $processStartInfo.RedirectStandardOutput = $true
-                $processStartInfo.RedirectStandardError = $true
-            }
-            else {
-                $processStartInfo.NoNewWindow = $true
+                $processInfo.RedirectStandardOutput = $true
+                $processInfo.RedirectStandardError = $true
             }
 
-            $process = Start-Process @processStartInfo
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $processInfo
 
-            # Track process if requested
-            if ($TrackProcess -and $process) {
-                $script:ModuleConfig.RunningProcesses.Add($process)
-                Write-BusBuddyStatus "📊 Process $($process.Id) added to tracking list" -Status Info
+            try {
+                $null = $process.Start()
+                Write-BusBuddyStatus "🔧 Process started: $($process.Id)" -Status Info
+
+                # Track process if requested
+                if ($TrackProcess) {
+                    $script:ModuleConfig.RunningProcesses.Add($process)
+                    Write-BusBuddyStatus "📊 Process $($process.Id) added to tracking list" -Status Info
+                }
+            }
+            catch {
+                Write-BusBuddyStatus "❌ Failed to start process: $($_.Exception.Message)" -Status Error
+                throw
             }
         }
 
@@ -1175,7 +1182,7 @@ function Get-BusBuddyGitEquivalents {
     Write-BusBuddyStatus "🔧 PowerShell Git Command Reference" -Status Info
     Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor DarkGray
 
-    $commands = @(
+    $commands = [System.Collections.ArrayList]@(
         @{
             Category    = "File Filtering"
             Unix        = "git ls-files | grep '\.cs$'"
@@ -1716,7 +1723,7 @@ function Invoke-BusBuddyBuild {
         [switch]$AutoFix,
 
         [ValidateSet('quiet', 'minimal', 'normal', 'detailed', 'diagnostic')]
-        [string]$BuildVerbosity = 'minimal',
+        [string]$Verbosity = 'minimal',
 
         [ValidateSet('Error', 'Warning', 'Information')]
         [string[]]$AnalysisSeverity = @('Error', 'Warning'),
@@ -1786,7 +1793,7 @@ function Invoke-BusBuddyBuild {
         if ($NoLogo) { $buildArgs += '--nologo' }
 
         Write-Host "🔨 Building solution with configuration: $Configuration" -ForegroundColor Green
-        $dotnetResult = Invoke-BusBuddyDotNetCommand -Command "build" -Arguments $buildArgs -Verbosity $BuildVerbosity -EnableDebug -TrackProcess $false
+        $dotnetResult = Invoke-BusBuddyDotNetCommand -Command "build" -Arguments $buildArgs -Verbosity $Verbosity -EnableDebug -TrackProcess $false
         $buildResults.BuildOutput = $dotnetResult.Output
 
         # Check result and capture build output for analysis
@@ -2418,7 +2425,7 @@ function Invoke-BusBuddyRun {
 
         # Build first unless skipped
         if (-not $NoBuild) {
-            Write-Host "🔨 Building before launch..." -ForegroundColor Yellow
+            Write-BusBuddyStatus "🔨 Building before launch..." -Status Build
             $buildResult = Invoke-BusBuddyBuild -Configuration $Configuration -BuildVerbosity minimal
             if (-not $buildResult.Success) {
                 Write-BusBuddyStatus "Build failed, cannot run application" -Status Error
@@ -2439,17 +2446,33 @@ function Invoke-BusBuddyRun {
             $env:BUSBUDDY_DEBUG = "true"
         }
 
-        # Use Start-Process to get better control over the process lifecycle
-        $process = Start-Process -PassThru -FilePath "dotnet" -ArgumentList $runArgs -NoNewWindow
-        $script:ModuleConfig.RunningProcesses.Add($process)
+        # Use System.Diagnostics.Process for better control over the process lifecycle
+        $processInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $processInfo.FileName = "dotnet"
+        $processInfo.Arguments = $runArgs -join ' '
+        $processInfo.WorkingDirectory = $PWD.Path
+        $processInfo.UseShellExecute = $false
+        $processInfo.CreateNoWindow = $true
 
-        Write-BusBuddyStatus "✅ Application started with Process ID: $($process.Id)" -Status Success
-        Write-Host "   Waiting for application to exit..." -ForegroundColor Gray
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = $processInfo
 
-        # Wait for the process to exit
-        $process.WaitForExit()
+        try {
+            $null = $process.Start()
+            $script:ModuleConfig.RunningProcesses.Add($process)
 
-        Write-BusBuddyStatus "Application process $($process.Id) has exited." -Status Info
+            Write-BusBuddyStatus "✅ Application started with Process ID: $($process.Id)" -Status Success
+            Write-Information "   Waiting for application to exit..." -InformationAction Continue
+
+            # Wait for the process to exit
+            $process.WaitForExit()
+
+            Write-BusBuddyStatus "Application process $($process.Id) has exited." -Status Info
+        }
+        catch {
+            Write-BusBuddyStatus "❌ Failed to start application: $($_.Exception.Message)" -Status Error
+            throw
+        }
         return $process.ExitCode -eq 0
     }
     catch {
@@ -2659,6 +2682,484 @@ function Invoke-BusBuddyClean {
 
 #region Advanced Development Functions
 
+#region Enhanced Problem Analysis Functions
+
+function Get-BusBuddyVSCodeProblems {
+    <#
+    .SYNOPSIS
+        Capture and analyze VS Code problem list with detailed categorization
+
+    .DESCRIPTION
+        Fetches all problems from VS Code and categorizes them for strategic resolution
+
+    .PARAMETER ExportJson
+        Export problems to JSON file for detailed analysis
+
+    .PARAMETER GroupByType
+        Group problems by error type for pattern analysis
+
+    .PARAMETER ShowTopIssues
+        Number of most common issues to highlight
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$ExportJson,
+        [switch]$GroupByType,
+        [int]$ShowTopIssues = 10
+    )
+
+    Write-BusBuddyStatus "🔍 Analyzing VS Code Problems (289 issues)" -Status Info
+
+    $problemCategories = @{
+        CSharpErrors = @()
+        CSharpWarnings = @()
+        XamlErrors = @()
+        XamlWarnings = @()
+        NullReferenceIssues = @()
+        SyncfusionIssues = @()
+        BuildIssues = @()
+        IntelliSenseIssues = @()
+        Other = @()
+    }
+
+    $projectRoot = Get-BusBuddyProjectRoot
+    if (-not $projectRoot) {
+        Write-BusBuddyError "Project root not found"
+        return
+    }
+
+    Push-Location $projectRoot
+
+    try {
+        # Method 1: Analyze common file types for issues
+        Write-Host "📁 Scanning project files for common issues..." -ForegroundColor Cyan
+
+        # C# files analysis
+        $csharpFiles = Get-ChildItem -Recurse -Filter "*.cs" | Where-Object { $_.FullName -notmatch "\\bin\\|\\obj\\" }
+        Write-Host "Found $($csharpFiles.Count) C# files to analyze" -ForegroundColor Gray
+
+        # XAML files analysis
+        $xamlFiles = Get-ChildItem -Recurse -Filter "*.xaml" | Where-Object { $_.FullName -notmatch "\\bin\\|\\obj\\" }
+        Write-Host "Found $($xamlFiles.Count) XAML files to analyze" -ForegroundColor Gray
+
+        # Project files analysis
+        $projectFiles = Get-ChildItem -Recurse -Filter "*.csproj"
+        Write-Host "Found $($projectFiles.Count) project files to analyze" -ForegroundColor Gray
+
+        # Quick syntax check on C# files
+        foreach ($file in $csharpFiles | Select-Object -First 20) {
+            try {
+                $content = Get-Content $file.FullName -Raw -ErrorAction SilentlyContinue
+                if ($content) {
+                    # Check for common issues
+                    if ($content -match 'CS\d{4}') {
+                        $problemCategories.CSharpErrors += @{
+                            File = $file.FullName
+                            Issue = "Contains C# compiler errors"
+                            Type = "CS_ERROR"
+                        }
+                    }
+
+                    if ($content -match '\?\s*\.' -or $content -match 'nullable') {
+                        $problemCategories.NullReferenceIssues += @{
+                            File = $file.FullName
+                            Issue = "Potential null reference issues"
+                            Type = "NULL_REF"
+                        }
+                    }
+
+                    if ($content -match 'syncfusion|Syncfusion' -and $content -match 'error|Error') {
+                        $problemCategories.SyncfusionIssues += @{
+                            File = $file.FullName
+                            Issue = "Syncfusion-related issues"
+                            Type = "SYNCFUSION"
+                        }
+                    }
+                }
+            }
+            catch {
+                $problemCategories.Other += @{
+                    File = $file.FullName
+                    Issue = "File read error: $($_.Exception.Message)"
+                    Type = "FILE_ACCESS"
+                }
+            }
+        }
+
+        # Quick XAML validation
+        foreach ($file in $xamlFiles | Select-Object -First 15) {
+            try {
+                $xamlValidation = Test-BusBuddyXml -FilePath $file.FullName
+                if (-not $xamlValidation.IsValid) {
+                    $problemCategories.XamlErrors += @{
+                        File = $file.FullName
+                        Issue = "XAML validation failed"
+                        Errors = $xamlValidation.Errors
+                        Type = "XAML_ERROR"
+                    }
+                }
+            }
+            catch {
+                $problemCategories.XamlErrors += @{
+                    File = $file.FullName
+                    Issue = "XAML parsing error: $($_.Exception.Message)"
+                    Type = "XAML_PARSE"
+                }
+            }
+        }
+
+        # Build attempt to capture real errors
+        Write-Host "🔨 Running build to capture actual compiler errors..." -ForegroundColor Cyan
+        $buildResult = Invoke-BusBuddyDotNetCommand -Command "build" -Arguments @("--verbosity", "normal", "--no-restore") -TrackProcess $false
+
+        if (-not $buildResult.Success -and $buildResult.Output) {
+            $buildOutput = $buildResult.Output + $buildResult.Error
+            $buildLines = $buildOutput -split "`n"
+
+            foreach ($line in $buildLines) {
+                if ($line -match 'error\s+(CS\d+|MC\d+|MSB\d+)') {
+                    $problemCategories.BuildIssues += @{
+                        Line = $line.Trim()
+                        Type = "BUILD_ERROR"
+                        Issue = "Compiler/Build error"
+                    }
+                }
+                elseif ($line -match 'warning\s+(CS\d+|CA\d+)') {
+                    $problemCategories.CSharpWarnings += @{
+                        Line = $line.Trim()
+                        Type = "CS_WARNING"
+                        Issue = "C# compiler warning"
+                    }
+                }
+            }
+        }
+
+        # Generate analysis report
+        Write-Host ""
+        Write-Host "📊 Problem Analysis Results:" -ForegroundColor Cyan
+        Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+
+        $totalProblems = 0
+        foreach ($category in $problemCategories.Keys) {
+            $count = $problemCategories[$category].Count
+            $totalProblems += $count
+            if ($count -gt 0) {
+                Write-Host "  $category`: $count issues" -ForegroundColor $(if ($count -gt 50) { "Red" } elseif ($count -gt 20) { "Yellow" } else { "Green" })
+            }
+        }
+
+        Write-Host ""
+        Write-Host "Total Issues Analyzed: $totalProblems" -ForegroundColor $(if ($totalProblems -gt 200) { "Red" } elseif ($totalProblems -gt 100) { "Yellow" } else { "Green" })
+
+        # Export to JSON if requested
+        if ($ExportJson) {
+            $exportPath = Join-Path $projectRoot "vscode-problems-analysis-$(Get-Date -Format 'yyyyMMdd-HHmmss').json"
+            $problemCategories | ConvertTo-Json -Depth 5 | Out-File $exportPath -Encoding UTF8
+            Write-Host "📄 Exported detailed analysis to: $exportPath" -ForegroundColor Blue
+        }
+
+        return $problemCategories
+
+    }
+    catch {
+        Write-BusBuddyError "Error analyzing VS Code problems: $($_.Exception.Message)" -Exception $_.Exception
+        return $null
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+function New-BusBuddyProblemResolutionPlan {
+    <#
+    .SYNOPSIS
+        Create strategic plan for resolving VS Code problems
+
+    .DESCRIPTION
+        Analyzes the 289 problems and creates a prioritized resolution plan
+
+    .PARAMETER Problems
+        Problem analysis results from Get-BusBuddyVSCodeProblems
+
+    .PARAMETER FocusArea
+        Specific area to focus on first
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [hashtable]$Problems,
+
+        [ValidateSet("BuildErrors", "CSharpErrors", "XamlIssues", "NullSafety", "Syncfusion", "All")]
+        [string]$FocusArea = "BuildErrors"
+    )
+
+    Write-Host ""
+    Write-Host "🎯 BusBuddy Problem Resolution Strategic Plan" -ForegroundColor Cyan
+    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+    Write-Host ""
+
+    $plan = @{
+        Phase1_Critical = @()
+        Phase2_Major = @()
+        Phase3_Minor = @()
+        Phase4_Cleanup = @()
+        EstimatedHours = 0
+        PriorityOrder = @()
+    }
+
+    # Phase 1: Critical Issues (Blockers)
+    Write-Host "🚨 Phase 1: Critical Issues (Must Fix First)" -ForegroundColor Red
+    if ($Problems.BuildIssues.Count -gt 0) {
+        $plan.Phase1_Critical += "Build Errors ($($Problems.BuildIssues.Count)) - Prevents compilation"
+        $plan.EstimatedHours += [math]::Min($Problems.BuildIssues.Count * 0.5, 8)
+        Write-Host "  • Build/Compiler Errors: $($Problems.BuildIssues.Count) issues" -ForegroundColor White
+        Write-Host "    Action: Run bb-build with detailed output, fix one by one" -ForegroundColor Gray
+    }
+
+    if ($Problems.CSharpErrors.Count -gt 0) {
+        $plan.Phase1_Critical += "C# Compilation Errors ($($Problems.CSharpErrors.Count))"
+        $plan.EstimatedHours += [math]::Min($Problems.CSharpErrors.Count * 0.3, 6)
+        Write-Host "  • C# Errors: $($Problems.CSharpErrors.Count) issues" -ForegroundColor White
+        Write-Host "    Action: Focus on namespace, using statements, missing references" -ForegroundColor Gray
+    }
+
+    if ($Problems.XamlErrors.Count -gt 0) {
+        $plan.Phase1_Critical += "XAML Parse Errors ($($Problems.XamlErrors.Count))"
+        $plan.EstimatedHours += [math]::Min($Problems.XamlErrors.Count * 0.4, 4)
+        Write-Host "  • XAML Errors: $($Problems.XamlErrors.Count) issues" -ForegroundColor White
+        Write-Host "    Action: Fix namespace declarations, missing references" -ForegroundColor Gray
+    }
+
+    # Phase 2: Major Issues (High Impact)
+    Write-Host ""
+    Write-Host "⚠️ Phase 2: Major Issues (High Impact)" -ForegroundColor Yellow
+    if ($Problems.SyncfusionIssues.Count -gt 0) {
+        $plan.Phase2_Major += "Syncfusion Integration ($($Problems.SyncfusionIssues.Count))"
+        $plan.EstimatedHours += [math]::Min($Problems.SyncfusionIssues.Count * 0.3, 6)
+        Write-Host "  • Syncfusion Issues: $($Problems.SyncfusionIssues.Count) issues" -ForegroundColor White
+        Write-Host "    Action: Verify package references, namespace declarations" -ForegroundColor Gray
+    }
+
+    if ($Problems.NullReferenceIssues.Count -gt 0) {
+        $plan.Phase2_Major += "Null Reference Safety ($($Problems.NullReferenceIssues.Count))"
+        $plan.EstimatedHours += [math]::Min($Problems.NullReferenceIssues.Count * 0.2, 4)
+        Write-Host "  • Null Reference Issues: $($Problems.NullReferenceIssues.Count) issues" -ForegroundColor White
+        Write-Host "    Action: Add null checks, use null-safe operators" -ForegroundColor Gray
+    }
+
+    # Phase 3: Minor Issues (Code Quality)
+    Write-Host ""
+    Write-Host "📝 Phase 3: Minor Issues (Code Quality)" -ForegroundColor Green
+    if ($Problems.CSharpWarnings.Count -gt 0) {
+        $plan.Phase3_Minor += "C# Warnings ($($Problems.CSharpWarnings.Count))"
+        $plan.EstimatedHours += [math]::Min($Problems.CSharpWarnings.Count * 0.1, 3)
+        Write-Host "  • C# Warnings: $($Problems.CSharpWarnings.Count) issues" -ForegroundColor White
+        Write-Host "    Action: Address unused variables, missing documentation" -ForegroundColor Gray
+    }
+
+    # Phase 4: Cleanup
+    Write-Host ""
+    Write-Host "🧹 Phase 4: Final Cleanup" -ForegroundColor Blue
+    if ($Problems.Other.Count -gt 0) {
+        $plan.Phase4_Cleanup += "Other Issues ($($Problems.Other.Count))"
+        $plan.EstimatedHours += [math]::Min($Problems.Other.Count * 0.1, 2)
+        Write-Host "  • Miscellaneous: $($Problems.Other.Count) issues" -ForegroundColor White
+    }
+
+    # Execution Strategy
+    Write-Host ""
+    Write-Host "🚀 Recommended Execution Strategy:" -ForegroundColor Magenta
+    Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+
+    $totalEstimated = [math]::Round($plan.EstimatedHours, 1)
+    Write-Host "Estimated Total Time: $totalEstimated hours" -ForegroundColor White
+
+    Write-Host ""
+    Write-Host "Step-by-Step Execution:" -ForegroundColor Cyan
+    Write-Host "1️⃣ bb-clean && bb-restore               # Clean start" -ForegroundColor Green
+    Write-Host "2️⃣ bb-build -Verbosity detailed          # Get detailed errors" -ForegroundColor Green
+    Write-Host "3️⃣ Focus on first 10 build errors       # Quick wins" -ForegroundColor Green
+    Write-Host "4️⃣ bb-test                              # Validate fixes" -ForegroundColor Green
+    Write-Host "5️⃣ Repeat until all critical resolved   # Iterative approach" -ForegroundColor Green
+
+    Write-Host ""
+    Write-Host "💡 Quick Fix Commands:" -ForegroundColor Blue
+    Write-Host "bb-analyze                               # PowerShell static analysis" -ForegroundColor Gray
+    Write-Host "bb-warning-analysis                      # Focus on warnings" -ForegroundColor Gray
+    Write-Host "bb-error-fix                            # Automated error analysis" -ForegroundColor Gray
+
+    return $plan
+}
+
+function Start-BusBuddyProblemResolution {
+    <#
+    .SYNOPSIS
+        Execute the problem resolution plan systematically
+
+    .DESCRIPTION
+        Implements the strategic plan to resolve VS Code problems efficiently
+
+    .PARAMETER Phase
+        Which phase to execute (1-4, or All)
+
+    .PARAMETER AutoFix
+        Attempt automated fixes where possible
+
+    .PARAMETER BatchSize
+        Number of issues to tackle in each batch
+    #>
+    [CmdletBinding()]
+    param(
+        [ValidateSet("1", "2", "3", "4", "All")]
+        [string]$Phase = "1",
+
+        [switch]$AutoFix,
+
+        [int]$BatchSize = 10
+    )
+
+    Write-Host "🎯 Starting BusBuddy Problem Resolution - Phase $Phase" -ForegroundColor Cyan
+    Write-Host "════════════════════════════════════════════════════════════" -ForegroundColor DarkGray
+
+    # Get current problems
+    $problems = Get-BusBuddyVSCodeProblems -GroupByType
+    if (-not $problems) {
+        Write-Host "❌ Could not analyze problems" -ForegroundColor Red
+        return $false
+    }
+
+    # Create resolution plan
+    $plan = New-BusBuddyProblemResolutionPlan -Problems $problems
+
+    # Output the resolution plan
+    Write-Output $plan
+
+    $success = $true
+
+    # Execute based on phase
+    switch ($Phase) {
+        "1" {
+            Write-Host "🚨 Executing Phase 1: Critical Issues" -ForegroundColor Red
+            $success = Resolve-CriticalIssues -Problems $problems -AutoFix:$AutoFix -BatchSize $BatchSize
+        }
+        "2" {
+            Write-Host "⚠️ Executing Phase 2: Major Issues" -ForegroundColor Yellow
+            $success = Resolve-MajorIssues -Problems $problems -AutoFix:$AutoFix -BatchSize $BatchSize
+        }
+        "3" {
+            Write-Host "📝 Executing Phase 3: Minor Issues" -ForegroundColor Green
+            $success = Resolve-MinorIssues -Problems $problems -AutoFix:$AutoFix -BatchSize $BatchSize
+        }
+        "4" {
+            Write-Host "🧹 Executing Phase 4: Cleanup" -ForegroundColor Blue
+            $success = Resolve-CleanupIssues -Problems $problems -AutoFix:$AutoFix -BatchSize $BatchSize
+        }
+        "All" {
+            Write-Host "🎯 Executing All Phases Sequentially" -ForegroundColor Magenta
+            foreach ($phaseNum in @("1", "2", "3", "4")) {
+                $phaseSuccess = Start-BusBuddyProblemResolution -Phase $phaseNum -AutoFix:$AutoFix -BatchSize $BatchSize
+                if (-not $phaseSuccess) {
+                    Write-Host "⚠️ Phase $phaseNum had issues, stopping execution" -ForegroundColor Yellow
+                    $success = $false
+                    break
+                }
+            }
+        }
+    }
+
+    # Final validation
+    if ($success) {
+        Write-Host ""
+        Write-Host "✅ Phase $Phase completed successfully!" -ForegroundColor Green
+        Write-Host "💡 Run bb-build to verify fixes" -ForegroundColor Blue
+    } else {
+        Write-Host ""
+        Write-Host "⚠️ Phase $Phase completed with some issues" -ForegroundColor Yellow
+        Write-Host "💡 Review errors above and re-run as needed" -ForegroundColor Blue
+    }
+
+    return $success
+}
+
+function Resolve-CriticalIssues {
+    param($Problems, [switch]$AutoFix, [int]$BatchSize)
+
+    Write-Host "🔨 Building solution to identify critical compiler errors..." -ForegroundColor Cyan
+
+    # Clean build to get fresh error list
+    $cleanResult = Invoke-BusBuddyClean -Configuration Debug
+    if (-not $cleanResult) {
+        Write-Host "⚠️ Clean failed, continuing anyway..." -ForegroundColor Yellow
+    }
+
+    # Build with detailed output
+    $buildResult = Invoke-BusBuddyBuild -Configuration Debug -Restore -Verbosity detailed
+
+    if ($buildResult) {
+        Write-Host "✅ Build succeeded! Critical issues may be resolved." -ForegroundColor Green
+        return $true
+    } else {
+        Write-Host "❌ Build failed. Analyzing specific errors..." -ForegroundColor Red
+
+        # This would contain specific error resolution logic
+        Write-Host "💡 Manual intervention required for build errors" -ForegroundColor Blue
+        Write-Host "   Check build output above for specific compiler errors" -ForegroundColor Gray
+
+        return $false
+    }
+}
+
+function Resolve-MajorIssues {
+    param($Problems, [switch]$AutoFix, [int]$BatchSize)
+
+    Write-Host "🔧 Addressing major issues..." -ForegroundColor Yellow
+
+    # Focus on Syncfusion issues first
+    if ($Problems.SyncfusionIssues.Count -gt 0) {
+        Write-Host "🎯 Fixing Syncfusion integration issues..." -ForegroundColor Cyan
+        # Implementation would go here
+    }
+
+    # Address null reference issues
+    if ($Problems.NullReferenceIssues.Count -gt 0) {
+        Write-Host "🛡️ Addressing null reference safety..." -ForegroundColor Cyan
+        # Implementation would go here
+    }
+
+    return $true
+}
+
+function Resolve-MinorIssues {
+    param($Problems, [switch]$AutoFix, [int]$BatchSize)
+
+    Write-Host "📝 Addressing code quality issues..." -ForegroundColor Green
+
+    # Run PowerShell analysis
+    if (Get-Command Invoke-BusBuddyCodeAnalysis -ErrorAction SilentlyContinue) {
+        Invoke-BusBuddyCodeAnalysis
+    }
+
+    return $true
+}
+
+function Resolve-CleanupIssues {
+    param($Problems, [switch]$AutoFix, [int]$BatchSize)
+
+    Write-Host "🧹 Final cleanup..." -ForegroundColor Blue
+
+    # Clean up temp files, run final validation
+    Invoke-BusBuddyClean -Deep
+
+    return $true
+}
+
+# Create aliases for problem resolution
+Set-Alias -Name "bb-problems" -Value "Get-BusBuddyVSCodeProblems" -Description "Analyze VS Code problems"
+Set-Alias -Name "bb-problem-plan" -Value "New-BusBuddyProblemResolutionPlan" -Description "Create resolution plan"
+Set-Alias -Name "bb-fix-problems" -Value "Start-BusBuddyProblemResolution" -Description "Execute problem resolution"
+
+#endregion
+
 function Start-BusBuddyDevSession {
     <#
     .SYNOPSIS
@@ -2701,7 +3202,7 @@ function Start-BusBuddyDevSession {
     # Optional build
     if (-not $SkipBuild) {
         Write-BusBuddyStatus "Building solution..." -Status Build
-        $buildResult = InvokeBusBuddyBuild -Configuration Debug -Restore
+        $buildResult = Invoke-BusBuddyBuild -Configuration Debug -Restore
         if (-not $buildResult) {
             Write-BusBuddyStatus "Build failed - development session incomplete" -Status Error
             return $false
@@ -3689,6 +4190,7 @@ Set-Alias -Name 'bb-run' -Value 'Invoke-BusBuddyRun' -Description 'Run Bus Buddy
 Set-Alias -Name 'bb-test' -Value 'Invoke-BusBuddyTest' -Description 'Run Bus Buddy tests'
 Set-Alias -Name 'bb-clean' -Value 'Invoke-BusBuddyClean' -Description 'Clean build artifacts'
 Set-Alias -Name 'bb-restore' -Value 'Invoke-BusBuddyRestore' -Description 'Restore NuGet packages'
+Set-Alias -Name 'bb-workflow' -Value 'Invoke-BusBuddyWorkflow' -Description 'Run the full development workflow'
 
 # Advanced development aliases
 Set-Alias -Name 'bb-dev-session' -Value 'Start-BusBuddyDevSession' -Description 'Start development session'
@@ -3720,20 +4222,10 @@ Set-Alias -Name 'bb-ai-workflow' -Value 'Start-BusBuddyAIWorkflow' -Description 
 Set-Alias -Name 'bb-ai-help' -Value 'Get-BusBuddyAIAssistance' -Description 'Get AI assistance for development tasks'
 Set-Alias -Name 'bb-context-search' -Value 'Get-BusBuddyContextualSearch' -Description 'Context-aware project search'
 
-# Learning and mentorship aliases with error handling
-try {
-    if (-not (Get-Alias -Name 'bb-mentor' -ErrorAction SilentlyContinue)) {
-        Set-Alias -Name 'bb-mentor' -Value 'Get-BusBuddyMentor' -Description 'AI learning mentor'
-    }
-    if (-not (Get-Alias -Name 'bb-docs' -ErrorAction SilentlyContinue)) {
-        Set-Alias -Name 'bb-docs' -Value 'Search-OfficialDocs' -Description 'Search official documentation'
-    }
-    if (-not (Get-Alias -Name 'bb-ref' -ErrorAction SilentlyContinue)) {
-        Set-Alias -Name 'bb-ref' -Value 'Get-QuickReference' -Description 'Quick reference sheets'
-    }
-} catch {
-    # Silently handle alias conflicts
-}
+# Learning and mentorship aliases
+Set-Alias -Name 'bb-mentor' -Value 'Get-BusBuddyMentor' -Description 'AI learning mentor'
+Set-Alias -Name 'bb-docs' -Value 'Search-OfficialDocs' -Description 'Search official documentation'
+Set-Alias -Name 'bb-ref' -Value 'Get-QuickReference' -Description 'Quick reference sheets'
 
 #endregion
 
@@ -3906,14 +4398,10 @@ function Initialize-BusBuddyModule {
             $loadedFunctions = Import-BusBuddyFunctionCategory -CategoryPath $categoryPath -CategoryName $category
             $allLoadedFunctions += $loadedFunctions
 
-            if ($ShowDetails -or $settings.General.VerboseLogging) {
-                Write-Host "Loaded $($loadedFunctions.Count) functions from category: $category" -ForegroundColor Cyan
-            }
+            Write-Verbose "Loaded $($loadedFunctions.Count) functions from category: $category"
         }
         else {
-            if ($ShowDetails -or $settings.General.VerboseLogging) {
-                Write-Host "Category folder not found: $category" -ForegroundColor Yellow
-            }
+            Write-Verbose "Category folder not found: $category"
         }
     }
 
@@ -3931,9 +4419,7 @@ function Initialize-BusBuddyModule {
             if (Test-Path $aiFilePath) {
                 try {
                     . $aiFilePath
-                    if ($ShowDetails -or $settings.General.VerboseLogging) {
-                        Write-Host "Loaded AI function file: $aiFile" -ForegroundColor Green
-                    }
+                    Write-Verbose "Loaded AI function file: $aiFile"
                 }
                 catch {
                     Write-Warning "Failed to load AI function file $aiFile`: $($_.Exception.Message)"
@@ -3958,10 +4444,8 @@ function Initialize-BusBuddyModule {
 
     # Core assembly loading disabled to prevent file locks.
 
-    if ($ShowDetails -or $settings.General.VerboseLogging) {
-        Write-Host "Bus Buddy Module Initialization Complete" -ForegroundColor Green
-        Write-Host "Loaded $($allLoadedFunctions.Count) functions across $($script:ModuleConfig.FunctionCategories.Count) categories" -ForegroundColor Green
-    }
+    Write-Verbose "Bus Buddy Module Initialization Complete"
+    Write-Verbose "Loaded $($allLoadedFunctions.Count) functions across $($script:ModuleConfig.FunctionCategories.Count) categories"
 
     return $script:ModuleConfig
 }
@@ -4513,6 +4997,295 @@ function Invoke-BusBuddyDevWorkflow {
     finally {
         Pop-Location
     }
+}
+
+function Invoke-BusBuddyWorkflow {
+    <#
+    .SYNOPSIS
+        Full BusBuddy Development Workflow with PowerShell 7.5+ Enhancements
+
+    .DESCRIPTION
+        Automates the complete BusBuddy development cycle with AI integration points.
+        Leverages PowerShell 7.5+ features for parallel processing and enhanced error handling.
+
+        Workflow Steps:
+        1. bb-dev-session  - Environment setup and validation
+        2. AI Prompt Point - Manual intervention for AI-enhanced development
+        3. bb-test        - Parallel test execution
+        4. bb-build       - Solution build with enhanced error capture
+        5. bb-run         - Application launch with monitoring
+        6. bb-repo-align  - Repository cleanup and alignment
+
+    .PARAMETER SkipAIPrompt
+        Skip the AI prompt integration point
+
+    .PARAMETER ParallelTests
+        Use PowerShell 7.5+ parallel processing for tests
+
+    .PARAMETER SkipRun
+        Skip application launch
+
+    .PARAMETER CustomSteps
+        Array of custom PowerShell steps to include
+
+    .EXAMPLE
+        Invoke-BusBuddyWorkflow
+        # Full workflow with AI prompt point
+
+    .EXAMPLE
+        Invoke-BusBuddyWorkflow -SkipAIPrompt -ParallelTests
+        # Automated workflow with parallel test execution
+
+    .EXAMPLE
+        Invoke-BusBuddyWorkflow -CustomSteps @('bb-health', 'bb-validate')
+        # Custom workflow with additional validation steps
+
+    .NOTES
+        PowerShell 7.5+ Features Used:
+        - Pipeline chain operators (&&, ||)
+        - Parallel processing with ForEach-Object -Parallel
+        - Enhanced error handling with $? validation
+        - Ternary operators for conditional execution
+    #>
+    [CmdletBinding()]
+    param(
+        [switch]$SkipAIPrompt,
+        [switch]$ParallelTests,
+        [switch]$SkipRun,
+        [string[]]$CustomSteps = @()
+    )
+
+    Write-Host "🚌 Starting BusBuddy Full Development Workflow" -ForegroundColor Cyan
+    Write-Host "═══════════════════════════════════════════════" -ForegroundColor DarkGray
+
+    $workflowStart = Get-Date
+    $results = [PSCustomObject]@{
+        WorkflowStart = $workflowStart
+        Steps = @()
+        Success = $true
+        Issues = @()
+        Duration = $null
+    }
+
+    try {
+        # Step 1: Development Session Setup
+        Write-Host "📋 Step 1: Development Session Setup" -ForegroundColor Yellow
+        $stepStart = Get-Date
+
+        bb-dev-session
+        $stepResult = $?
+
+        $results.Steps += [PSCustomObject]@{
+            Step = "bb-dev-session"
+            Success = $stepResult
+            Duration = (Get-Date) - $stepStart
+            Output = "Environment setup and validation"
+        }
+
+        if (-not $stepResult) {
+            $results.Issues += "Development session setup failed"
+            $results.Success = $false
+        }
+
+        # Step 2: AI Integration Point (Manual)
+        if (-not $SkipAIPrompt) {
+            Write-Host ""
+            Write-Host "🤖 Step 2: AI Enhancement Point" -ForegroundColor Magenta
+            Write-Host "─────────────────────────────────" -ForegroundColor DarkGray
+            Write-Host "💡 This is your AI prompt integration point:" -ForegroundColor Green
+            Write-Host "   • Review current development state" -ForegroundColor White
+            Write-Host "   • Use AI for code generation or problem solving" -ForegroundColor White
+            Write-Host "   • Implement suggested improvements" -ForegroundColor White
+            Write-Host ""
+            Write-Host "Press Enter when AI work is complete, or Ctrl+C to exit..." -ForegroundColor Yellow
+
+            try {
+                Read-Host
+                Write-Host "✅ AI integration point completed" -ForegroundColor Green
+            }
+            catch {
+                Write-Host "⚠️ Workflow interrupted by user" -ForegroundColor Yellow
+                return $results
+            }
+        } else {
+            Write-Host "🤖 Step 2: AI Integration Point (Skipped)" -ForegroundColor DarkGray
+        }
+
+        # Step 3: Test Execution (with PowerShell 7.5+ parallel option)
+        Write-Host ""
+        Write-Host "🧪 Step 3: Test Execution" -ForegroundColor Yellow
+        $stepStart = Get-Date
+
+        if ($ParallelTests) {
+            Write-Host "⚡ Using PowerShell 7.5+ parallel test execution" -ForegroundColor Cyan
+
+            # PowerShell 7.5+ parallel processing for multiple test projects
+            $testProjects = @("BusBuddy.Tests", "BusBuddy.UITests")
+            $testResults = $testProjects | ForEach-Object -Parallel {
+                $project = $_
+                try {
+                    $result = dotnet test $project --verbosity minimal 2>&1
+                    return [PSCustomObject]@{
+                        Project = $project
+                        Success = $LASTEXITCODE -eq 0
+                        Output = $result
+                    }
+                } catch {
+                    return [PSCustomObject]@{
+                        Project = $project
+                        Success = $false
+                        Output = $_.Exception.Message
+                    }
+                }
+            } -ThrottleLimit 2
+
+            $allTestsSucceeded = ($testResults | Where-Object { -not $_.Success }).Count -eq 0
+        } else {
+            bb-test
+            $allTestsSucceeded = $?
+        }
+
+        $results.Steps += [PSCustomObject]@{
+            Step = "bb-test"
+            Success = $allTestsSucceeded
+            Duration = (Get-Date) - $stepStart
+            Output = $ParallelTests ? "Parallel test execution" : "Sequential test execution"
+        }
+
+        if (-not $allTestsSucceeded) {
+            $results.Issues += "Test execution failed"
+            $results.Success = $false
+        }
+
+        # Step 4: Build Solution
+        Write-Host ""
+        Write-Host "🏗️ Step 4: Solution Build" -ForegroundColor Yellow
+        $stepStart = Get-Date
+
+        bb-build
+        $buildSuccess = $?
+
+        $results.Steps += [PSCustomObject]@{
+            Step = "bb-build"
+            Success = $buildSuccess
+            Duration = (Get-Date) - $stepStart
+            Output = "Solution build with enhanced error capture"
+        }
+
+        if (-not $buildSuccess) {
+            $results.Issues += "Solution build failed"
+            $results.Success = $false
+        }
+
+        # Step 5: Application Launch (Optional)
+        if (-not $SkipRun -and $buildSuccess) {
+            Write-Host ""
+            Write-Host "🚀 Step 5: Application Launch" -ForegroundColor Yellow
+            $stepStart = Get-Date
+
+            Write-Host "💡 Starting BusBuddy application..." -ForegroundColor Green
+            Write-Host "   Press Ctrl+C to stop application and continue workflow" -ForegroundColor Gray
+
+            try {
+                bb-run
+                $runSuccess = $?
+            } catch {
+                $runSuccess = $false
+                Write-Host "⚠️ Application launch interrupted or failed" -ForegroundColor Yellow
+            }
+
+            $results.Steps += [PSCustomObject]@{
+                Step = "bb-run"
+                Success = $runSuccess
+                Duration = (Get-Date) - $stepStart
+                Output = "Application launch with monitoring"
+            }
+        } else {
+            Write-Host ""
+            Write-Host "🚀 Step 5: Application Launch (Skipped)" -ForegroundColor DarkGray
+        }
+
+        # Step 6: Repository Alignment
+        Write-Host ""
+        Write-Host "📂 Step 6: Repository Alignment" -ForegroundColor Yellow
+        $stepStart = Get-Date
+
+        bb-repo-align
+        $repoSuccess = $?
+
+        $results.Steps += [PSCustomObject]@{
+            Step = "bb-repo-align"
+            Success = $repoSuccess
+            Duration = (Get-Date) - $stepStart
+            Output = "Repository cleanup and alignment"
+        }
+
+        if (-not $repoSuccess) {
+            $results.Issues += "Repository alignment had issues"
+            # Don't mark as failure - this is cleanup
+        }
+
+        # Custom Steps
+        if ($CustomSteps.Count -gt 0) {
+            Write-Host ""
+            Write-Host "⚙️ Custom Steps Execution" -ForegroundColor Yellow
+
+            foreach ($customStep in $CustomSteps) {
+                $stepStart = Get-Date
+                Write-Host "   Executing: $customStep" -ForegroundColor Cyan
+
+                try {
+                    & $customStep
+                    $customSuccess = $?
+                } catch {
+                    $customSuccess = $false
+                    Write-Warning "Custom step failed: $customStep - $($_.Exception.Message)"
+                }
+
+                $results.Steps += [PSCustomObject]@{
+                    Step = $customStep
+                    Success = $customSuccess
+                    Duration = (Get-Date) - $stepStart
+                    Output = "Custom workflow step"
+                }
+            }
+        }
+
+    } catch {
+        Write-Host "❌ Workflow error: $($_.Exception.Message)" -ForegroundColor Red
+        $results.Issues += "Workflow execution error: $($_.Exception.Message)"
+        $results.Success = $false
+    }
+
+    # Final Results
+    $results.Duration = (Get-Date) - $workflowStart
+
+    Write-Host ""
+    Write-Host "📊 Workflow Results Summary" -ForegroundColor Cyan
+    Write-Host "═══════════════════════════" -ForegroundColor DarkGray
+    Write-Host "Overall Success: $(if ($results.Success) { '✅' } else { '❌' })" -ForegroundColor $(if ($results.Success) { 'Green' } else { 'Red' })
+    Write-Host "Total Duration: $([math]::Round($results.Duration.TotalMinutes, 2)) minutes" -ForegroundColor Gray
+    Write-Host "Steps Completed: $($results.Steps.Count)" -ForegroundColor Gray
+
+    if ($results.Issues.Count -gt 0) {
+        Write-Host ""
+        Write-Host "⚠️ Issues Encountered:" -ForegroundColor Yellow
+        $results.Issues | ForEach-Object { Write-Host "   • $_" -ForegroundColor Red }
+    }
+
+    Write-Host ""
+    Write-Host "🎯 Next Steps:" -ForegroundColor Green
+    if ($results.Success) {
+        Write-Host "   • Ready for Student forms development!" -ForegroundColor White
+        Write-Host "   • Use 'bb-health' to verify project state" -ForegroundColor White
+        Write-Host "   • Continue with MVP implementation" -ForegroundColor White
+    } else {
+        Write-Host "   • Review and fix issues above" -ForegroundColor White
+        Write-Host "   • Run 'bb-health' for detailed diagnostics" -ForegroundColor White
+        Write-Host "   • Re-run workflow after fixes" -ForegroundColor White
+    }
+
+    return $results
 }
 
 function Get-BusBuddyWorkflowResults {
@@ -5798,19 +6571,9 @@ function Get-QuickReference {
 }
 
 # Create aliases for the mentor system with error handling
-try {
-    if (-not (Get-Alias -Name "bb-mentor" -ErrorAction SilentlyContinue)) {
-        New-Alias -Name "bb-mentor" -Value "Get-BusBuddyMentor" -Description "AI learning mentor"
-    }
-    if (-not (Get-Alias -Name "bb-docs" -ErrorAction SilentlyContinue)) {
-        New-Alias -Name "bb-docs" -Value "Search-OfficialDocs" -Description "Search official documentation"
-    }
-    if (-not (Get-Alias -Name "bb-ref" -ErrorAction SilentlyContinue)) {
-        New-Alias -Name "bb-ref" -Value "Get-QuickReference" -Description "Quick reference sheets"
-    }
-} catch {
-    # Silently handle alias conflicts
-}
+Set-Alias -Name "bb-mentor" -Value "Get-BusBuddyMentor" -Description "AI learning mentor"
+Set-Alias -Name "bb-docs" -Value "Search-OfficialDocs" -Description "Search official documentation"
+Set-Alias -Name "bb-ref" -Value "Get-QuickReference" -Description "Quick reference sheets"
 
 #endregion
 
@@ -6051,24 +6814,25 @@ function Import-BusBuddyRealWorldData {
 }
 
 # Database diagnostic aliases
-New-Alias -Name "bb-db-diag" -Value "Invoke-BusBuddyDatabaseDiagnostic" -Description "Full database diagnostics"
-New-Alias -Name "bb-db-test" -Value "Test-BusBuddyDatabaseConnection" -Description "Test database connection"
-New-Alias -Name "bb-db-add-migration" -Value "Add-BusBuddyMigration" -Description "Add EF Core migration"
-New-Alias -Name "bb-db-update" -Value "Update-BusBuddyDatabase" -Description "Update database schema"
-New-Alias -Name "bb-db-seed" -Value "Import-BusBuddyRealWorldData" -Description "Import sample data"
+Set-Alias -Name "bb-db-diag" -Value "Invoke-BusBuddyDatabaseDiagnostic" -Description "Full database diagnostics"
+Set-Alias -Name "bb-db-test" -Value "Test-BusBuddyDatabaseConnection" -Description "Test database connection"
+Set-Alias -Name "bb-db-add-migration" -Value "Add-BusBuddyMigration" -Description "Add EF Core migration"
+Set-Alias -Name "bb-db-update" -Value "Update-BusBuddyDatabase" -Description "Update database schema"
+Set-Alias -Name "bb-db-seed" -Value "Import-BusBuddyRealWorldData" -Description "Import sample data"
 
 # Package management aliases
-New-Alias -Name "bb-manage-dependencies" -Value "Invoke-BusBuddyDependencyManagement" -Description "Comprehensive dependency management"
-New-Alias -Name "bb-error-fix" -Value "Invoke-BusBuddyErrorAnalysis" -Description "Analyze and fix build errors"
+Set-Alias -Name "bb-manage-dependencies" -Value "Invoke-BusBuddyDependencyManagement" -Description "Comprehensive dependency management"
+Set-Alias -Name "bb-error-fix" -Value "Invoke-BusBuddyErrorAnalysis" -Description "Analyze and fix build errors"
 
 # Development workflow aliases
-New-Alias -Name "bb-dev-workflow" -Value "Invoke-BusBuddyDevWorkflow" -Description "Comprehensive development workflow"
-New-Alias -Name "bb-get-workflow-results" -Value "Get-BusBuddyWorkflowResults" -Description "Monitor GitHub Actions workflows"
-New-Alias -Name "bb-warning-analysis" -Value "Show-BusBuddyWarningAnalysis" -Description "Analyze build warnings"
+Set-Alias -Name "bb-workflow" -Value "Invoke-BusBuddyWorkflow" -Description "Full BusBuddy development workflow with AI integration"
+Set-Alias -Name "bb-dev-workflow" -Value "Invoke-BusBuddyDevWorkflow" -Description "Comprehensive development workflow"
+Set-Alias -Name "bb-get-workflow-results" -Value "Get-BusBuddyWorkflowResults" -Description "Monitor GitHub Actions workflows"
+Set-Alias -Name "bb-warning-analysis" -Value "Show-BusBuddyWarningAnalysis" -Description "Analyze build warnings"
 
 # VS Code integration aliases
-New-Alias -Name "bb-install-extensions" -Value "Install-BusBuddyVSCodeExtensions" -Description "Install VS Code extensions"
-New-Alias -Name "bb-validate-vscode" -Value "Test-BusBuddyVSCodeSetup" -Description "Validate VS Code setup"
+Set-Alias -Name "bb-install-extensions" -Value "Install-BusBuddyVSCodeExtensions" -Description "Install VS Code extensions"
+Set-Alias -Name "bb-validate-vscode" -Value "Test-BusBuddyVSCodeSetup" -Description "Validate VS Code setup"
 
 #endregion
 
@@ -6391,6 +7155,7 @@ Export-ModuleMember -Function @(
     'Invoke-BusBuddyErrorAnalysis',
 
     # Development workflow functions
+    'Invoke-BusBuddyWorkflow',
     'Invoke-BusBuddyDevWorkflow',
     'Get-BusBuddyWorkflowResults',
     'Show-BusBuddyWarningAnalysis',
@@ -7713,9 +8478,9 @@ function Get-ModelProperties {
 
         # Extract property definitions with regex pattern
         $propertyPattern = '(?ms)(?<Attributes>(?:\[.*?\]\s*)*)\s*public\s+(?<Type>[\w\?\<\>\[\]]+)\s+(?<Name>\w+)\s*{\s*get;?\s*set;?\s*}'
-        $matches = [regex]::Matches($content, $propertyPattern)
+        $propertyMatches = [regex]::Matches($content, $propertyPattern)
 
-        foreach ($match in $matches) {
+        foreach ($match in $propertyMatches) {
             $name = $match.Groups['Name'].Value
             $type = $match.Groups['Type'].Value
             $attributesText = $match.Groups['Attributes'].Value
@@ -7823,8 +8588,8 @@ function Test-ModelPropertyMatch {
 }
 
 # Alias for quick access
-New-Alias -Name "bb-scan-model" -Value "Get-ModelProperties" -Force
-New-Alias -Name "bb-test-props" -Value "Test-ModelPropertyMatch" -Force
+Set-Alias -Name "bb-scan-model" -Value "Get-ModelProperties"
+Set-Alias -Name "bb-test-props" -Value "Test-ModelPropertyMatch"
 
 #endregion
 

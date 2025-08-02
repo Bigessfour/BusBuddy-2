@@ -253,5 +253,175 @@ namespace BusBuddy.Core.Services
             // Return formatted address
             return FormatAddress(address, city, state, zip);
         }
+
+        // MVP Address Validation Methods - Simple regex-based validation for forms
+        /// <summary>
+        /// MVP: Simple address validation for student intake forms
+        /// Uses basic regex patterns for US address validation
+        /// </summary>
+        /// <param name="fullAddress">Complete address string to validate</param>
+        /// <returns>Validation result with success status and error message</returns>
+        public Task<AddressValidationResult> ValidateAddressSimpleAsync(string fullAddress)
+        {
+            if (string.IsNullOrWhiteSpace(fullAddress))
+            {
+                return Task.FromResult(AddressValidationResult.Failure("Address is required"));
+            }
+
+            try
+            {
+                // Basic US address pattern: number + street name
+                var addressPattern = @"^\d+\s+[\w\s\.,#-]+$";
+
+                if (!Regex.IsMatch(fullAddress.Trim(), addressPattern))
+                {
+                    return Task.FromResult(AddressValidationResult.Failure("Address must start with a street number followed by street name"));
+                }
+
+                return Task.FromResult(AddressValidationResult.Success());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error validating address: {Address}", fullAddress);
+                return Task.FromResult(AddressValidationResult.Failure("Error validating address"));
+            }
+        }
+
+        /// <summary>
+        /// MVP: Validates address components separately for form validation
+        /// </summary>
+        public Task<AddressValidationResult> ValidateAddressComponentsSimpleAsync(string street, string city, string state, string zipCode)
+        {
+            var result = new AddressValidationResult { IsValid = true };
+            var validationMessages = new List<string>();
+
+            // Validate street address
+            if (string.IsNullOrWhiteSpace(street))
+            {
+                validationMessages.Add("Street address is required");
+            }
+            else if (!Regex.IsMatch(street.Trim(), @"^\d+\s+[\w\s\.,#-]+$"))
+            {
+                validationMessages.Add("Street address must start with a number followed by street name");
+            }
+
+            // Validate city
+            if (string.IsNullOrWhiteSpace(city))
+            {
+                validationMessages.Add("City is required");
+            }
+            else if (!Regex.IsMatch(city.Trim(), @"^[A-Za-z\s\.-]+$"))
+            {
+                validationMessages.Add("City name can only contain letters, spaces, periods, and hyphens");
+            }
+
+            // Validate state
+            if (string.IsNullOrWhiteSpace(state))
+            {
+                validationMessages.Add("State is required");
+            }
+            else if (!IsValidState(state))
+            {
+                validationMessages.Add("State must be a valid 2-letter US state abbreviation");
+            }
+
+            // Validate ZIP code
+            if (string.IsNullOrWhiteSpace(zipCode))
+            {
+                validationMessages.Add("ZIP code is required");
+            }
+            else if (!IsValidZipCode(zipCode))
+            {
+                validationMessages.Add("ZIP code must be 5 digits or 5+4 format (e.g., 12345 or 12345-6789)");
+            }
+
+            if (validationMessages.Any())
+            {
+                result.IsValid = false;
+                result.ErrorMessage = string.Join("; ", validationMessages);
+                result.ValidationMessages = validationMessages;
+            }
+
+            return Task.FromResult(result);
+        }
+
+        /// <summary>
+        /// MVP: Validates ZIP code format (5-digit or 9-digit)
+        /// </summary>
+        public bool IsValidZipCode(string zipCode)
+        {
+            if (string.IsNullOrWhiteSpace(zipCode))
+            {
+                return false;
+            }
+
+            // 5-digit or 5+4 format
+            return Regex.IsMatch(zipCode.Trim(), @"^\d{5}(-\d{4})?$");
+        }
+
+        /// <summary>
+        /// MVP: Validates US state abbreviation
+        /// </summary>
+        public bool IsValidState(string state)
+        {
+            if (string.IsNullOrWhiteSpace(state))
+            {
+                return false;
+            }
+
+            var validStates = new HashSet<string>
+            {
+                "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+                "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+                "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+                "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+                "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+                "DC"  // District of Columbia
+            };
+
+            return validStates.Contains(state.ToUpperInvariant());
+        }
+    }
+
+    /// <summary>
+    /// MVP: Simple result class for address validation
+    /// </summary>
+    public class AddressValidationResult
+    {
+        /// <summary>
+        /// Whether the address validation was successful
+        /// </summary>
+        public bool IsValid { get; set; }
+
+        /// <summary>
+        /// Error message if validation failed
+        /// </summary>
+        public string? ErrorMessage { get; set; }
+
+        /// <summary>
+        /// Detailed validation messages for form display
+        /// </summary>
+        public List<string> ValidationMessages { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Creates a successful validation result
+        /// </summary>
+        public static AddressValidationResult Success()
+        {
+            return new AddressValidationResult { IsValid = true };
+        }
+
+        /// <summary>
+        /// Creates a failed validation result with error message
+        /// </summary>
+        public static AddressValidationResult Failure(string errorMessage)
+        {
+            return new AddressValidationResult
+            {
+                IsValid = false,
+                ErrorMessage = errorMessage,
+                ValidationMessages = new List<string> { errorMessage }
+            };
+        }
     }
 }

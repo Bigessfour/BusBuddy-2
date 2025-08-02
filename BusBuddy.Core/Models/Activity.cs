@@ -476,4 +476,9 @@ public class Activity : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
+    public string ActivityName { get; set; } = string.Empty;
+    public TimeSpan DepartureTime { get; set; }
+    public TimeSpan EstimatedArrival { get; set; }
+    public int AssignedDriverId { get; set; }
 }

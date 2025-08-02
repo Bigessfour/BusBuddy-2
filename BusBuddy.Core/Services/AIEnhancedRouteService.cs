@@ -191,7 +191,7 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class RouteAnalysisResult
     {
-        public Route Route { get; set; } = new();
+        public Route Route { get; set; } = new() { School = string.Empty };
         public TerrainAnalysisResult? TerrainAnalysis { get; set; }
         public WeatherData? WeatherData { get; set; }
         public AIRouteRecommendations? AIRecommendations { get; set; }
@@ -213,7 +213,7 @@ namespace BusBuddy.Core.Services
     /// </summary>
     public class RouteWithAISummary
     {
-        public Route Route { get; set; } = new();
+        public Route Route { get; set; } = new() { School = string.Empty };
         public double AIOptimizationScore { get; set; }
         public double SafetyRating { get; set; }
         public double EfficiencyRating { get; set; }

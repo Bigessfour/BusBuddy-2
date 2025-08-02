@@ -24,11 +24,13 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <Style x:Key="ValidationErrorStyle" TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="LightGray"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Style.Triggers>
-                <Trigger Property="Validation.HasError" Value="True">
-                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                <DataTrigger Binding="{Binding HasValidationErrors}" Value="True">
                     <Setter Property="BorderBrush" Value="Red"/>
-                </Trigger>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
@@ -76,64 +78,107 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="Bus Number *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
-                        <TextBox Grid.Row="1" Text="{Binding Bus.BusNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                        <TextBox Grid.Row="1" Text="{Binding Bus.BusNumber, UpdateSourceTrigger=PropertyChanged}"
                                 Style="{StaticResource ValidationErrorStyle}"
                                 MaxLength="20"/>
                         <TextBlock Grid.Row="2" Text="Required. The identifying number of the bus." FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Year -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <syncfusion:DoubleTextBox
-                            Value="{Binding Bus.Year, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                            MinValue="1900"
-                            MaxValue="2030"
-                            NumberDecimalDigits="0"/>
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Year *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.Year, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource ValidationErrorStyle}"/>
+                        <TextBlock Grid.Row="2" Text="Year of manufacture (1900-2030)" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Make -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <TextBox Text="{Binding Bus.Make, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Make *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.Make, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="50"/>
+                        <TextBlock Grid.Row="2" Text="Vehicle manufacturer" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Model -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <TextBox Text="{Binding Bus.Model, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Model *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.Model, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="50"/>
+                        <TextBlock Grid.Row="2" Text="Vehicle model" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Seating Capacity -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <syncfusion:DoubleTextBox Value="{Binding Bus.SeatingCapacity, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                               MinValue="1"
-                                               MaxValue="90"
-                                               NumberDecimalDigits="0"
-                                               Height="30"
-                                               VerticalContentAlignment="Center"/>
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Seating Capacity *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.SeatingCapacity, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource ValidationErrorStyle}"/>
+                        <TextBlock Grid.Row="2" Text="Number of passenger seats (1-90)" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- VIN Number -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <TextBox Text="{Binding Bus.VINNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="VIN Number *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.VINNumber, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="17"/>
+                        <TextBlock Grid.Row="2" Text="17-character vehicle identification number" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- License Number -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <TextBox Text="{Binding Bus.LicenseNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="License Number *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.LicenseNumber, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource ValidationErrorStyle}"
                                  MaxLength="20"/>
+                        <TextBlock Grid.Row="2" Text="License plate number" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
+
                     <!-- Notes -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <TextBox Text="{Binding Bus.Notes, UpdateSourceTrigger=PropertyChanged}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Notes" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.Notes, UpdateSourceTrigger=PropertyChanged}"
                                  Height="100"
                                  TextWrapping="Wrap"
                                  AcceptsReturn="True"/>
+                        <TextBlock Grid.Row="2" Text="Additional notes or comments" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
                 </StackPanel>
 
@@ -142,60 +187,100 @@
                     <TextBlock Text="Additional Information" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
                     <!-- Status -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <ComboBox SelectedItem="{Binding Bus.Status, UpdateSourceTrigger=PropertyChanged}">
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Status *" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <ComboBox Grid.Row="1" SelectedItem="{Binding Bus.Status, UpdateSourceTrigger=PropertyChanged}">
                             <ComboBoxItem Content="Active"/>
                             <ComboBoxItem Content="Maintenance"/>
                             <ComboBoxItem Content="Out of Service"/>
                             <ComboBoxItem Content="Reserved"/>
                             <ComboBoxItem Content="Retired"/>
                         </ComboBox>
+                        <TextBlock Grid.Row="2" Text="Current operational status" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Date Last Inspection -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <DatePicker SelectedDate="{Binding Bus.DateLastInspection, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Last Inspection" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <DatePicker Grid.Row="1" SelectedDate="{Binding Bus.DateLastInspection, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Row="2" Text="Date of last safety inspection" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Current Odometer -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <syncfusion:DoubleTextBox Value="{Binding Bus.CurrentOdometer, UpdateSourceTrigger=PropertyChanged}"
-                                               MinValue="0"
-                                               MaxValue="9999999"
-                                               NumberDecimalDigits="0"
-                                               Height="30"
-                                               VerticalContentAlignment="Center"/>
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Current Odometer" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.CurrentOdometer, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Row="2" Text="Current mileage reading" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Purchase Date -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <DatePicker SelectedDate="{Binding Bus.PurchaseDate, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Purchase Date" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <DatePicker Grid.Row="1" SelectedDate="{Binding Bus.PurchaseDate, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Grid.Row="2" Text="Date vehicle was purchased" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Purchase Price -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <syncfusion:CurrencyTextBox Value="{Binding Bus.PurchasePrice, UpdateSourceTrigger=PropertyChanged}"
-                                               MinValue="0"
-                                               CurrencySymbol="$"
-                                               Height="30"
-                                               VerticalContentAlignment="Center"/>
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Purchase Price" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.PurchasePrice, UpdateSourceTrigger=PropertyChanged, StringFormat=C}"/>
+                        <TextBlock Grid.Row="2" Text="Original purchase price" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Department -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <TextBox Text="{Binding Bus.Department, UpdateSourceTrigger=PropertyChanged}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Department" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding Bus.Department, UpdateSourceTrigger=PropertyChanged}"
                                  MaxLength="50"/>
+                        <TextBlock Grid.Row="2" Text="Assigned department" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
 
                     <!-- Fleet Type -->
-                    <Grid Margin="0,5,0,10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <ComboBox Text="{Binding Bus.FleetType, UpdateSourceTrigger=PropertyChanged}"
+                    <Grid Margin="0,5,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Fleet Type" FontSize="12" Opacity="0.8" Margin="0,0,0,4"/>
+                        <ComboBox Grid.Row="1" Text="{Binding Bus.FleetType, UpdateSourceTrigger=PropertyChanged}"
                                   IsEditable="True">
                             <ComboBoxItem Content="Regular"/>
                             <ComboBoxItem Content="Special Needs"/>
                             <ComboBoxItem Content="Activity"/>
                             <ComboBoxItem Content="Spare"/>
                         </ComboBox>
+                        <TextBlock Grid.Row="2" Text="Type of fleet usage" FontSize="10" Opacity="0.6" Margin="0,2,0,0"/>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -204,18 +289,18 @@
         <!-- Footer with Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
             <TextBlock Text="* Required fields" Foreground="Gray" VerticalAlignment="Center" Margin="0,0,20,0"/>
-            <syncfusion:ButtonAdv Label="Cancel"
-                              Width="100"
-                              Height="30"
-                              Margin="0,0,10,0"
-                              Click="CancelButton_Click"
-                              Style="{StaticResource BusBuddySecondaryButtonAdvStyle}"/>
-            <syncfusion:ButtonAdv Label="Save"
-                              Width="100"
-                              Height="30"
-                              Click="SaveButton_Click"
-                              IsDefault="True"
-                              Style="{StaticResource BusBuddyPrimaryButtonAdvStyle}"/>
+            <Button Content="Cancel"
+                    Width="100"
+                    Height="30"
+                    Margin="0,0,10,0"
+                    Click="CancelButton_Click"/>
+            <Button Content="Save"
+                    Width="100"
+                    Height="30"
+                    Click="SaveButton_Click"
+                    IsDefault="True"
+                    Background="#0078D4"
+                    Foreground="White"/>
         </StackPanel>
 
         <!-- Validation Message -->
