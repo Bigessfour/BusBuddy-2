@@ -33,7 +33,7 @@
             Severity = 'Error'
         }
 
-        # Code quality rules
+        # Code quality rules - ENHANCED for error prevention
         PSAvoidUsingCmdletAliases                      = @{
             Enable   = $true
             Severity = 'Warning'
@@ -41,7 +41,13 @@
 
         PSUseDeclaredVarsMoreThanAssignments           = @{
             Enable   = $true
-            Severity = 'Warning'
+            Severity = 'Error'  # Escalated to prevent unused variables
+        }
+
+        # Prevent automatic variable assignments - ESCALATED TO ERROR
+        PSAvoidAssignmentToAutomaticVariable           = @{
+            Enable   = $true
+            Severity = 'Error'  # Escalate to error for $matches, etc.
         }
 
         PSAvoidGlobalVars                              = @{

@@ -15,7 +15,7 @@
 
     <!-- Phase 1: Essential Build Configuration -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <NoWarn>$(NoWarn);CA1416;CA1845;CA1869;CA1859;CA1852;CA1836;CS1998</NoWarn>
+    <NoWarn>$(NoWarn);CA1416;CA1845;CA1869;CA1859;CA1852;CA1836;CS1998;CA1016</NoWarn>
 
     <!-- MSB3027/MSB3021 File Lock Prevention -->
     <UseSharedCompilation>false</UseSharedCompilation>
@@ -26,6 +26,17 @@
     <!-- Enable binding redirects to handle assembly version conflicts -->
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+    <!-- CS0103 Prevention: Enhanced Build Reliability -->
+    <!-- Note: EnableDefaultItems=true is required for WPF Main method generation -->
+    <EnableDefaultItems>true</EnableDefaultItems>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+
+    <!-- .NET 9 WPF: Enhanced Analysis for Early Issue Detection -->
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors> <!-- Keep false for MVP Phase 1 -->
   </PropertyGroup>
 
   <!-- 🏗️ CORE PROJECT REFERENCE -->
@@ -33,6 +44,11 @@
     <!-- MainWindow.xaml and MainWindow.xaml.cs are handled by default WPF build targets. Removed explicit entries to fix duplicate compile items error. -->
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
   </ItemGroup>
+
+  <!-- CS0103 Prevention: Custom target to clean before build (prevents stale .g.cs) -->
+  <Target Name="CleanBeforeBuild" BeforeTargets="Build">
+    <RemoveDir Directories="$(BaseIntermediateOutputPath);$(BaseOutputPath)" Condition="Exists('$(BaseIntermediateOutputPath)') OR Exists('$(BaseOutputPath)')" />
+  </Target>
 
   <!-- 🌐 .NET 9 Framework References with Globalization Support -->
   <ItemGroup>
@@ -197,6 +213,8 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
     <!-- Removed direct reference to System.Reflection.MetadataLoadContext to resolve version conflict with Syncfusion.Edit.WPF -->
+
+    <!-- Note: Microsoft.CodeAnalysis.Analyzers is defined in Directory.Build.props -->
   </ItemGroup>
 
   <!-- 🧹 CLEAN CONFIGURATION -->

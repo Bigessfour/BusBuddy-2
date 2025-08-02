@@ -25,9 +25,22 @@
             Enable = $true
         }
 
-        # Enforce parameter validation
+        # Enforce parameter validation - ESCALATED TO ERROR for unused variables
         PSUseDeclaredVarsMoreThanAssignments           = @{
-            Enable = $true
+            Enable   = $true
+            Severity = 'Error'  # Escalate to block on analysis
+        }
+
+        # Prevent automatic variable assignments - ESCALATED TO ERROR
+        PSAvoidAssignmentToAutomaticVariable           = @{
+            Enable   = $true
+            Severity = 'Error'  # Escalate to error for $matches, etc.
+        }
+
+        # Additional: Enforce no global vars to avoid side effects
+        PSAvoidGlobalVars                              = @{
+            Enable   = $true
+            Severity = 'Warning'
         }
 
         # Security rules

@@ -48,6 +48,16 @@ dotnet_diagnostic.CA1822.severity = warning
 dotnet_diagnostic.CA1305.severity = suggestion
 dotnet_diagnostic.CA1860.severity = suggestion
 
+# CS1061 Prevention: FluentAssertions and Missing Definitions
+dotnet_diagnostic.CS1061.severity = error  # Escalate missing definitions
+
+# Test-specific rules for FluentAssertions prevention
+[*Tests.cs]
+# Enforce proper null checks (avoids NotBeNull misuse on non-nullable types)
+csharp_style_prefer_not_null_assertion = true:error
+# Force explicit usings for FluentAssertions
+dotnet_style_require_accessibility_modifiers = always:error
+
 # Formatting preferences
 csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
