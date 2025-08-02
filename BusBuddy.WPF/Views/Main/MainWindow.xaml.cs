@@ -6,6 +6,7 @@ using BusBuddy.WPF.Views.Dashboard;
 using BusBuddy.WPF.Views.Student;
 using BusBuddy.WPF.Views.Analytics;
 using BusBuddy.WPF.Views.Route;
+using BusBuddy.WPF.Views.Settings;
 
 namespace BusBuddy.WPF.Views.Main
 {

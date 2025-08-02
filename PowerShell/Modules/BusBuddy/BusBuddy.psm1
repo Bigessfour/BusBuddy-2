@@ -4209,6 +4209,7 @@ Set-Alias -Name 'bb-commands' -Value 'Get-BusBuddyCommands' -Description 'List a
 Set-Alias -Name 'bb-info' -Value 'Get-BusBuddyInfo' -Description 'Show module information and status'
 Set-Alias -Name 'bb-env-check' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation'
 Set-Alias -Name 'bb-validate' -Value 'Test-BusBuddyEnvironment' -Description 'Environment validation (alias)'
+Set-Alias -Name 'bb-validate-xml' -Value 'Test-BusBuddyXml' -Description 'Validate XML/XAML files'
 
 # Utility aliases
 Set-Alias -Name 'bb-happiness' -Value 'Get-BusBuddyHappiness' -Description 'Motivational quotes'

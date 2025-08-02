@@ -39,7 +39,7 @@ namespace BusBuddy.Core.Services.Interfaces
         Task<bool> IsVehicleAvailableForActivityAsync(int vehicleId, DateTime activityDate, TimeSpan startTime, TimeSpan endTime);
 
         // Recurring Activities
-        Task<IEnumerable<Activity>> CreateRecurringActivitiesAsync(Activity baseActivity, DateTime startDate, DateTime endDate, RecurrenceType recurrenceType, int recurrenceInterval, List<DayOfWeek>? daysOfWeek = null);
+        Task<List<Activity>> CreateRecurringActivitiesAsync(Activity baseActivity, DateTime startDate, DateTime endDate, RecurrenceType recurrenceType, int recurrenceInterval, List<DayOfWeek>? daysOfWeek = null);
         Task<IEnumerable<Activity>> GetRecurringSeriesAsync(int activityId);
         Task<bool> UpdateRecurringSeriesAsync(Activity updatedActivity, bool updateAll);
         Task<bool> DeleteRecurringSeriesAsync(int activityId, bool deleteAll);
@@ -66,16 +66,5 @@ namespace BusBuddy.Core.Services.Interfaces
         Task<Dictionary<string, object>> GetActivityDiagnosticsAsync(int activityId);
         Task<Dictionary<string, object>> GetScheduleOperationMetricsAsync();
 #endif
-    }
-}
-    /// <summary>
-    /// Defines recurrence types for recurring activities
-    /// </summary>
-    public enum RecurrenceType
-    {
-        Daily,
-        Weekly,
-        Monthly,
-        Yearly
     }
 }

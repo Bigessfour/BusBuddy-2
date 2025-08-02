@@ -4,7 +4,6 @@ using BusBuddy.Core.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Text;
-using RecurrenceType = BusBuddy.Core.Models.RecurrenceType;
 
 namespace BusBuddy.Core.Services;
 
@@ -547,11 +546,11 @@ public class ActivityService : IActivityService
     }
 
     public async Task<List<Activity>> CreateRecurringActivitiesAsync(
-        Activity templateActivity,
+        Activity baseActivity,
         DateTime startDate,
         DateTime endDate,
-        BusBuddy.Core.Services.Interfaces.RecurrenceType recurrenceType,
-        int intervalDays = 1,
+        RecurrenceType recurrenceType,
+        int recurrenceInterval,
         List<DayOfWeek>? daysOfWeek = null)
     {
         var activities = new List<Activity>();
@@ -563,10 +562,10 @@ public class ActivityService : IActivityService
             {
                 bool shouldCreateActivity = recurrenceType switch
                 {
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Daily => true,
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Weekly => daysOfWeek?.Contains(currentDate.DayOfWeek) ?? true,
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Monthly => currentDate.Day == startDate.Day,
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Yearly => currentDate.DayOfYear == startDate.DayOfYear,
+                    RecurrenceType.Daily => true,
+                    RecurrenceType.Weekly => daysOfWeek?.Contains(currentDate.DayOfWeek) ?? true,
+                    RecurrenceType.Monthly => currentDate.Day == startDate.Day,
+                    RecurrenceType.Yearly => currentDate.DayOfYear == startDate.DayOfYear,
                     _ => false
                 };
 
@@ -574,15 +573,15 @@ public class ActivityService : IActivityService
                 {
                     var newActivity = new Activity
                     {
-                        ActivityName = templateActivity.ActivityName,
-                        Destination = templateActivity.Destination,
+                        ActivityName = baseActivity.ActivityName,
+                        Destination = baseActivity.Destination,
                         ActivityDate = currentDate,
-                        DepartureTime = templateActivity.DepartureTime,
-                        EstimatedArrival = templateActivity.EstimatedArrival,
-                        RequestedBy = templateActivity.RequestedBy,
-                        AssignedVehicleId = templateActivity.AssignedVehicleId,
-                        AssignedDriverId = templateActivity.AssignedDriverId,
-                        Notes = templateActivity.Notes,
+                        DepartureTime = baseActivity.DepartureTime,
+                        EstimatedArrival = baseActivity.EstimatedArrival,
+                        RequestedBy = baseActivity.RequestedBy,
+                        AssignedVehicleId = baseActivity.AssignedVehicleId,
+                        AssignedDriverId = baseActivity.AssignedDriverId,
+                        Notes = baseActivity.Notes,
                         CreatedDate = DateTime.UtcNow,
                         UpdatedDate = DateTime.UtcNow
                     };
@@ -593,10 +592,10 @@ public class ActivityService : IActivityService
 
                 currentDate = recurrenceType switch
                 {
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Daily => currentDate.AddDays(intervalDays),
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Weekly => currentDate.AddDays(7),
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Monthly => currentDate.AddMonths(1),
-                    BusBuddy.Core.Services.Interfaces.RecurrenceType.Yearly => currentDate.AddYears(1),
+                    RecurrenceType.Daily => currentDate.AddDays(recurrenceInterval),
+                    RecurrenceType.Weekly => currentDate.AddDays(7),
+                    RecurrenceType.Monthly => currentDate.AddMonths(1),
+                    RecurrenceType.Yearly => currentDate.AddYears(1),
                     _ => currentDate.AddDays(1)
                 };
             }

@@ -83,7 +83,7 @@
       "args": [
         "-NoExit",
         "-ExecutionPolicy", "Bypass",
-        "-File", "${workspaceFolder}\\PowerShell\\Profiles\\Microsoft.PowerShell_profile.ps1"
+        "-File", "${workspaceFolder}\\PowerShell\\init-terminal.ps1"
       ],
       "icon": "terminal-powershell",
       "color": "terminal.ansiGreen"
