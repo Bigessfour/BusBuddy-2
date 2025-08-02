@@ -7657,4 +7657,175 @@ function Invoke-BusBuddyAutoFix {
     return $fixedCount
 }
 
+#region TDD and Model Analysis Functions (Added August 02, 2025)
+
+function Get-ModelProperties {
+    <#
+    .SYNOPSIS
+        Analyze C# model files to extract properties for TDD test generation
+    .DESCRIPTION
+        Scans C# model files to extract property names, types, and data annotations.
+        Prevents Copilot test generation mismatches by providing accurate property info.
+    .PARAMETER FilePath
+        Path to the C# model file to analyze
+    .PARAMETER ProjectPath
+        Optional project path, defaults to current location
+    .EXAMPLE
+        Get-ModelProperties "BusBuddy.Core/Models/Driver.cs"
+
+        Name                Type      Attributes
+        ----                ----      ----------
+        DriverId           int       [Key]
+        DriverName         string    [Required], [StringLength(100)]
+        DriverPhone        string    [StringLength(20)]
+        DriversLicenceType string    [Required], [StringLength(20)]
+    .NOTES
+        Created to solve Copilot test generation property mismatches in MVP Phase 2
+        Use this before generating tests to ensure property names match exactly
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$FilePath,
+
+        [Parameter(Position = 1)]
+        [string]$ProjectPath = (Get-Location).Path
+    )
+
+    try {
+        # Resolve full path
+        $fullPath = if ([System.IO.Path]::IsPathRooted($FilePath)) {
+            $FilePath
+        } else {
+            Join-Path $ProjectPath $FilePath
+        }
+
+        if (-not (Test-Path $fullPath)) {
+            Write-Error "File not found: $fullPath"
+            return
+        }
+
+        Write-Host "🔍 Analyzing model: " -NoNewline
+        Write-Host "$FilePath" -ForegroundColor Cyan
+
+        $content = Get-Content $fullPath -Raw
+        $properties = @()
+
+        # Extract property definitions with regex pattern
+        $propertyPattern = '(?ms)(?<Attributes>(?:\[.*?\]\s*)*)\s*public\s+(?<Type>[\w\?\<\>\[\]]+)\s+(?<Name>\w+)\s*{\s*get;?\s*set;?\s*}'
+        $matches = [regex]::Matches($content, $propertyPattern)
+
+        foreach ($match in $matches) {
+            $name = $match.Groups['Name'].Value
+            $type = $match.Groups['Type'].Value
+            $attributesText = $match.Groups['Attributes'].Value
+
+            # Parse attributes
+            $attributes = @()
+            if ($attributesText) {
+                $attrMatches = [regex]::Matches($attributesText, '\[([^\]]+)\]')
+                foreach ($attrMatch in $attrMatches) {
+                    $attributes += $attrMatch.Groups[1].Value
+                }
+            }
+
+            $properties += [PSCustomObject]@{
+                Name = $name
+                Type = $type
+                Attributes = $attributes -join ', '
+            }
+        }
+
+        # Display results
+        if ($properties.Count -gt 0) {
+            Write-Host "✅ Found $($properties.Count) properties:" -ForegroundColor Green
+            $properties | Format-Table -Property Name, Type, Attributes -AutoSize
+
+            Write-Host ""
+            Write-Host "💡 Copy-paste for Copilot:" -ForegroundColor Yellow
+            Write-Host "Properties: $($properties.Name -join ', ')" -ForegroundColor White
+        } else {
+            Write-Warning "No properties found in $FilePath"
+        }
+
+        return $properties
+    }
+    catch {
+        Write-Error "Error analyzing model: $($_.Exception.Message)"
+    }
+}
+
+function Test-ModelPropertyMatch {
+    <#
+    .SYNOPSIS
+        Compare test file property usage against actual model properties
+    .DESCRIPTION
+        Validates that test files use correct property names from model classes
+        Helps catch property mismatches before running tests
+    .PARAMETER TestFilePath
+        Path to the test file to validate
+    .PARAMETER ModelFilePath
+        Path to the model file to compare against
+    .EXAMPLE
+        Test-ModelPropertyMatch "BusBuddy.Tests/Core/DataLayerTests.cs" "BusBuddy.Core/Models/Driver.cs"
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TestFilePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ModelFilePath
+    )
+
+    try {
+        $modelProps = Get-ModelProperties -FilePath $ModelFilePath
+        if (-not $modelProps) {
+            Write-Error "Could not extract properties from $ModelFilePath"
+            return $false
+        }
+
+        $testContent = Get-Content $TestFilePath -Raw
+        $mismatches = @()
+
+        # Check for common property name patterns in tests
+        foreach ($prop in $modelProps) {
+            if ($testContent -match "\b$($prop.Name)\b") {
+                Write-Host "✅ $($prop.Name) - Found in test" -ForegroundColor Green
+            }
+        }
+
+        # Look for potential mismatches (properties in test not in model)
+        $testPropertyPattern = '(?:new\s+\w+\s*{[^}]*?(\w+)\s*='
+        $testMatches = [regex]::Matches($testContent, $testPropertyPattern)
+
+        foreach ($match in $testMatches) {
+            $testProp = $match.Groups[1].Value
+            if ($testProp -notin $modelProps.Name) {
+                $mismatches += $testProp
+            }
+        }
+
+        if ($mismatches) {
+            Write-Host ""
+            Write-Host "❌ Potential property mismatches found:" -ForegroundColor Red
+            $mismatches | ForEach-Object { Write-Host "   - $_" -ForegroundColor Red }
+            return $false
+        } else {
+            Write-Host "✅ No property mismatches detected" -ForegroundColor Green
+            return $true
+        }
+    }
+    catch {
+        Write-Error "Error validating properties: $($_.Exception.Message)"
+        return $false
+    }
+}
+
+# Alias for quick access
+New-Alias -Name "bb-scan-model" -Value "Get-ModelProperties" -Force
+New-Alias -Name "bb-test-props" -Value "Test-ModelPropertyMatch" -Force
+
+#endregion
+
 #endregion

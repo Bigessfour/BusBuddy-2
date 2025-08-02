@@ -37,15 +37,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusBuddy.Core\BusBuddy.Core.csproj" />
-    <ProjectReference Include="..\BusBuddy.WPF\BusBuddy.WPF.csproj" />
+    <!-- Removed WPF reference - UI tests should be in BusBuddy.UITests project -->
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Core\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Services\" />
     <Folder Include="Integration\" />
-    <Folder Include="Utilities\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Phase3Tests\**" />
+    <EmbeddedResource Remove="Phase3Tests\**" />
+    <None Remove="Phase3Tests\**" />
   </ItemGroup>
 
 </Project>

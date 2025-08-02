@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using FluentAssertions;
-using BusBuddy.WPF.Services;
 using BusBuddy.Core.Data;
 using BusBuddy.Core.Models;
 using BusBuddy.Core.Services.Interfaces;

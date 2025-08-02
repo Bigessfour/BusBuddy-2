@@ -1,4 +1,11 @@
-# 📚 BusBuddy Documentation Hub
+# 📚### 🗂️ Documentation Structure
+
+### 🧪 **Testing & TDD** (CRITICAL)
+Essential development practices:
+- **[TDD Best Practices with Copilot](TDD-COPILOT-BEST-PRACTICES.md)** — LOCKED-IN TDD workflow preventing test failures
+- **[Testing Standards](../BusBuddy.Tests/TESTING-STANDARDS.md)** — NUnit framework and patterns
+
+### 📖 **Learning Resources** (`/Learning/`)sBuddy Documentation Hub
 
 Welcome to the BusBuddy comprehensive documentation center! This organized structure replaces the "README bloat" with focused, discoverable documentation.
 
